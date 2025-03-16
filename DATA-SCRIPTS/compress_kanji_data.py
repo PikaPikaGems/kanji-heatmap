@@ -122,15 +122,15 @@ def get_all_generic(all_, all_source_keys):
         return None
     return item_list
 
-# -------------------
-# FUNCTIONS TO GET KANJI INFORMATION MINUS FREQUENCY INFO
-# -------------------
-
 def running_count_diff_GLOBAL_COUNT_UNSTABLE(a, b, c, r, pref):
     if (a and a != r) or (b and b != r) or (c and c != r):
         global global_count 
         global_count += 1
         print (global_count, pref, a, b, c)
+
+# -------------------
+# FUNCTIONS TO GET KANJI INFORMATION MINUS FREQUENCY INFO
+# -------------------
 
 def get_component_parts(kanji_info):
     deps = kanji_info.get('componentDependencies', {}).get('topoKanji', [])
@@ -312,11 +312,10 @@ def get_wanikani_lvl(kanji_info):
 
 def get_semantic_phonetic(kanji_info):
     phonetic = kanji_info.get("semanticPhonetic", {}).get('moeUsagi', None)
-    # if phonetic:
-    #     print("->", phonetic, kanji_info.get("kanji"))
     return phonetic
 
 DEFAULT_ARRAY_VAL = []
+
 # -------------------
 # FUNCTIONS TO GET FREQUENCY RANK INFORMATION
 # -------------------
@@ -489,6 +488,22 @@ dump_json(f"{OUT_DIR}/word_details.json", word_details)
 
 # .......................
 # We just put the kanji as part of the value of the dictionary
+# for quick access
+# .......................
+def convert_cum_use_point(point):
+    [x, y] = point 
+    return [x, round(float(y), 2)]
+
+cum_use_data = get_data_from_file(f"{IN_DIR}/cum_use.json") 
+
+for key, value in cum_use_data.items():
+    cum_use_data[key] = [convert_cum_use_point(point) for point in value]
+
+dump_json(f"{OUT_DIR}/cum_use.json", cum_use_data)
+
+
+# .......................
+# We  put the kanji as part of the value of the dictionary
 # for quick access
 # .......................
 

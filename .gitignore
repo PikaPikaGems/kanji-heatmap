@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
-DATA-SCRIPTS/generated/*
+DATA-SCRIPTS/generated/*.json
 
 dist-ssr
 *.local
