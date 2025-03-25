@@ -27,7 +27,8 @@
 
   --scrollbar-bg: white;
   --thumb-bg: rgba(0, 0, 0, 0.3);
-  scrollbar-width: thin;
+  --scrollbar-width: 5px;
+  scrollbar-width: var(--scrollbar-width);
   scrollbar-color: var(--thumb-bg) var(--scrollbar-bg);
 
   margin: 0 auto;

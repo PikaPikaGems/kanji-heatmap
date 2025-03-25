@@ -6,7 +6,7 @@ export const ItemCountBadge = () => {
     return null;
   }
   return (
-    <div className="px-2 rounded-lg bg-opacity-75 bg-white dark:bg-black border absolute top-[39px] text-xs font-extrabold">
+    <div className="px-2 rounded-lg bg-opacity-75 bg-white dark:bg-black border text-xs font-extrabold">
       {result.data.length} items match your search filters
     </div>
   );

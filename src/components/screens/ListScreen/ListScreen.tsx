@@ -11,14 +11,15 @@ import { SuspendedKanjiList } from "./KanjiList/LazyKanjiList";
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <>
-      <div className="fixed w-full pt-12 bg-white dark:bg-black pb-2 z-40">
-        <section className="mx-auto max-w-screen-xl flex border-0 space-x-1 sticky px-1 w-full scroll-x-auto">
+      <section className="sticky top-10 w-full z-10 bg-white dark:bg-black">
+        <div className="relative py-2 mx-auto max-w-screen-xl flex border-0 space-x-1 px-1 w-full ">
           <ErrorBoundary fallback={<LinksOutItems />}>
             <ControlBar />
           </ErrorBoundary>
-        </section>
-      </div>
-      <div className="relative pt-24 -z-0 flex flex-wrap items-center justify-center overflow-x-hidden">
+        </div>
+      </section>
+
+      <div className="pt-4 flex flex-wrap items-center justify-center">
         {children}
       </div>
     </>

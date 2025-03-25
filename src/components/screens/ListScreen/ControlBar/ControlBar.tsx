@@ -21,6 +21,9 @@ export const ControlBarRaw = () => {
         }
       >
         <SettledSearchInput />
+        <div className="absolute top-12">
+          <ItemCountBadge />
+        </div>
       </ErrorBoundary>
       <ErrorBoundary
         details="SettledSortAndFilter in ControlBar"
@@ -31,7 +34,6 @@ export const ControlBarRaw = () => {
         }
       >
         <SettledSortAndFilter />
-        <ItemCountBadge />
       </ErrorBoundary>
       <ErrorBoundary
         details="ItemPresentationSettings in ControlBar"

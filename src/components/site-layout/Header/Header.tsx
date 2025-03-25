@@ -15,7 +15,7 @@ const HeaderLayout = ({
   main?: ReactNode;
 }) => {
   return (
-    <header className="flex w-full items-center justify-between border-dashed border-b-4 px-1 fixed top-0 right-0 left-0 z-50 bg-white dark:bg-black backdrop-blur-sm">
+    <header className="sticky flex w-full items-center justify-between border-b border-dotted px-1 top-0 right-0 left bottom-0-0 z-50 bg-white dark:bg-black backdrop-blur-sm">
       <section className="flex items-center space-x-1">
         {title}
         {main && <div className="flex space-x-1">{main}</div>}
