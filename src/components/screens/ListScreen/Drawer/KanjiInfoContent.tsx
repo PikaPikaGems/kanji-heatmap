@@ -6,8 +6,6 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 
 import { ErrorBoundary, KanjiNotFound } from "@/components/error";
-
-import { BasicLoading } from "@/components/common/BasicLoading";
 import { KanjiCard } from "@/components/sections/KanjiInfoCard/KanjiCard";
 import { KanjiDetails } from "@/components/sections/KanjiDetails/Details";
 import { KanjiActionsBtns } from "@/components/dependent/site-wide/KanjiActionBtns";
@@ -46,7 +44,7 @@ export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
   const getFn = useGetKanjiInfoFn();
 
   if (!ready) {
-    return <BasicLoading />;
+    return null;
   }
 
   const info = getFn?.(kanji);

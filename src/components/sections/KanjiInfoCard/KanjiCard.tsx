@@ -8,8 +8,6 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 
 import { DefaultErrorFallback } from "@/components/error";
-
-import { BasicLoading } from "@/components/common/BasicLoading";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 
@@ -55,7 +53,7 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
   }
 
   if (!ready || data.status === "loading" || data.data == null) {
-    return <BasicLoading />;
+    return null;
   }
 
   const info = data.data as HoverItemReturnData;
