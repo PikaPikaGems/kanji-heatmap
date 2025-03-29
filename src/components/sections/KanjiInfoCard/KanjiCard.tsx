@@ -14,6 +14,7 @@ import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { SingleKanjiPart } from "@/components/dependent/site-wide/SingleKanjiPart";
+import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 
 const transformKanjiWordDetails = (
   kanji: string,
@@ -53,7 +54,7 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
   }
 
   if (!ready || data.status === "loading" || data.data == null) {
-    return null;
+    return <CardLoadingScreen />;
   }
 
   const info = data.data as HoverItemReturnData;

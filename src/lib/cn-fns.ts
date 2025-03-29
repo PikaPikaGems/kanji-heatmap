@@ -40,3 +40,10 @@ export const randomCn = () => {
 export const randomCn2 = () => {
   return `${cnNormal()}  !bg-[#fb02a8] ${SMALL_TILE_CN}`;
 };
+
+export const cnRandomDurationDelay = () => {
+  const a = selectRandom(duration);
+  const b = selectRandom(delay);
+
+  return `${a} ${b} bg-gray-100 dark:bg-gray-200 animate-pulse`;
+};

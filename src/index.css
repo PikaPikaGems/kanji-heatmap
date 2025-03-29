@@ -179,7 +179,7 @@ button:focus-visible {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.75s;
+  animation: fade-in 0.5s;
 }
 
 @keyframes fade-in {
