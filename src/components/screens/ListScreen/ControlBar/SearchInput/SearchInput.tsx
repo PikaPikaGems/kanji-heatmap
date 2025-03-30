@@ -21,7 +21,7 @@ export const SearchInput = ({
 }: {
   initialSearchType: SearchType;
   initialText: string;
-  onSettle: (searchText: string, searchType: string) => void;
+  onSettle: (searchText: string, searchType: SearchType) => void;
 }) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [searchType, setSearchType] = useState(initialSearchType);

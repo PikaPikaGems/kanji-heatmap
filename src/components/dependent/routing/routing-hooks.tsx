@@ -95,6 +95,8 @@ export const useUrlLocation = () => {
 
 /* 
 
+  UPDATE: This is unused for now 
+
   Increments key everytime user has
   gone from "/?xxxx" to "/" or viceversia
   this is used to keep the search bar value 

@@ -4,20 +4,23 @@ import {
   useSearchSettingsDispatch,
 } from "@/providers/search-settings-hooks";
 import { SearchInput } from "./SearchInput";
-import { useHasNavigatedToHomeKey } from "@/components/dependent/routing/routing-hooks";
+import { useCallback } from "react";
 
 export const SettledSearchInput = () => {
   const dispatch = useSearchSettingsDispatch();
   const settings = useSearchSettings();
-  const key = useHasNavigatedToHomeKey();
+
+  const onSettle = useCallback(
+    (text: string, searchType: SearchType) => {
+      dispatch("textSearch", { text, type: searchType });
+    },
+    [dispatch]
+  );
 
   return (
     <>
       <SearchInput
-        key={key}
-        onSettle={(text, searchType) => {
-          dispatch("textSearch", { text, type: searchType as SearchType });
-        }}
+        onSettle={onSettle}
         initialText={settings.textSearch.text}
         initialSearchType={settings.textSearch.type}
       />

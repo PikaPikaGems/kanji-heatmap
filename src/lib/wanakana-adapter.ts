@@ -1,6 +1,11 @@
 import * as wanakana from "wanakana";
 
-export type TranslateType = "romaji" | "hiragana" | "katakana" | "kana";
+export type TranslateType =
+  | "romaji"
+  | "hiragana"
+  | "katakana"
+  | "kana"
+  | "none";
 
 export function translateValue(val: string, type: TranslateType) {
   // Need IMEMode option to handle single kana characters like ん and い
@@ -16,7 +21,11 @@ export function translateValue(val: string, type: TranslateType) {
     return wanakana.toRomaji(val);
   }
 
-  return wanakana.toKana(val, { IMEMode: true });
+  if (type === "kana") {
+    return wanakana.toKana(val, { IMEMode: true });
+  }
+
+  return val;
 }
 
 export const tryConvertRomaji = (kana: string) => {

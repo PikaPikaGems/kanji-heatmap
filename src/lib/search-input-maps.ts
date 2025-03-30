@@ -7,7 +7,7 @@ export const translateMap: Record<SearchType, TranslateType> = {
   kunyomi: "hiragana",
   meanings: "romaji",
   readings: "hiragana",
-  "multi-kanji": "kana",
+  "multi-kanji": "none",
 };
 
 export const placeholderMap: Record<SearchType, string> = {
