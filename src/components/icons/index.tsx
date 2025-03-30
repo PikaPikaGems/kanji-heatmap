@@ -29,6 +29,8 @@ import {
   Link,
   Link2,
   DotIcon,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -60,4 +62,6 @@ export {
   Link,
   Link2,
   DotIcon,
+  ArrowLeft,
+  ArrowRight,
 };

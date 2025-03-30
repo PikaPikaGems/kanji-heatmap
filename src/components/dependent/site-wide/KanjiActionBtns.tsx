@@ -3,7 +3,7 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import ChangeFontButton from "./ChangeFontButton";
 import { DotIcon } from "../../icons";
-import { NextPrevLinks } from "../routing";
+import { NextPrevLinks } from "../routing/NextPrevLinks";
 
 export const KanjiActionsBtns = ({ kanji }: { kanji: string }) => {
   return (
