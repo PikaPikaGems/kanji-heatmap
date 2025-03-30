@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "./routing-hooks";
 import { Link } from "./router-adapter";
+import { useNextPrevKanji } from "@/hooks/use-next-prev-kanji";
 
 const buildKanjiParamStr = (paramStr: string, kanji: string) => {
   const params = new URLSearchParams(paramStr);
@@ -14,40 +14,20 @@ const buildKanjiParamStr = (paramStr: string, kanji: string) => {
 };
 
 const useNextPrevUrls = (currentKanji: string) => {
-  const kanjisData = useKanjiSearchResult();
   const [params] = useSearchParams();
+  const kanjis = useNextPrevKanji(currentKanji);
+  const paramsStr = params.toString();
 
   const nextPrevUrls = useMemo(() => {
-    const kanjis = kanjisData.data;
-
-    if (kanjis == null || kanjis.length <= 0) {
-      return null;
-    }
-
-    const paramsStr = params.toString();
-    const index = kanjis.findIndex((kanji) => kanji == currentKanji);
-
-    // not in current displayed kanjis
-    if (index === -1) {
-      return {
-        next: buildKanjiParamStr(paramsStr, kanjis[0]),
-      };
-    }
-
-    // the current kanji is the only one in the list
-    if (kanjis.length === 1) {
+    if (kanjis == null) {
       return null;
     }
 
     return {
-      next:
-        index + 1 === kanjis.length
-          ? null
-          : buildKanjiParamStr(paramsStr, kanjis[index + 1]),
-      prev:
-        index === 0 ? null : buildKanjiParamStr(paramsStr, kanjis[index - 1]),
+      prev: kanjis?.prev ? buildKanjiParamStr(paramsStr, kanjis?.prev) : null,
+      next: kanjis?.next ? buildKanjiParamStr(paramsStr, kanjis?.next) : null,
     };
-  }, [currentKanji, kanjisData, params]);
+  }, [kanjis, paramsStr]);
 
   return nextPrevUrls;
 };
