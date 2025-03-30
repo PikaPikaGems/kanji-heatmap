@@ -63,22 +63,37 @@ const ExpandedBtnContent = ({ kanji }: { kanji: string }) => {
   );
 };
 
+const useItemType = () => {
+  const itemSettings = useDeferredItemSettings();
+  return itemSettings.cardType;
+};
+
+const useItemBgSettings = () => {
+  const itemSettings = useDeferredItemSettings();
+  return itemSettings.backgroundColorSettingDataSource;
+};
+
+const useItemDontIncludeJLPT = () => {
+  const itemSettings = useDeferredItemSettings();
+  return itemSettings.borderColorAttached === false;
+};
+
 const useItemBtnCn = (kanji: string) => {
   const getInfo = useGetKanjiInfoFn();
-  const itemSettings = useDeferredItemSettings();
+  const bgSrc = useItemBgSettings();
+  const itemType = useItemType();
+  const dontIncludeJLPT = useItemDontIncludeJLPT();
+
   const kanjiInfo = getInfo?.(kanji);
-  const dontIncludeFreq =
-    itemSettings.backgroundColorSettingDataSource == null ||
-    itemSettings.backgroundColorSettingDataSource == "none";
 
   if (kanjiInfo == null) {
-    return { loadingCn };
+    return loadingCn;
   }
 
-  const dontIncludeJLPT = itemSettings.borderColorAttached === false;
+  const dontIncludeFreq = bgSrc == null || bgSrc == "none";
 
   const freqData = kanjiInfo.frequency;
-  const freqType = freqMap[itemSettings.backgroundColorSettingDataSource];
+  const freqType = freqMap[bgSrc];
   const freqRank = freqType ? freqData[freqType] : undefined;
   const freqRankCategory = getFreqCategory(freqRank);
 
@@ -99,11 +114,11 @@ const useItemBtnCn = (kanji: string) => {
 
   const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}`;
   const btnCn =
-    itemSettings.cardType === "compact"
+    itemType === "compact"
       ? `${btnCnRaw} kanji-font`
       : `${btnCnRaw} border-8 flex flex-col justify-center items-center`;
 
-  return { btnCn, itemType: itemSettings.cardType };
+  return btnCn;
 };
 
 export const KanjiBtnErrorFallback = () => {
@@ -117,18 +132,8 @@ export const KanjiBtnErrorFallback = () => {
 const KanjiItemButton = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
     const { kanji, ...rest } = props;
-    const { loadingCn, btnCn, itemType } = useItemBtnCn(kanji);
-
-    if (loadingCn) {
-      return (
-        <button
-          ref={ref}
-          className={loadingCn}
-          role="status"
-          aria-label="loading"
-        />
-      );
-    }
+    const btnCn = useItemBtnCn(kanji);
+    const itemType = useItemType();
 
     if (itemType === "compact") {
       return (
