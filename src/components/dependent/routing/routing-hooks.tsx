@@ -3,9 +3,14 @@ import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import usePrevious from "@/hooks/use-previous";
 
-export const useKanjiUrlState = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+export const useOpenedParam = () => {
+  const [searchParams] = useSearchParams();
+  const openedKanji = searchParams.get(URL_PARAMS.openKanji);
+  return openedKanji;
+};
 
+export const useSetOpenedParam = () => {
+  const setSearchParams = useSearchParams()[1];
   const setOpenedKanji = useCallback(
     (kanji: string | null) => {
       setSearchParams((prev) => {
@@ -20,7 +25,13 @@ export const useKanjiUrlState = () => {
     },
     [setSearchParams]
   );
-  const openedKanji = searchParams.get(URL_PARAMS.openKanji);
+
+  return setOpenedKanji;
+};
+
+export const useKanjiUrlState = () => {
+  const openedKanji = useOpenedParam();
+  const setOpenedKanji = useSetOpenedParam();
 
   return [openedKanji, setOpenedKanji] as [
     string,
