@@ -21,3 +21,11 @@ export const toNum = (str?: string | null | number, fallback?: number) => {
 
   return fallback ?? 0;
 };
+
+export const checkIfInputField = (target: HTMLElement) => {
+  return (
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.isContentEditable
+  );
+};

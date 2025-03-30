@@ -16,6 +16,7 @@ import pageItems from "@/components/items/page-items";
 
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { docPages } from "./components/items/nav-items";
+import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
 const LazyBottomBanner = React.lazy(
   () => import("./components/site-layout/BottomBanner")
@@ -65,36 +66,41 @@ const App = () => {
       }
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Header nav={<NavBar />} />
-        <main className="bg-background">
-          <ErrorBoundary
-            details="App"
-            fallback={
-              <div className="w-full pr-4 mt-14">
-                <DefaultErrorFallback />
-              </div>
-            }
-          >
-            <KanjiFunctionalityProvider>
-              <Switch>
-                <Route
-                  path={cumUseGraphPage.href}
-                  component={cumUseGraphPage.Component}
-                />
-                <Route path={kanjiPage.href} component={kanjiPage.Component} />
-                <Route
-                  path={pageItems.docsPage.href}
-                  component={pageItems.docsPage.Component}
-                />
-                <Route path="*">
-                  <div className="w-full pr-4 mt-14">
-                    <PageNotFound />
-                  </div>
-                </Route>
-              </Switch>
-            </KanjiFunctionalityProvider>
-          </ErrorBoundary>
-        </main>
+        <GlobalKeyboardShortcutProvider>
+          <Header nav={<NavBar />} />
+          <main className="bg-background">
+            <ErrorBoundary
+              details="App"
+              fallback={
+                <div className="w-full pr-4 mt-14">
+                  <DefaultErrorFallback />
+                </div>
+              }
+            >
+              <KanjiFunctionalityProvider>
+                <Switch>
+                  <Route
+                    path={cumUseGraphPage.href}
+                    component={cumUseGraphPage.Component}
+                  />
+                  <Route
+                    path={kanjiPage.href}
+                    component={kanjiPage.Component}
+                  />
+                  <Route
+                    path={pageItems.docsPage.href}
+                    component={pageItems.docsPage.Component}
+                  />
+                  <Route path="*">
+                    <div className="w-full pr-4 mt-14">
+                      <PageNotFound />
+                    </div>
+                  </Route>
+                </Switch>
+              </KanjiFunctionalityProvider>
+            </ErrorBoundary>
+          </main>
+        </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
       <LazyBottomBanner />
     </ErrorBoundary>
