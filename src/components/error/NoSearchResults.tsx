@@ -1,7 +1,7 @@
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ReachOutToUs, Wrapper } from "./common";
 import { Sumimasen } from "./Sumimasen";
-import { ClearFiltersCTA } from "../dependent/routing";
+import { ClearFiltersCTA } from "../dependent/routing/ClearFiltersCTA";
 
 export const NoSearchResults = () => {
   return (

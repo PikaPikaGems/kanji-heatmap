@@ -129,26 +129,4 @@ export const useHasNavigatedToHomeKey = () => {
   return key;
 };
 
-// Create an url param with only the existing search-text and search-type
-// e.g search-text=xxx&search-type=meanings
-export const useClearedUrl = () => {
-  const [searchParams] = useSearchParams();
-
-  const searchText = searchParams.get(URL_PARAMS.textSearch.text);
-  const searchType = searchParams.get(URL_PARAMS.textSearch.type);
-
-  const hasText = (searchText ?? "").length > 0;
-  const hasType = (searchType ?? "").length > 0;
-  const textString = hasText
-    ? `${URL_PARAMS.textSearch.text}=${searchText}`
-    : "";
-
-  const typeString = hasType
-    ? `&${URL_PARAMS.textSearch.type}=${searchType}`
-    : "";
-
-  const link = `${textString}${typeString}`;
-  return encodeURI(link);
-};
-
 export { useSearchParams };

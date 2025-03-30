@@ -1,11 +1,7 @@
-import { Link, Route, Switch, useSearchParams } from "wouter";
+import { Link, Route, Switch } from "wouter";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
-import {
-  useClearedUrl,
-  useKanjiFromUrl,
-  useNextPrevUrls,
-} from "./routing-hooks";
+import { useKanjiFromUrl, useNextPrevUrls } from "./routing-hooks";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -40,28 +36,6 @@ export const GlobalKanjiLink = ({
 
 export const GlobalHomeHeaderLink = () => {
   return <Link to={"/"}>Kanji Heatmap</Link>;
-};
-
-export const ClearFiltersCTA = () => {
-  const [searchParams] = useSearchParams();
-
-  const link = useClearedUrl();
-
-  const noChange = searchParams.toString() === link;
-
-  if (noChange) {
-    return <>{"Small typo, maybe?"}</>;
-  }
-
-  return (
-    <>
-      Try
-      <Link to={`/?${link}`} className={cnTextLink}>
-        clearing your filters
-      </Link>
-      to see more results.
-    </>
-  );
 };
 
 const btnLinkCn =
