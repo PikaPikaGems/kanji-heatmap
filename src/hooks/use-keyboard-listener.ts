@@ -51,12 +51,6 @@ function useKeyboardListener(
   const handleKeyEvent = useCallback(
     (event: KeyboardEvent) => {
       const handler = keyMapRef.current[event.key];
-      console.log(
-        "key",
-        event.key,
-        keyMapRef.current,
-        keyMapRef.current[event.key]
-      );
 
       if (handler) {
         if (preventDefault) event.preventDefault();
