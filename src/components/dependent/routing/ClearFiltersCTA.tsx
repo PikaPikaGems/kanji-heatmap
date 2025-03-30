@@ -1,9 +1,9 @@
 import { useSearchParams } from "./routing-hooks";
-import { Link } from ".";
 import { cnTextLink } from "@/lib/generic-cn";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { hasNoFilters } from "@/lib/results-utils";
 import { URL_PARAMS } from "@/lib/settings/url-params";
+import { Link } from "./router-adapter";
 
 // Create an url param with only the existing search-text and search-type
 // e.g search-text=xxx&search-type=meanings

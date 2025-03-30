@@ -4,7 +4,7 @@ import { URL_PARAMS } from "@/lib/settings/url-params";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "./routing-hooks";
-import { Link } from ".";
+import { Link } from "./router-adapter";
 
 const buildKanjiParamStr = (paramStr: string, kanji: string) => {
   const params = new URLSearchParams(paramStr);

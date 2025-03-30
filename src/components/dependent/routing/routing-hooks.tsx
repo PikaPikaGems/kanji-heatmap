@@ -1,4 +1,4 @@
-import { useLocation, useSearch, useSearchParams } from "wouter";
+import { useLocation, useSearch, useSearchParams } from "./router-adapter";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import usePrevious from "@/hooks/use-previous";
