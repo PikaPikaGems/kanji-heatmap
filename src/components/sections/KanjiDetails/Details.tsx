@@ -7,6 +7,7 @@ import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { RequestForSuggestion } from "@/components/common/RequestForSuggestion";
+import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
@@ -41,6 +42,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <RequestForSuggestion />
       <div className="w-full flex justify-start space-x-1">
         <LinksOutItems />
+        <KanjiKeyboardShortcuts kanji={kanji} />
       </div>
     </div>
   );
