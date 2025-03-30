@@ -25,7 +25,7 @@
   margin: 0;
   display: flex;
 
-  --scrollbar-bg: white;
+  --scrollbar-bg: hsl(var(--background));
   --thumb-bg: rgba(0, 0, 0, 0.3);
   scrollbar-color: var(--thumb-bg) var(--scrollbar-bg);
 
@@ -37,7 +37,6 @@
 }
 
 .dark {
-  --scrollbar-bg: black;
   --thumb-bg: rgba(255, 255, 255, 0.3);
   background-color: black;
 }
@@ -98,6 +97,7 @@ button {
 
 ::selection {
   background: chartreuse;
+  color: black !important;
 }
 
 .dark button:focus,

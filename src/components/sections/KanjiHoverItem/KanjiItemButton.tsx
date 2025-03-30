@@ -94,7 +94,7 @@ const useItemBtnCn = (kanji: string) => {
 
   const bgColor =
     freqRankCategory === 0 && dontIncludeFreq === false
-      ? "dark:bg-black bg-white"
+      ? "bg-background"
       : freqCategoryCn[freqRankCategory];
 
   const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}`;

@@ -66,7 +66,7 @@ const App = () => {
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Header nav={<NavBar />} />
-        <main className="bg-white dark:bg-black">
+        <main className="bg-background">
           <ErrorBoundary
             details="App"
             fallback={

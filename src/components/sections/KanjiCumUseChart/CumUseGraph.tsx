@@ -313,7 +313,7 @@ function MultiLineChart({
       <div
         ref={tooltipRef}
         className={
-          "absolute z-10 rounded-lg shadow-md min-w-[150px] opacity-0 pointer-events-none bg-white dark:bg-black border border-gray-200 dark:border-gray-800"
+          "absolute z-10 rounded-lg shadow-md min-w-[150px] opacity-0 pointer-events-none bg-background border border-gray-200 dark:border-gray-800"
         }
       />
     </div>

@@ -18,7 +18,7 @@ const Layout = ({
 }) => {
   return (
     <>
-      <div className="fix-scroll-layout-shift-right fixed w-full pt-12  pb-2 z-40 bg-white dark:bg-black">
+      <div className="fix-scroll-layout-shift-right fixed w-full pt-12 pb-2 z-40 bg-background">
         <section className="mx-auto max-w-screen-xl flex border-0 space-x-1 sticky pt-1 pl-2 pr-1 w-full ">
           <ErrorBoundary fallback={<LinksOutItems />}>
             <ControlBar />
