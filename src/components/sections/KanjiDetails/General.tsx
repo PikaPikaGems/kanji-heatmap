@@ -11,8 +11,17 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { ReactNode } from "react";
 
 const hasData = (data?: number) => data != null && data !== -1;
+
+const TableCellFixed = ({ children }: { children: ReactNode }) => (
+  <TableCell className="w-24 sm:w-32">{children}</TableCell>
+);
+
+const TableCellGrow = ({ children }: { children: ReactNode }) => (
+  <TableCell>{children}</TableCell>
+);
 
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
@@ -43,8 +52,8 @@ export const General = ({ kanji }: { kanji: string }) => {
       <Table>
         <TableBody>
           <TableRow className="text-left">
-            <TableCell>Meanings</TableCell>
-            <TableCell>
+            <TableCellFixed>Meanings</TableCellFixed>
+            <TableCellGrow>
               {data.meanings.map((meaning) => {
                 return (
                   <Badge key={meaning} variant={"outline"} className="m-1">
@@ -54,25 +63,25 @@ export const General = ({ kanji }: { kanji: string }) => {
               })}
 
               {data.meanings.length === 0 && <div> - </div>}
-            </TableCell>
+            </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
-            <TableCell>Kun Readings</TableCell>
-            <TableCell>
+            <TableCellFixed>Kun Readings</TableCellFixed>
+            <TableCellGrow>
               {data.allKun.map((kun) => {
                 return <RomajiBadge key={kun} kana={kun} />;
               })}
               {data.allKun.length === 0 && <div> - </div>}
-            </TableCell>
+            </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
-            <TableCell>On Readings</TableCell>
-            <TableCell>
+            <TableCellFixed>On Readings</TableCellFixed>
+            <TableCellGrow>
               {data.allOn.map((on) => {
                 return <RomajiBadge key={on} kana={on} />;
               })}
               {data.allOn.length === 0 && <div> - </div>}
-            </TableCell>
+            </TableCellGrow>
           </TableRow>
         </TableBody>
       </Table>
