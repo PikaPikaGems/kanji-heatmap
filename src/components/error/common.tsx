@@ -31,7 +31,7 @@ export const Wrapper = ({ children }: { children: ReactNode }) => {
 };
 
 export const ReachOutToUs = ({
-  prefix = " Please let us know on ",
+  prefix = " Let us know on ",
 }: {
   prefix?: string;
 }) => {

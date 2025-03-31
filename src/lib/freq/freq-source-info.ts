@@ -35,8 +35,8 @@ const ultimate_kanji_links = [
 ];
 
 export const rankTypeLabel = {
-  1224: "(Standard Competition Ranking)",
-  1223: "(Dense ranking)",
+  1224: "(Std Comp Rank)",
+  1223: "(Dense Rank)",
   "N/A": "",
 };
 

@@ -11,7 +11,7 @@ export const CumUseChartWrapper = ({
     <article className="flex justify-center flex-col items-center">
       <div className="w-full max-w-5xl">
         <h1 className="font-bold text-lg md:text-xl my-3">
-          Cumulative Use vs Standard Competition Frequency Ranking
+          Cumulative Use vs Standard Competition Ranking (Frequency)
         </h1>
 
         <div>{children}</div>
