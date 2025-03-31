@@ -11,6 +11,7 @@ export function ItemSettingsProvider({ children }: { children: ReactNode }) {
     storageKey,
     defaultItemSettingsValue
   );
+
   return (
     <itemSettings.StateContext.Provider value={storageData}>
       <itemSettings.DispatchContext.Provider value={setItem}>

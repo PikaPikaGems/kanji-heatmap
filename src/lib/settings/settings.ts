@@ -9,6 +9,7 @@ export const SEARCH_TYPE_ARR = [
   "kunyomi",
   "multi-kanji",
 ] as const;
+
 export type SearchType = (typeof SEARCH_TYPE_ARR)[number];
 
 export type TextSearch = {

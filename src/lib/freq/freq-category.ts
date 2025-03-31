@@ -22,7 +22,10 @@ export const freqCategoryOpacity: Record<FreqCategory, number> = {
   5: 1,
 };
 
-const freqRankMaxMin: Record<FreqCategory, { min: number; max: number }> = {
+export const freqRankMaxMin: Record<
+  FreqCategory,
+  { min: number; max: number }
+> = {
   0: { min: 2250, max: Infinity },
   1: { min: 1700, max: 2250 },
   2: { min: 1100, max: 1700 },
