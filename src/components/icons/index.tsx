@@ -31,6 +31,7 @@ import {
   DotIcon,
   ArrowLeft,
   ArrowRight,
+  Keyboard,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -64,4 +65,5 @@ export {
   DotIcon,
   ArrowLeft,
   ArrowRight,
+  Keyboard,
 };
