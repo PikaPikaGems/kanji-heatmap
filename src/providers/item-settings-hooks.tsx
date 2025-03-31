@@ -3,9 +3,9 @@ import { createContextComponents, useContextWithCatch } from "./helpers";
 import { ItemSettings } from "@/lib/settings/settings";
 
 export const defaultItemSettingsValue: ItemSettings = {
-  cardType: "compact",
+  cardType: "expanded",
   borderColorAttached: true,
-  backgroundColorSettingDataSource: "none",
+  backgroundColorSettingDataSource: "rank-novels-5100",
 };
 
 export const itemSettings = createContextComponents<ItemSettings>(
