@@ -12,6 +12,7 @@ import { FrequencyRankDataSource } from "@/components/common/freq/FrequencyRankD
 import { FreqGradient } from "@/components/common/freq/FreqGradient";
 import { ItemTypeSwitch } from "@/components/common/ItemTypeSwitch";
 import { JLPTBordersMeanings } from "@/components/common/jlpt/JLPTBorderMeanings";
+import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoIcon";
 
 const H2 = ({ children }: { children: ReactNode }) => (
   <h2 className="font-bold border-b-2 border-dotted mt-4 mb-2">{children}</h2>
@@ -30,7 +31,9 @@ const BackgroundColorSection = ({
 
   return (
     <>
-      <H2>Background Color Meaning</H2>
+      <H2>
+        Background Color Meaning <FreqGradientInfoIcon />
+      </H2>
       <LabeledCheckbox
         label="Attach Background Color Meaning"
         value={shouldAttachMeaning}
