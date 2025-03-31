@@ -1,3 +1,4 @@
+import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import { Label } from "../ui/label";
 import BasicSelect from "./BasicSelect";
 import { Combobox } from "./Combobox";
@@ -18,6 +19,21 @@ export const ResponsiveSelect = ({
   }[];
   label: string;
 }) => {
+  const isTouchDevice = useIsTouchDevice();
+
+  if (isTouchDevice) {
+    return (
+      <BasicSelect
+        value={value}
+        onChange={onChange}
+        triggerCN={"h-8 w-full"}
+        options={options}
+        label={label}
+        isLabelSrOnly={false}
+      />
+    );
+  }
+
   return (
     <>
       <div className="hidden sm:block">
