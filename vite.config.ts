@@ -5,8 +5,6 @@ import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 import { TemplateType } from "rollup-plugin-visualizer/dist/plugin/template-types";
 
-const ASSETS_URL = "https://assets.pikapikagems.com";
-
 const pwaConfig = {
   // registerType: 'prompt' <-- if we want to ensure user updates
   registerType: "autoUpdate" as const,
@@ -87,7 +85,7 @@ const pwaConfig = {
       // **********************
       {
         urlPattern: ({ url }: { url: { pathname: string; origin: string } }) =>
-          url.origin === ASSETS_URL &&
+          url.origin === "https://assets.pikapikagems.com" &&
           url.pathname.startsWith("/kanji/") &&
           url.pathname.endsWith(".svg"),
         handler: "CacheFirst" as const,
