@@ -37,6 +37,18 @@ const pwaConfig = {
         src: "img/app-icon-192x192.png",
         type: "image/png",
       },
+      {
+        purpose: "any",
+        sizes: "512x512",
+        src: "img/app-icon-512x512.png",
+        type: "image/png",
+      },
+      {
+        purpose: "any",
+        sizes: "192x192",
+        src: "img/app-icon-192x192.png",
+        type: "image/png",
+      },
     ],
   },
 
