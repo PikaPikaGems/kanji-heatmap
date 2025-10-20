@@ -20,7 +20,7 @@ const pwaConfig = {
     display: "standalone" as const,
     lang: "en-US" as const,
     description:
-      "Efficiently identify and study the most relevant kanji using frequency data-driven visuals. Explore kanji with advanced filtering, sorting, and more.",
+      "Efficiently identify and study the kanji most useful to you with frequency data visuals, advanced filtering, sorting, and more",
     start_url: ".",
     theme_color: "#fb02a8",
     background_color: "#FFFFFF",
