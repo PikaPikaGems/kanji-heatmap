@@ -41,11 +41,6 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://en.wiktionary.org/wiki/${kanji}`,
   },
   {
-    name: "Unicode",
-    url: (kanji: string) =>
-      `http://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=${kanji}&useutf8=true`,
-  },
-  {
     name: "Hanziyuan",
     url: (kanji: string) => `https://hanziyuan.net/#${kanji}`,
   },
@@ -73,6 +68,30 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "Niai Mrahhal",
     url: (kanji: string) => `https://niai.mrahhal.net/similar?q=${kanji}`,
+  },
+  {
+    name: "Kurumi Kanji Explosion",
+    url: (kanji: string) => `https://kurumi.com/jp/kjbh/?k=${kanji}`,
+  },
+  {
+    name: "Uchiwakekanji Explosion",
+    url: (kanji: string) => `https://uchiwakekanji.github.io/jp/?k=${kanji}`,
+  },
+  {
+    name: "Romaji Desu",
+    url: (kanji: string) => `https://www.romajidesu.com/kanji/${kanji}`,
+  },
+  {
+    name: "Kyou Benkyou",
+    url: (kanji: string) => `https://www.kyoubenkyou.com/search/${kanji}`,
+  },
+  {
+    name: "Kanjiverse",
+    url: (kanji: string) => `https://app.kanjiverse.com/kanji/${kanji}`,
+  },
+  {
+    name: "Lorenzi's Jisho",
+    url: (kanji: string) => `https://jisho.hlorenzi.com/search/${kanji}%20%23k`,
   },
 ];
 
@@ -136,5 +155,9 @@ export const vocabExternalLinks = [
   {
     name: "Sentence Search",
     url: (word: string) => `https://sentencesearch.neocities.org/#${word}`,
+  },
+  {
+    name: "Draw Me a Kanji",
+    url: (word: string) => `https://mbilbille.github.io/dmak/#${word}`,
   },
 ];
