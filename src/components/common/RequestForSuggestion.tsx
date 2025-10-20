@@ -44,21 +44,13 @@ export const RequestForSuggestion = () => {
             {`... they’re not all manually-checked yet, so don’t be surprised if some are a little... unique 🧐😅`}
           </li>
           <li>
-            {`- The audio? 🔊 That’s your browser’s`}
-            <ExternalTextLink
-              text={"Web Speech Synthesis API."}
-              href={otherOutLinks.webSpeechApi}
-            />
-            {`doing its best impression of a native speaker. Robot vibes included. 🤖`}
-          </li>
-          <li>
             {`- If you catch anything weird, drop us a note on`}
             <ExternalTextLink
               text={"Github"}
               href={outLinks.githubContentIssue}
             />
             or <ExternalTextLink text={"Discord"} href={outLinks.discord} />
-            {`- We might fix it.. eventually 😁`}
+            {`!`}
           </li>
         </ul>
       </AlertDescription>
