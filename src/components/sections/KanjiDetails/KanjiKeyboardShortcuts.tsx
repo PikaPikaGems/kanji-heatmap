@@ -53,7 +53,7 @@ export const KanjiKeyboardShortcuts = ({ kanji }: { kanji: string }) => {
   useKeyboardListener({
     ArrowLeft: prevKanji,
     ArrowRight: nextKanji,
-    "0": speakKanji,
+    "!": speakKanji,
   });
 
   if (kanjis == null) {
