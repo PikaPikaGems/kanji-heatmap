@@ -120,4 +120,19 @@ const KaomojiAnimation = ({
   );
 };
 
-export default KaomojiAnimation;
+const KaomojiWithDelay = () => {
+  const [showLoading, setShowLoading] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setShowLoading(true);
+    }, 150);
+  }, []);
+
+  if (!showLoading) {
+    return null;
+  }
+
+  return <KaomojiAnimation />;
+};
+
+export default KaomojiWithDelay;
