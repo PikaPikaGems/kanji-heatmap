@@ -6,7 +6,7 @@ const KanjiDrawerGlobal = lazy(() => import("../Drawer/KanjiDrawerGlobal"));
 
 export const SuspendedKanjiList = () => {
   return (
-    <Suspense fallback={<LoadingKanjis type="colorful" />}>
+    <Suspense fallback={<LoadingKanjis />}>
       <>
         <KanjiList />
         <KanjiDrawerGlobal />
