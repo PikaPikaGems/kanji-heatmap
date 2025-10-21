@@ -25,7 +25,29 @@ const Layout = ({ children }: { children: ReactNode }) => {
     </>
   );
 };
-export const BottomBanner = () => {
+
+export const SocialLinksCTA = () => {
+  return (
+    <>
+      {"(◠_◠)"} Say hi on
+      <ExternalTextLink href={outLinks.koFi} text={"Ko-Fi,"} />
+      <ExternalTextLink href={outLinks.discord} text="Discord," />
+      or
+      <ExternalTextLink href={outLinks.githubIssue} text={"GitHub"} />
+      {"👋"}
+    </>
+  );
+};
+
+const RirikkuCTA = () => {
+  return (
+    <>
+      👀 Look! The {"world's"} coolest{" "}
+      <ExternalTextLink href={outLinks.ririkku} text={"J-Music app ♫"} />
+    </>
+  );
+};
+const BottomBanner = () => {
   const network = useNetworkState();
 
   if (!network.online) {
@@ -59,12 +81,7 @@ export const BottomBanner = () => {
 
   return (
     <Layout>
-      {"(◠_◠)"} Say hi on
-      <ExternalTextLink href={outLinks.koFi} text={"Ko-Fi,"} />
-      <ExternalTextLink href={outLinks.discord} text="Discord," />
-      or
-      <ExternalTextLink href={outLinks.githubIssue} text={"GitHub"} />
-      {"👋"}
+      <RirikkuCTA />
     </Layout>
   );
 };
