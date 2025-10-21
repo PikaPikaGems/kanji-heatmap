@@ -8,7 +8,22 @@ import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { RequestForSuggestion } from "@/components/common/RequestForSuggestion";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
+import { Badge } from "@/components/ui/badge";
+import { outLinks } from "@/lib/external-links";
 
+const RirikkuCTABadge = () => {
+  return (
+    <Badge className="mt-3 mb-1 rounded-md py-2">
+      <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
+        Pick up Japanese words and grammar effortlessly while enjoying your
+        favorite songs — only on{" "}
+        <span className="underline">
+          {"the Internet's coolest music player ♫"}
+        </span>
+      </a>
+    </Badge>
+  );
+};
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
 export const KanjiDetails = ({ kanji }: { kanji: string }) => {
@@ -39,6 +54,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
+      <RirikkuCTABadge />
       <RequestForSuggestion />
       <div className="w-full flex justify-start space-x-1">
         <LinksOutItems />
