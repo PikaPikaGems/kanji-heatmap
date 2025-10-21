@@ -34,25 +34,18 @@ export const RequestForSuggestion = () => {
         Disclaimer:
       </AlertTitle>
       <AlertDescription className="text-xs text-left">
-        <ul>
-          <li>
-            {`- Word Readings 📖  are pulled from`}
-            <ExternalTextLink
-              text={" doublevil/JmdictFurigana"}
-              href={otherOutLinks.jmdictFurigana}
-            />
-            {`... they’re not all manually-checked yet, so don’t be surprised if some are a little... unique 🧐😅`}
-          </li>
-          <li>
-            {`- If you catch anything weird, drop us a note on`}
-            <ExternalTextLink
-              text={"Github"}
-              href={outLinks.githubContentIssue}
-            />
-            or <ExternalTextLink text={"Discord"} href={outLinks.discord} />
-            {`!`}
-          </li>
-        </ul>
+        {` Word readings 📖 come from`}
+        <ExternalTextLink
+          text={" doublevil/JmdictFurigana"}
+          href={otherOutLinks.jmdictFurigana}
+        />
+        {
+          "... not all are manually checked yet, so some might be a bit quirky 🧐"
+        }
+        {` If you catch anything weird, drop us a note on`}
+        <ExternalTextLink text={"Github"} href={outLinks.githubContentIssue} />
+        or <ExternalTextLink text={"Discord"} href={outLinks.discord} />
+        {`!`}
       </AlertDescription>
     </Alert>
   );
