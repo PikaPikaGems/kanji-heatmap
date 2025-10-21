@@ -101,6 +101,7 @@ export const outLinks = {
     "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5",
   koFi: "https://ko-fi.com/minimithi",
   discord: "https://discord.gg/Ash8ZrGb4s",
+  ririkku: `https://demo.ririkku.com/?utm_source=kanjiheatmap"`,
 };
 
 export const otherOutLinks = {
