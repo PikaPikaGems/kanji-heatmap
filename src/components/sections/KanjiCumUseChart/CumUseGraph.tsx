@@ -149,7 +149,7 @@ const buildTooltipInnerHtml = (context: TooltipContext) => {
       value: dataPoint.parsed.y ?? 0,
       color: dataset.borderColor as string,
       datasetLabel: dataset.label || "",
-      xValue: dataPoint.parsed.x,
+      xValue: dataPoint.parsed.x ?? 0,
     };
   });
 
