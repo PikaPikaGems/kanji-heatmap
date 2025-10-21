@@ -146,7 +146,7 @@ const buildTooltipInnerHtml = (context: TooltipContext) => {
     const dataset = chart.data.datasets[datasetIndex];
     return {
       label: dataset.label || "",
-      value: dataPoint.parsed.y,
+      value: dataPoint.parsed.y ?? 0,
       color: dataset.borderColor as string,
       datasetLabel: dataset.label || "",
       xValue: dataPoint.parsed.x,
