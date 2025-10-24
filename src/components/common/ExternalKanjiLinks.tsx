@@ -7,10 +7,7 @@ export const ExternalKanjiLinks = ({ kanji }: { kanji: string }) => {
       {externalLinks.map((item) => {
         return (
           <li key={item.name} className="m-1">
-            <ExternalTextLink
-              href={`${item.url(kanji)}/?utm_source=kanjiheatmap`}
-              text={item.name}
-            />
+            <ExternalTextLink href={`${item.url(kanji)}`} text={item.name} />
           </li>
         );
       })}
