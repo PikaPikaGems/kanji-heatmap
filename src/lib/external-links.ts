@@ -93,6 +93,19 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "Lorenzi's Jisho",
     url: (kanji: string) => `https://jisho.hlorenzi.com/search/${kanji}%20%23k`,
   },
+  {
+    name: "Kanji Sense",
+    url: (kanji: string) => `https://kanjisense.com/dict/${kanji}`,
+  },
+  {
+    name: "Kanji Jump",
+    url: (kanji: string) => `https://kanjijump.com/dict/${kanji}`,
+  },
+
+  {
+    name: "JapanDict",
+    url: (kanji: string) => `https://japandict.com/kanji/${kanji}`,
+  },
 ];
 
 export const outLinks = {
@@ -101,7 +114,7 @@ export const outLinks = {
     "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5",
   koFi: "https://ko-fi.com/minimithi",
   discord: "https://discord.gg/Ash8ZrGb4s",
-  ririkku: `https://demo.ririkku.com/?utm_source=kanjiheatmap`,
+  ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
 };
 
 export const otherOutLinks = {
