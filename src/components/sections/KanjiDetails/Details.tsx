@@ -15,10 +15,10 @@ const RirikkuCTABadge = () => {
   return (
     <Badge className="mt-3 mb-1 rounded-md py-2">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
-        Pick up Japanese words and grammar effortlessly while enjoying your
-        favorite songs — only on{" "}
+        👀 Look! Pick up Japanese words and grammar effortlessly while enjoying
+        your favorite songs — with{" "}
         <span className="underline">
-          {"the Internet's coolest music player ♫"}
+          {"Ririkku, the Internet's coolest music player ♫"}
         </span>
       </a>
     </Badge>
