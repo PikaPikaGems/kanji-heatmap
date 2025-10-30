@@ -71,7 +71,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   },
   {
     name: "JLearn",
-    url: (kanji: string) => `https://jlearn.net/search/${kanji}`,
+    url: (kanji: string) => `https://jlearn.net/search/${kanji}#kanji-results`,
   },
   {
     name: "Niai Mrahhal",
@@ -105,7 +105,51 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "Hanziyuan",
     url: (kanji: string) => `https://hanziyuan.net/#${kanji}`,
   },
+  {
+    name: "Nihongo Master",
+    url: (kanji: string) =>
+      `https://www.nihongomaster.com/japanese/dictionary/search?query=${kanji}`,
+  },
+  {
+    name: "Tangorin",
+    url: (kanji: string) => `https://tangorin.com/kanji?search=${kanji}`,
+  },
+  {
+    name: "Joy-o-Kanji",
+    url: (kanji: string) =>
+      `https://www.joyokanji.com/character-home-page/${kanji}`,
+  },
+  {
+    name: "Taigani",
+    url: (kanji: string) =>
+      `https://kanjivg.tagaini.net/viewer.html?kanji=${kanji}`,
+  },
+  {
+    name: "Kotobank",
+    url: (kanji: string) => `https://kotobank.jp/word/${kanji}`,
+  },
+  {
+    name: "Weblio",
+    url: (kanji: string) => `https://www.weblio.jp/content/${kanji}`,
+  },
+  {
+    name: "Mazii",
+    url: (kanji: string) =>
+      `https://mazii.net/en-US/search/kanji/jaen/${kanji}`,
+  },
+  {
+    name: "JPDictionary",
+    url: (kanji: string) => `https://jpdictionary.com/?kanji=${kanji}`,
+  },
+  {
+    name: "TanoshiiJapanese",
+    url: (kanji: string) =>
+      `https://www.tanoshiijapanese.com/dictionary/kanji.cfm?k=${kanji}`,
+  },
 ];
+
+//www.ldoceonline.com/dictionary/見る
+// https: //www.verbix.com/webverbix/japanese/miru
 
 export const outLinks = {
   githubIssue: "https://github.com/PikaPikaGems/kanji-heatmap/issues/63",
