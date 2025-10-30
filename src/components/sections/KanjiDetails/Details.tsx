@@ -10,10 +10,11 @@ import { RequestForSuggestion } from "@/components/common/RequestForSuggestion";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
+import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 
 const RirikkuCTABadge = () => {
   return (
-    <Badge className="mt-3 mb-1 rounded-md py-2">
+    <Badge className="mt-3 mb-1 rounded-md py-2 w-full">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
         👀 Look! Pick up Japanese words and grammar effortlessly while enjoying
         your favorite songs — with{" "}
@@ -41,6 +42,8 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
+      <RirikkuCTABadge />
+
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
@@ -54,7 +57,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
-      <RirikkuCTABadge />
+      <SimpleAccordion trigger={"External Dictionaries"}>
+        <div className="text-left mt-2">
+          <ExternalKanjiLinks kanji={kanji} />
+        </div>
+      </SimpleAccordion>
       <RequestForSuggestion />
       <div className="w-full flex justify-start space-x-1">
         <LinksOutItems />
