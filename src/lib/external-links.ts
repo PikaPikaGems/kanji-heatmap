@@ -146,6 +146,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) =>
       `https://www.tanoshiijapanese.com/dictionary/kanji.cfm?k=${kanji}`,
   },
+  {
+    name: "KanjiKana",
+    url: (kanji: string) => `https://kanjikana.com/en/kanji/${kanji}`,
+  },
 ];
 
 //www.ldoceonline.com/dictionary/見る
