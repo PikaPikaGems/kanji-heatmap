@@ -14,7 +14,7 @@ import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 
 const RirikkuCTABadge = () => {
   return (
-    <Badge className="mt-3 mb-1 rounded-md py-2 w-full">
+    <Badge className="mb-3 rounded-md py-2 w-full">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
         👀 Look! Pick up Japanese words and grammar effortlessly while enjoying
         your favorite songs — with{" "}
