@@ -5,44 +5,48 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://jotoba.de/search/1/${kanji}?l=en-US`,
   },
   {
-    name: "The Kanji Map",
-    url: (kanji: string) => `https://thekanjimap.com/${kanji}`,
-  },
-  {
-    name: "Jisho",
-    url: (kanji: string) => `https://jisho.org/search/${kanji}%20%23kanji`,
-  },
-  {
-    name: "Kai",
-    url: (kanji: string) => `https://kai.kanjiapi.dev/#!/${kanji}`,
-  },
-  {
-    name: "Kanshudo",
-    url: (kanji: string) => `https://www.kanshudo.com/kanji/${kanji}`,
-  },
-  {
-    name: "Kanji Alive",
-    url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
-  },
-  {
     name: "Hochanh",
     url: (kanji: string) => `https://hochanh.github.io/rtk/${kanji}/index.html`,
+  },
+  {
+    name: "The Kanji Map",
+    url: (kanji: string) => `https://thekanjimap.com/${kanji}`,
   },
   {
     name: "Wanikani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
   },
   {
+    name: "Jisho",
+    url: (kanji: string) => `https://jisho.org/search/${kanji}%20%23kanji`,
+  },
+  {
+    name: "Kyou Benkyou",
+    url: (kanji: string) => `https://www.kyoubenkyou.com/search/${kanji}`,
+  },
+  {
+    name: "Kanjiverse",
+    url: (kanji: string) => `https://app.kanjiverse.com/kanji/${kanji}`,
+  },
+  {
+    name: "Lorenzi's Jisho",
+    url: (kanji: string) => `https://jisho.hlorenzi.com/search/${kanji}%20%23k`,
+  },
+  {
+    name: "Kai",
+    url: (kanji: string) => `https://kai.kanjiapi.dev/#!/${kanji}`,
+  },
+  {
+    name: "Kanji Alive",
+    url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
+  },
+  {
+    name: "Kanshudo",
+    url: (kanji: string) => `https://www.kanshudo.com/kanji/${kanji}`,
+  },
+  {
     name: "Kanji Garden",
     url: (kanji: string) => `https://kanji.garden/kanji?kanji=${kanji}`,
-  },
-  {
-    name: "Wiktionary",
-    url: (kanji: string) => `https://en.wiktionary.org/wiki/${kanji}`,
-  },
-  {
-    name: "Hanziyuan",
-    url: (kanji: string) => `https://hanziyuan.net/#${kanji}`,
   },
   {
     name: "Kakimashou",
@@ -52,6 +56,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "Ichi Moe",
     url: (kanji: string) => `https://ichi.moe/cl/kanji/?q=${kanji}`,
+  },
+  {
+    name: "JapanDict",
+    url: (kanji: string) => `https://japandict.com/kanji/${kanji}`,
   },
   {
     name: "Jitenon",
@@ -82,18 +90,6 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://www.romajidesu.com/kanji/${kanji}`,
   },
   {
-    name: "Kyou Benkyou",
-    url: (kanji: string) => `https://www.kyoubenkyou.com/search/${kanji}`,
-  },
-  {
-    name: "Kanjiverse",
-    url: (kanji: string) => `https://app.kanjiverse.com/kanji/${kanji}`,
-  },
-  {
-    name: "Lorenzi's Jisho",
-    url: (kanji: string) => `https://jisho.hlorenzi.com/search/${kanji}%20%23k`,
-  },
-  {
     name: "Kanji Sense",
     url: (kanji: string) => `https://kanjisense.com/dict/${kanji}`,
   },
@@ -101,10 +97,13 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "Kanji Jump",
     url: (kanji: string) => `https://kanjijump.com/dict/${kanji}`,
   },
-
   {
-    name: "JapanDict",
-    url: (kanji: string) => `https://japandict.com/kanji/${kanji}`,
+    name: "Wiktionary",
+    url: (kanji: string) => `https://en.wiktionary.org/wiki/${kanji}`,
+  },
+  {
+    name: "Hanziyuan",
+    url: (kanji: string) => `https://hanziyuan.net/#${kanji}`,
   },
 ];
 
