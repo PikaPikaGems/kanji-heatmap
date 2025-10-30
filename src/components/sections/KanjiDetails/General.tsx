@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 
 import { BasicLoading } from "@/components/common/BasicLoading";
-import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { ReactNode } from "react";
@@ -85,11 +84,6 @@ export const General = ({ kanji }: { kanji: string }) => {
           </TableRow>
         </TableBody>
       </Table>
-      <DottedSeparator className="border-b-2 mb-4" />
-      <div className="text-left">
-        <h1 className="font-bold mb-1">Learn more from: </h1>
-        <ExternalKanjiLinks kanji={kanji} />
-      </div>
     </>
   );
 };
