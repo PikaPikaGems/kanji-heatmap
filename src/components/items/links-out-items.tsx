@@ -1,5 +1,6 @@
 import { outLinks } from "@/lib/external-links";
 import { BugIcon, KoFiIcon, DiscordIcon } from "../icons";
+import { BirdIcon } from "lucide-react";
 
 const bugItem = {
   href: outLinks.githubIssue,
@@ -19,10 +20,17 @@ const kofiItem = {
   icon: <KoFiIcon />,
 };
 
+const twitterItem = {
+  href: outLinks.koFi,
+  text: "Follow us on X/Twitter",
+  icon: <BirdIcon />,
+};
+
 const linksOutItems = {
   bugItem,
   discordItem,
   kofiItem,
+  twitterItem,
 };
 
 export { linksOutItems };
