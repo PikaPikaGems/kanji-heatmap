@@ -42,8 +42,9 @@ export const SocialLinksCTA = () => {
 const RirikkuCTA = () => {
   return (
     <>
-      👀 Look! The {"world's"} coolest{" "}
-      <ExternalTextLink href={outLinks.ririkku} text={"J-Music app ♫"} />
+      👀 Look! The {"World's"} Coolest{"™"}
+      <ExternalTextLink href={outLinks.ririkku} text={"J-Music App"} />
+      {"♫"}
     </>
   );
 };
