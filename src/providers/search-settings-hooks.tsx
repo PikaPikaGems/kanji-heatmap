@@ -5,7 +5,7 @@ import { JLPT_TYPE_ARR } from "@/lib/jlpt";
 
 export const searchSettings = createContextComponents<SearchSettings>({
   textSearch: {
-    type: "keyword",
+    type: "readings",
     text: "",
   },
   filterSettings: {

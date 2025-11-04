@@ -162,6 +162,7 @@ export const outLinks = {
   koFi: "https://ko-fi.com/minimithi",
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
+  twitter: `https://x.com/pikapikagems`,
 };
 
 export const otherOutLinks = {
