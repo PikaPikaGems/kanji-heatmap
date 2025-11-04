@@ -88,7 +88,7 @@ export const KanjiKeyboardShortcuts = ({ kanji }: { kanji: string }) => {
             text="Change font"
           />
           <IconMeanings
-            kbd="0"
+            kbd="!"
             text="Kanji Default Reading"
             onClick={speakKanji}
           />
