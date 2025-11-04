@@ -33,7 +33,7 @@ const defaultSortSettings: SortSettings = {
 
 const defaultSearchTextSettings: TextSearch = {
   text: "",
-  type: "keyword",
+  type: "readings",
 };
 
 const defaultSearchType = defaultSearchTextSettings.type;
