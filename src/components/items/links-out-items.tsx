@@ -21,7 +21,7 @@ const kofiItem = {
 };
 
 const twitterItem = {
-  href: outLinks.koFi,
+  href: outLinks.twitter,
   text: "Follow us on X/Twitter",
   icon: <BirdIcon />,
 };

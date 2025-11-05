@@ -22,7 +22,7 @@ import { RadicalsScreenDialog } from "./RadicalScreen/RadicalScreenDialog";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 
-const INPUT_DEBOUNCE_TIME = 300;
+const INPUT_DEBOUNCE_TIME = 400;
 
 export const SearchInput = ({
   initialSearchType = defaultSearchType,
