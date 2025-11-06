@@ -150,6 +150,11 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "KanjiKana",
     url: (kanji: string) => `https://kanjikana.com/en/kanji/${kanji}`,
   },
+  {
+    name: "Kanjipedia",
+    url: (kanji: string) =>
+      `https://www.kanjipedia.jp/search?k=${kanji}&kt=1&sk=leftHand`,
+  },
 ];
 
 //www.ldoceonline.com/dictionary/見る
@@ -162,7 +167,8 @@ export const outLinks = {
   koFi: "https://ko-fi.com/minimithi",
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
-  twitter: `https://x.com/pikapikagems`,
+  twitter: "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5",
+  // twitter: `https://x.com/pikapikagems`,
 };
 
 export const otherOutLinks = {
