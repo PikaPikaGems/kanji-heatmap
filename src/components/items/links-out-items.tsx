@@ -20,7 +20,7 @@ const kofiItem = {
   icon: <KoFiIcon />,
 };
 
-const twitterItem = {
+export const twitterItem = {
   href: outLinks.twitter,
   text: "Follow us on X/Twitter",
   icon: <BirdIcon />,
@@ -30,7 +30,7 @@ const linksOutItems = {
   bugItem,
   discordItem,
   kofiItem,
-  twitterItem,
+  //   twitterItem,
 };
 
 export { linksOutItems };
