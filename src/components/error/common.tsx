@@ -29,6 +29,7 @@ export const Wrapper = ({ children }: { children: ReactNode }) => {
   );
 };
 
+const SHOW_TWITTER = false;
 export const ReachOutToUs = ({
   prefix = " Let us know on ",
 }: {
@@ -38,7 +39,9 @@ export const ReachOutToUs = ({
     <>
       {prefix}
       <ExternalTextLink href={outLinks.discord} text="Discord," />
-      <ExternalTextLink href={outLinks.twitter} text="Twitter," />
+      {SHOW_TWITTER && (
+        <ExternalTextLink href={outLinks.twitter} text="Twitter," />
+      )}
       <ExternalTextLink href={outLinks.githubIssue} text="GitHub," /> or
       <ExternalTextLink href={outLinks.koFi} text="Ko-Fi." />
     </>

@@ -11,6 +11,7 @@ import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 const RirikkuCTABadge = () => {
   return (
@@ -21,6 +22,19 @@ const RirikkuCTABadge = () => {
         coolest music player™ helps you absorb real Japanese from the songs you
         already love. We hope you try it!
       </a>
+    </Badge>
+  );
+};
+
+const ImprovementCTA = () => {
+  return (
+    <Badge className="mb-3 rounded-md py-2 w-full text-left block">
+      We strive to make our content as accurate and helpful as possible. If you
+      notice an error or think the sample vocabulary or English keywords for
+      this kanji could be better, please let us know on{" "}
+      <ExternalTextLink href={outLinks.githubContentIssue} text="GitHub" /> or{" "}
+      <ExternalTextLink href={outLinks.discord} text="Discord." /> Your feedback
+      means a lot!
     </Badge>
   );
 };
@@ -41,6 +55,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
+      <ImprovementCTA />
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
