@@ -1,4 +1,5 @@
 import { selectRandom } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const kaomojiFrames = {
@@ -120,7 +121,7 @@ const KaomojiAnimation = ({
   );
 };
 
-const KaomojiWithDelay = () => {
+export const DelayedLoadingKaomoji = () => {
   const [showLoading, setShowLoading] = useState(false);
   useEffect(() => {
     setTimeout(() => {
@@ -135,4 +136,12 @@ const KaomojiWithDelay = () => {
   return <KaomojiAnimation />;
 };
 
-export default KaomojiWithDelay;
+const KaoMojiLoadingSpinner = () => {
+  return (
+    <div className="p-5 flex w-full h-full justify-center items-center">
+      <Loader2 className="size-7 animate-spin" />
+    </div>
+  );
+};
+
+export default KaoMojiLoadingSpinner;
