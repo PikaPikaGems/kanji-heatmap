@@ -29,7 +29,7 @@ export const Wrapper = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const SHOW_TWITTER = false;
+const SHOW_TWITTER = true;
 export const ReachOutToUs = ({
   prefix = " Let us know on ",
 }: {
