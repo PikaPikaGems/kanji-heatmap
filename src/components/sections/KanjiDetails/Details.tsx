@@ -6,7 +6,6 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
-import { RequestForSuggestion } from "@/components/common/RequestForSuggestion";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
@@ -19,8 +18,8 @@ const RirikkuCTABadge = () => {
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
         Lyrics make Japanese stick.{" "}
         <span className="underline">{"Ririkku,"}</span> the{" Internet's"}{" "}
-        coolest music player™ helps you absorb real Japanese from the songs you
-        already love. We hope you try it!
+        coolest music player™ helps you absorb real Japanese from songs you
+        love.
       </a>
     </Badge>
   );
@@ -74,7 +73,6 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           <ExternalKanjiLinks kanji={kanji} />
         </div>
       </SimpleAccordion>
-      <RequestForSuggestion />
       <RirikkuCTABadge />
       <div className="w-full flex justify-start space-x-1">
         <LinksOutItems />

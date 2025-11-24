@@ -30,7 +30,7 @@ const linksOutItems = {
   bugItem,
   discordItem,
   kofiItem,
-  //   twitterItem,
+  twitterItem,
 };
 
 export { linksOutItems };
