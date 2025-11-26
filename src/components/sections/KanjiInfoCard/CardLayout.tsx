@@ -18,7 +18,7 @@ export const KanjiCardLayout = ({
     <article className="w-full rounded-lg border-2 border-dotted animate-fade-in">
       <div className="hidden sm:flex">
         <div className=" border-r-2 border-dotted">{main}</div>
-        {hasWords && (
+        {firstWord && (
           <div className="px-2 w-full pb-4 pt-4">
             {firstWord}
             {hasWords && (
@@ -31,7 +31,7 @@ export const KanjiCardLayout = ({
 
       <div className="flex flex-col sm:hidden">
         <div>{main}</div>
-        {hasWords && (
+        {firstWord && (
           <div className="px-2 w-full py-2 mt-2 border-t-2 border-dotted flex flex-col justify-center">
             {firstWord}
             {hasWords && (

@@ -31,7 +31,8 @@ const ImprovementCTA = () => {
       We strive to make our content as accurate and helpful as possible. If you
       notice an error or think the sample vocabulary or English keywords for
       this kanji could be better, please let us know on{" "}
-      <ExternalTextLink href={outLinks.githubContentIssue} text="GitHub" /> or{" "}
+      <ExternalTextLink href={outLinks.githubContentIssue} text="GitHub," />{" "}
+      <ExternalTextLink href={outLinks.twitter} text="X/Twitter," /> or{" "}
       <ExternalTextLink href={outLinks.discord} text="Discord." /> Your feedback
       means a lot!
     </Badge>

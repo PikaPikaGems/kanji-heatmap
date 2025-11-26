@@ -102,7 +102,7 @@ export const SearchInput = ({
           }
 
           if (hasKanji(processedText)) {
-            onSyncAll(processedText, "multi-kanji");
+            onSyncAll(`${parsedValue}${processedText}`, "multi-kanji");
             return;
           }
 
