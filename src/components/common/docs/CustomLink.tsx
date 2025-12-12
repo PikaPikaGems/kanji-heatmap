@@ -17,3 +17,14 @@ export function CustomLink({ href, children }: CustomLinkProps) {
     </a>
   );
 }
+
+export function CustomMailLink({ email }: { email: string }) {
+  return (
+    <a
+      href={`mailto:${email}`}
+      className="underline font-bold hover:bg-[#2effff] hover:text-black rounded-md p-1"
+    >
+      {email}
+    </a>
+  );
+}

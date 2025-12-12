@@ -1,4 +1,4 @@
-import { CustomLink } from "@/components/common/docs/CustomLink";
+import { CustomLink, CustomMailLink } from "@/components/common/docs/CustomLink";
 
 export const PrivacyPolicySection = ({ title }: { title: string }) => {
   return (
@@ -7,12 +7,12 @@ export const PrivacyPolicySection = ({ title }: { title: string }) => {
         {title}
       </h1>
       <p className="text-sm text-muted-foreground italic mb-6">
-        <em>Last Updated: March 24, 2025</em>
+        <em>Last Updated: December 12, 2025</em>
       </p>
 
       <p className="leading-7 mb-4">
         <CustomLink href="https://github.com/PikaPikaGems">
-          PikaPikaGems
+          PikaPikaGems Pte Ltd
         </CustomLink>{" "}
         operates kanjiheatmap.com (the {`"Site"`}). This Privacy Policy explains
         how we handle information related to your use of the Site.
@@ -115,7 +115,7 @@ export const PrivacyPolicySection = ({ title }: { title: string }) => {
 
       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
         <li>
-          <CustomLink href="https://ko-fi.com/minimithi">KoFi</CustomLink>
+          <CustomMailLink email="privacy@pikapikagems.com"/>
         </li>
         <li>
           <CustomLink href="https://discord.gg/Ash8ZrGb4s">Discord</CustomLink>

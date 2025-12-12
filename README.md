@@ -80,4 +80,5 @@ rm kanji-heatmap-data.tar.gz
 ## Talk to Us
 
 - [Discord](https://discord.gg/Ash8ZrGb4s)
-- [Ko-Fi](https://ko-fi.com/minimithi")
+- [X/Twitter](https://x.com/pikapikagemsjp)
+- [Instagram](https://www.instagram.com/pikapikagems)

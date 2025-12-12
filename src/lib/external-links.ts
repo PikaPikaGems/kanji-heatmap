@@ -164,7 +164,6 @@ export const outLinks = {
   githubIssue: "https://github.com/PikaPikaGems/kanji-heatmap/issues/63",
   githubContentIssue:
     "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5",
-  koFi: "https://ko-fi.com/minimithi",
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
   twitter: "https://x.com/pikapikagemsJP",

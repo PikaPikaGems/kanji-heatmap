@@ -1,4 +1,4 @@
-import { CustomLink } from "@/components/common/docs/CustomLink";
+import { CustomLink, CustomMailLink } from "@/components/common/docs/CustomLink";
 
 export const TermsOfUseSection = ({ title }: { title: string }) => {
   return (
@@ -8,7 +8,7 @@ export const TermsOfUseSection = ({ title }: { title: string }) => {
       </h1>
       <div>
         <p className="text-sm text-muted-foreground italic mb-6">
-          <em>Last Updated: March 24, 2025</em>
+          <em>Last Updated: December 12, 2025</em>
         </p>
 
         <p className="leading-7 mb-4">
@@ -73,7 +73,7 @@ export const TermsOfUseSection = ({ title }: { title: string }) => {
 
         <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
           <li>
-            <CustomLink href="https://ko-fi.com/minimithi">KoFi</CustomLink>
+            <CustomMailLink email="admin@pikapikagems.com"/>
           </li>
           <li>
             <CustomLink href="https://discord.gg/Ash8ZrGb4s">

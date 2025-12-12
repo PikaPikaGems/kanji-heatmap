@@ -1,6 +1,6 @@
 # Terms of Use
 
-_Last Updated: March 24, 2025_
+_Last Updated: December 12, 2025_
 
 By using kanjiheatmap.com (the “Site”), you agree to these Terms of Use and our [Privacy Policy](#).
 
@@ -28,6 +28,6 @@ We may update these Terms of Use at any time. Changes will be posted here with a
 
 Questions? Reach out at:
 
-- [KoFi](https://ko-fi.com/minimithi)
+- admin@pikapikagems.com
 - [Discord](https://discord.gg/Ash8ZrGb4s)
 - [GitHub](https://github.com/PikaPikaGems/kanji-heatmap/issues)
