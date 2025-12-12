@@ -42,8 +42,8 @@ export const ReachOutToUs = ({
       {SHOW_TWITTER && (
         <ExternalTextLink href={outLinks.twitter} text="Twitter," />
       )}
-      <ExternalTextLink href={outLinks.githubIssue} text="GitHub," /> or
-      <ExternalTextLink href={outLinks.koFi} text="Ko-Fi." />
+      or
+      <ExternalTextLink href={outLinks.githubIssue} text="GitHub." />
     </>
   );
 };

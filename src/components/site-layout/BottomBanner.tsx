@@ -30,8 +30,8 @@ export const SocialLinksCTA = () => {
   return (
     <>
       {"(◠_◠)"} Say hi on
-      <ExternalTextLink href={outLinks.koFi} text={"Ko-Fi,"} />
       <ExternalTextLink href={outLinks.discord} text="Discord," />
+      <ExternalTextLink href={outLinks.twitter} text="X/Twitter," />
       or
       <ExternalTextLink href={outLinks.githubIssue} text={"GitHub"} />
       {"👋"}

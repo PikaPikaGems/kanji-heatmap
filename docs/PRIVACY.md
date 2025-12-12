@@ -1,8 +1,8 @@
 # Privacy Policy
 
-_Last Updated: March 24, 2025_
+_Last Updated: December 12, 2025_
 
-[PikaPikaGems](https://github.com/PikaPikaGems) operates kanjiheatmap.com (the “Site”). This Privacy Policy explains how we handle information related to your use of the Site.
+[PikaPikaGems Pte Ltd](https://github.com/PikaPikaGems) operates kanjiheatmap.com (the “Site”). This Privacy Policy explains how we handle information related to your use of the Site.
 
 ## Information We Collect
 
@@ -38,6 +38,6 @@ We may update this Privacy Policy from time to time. If we do, the updated versi
 
 If you have questions about this Privacy Policy, feel free to reach out:
 
-- [KoFi](https://ko-fi.com/minimithi)
+- privacy@pikapikagems.com
 - [Discord](https://discord.gg/Ash8ZrGb4s)
 - [GitHub](https://github.com/PikaPikaGems/kanji-heatmap/issues)
