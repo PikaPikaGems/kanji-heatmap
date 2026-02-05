@@ -56,7 +56,7 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
       trigger={
         <Button
           variant="ghost"
-          className="items-end h-auto p-1 tex t-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="items-end h-auto p-1 text-2xl kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
         >
           {vocabInfo?.parts == null ? word :
             vocabInfo.parts.map((part, index) => (

@@ -27,7 +27,7 @@ const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const colorClass = frequencyColors[frequency];
 
   return (
-    <span className={`font-medium ${colorClass}`}>
+    <span className={`text-xs font-bold ${colorClass}`}>
       {frequency} {label}
     </span>
   );
@@ -45,15 +45,15 @@ const ReadingTypeBadge = ({ type }: { type: "ON" | "KUN" }) => {
 const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
   return (
     <TableRow>
-      <TableCell className="text-lg font-medium">{entry.reading}</TableCell>
+      <TableCell className="text-base kanji-font">{entry.reading}</TableCell>
       <TableCell>
-        <ReadingTypeBadge type={entry.type} />
+        <FrequencyBadge frequency={entry.frequency} />
       </TableCell>
       <TableCell>
         <ExampleWordPopover word={entry.example_word} />
       </TableCell>
       <TableCell>
-        <FrequencyBadge frequency={entry.frequency} />
+        <ReadingTypeBadge type={entry.type} />
       </TableCell>
     </TableRow>
   );
@@ -62,7 +62,7 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
 const MethodologyNote = () => (
   <div className="p-4 text-sm text-left text-muted-foreground">
     <p className="text-left">
-   All data and the methodology used to determine the reading frequency categories are from on the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
+      All data and the methodology used to determine the reading frequency categories are from on the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
     </p>
     <ul className="mt-2 space-y-1 text-left list-disc list-inside">
       <li>
@@ -112,25 +112,25 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
 
   return (
     <div>
-      <div 
+      <div
         className="px-2 mt-4 -mx-2 overflow-x-auto"
 
       >
         <Table className="w-full min-w-[600px]">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-center">Reading</TableHead>
-                <TableHead className="text-center">Type</TableHead>
-                <TableHead className="text-center">Sample</TableHead>
-                <TableHead className="text-center">Frequency</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {kanjiReadingData.map((entry) => (
-                <ReadingRow key={`${entry.reading}-${entry.example_word}-${entry.frequency}-${entry.type}`} entry={entry} />
-              ))}
-            </TableBody>
-          </Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">Reading</TableHead>
+              <TableHead className="text-center">Frequency</TableHead>
+              <TableHead className="text-center">Sample Word</TableHead>
+              <TableHead className="text-center">Type </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {kanjiReadingData.map((entry) => (
+              <ReadingRow key={`${entry.reading}-${entry.example_word}-${entry.frequency}-${entry.type}`} entry={entry} />
+            ))}
+          </TableBody>
+        </Table>
       </div>
       <MethodologyNote />
     </div>
