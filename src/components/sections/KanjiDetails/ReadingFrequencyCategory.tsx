@@ -20,18 +20,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-
-// Source links for reading frequency data
-const readingFrequencySourceLinks = [
-  {
-    text: "Spreadsheet",
-    url: "https://docs.google.com/spreadsheets/d/1MBYfKPrlST3F51KIKbAlsGw1x4c_atuHfPwSSRN5sLs/edit?gid=496425456#gid=496425456",
-  },
-  {
-    text: "Research Paper",
-    url: "https://www.researchgate.net/publication/357159664_2242_Kanji_Frequency_List_ver_11",
-  },
-];
+import { readingFrequencySourceLinks } from "@/lib/freq/freq-source-info";
 
 const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const label = frequencyLabels[frequency];
