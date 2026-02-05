@@ -167,6 +167,7 @@ export const outLinks = {
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
   twitter: "https://x.com/pikapikagemsJP",
+  instagram: "https://www.instagram.com/pikapikagems/",
 };
 
 export const otherOutLinks = {
