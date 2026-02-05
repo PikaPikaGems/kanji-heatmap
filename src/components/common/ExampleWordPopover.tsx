@@ -9,10 +9,10 @@ import { GlobalKanjiLink } from "@/components/dependent/routing";
 
 import { vocabExternalLinks } from "@/lib/external-links";
 import {
+  useGetKanjiInfoFn,
   useVocabDetails,
   WordPartDetail,
-} from "@/providers/vocab-data-provider";
-import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
+} from "@/kanji-worker/kanji-worker-hooks";
 
 // Displays furigana above a word (small version for trigger)
 const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
@@ -32,33 +32,6 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
   );
 };
 
-// Displays furigana above a word (large version for popup)
-const FuriganaPart = ({ part }: { part: WordPartDetail }) => {
-  const [text, reading] = part;
-
-  if (!reading) {
-    return <span className="text-lg">{text}</span>;
-  }
-
-  return (
-    <ruby className="text-lg">
-      {text}
-      <rp>(</rp>
-      <rt className="text-xs">{reading}</rt>
-      <rp>)</rp>
-    </ruby>
-  );
-};
-
-const WordWithFurigana = ({ parts }: { parts: WordPartDetail[] }) => {
-  return (
-    <div className="flex flex-wrap justify-center items-end py-2">
-      {parts.map((part, index) => (
-        <FuriganaPart key={`${part[0]}-${index}`} part={part} />
-      ))}
-    </div>
-  );
-};
 
 // Helper to check if a character is a kanji
 const isKanji = (char: string) => {
@@ -114,7 +87,7 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
   const TriggerWithFurigana = (
     <Button
       variant="ghost"
-      className="text-lg h-auto p-1 kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+      className="h-auto p-1 text-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
     >
       {vocabInfo.parts.map((part, index) => (
         <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
@@ -130,7 +103,7 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
           {/* Kanji breakdown with keywords */}
           {wordKanjis.length > 0 && (
             <>
-              <div className="flex p-1 flex-wrap justify-center">
+              <div className="flex flex-wrap justify-center p-1">
                 {wordKanjis.map((item, index) => (
                   <GlobalKanjiLink
                     key={`${item.kanji}-${index}`}
@@ -143,9 +116,6 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
             </>
           )}
 
-          {/* Word with furigana */}
-          <WordWithFurigana parts={vocabInfo.parts} />
-
           {/* Definition */}
           <DottedSeparator />
           <SeeMore
@@ -155,10 +125,10 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
 
           {/* External links */}
           <DottedSeparator />
-          <div className="text-xs pt-2 font-bold flex flex-wrap justify-center">
+          <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
             Learn more from:
           </div>
-          <div className="text-xs pb-2 flex flex-wrap justify-center">
+          <div className="flex flex-wrap justify-center pb-2 text-xs">
             {vocabExternalLinks.map((item) => (
               <ExternalTextLink
                 key={item.name}

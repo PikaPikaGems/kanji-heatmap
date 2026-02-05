@@ -116,7 +116,8 @@ export type KanjiWorkerRequestName =
   | "initialize-decomposition-map"
   | "kanji-main-map"
   | "phonetic-map"
-  | "part-keyword-map";
+  | "part-keyword-map"
+  | "retrieve-vocab-info";
 
 export type KanjiWorkerRequest = {
   type: KanjiWorkerRequestName;
