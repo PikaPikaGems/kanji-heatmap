@@ -28,7 +28,7 @@ const Layout = ({
             {first}
           </ErrorBoundary>
         </div>
-        <div className="grow">
+        <div className="grow min-w-0">
           <ErrorBoundary details="Kanji Details in KanjiDrawer Layout">
             <div className="hidden md:block">{actionBar}</div>
             {second}

@@ -27,7 +27,7 @@ const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const colorClass = frequencyColors[frequency];
 
   return (
-    <span className={`font-medium text-left  ${colorClass}`}>
+    <span className={`font-medium ${colorClass}`}>
       {frequency} {label}
     </span>
   );
@@ -45,14 +45,14 @@ const ReadingTypeBadge = ({ type }: { type: "ON" | "KUN" }) => {
 const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
   return (
     <TableRow>
-      <TableCell className="font-medium text-lg ">{entry.reading}</TableCell>
+      <TableCell className="text-lg font-medium">{entry.reading}</TableCell>
       <TableCell>
         <ReadingTypeBadge type={entry.type} />
       </TableCell>
       <TableCell>
         <ExampleWordPopover word={entry.example_word} />
       </TableCell>
-      <TableCell className="text-left">
+      <TableCell>
         <FrequencyBadge frequency={entry.frequency} />
       </TableCell>
     </TableRow>
@@ -60,13 +60,11 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
 };
 
 const MethodologyNote = () => (
-  <div className="text-sm text-muted-foreground mb-4 text-left">
+  <div className="p-4 text-sm text-left text-muted-foreground">
     <p className="text-left">
-      Reading frequency categories are based on how often each reading appears
-      in common vocabulary. The associated example word shows a typical usage
-      that contributed to the frequency rating.
+   All data and the methodology used to determine the reading frequency categories are from on the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
     </p>
-    <ul className="mt-2 space-y-1 list-disc list-inside text-left">
+    <ul className="mt-2 space-y-1 text-left list-disc list-inside">
       <li>
         <span className={frequencyColors["↑"]}>↑ Often Used</span> - Frequently
         encountered in everyday Japanese
@@ -80,13 +78,12 @@ const MethodologyNote = () => (
         Rarely used or found mainly in specialized vocabulary
       </li>
     </ul>
-    <div className="mt-3 flex items-center gap-1">
-      <span className="font-bold">Sources:</span>
-      {readingFrequencySourceLinks.map((link, index) => (
-        <span key={link.text}>
+    <div className="pt-4 font-bold">See also:</div>
+    <div className="pl-6">
+      {readingFrequencySourceLinks.map((link) => (
+        <li key={link.text}>
           <ExternalTextLink href={link.url} text={link.text} />
-          {index < readingFrequencySourceLinks.length - 1 && <span> | </span>}
-        </span>
+        </li>
       ))}
     </div>
   </div>
@@ -107,30 +104,33 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
 
   if (!kanjiReadingData || kanjiReadingData.length === 0) {
     return (
-      <div className="text-muted-foreground text-sm py-4 text-left">
+      <div className="py-4 text-sm text-left text-muted-foreground">
         No reading frequency data available for this kanji.
       </div>
     );
   }
 
   return (
-    <div className="mt-4">
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Reading</TableHead>
-              <TableHead className="w-[100px]">Type</TableHead>
-              <TableHead className="w-[120px]">Sample</TableHead>
-              <TableHead>Frequency</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {kanjiReadingData.map((entry, index) => (
-              <ReadingRow key={`${entry.reading}-${index}`} entry={entry} />
-            ))}
-          </TableBody>
-        </Table>
+    <div>
+      <div 
+        className="px-2 mt-4 -mx-2 overflow-x-auto"
+
+      >
+        <Table className="w-full min-w-[600px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Reading</TableHead>
+                <TableHead className="text-center">Type</TableHead>
+                <TableHead className="text-center">Sample</TableHead>
+                <TableHead className="text-center">Frequency</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {kanjiReadingData.map((entry) => (
+                <ReadingRow key={`${entry.reading}-${entry.example_word}-${entry.frequency}-${entry.type}`} entry={entry} />
+              ))}
+            </TableBody>
+          </Table>
       </div>
       <MethodologyNote />
     </div>
