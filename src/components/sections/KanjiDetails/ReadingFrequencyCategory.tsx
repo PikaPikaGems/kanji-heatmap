@@ -21,6 +21,7 @@ import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { readingFrequencySourceLinks } from "@/lib/freq/freq-source-info";
+import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 
 const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const label = frequencyLabels[frequency];
@@ -45,7 +46,9 @@ const ReadingTypeBadge = ({ type }: { type: "ON" | "KUN" }) => {
 const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
   return (
     <TableRow>
-      <TableCell className="text-base kanji-font">{entry.reading}</TableCell>
+      <TableCell className="text-base kanji-font">
+        <RomajiBadge kana={entry.reading} />
+      </TableCell>
       <TableCell>
         <FrequencyBadge frequency={entry.frequency} />
       </TableCell>
