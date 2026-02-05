@@ -159,6 +159,12 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
     return;
   }
 
+  if (eventType === "retrieve-vocab-info") {
+    const vocabInfo = retrieveVocabInfo(payload as string);
+    sendResponse(vocabInfo);
+    return;
+  }
+
   if (eventType == null || payload == null) {
     sendError({
       message:

@@ -115,6 +115,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://tangorin.com/kanji?search=${kanji}`,
   },
   {
+    name: "MichiKanji",
+    url: (kanji: string) => `https://www.michikanji.com/kanji/${kanji}`,
+  },
+  {
     name: "Joy-o-Kanji",
     url: (kanji: string) =>
       `https://www.joyokanji.com/character-home-page/${kanji}`,
@@ -167,6 +171,7 @@ export const outLinks = {
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
   twitter: "https://x.com/pikapikagemsJP",
+  instagram: "https://www.instagram.com/pikapikagems/",
 };
 
 export const otherOutLinks = {
@@ -176,6 +181,10 @@ export const otherOutLinks = {
 };
 
 export const vocabExternalLinks = [
+  {
+    name: "Kagi Translate",
+    url: (word: string) => `https://translate.kagi.com/?from=ja&to=en&text=${word}`
+  },
   {
     name: "Immersion Kit",
     url: (word: string) =>

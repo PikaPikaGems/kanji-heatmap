@@ -7,6 +7,7 @@ import { KanjiInfoRequestType } from "@/lib/kanji/kanji-info-types";
 import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import { isKanji } from "@/lib/utils";
 
 export type KanjiRequestFn = (
   k: string,
@@ -186,4 +187,106 @@ export const useKanjiSearchResult = () => {
   const searchSettings = useSearchSettings();
   const results = useKanjiSearch(searchSettings);
   return results;
+};
+
+// Vocab types
+export type WordPartDetail = [string, string?]; // [kanji/kana, reading?]
+
+export interface VocabInfo {
+  meaning: string;
+  parts: WordPartDetail[];
+}
+
+type VocabStatus = "idle" | "pending" | "success" | "error";
+
+type VocabWorkerResponse = {
+  word: string;
+  meaning: string;
+  wordPartDetails: WordPartDetail[];
+} | null;
+
+// Hook to get vocab info for a specific word
+export const useVocabDetails = (word: string) => {
+  const [state, setState] = useState<{
+    status: VocabStatus;
+    error: Error | null;
+    vocabInfo: VocabInfo | null;
+  }>({
+    status: "idle",
+    error: null,
+    vocabInfo: null,
+  });
+
+  const lastRequestedWord = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!word) {
+      setState({ status: "idle", error: null, vocabInfo: null });
+      return;
+    }
+
+    // Avoid duplicate requests for the same word
+    if (lastRequestedWord.current === word) {
+      return;
+    }
+
+    lastRequestedWord.current = word;
+
+    setState((prev) => ({ ...prev, status: "pending" }));
+
+    requestWorker({ type: "retrieve-vocab-info", payload: word })
+      .then((result) => {
+        const response = result as VocabWorkerResponse;
+
+        if (response == null) {
+          setState({
+            status: "success",
+            error: null,
+            vocabInfo: null,
+          });
+          return;
+        }
+
+        setState({
+          status: "success",
+          error: null,
+          vocabInfo: {
+            meaning: response.meaning || "",
+            parts: response.wordPartDetails,
+          },
+        });
+      })
+      .catch((err) => {
+        setState({
+          status: "error",
+          error: err instanceof Error ? err : new Error(String(err)),
+          vocabInfo: null,
+        });
+      });
+  }, [word]);
+
+  return state;
+};
+
+
+export const useWordKanjis = (word: string) => {
+  const getKanjiInfo = useGetKanjiInfoFn();
+
+  const kanjis = word.split("").filter(isKanji);
+  const uniqueKanjis = [...new Set(kanjis)];
+
+  if (!getKanjiInfo) {
+    return [];
+  }
+
+  return uniqueKanjis
+    .map((kanji) => {
+      const info = getKanjiInfo(kanji);
+      return {
+        kanji,
+        keyword: info?.keyword || "Unknown",
+        isKanji: true,
+      };
+    })
+    .filter((item) => item.keyword !== "Unknown" || item.isKanji);
 };

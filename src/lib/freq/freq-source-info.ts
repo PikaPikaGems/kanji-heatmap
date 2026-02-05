@@ -205,3 +205,16 @@ export const FREQ_RANK_SOURCES_INFO: Record<
     rankType: "N/A",
   },
 };
+
+// Source links for reading frequency data
+export const readingFrequencySourceLinks = [
+  {
+    text: "Dr Patrick Kandrac's Research Paper",
+
+    url: "https://www.researchgate.net/publication/357163811_Joyo_Kanji_Readings_ver_11",
+  },
+  {
+    text: "Kanji Readings excel sheet to JSON Converter by Piyush",
+    url: "https://github.com/piyush8512/Kanji-Readings-Converter",
+  },
+];
