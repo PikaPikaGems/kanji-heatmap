@@ -40,7 +40,7 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
-  if (status !== "success" || !vocabInfo) {
+  if (status !== "success") {
     return (
       <span className="text-lg cursor-default kanji-font" title="Loading...">
         {word}
@@ -48,23 +48,22 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
     );
   }
 
-  const kana = vocabInfo.parts.map((part) => part[1] || part[0]).join("");
-
+  const kana = (vocabInfo ?? { parts: [] }).parts.map((part) => part[1] || part[0]).join("");
   // Show furigana on the trigger button
-  const TriggerWithFurigana = (
-    <Button
-      variant="ghost"
-      className="items-end h-auto p-1 text-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
-    >
-      {vocabInfo.parts.map((part, index) => (
-        <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
-      ))}
-    </Button>
-  );
 
   return (
     <GenericPopover
-      trigger={TriggerWithFurigana}
+      trigger={
+        <Button
+          variant="ghost"
+          className="items-end h-auto p-1 tex t-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          {vocabInfo?.parts == null ? word :
+            vocabInfo.parts.map((part, index) => (
+              <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
+            ))}
+
+        </Button>}
       content={
         <div className="w-64 p-2">
           {/* Kanji breakdown with keywords */}
@@ -85,10 +84,12 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
 
           {/* Definition */}
           <DottedSeparator />
-          <SeeMore
-            definition={vocabInfo.meaning || "not provided"}
-            maxLen={150}
-          />
+          {vocabInfo?.meaning &&
+            <SeeMore
+              definition={vocabInfo?.meaning || "not provided"}
+              maxLen={150}
+            />
+          }
 
           {/* External links */}
           <DottedSeparator />
