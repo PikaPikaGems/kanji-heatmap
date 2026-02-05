@@ -115,6 +115,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://tangorin.com/kanji?search=${kanji}`,
   },
   {
+    name: "MichiKanji",
+    url: (kanji: string) => `https://www.michikanji.com/kanji/${kanji}`,
+  },
+  {
     name: "Joy-o-Kanji",
     url: (kanji: string) =>
       `https://www.joyokanji.com/character-home-page/${kanji}`,
