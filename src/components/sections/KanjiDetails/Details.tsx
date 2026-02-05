@@ -7,6 +7,7 @@ import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
+import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
@@ -68,6 +69,9 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
+      </SimpleAccordion>
+      <SimpleAccordion trigger={"Reading Frequency Category"}>
+        <ReadingFrequencyCategory kanji={kanji} />
       </SimpleAccordion>
       <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
         <div className="text-left mt-2">
