@@ -87,7 +87,7 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
   const TriggerWithFurigana = (
     <Button
       variant="ghost"
-      className="h-auto p-1 text-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+      className="items-end h-auto p-1 text-lg kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
     >
       {vocabInfo.parts.map((part, index) => (
         <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
