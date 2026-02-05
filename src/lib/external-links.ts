@@ -182,6 +182,10 @@ export const otherOutLinks = {
 
 export const vocabExternalLinks = [
   {
+    name: "Kagi Translate",
+    url: (word: string) => `https://translate.kagi.com/?from=ja&to=en&text=${word}`
+  },
+  {
     name: "Immersion Kit",
     url: (word: string) =>
       `https://www.immersionkit.com/dictionary?keyword=${word}`,
