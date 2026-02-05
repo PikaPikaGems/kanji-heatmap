@@ -29,3 +29,12 @@ export const checkIfInputField = (target: HTMLElement) => {
     target.isContentEditable
   );
 };
+
+export const isKanji = (char: string) => {
+  const code = char.charCodeAt(0);
+  return (
+    (code >= 0x4e00 && code <= 0x9faf) || // CJK Unified Ideographs
+    (code >= 0x3400 && code <= 0x4dbf) // CJK Unified Ideographs Extension A
+  );
+};
+

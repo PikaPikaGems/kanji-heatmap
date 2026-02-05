@@ -13,6 +13,7 @@ import {
   useVocabDetails,
   WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { isKanji } from "@/lib/utils";
 
 // Displays furigana above a word (small version for trigger)
 const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
@@ -33,14 +34,6 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
 };
 
 
-// Helper to check if a character is a kanji
-const isKanji = (char: string) => {
-  const code = char.charCodeAt(0);
-  return (
-    (code >= 0x4e00 && code <= 0x9faf) || // CJK Unified Ideographs
-    (code >= 0x3400 && code <= 0x4dbf) // CJK Unified Ideographs Extension A
-  );
-};
 
 // Extract kanji characters from word with their keywords
 const useWordKanjis = (word: string) => {
