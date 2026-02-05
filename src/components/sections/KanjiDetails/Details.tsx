@@ -15,12 +15,11 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 const RirikkuCTABadge = () => {
   return (
-    <Badge className="mb-3 rounded-md py-2 w-full">
+    <Badge className="w-full py-2 mb-3 rounded-md">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
         Lyrics make Japanese stick.{" "}
         <span className="underline">{"Ririkku,"}</span> the{" Internet's"}{" "}
-        coolest music player™ helps you absorb real Japanese from songs you
-        love.
+        coolest music player™ helps you absorb real Japanese from memorable songs.
       </a>
     </Badge>
   );
@@ -28,7 +27,7 @@ const RirikkuCTABadge = () => {
 
 const ImprovementCTA = () => {
   return (
-    <Badge className="mb-3 rounded-md py-2 w-full text-left block">
+    <Badge className="block w-full py-2 mb-3 text-left rounded-md">
       We strive to make our content as accurate and helpful as possible. If you
       notice an error or think the sample vocabulary or English keywords for
       this kanji could be better, please let us know on{" "}
@@ -70,16 +69,16 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Reading Frequency Category"}>
+      <SimpleAccordion trigger={"Reading Usefulness Data"}>
         <ReadingFrequencyCategory kanji={kanji} />
       </SimpleAccordion>
       <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
-        <div className="text-left mt-2">
+        <div className="mt-2 text-left">
           <ExternalKanjiLinks kanji={kanji} />
         </div>
       </SimpleAccordion>
       <RirikkuCTABadge />
-      <div className="w-full flex justify-start space-x-1">
+      <div className="flex justify-start w-full space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />
       </div>
