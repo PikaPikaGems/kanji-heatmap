@@ -83,12 +83,13 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
           )}
 
           {/* Definition */}
-          <DottedSeparator />
-          {vocabInfo?.meaning &&
+          {vocabInfo?.meaning && <>
+            <DottedSeparator />
             <SeeMore
               definition={vocabInfo?.meaning || "not provided"}
               maxLen={150}
             />
+          </>
           }
 
           {/* External links */}
