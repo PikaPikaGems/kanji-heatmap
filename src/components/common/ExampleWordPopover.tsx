@@ -9,11 +9,10 @@ import { GlobalKanjiLink } from "@/components/dependent/routing";
 
 import { vocabExternalLinks } from "@/lib/external-links";
 import {
-  useGetKanjiInfoFn,
   useVocabDetails,
+  useWordKanjis,
   WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { isKanji } from "@/lib/utils";
 
 // Displays furigana above a word (small version for trigger)
 const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
@@ -31,31 +30,6 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
       <rp>)</rp>
     </ruby>
   );
-};
-
-
-
-// Extract kanji characters from word with their keywords
-const useWordKanjis = (word: string) => {
-  const getKanjiInfo = useGetKanjiInfoFn();
-
-  const kanjis = word.split("").filter(isKanji);
-  const uniqueKanjis = [...new Set(kanjis)];
-
-  if (!getKanjiInfo) {
-    return [];
-  }
-
-  return uniqueKanjis
-    .map((kanji) => {
-      const info = getKanjiInfo(kanji);
-      return {
-        kanji,
-        keyword: info?.keyword || "Unknown",
-        isKanji: true,
-      };
-    })
-    .filter((item) => item.keyword !== "Unknown" || item.isKanji);
 };
 
 interface ExampleWordPopoverProps {

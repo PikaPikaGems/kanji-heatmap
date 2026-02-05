@@ -7,6 +7,7 @@ import { KanjiInfoRequestType } from "@/lib/kanji/kanji-info-types";
 import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import { isKanji } from "@/lib/utils";
 
 export type KanjiRequestFn = (
   k: string,
@@ -265,4 +266,27 @@ export const useVocabDetails = (word: string) => {
   }, [word]);
 
   return state;
+};
+
+
+export const useWordKanjis = (word: string) => {
+  const getKanjiInfo = useGetKanjiInfoFn();
+
+  const kanjis = word.split("").filter(isKanji);
+  const uniqueKanjis = [...new Set(kanjis)];
+
+  if (!getKanjiInfo) {
+    return [];
+  }
+
+  return uniqueKanjis
+    .map((kanji) => {
+      const info = getKanjiInfo(kanji);
+      return {
+        kanji,
+        keyword: info?.keyword || "Unknown",
+        isKanji: true,
+      };
+    })
+    .filter((item) => item.keyword !== "Unknown" || item.isKanji);
 };
