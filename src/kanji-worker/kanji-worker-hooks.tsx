@@ -272,7 +272,7 @@ export const useVocabDetails = (word: string) => {
 export const useWordKanjis = (word: string) => {
   const getKanjiInfo = useGetKanjiInfoFn();
 
-  const kanjis = word.split("").filter(isKanji);
+  const kanjis = (word || "").split("").filter(isKanji);
   const uniqueKanjis = [...new Set(kanjis)];
 
   if (!getKanjiInfo) {

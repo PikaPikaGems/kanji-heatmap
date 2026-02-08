@@ -53,7 +53,7 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
         <FrequencyBadge frequency={entry.frequency} />
       </TableCell>
       <TableCell>
-        <ExampleWordPopover word={entry.example_word} />
+        {entry.example_word ? <ExampleWordPopover word={entry.example_word} /> : "-"}
       </TableCell>
       <TableCell>
         <ReadingTypeBadge type={entry.type} />
@@ -65,7 +65,7 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
 const MethodologyNote = () => (
   <div className="p-4 text-sm text-left text-muted-foreground">
     <p className="text-left">
-      All data and the methodology used to determine the reading frequency categories are from on the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
+      All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
     </p>
     <ul className="mt-2 space-y-1 text-left list-disc list-inside">
       <li>
