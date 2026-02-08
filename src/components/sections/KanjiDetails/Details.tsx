@@ -70,7 +70,9 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
       <SimpleAccordion trigger={"Reading Usefulness Data"}>
-        <ReadingFrequencyCategory kanji={kanji} />
+        <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
+          <ReadingFrequencyCategory kanji={kanji} />
+        </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
         <div className="mt-2 text-left">
