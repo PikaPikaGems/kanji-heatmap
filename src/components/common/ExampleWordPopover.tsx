@@ -68,20 +68,16 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
         <div className="w-64 p-2">
           {/* Kanji breakdown with keywords */}
           {wordKanjis.length > 0 && (
-            <>
-              <div className="flex flex-wrap justify-center p-1">
-                {wordKanjis.map((item, index) => (
-                  <GlobalKanjiLink
-                    key={`${item.kanji}-${index}`}
-                    keyword={item.keyword}
-                    kanji={item.kanji}
-                  />
-                ))}
-              </div>
-              <DottedSeparator />
-            </>
+            <div className="flex flex-wrap justify-center p-1">
+              {wordKanjis.map((item, index) => (
+                <GlobalKanjiLink
+                  key={`${item.kanji}-${index}`}
+                  keyword={item.keyword}
+                  kanji={item.kanji}
+                />
+              ))}
+            </div>
           )}
-
           {/* Definition */}
           {vocabInfo?.meaning && <>
             <DottedSeparator />
