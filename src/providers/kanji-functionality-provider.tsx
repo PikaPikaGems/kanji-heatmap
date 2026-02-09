@@ -6,6 +6,7 @@ import { DefaultErrorFallback } from "@/components/error";
 import { SearchSettingsProvider } from "./search-settings-provider";
 import { ItemSettingsProvider } from "./item-settings-provider";
 import { KanjiReadingCategoryProvider } from "./kanji-reading-category-provider";
+import { KanjiStructureProvider } from "./kanji-structure-provider";
 
 export const KanjiFunctionalityProvider = ({
   children,
@@ -22,7 +23,9 @@ export const KanjiFunctionalityProvider = ({
         }
       >
         <KanjiReadingCategoryProvider>
-          <ItemSettingsProvider>{children}</ItemSettingsProvider>
+          <KanjiStructureProvider>
+            <ItemSettingsProvider>{children}</ItemSettingsProvider>
+          </KanjiStructureProvider>
         </KanjiReadingCategoryProvider>
       </KanjiWorkerProvider>
     </SearchSettingsProvider>
