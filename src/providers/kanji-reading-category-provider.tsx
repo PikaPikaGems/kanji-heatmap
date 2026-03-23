@@ -15,7 +15,7 @@ export interface KanjiReadingEntry {
   reading: string;
   type: ReadingType;
   frequency: FrequencyCategory;
-  example_word: string;
+  example_word: string | null;
 }
 
 export type KanjiReadingsData = Record<string, KanjiReadingEntry[]>;
