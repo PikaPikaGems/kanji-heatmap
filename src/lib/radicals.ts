@@ -311,7 +311,7 @@ export const moreRadicalKeywords: Record<string, string> = {
   尤: "peculiar",
   禸: "track",
   "⻂": "shell variant",
-  "⺲": "fish variant",
+  "⺲": "small net / fish variant",
   韭: "leek",
   髟: "long hair",
   鬥: "fighting",
@@ -327,6 +327,45 @@ export const moreRadicalKeywords: Record<string, string> = {
   龠: "flute",
 };
 
+export const radicalFalseFriends: Record<string, string> = {
+  // 艸, 廾 <--- 艹 (from component keyword), ⺾ (from moreRadicals.ts)
+  // ⽊ <-- tree (radical), tree (radical 木)
+
+  // ⺲ "fish variant/small net"
+  // 罒 small net
+  // small net -> fish variant / small net
+  罒: "⺲",
+
+  // 灬 fire sparks
+  // ⺣ small fire variant
+  // fire sparks -> small fire variant
+  灬: "⺣",
+  艹: " ⺾",
+  亻: "⺅",
+  刂: "⺉",
+  辶: "⻌",
+  忄: "⺖",
+  扌: "⺘",
+  氵: "⺡",
+  礻: "⺭",
+  彐: "ヨ",
+  耂: "⺹",
+  丿: "ノ",
+  丨: "｜",
+  // TODO CONFIRM IF CORRECT
+
+  /** TODO: How to handle this? 
+阝 → could be either ⻏ (right) or ⻖ (left), ambiguous without position context
+衤 → related to 衣 but 衣 itself is in the radicals list (not a variant form like ⺅)
+飠 → related to 食, same situation as 衤   */
+};
+
+// IMPORTANT NOTE THINGS I HAVE DONE:
+// Updated kanji-structure.json
+// 1.  艸 -> 艹
+// 2.  ⽊ (radical) -> 木 (kanji)
+// FIX ME: What is 丩 ?
+
 // returns Record<Radical, StrokeCount>
 function transformRadicalsData(): Record<string, string> {
   const output: Record<string, string> = {};
@@ -341,3 +380,6 @@ function transformRadicalsData(): Record<string, string> {
 }
 export const radicalStrokeCountMap: Record<string, string> =
   transformRadicalsData();
+
+export const isKnownRadical = (char: string): boolean =>
+  char in radicalStrokeCountMap || char in radicalFalseFriends;

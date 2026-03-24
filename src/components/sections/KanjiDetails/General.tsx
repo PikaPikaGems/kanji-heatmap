@@ -10,12 +10,23 @@ import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { BasicLoading } from "@/components/common/BasicLoading";
 
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import {
+  KanjiStructuralData,
+} from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
-const TableCellFixed = ({ children }: { children: ReactNode }) => (
-  <TableCell className="w-24 sm:w-32">{children}</TableCell>
+const TableCellFixed = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <TableCell className={`w-24 sm:w-32 ${className ?? ""}`}>
+    {children}
+  </TableCell>
 );
 
 const TableCellGrow = ({ children }: { children: ReactNode }) => (
@@ -37,7 +48,7 @@ export const General = ({ kanji }: { kanji: string }) => {
 
   return (
     <>
-      <div className="text-left mt-6">
+      <div className="mt-6 text-left">
         {hasData(data.jouyouGrade) && (
           <Badge className="m-1">Grade {data.jouyouGrade}</Badge>
         )}
@@ -47,7 +58,7 @@ export const General = ({ kanji }: { kanji: string }) => {
         {hasData(data.wk) && <Badge className="m-1">Wanikani {data.wk}</Badge>}
         {hasData(data.rtk) && <Badge className="m-1">RTK {data.rtk}</Badge>}
       </div>
-      <DottedSeparator className="border-b-2 my-4" />
+      <DottedSeparator className="my-4 border-b-2" />
       <Table>
         <TableBody>
           <TableRow className="text-left">
@@ -80,6 +91,16 @@ export const General = ({ kanji }: { kanji: string }) => {
                 return <RomajiBadge key={on} kana={on} />;
               })}
               {data.allOn.length === 0 && <div> - </div>}
+            </TableCellGrow>
+          </TableRow>
+
+          <TableRow className="text-left">
+            <TableCellFixed>
+              Structure
+            </TableCellFixed>
+            <TableCellGrow>
+
+              <KanjiStructuralData kanji={kanji} />
             </TableCellGrow>
           </TableRow>
         </TableBody>

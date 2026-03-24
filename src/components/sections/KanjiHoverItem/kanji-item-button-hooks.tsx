@@ -43,8 +43,9 @@ export const useItemBtnCn = (kanji: string) => {
   const freqRank = freqType !== "none" ? freqData[freqType] : undefined;
   const freqRankCategory = getFreqCategory(freqRank);
 
-  const textColor =
-    freqRankCategory > 3 || dontIncludeFreq
+  const textColor = dontIncludeFreq
+    ? "text-black dark:text-white"
+    : freqRankCategory > 3
       ? "text-white"
       : "dark:text-white text-gray-700";
   const { jlpt } = kanjiInfo;
@@ -56,7 +57,7 @@ export const useItemBtnCn = (kanji: string) => {
       : `border-theme-color-with-opacity-${20 * freqRankCategory}`;
 
   const bgColor = dontIncludeFreq
-    ? "background-theme-color-with-opacity-100"
+    ? ""
     : freqRankCategory === 0
       ? "bg-background"
       : freqCategoryCn[freqRankCategory];

@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "find-missing-components": "node scripts/find-missing-components.mjs",
+    "find-unhandled-components": "node scripts/find-unhandled-components.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",
