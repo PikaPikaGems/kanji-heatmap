@@ -64,12 +64,32 @@ Component | Keyword              | Also in kanji_main?
 兀 壬 氺 乍 衤 夬 洛 吊 昏 兔 巷 飠 廿 匸 于 尹 旡 乂 莫 阝 屏 㑒 ヨ冖又 𠦝 矢隹 咅
 ```
 
-# Updating `kanji-structure.json`
+# `kanji-structure.json`
+
+Updating
 
 ```
 1.  艸 -> 艹
 2.  ⽊ (radical) -> 木 (kanji)
 ```
+
+Weird Stuff
+
+```
+https://kanjiheatmap.com/?open=円
+
+Why is it?
+
+囗
+Semantic
+員
+phonetic
+
+https://kanjiheatmap.com/?open=考
+
+```
+
+See also: https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5
 
 # Finding Missing Kanji
 
@@ -265,3 +285,9 @@ Problematic (not in any source): 157
 
 辵 攴 网 昜 戔 兑 𢦏 曷 圣 雚 兪 尞 甬 袁 枼 畐 氐 尃 弗 蜀 朿 复 咼 冓 夋 爰 喿 丰 夾 禺 臤 䍃 㐮 辟 𡈼 丂 㕣 翟 关 奐 𦰩 彔 埶 劦 𤇾 亢 侖 攸 龹 悤 扁 戠 蒦 耑 堇 茲 并 夆 夌 賁 敝 㫃 戊 开 𠂔 囟 㐬 罙 咸 柬 睪 䜌 坴 㒸 厤 竟 叚 朮 隺 乇 宓 𡿺 豦 孰 奞 卬 丩 犮 冘 尗 㐱 妟 叟 厓 奚 畾 荅 犀 迶 菐 曼 桼 褱 睘 熏 豤 溥 剌 离 咢 夭 夗 齒 敕 爭 黑 庚 襾 柰 帛 壴 哥 亲 𠬝 羕 㒼 宁 羍 賈 屰 妾 敄 絜 夅 肙 烝 臧 卂 倝 卦 它 陏 胥 厷 崔 窄 垔 罔 閏 楚 蚤 潘 彭 羔 滕 匽 戕
 ```
+
+# Sources
+
+- https://github.com/mifunetoshiro/kanjium/blob/master/data/source_files/kanjidict.txt
+- https://raw.githubusercontent.com/hlorenzi/jisho-open/main/backend/src/data/kanji_structural_category.ts
+- https://github.com/rewhowe/kanji/tree/develop
