@@ -34,6 +34,27 @@ export const GlobalRadicalLink = ({
   );
 };
 
+export const FakeComponentLink = ({
+  radical,
+  keyword
+}: {
+  radical: string;
+  keyword?: string
+}) => {
+
+
+  return (
+    <div
+      className={
+        "flex flex-col m-1 p-1 text-xl rounded-md"
+      }
+    >
+      <Badge className="justify-center text-center border-black border-dashed opacity-50 border-opacity-2" variant="outline">{keyword ?? "..."}</Badge>
+      <div className="kanji-font">{radical}</div>
+    </div>
+  );
+};
+
 export const GlobalKanjiLink = ({
   kanji,
   keyword,

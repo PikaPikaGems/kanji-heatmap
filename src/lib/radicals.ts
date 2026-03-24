@@ -380,3 +380,6 @@ function transformRadicalsData(): Record<string, string> {
 }
 export const radicalStrokeCountMap: Record<string, string> =
   transformRadicalsData();
+
+export const isKnownRadical = (char: string): boolean =>
+  char in radicalStrokeCountMap || char in radicalFalseFriends;

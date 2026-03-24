@@ -4,7 +4,8 @@ import {
 } from "@/providers/kanji-structure-provider";
 import { StructuralType, structuralTypeInfo } from "@/lib/kanji-section-constants";
 import { GlobalKanjiLink } from "@/components/dependent/routing";
-import { GlobalRadicalLink } from "@/components/dependent/routing/global-links";
+import { FakeComponentLink, GlobalRadicalLink } from "@/components/dependent/routing/global-links";
+import { moreRadicalKeywords, radicalFalseFriends } from "@/lib/radicals";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
@@ -26,15 +27,15 @@ const ComponentLink = ({
   component: string;
   keyword: string;
   title: string;
-  type: 'kanji' | 'radical'
+  type: 'kanji' | 'radical' | 'unknown'
 }) => {
 
 
   return (
     <div className="flex flex-col text-center w-fit">
       {type === 'kanji' ?
-        <GlobalKanjiLink kanji={component} keyword={keyword} /> :
-        <GlobalRadicalLink radical={component} keyword={keyword} />
+        <GlobalKanjiLink kanji={component} keyword={keyword} /> : type === "radical" ?
+          <GlobalRadicalLink radical={component} keyword={keyword} /> : <FakeComponentLink radical={component} />
       }
       <div className="text-[10px] uppercase opacity-70">{title}</div>
     </div>
@@ -44,6 +45,13 @@ const ComponentLink = ({
 };
 
 // Info popover explaining a specific structural type
+
+const getRadicalKeyword = (component: string): string | undefined => {
+  if (moreRadicalKeywords[component]) return moreRadicalKeywords[component];
+  const canonical = radicalFalseFriends[component]?.trim();
+  if (canonical && moreRadicalKeywords[canonical]) return moreRadicalKeywords[canonical];
+  return undefined;
+};
 
 const useStructuralData = (kanji: string) => {
   const { status, kanjiStructureData } = useKanjiStructure(kanji);
@@ -60,16 +68,18 @@ const useStructuralData = (kanji: string) => {
   const { type, semantic, phonetic } = kanjiStructureData;
   const semanticInfo = semantic ? getKanjiInfo?.(semantic) : null;
   const phoneticInfo = phonetic ? getKanjiInfo?.(phonetic) : null;
+  const isFullKanji = (info: typeof semanticInfo) => !!info && "on" in info;
 
   return {
     type,
-
     typeName: formatStructuralTypeName(type),
     typeDescription: structuralTypeInfo[type].description ?? 'No Description Provided',
-    semantic: semantic,
-    semanticKeyword: semanticInfo?.keyword,
+    semantic,
+    semanticKeyword: semanticInfo?.keyword ?? (semantic ? getRadicalKeyword(semantic) : undefined),
+    semanticIsKanji: isFullKanji(semanticInfo),
     phonetic,
-    phoneticKeyword: phoneticInfo?.keyword,
+    phoneticKeyword: phoneticInfo?.keyword ?? (phonetic ? getRadicalKeyword(phonetic) : undefined),
+    phoneticIsKanji: isFullKanji(phoneticInfo),
   };
 };
 
@@ -96,39 +106,25 @@ const KanjiStructuralData = ({ kanji }: { kanji: string }) => {
     return "..."
   }
 
-  // TODO: Add logic (put in radical.ts to get radical keyword. It might also be in component_keyword.json
-  // IMPORTANT THOUGH: We actually we need a way to unify component_keyword.json and also the mapping in radical.ts, so need to think about an approach to do this  //
-  // ADDITIONAL TODO: make a script that
-  //  scans kanji-structure.json and gets all the semantic and phonetic components
-  // find the semantic and phonetic components that doesn't exist after searching for it in the
-  // following playslit
-  // as a kanji
-  // in moreRadicalKeywords and radicalFalseFreiwns in radical.ts
-  // in component_keywords.json
-  // output the list of components (these are problematc components we need to investigate)
-
   return (
-    <div className="flex flex-col justify-center">
-      <div className="flex items-center gap-4">
-        <KanjiStructuralTypeBadge name={structuralData.typeName} desc={structuralData.typeDescription} />
-        {structuralData.semantic ?
-          <ComponentLink
-            component={structuralData.semantic}
-            keyword={structuralData.semanticKeyword ?? '...'}
-            title="Semantic"
-            type={structuralData.semanticKeyword ? "kanji" : "radical"}
-          /> : null
-        }
-        {structuralData.phonetic ?
-          <ComponentLink
-            component={structuralData.phonetic}
-            keyword={structuralData.phoneticKeyword ?? "..."}
-            title="phonetic"
-            type={structuralData.phoneticKeyword ? "kanji" : "radical"}
-          /> : null
-        }
-
-      </div>
+    <div className="flex flex-wrap items-center justify-center gap-4 w-fit">
+      {structuralData.semantic ?
+        <ComponentLink
+          component={structuralData.semantic}
+          keyword={structuralData.semanticKeyword ?? '...'}
+          title="Semantic"
+          type={structuralData.semanticIsKanji ? "kanji" : structuralData.semanticKeyword ? "radical" : "unknown"}
+        /> : null
+      }
+      {structuralData.phonetic ?
+        <ComponentLink
+          component={structuralData.phonetic}
+          keyword={structuralData.phoneticKeyword ?? "..."}
+          title="phonetic"
+          type={structuralData.phoneticIsKanji ? "kanji" : structuralData.phoneticKeyword ? "radical" : "unknown"}
+        /> : null
+      }
+      <KanjiStructuralTypeBadge name={structuralData.typeName} desc={structuralData.typeDescription} />
     </div>
   )
 }

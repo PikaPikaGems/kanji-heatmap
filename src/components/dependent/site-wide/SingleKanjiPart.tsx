@@ -3,7 +3,8 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
 import { outLinks } from "@/lib/external-links";
-import { GlobalRadicalLink } from "../routing/global-links";
+import { FakeComponentLink, GlobalRadicalLink } from "../routing/global-links";
+import { isKnownRadical } from "@/lib/radicals";
 
 export const SingleKanjiPart = ({
   kanji,
@@ -26,7 +27,7 @@ export const SingleKanjiPart = ({
         </button>
       }
       content={
-        <div className="text-xs p-2 font-bold">
+        <div className="p-2 text-xs font-bold">
           {phonetics.map((phonetic) => (
             <RomajiBadge key={phonetic} kana={phonetic} />
           ))}
@@ -41,12 +42,17 @@ export const SingleKanjiPart = ({
           ) : isKanji ? (
             <>
               <GlobalKanjiLink keyword={keyword} kanji={kanji} />
-              <span className="font-normal italic">{"(Kanji)"}</span>
+              <span className="italic font-normal">{"(Kanji)"}</span>
+            </>
+          ) : isKnownRadical(kanji) ? (
+            <>
+              <GlobalRadicalLink radical={kanji} keyword={keyword} />
+              <span className="italic font-normal">{"(Radical)"}</span>
             </>
           ) : (
             <>
-              <GlobalRadicalLink radical={kanji} keyword={keyword} />
-              <span className="font-normal italic">{"(Radical)"}</span>
+              <FakeComponentLink radical={kanji} keyword={keyword} />
+              <span className="italic font-normal">{"(Component)"}</span>
             </>
           )}
         </div>
