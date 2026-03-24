@@ -24,20 +24,23 @@ export const VocabActions = ({
   kana: string;
 }) => {
   return (
-    <div className="flex relative flex-wrap justify-center space-x-1 items-center p-2">
+    <div className="relative flex flex-wrap items-center justify-center p-2 space-x-1">
       <CopyButton textToCopy={word} iconType={"clipboard"} />
       <SpeakButton word={word} iconType="volume-2" />
-      <SpeakButton word={kana} iconType={"audio-lines"} />
+      {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />
+      }
       <GenericPopover
         trigger={
-          <InfoIcon className="inline-block absolute top-2 right-2" size={18} />
+          <InfoIcon className="absolute inline-block top-2 right-2" size={18} />
         }
         content={
-          <div className="flex flex-col w-full text-xs p-2 space-y-1">
-            <IconMeanings
-              btn={<CopyButton textToCopy={kana} iconType={"copy"} />}
-              text={"Copy Kana"}
-            />
+          <div className="flex flex-col w-full p-2 space-y-1 text-xs">
+            {kana.length ?
+              <IconMeanings
+                btn={<CopyButton textToCopy={kana} iconType={"copy"} />}
+                text={"Copy Kana"}
+              /> : ""
+            }
             <IconMeanings
               btn={<CopyButton textToCopy={word} iconType={"clipboard"} />}
               text={"Copy Word"}
