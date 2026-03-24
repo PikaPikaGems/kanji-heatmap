@@ -42,6 +42,21 @@ export const SearchInput = ({
 
   const [isOpenRadicals, setIsOpenRadicals] = useState(false);
 
+  // sync internal state when props change (e.g. navigating via link) example for radical search
+  const [prevInitialText, setPrevInitialText] = useState(initialText);
+  const [prevInitialSearchType, setPrevInitialSearchType] =
+    useState(initialSearchType);
+
+  if (
+    prevInitialText !== initialText ||
+    prevInitialSearchType !== initialSearchType
+  ) {
+    setPrevInitialText(initialText);
+    setPrevInitialSearchType(initialSearchType);
+    setSearchType(initialSearchType);
+    setValue(translateValue(initialText, translateMap[initialSearchType]));
+  }
+
   // force focus input ref on mount
   useEffect(() => {
     inputRef.current?.focus?.();
@@ -59,7 +74,7 @@ export const SearchInput = ({
       : "kanji-font";
 
   return (
-    <section className="w-full relative">
+    <section className="relative w-full">
       <input
         ref={inputRef}
         className={cn(
