@@ -12,7 +12,7 @@ const assetsPaths = {
   },
   KANJI_DECOMPOSITION: "/json/kanji_decomposition.json",
   KANJI_READING_DETAILS: "/json/kanji-readings-details.json",
-  KANJI_STRUCTURE_DETAILS: '"/json/kanji-structure.json"',
+  KANJI_STRUCTURE_DETAILS: "/json/kanji-structure.json",
 };
 
 export default assetsPaths;

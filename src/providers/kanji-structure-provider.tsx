@@ -3,28 +3,11 @@ import {
   useContext,
   useMemo,
   ReactNode,
-  useCallback,
 } from "react";
 import { useJsonFetch } from "@/hooks/use-json";
+import assetsPaths from "@/lib/assets-paths";
+import { KanjiStructureData, KanjiStructureEntry } from "@/lib/kanji-section-constants";
 
-export type StructuralType =
-  | "shiji"
-  | "shoukei"
-  | "kaii"
-  | "keisei"
-  | "unknown"
-  | "derivative"
-  | "rebus"
-  | "kokuji"
-  | "shinjitai";
-
-export interface KanjiStructureEntry {
-  type: StructuralType;
-  semantic?: string;
-  phonetic?: string;
-}
-
-export type KanjiStructureData = Record<string, KanjiStructureEntry>;
 
 // Context
 interface KanjiStructureContextValue {
@@ -44,28 +27,26 @@ export const KanjiStructureProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const { data, status, error } = useJsonFetch<KanjiStructureData>(
-    "/json/kanji-structure.json"
-  );
-
-  const getStructureForKanji = useCallback(
-    (kanji: string): KanjiStructureEntry | null => {
-      if (!data || !kanji) {
-        return null;
-      }
-      return data[kanji] || null;
-    },
-    [data]
+  const jsonFetchValue = useJsonFetch<KanjiStructureData>(
+    assetsPaths.KANJI_STRUCTURE_DETAILS
   );
 
   const value = useMemo(
-    () => ({
-      data,
-      status,
-      error,
-      getStructureForKanji,
-    }),
-    [data, status, error, getStructureForKanji]
+    () => {
+      const { data, status, error } = jsonFetchValue
+      return {
+        data,
+        status,
+        error,
+        getStructureForKanji: (kanji: string): KanjiStructureEntry | null => {
+          if (!data || !kanji) {
+            return null;
+          }
+          return data[kanji] || null;
+        }
+      }
+    },
+    [jsonFetchValue]
   );
 
   return (
@@ -86,17 +67,16 @@ export const useKanjiStructureContext = () => {
   return context;
 };
 
-// Hook to get structure data for a specific kanji
 export const useKanjiStructure = (kanji: string) => {
-  const { status, error, getStructureForKanji } = useKanjiStructureContext();
+  const value = useKanjiStructureContext();
 
-  const kanjiStructureData = useMemo(() => {
-    return getStructureForKanji(kanji);
-  }, [getStructureForKanji, kanji]);
+  const state = useMemo(() => {
+    return {
+      kanjiStructureData: value.getStructureForKanji(kanji),
+      status: value.status,
+      error: value.error
+    }
+  }, [value, kanji]);
 
-  return {
-    status,
-    error,
-    kanjiStructureData,
-  };
+  return state;
 };

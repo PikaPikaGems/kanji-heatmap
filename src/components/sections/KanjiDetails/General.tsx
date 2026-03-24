@@ -11,9 +11,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import {
-  useStructuralData,
-  StructuralTypeInfoPopover,
-  ComponentLink,
+  KanjiStructuralData,
 } from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 
@@ -37,7 +35,6 @@ const TableCellGrow = ({ children }: { children: ReactNode }) => (
 
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
-  const structuralData = useStructuralData(kanji);
 
   if (info.error) {
     return <DefaultErrorFallback message="Failed to load data." />;
@@ -51,7 +48,7 @@ export const General = ({ kanji }: { kanji: string }) => {
 
   return (
     <>
-      <div className="text-left mt-6">
+      <div className="mt-6 text-left">
         {hasData(data.jouyouGrade) && (
           <Badge className="m-1">Grade {data.jouyouGrade}</Badge>
         )}
@@ -61,7 +58,7 @@ export const General = ({ kanji }: { kanji: string }) => {
         {hasData(data.wk) && <Badge className="m-1">Wanikani {data.wk}</Badge>}
         {hasData(data.rtk) && <Badge className="m-1">RTK {data.rtk}</Badge>}
       </div>
-      <DottedSeparator className="border-b-2 my-4" />
+      <DottedSeparator className="my-4 border-b-2" />
       <Table>
         <TableBody>
           <TableRow className="text-left">
@@ -96,45 +93,16 @@ export const General = ({ kanji }: { kanji: string }) => {
               {data.allOn.length === 0 && <div> - </div>}
             </TableCellGrow>
           </TableRow>
-          {structuralData && (
-            <TableRow className="text-left">
-              <TableCellFixed>
-                <div className="flex items-center">
-                  Structure
-                  <StructuralTypeInfoPopover type={structuralData.type} />
-                </div>
-              </TableCellFixed>
-              <TableCellGrow>
-                <span>{structuralData.typeName}</span>
-              </TableCellGrow>
-            </TableRow>
-          )}
-          {structuralData?.isKeisei && structuralData.semantic && (
-            <TableRow className="text-left">
-              <TableCellFixed className="pl-6 text-muted-foreground">
-                Semantic
-              </TableCellFixed>
-              <TableCellGrow>
-                <ComponentLink
-                  component={structuralData.semantic}
-                  keyword={structuralData.semanticKeyword}
-                />
-              </TableCellGrow>
-            </TableRow>
-          )}
-          {structuralData?.isKeisei && structuralData.phonetic && (
-            <TableRow className="text-left">
-              <TableCellFixed className="pl-6 text-muted-foreground">
-                Phonetic
-              </TableCellFixed>
-              <TableCellGrow>
-                <ComponentLink
-                  component={structuralData.phonetic}
-                  keyword={structuralData.phoneticKeyword}
-                />
-              </TableCellGrow>
-            </TableRow>
-          )}
+
+          <TableRow className="text-left">
+            <TableCellFixed>
+              Structure
+            </TableCellFixed>
+            <TableCellGrow>
+
+              <KanjiStructuralData kanji={kanji} />
+            </TableCellGrow>
+          </TableRow>
         </TableBody>
       </Table>
     </>
