@@ -11,6 +11,8 @@ const assetsPaths = {
     KANJI_SVGS: "https://kanjivg.tagaini.net/kanjivg/kanji/",
   },
   KANJI_DECOMPOSITION: "/json/kanji_decomposition.json",
+  KANJI_READING_DETAILS: "/json/kanji-readings-details.json",
+  KANJI_STRUCTURE_DETAILS: '"/json/kanji-structure.json"',
 };
 
 export default assetsPaths;

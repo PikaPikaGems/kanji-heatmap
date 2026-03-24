@@ -1,10 +1,5 @@
 import {
   useKanjiReadingDetails,
-  frequencyLabels,
-  frequencyColors,
-  readingTypeLabels,
-  KanjiReadingEntry,
-  FrequencyCategory,
 } from "@/providers/kanji-reading-category-provider";
 
 import {
@@ -22,6 +17,7 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { readingFrequencySourceLinks } from "@/lib/freq/freq-source-info";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { FrequencyCategory, frequencyColors, frequencyLabels, KanjiReadingEntry, readingTypeLabels } from "@/lib/kanji-section-constants";
 
 const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const label = frequencyLabels[frequency];

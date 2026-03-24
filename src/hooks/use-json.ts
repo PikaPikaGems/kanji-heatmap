@@ -18,21 +18,21 @@ export const useAsync = <T>(
 ): {
   execute: () => Promise<T>;
   status: Status;
-  value: T | null;
+  data: T | null;
   error: Error | null;
 } => {
   const [status, setStatus] = useState<Status>("idle");
-  const [value, setValue] = useState<T | null>(null);
+  const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const execute = useCallback(async (): Promise<T> => {
     setStatus("pending");
-    setValue(null);
+    setData(null);
     setError(null);
 
     try {
       const response = await asyncFunction();
-      setValue(response);
+      setData(response);
       setStatus("success");
       return response;
     } catch (error) {
@@ -48,7 +48,7 @@ export const useAsync = <T>(
     }
   }, [execute, immediate]);
 
-  return { execute, status, value, error };
+  return { execute, status, data, error };
 };
 
 /**
@@ -80,12 +80,7 @@ export const useJsonFetch = <T>(
     return response.json() as Promise<T>;
   }, [path]);
 
-  const { execute, status, value, error } = useAsync<T>(fetchJson, immediate);
+  const value = useAsync<T>(fetchJson, immediate);
 
-  return {
-    execute,
-    status,
-    data: value,
-    error,
-  };
+  return value;
 };

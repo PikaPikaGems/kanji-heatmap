@@ -6,39 +6,10 @@ import {
   useCallback,
 } from "react";
 import { useJsonFetch } from "@/hooks/use-json";
+import assetsPaths from "@/lib/assets-paths";
 
-// Types for the kanji reading data
-export type ReadingType = "ON" | "KUN";
-export type FrequencyCategory = "↑" | "↔" | "↓";
+import type { KanjiReadingEntry, KanjiReadingsData } from "@/lib/kanji-section-constants"
 
-export interface KanjiReadingEntry {
-  reading: string;
-  type: ReadingType;
-  frequency: FrequencyCategory;
-  example_word: string | null;
-}
-
-export type KanjiReadingsData = Record<string, KanjiReadingEntry[]>;
-
-// Frequency display mappings
-export const frequencyLabels: Record<FrequencyCategory, string> = {
-  "↑": "Often Used",
-  "↔": "Sometimes Used",
-  "↓": "Almost Never Used",
-};
-
-export const frequencyColors: Record<FrequencyCategory, string> = {
-  "↑": "text-green-500",
-  "↔": "text-yellow-500",
-  "↓": "text-red-500",
-};
-
-export const readingTypeLabels: Record<ReadingType, string> = {
-  ON: "On'yomi",
-  KUN: "Kun'yomi",
-};
-
-// Context
 interface KanjiReadingCategoryContextValue {
   data: KanjiReadingsData | null;
   status: "idle" | "pending" | "success" | "error";
@@ -49,14 +20,13 @@ interface KanjiReadingCategoryContextValue {
 const KanjiReadingCategoryContext =
   createContext<KanjiReadingCategoryContextValue | null>(null);
 
-// Provider
 export const KanjiReadingCategoryProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
   const { data, status, error } = useJsonFetch<KanjiReadingsData>(
-    "/json/kanji-readings-details.json"
+    assetsPaths.KANJI_READING_DETAILS
   );
 
   const getReadingsForKanji = useCallback(
