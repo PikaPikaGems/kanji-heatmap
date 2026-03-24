@@ -3,6 +3,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
 import { outLinks } from "@/lib/external-links";
+import { GlobalRadicalLink } from "../routing/global-links";
 
 export const SingleKanjiPart = ({
   kanji,
@@ -38,9 +39,15 @@ export const SingleKanjiPart = ({
               {"🐛🐞"}
             </div>
           ) : isKanji ? (
-            <GlobalKanjiLink keyword={keyword} kanji={kanji} />
+            <>
+              <GlobalKanjiLink keyword={keyword} kanji={kanji} />
+              <span className="font-normal italic">{"(Kanji)"}</span>
+            </>
           ) : (
-            <span className="block">{keyword}</span>
+            <>
+              <GlobalRadicalLink radical={kanji} keyword={keyword} />
+              <span className="font-normal italic">{"(Radical)"}</span>
+            </>
           )}
         </div>
       }
