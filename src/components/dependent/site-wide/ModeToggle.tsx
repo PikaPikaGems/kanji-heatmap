@@ -11,7 +11,7 @@ import { Moon, Sun } from "@/components/icons";
 
 // Copied and modified from: https://ui.shadcn.com/docs/dark-mode/vite
 
-export function ModeToggle() {
+export function ModeToggle0() {
   const { setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,7 +32,7 @@ export function ModeToggle() {
         }}
         asChild
       >
-        <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl">
+        <Button variant="outline" size="icon" className="w-8 h-8 rounded-xl">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
@@ -52,3 +52,21 @@ export function ModeToggle() {
     </DropdownMenu>
   );
 }
+
+export const ModeToggle = () => {
+  const { theme, setTheme } = useTheme();
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  return (
+    <Button variant="outline" size="icon" className="w-8 h-8 rounded-xl"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    >
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 " />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  );
+};
