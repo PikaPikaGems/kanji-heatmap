@@ -11,13 +11,11 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 
 
 
-// Format the structural type name for display
 const formatStructuralTypeName = (type: StructuralType): string => {
   const info = structuralTypeInfo[type];
   return `${info.name ?? "unknown"} ${info.japanese ? `(${info.japanese})` : ""}`;
 };
 
-// Component link for semantic/phonetic parts that links to radical search
 const ComponentLink = ({
   component,
   keyword,
@@ -87,7 +85,7 @@ const KanjiStructuralTypeBadge = ({ name, desc }: { name: string, desc: string }
   return <Popover>
     <PopoverTrigger asChild>
       <button>
-        <Badge variant="outline" className="cursor-pointer">
+        <Badge variant="outline" className="cursor-pointer hover:bg-[#2effff] hover:text-black">
           {name}
         </Badge>
       </button>
