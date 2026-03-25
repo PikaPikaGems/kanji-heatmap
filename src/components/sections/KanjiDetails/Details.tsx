@@ -13,8 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 
-const SHOW_SAMPLE_VOCAB_SECTION = false;
+const SHOW_SAMPLE_VOCAB_SECTION = true;
 const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
@@ -92,6 +93,8 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <div className="flex justify-start w-full space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />
+        {/* FIX ME: Why dont I see the toggle icon here? */}
+        <ModeToggle />
       </div>
     </div>
   );

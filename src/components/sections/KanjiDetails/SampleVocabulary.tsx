@@ -30,8 +30,13 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   );
 };
 
+const PATH = import.meta.env.MODE === "development" ||
+  window.location.protocol === "http:"
+  ? assetsPaths.dev.KANJI_VOCAB
+  : assetsPaths.KANJI_VOCAB
+
 export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
-  const url = `${assetsPaths.KANJI_VOCAB}/${encodeURIComponent(kanji)}.json`;
+  const url = `${PATH}/${kanji}.json`;
   const { data, status, error } = useJsonFetch<CommonWordEntry[]>(url);
 
   if (status === "pending" || status === "idle") {
