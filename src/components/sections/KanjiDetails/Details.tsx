@@ -8,11 +8,13 @@ import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
+import { SampleVocabulary } from "./SampleVocabulary";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
+const SHOW_SAMPLE_VOCAB_SECTION = false;
 const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
@@ -59,6 +61,13 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
+      {SHOW_SAMPLE_VOCAB_SECTION &&
+        <SimpleAccordion trigger={"Sample Vocabulary"}>
+          <ErrorBoundary details="SampleVocabulary in KanjiDetails">
+            <SampleVocabulary kanji={kanji} />
+          </ErrorBoundary>
+        </SimpleAccordion>
+      }
       <SimpleAccordion trigger={"Stroke Order Animation"}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>

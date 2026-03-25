@@ -93,6 +93,27 @@ const pwaConfig = {
         },
       },
       // **********************
+      // Cache KANJI SAMPLE VOCABULARY from external source
+      // **********************
+      {
+        urlPattern: ({ url }: { url: { pathname: string; origin: string } }) =>
+          url.origin === "https://assets.pikapikagems.com" &&
+          url.pathname.startsWith("/kanji-common-words/v1/"),
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "kanji-vocabulary-cache",
+          expiration: {
+            maxEntries: 3000,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+          },
+          fetchOptions: {
+            mode: "cors" as const,
+            credentials: "omit" as const,
+          },
+        },
+      },
+
+      // **********************
       // Cache KANJI SVG from external source
       // **********************
       {

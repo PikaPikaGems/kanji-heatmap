@@ -1,0 +1,7 @@
+- Add a note that Structure Data came from HLORENZI
+- Phonosemantic Badge should turn blue on hover (like "on" and "kun" readings badge)
+- Add info popover for on and kun readings?
+- Add "Sample" Vocabulary section
+- Update FAQ section
+- Add instructions on how to update docs
+- Update nav header?

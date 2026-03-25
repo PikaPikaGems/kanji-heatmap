@@ -12,7 +12,10 @@
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
     "format": "prettier --write .",
     "find-missing-components": "node scripts/find-missing-components.mjs",
-    "find-unhandled-components": "node scripts/find-unhandled-components.mjs"
+    "find-unhandled-components": "node scripts/find-unhandled-components.mjs",
+    "inspect-kanjidict": "node scripts/data-inspection-part-2.mjs",
+    "kanjidict-to-json": "node scripts/kanjidict-to-json.mjs",
+    "validate-kanjidict": "node scripts/validate-kanjidict-vs-structure.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",
