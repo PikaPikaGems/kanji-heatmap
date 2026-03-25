@@ -11,6 +11,8 @@ stats.html
 node_modules
 dist
 
+public/kanji-words/*
+
 dist-ssr
 *.local
 
