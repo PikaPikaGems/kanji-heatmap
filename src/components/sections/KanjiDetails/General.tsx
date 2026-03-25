@@ -107,8 +107,8 @@ export const General = ({ kanji }: { kanji: string }) => {
         </TableBody>
       </Table>
 
-      <div className="mt-12 text-xs font-bold text-left">📌 Notes:</div>
-      <div className="mb-12 italic text-left">Structure (hlorenzi) is sourced from
+      <div className="mx-4 mt-12 text-xs font-bold text-left">📌 Notes:</div>
+      <div className="mx-6 mb-12 italic text-left">Structure (hlorenzi) is sourced from
         <ExternalTextLink href={"https://github.com/hlorenzi/jisho-open"} text="hlorenzi/jisho-open" /> with
         minimal modifications.
       </div>
