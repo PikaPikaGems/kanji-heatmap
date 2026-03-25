@@ -183,7 +183,13 @@ export const otherOutLinks = {
 export const vocabExternalLinks = [
   {
     name: "Kagi Translate",
-    url: (word: string) => `https://translate.kagi.com/?from=ja&to=en&text=${word}`
+    url: (word: string) =>
+      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
+  },
+  {
+    name: "JP Word Ranks",
+    url: (word: string) =>
+      `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
   },
   {
     name: "Immersion Kit",
