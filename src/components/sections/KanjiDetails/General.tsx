@@ -14,6 +14,7 @@ import {
   KanjiStructuralData,
 } from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -96,7 +97,7 @@ export const General = ({ kanji }: { kanji: string }) => {
 
           <TableRow className="text-left">
             <TableCellFixed>
-              Structure
+              Structure (hlorenzi)
             </TableCellFixed>
             <TableCellGrow>
 
@@ -105,6 +106,12 @@ export const General = ({ kanji }: { kanji: string }) => {
           </TableRow>
         </TableBody>
       </Table>
+
+      <div className="mt-12 text-xs font-bold text-left">📌 Notes:</div>
+      <div className="mb-12 italic text-left">Structure (hlorenzi) is sourced from
+        <ExternalTextLink href={"https://github.com/hlorenzi/jisho-open"} text="hlorenzi/jisho-open" /> with
+        minimal modifications.
+      </div>
     </>
   );
 };
