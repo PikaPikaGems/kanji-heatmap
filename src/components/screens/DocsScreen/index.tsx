@@ -1,14 +1,32 @@
 import { lazy } from "react";
 import { PageWrapper } from "@/components/dependent/site-wide/PageWrapper";
 
-const LazyDocsScreen = lazy(() => import("./DocsScreen"));
+const LazyAboutPage = lazy(() =>
+  import("./DocsScreen").then((m) => ({ default: m.AboutPage }))
+);
+const LazyTermsPage = lazy(() =>
+  import("./DocsScreen").then((m) => ({ default: m.TermsPage }))
+);
+const LazyPrivacyPage = lazy(() =>
+  import("./DocsScreen").then((m) => ({ default: m.PrivacyPage }))
+);
 
-const DocsScreen = () => {
-  return (
-    <PageWrapper>
-      <LazyDocsScreen />
-    </PageWrapper>
-  );
-};
+const AboutScreen = () => (
+  <PageWrapper>
+    <LazyAboutPage />
+  </PageWrapper>
+);
 
-export { DocsScreen };
+const TermsScreen = () => (
+  <PageWrapper>
+    <LazyTermsPage />
+  </PageWrapper>
+);
+
+const PrivacyScreen = () => (
+  <PageWrapper>
+    <LazyPrivacyPage />
+  </PageWrapper>
+);
+
+export { AboutScreen, TermsScreen, PrivacyScreen };
