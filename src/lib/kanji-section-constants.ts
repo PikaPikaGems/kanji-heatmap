@@ -49,7 +49,6 @@ export interface KanjiStructureEntry {
 
 export type KanjiStructureData = Record<string, KanjiStructureEntry>;
 
-// Structural type information
 export const structuralTypeInfo: Record<
   StructuralType,
   { name: string; japanese: string; description: string }
@@ -58,53 +57,54 @@ export const structuralTypeInfo: Record<
     name: "Indicative",
     japanese: "指事",
     description:
-      "A simple ideograph that represents an abstract concept through a symbolic or diagrammatic form.",
+      "A simple symbol that points to an idea rather than drawing it—often used to represent abstract concepts like numbers or directions.",
   },
   shoukei: {
     name: "Pictographic",
     japanese: "象形",
     description:
-      "A character that is a stylized depiction of a physical object or natural phenomenon.",
+      "A character that started as a drawing of something real, like a tree, mountain, or person, and gradually became more stylized over time.",
   },
   kaii: {
     name: "Compound Ideographic",
     japanese: "会意",
     description:
-      "A compound character formed by combining two or more elements to suggest a meaning.",
+      "A character made by combining two or more parts, where each piece contributes to the overall meaning—like a little visual puzzle.",
   },
   keisei: {
     name: "Phono-semantic",
     japanese: "形声",
     description:
-      "A compound character combining a semantic component (meaning) and a phonetic component (sound).",
+      "A clever mix of meaning and sound: one part hints at what the character means, while another part gives a clue to how it’s pronounced.",
   },
   unknown: {
     name: "Unknown",
     japanese: "不明",
-    description: "The etymological origin of this character is uncertain.",
+    description:
+      "The origin of this character isn’t clearly understood—its history has been lost or is still debated.",
   },
   derivative: {
     name: "Derivative",
     japanese: "転注",
     description:
-      "A character whose meaning has been extended or transferred from its original meaning.",
+      "A character whose meaning has shifted or expanded over time, taking on new uses related to its original sense.",
   },
   rebus: {
     name: "Rebus",
     japanese: "仮借",
     description:
-      "A character borrowed for its phonetic value to represent a word with a similar sound.",
+      "A character borrowed for its sound rather than its meaning—used to represent a different word that sounds the same or similar.",
   },
   kokuji: {
     name: "Japanese-made",
     japanese: "国字",
     description:
-      "A character created in Japan, not found in classical Chinese.",
+      "A character created in Japan to express ideas or things unique to Japanese life, not originally found in Chinese writing.",
   },
   shinjitai: {
     name: "Simplified",
     japanese: "新字体",
     description:
-      "A simplified form of a traditional character introduced in post-war Japan.",
+      "A modern simplified version of a traditional character, introduced in Japan to make writing and reading easier.",
   },
 };
