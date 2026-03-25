@@ -1,10 +1,10 @@
 import { CustomLink } from "@/components/common/docs/CustomLink";
 
-export const AboutSection = ({ title }: { title: string }) => {
+export const AboutSection = () => {
   return (
     <article>
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-        {title}
+      <h1 className="mb-6 text-4xl font-extrabold tracking-tight scroll-m-20 lg:text-5xl">
+        About
       </h1>
       <p className="my-5 leading-7">
         Kanji Heatmap is an exploration tool with advanced filtering, sorting,
@@ -34,10 +34,10 @@ export const AboutSection = ({ title }: { title: string }) => {
         more.
       </p>
 
-      <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 mt-10 mb-4">
+      <h2 className="pb-2 mt-10 mb-4 text-3xl font-semibold tracking-tight border-b scroll-m-20 first:mt-0">
         License
       </h2>
-      <p className="leading-7 mb-4">
+      <p className="mb-4 leading-7">
         The data published in kanjiheatmap.com by PikaPikaGems are licensed
         under{" "}
         <CustomLink href="https://creativecommons.org/licenses/by-sa/4.0/">
@@ -45,10 +45,10 @@ export const AboutSection = ({ title }: { title: string }) => {
         </CustomLink>
         .
       </p>
-      <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 mt-10 mb-4">
+      <h2 className="pb-2 mt-10 mb-4 text-3xl font-semibold tracking-tight border-b scroll-m-20 first:mt-0">
         Credits
       </h2>
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4">
+      <h3 className="mt-8 mb-4 text-2xl font-semibold tracking-tight scroll-m-20">
         Data Sources
       </h3>
       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
@@ -275,10 +275,10 @@ export const AboutSection = ({ title }: { title: string }) => {
           </ul>
         </li>
       </ul>
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4">
+      <h3 className="mt-8 mb-4 text-2xl font-semibold tracking-tight scroll-m-20">
         Common Sources
       </h3>
-      <p className="leading-7 mb-4">
+      <p className="mb-4 leading-7">
         Data owned by Electronic Dictionary Research and Development Group such
         as KANJIDIC and EDICT are used under the{" Group's"}{" "}
         <CustomLink href="https://www.edrdg.org/edrdg/licence.html">
@@ -286,7 +286,7 @@ export const AboutSection = ({ title }: { title: string }) => {
         </CustomLink>
         .
       </p>
-      <p className="leading-7 mb-4">
+      <p className="mb-4 leading-7">
         Jonathan{" Waller's"} JLPT resources are licensed under{" "}
         <CustomLink href="https://creativecommons.org/licenses/by/4.0/">
           CC BY 4.0
