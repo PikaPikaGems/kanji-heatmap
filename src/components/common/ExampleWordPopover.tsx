@@ -56,7 +56,7 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWor
       trigger={
         <Button
           variant="outline"
-          className="items-end h-auto px-4 py-2 text-3xl border-dashed rounded-2xl kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="items-end h-auto px-4 py-2 text-3xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
         >
           {vocabInfo?.parts == null ? word :
             vocabInfo.parts.map((part, index) => (
