@@ -14,7 +14,6 @@ import {
   WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
 
-// Displays furigana above a word (small version for trigger)
 const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
   const [text, reading] = part;
 
@@ -34,9 +33,10 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
 
 interface ExampleWordPopoverProps {
   word: string;
+  wordTranslationOverride?: string
 }
 
-export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
+export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
@@ -49,14 +49,14 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
   }
 
   const kana = (vocabInfo ?? { parts: [] }).parts.map((part) => part[1] || part[0]).join("");
-  // Show furigana on the trigger button
 
+  const meaning = wordTranslationOverride ?? vocabInfo?.meaning
   return (
     <GenericPopover
       trigger={
         <Button
-          variant="ghost"
-          className="items-end h-auto p-1 text-2xl kanji-font hover:bg-gray-200 dark:hover:bg-gray-800"
+          variant="outline"
+          className="items-end h-auto px-4 py-2 text-3xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
         >
           {vocabInfo?.parts == null ? word :
             vocabInfo.parts.map((part, index) => (
@@ -66,7 +66,6 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
         </Button>}
       content={
         <div className="w-64 p-2">
-          {/* Kanji breakdown with keywords */}
           {wordKanjis.length > 0 && (
             <div className="flex flex-wrap justify-center p-1">
               {wordKanjis.map((item, index) => (
@@ -78,17 +77,14 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
               ))}
             </div>
           )}
-          {/* Definition */}
-          {vocabInfo?.meaning && <>
+          {meaning && <>
             <DottedSeparator />
             <SeeMore
-              definition={vocabInfo?.meaning || "not provided"}
+              definition={meaning}
               maxLen={150}
             />
           </>
           }
-
-          {/* External links */}
           <DottedSeparator />
           <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
             Learn more from:
@@ -102,7 +98,6 @@ export const ExampleWordPopover = ({ word }: ExampleWordPopoverProps) => {
               />
             ))}
           </div>
-
           <DottedSeparator />
           <VocabActions kana={kana} word={word} />
         </div>

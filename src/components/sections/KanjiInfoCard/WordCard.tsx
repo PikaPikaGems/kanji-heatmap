@@ -32,14 +32,14 @@ export const WordCard = ({
         trigger={
           <Button
             variant="ghost"
-            className="flex text-5xl h-auto p-0 my-2 z-1 kanji-font hover:bg-gray-200 dark:hover:bg-gray-800 text-clip"
+            className="flex h-auto p-0 my-2 text-5xl z-1 kanji-font hover:bg-foreground/5 text-clip"
           >
             {word}
           </Button>
         }
         content={
           <div className="w-64">
-            <div className="flex p-1 flex-wrap justify-center">
+            <div className="flex flex-wrap justify-center p-1">
               {wordKanjis.map((item, index) => {
                 return (
                   <GlobalKanjiLink
@@ -54,10 +54,10 @@ export const WordCard = ({
             <DottedSeparator />
             <SeeMore definition={definition} />
             <DottedSeparator />
-            <div className="text-xs pt-2 font-bold flex flex-wrap justify-center">
+            <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
               Learn more from:
             </div>
-            <div className="text-xs pb-2 flex flex-wrap justify-center">
+            <div className="flex flex-wrap justify-center pb-2 text-xs">
               {vocabExternalLinks.map((item) => {
                 return (
                   <ExternalTextLink
