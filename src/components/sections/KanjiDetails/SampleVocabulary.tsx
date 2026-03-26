@@ -10,10 +10,10 @@ import {
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { DefaultErrorFallback } from "@/components/error";
-import { Loader2 } from "lucide-react";
 import assetsPaths from "@/lib/assets-paths";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Pagination, usePagination } from "./Pagination";
+import { useEffect, useState } from "react";
 
 type CommonWordEntry = [string, string];
 
@@ -76,6 +76,50 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
   );
 };
 
+const TableSkeleton = () => {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    setTimeout(() => setShow(true), 200)
+  }, [])
+
+
+  if (!show) {
+    return <div className="h-[800px]"></div>
+  }
+
+  return (
+    <div className="px-2 mx-2 overflow-x-auto mt-14 animate pulse">
+      <Table className="w-full min-w-[400px]" >
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-center w-fit">Speak</TableHead>
+            <TableHead className="text-center w-fit">Sample Word</TableHead>
+            <TableHead className="text-center w-fit">Reading</TableHead>
+            <TableHead className="text-center w-fit">Tags</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <TableRow key={i}>
+              <TableCell className="w-24">
+                <div className="w-8 h-8 mx-auto rounded-xl bg-muted" />
+              </TableCell>
+              <TableCell className="w-fit">
+                <div className="w-24 h-12 rounded-full bg-muted" />
+              </TableCell>
+              <TableCell className="w-fit">
+                <div className="h-5 rounded-full bg-muted w-36" />
+              </TableCell>
+              <TableCell className="w-full">
+                <div className="w-full h-5 rounded-full bg-muted" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
 const PATH = import.meta.env.MODE === "development" ||
   window.location.protocol === "http:"
   ? assetsPaths.dev.KANJI_VOCAB
@@ -87,9 +131,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
 
   if (status === "pending" || status === "idle") {
     return (
-      <div className="flex items-center justify-center w-full h-full p-5">
-        <Loader2 className="size-7 animate-spin" />
-      </div>
+      <TableSkeleton />
     );
   }
 
