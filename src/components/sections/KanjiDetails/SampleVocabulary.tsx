@@ -12,6 +12,7 @@ import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { DefaultErrorFallback } from "@/components/error";
 import { Loader2 } from "lucide-react";
 import assetsPaths from "@/lib/assets-paths";
+import { SpeakButton } from "@/components/common/SpeakButton";
 
 type CommonWordEntry = [string, string];
 
@@ -19,13 +20,17 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const [word, reading] = entry;
   return (
     <TableRow>
-      <TableCell className="text-base kanji-font">
+      <TableCell className="w-24">
+        <SpeakButton iconType="headphones" word={word} />
+      </TableCell>
+
+      <TableCell className="text-base kanji-font w-fit">
         <ExampleWordPopover word={word} />
       </TableCell>
-      <TableCell className="text-base kanji-font">
+      <TableCell className="text-base kanji-font w-fit">
         {reading !== "-" ? <RomajiBadge kana={reading} /> : "-"}
       </TableCell>
-      <TableCell className="text-sm text-muted-foreground">N/A</TableCell>
+      <TableCell className="text-sm text-muted-foreground w-fit">N/A</TableCell>
     </TableRow>
   );
 };
@@ -38,6 +43,7 @@ const PATH = import.meta.env.MODE === "development" ||
 export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
   const url = `${PATH}/${kanji}.json`;
   const { data, status, error } = useJsonFetch<CommonWordEntry[]>(url);
+  console.log("data", data)
 
   if (status === "pending" || status === "idle") {
     return (
@@ -61,6 +67,11 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
     );
   }
 
+  // TODO: Add pagination; put it in its own <Pagination /> component 
+  // default to itemsPerPage=10 at a time.
+  // Very simple, something like this:  <--- 1 / 4 ---> 
+  // which is PREVIOUS_PAGE_BUTTON_ICON PAGE_1 OUT OF 4_TOTAL_PAGES NEXT_PAGE_BUTTON_ICON
+
   return (
     <div
       className="px-2 mt-4 -mx-2 overflow-x-auto"
@@ -68,9 +79,10 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
       <Table className="w-full min-w-[400px]">
         <TableHeader>
           <TableRow>
-            <TableHead className="text-center">Sample Word</TableHead>
-            <TableHead className="text-center">Reading</TableHead>
-            <TableHead className="text-center">Tags</TableHead>
+            <TableHead className="text-center w-fit">Speak</TableHead>
+            <TableHead className="text-center w-fit">Sample Word</TableHead>
+            <TableHead className="text-center w-fit">Reading</TableHead>
+            <TableHead className="text-center w-fit">Tags</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
