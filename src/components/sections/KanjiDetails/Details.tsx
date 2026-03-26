@@ -93,7 +93,6 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <div className="flex justify-start w-full space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />
-        {/* FIX ME: Why dont I see the toggle icon here? */}
         <ModeToggle />
       </div>
     </div>
