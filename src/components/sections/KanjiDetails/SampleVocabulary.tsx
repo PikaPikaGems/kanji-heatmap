@@ -28,7 +28,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
       <TableCell className="text-base kanji-font w-fit">
         <ExampleWordPopover word={word} />
       </TableCell>
-      <TableCell className="text-base kanji-font w-fit">
+      <TableCell className="text-base kanji-font w-fit whitespace-nowrap">
         {reading !== "-" ? <RomajiBadge kana={reading} /> : "-"}
       </TableCell>
       <TableCell className="text-sm text-muted-foreground w-fit">N/A</TableCell>
