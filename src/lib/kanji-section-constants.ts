@@ -3,6 +3,13 @@
 export type ReadingType = "ON" | "KUN";
 export type FrequencyCategory = "↑" | "↔" | "↓";
 
+export interface KanjiReadingEntrySmall {
+  r: string;
+  t: ReadingType;
+  f: FrequencyCategory;
+  w: string | null;
+}
+
 export interface KanjiReadingEntry {
   reading: string;
   type: ReadingType;
@@ -48,6 +55,29 @@ export interface KanjiStructureEntry {
 }
 
 export type KanjiStructureData = Record<string, KanjiStructureEntry>;
+
+export const structuralTypeInfoB = {
+  "Compound Ideograph": {
+    name: "Compound Ideograph",
+    description:
+      "A character built by combining parts that each contribute meaning—like a small visual story. For example, 休 (rest) shows a person 人 leaning against a tree 木.",
+  },
+  "Phono-semantic Compound": {
+    name: "Phono-semantic Compound",
+    description:
+      "A character that combines meaning and sound: one part hints at what it means, and another suggests how it’s read. For example, 河 (river) has 氵 (water) and 可 (か) for pronunciation.",
+  },
+  Pictograph: {
+    name: "Pictograph",
+    description:
+      "A character that started as a drawing of something real and became more stylized over time. For example, 山 (mountain) and 木 (tree).",
+  },
+  Ideograph: {
+    name: "Ideograph",
+    description:
+      "A simple symbol that represents an idea rather than a physical object. For example, 上 (up) and 下 (down) use lines to show direction.",
+  },
+};
 
 export const structuralTypeInfo: Record<
   StructuralType,
