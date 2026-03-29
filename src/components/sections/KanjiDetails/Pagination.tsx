@@ -38,7 +38,7 @@ export const Pagination = ({
   </div>
 );
 
-export const usePagination = (totalItems: number, itemsPerPage: number = 10) => {
+export const usePagination = (totalItems: number, itemsPerPage: number = 5) => {
   const [page, setPage] = useState(1);
 
   const state = useMemo(() => {
