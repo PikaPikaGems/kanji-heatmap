@@ -14,6 +14,7 @@ import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
+import { StructureInfo } from "./StructureInfo";
 
 const SHOW_SAMPLE_VOCAB_SECTION = true;
 const RirikkuCTABadge = () => {
@@ -62,6 +63,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
+
       {SHOW_SAMPLE_VOCAB_SECTION &&
         <SimpleAccordion trigger={"Sample Vocabulary"}>
           <ErrorBoundary details="SampleVocabulary in KanjiDetails">
@@ -74,6 +76,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           <Suspense fallback={<BasicLoading />}>
             <StrokeAnimation kanji={kanji} />
           </Suspense>
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger={"Structural Composition"} defaultOpen={false}>
+        <ErrorBoundary details="StructuralComposition in KanjiDetails">
+          <StructureInfo kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>
