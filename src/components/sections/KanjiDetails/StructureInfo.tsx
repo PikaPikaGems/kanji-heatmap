@@ -29,7 +29,7 @@ const TableCellGrow = ({ children }: { children: ReactNode }) => (
 export const StructureInfo = ({ kanji }: { kanji: string }) => {
     return (
         <>
-            <Table>
+            <Table key={kanji} className="animate-fade-in">
                 <TableBody>
 
                     <TableRow className="text-left">

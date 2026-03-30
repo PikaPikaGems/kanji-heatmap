@@ -96,7 +96,7 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
   }
 
   return (
-    <div>
+    <div className="animate-fade-in" key={kanji}>
       <div
         className="px-2 mt-4 -mx-2 overflow-x-auto"
 
