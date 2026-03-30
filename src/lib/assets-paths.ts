@@ -15,6 +15,9 @@ const assetsPaths = {
   KANJI_DECOMPOSITION: "/json/kanji_decomposition.json",
   KANJI_READING_DETAILS: "/json/kanji-readings-details-filtered.json",
   KANJI_STRUCTURE_DETAILS: "/json/kanji-structure-filtered-hlorenzi.json",
+  KANJI_STRUCTURE_KANJIUM: "/json/kanji-structure-kanjium.json",
+  KANJI_STRUCTURE_SCOTT: "/json/scott-components.json",
+  KANJI_STRUCTURE_YAGAYS: "/json/yagays-components.json",
   ICON_SVG: "/img/app-icon.svg",
 };
 

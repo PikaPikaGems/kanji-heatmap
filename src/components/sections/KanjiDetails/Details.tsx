@@ -63,14 +63,6 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-
-      {SHOW_SAMPLE_VOCAB_SECTION &&
-        <SimpleAccordion trigger={"Sample Vocabulary"}>
-          <ErrorBoundary details="SampleVocabulary in KanjiDetails">
-            <SampleVocabulary kanji={kanji} />
-          </ErrorBoundary>
-        </SimpleAccordion>
-      }
       <SimpleAccordion trigger={"Stroke Order Animation"}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>
@@ -78,7 +70,14 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Structural Composition"} defaultOpen={false}>
+      {SHOW_SAMPLE_VOCAB_SECTION &&
+        <SimpleAccordion trigger={"Sample Vocabulary"}>
+          <ErrorBoundary details="SampleVocabulary in KanjiDetails">
+            <SampleVocabulary kanji={kanji} />
+          </ErrorBoundary>
+        </SimpleAccordion>
+      }
+      <SimpleAccordion trigger={"Structural Composition"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
         </ErrorBoundary>
@@ -86,7 +85,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Reading Usefulness Data"}>
+      <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>

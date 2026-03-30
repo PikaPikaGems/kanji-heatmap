@@ -56,24 +56,45 @@ export interface KanjiStructureEntry {
 
 export type KanjiStructureData = Record<string, KanjiStructureEntry>;
 
+// Kanjium tuple: [semantic, radicalVariant, phonetic, idsStructure, structureType]
+export type KanjiumEntry = [
+  string | null,
+  string | null,
+  string | null,
+  string | null,
+  string | null,
+];
+
+export type KanjiumData = Record<string, KanjiumEntry>;
+export type ComponentListData = Record<string, string[]>;
+
+export interface MultiKanjiStructureEntry {
+  hlorenzi: KanjiStructureEntry | null;
+  kanjium: KanjiumEntry | null;
+  scott: string[] | null;
+  yagays: string[] | null;
+}
+
+export type MultiKanjiStructureData = Record<string, MultiKanjiStructureEntry>;
+
 export const structuralTypeInfoB = {
-  "Compound Ideograph": {
-    name: "Compound Ideograph",
+  "Compound ideograph": {
+    name: "Compound Ideographic",
     description:
       "A character built by combining parts that each contribute meaning—like a small visual story. For example, 休 (rest) shows a person 人 leaning against a tree 木.",
   },
-  "Phono-semantic Compound": {
-    name: "Phono-semantic Compound",
+  "Phono-semantic compound": {
+    name: "Phono-semantic",
     description:
       "A character that combines meaning and sound: one part hints at what it means, and another suggests how it’s read. For example, 河 (river) has 氵 (water) and 可 (か) for pronunciation.",
   },
   Pictograph: {
-    name: "Pictograph",
+    name: "Pictographic",
     description:
       "A character that started as a drawing of something real and became more stylized over time. For example, 山 (mountain) and 木 (tree).",
   },
   Ideograph: {
-    name: "Ideograph",
+    name: "Ideographic",
     description:
       "A simple symbol that represents an idea rather than a physical object. For example, 上 (up) and 下 (down) use lines to show direction.",
   },
