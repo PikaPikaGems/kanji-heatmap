@@ -5,9 +5,8 @@ import { StructuralType, structuralTypeInfo, structuralTypeInfoB } from "@/lib/k
 import { GlobalKanjiLink } from "@/components/dependent/routing";
 import { FakeComponentLink, GlobalRadicalLink } from "@/components/dependent/routing/global-links";
 import { moreRadicalKeywords, nonRadicalVariantKeywords, radicalFalseFriends } from "@/lib/radicals";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { ReactNode } from "react";
+import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 
 
 
@@ -29,7 +28,7 @@ const ComponentLink = ({
 }) => {
 
   return (
-    <div className="flex flex-col text-center w-fit">
+    <div className="flex flex-col text-center w-fit ">
       {type === 'kanji' ?
         <GlobalKanjiLink kanji={component} keyword={keyword} /> : type === "radical" ?
           <GlobalRadicalLink radical={component} keyword={keyword} /> : <FakeComponentLink radical={component} keyword={keyword} />
@@ -53,29 +52,6 @@ const getRadicalKeyword = (component: string): string | undefined => {
   if (canonical && moreRadicalKeywords[canonical]) return moreRadicalKeywords[canonical];
   return undefined;
 };
-
-
-const KanjiStructuralTypeBadge = ({ name, desc }: { name: string, desc?: string }) => {
-  if (desc == null) {
-    return (
-      <Badge variant="outline" className="cursor-not-allowed">
-        {name}
-      </Badge>
-    )
-  }
-  return <Popover>
-    <PopoverTrigger asChild>
-      <button>
-        <Badge variant="outline" className="cursor-pointer hover:bg-[#2effff] hover:text-black">
-          {name}
-        </Badge>
-      </button>
-    </PopoverTrigger>
-    <PopoverContent className="w-64 text-xs">
-      {desc}
-    </PopoverContent>
-  </Popover>
-}
 
 
 // --- Helper to resolve component type and keyword ---
@@ -126,7 +102,7 @@ const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {
         <ComponentLink {...phoneticResolved} title="Phonetic" />
       )}
       {hlorenzi?.type &&
-        <KanjiStructuralTypeBadge
+        <BadgeWithPopover
           name={formatStructuralTypeName(hlorenzi.type) ?? hlorenzi.type}
           desc={structuralTypeInfo[hlorenzi.type]?.description}
         />
@@ -172,7 +148,7 @@ const KanjiStructuralDataKanjium = ({ kanji }: { kanji: string }) => {
         <ComponentLink component={idsStructure} title="Structure" keyword="..." type="unknown" />
       )}
       {structureType &&
-        (<KanjiStructuralTypeBadge name={typeInfo?.name ?? structureType} desc={typeInfo?.description} />
+        (<BadgeWithPopover name={typeInfo?.name ?? structureType} desc={typeInfo?.description} />
         )}
 
     </Wrapper>
