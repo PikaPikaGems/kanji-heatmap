@@ -1,10 +1,9 @@
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
-import { outLinks } from "@/lib/external-links";
+
 import { FakeComponentLink, GlobalRadicalLink } from "../routing/global-links";
-import { isKnownRadical } from "@/lib/radicals";
+import { isKnownRadical, nonRadicalVariantKeywords } from "@/lib/radicals";
 
 export const SingleKanjiPart = ({
   kanji,
@@ -32,29 +31,24 @@ export const SingleKanjiPart = ({
             <RomajiBadge key={phonetic} kana={phonetic} />
           ))}
 
-          {keyword == null ? (
-            <div className="w-32 my-2">
-              Keyword Missing
-              <br />
-              <ExternalTextLink text="Report Bug" href={outLinks.discord} />
-              {"🐛🐞"}
-            </div>
-          ) : isKanji ? (
-            <>
-              <GlobalKanjiLink keyword={keyword} kanji={kanji} />
-              <span className="italic font-normal">{"(Kanji)"}</span>
-            </>
-          ) : isKnownRadical(kanji) ? (
-            <>
-              <GlobalRadicalLink radical={kanji} keyword={keyword} />
-              <span className="italic font-normal">{"(Radical)"}</span>
-            </>
-          ) : (
-            <>
-              <FakeComponentLink radical={kanji} keyword={keyword} />
-              <span className="italic font-normal">{"(Component)"}</span>
-            </>
-          )}
+          {keyword == null
+            ? <FakeComponentLink radical={kanji} keyword={nonRadicalVariantKeywords[kanji] ?? "..."} />
+            : isKanji ? (
+              <>
+                <GlobalKanjiLink keyword={keyword} kanji={kanji} />
+                <span className="italic font-normal">{"(Kanji)"}</span>
+              </>
+            ) : isKnownRadical(kanji) ? (
+              <>
+                <GlobalRadicalLink radical={kanji} keyword={keyword} />
+                <span className="italic font-normal">{"(Radical)"}</span>
+              </>
+            ) : (
+              <>
+                <FakeComponentLink radical={kanji} keyword={keyword} />
+                <span className="italic font-normal">{"(Component)"}</span>
+              </>
+            )}
         </div>
       }
     />
