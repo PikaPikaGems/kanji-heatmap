@@ -36,13 +36,9 @@ export function KanjiDrawerRaw({
         <ErrorBoundary>
           <KanjiInfoContent kanji={kanji} />
         </ErrorBoundary>
-        <DrawerClose asChild className="absolute -top-1 right-0">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="mx-3 mt-3 rounded-full border-2 border-dotted flex justify-center item-center"
-          >
-            <CircleX />
+        <DrawerClose asChild className="absolute top-2 right-5">
+          <Button variant="ghost" size="icon" className="p-4 border-4 border-dashed rounded-xl">
+            <CircleX className="size-8" />
           </Button>
         </DrawerClose>
       </DrawerContent>

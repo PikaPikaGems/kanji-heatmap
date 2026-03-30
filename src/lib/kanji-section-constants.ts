@@ -77,22 +77,28 @@ export interface MultiKanjiStructureEntry {
 
 export type MultiKanjiStructureData = Record<string, MultiKanjiStructureEntry>;
 
+const compoundIdeographic = {
+  name: "Compound Ideographic",
+  description:
+    "A character made by combining parts that each add meaning—like a visual puzzle. For example, 休 (rest) combines 人 (person) and 木 (tree), suggesting a person leaning against a tree.",
+};
+
+const phonoSemantic = {
+  name: "Phono-semantic",
+  description:
+    "A mix of meaning and sound: one part hints at meaning, the other at pronunciation. For example, 河 (river) has 氵 (water) for meaning and 可 (か) for sound.",
+};
+
+const pictographic = {
+  name: "Pictographic",
+  description:
+    "A character that began as a drawing of something real and became more stylized over time. For example, 山 (mountain) and 木 (tree) still resemble their original shapes.",
+};
+
 export const structuralTypeInfoB = {
-  "Compound ideograph": {
-    name: "Compound Ideographic",
-    description:
-      "A character built by combining parts that each contribute meaning—like a small visual story. For example, 休 (rest) shows a person 人 leaning against a tree 木.",
-  },
-  "Phono-semantic compound": {
-    name: "Phono-semantic",
-    description:
-      "A character that combines meaning and sound: one part hints at what it means, and another suggests how it’s read. For example, 河 (river) has 氵 (water) and 可 (か) for pronunciation.",
-  },
-  Pictograph: {
-    name: "Pictographic",
-    description:
-      "A character that started as a drawing of something real and became more stylized over time. For example, 山 (mountain) and 木 (tree).",
-  },
+  "Compound ideograph": compoundIdeographic,
+  "Phono-semantic compound": phonoSemantic,
+  Pictograph: pictographic,
   Ideograph: {
     name: "Ideographic",
     description:
@@ -111,40 +117,34 @@ export const structuralTypeInfo: Record<
       "A simple symbol that points to an idea rather than drawing it—often used for abstract concepts. For example, 上 (up) shows a line above a base, and 下 (down) shows it below.",
   },
   shoukei: {
-    name: "Pictographic",
+    ...pictographic,
     japanese: "象形",
-    description:
-      "A character that began as a drawing of something real and became more stylized over time. For example, 山 (mountain) and 木 (tree) still resemble their original shapes.",
   },
   kaii: {
-    name: "Compound Ideographic",
+    ...compoundIdeographic,
     japanese: "会意",
-    description:
-      "A character made by combining parts that each add meaning—like a visual puzzle. For example, 休 (rest) combines 人 (person) and 木 (tree), suggesting a person leaning against a tree.",
   },
   keisei: {
-    name: "Phono-semantic",
+    ...phonoSemantic,
     japanese: "形声",
-    description:
-      "A mix of meaning and sound: one part hints at meaning, the other at pronunciation. For example, 河 (river) has 氵 (water) for meaning and 可 (か) for sound.",
   },
   unknown: {
     name: "Unknown",
     japanese: "不明",
     description:
-      "The origin of this character isn’t clearly understood—its history is uncertain or debated.",
+      "The origin of this character isn't clearly understood—its history is uncertain or debated.",
   },
   derivative: {
     name: "Derivative",
     japanese: "転注",
     description:
-      "A character whose meaning has shifted or expanded over time. For example, 楽 originally meant “music” but also came to mean “comfort” or “ease.”",
+      "A character whose meaning has shifted or expanded over time. For example, 楽 originally meant 'music' but also came to mean 'comfort' or 'ease.'",
   },
   rebus: {
     name: "Rebus",
     japanese: "仮借",
     description:
-      "A character borrowed for its sound rather than its meaning. For example, 来 originally meant “wheat” but was borrowed to mean “come” because of similar pronunciation.",
+      "A character borrowed for its sound rather than its meaning. For example, 来 originally meant 'wheat' but was borrowed to mean 'come' because of similar pronunciation.",
   },
   kokuji: {
     name: "Japanese-made",
