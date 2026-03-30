@@ -7,6 +7,32 @@ import { FakeComponentLink, GlobalRadicalLink } from "@/components/dependent/rou
 import { moreRadicalKeywords, nonRadicalVariantKeywords, radicalFalseFriends } from "@/lib/radicals";
 import { ReactNode } from "react";
 import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
+import {
+  Pointer, ImageIcon, Layers, AudioWaveform,
+  CircleHelp, GitBranch, Mic, Sparkles, Minimize2,
+  Lightbulb,
+} from "lucide-react";
+
+const ICON_SIZE = 15;
+
+const structuralTypeIcons: Record<StructuralType, ReactNode> = {
+  shiji: <Pointer size={ICON_SIZE} />,
+  shoukei: <ImageIcon size={ICON_SIZE} />,
+  kaii: <Layers size={ICON_SIZE} />,
+  keisei: <AudioWaveform size={ICON_SIZE} />,
+  unknown: <CircleHelp size={ICON_SIZE} />,
+  derivative: <GitBranch size={ICON_SIZE} />,
+  rebus: <Mic size={ICON_SIZE} />,
+  kokuji: <Sparkles size={ICON_SIZE} />,
+  shinjitai: <Minimize2 size={ICON_SIZE} />,
+};
+
+const structuralTypeIconsB: Record<keyof typeof structuralTypeInfoB, ReactNode> = {
+  "Compound ideograph": <Layers size={ICON_SIZE} />,
+  "Phono-semantic compound": <AudioWaveform size={ICON_SIZE} />,
+  "Pictograph": <ImageIcon size={ICON_SIZE} />,
+  "Ideograph": <Lightbulb size={ICON_SIZE} />,
+};
 
 
 
@@ -105,6 +131,7 @@ const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {
         <BadgeWithPopover
           name={formatStructuralTypeName(hlorenzi.type) ?? hlorenzi.type}
           desc={structuralTypeInfo[hlorenzi.type]?.description}
+          icon={structuralTypeIcons[hlorenzi.type]}
         />
       }
     </Wrapper>
@@ -148,7 +175,11 @@ const KanjiStructuralDataKanjium = ({ kanji }: { kanji: string }) => {
         <ComponentLink component={idsStructure} title="Structure" keyword="..." type="unknown" />
       )}
       {structureType &&
-        (<BadgeWithPopover name={typeInfo?.name ?? structureType} desc={typeInfo?.description} />
+        (<BadgeWithPopover
+          name={typeInfo?.name ?? structureType}
+          desc={typeInfo?.description}
+          icon={structuralTypeIconsB[structureType as keyof typeof structuralTypeInfoB]}
+        />
         )}
 
     </Wrapper>
