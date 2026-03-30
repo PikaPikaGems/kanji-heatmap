@@ -9,17 +9,17 @@ export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
       {jlpt !== "none" && (
         <GenericPopover
           trigger={
-            <button className="m-0 p-0">
-              <Badge className="text-nowrap py-1 px-3" variant={"outline"}>
+            <button className="p-0 m-0 hover:bg-[#2effff] rounded-full group">
+              <Badge className="px-3 py-1 text-nowrap group-hover:text-black" variant={"outline"}>
                 <span
-                  className={`h-3 w-3 block ${JLPTListItems[jlpt].cn} !rounded-full mr-1`}
+                  className={`h-3 w-3 block ${JLPTListItems[jlpt].cn} !rounded-full group-hover:text-black mr-1`}
                 />
                 {jlpt.toUpperCase()}
               </Badge>
             </button>
           }
           content={
-            <div className="px-4 py-3 w-64 text-xs">
+            <div className="w-64 px-4 py-3 text-xs">
               The <strong>Japanese‑Language Proficiency Test</strong>
               <ExternalTextLink href="https://jlpt.jp" text="(jlpt.jp)" />{" "}
               certifies non‑native speakers’ Japanese skills across five levels.{" "}
