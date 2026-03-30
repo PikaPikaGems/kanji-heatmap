@@ -36,8 +36,6 @@ export const KanjiReadingCategoryProvider = ({
       }
 
       const kanjiData = data[kanji]
-      console.log(kanjiData, data)
-
 
       if (!kanjiData || kanjiData.length <= 0) {
         return null
