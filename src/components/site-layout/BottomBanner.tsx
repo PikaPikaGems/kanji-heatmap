@@ -9,15 +9,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <div className="fix-scroll-layout-shift-right hidden md:block fixed bottom-0 left-0 bg-lime-400 text-black w-full text-sm font-extrabold px-1 pt-1 pb-[env(safe-area-inset-bottom)]">
         {children}
       </div>
-      <div className="fix-scroll-layout-shift-right fixed bottom-0 w-full flex items-center justify-center">
+      <div className="fixed bottom-0 flex items-center justify-center w-full fix-scroll-layout-shift-right">
         <div
           style={{
             bottom: "env(safe-area-inset-bottom)",
             width: "calc(100vw - 30px)",
           }}
-          className="flex md:hidden  my-1 items-center justify-center text-xs font-extrabold "
+          className="flex items-center justify-center my-1 text-xs font-extrabold md:hidden "
         >
-          <div className="bg-lime-400 text-black py-1 px-4 rounded-xl w-fit">
+          <div className="px-4 py-1 text-black bg-lime-400 rounded-xl w-fit">
             {children}
           </div>
         </div>
@@ -42,9 +42,9 @@ export const SocialLinksCTA = () => {
 const RirikkuCTA = () => {
   return (
     <>
-      👀 Look! The {"World's"} Coolest{"™"}
-      <ExternalTextLink href={outLinks.ririkku} text={"J-Music App"} />
-      {"♫"}
+      👀 Look! {`It's`}
+      <ExternalTextLink href={outLinks.ririkku} text={"Ririkku"} />
+      {"♥️"}
     </>
   );
 };

@@ -21,6 +21,7 @@ import {
   GetBasicKanjiInfoContext,
   IsReadyContext,
 } from "./kanji-worker-hooks";
+import { radicalFalseFriends } from "@/lib/radicals";
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
 const extractKanjiHoverData = (
@@ -78,9 +79,9 @@ const extractKanjiHoverData = (
         : undefined,
       second: vocab?.second
         ? {
-            ...vocab.second,
-            partsList: getPartsList(vocab.second.word),
-          }
+          ...vocab.second,
+          partsList: getPartsList(vocab.second.word),
+        }
         : undefined,
     },
     parts: Array.from(kanjiInfoExtended.parts).map((part) => {
@@ -265,9 +266,11 @@ export function KanjiWorkerProvider({
 
   const getKanjiBasicInfo: GetBasicKanjiInfo = useCallback((kanji) => {
     const main = kanjiCacheRef.current?.[kanji]?.main;
-    const keyword = main == null ? partKeywordCacheRef.current?.[kanji] : null;
+    const mainAlt = kanjiCacheRef.current?.[radicalFalseFriends[kanji]]?.main
+    const keyword = partKeywordCacheRef.current?.[kanji] ?? partKeywordCacheRef.current?.[radicalFalseFriends[kanji]]
 
-    return main ? main : keyword ? { keyword } : null;
+
+    return main ? main : mainAlt ? mainAlt : keyword ? { keyword } : null;
   }, []);
 
   if (workerError) {

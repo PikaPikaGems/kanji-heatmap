@@ -61,22 +61,8 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
 const MethodologyNote = () => (
   <div className="p-4 text-sm text-left text-muted-foreground">
     <p className="text-left">
-      All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary. The associated example word illustrates a typical usage that contributed to the assigned frequency rating.
+      All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary.
     </p>
-    <ul className="mt-2 space-y-1 text-left list-disc list-inside">
-      <li>
-        <span className={frequencyColors["↑"]}>↑ Often Used</span> - Frequently
-        encountered in everyday Japanese
-      </li>
-      <li>
-        <span className={frequencyColors["↔"]}>↔ Sometimes Used</span> -
-        Occasionally seen in common contexts
-      </li>
-      <li>
-        <span className={frequencyColors["↓"]}>↓ Almost Never Used</span> -
-        Rarely used or found mainly in specialized vocabulary
-      </li>
-    </ul>
     <div className="pt-4 font-bold">See also:</div>
     <div className="pl-6">
       {readingFrequencySourceLinks.map((link) => (
@@ -110,7 +96,7 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
   }
 
   return (
-    <div>
+    <div className="animate-fade-in" key={kanji}>
       <div
         className="px-2 mt-4 -mx-2 overflow-x-auto"
 

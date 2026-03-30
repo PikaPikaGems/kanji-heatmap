@@ -14,9 +14,11 @@ import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
+import { StructureInfo } from "./StructureInfo";
+import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 
 const SHOW_SAMPLE_VOCAB_SECTION = true;
-const RirikkuCTABadge = () => {
+export const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
@@ -28,7 +30,7 @@ const RirikkuCTABadge = () => {
   );
 };
 
-const ImprovementCTA = () => {
+export const ImprovementCTA = () => {
   return (
     <Badge className="block w-full py-2 mb-3 text-left rounded-md">
       We strive to make our content as accurate and helpful as possible. If you
@@ -58,9 +60,15 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
-      <ImprovementCTA />
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
+      </SimpleAccordion>
+      <SimpleAccordion trigger={"Stroke Order Animation"}>
+        <ErrorBoundary details="StrokeAnimation in KanjiDetails">
+          <Suspense fallback={<BasicLoading />}>
+            <StrokeAnimation kanji={kanji} />
+          </Suspense>
+        </ErrorBoundary>
       </SimpleAccordion>
       {SHOW_SAMPLE_VOCAB_SECTION &&
         <SimpleAccordion trigger={"Sample Vocabulary"}>
@@ -69,17 +77,15 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           </ErrorBoundary>
         </SimpleAccordion>
       }
-      <SimpleAccordion trigger={"Stroke Order Animation"}>
-        <ErrorBoundary details="StrokeAnimation in KanjiDetails">
-          <Suspense fallback={<BasicLoading />}>
-            <StrokeAnimation kanji={kanji} />
-          </Suspense>
+      <SimpleAccordion trigger={"Structural Composition"}>
+        <ErrorBoundary details="StructuralComposition in KanjiDetails">
+          <StructureInfo kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data.frequency} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Reading Usefulness Data"}>
+      <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
@@ -89,11 +95,13 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           <ExternalKanjiLinks kanji={kanji} />
         </div>
       </SimpleAccordion>
-      <RirikkuCTABadge />
-      <div className="flex justify-start w-full space-x-1">
+      <div className="flex justify-start w-full mt-4 space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />
         <ModeToggle />
+      </div>
+      <div className="mt-4 w-fit">
+        <PikaPikaLinks />
       </div>
     </div>
   );

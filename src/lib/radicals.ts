@@ -289,7 +289,7 @@ export const moreRadicalKeywords: Record<string, string> = {
   "⺉": "sun variant",
   マ: "katakana ma",
   ユ: "hook variant",
-  "𠂉": "gun person",
+  "𠂉": "(gun) person",
   "⻌": "movement radical",
   "⺌": "small variant",
   已: "snake variant",
@@ -327,6 +327,14 @@ export const moreRadicalKeywords: Record<string, string> = {
   龠: "flute",
 };
 
+export const nonRadicalVariantKeywords: Record<string, string> = {
+  昜: "light of the sun",
+  訁: "say (variant)",
+  "⻗": "rain (squished)",
+  氐: "bottom",
+  粦: "The rice you oppose",
+};
+
 export const radicalFalseFriends: Record<string, string> = {
   // 艸, 廾 <--- 艹 (from component keyword), ⺾ (from moreRadicals.ts)
   // ⽊ <-- tree (radical), tree (radical 木)
@@ -352,6 +360,10 @@ export const radicalFalseFriends: Record<string, string> = {
   耂: "⺹",
   丿: "ノ",
   丨: "｜",
+  辶: "⻌",
+  龺: "𠦝",
+  夊: "夂",
+  "⺕": "彐",
   // TODO CONFIRM IF CORRECT
 
   /** TODO: How to handle this? 

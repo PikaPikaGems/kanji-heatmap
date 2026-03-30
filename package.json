@@ -15,7 +15,10 @@
     "find-unhandled-components": "node scripts/find-unhandled-components.mjs",
     "inspect-kanjidict": "node scripts/data-inspection-part-2.mjs",
     "kanjidict-to-json": "node scripts/kanjidict-to-json.mjs",
-    "validate-kanjidict": "node scripts/validate-kanjidict-vs-structure.mjs"
+    "validate-kanjidict": "node scripts/validate-kanjidict-vs-structure.mjs",
+    "struct1": "node scripts/filter-structure-1.mjs"
+
+    
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",

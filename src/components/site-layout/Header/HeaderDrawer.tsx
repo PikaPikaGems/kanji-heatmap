@@ -9,6 +9,7 @@ import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
+import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 
 const { kanjiPage, cumUseGraphPage } = pageItems;
 
@@ -49,7 +50,6 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
               href={item.href}
-
               className="block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent"
             >
               <div className="flex items-center text-sm font-semibold">
@@ -66,8 +66,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         ))}
       </div>
 
-      {/* Info links */}
-      <div className="flex flex-wrap justify-center w-full gap-2 mb-4">
+      <div className="flex flex-wrap justify-center w-full gap-2">
         {infoLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
@@ -78,14 +77,17 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
             </Link>
           </DrawerPrimitive.Close>
         ))}
-      </div>
 
-      <div className="mb-4">
-        <div className="flex justify-center space-x-1">
-          <LinksOutItems />
+        <PikaPikaLinks />
+
+
+        <div className="mt-4">
+          <div className="flex justify-center space-x-1">
+            <LinksOutItems />
+          </div>
         </div>
-      </div>
 
+      </div>
     </div>
   )
 }

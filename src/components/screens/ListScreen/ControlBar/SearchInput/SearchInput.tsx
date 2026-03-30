@@ -184,7 +184,7 @@ export const SearchInput = ({
           onSettle(newParsedValue.trim(), newType);
         }}
         triggerCN={
-          "absolute right-1 top-1 w-[115px] h-7 bg-gray-100 dark:bg-gray-900"
+          "absolute right-1 top-1 w-[115px] h-7 bg-foreground/5"
         }
         options={SEARCH_TYPE_OPTIONS}
         label="Search Type"

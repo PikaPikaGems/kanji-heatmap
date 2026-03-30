@@ -10,11 +10,7 @@ import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { BasicLoading } from "@/components/common/BasicLoading";
 
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
-import {
-  KanjiStructuralData,
-} from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -94,24 +90,8 @@ export const General = ({ kanji }: { kanji: string }) => {
               {data.allOn.length === 0 && <div> - </div>}
             </TableCellGrow>
           </TableRow>
-
-          <TableRow className="text-left">
-            <TableCellFixed>
-              Structure (hlorenzi)
-            </TableCellFixed>
-            <TableCellGrow>
-
-              <KanjiStructuralData kanji={kanji} />
-            </TableCellGrow>
-          </TableRow>
         </TableBody>
       </Table>
-
-      <div className="mx-4 mt-12 text-xs font-bold text-left">📌 Notes:</div>
-      <div className="mx-6 mb-12 italic text-left">Structure (hlorenzi) is sourced from
-        <ExternalTextLink href={"https://github.com/hlorenzi/jisho-open"} text="hlorenzi/jisho-open" /> with
-        minimal modifications.
-      </div>
     </>
   );
 };
