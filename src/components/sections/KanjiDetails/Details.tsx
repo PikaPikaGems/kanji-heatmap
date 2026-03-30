@@ -15,9 +15,10 @@ import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { StructureInfo } from "./StructureInfo";
+import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 
 const SHOW_SAMPLE_VOCAB_SECTION = true;
-const RirikkuCTABadge = () => {
+export const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
@@ -29,7 +30,7 @@ const RirikkuCTABadge = () => {
   );
 };
 
-const ImprovementCTA = () => {
+export const ImprovementCTA = () => {
   return (
     <Badge className="block w-full py-2 mb-3 text-left rounded-md">
       We strive to make our content as accurate and helpful as possible. If you
@@ -59,7 +60,6 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
-      <ImprovementCTA />
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
@@ -95,11 +95,13 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           <ExternalKanjiLinks kanji={kanji} />
         </div>
       </SimpleAccordion>
-      <RirikkuCTABadge />
-      <div className="flex justify-start w-full space-x-1">
+      <div className="flex justify-start w-full mt-4 space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />
         <ModeToggle />
+      </div>
+      <div className="mt-4 w-fit">
+        <PikaPikaLinks />
       </div>
     </div>
   );
