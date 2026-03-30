@@ -77,7 +77,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           </ErrorBoundary>
         </SimpleAccordion>
       }
-      <SimpleAccordion trigger={"Structural Composition"}>
+      <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
         </ErrorBoundary>

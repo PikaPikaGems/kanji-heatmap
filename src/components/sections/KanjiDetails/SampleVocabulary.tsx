@@ -52,7 +52,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
         <TableCell className="w-fit max-w-24">
           {entry.e && entry.e !== "-" ? <span className="text-xs font-bold" >{entry.e}</span> : "-"}
         </TableCell>
-        <TableCell className="gap-2 px-4 text-sm text-muted-foreground max-w-24">
+        <TableCell className="gap-2 px-4 text-sm text-muted-foreground max-w-36">
           {jlpt && <><JLPTBadge jlpt={jlpt} /><br /></>}
           {entry.k && entry.k === 1 &&
             (<BadgeWithPopover name="✓ Kaishi 1.5k" desc={"This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners "} />)
@@ -122,7 +122,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
         <TableHeader>
           <TableRow>
             <TableHead className="text-left w-fit">Speak</TableHead>
-            <TableHead className="text-center w-fit">Sample Word</TableHead>
+            <TableHead className="text-center w-fit">Word</TableHead>
             <TableHead className="text-center w-fit">Reading</TableHead>
             <TableHead className="text-center max-w-12">Translation</TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
@@ -156,7 +156,7 @@ const TableSkeleton = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="text-left w-fit">Speak</TableHead>
-            <TableHead className="text-center w-fit">Sample Word</TableHead>
+            <TableHead className="text-center w-fit">Word</TableHead>
             <TableHead className="text-center w-fit">Reading</TableHead>
             <TableHead className="w-12 text-center">Translation</TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
@@ -211,7 +211,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
   if (!data || data.length === 0) {
     return (
       <div className="py-4 text-sm text-left text-muted-foreground ">
-        {"We don't have sample words for this kanji yet."}
+        {"There are no sample words for this kanji yet."}
       </div>
     );
   }
