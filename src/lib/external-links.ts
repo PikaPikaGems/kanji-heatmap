@@ -18,7 +18,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://thekanjimap.com/${kanji}`,
   },
   {
-    name: "Wanikani",
+    name: "WaniKani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
   },
   {

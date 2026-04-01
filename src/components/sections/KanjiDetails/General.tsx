@@ -52,7 +52,7 @@ export const General = ({ kanji }: { kanji: string }) => {
         {hasData(data.strokes) && (
           <Badge className="m-1">Strokes {data.strokes}</Badge>
         )}
-        {hasData(data.wk) && <Badge className="m-1">Wanikani {data.wk}</Badge>}
+        {hasData(data.wk) && <Badge className="m-1">WK {data.wk}</Badge>}
         {hasData(data.rtk) && <Badge className="m-1">RTK {data.rtk}</Badge>}
         {hasData(data.kklcIndex) && <Badge className="m-1">KKLC {data.kklcIndex}</Badge>}
       </div>
