@@ -1,4 +1,3 @@
-import fuzzysearch from "fuzzysearch";
 import wanakana from "@/lib/wanakana-adapter";
 import { JLPTOptionsCount, JLPTRank, JLTPTtypes } from "@/lib/jlpt";
 import {
@@ -9,6 +8,7 @@ import { SearchSettings } from "@/lib/settings/settings";
 import {
   K_JLPT,
   K_JOUYOU_KEY,
+  K_KKLC_INDEX,
   K_MEANING_KEY,
   K_RTK_INDEX,
   K_STROKES,
@@ -136,14 +136,16 @@ export const filterKanji = (
       : allKanji.filter((kanji) => {
           if (textSearch.type === "keyword") {
             const info = kanjiPool.main[kanji];
-            return fuzzysearch(textToSearch, info.keyword);
+
+            // return fuzzysearch(textToSearch, info.keyword);
+            return info.keyword.includes(textToSearch);
           }
 
           if (textSearch.type === "meanings") {
             const info = kanjiPool.main[kanji];
             const meanings = kanjiPool.extended[kanji].meanings;
             return (
-              fuzzysearch(textToSearch, info.keyword) ||
+              info.keyword.includes(textToSearch) ||
               meanings.find((meaning) => meaning.includes(textToSearch))
             );
           }
@@ -212,6 +214,10 @@ export const sortKanji = (
 
       if (sortKey === K_RTK_INDEX) {
         return numericSort(exInfoA.rtk, exInfoB.rtk);
+      }
+
+      if (sortKey === K_KKLC_INDEX) {
+        return numericSort(exInfoA.kklcIndex, exInfoB.kklcIndex);
       }
 
       if (sortKey === K_MEANING_KEY) {

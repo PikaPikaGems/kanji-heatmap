@@ -274,6 +274,13 @@ export const AboutSection = () => {
             <li>Alex {"Yatskov's"} Wikipedia Kanji Frequency Report</li>
           </ul>
         </li>
+        <li>
+          Data sources not listed here are credited either in the relevant sections of the website where they are used or in the
+          <CustomLink href="https://github.com/PikaPikaGems/kanji-heatmap-data">
+            Kanji Heatmap Data
+          </CustomLink>
+          repository.
+        </li>
       </ul>
       <h3 className="mt-8 mb-4 text-2xl font-semibold tracking-tight scroll-m-20">
         Common Sources

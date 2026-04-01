@@ -2,6 +2,7 @@ import { KanjiInfoFrequency, KanjiMainInfo } from "../kanji/kanji-worker-types";
 import {
   K_JLPT,
   K_JOUYOU_KEY,
+  K_KKLC_INDEX,
   K_MEANING_KEY,
   K_RANK_AOZORA_CHAR,
   K_RANK_AOZORA_DOC,
@@ -9,6 +10,8 @@ import {
   K_RANK_DRAMA_SUBTITLES,
   K_RANK_GOOGLE,
   K_RANK_JISHO,
+  K_RANK_JITEN,
+  K_RANK_JPDB,
   K_RANK_KD,
   K_RANK_KUF,
   K_RANK_MCD,
@@ -37,9 +40,10 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_JLPT]: "JLPT",
   [K_JOUYOU_KEY]: "Jouyou Grade",
   [K_STROKES]: "Stroke Count",
-  [K_WK_LVL]: "Wanikani Level",
+  [K_WK_LVL]: "(WK) WaniKani Level",
   [K_RTK_INDEX]: "(RTK) James W. Heisig's Remembering the Kanji Index",
   [K_MEANING_KEY]: "Keyword",
+  [K_KKLC_INDEX]: "(KKLC) The Kodansha Kanji Learner's Course",
 };
 
 export const freqMap: Record<
@@ -63,6 +67,8 @@ export const freqMap: Record<
   [K_RANK_JISHO]: "jisho",
   [K_RANK_KD]: "kd",
   [K_RANK_WKFR]: "wkfr",
+  [K_RANK_JPDB]: "jpdb",
+  [K_RANK_JITEN]: "jiten",
   [K_RANK_NONE]: undefined,
 };
 
@@ -84,6 +90,8 @@ export const frequencyRankLabels: Record<keyof KanjiInfoFrequency, string> = {
   bunka: "Japan's Agency for Cultural Affairs",
   wkfr: "Wikipedia Kanji Frequency Report",
   jisho: "Jisho.org",
+  jiten: "Jiten.moe",
+  jpdb: "JPDB.io",
 };
 
 export const SORT_OPTION_LABELS: SortOptionLabelType = Object.keys({

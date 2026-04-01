@@ -224,7 +224,7 @@ export function KanjiWorkerProvider({
         }
 
         if (type === "general") {
-          const { allKun, allOn, meanings, jouyouGrade, wk, rtk, strokes } =
+          const { allKun, allOn, meanings, jouyouGrade, wk, rtk, strokes, kklcIndex } =
             kanjiInfo.extended;
 
           return {
@@ -235,6 +235,7 @@ export function KanjiWorkerProvider({
             wk,
             rtk,
             strokes,
+            kklcIndex
           } as GeneralKanjiItem;
         }
 

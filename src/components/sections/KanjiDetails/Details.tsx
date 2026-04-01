@@ -71,7 +71,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
         </ErrorBoundary>
       </SimpleAccordion>
       {SHOW_SAMPLE_VOCAB_SECTION &&
-        <SimpleAccordion trigger={"Sample Vocabulary"}>
+        <SimpleAccordion trigger={`Selected Words Starting with ${kanji} `}>
           <ErrorBoundary details="SampleVocabulary in KanjiDetails">
             <SampleVocabulary kanji={kanji} />
           </ErrorBoundary>
@@ -100,7 +100,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
         <KanjiKeyboardShortcuts kanji={kanji} />
         <ModeToggle />
       </div>
-      <div className="mt-4 w-fit">
+      <div className="my-4 w-fit">
         <PikaPikaLinks />
       </div>
     </div>

@@ -41,6 +41,8 @@ export type KanjiInfoFrequency = {
   bunka: number | null; //rank_bunka,
   kd: number | null; //rank_kd,
   jisho: number | null; //rank_jisho,
+  jiten: number | null; // rank_jiten,
+  jpdb: number | null; // rank_jpdb,
 };
 
 export type KanjiExtendedInfo = {
@@ -55,6 +57,7 @@ export type KanjiExtendedInfo = {
   allKunStripped: Set<string>; // same as allKun except wanakana.toHiragana(item.replace(/[-.。ー]/g, ""))
   phonetic?: string;
   mainVocab?: string[];
+  kklcIndex: number;
 };
 
 export type WordMeaning = string;
@@ -84,6 +87,8 @@ export type FreqList = [
   number, //rank_bunka,
   number, //rank_kd,
   number, //rank_jisho,
+  number, //rank_jiten
+  number, // rank_jpdb
 ];
 
 export type MainKanjiInfoResponseType = Record<
@@ -101,7 +106,8 @@ export type ExtendedKanjiInfoItemType = [
   string[], // on readings
   string[], // kun readings
   string, // semantic phonetic if any
-  string[], // sample vocabulary
+  string[], // sample vocabulary,
+  number, // kklc index
 ];
 export type ExtendedKanjiInfoResponseType = Record<
   string,

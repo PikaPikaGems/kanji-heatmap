@@ -6,6 +6,7 @@ export const K_ONYOMI = "onyomi";
 export const K_KUNYOMI = "kunyomi";
 export const K_STROKES = "strokes";
 export const K_WK_LVL = "wanikani-level";
+export const K_KKLC_INDEX = "kklc-index";
 
 export const K_RTK_INDEX = "rtk-index";
 export const K_MEANING_KEY = "keyword";
@@ -21,6 +22,9 @@ export const K_RANK_ONLINE_NEWS_CHAR = "rank-online-news-char";
 export const K_RANK_AOZORA_DOC = "rank-aozora-doc";
 export const K_RANK_AOZORA_CHAR = "rank-aozora-char";
 
+export const K_RANK_JITEN = "rank-jiten";
+export const K_RANK_JPDB = "rank-jpdb";
+
 export const K_RANK_GOOGLE = "rank-google";
 export const K_RANK_KUF = "rank-kuf";
 export const K_RANK_MCD = "rank-mcd";
@@ -34,6 +38,7 @@ export const GROUP_OPTIONS = [
   K_JOUYOU_KEY,
   K_STROKES,
   K_WK_LVL,
+  K_KKLC_INDEX,
 ] as const; // removed K_KUNYOMI, K_ONYOMI for now
 
 export const NONGROUP_OPTIONS = [K_RTK_INDEX, K_MEANING_KEY] as const;
@@ -58,6 +63,8 @@ export const FREQ_RANK_OPTIONS = [
   K_RANK_NOVELS_5100,
   K_RANK_MCD,
   K_RANK_DRAMA_SUBTITLES,
+  K_RANK_JITEN,
+  K_RANK_JPDB,
   K_RANK_NONE,
 ] as const;
 
@@ -80,4 +87,6 @@ export const frequencyRankNamesOrdered: (keyof KanjiInfoFrequency)[] = [
   "novels5100",
   "mcd",
   "dramaSubs",
+  "jpdb",
+  "jiten",
 ] as const;

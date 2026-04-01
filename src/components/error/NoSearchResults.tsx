@@ -5,11 +5,11 @@ import { ClearFiltersCTA } from "../dependent/routing/ClearFiltersCTA";
 export const NonIdealResultText = () => {
   return (
     <>
-      <div className="text-xs">
+      <div className="text-base">
         Since Kanji Heatmap focuses on the most common kanji, some characters
         might be missing.
       </div>
-      <div className="text-xs flex items-center flex-wrap mx-4 justify-center">
+      <div className="flex flex-wrap items-center justify-center mx-4 text-base">
         <ReachOutToUs prefix={`Is this a mistake? Let us know on `} />
       </div>
     </>

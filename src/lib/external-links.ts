@@ -1,4 +1,9 @@
 export const externalLinks: { name: string; url: (x: string) => string }[] = [
+  {
+    name: "Kagi Translate",
+    url: (kanji: string) =>
+      `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
+  },
   { name: "JPDB", url: (kanji: string) => `https://jpdb.io/kanji/${kanji}#a` },
   {
     name: "Jotoba",
@@ -13,7 +18,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://thekanjimap.com/${kanji}`,
   },
   {
-    name: "Wanikani",
+    name: "WaniKani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
   },
   {
