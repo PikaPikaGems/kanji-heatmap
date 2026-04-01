@@ -115,8 +115,8 @@ export const transformToMainKanjiInfo = (
       bunka: freq[14], //rank_bunka
       wkfr: freq[15], //rank_kd
       jisho: freq[16], //rank_jisho
-      jiten: freq[17] ?? 10_000,
-      jpdb: freq[18] ?? 10_000,
+      jiten: freq[17] ?? -1,
+      jpdb: freq[18] ?? -1,
     },
   };
 };
@@ -155,6 +155,6 @@ export const transformToExtendedKanjiInfo = (
     allKunStripped: new Set(hiraganaAllKunStripped),
     phonetic: (phonetic ?? "").length > 0 ? phonetic : undefined,
     mainVocab,
-    kklcIndex: kklcIndex ?? 10_000,
+    kklcIndex: kklcIndex ?? -1,
   };
 };
