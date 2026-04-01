@@ -1,4 +1,3 @@
-import fuzzysearch from "fuzzysearch";
 import wanakana from "@/lib/wanakana-adapter";
 import { JLPTOptionsCount, JLPTRank, JLTPTtypes } from "@/lib/jlpt";
 import {
@@ -136,14 +135,16 @@ export const filterKanji = (
       : allKanji.filter((kanji) => {
           if (textSearch.type === "keyword") {
             const info = kanjiPool.main[kanji];
-            return fuzzysearch(textToSearch, info.keyword);
+
+            // return fuzzysearch(textToSearch, info.keyword);
+            return info.keyword.includes(textToSearch);
           }
 
           if (textSearch.type === "meanings") {
             const info = kanjiPool.main[kanji];
             const meanings = kanjiPool.extended[kanji].meanings;
             return (
-              fuzzysearch(textToSearch, info.keyword) ||
+              info.keyword.includes(textToSearch) ||
               meanings.find((meaning) => meaning.includes(textToSearch))
             );
           }
