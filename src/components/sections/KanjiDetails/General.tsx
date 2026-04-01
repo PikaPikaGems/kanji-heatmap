@@ -5,6 +5,7 @@ import { DefaultErrorFallback } from "@/components/error";
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { PrimaryBadgeWithPopover } from "@/components/dependent/PrimaryBadgeWithPopover";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 
 import { BasicLoading } from "@/components/common/BasicLoading";
@@ -47,14 +48,40 @@ export const General = ({ kanji }: { kanji: string }) => {
     <>
       <div className="mt-6 text-left">
         {hasData(data.jouyouGrade) && (
-          <Badge className="m-1">Grade {data.jouyouGrade}</Badge>
+          <PrimaryBadgeWithPopover
+            label="Grade"
+            value={data.jouyouGrade!}
+            description="The Japanese school grade level where this kanji is officially introduced in the jōyō curriculum."
+          />
         )}
         {hasData(data.strokes) && (
-          <Badge className="m-1">Strokes {data.strokes}</Badge>
+          <PrimaryBadgeWithPopover
+            label="Strokes"
+            value={data.strokes!}
+            description="The total number of pen strokes used to write the kanji correctly."
+          />
         )}
-        {hasData(data.wk) && <Badge className="m-1">WK {data.wk}</Badge>}
-        {hasData(data.rtk) && <Badge className="m-1">RTK {data.rtk}</Badge>}
-        {hasData(data.kklcIndex) && <Badge className="m-1">KKLC {data.kklcIndex}</Badge>}
+        {hasData(data.wk) && (
+          <PrimaryBadgeWithPopover
+            label="WK"
+            value={data.wk!}
+            description="The kanji’s corresponding level in the WaniKani learning system."
+          />
+        )}
+        {hasData(data.rtk) && (
+          <PrimaryBadgeWithPopover
+            label="RTK"
+            value={data.rtk!}
+            description="The kanji’s entry number in Remembering the Kanji (RTK) by James Heisig."
+          />
+        )}
+        {hasData(data.kklcIndex) && (
+          <PrimaryBadgeWithPopover
+            label="KKLC"
+            value={data.kklcIndex!}
+            description="The kanji’s entry number in the Kodansha Kanji Learner’s Course (KKLC)."
+          />
+        )}
       </div>
       <DottedSeparator className="my-4 border-b-2" />
       <Table>

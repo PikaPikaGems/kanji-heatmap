@@ -71,7 +71,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
         </ErrorBoundary>
       </SimpleAccordion>
       {SHOW_SAMPLE_VOCAB_SECTION &&
-        <SimpleAccordion trigger={`Words Starting with ${kanji} `}>
+        <SimpleAccordion trigger={`Selected Words Starting with ${kanji} `}>
           <ErrorBoundary details="SampleVocabulary in KanjiDetails">
             <SampleVocabulary kanji={kanji} />
           </ErrorBoundary>
