@@ -54,6 +54,7 @@ export const General = ({ kanji }: { kanji: string }) => {
         )}
         {hasData(data.wk) && <Badge className="m-1">Wanikani {data.wk}</Badge>}
         {hasData(data.rtk) && <Badge className="m-1">RTK {data.rtk}</Badge>}
+        {hasData(data.kklcIndex) && <Badge className="m-1">KKLC {data.kklcIndex}</Badge>}
       </div>
       <DottedSeparator className="my-4 border-b-2" />
       <Table>

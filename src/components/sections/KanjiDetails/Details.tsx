@@ -100,7 +100,7 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
         <KanjiKeyboardShortcuts kanji={kanji} />
         <ModeToggle />
       </div>
-      <div className="mt-4 w-fit">
+      <div className="my-4 w-fit">
         <PikaPikaLinks />
       </div>
     </div>

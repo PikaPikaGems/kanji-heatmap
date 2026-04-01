@@ -46,6 +46,7 @@ export type GeneralKanjiItem = {
   wk: number;
   rtk: number;
   strokes: number;
+  kklcIndex: number;
 };
 
 export type HoverItemReturnData = {

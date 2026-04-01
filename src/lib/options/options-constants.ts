@@ -6,6 +6,7 @@ export const K_ONYOMI = "onyomi";
 export const K_KUNYOMI = "kunyomi";
 export const K_STROKES = "strokes";
 export const K_WK_LVL = "wanikani-level";
+export const K_KKLC_INDEX = "kklc-index";
 
 export const K_RTK_INDEX = "rtk-index";
 export const K_MEANING_KEY = "keyword";
@@ -37,6 +38,7 @@ export const GROUP_OPTIONS = [
   K_JOUYOU_KEY,
   K_STROKES,
   K_WK_LVL,
+  K_KKLC_INDEX,
 ] as const; // removed K_KUNYOMI, K_ONYOMI for now
 
 export const NONGROUP_OPTIONS = [K_RTK_INDEX, K_MEANING_KEY] as const;

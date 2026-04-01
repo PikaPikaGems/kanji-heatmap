@@ -8,6 +8,7 @@ import { SearchSettings } from "@/lib/settings/settings";
 import {
   K_JLPT,
   K_JOUYOU_KEY,
+  K_KKLC_INDEX,
   K_MEANING_KEY,
   K_RTK_INDEX,
   K_STROKES,
@@ -213,6 +214,10 @@ export const sortKanji = (
 
       if (sortKey === K_RTK_INDEX) {
         return numericSort(exInfoA.rtk, exInfoB.rtk);
+      }
+
+      if (sortKey === K_KKLC_INDEX) {
+        return numericSort(exInfoA.kklcIndex, exInfoB.kklcIndex);
       }
 
       if (sortKey === K_MEANING_KEY) {
