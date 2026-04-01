@@ -117,7 +117,14 @@ export const SearchInput = ({
           }
 
           if (hasKanji(processedText)) {
-            onSyncAll(`${parsedValue}${processedText}`, "multi-kanji");
+            // if has selection overwrite selection, else append to existing text 
+            const start = inputRef.current?.selectionStart ?? null;
+            const end = inputRef.current?.selectionEnd ?? null;
+            const hasSelection = start !== null && end !== null && start !== end;
+            const newValue = hasSelection
+              ? `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`
+              : `${parsedValue}${processedText}`;
+            onSyncAll(newValue, "multi-kanji");
             return;
           }
 
@@ -184,7 +191,7 @@ export const SearchInput = ({
           onSettle(newParsedValue.trim(), newType);
         }}
         triggerCN={
-          "absolute right-1 top-1 w-[110  px] h-7 bg-foreground text-background text-xs font-bold"
+          "absolute right-1 top-1 w-[110]  px] h-7 bg-foreground text-background text-xs font-bold"
         }
         options={SEARCH_TYPE_OPTIONS}
         label="Search Type"
