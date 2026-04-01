@@ -18,6 +18,8 @@ import {
   K_RANK_WIKIPEDIA_CHAR,
   K_RANK_WIKIPEDIA_DOC,
   K_RANK_WKFR,
+  K_RANK_JITEN,
+  K_RANK_JPDB,
 } from "../options/options-constants";
 
 const scriptin_attribute_desc = " Compiled by Dmitry Shpika.";
@@ -44,8 +46,25 @@ export const rankTypeLabel = {
 
 export const FREQ_RANK_SOURCES_INFO: Record<
   FrequencyType,
-  { description: string; links: string[]; rankType: "1224" | "1223" | "N/A" }
+  {
+    description: string;
+    links: string[];
+    rankType: "1224" | "1223" | "N/A";
+  }
 > = {
+  [K_RANK_JITEN]: {
+    description: "Dataset from jiten.moe/other",
+    links: ["https://jiten.moe/other"],
+    rankType: "1224",
+  },
+  [K_RANK_JPDB]: {
+    description:
+      "Aggregated from JPDB.io consolidated by GitHub user @Kuuuube (2026-02-09)",
+    links: [
+      "https://github.com/Kuuuube/yomitan-dictionaries/blob/main/data/jpdbv2_kanji_frequency_2026-02-09.csv",
+    ],
+    rankType: "1223",
+  },
   [K_RANK_NETFLIX]: {
     description:
       "Derived from Japanese Netflix subtitles containing about 53M total kanji occurrences. " +

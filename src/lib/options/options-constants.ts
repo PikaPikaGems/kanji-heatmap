@@ -21,6 +21,9 @@ export const K_RANK_ONLINE_NEWS_CHAR = "rank-online-news-char";
 export const K_RANK_AOZORA_DOC = "rank-aozora-doc";
 export const K_RANK_AOZORA_CHAR = "rank-aozora-char";
 
+export const K_RANK_JITEN = "rank-jiten";
+export const K_RANK_JPDB = "rank-jpdb";
+
 export const K_RANK_GOOGLE = "rank-google";
 export const K_RANK_KUF = "rank-kuf";
 export const K_RANK_MCD = "rank-mcd";
@@ -58,6 +61,8 @@ export const FREQ_RANK_OPTIONS = [
   K_RANK_NOVELS_5100,
   K_RANK_MCD,
   K_RANK_DRAMA_SUBTITLES,
+  K_RANK_JITEN,
+  K_RANK_JPDB,
   K_RANK_NONE,
 ] as const;
 
@@ -80,4 +85,6 @@ export const frequencyRankNamesOrdered: (keyof KanjiInfoFrequency)[] = [
   "novels5100",
   "mcd",
   "dramaSubs",
+  "jpdb",
+  "jiten",
 ] as const;

@@ -9,6 +9,8 @@ import {
   K_RANK_DRAMA_SUBTITLES,
   K_RANK_GOOGLE,
   K_RANK_JISHO,
+  K_RANK_JITEN,
+  K_RANK_JPDB,
   K_RANK_KD,
   K_RANK_KUF,
   K_RANK_MCD,
@@ -63,6 +65,8 @@ export const freqMap: Record<
   [K_RANK_JISHO]: "jisho",
   [K_RANK_KD]: "kd",
   [K_RANK_WKFR]: "wkfr",
+  [K_RANK_JPDB]: "jpdb",
+  [K_RANK_JITEN]: "jiten",
   [K_RANK_NONE]: undefined,
 };
 
@@ -84,6 +88,8 @@ export const frequencyRankLabels: Record<keyof KanjiInfoFrequency, string> = {
   bunka: "Japan's Agency for Cultural Affairs",
   wkfr: "Wikipedia Kanji Frequency Report",
   jisho: "Jisho.org",
+  jiten: "Jiten.moe",
+  jpdb: "JPDB.io",
 };
 
 export const SORT_OPTION_LABELS: SortOptionLabelType = Object.keys({
