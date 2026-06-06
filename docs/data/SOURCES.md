@@ -3,3 +3,11 @@
 3. kanji-structural-hlorenzi.json : https://raw.githubusercontent.com/hlorenzi/jisho-open/main/backend/src/data/kanji_structural_category.ts
 4. https://github.com/yagays/kanjivg-radical/blob/master/data/kanji2radical.json
 5. https://github.com/ScottOglesby/kanji-bakuhatsu/blob/master/raw/kanji-composition-map.txt
+
+For common words see:
+
+- https://ankiweb.net/shared/info/1564742924
+- https://ankiweb.net/shared/info/779483253
+- https://ankiweb.net/shared/info/2106223612
+- https://ankiweb.net/shared/info/1468618470
+- https://kanjimastery.blogspot.com/

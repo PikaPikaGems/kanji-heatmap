@@ -1,0 +1,4997 @@
+{
+  "する": {
+    "reading": "する",
+    "enTranslation": "to do",
+    "furigana": "する"
+  },
+  "何": {
+    "reading": "なに",
+    "enTranslation": "what",
+    "furigana": "何[なに]"
+  },
+  "これ": {
+    "reading": "これ",
+    "enTranslation": "this",
+    "furigana": "これ"
+  },
+  "学校": {
+    "reading": "がっこう",
+    "enTranslation": "school",
+    "furigana": "学校[がっこう]"
+  },
+  "行く": {
+    "reading": "いく",
+    "enTranslation": "to go",
+    "furigana": "行[い]く"
+  },
+  "たくさん": {
+    "reading": "たくさん",
+    "enTranslation": "a lot",
+    "furigana": "たくさん"
+  },
+  "子供": {
+    "reading": "こども",
+    "enTranslation": "child, children",
+    "furigana": "子供[こども]"
+  },
+  "連れる": {
+    "reading": "つれる",
+    "enTranslation": "to take (a person along)",
+    "furigana": "連[つ]れる"
+  },
+  "犬": {
+    "reading": "いぬ",
+    "enTranslation": "dog",
+    "furigana": "犬[いぬ]"
+  },
+  "宿題": {
+    "reading": "しゅくだい",
+    "enTranslation": "homework",
+    "furigana": "宿題[しゅくだい]"
+  },
+  "私": {
+    "reading": "わたし",
+    "enTranslation": "I",
+    "furigana": "私[わたし]"
+  },
+  "屋": {
+    "reading": "や",
+    "enTranslation": "(something) shop",
+    "furigana": "屋[や]"
+  },
+  "ある": {
+    "reading": "ある",
+    "enTranslation": "to exist (inanimate objects)",
+    "furigana": "ある"
+  },
+  "あそこ": {
+    "reading": "あそこ",
+    "enTranslation": "over there",
+    "furigana": "あそこ"
+  },
+  "人": {
+    "reading": "ひと",
+    "enTranslation": "person",
+    "furigana": "人[ひと]"
+  },
+  "教室": {
+    "reading": "きょうしつ",
+    "enTranslation": "classroom",
+    "furigana": "教室[きょうしつ]"
+  },
+  "そんな": {
+    "reading": "そんな",
+    "enTranslation": "such (actions, ideas), like that, that sort of",
+    "furigana": "そんな"
+  },
+  "鳴る": {
+    "reading": "なる",
+    "enTranslation": "to sound, to ring",
+    "furigana": "鳴[な]る"
+  },
+  "買う": {
+    "reading": "かう",
+    "enTranslation": "to buy",
+    "furigana": "買[か]う"
+  },
+  "本": {
+    "reading": "ほん",
+    "enTranslation": "book",
+    "furigana": "本[ほん]"
+  },
+  "有名": {
+    "reading": "ゆうめい",
+    "enTranslation": "famous",
+    "furigana": "有名[ゆうめい]"
+  },
+  "読む": {
+    "reading": "よむ",
+    "enTranslation": "to read",
+    "furigana": "読[よ]む"
+  },
+  "上がる": {
+    "reading": "あがる",
+    "enTranslation": "to ascend, to go up, to be raised, to lift",
+    "furigana": "上[あ]がる"
+  },
+  "成績": {
+    "reading": "せいせき",
+    "enTranslation": "grades (school)",
+    "furigana": "成績[せいせき]"
+  },
+  "ここ": {
+    "reading": "ここ",
+    "enTranslation": "here",
+    "furigana": "ここ"
+  },
+  "言う": {
+    "reading": "いう",
+    "enTranslation": "to say, speak",
+    "furigana": "言[い]う"
+  },
+  "この": {
+    "reading": "この",
+    "enTranslation": "this (thing)",
+    "furigana": "この"
+  },
+  "問題": {
+    "reading": "もんだい",
+    "enTranslation": "problem, question",
+    "furigana": "問題[もんだい]"
+  },
+  "考える": {
+    "reading": "かんがえる",
+    "enTranslation": "to think (about something)",
+    "furigana": "考[かんが]える"
+  },
+  "後": {
+    "reading": "あと",
+    "enTranslation": "later, after",
+    "furigana": "後[あと]"
+  },
+  "毎日": {
+    "reading": "まいにち",
+    "enTranslation": "every day",
+    "furigana": "毎日[まいにち]"
+  },
+  "彼": {
+    "reading": "かれ",
+    "enTranslation": "he, him",
+    "furigana": "彼[かれ]"
+  },
+  "来る": {
+    "reading": "くる",
+    "enTranslation": "to come",
+    "furigana": "来[く]る"
+  },
+  "彼氏": {
+    "reading": "かれし",
+    "enTranslation": "boyfriend",
+    "furigana": "彼氏[かれし]"
+  },
+  "電話": {
+    "reading": "でんわ",
+    "enTranslation": "phone",
+    "furigana": "電話[でんわ]"
+  },
+  "集まる": {
+    "reading": "あつまる",
+    "enTranslation": "to gather, to collect, to assemble",
+    "furigana": "集[あつ]まる"
+  },
+  "事": {
+    "reading": "こと",
+    "enTranslation": "thing, matter",
+    "furigana": "事[こと]"
+  },
+  "好き": {
+    "reading": "すき",
+    "enTranslation": "liking, fondness, love, being attractive (to)",
+    "furigana": "好[す]き"
+  },
+  "僕": {
+    "reading": "ぼく",
+    "enTranslation": "I, me (male)",
+    "furigana": "僕[ぼく]"
+  },
+  "勉強": {
+    "reading": "べんきょう",
+    "enTranslation": "study",
+    "furigana": "勉強[べんきょう]"
+  },
+  "英語": {
+    "reading": "えいご",
+    "enTranslation": "english",
+    "furigana": "英語[えいご]"
+  },
+  "教える": {
+    "reading": "おしえる",
+    "enTranslation": "to teach, to tell",
+    "furigana": "教[おし]える"
+  },
+  "分かる": {
+    "reading": "わかる",
+    "enTranslation": "to understand, to comprehend",
+    "furigana": "分[わ]かる"
+  },
+  "手": {
+    "reading": "て",
+    "enTranslation": "hand",
+    "furigana": "手[て]"
+  },
+  "上げる": {
+    "reading": "あげる",
+    "enTranslation": "to raise",
+    "furigana": "上[あ]げる"
+  },
+  "君": {
+    "reading": "きみ",
+    "enTranslation": "you",
+    "furigana": "君[きみ]"
+  },
+  "全然": {
+    "reading": "ぜんぜん",
+    "enTranslation": "not at all (with neg. verb)",
+    "furigana": "全然[ぜんぜん]"
+  },
+  "友達": {
+    "reading": "ともだち",
+    "enTranslation": "friend, companion",
+    "furigana": "友達[ともだち]"
+  },
+  "会う": {
+    "reading": "あう",
+    "enTranslation": "to meet",
+    "furigana": "会[あ]う"
+  },
+  "生徒": {
+    "reading": "せいと",
+    "enTranslation": "pupil, student",
+    "furigana": "生徒[せいと]"
+  },
+  "兄": {
+    "reading": "あに",
+    "enTranslation": "older brother",
+    "furigana": "兄[あに]"
+  },
+  "大学": {
+    "reading": "だいがく",
+    "enTranslation": "university, college",
+    "furigana": "大学[だいがく]"
+  },
+  "部": {
+    "reading": "ぶ",
+    "enTranslation": "department, club",
+    "furigana": "部[ぶ]"
+  },
+  "方": {
+    "reading": "ほう",
+    "enTranslation": "side (of an argument, etc.)",
+    "furigana": "方[ほう]"
+  },
+  "より": {
+    "reading": "より",
+    "enTranslation": "than",
+    "furigana": "より"
+  },
+  "力": {
+    "reading": "ちから",
+    "enTranslation": "strength, power",
+    "furigana": "力[ちから]"
+  },
+  "猫": {
+    "reading": "ねこ",
+    "enTranslation": "cat",
+    "furigana": "猫[ねこ]"
+  },
+  "上": {
+    "reading": "うえ",
+    "enTranslation": "above",
+    "furigana": "上[うえ]"
+  },
+  "置く": {
+    "reading": "おく",
+    "enTranslation": "to put, to place",
+    "furigana": "置[お]く"
+  },
+  "色々": {
+    "reading": "いろいろ",
+    "enTranslation": "various, all sorts of",
+    "furigana": "色々[いろいろ]"
+  },
+  "かばん": {
+    "reading": "かばん",
+    "enTranslation": "bag",
+    "furigana": "かばん"
+  },
+  "家": {
+    "reading": "いえ",
+    "enTranslation": "house",
+    "furigana": "家[いえ]"
+  },
+  "美味しい": {
+    "reading": "おいしい",
+    "enTranslation": "delicious",
+    "furigana": "美味[おい]しい"
+  },
+  "遊ぶ": {
+    "reading": "あそぶ",
+    "enTranslation": "to play, to hang out",
+    "furigana": "遊[あそ]ぶ"
+  },
+  "明日": {
+    "reading": "あした",
+    "enTranslation": "tomorrow",
+    "furigana": "明日[あした]"
+  },
+  "料理": {
+    "reading": "りょうり",
+    "enTranslation": "cooking, cuisine",
+    "furigana": "料理[りょうり]"
+  },
+  "そう": {
+    "reading": "そう",
+    "enTranslation": "appearing that, seeming that",
+    "furigana": "そう"
+  },
+  "立つ": {
+    "reading": "たつ",
+    "enTranslation": "to stand",
+    "furigana": "立[た]つ"
+  },
+  "ください": {
+    "reading": "ください",
+    "enTranslation": "please (give/do for me)",
+    "furigana": "ください"
+  },
+  "ゆっくり": {
+    "reading": "ゆっくり",
+    "enTranslation": "slowly, at ease",
+    "furigana": "ゆっくり"
+  },
+  "作る": {
+    "reading": "つくる",
+    "enTranslation": "to create, to make",
+    "furigana": "作[つく]る"
+  },
+  "その": {
+    "reading": "その",
+    "enTranslation": "that (thing)",
+    "furigana": "その"
+  },
+  "通る": {
+    "reading": "とおる",
+    "enTranslation": "to pass",
+    "furigana": "通[とお]る"
+  },
+  "高校": {
+    "reading": "こうこう",
+    "enTranslation": "high school",
+    "furigana": "高校[こうこう]"
+  },
+  "彼女": {
+    "reading": "かのじょ",
+    "enTranslation": "she, her; girlfriend",
+    "furigana": "彼女[かのじょ]"
+  },
+  "手伝う": {
+    "reading": "てつだう",
+    "enTranslation": "to help, to assist",
+    "furigana": "手伝[てつだ]う"
+  },
+  "両親": {
+    "reading": "りょうしん",
+    "enTranslation": "parents",
+    "furigana": "両親[りょうしん]"
+  },
+  "もらう": {
+    "reading": "もらう",
+    "enTranslation": "to recieve",
+    "furigana": "もらう"
+  },
+  "手紙": {
+    "reading": "てがみ",
+    "enTranslation": "letter",
+    "furigana": "手紙[てがみ]"
+  },
+  "くれる": {
+    "reading": "くれる",
+    "enTranslation": "to give",
+    "furigana": "くれる"
+  },
+  "そこ": {
+    "reading": "そこ",
+    "enTranslation": "there (a little distant)",
+    "furigana": "そこ"
+  },
+  "場所": {
+    "reading": "ばしょ",
+    "enTranslation": "place, location",
+    "furigana": "場所[ばしょ]"
+  },
+  "ありがとう": {
+    "reading": "ありがとう",
+    "enTranslation": "thank you (informal)",
+    "furigana": "ありがとう"
+  },
+  "様": {
+    "reading": "さま",
+    "enTranslation": "Mr., Mrs., Ms. (very formal)",
+    "furigana": "様[さま]"
+  },
+  "いらっしゃる": {
+    "reading": "いらっしゃる",
+    "enTranslation": "to be (honorific version of いる)",
+    "furigana": "いらっしゃる"
+  },
+  "数学": {
+    "reading": "すうがく",
+    "enTranslation": "mathematics",
+    "furigana": "数学[すうがく]"
+  },
+  "解く": {
+    "reading": "とく",
+    "enTranslation": "to untie, to unfasten, to solve",
+    "furigana": "解[と]く"
+  },
+  "難しい": {
+    "reading": "むずかしい",
+    "enTranslation": "difficult, hard",
+    "furigana": "難[むずか]しい"
+  },
+  "とても": {
+    "reading": "とても",
+    "enTranslation": "very",
+    "furigana": "とても"
+  },
+  "中": {
+    "reading": "なか",
+    "enTranslation": "middle, within",
+    "furigana": "中[なか]"
+  },
+  "忙しい": {
+    "reading": "いそがしい",
+    "enTranslation": "busy",
+    "furigana": "忙[いそが]しい"
+  },
+  "仕事": {
+    "reading": "しごと",
+    "enTranslation": "work, job",
+    "furigana": "仕事[しごと]"
+  },
+  "疲れる": {
+    "reading": "つかれる",
+    "enTranslation": "to get tired, to be worn out",
+    "furigana": "疲[つか]れる"
+  },
+  "休憩": {
+    "reading": "きゅうけい",
+    "enTranslation": "break (from doing something)",
+    "furigana": "休憩[きゅうけい]"
+  },
+  "取る": {
+    "reading": "とる",
+    "enTranslation": "to take",
+    "furigana": "取[と]る"
+  },
+  "任せる": {
+    "reading": "まかせる",
+    "enTranslation": "to entrust (a task) to another",
+    "furigana": "任[まか]せる"
+  },
+  "新しい": {
+    "reading": "あたらしい",
+    "enTranslation": "new",
+    "furigana": "新[あたら]しい"
+  },
+  "前": {
+    "reading": "まえ",
+    "enTranslation": "in front (of), before",
+    "furigana": "前[まえ]"
+  },
+  "朝": {
+    "reading": "あさ",
+    "enTranslation": "morning",
+    "furigana": "朝[あさ]"
+  },
+  "降る": {
+    "reading": "ふる",
+    "enTranslation": "to fall (rain, snow, etc)",
+    "furigana": "降[ふ]る"
+  },
+  "日": {
+    "reading": "ひ",
+    "enTranslation": "day",
+    "furigana": "日[ひ]"
+  },
+  "なる": {
+    "reading": "なる",
+    "enTranslation": "to become",
+    "furigana": "なる"
+  },
+  "聞く": {
+    "reading": "きく",
+    "enTranslation": "to listen",
+    "furigana": "聞[き]く"
+  },
+  "先生": {
+    "reading": "せんせい",
+    "enTranslation": "teacher",
+    "furigana": "先生[せんせい]"
+  },
+  "今年": {
+    "reading": "ことし",
+    "enTranslation": "this year",
+    "furigana": "今年[ことし]"
+  },
+  "冬": {
+    "reading": "ふゆ",
+    "enTranslation": "winter (season)",
+    "furigana": "冬[ふゆ]"
+  },
+  "寒い": {
+    "reading": "さむい",
+    "enTranslation": "cold (weather)",
+    "furigana": "寒[さむ]い"
+  },
+  "誰": {
+    "reading": "だれ",
+    "enTranslation": "who",
+    "furigana": "誰[だれ]"
+  },
+  "店": {
+    "reading": "みせ",
+    "enTranslation": "store, shop",
+    "furigana": "店[みせ]"
+  },
+  "入る": {
+    "reading": "はいる",
+    "enTranslation": "to enter",
+    "furigana": "入[はい]る"
+  },
+  "本当": {
+    "reading": "ほんとう",
+    "enTranslation": "really, truth",
+    "furigana": "本当[ほんとう]"
+  },
+  "妹": {
+    "reading": "いもうと",
+    "enTranslation": "younger sister",
+    "furigana": "妹[いもうと]"
+  },
+  "買い物": {
+    "reading": "かいもの",
+    "enTranslation": "shopping",
+    "furigana": "買[か]い 物[もの]"
+  },
+  "携帯": {
+    "reading": "けいたい",
+    "enTranslation": "cell phone",
+    "furigana": "携帯[けいたい]"
+  },
+  "今日": {
+    "reading": "きょう",
+    "enTranslation": "today",
+    "furigana": "今日[きょう]"
+  },
+  "暑い": {
+    "reading": "あつい",
+    "enTranslation": "hot (weather)",
+    "furigana": "暑[あつ]い"
+  },
+  "ちょっと": {
+    "reading": "ちょっと",
+    "enTranslation": "a little bit",
+    "furigana": "ちょっと"
+  },
+  "見る": {
+    "reading": "みる",
+    "enTranslation": "to see, to look, to watch",
+    "furigana": "見[み]る"
+  },
+  "一緒": {
+    "reading": "いっしょ",
+    "enTranslation": "together, at the same time",
+    "furigana": "一緒[いっしょ]"
+  },
+  "映画": {
+    "reading": "えいが",
+    "enTranslation": "movie",
+    "furigana": "映画[えいが]"
+  },
+  "面白い": {
+    "reading": "おもしろい",
+    "enTranslation": "interesting, amusing",
+    "furigana": "面白[おもしろ]い"
+  },
+  "周り": {
+    "reading": "まわり",
+    "enTranslation": "surroundings",
+    "furigana": "周[まわ]り"
+  },
+  "もちろん": {
+    "reading": "もちろん",
+    "enTranslation": "of course",
+    "furigana": "もちろん"
+  },
+  "知る": {
+    "reading": "しる",
+    "enTranslation": "to know, to be aware of",
+    "furigana": "知[し]る"
+  },
+  "すごい": {
+    "reading": "すごい",
+    "enTranslation": "amazing, terrific",
+    "furigana": "すごい"
+  },
+  "みんな": {
+    "reading": "みんな",
+    "enTranslation": "everyone, everybody, all",
+    "furigana": "みんな"
+  },
+  "名前": {
+    "reading": "なまえ",
+    "enTranslation": "name, first name",
+    "furigana": "名前[なまえ]"
+  },
+  "思い": {
+    "reading": "おもい",
+    "enTranslation": "thought, feeling",
+    "furigana": "思[おも]い"
+  },
+  "出す": {
+    "reading": "だす",
+    "enTranslation": "to take out",
+    "furigana": "出[だ]す"
+  },
+  "忘れる": {
+    "reading": "わすれる",
+    "enTranslation": "to forget",
+    "furigana": "忘[わす]れる"
+  },
+  "恥ずかしい": {
+    "reading": "はずかしい",
+    "enTranslation": "shameful, embarrassing",
+    "furigana": "恥[は]ずかしい"
+  },
+  "乾かす": {
+    "reading": "かわかす",
+    "enTranslation": "to dry",
+    "furigana": "乾[かわ]かす"
+  },
+  "髪": {
+    "reading": "かみ",
+    "enTranslation": "hair (on the head)",
+    "furigana": "髪[かみ]"
+  },
+  "変わる": {
+    "reading": "かわる",
+    "enTranslation": "to change, to be transformed, to be altered",
+    "furigana": "変[か]わる"
+  },
+  "長い": {
+    "reading": "ながい",
+    "enTranslation": "long (length, time)",
+    "furigana": "長[なが]い"
+  },
+  "足": {
+    "reading": "あし",
+    "enTranslation": "leg, foot",
+    "furigana": "足[あし]"
+  },
+  "強い": {
+    "reading": "つよい",
+    "enTranslation": "strong, tough",
+    "furigana": "強[つよ]い"
+  },
+  "別": {
+    "reading": "べつ",
+    "enTranslation": "separate, different",
+    "furigana": "別[べつ]"
+  },
+  "色": {
+    "reading": "いろ",
+    "enTranslation": "color",
+    "furigana": "色[いろ]"
+  },
+  "まだ": {
+    "reading": "まだ",
+    "enTranslation": "not yet",
+    "furigana": "まだ"
+  },
+  "歳": {
+    "reading": "さい",
+    "enTranslation": "age counter",
+    "furigana": "歳[さい]"
+  },
+  "生きる": {
+    "reading": "いきる",
+    "enTranslation": "to live",
+    "furigana": "生[い]きる"
+  },
+  "二人": {
+    "reading": "ふたり",
+    "enTranslation": "two people",
+    "furigana": "二人[ふたり]"
+  },
+  "環境": {
+    "reading": "かんきょう",
+    "enTranslation": "environment",
+    "furigana": "環境[かんきょう]"
+  },
+  "息子": {
+    "reading": "むすこ",
+    "enTranslation": "son",
+    "furigana": "息子[むすこ]"
+  },
+  "受ける": {
+    "reading": "うける",
+    "enTranslation": "to take (a test), to accept (a challenge), to receive",
+    "furigana": "受[う]ける"
+  },
+  "授業": {
+    "reading": "じゅぎょう",
+    "enTranslation": "lesson, class (school)",
+    "furigana": "授業[じゅぎょう]"
+  },
+  "終わる": {
+    "reading": "おわる",
+    "enTranslation": "to finish, to end",
+    "furigana": "終[お]わる"
+  },
+  "俺": {
+    "reading": "おれ",
+    "enTranslation": "I, me (male)",
+    "furigana": "俺[おれ]"
+  },
+  "もう": {
+    "reading": "もう",
+    "enTranslation": "now, soon, already, yet",
+    "furigana": "もう"
+  },
+  "待つ": {
+    "reading": "まつ",
+    "enTranslation": "to wait",
+    "furigana": "待[ま]つ"
+  },
+  "椅子": {
+    "reading": "いす",
+    "enTranslation": "chair",
+    "furigana": "椅子[いす]"
+  },
+  "すぐ": {
+    "reading": "すぐ",
+    "enTranslation": "immediately, right away",
+    "furigana": "すぐ"
+  },
+  "試合": {
+    "reading": "しあい",
+    "enTranslation": "match, game",
+    "furigana": "試合[しあい]"
+  },
+  "始まる": {
+    "reading": "はじまる",
+    "enTranslation": "to begin, to start",
+    "furigana": "始[はじ]まる"
+  },
+  "年": {
+    "reading": "とし",
+    "enTranslation": "year",
+    "furigana": "年[とし]"
+  },
+  "時": {
+    "reading": "とき",
+    "enTranslation": "when",
+    "furigana": "時[とき]"
+  },
+  "経つ": {
+    "reading": "たつ",
+    "enTranslation": "to elapse (time)",
+    "furigana": "経[た]つ"
+  },
+  "最近": {
+    "reading": "さいきん",
+    "enTranslation": "nowadays, recently",
+    "furigana": "最近[さいきん]"
+  },
+  "座る": {
+    "reading": "すわる",
+    "enTranslation": "to sit",
+    "furigana": "座[すわ]る"
+  },
+  "走る": {
+    "reading": "はしる",
+    "enTranslation": "to run",
+    "furigana": "走[はし]る"
+  },
+  "必死": {
+    "reading": "ひっし",
+    "enTranslation": "frantic, desperate",
+    "furigana": "必死[ひっし]"
+  },
+  "机": {
+    "reading": "つくえ",
+    "enTranslation": "desk",
+    "furigana": "机[つくえ]"
+  },
+  "鉛筆": {
+    "reading": "えんぴつ",
+    "enTranslation": "pencil",
+    "furigana": "鉛筆[えんぴつ]"
+  },
+  "子": {
+    "reading": "こ",
+    "enTranslation": "child",
+    "furigana": "子[こ]"
+  },
+  "運動": {
+    "reading": "うんどう",
+    "enTranslation": "exercise (physical)",
+    "furigana": "運動[うんどう]"
+  },
+  "もっと": {
+    "reading": "もっと",
+    "enTranslation": "(some) more",
+    "furigana": "もっと"
+  },
+  "夢": {
+    "reading": "ゆめ",
+    "enTranslation": "dream",
+    "furigana": "夢[ゆめ]"
+  },
+  "不思議": {
+    "reading": "ふしぎ",
+    "enTranslation": "wonder, mystery",
+    "furigana": "不思議[ふしぎ]"
+  },
+  "歌": {
+    "reading": "うた",
+    "enTranslation": "song",
+    "furigana": "歌[うた]"
+  },
+  "上手": {
+    "reading": "じょうず",
+    "enTranslation": "good (at), skilled",
+    "furigana": "上手[じょうず]"
+  },
+  "絵": {
+    "reading": "え",
+    "enTranslation": "drawing, painting, sketch",
+    "furigana": "絵[え]"
+  },
+  "上手い": {
+    "reading": "うまい",
+    "enTranslation": "good, skilled",
+    "furigana": "上手[うま]い"
+  },
+  "どれ": {
+    "reading": "どれ",
+    "enTranslation": "which",
+    "furigana": "どれ"
+  },
+  "くらい": {
+    "reading": "くらい",
+    "enTranslation": "approximately",
+    "furigana": "くらい"
+  },
+  "褒める": {
+    "reading": "ほめる",
+    "enTranslation": "to praise",
+    "furigana": "褒[ほ]める"
+  },
+  "なかなか": {
+    "reading": "なかなか",
+    "enTranslation": "quite",
+    "furigana": "なかなか"
+  },
+  "眠る": {
+    "reading": "ねむる",
+    "enTranslation": "to sleep",
+    "furigana": "眠[ねむ]る"
+  },
+  "思う": {
+    "reading": "おもう",
+    "enTranslation": "to think",
+    "furigana": "思[おも]う"
+  },
+  "綺麗": {
+    "reading": "きれい",
+    "enTranslation": "clean, beautiful",
+    "furigana": "綺麗[きれい]"
+  },
+  "花": {
+    "reading": "はな",
+    "enTranslation": "flower",
+    "furigana": "花[はな]"
+  },
+  "咲く": {
+    "reading": "さく",
+    "enTranslation": "to bloom",
+    "furigana": "咲[さ]く"
+  },
+  "桜": {
+    "reading": "さくら",
+    "enTranslation": "cherry blossom",
+    "furigana": "桜[さくら]"
+  },
+  "春": {
+    "reading": "はる",
+    "enTranslation": "spring (season)",
+    "furigana": "春[はる]"
+  },
+  "公園": {
+    "reading": "こうえん",
+    "enTranslation": "park",
+    "furigana": "公園[こうえん]"
+  },
+  "夜": {
+    "reading": "よる",
+    "enTranslation": "night",
+    "furigana": "夜[よる]"
+  },
+  "風呂": {
+    "reading": "ふろ",
+    "enTranslation": "bath",
+    "furigana": "風呂[ふろ]"
+  },
+  "脱ぐ": {
+    "reading": "ぬぐ",
+    "enTranslation": "to take off (clothes)",
+    "furigana": "脱[ぬ]ぐ"
+  },
+  "部屋": {
+    "reading": "へや",
+    "enTranslation": "room",
+    "furigana": "部屋[へや]"
+  },
+  "片付ける": {
+    "reading": "かたづける",
+    "enTranslation": "to organize",
+    "furigana": "片付[かたづ]ける"
+  },
+  "一人": {
+    "reading": "ひとり",
+    "enTranslation": "one person, alone, on one's own",
+    "furigana": "一人[ひとり]"
+  },
+  "食べる": {
+    "reading": "たべる",
+    "enTranslation": "to eat",
+    "furigana": "食[た]べる"
+  },
+  "全部": {
+    "reading": "ぜんぶ",
+    "enTranslation": "all, entire, whole, altogether",
+    "furigana": "全部[ぜんぶ]"
+  },
+  "月": {
+    "reading": "つき",
+    "enTranslation": "moon",
+    "furigana": "月[つき]"
+  },
+  "服": {
+    "reading": "ふく",
+    "enTranslation": "clothes",
+    "furigana": "服[ふく]"
+  },
+  "山": {
+    "reading": "やま",
+    "enTranslation": "mountain",
+    "furigana": "山[やま]"
+  },
+  "見える": {
+    "reading": "みえる",
+    "enTranslation": "be able to see, to be in sight",
+    "furigana": "見[み]える"
+  },
+  "今夜": {
+    "reading": "こんや",
+    "enTranslation": "this evening, tonight",
+    "furigana": "今夜[こんや]"
+  },
+  "優しい": {
+    "reading": "やさしい",
+    "enTranslation": "kind, nice",
+    "furigana": "優[やさ]しい"
+  },
+  "対する": {
+    "reading": "たいする",
+    "enTranslation": "relating to something",
+    "furigana": "対[たい]する"
+  },
+  "厳しい": {
+    "reading": "きびしい",
+    "enTranslation": "strict",
+    "furigana": "厳[きび]しい"
+  },
+  "どう": {
+    "reading": "どう",
+    "enTranslation": "how",
+    "furigana": "どう"
+  },
+  "あなた": {
+    "reading": "あなた",
+    "enTranslation": "you",
+    "furigana": "あなた"
+  },
+  "頃": {
+    "reading": "ころ",
+    "enTranslation": "(approximate) time",
+    "furigana": "頃[ころ]"
+  },
+  "小学生": {
+    "reading": "しょうがくせい",
+    "enTranslation": "elementary school student",
+    "furigana": "小学生[しょうがくせい]"
+  },
+  "どんどん": {
+    "reading": "どんどん",
+    "enTranslation": "more and more",
+    "furigana": "どんどん"
+  },
+  "音": {
+    "reading": "おと",
+    "enTranslation": "sound, noise",
+    "furigana": "音[おと]"
+  },
+  "雨": {
+    "reading": "あめ",
+    "enTranslation": "rain",
+    "furigana": "雨[あめ]"
+  },
+  "聞こえる": {
+    "reading": "きこえる",
+    "enTranslation": "to be audible, can hear",
+    "furigana": "聞[き]こえる"
+  },
+  "海": {
+    "reading": "うみ",
+    "enTranslation": "sea, ocean",
+    "furigana": "海[うみ]"
+  },
+  "波": {
+    "reading": "なみ",
+    "enTranslation": "wave (ocean)",
+    "furigana": "波[なみ]"
+  },
+  "はっきり": {
+    "reading": "はっきり",
+    "enTranslation": "clearly, plainly, distinctly",
+    "furigana": "はっきり"
+  },
+  "応援": {
+    "reading": "おうえん",
+    "enTranslation": "cheer, support",
+    "furigana": "応援[おうえん]"
+  },
+  "選手": {
+    "reading": "せんしゅ",
+    "enTranslation": "player (sports), athlete",
+    "furigana": "選手[せんしゅ]"
+  },
+  "目指す": {
+    "reading": "めざす",
+    "enTranslation": "to aim at (for, to do, to become)",
+    "furigana": "目指[めざ]す"
+  },
+  "将来": {
+    "reading": "しょうらい",
+    "enTranslation": "future (near term)",
+    "furigana": "将来[しょうらい]"
+  },
+  "野球": {
+    "reading": "やきゅう",
+    "enTranslation": "baseball",
+    "furigana": "野球[やきゅう]"
+  },
+  "物": {
+    "reading": "もの",
+    "enTranslation": "item, thing",
+    "furigana": "物[もの]"
+  },
+  "姉": {
+    "reading": "あね",
+    "enTranslation": "older sister",
+    "furigana": "姉[あね]"
+  },
+  "やる": {
+    "reading": "やる",
+    "enTranslation": "to do",
+    "furigana": "やる"
+  },
+  "自分": {
+    "reading": "じぶん",
+    "enTranslation": "oneself",
+    "furigana": "自分[じぶん]"
+  },
+  "高い": {
+    "reading": "たかい",
+    "enTranslation": "high, tall; expensive",
+    "furigana": "高[たか]い"
+  },
+  "選ぶ": {
+    "reading": "えらぶ",
+    "enTranslation": "to choose, to select",
+    "furigana": "選[えら]ぶ"
+  },
+  "間違う": {
+    "reading": "まちがう",
+    "enTranslation": "to be incorrect, to be mistaken",
+    "furigana": "間違[まちが]う"
+  },
+  "答え": {
+    "reading": "こたえ",
+    "enTranslation": "answer, reply, response",
+    "furigana": "答[こた]え"
+  },
+  "しまう": {
+    "reading": "しまう",
+    "enTranslation": "to complete, to finish",
+    "furigana": "しまう"
+  },
+  "濡れる": {
+    "reading": "ぬれる",
+    "enTranslation": "to get wet",
+    "furigana": "濡[ぬ]れる"
+  },
+  "止まる": {
+    "reading": "とまる",
+    "enTranslation": "to come to a stop",
+    "furigana": "止[と]まる"
+  },
+  "雪": {
+    "reading": "ゆき",
+    "enTranslation": "snow",
+    "furigana": "雪[ゆき]"
+  },
+  "戦争": {
+    "reading": "せんそう",
+    "enTranslation": "war",
+    "furigana": "戦争[せんそう]"
+  },
+  "世界": {
+    "reading": "せかい",
+    "enTranslation": "the world, society",
+    "furigana": "世界[せかい]"
+  },
+  "平和": {
+    "reading": "へいわ",
+    "enTranslation": "peace",
+    "furigana": "平和[へいわ]"
+  },
+  "弟": {
+    "reading": "おとうと",
+    "enTranslation": "younger brother, little brother",
+    "furigana": "弟[おとうと]"
+  },
+  "車": {
+    "reading": "くるま",
+    "enTranslation": "car",
+    "furigana": "車[くるま]"
+  },
+  "多い": {
+    "reading": "おおい",
+    "enTranslation": "frequent, many",
+    "furigana": "多[おお]い"
+  },
+  "危ない": {
+    "reading": "あぶない",
+    "enTranslation": "dangerous, risky, hazardous",
+    "furigana": "危[あぶ]ない"
+  },
+  "道": {
+    "reading": "みち",
+    "enTranslation": "road",
+    "furigana": "道[みち]"
+  },
+  "父親": {
+    "reading": "ちちおや",
+    "enTranslation": "father",
+    "furigana": "父親[ちちおや]"
+  },
+  "病院": {
+    "reading": "びょういん",
+    "enTranslation": "hospital",
+    "furigana": "病院[びょういん]"
+  },
+  "気持ち": {
+    "reading": "きもち",
+    "enTranslation": "feeling, emotion, mood",
+    "furigana": "気持[きも]ち"
+  },
+  "伝える": {
+    "reading": "つたえる",
+    "enTranslation": "to convey, to communicate",
+    "furigana": "伝[つた]える"
+  },
+  "飲む": {
+    "reading": "のむ",
+    "enTranslation": "to drink",
+    "furigana": "飲[の]む"
+  },
+  "酒": {
+    "reading": "さけ",
+    "enTranslation": "alcohol",
+    "furigana": "酒[さけ]"
+  },
+  "風": {
+    "reading": "かぜ",
+    "enTranslation": "wind",
+    "furigana": "風[かぜ]"
+  },
+  "冷たい": {
+    "reading": "つめたい",
+    "enTranslation": "cold (to touch)",
+    "furigana": "冷[つめ]たい"
+  },
+  "吹く": {
+    "reading": "ふく",
+    "enTranslation": "to blow",
+    "furigana": "吹[ふ]く"
+  },
+  "どんな": {
+    "reading": "どんな",
+    "enTranslation": "what kind of",
+    "furigana": "どんな"
+  },
+  "危険": {
+    "reading": "きけん",
+    "enTranslation": "danger",
+    "furigana": "危険[きけん]"
+  },
+  "こんな": {
+    "reading": "こんな",
+    "enTranslation": "this kind of",
+    "furigana": "こんな"
+  },
+  "初めて": {
+    "reading": "はじめて",
+    "enTranslation": "for the first time",
+    "furigana": "初[はじ]めて"
+  },
+  "肉": {
+    "reading": "にく",
+    "enTranslation": "meat",
+    "furigana": "肉[にく]"
+  },
+  "昨日": {
+    "reading": "きのう",
+    "enTranslation": "yesterday",
+    "furigana": "昨日[きのう]"
+  },
+  "覚える": {
+    "reading": "おぼえる",
+    "enTranslation": "to memorize, to remember",
+    "furigana": "覚[おぼ]える"
+  },
+  "今": {
+    "reading": "いま",
+    "enTranslation": "now",
+    "furigana": "今[いま]"
+  },
+  "話す": {
+    "reading": "はなす",
+    "enTranslation": "to talk, to converse, to speak",
+    "furigana": "話[はな]す"
+  },
+  "一番": {
+    "reading": "いちばん",
+    "enTranslation": "number one, first",
+    "furigana": "一番[いちばん]"
+  },
+  "外": {
+    "reading": "そと",
+    "enTranslation": "outside",
+    "furigana": "外[そと]"
+  },
+  "電気": {
+    "reading": "でんき",
+    "enTranslation": "electricity",
+    "furigana": "電気[でんき]"
+  },
+  "暗い": {
+    "reading": "くらい",
+    "enTranslation": "dark",
+    "furigana": "暗[くら]い"
+  },
+  "気をつける": {
+    "reading": "きをつける",
+    "enTranslation": "to be careful",
+    "furigana": "気[き]をつける"
+  },
+  "迎える": {
+    "reading": "むかえる",
+    "enTranslation": "to receive, to welcome, to greet",
+    "furigana": "迎[むか]える"
+  },
+  "質問": {
+    "reading": "しつもん",
+    "enTranslation": "question",
+    "furigana": "質問[しつもん]"
+  },
+  "答える": {
+    "reading": "こたえる",
+    "enTranslation": "to answer",
+    "furigana": "答[こた]える"
+  },
+  "出来る": {
+    "reading": "できる",
+    "enTranslation": "can, to be able to do",
+    "furigana": "出来[でき]る"
+  },
+  "祈る": {
+    "reading": "いのる",
+    "enTranslation": "to pray",
+    "furigana": "祈[いの]る"
+  },
+  "受験": {
+    "reading": "じゅけん",
+    "enTranslation": "taking an examination (school and university entrance)",
+    "furigana": "受験[じゅけん]"
+  },
+  "合格": {
+    "reading": "ごうかく",
+    "enTranslation": "passing (exam)",
+    "furigana": "合格[ごうかく]"
+  },
+  "休む": {
+    "reading": "やすむ",
+    "enTranslation": "to rest, to take a day off",
+    "furigana": "休[やす]む"
+  },
+  "しばらく": {
+    "reading": "しばらく",
+    "enTranslation": "for the time being",
+    "furigana": "しばらく"
+  },
+  "写真": {
+    "reading": "しゃしん",
+    "enTranslation": "photo, picture",
+    "furigana": "写真[しゃしん]"
+  },
+  "家族": {
+    "reading": "かぞく",
+    "enTranslation": "family",
+    "furigana": "家族[かぞく]"
+  },
+  "飾る": {
+    "reading": "かざる",
+    "enTranslation": "to decorate",
+    "furigana": "飾[かざ]る"
+  },
+  "壁": {
+    "reading": "かべ",
+    "enTranslation": "wall",
+    "furigana": "壁[かべ]"
+  },
+  "塗る": {
+    "reading": "ぬる",
+    "enTranslation": "to paint, to spread",
+    "furigana": "塗[ぬ]る"
+  },
+  "旅行": {
+    "reading": "りょこう",
+    "enTranslation": "travel, trip",
+    "furigana": "旅行[りょこう]"
+  },
+  "帰る": {
+    "reading": "かえる",
+    "enTranslation": "to return home",
+    "furigana": "帰[かえ]る"
+  },
+  "遅れる": {
+    "reading": "おくれる",
+    "enTranslation": "to be late",
+    "furigana": "遅[おく]れる"
+  },
+  "今朝": {
+    "reading": "けさ",
+    "enTranslation": "this morning",
+    "furigana": "今朝[けさ]"
+  },
+  "ごめん": {
+    "reading": "ごめん",
+    "enTranslation": "sorry",
+    "furigana": "ごめん"
+  },
+  "時間": {
+    "reading": "じかん",
+    "enTranslation": "time hours (period of)",
+    "furigana": "時間[じかん]"
+  },
+  "大きい": {
+    "reading": "おおきい",
+    "enTranslation": "big, large",
+    "furigana": "大[おお]きい"
+  },
+  "卒業": {
+    "reading": "そつぎょう",
+    "enTranslation": "graduation",
+    "furigana": "卒業[そつぎょう]"
+  },
+  "会社": {
+    "reading": "かいしゃ",
+    "enTranslation": "company, corporation",
+    "furigana": "会社[かいしゃ]"
+  },
+  "働く": {
+    "reading": "はたらく",
+    "enTranslation": "to work",
+    "furigana": "働[はたら]く"
+  },
+  "掛ける": {
+    "reading": "かける",
+    "enTranslation": "to hang",
+    "furigana": "掛[か]ける"
+  },
+  "起きる": {
+    "reading": "おきる",
+    "enTranslation": "to wake up, to be awake",
+    "furigana": "起[お]きる"
+  },
+  "早い": {
+    "reading": "はやい",
+    "enTranslation": "early",
+    "furigana": "早[はや]い"
+  },
+  "出る": {
+    "reading": "でる",
+    "enTranslation": "to leave, to come out",
+    "furigana": "出[で]る"
+  },
+  "悪い": {
+    "reading": "わるい",
+    "enTranslation": "bad",
+    "furigana": "悪[わる]い"
+  },
+  "楽しい": {
+    "reading": "たのしい",
+    "enTranslation": "enjoyable, fun",
+    "furigana": "楽[たの]しい"
+  },
+  "気": {
+    "reading": "き",
+    "enTranslation": "mood, spirit, mind",
+    "furigana": "気[き]"
+  },
+  "意味": {
+    "reading": "いみ",
+    "enTranslation": "meaning",
+    "furigana": "意味[いみ]"
+  },
+  "得意": {
+    "reading": "とくい",
+    "enTranslation": "one's strong point",
+    "furigana": "得意[とくい]"
+  },
+  "母親": {
+    "reading": "ははおや",
+    "enTranslation": "mother",
+    "furigana": "母親[ははおや]"
+  },
+  "欲しい": {
+    "reading": "ほしい",
+    "enTranslation": "want, wanted, desired",
+    "furigana": "欲[ほ]しい"
+  },
+  "だけ": {
+    "reading": "だけ",
+    "enTranslation": "only, just",
+    "furigana": "だけ"
+  },
+  "頑張る": {
+    "reading": "がんばる",
+    "enTranslation": "good luck, do your best",
+    "furigana": "頑張[がんば]る"
+  },
+  "持つ": {
+    "reading": "もつ",
+    "enTranslation": "to possess, to have, to carry, to hold",
+    "furigana": "持[も]つ"
+  },
+  "痛い": {
+    "reading": "いたい",
+    "enTranslation": "ouch, painful",
+    "furigana": "痛[いた]い"
+  },
+  "頭": {
+    "reading": "あたま",
+    "enTranslation": "head",
+    "furigana": "頭[あたま]"
+  },
+  "人気": {
+    "reading": "にんき",
+    "enTranslation": "popular",
+    "furigana": "人気[にんき]"
+  },
+  "商品": {
+    "reading": "しょうひん",
+    "enTranslation": "product (business), merchandise",
+    "furigana": "商品[しょうひん]"
+  },
+  "払う": {
+    "reading": "はらう",
+    "enTranslation": "to pay (money, bill, etc.)",
+    "furigana": "払[はら]う"
+  },
+  "金": {
+    "reading": "かね",
+    "enTranslation": "money",
+    "furigana": "金[かね]"
+  },
+  "小さい": {
+    "reading": "ちいさい",
+    "enTranslation": "small, little",
+    "furigana": "小[ちい]さい"
+  },
+  "女優": {
+    "reading": "じょゆう",
+    "enTranslation": "actress",
+    "furigana": "女優[じょゆう]"
+  },
+  "勝つ": {
+    "reading": "かつ",
+    "enTranslation": "to win, to gain victory",
+    "furigana": "勝[か]つ"
+  },
+  "ため": {
+    "reading": "ため",
+    "enTranslation": "sake, purpose",
+    "furigana": "ため"
+  },
+  "体": {
+    "reading": "からだ",
+    "enTranslation": "body",
+    "furigana": "体[からだ]"
+  },
+  "当たり前": {
+    "reading": "あたりまえ",
+    "enTranslation": "of course, obvious, commonplace, the norm",
+    "furigana": "当[あ]たり 前[まえ]"
+  },
+  "過ぎる": {
+    "reading": "すぎる",
+    "enTranslation": "to exceed, to surpass",
+    "furigana": "過[す]ぎる"
+  },
+  "太る": {
+    "reading": "ふとる",
+    "enTranslation": "to fatten",
+    "furigana": "太[ふと]る"
+  },
+  "世話": {
+    "reading": "せわ",
+    "enTranslation": "care (for)",
+    "furigana": "世話[せわ]"
+  },
+  "間": {
+    "reading": "あいだ",
+    "enTranslation": "period of time (during, while), between",
+    "furigana": "間[あいだ]"
+  },
+  "食う": {
+    "reading": "くう",
+    "enTranslation": "to eat (informal)",
+    "furigana": "食[く]う"
+  },
+  "飯": {
+    "reading": "めし",
+    "enTranslation": "meal",
+    "furigana": "飯[めし]"
+  },
+  "着く": {
+    "reading": "つく",
+    "enTranslation": "to arrive",
+    "furigana": "着[つ]く"
+  },
+  "話": {
+    "reading": "はなし",
+    "enTranslation": "story, conversation",
+    "furigana": "話[はなし]"
+  },
+  "声": {
+    "reading": "こえ",
+    "enTranslation": "voice",
+    "furigana": "声[こえ]"
+  },
+  "男": {
+    "reading": "おとこ",
+    "enTranslation": "man",
+    "furigana": "男[おとこ]"
+  },
+  "いつも": {
+    "reading": "いつも",
+    "enTranslation": "always",
+    "furigana": "いつも"
+  },
+  "合う": {
+    "reading": "あう",
+    "enTranslation": "to fit, to match, to suit",
+    "furigana": "合[あ]う"
+  },
+  "通り": {
+    "reading": "とおり",
+    "enTranslation": "avenue, street, way, road",
+    "furigana": "通[とお]り"
+  },
+  "いっぱい": {
+    "reading": "いっぱい",
+    "enTranslation": "full",
+    "furigana": "いっぱい"
+  },
+  "若い": {
+    "reading": "わかい",
+    "enTranslation": "young",
+    "furigana": "若[わか]い"
+  },
+  "女": {
+    "reading": "おんな",
+    "enTranslation": "woman",
+    "furigana": "女[おんな]"
+  },
+  "どこ": {
+    "reading": "どこ",
+    "enTranslation": "where",
+    "furigana": "どこ"
+  },
+  "向かう": {
+    "reading": "むかう",
+    "enTranslation": "to go towards, to head towards",
+    "furigana": "向[む]かう"
+  },
+  "次": {
+    "reading": "つぎ",
+    "enTranslation": "next (in sequence)",
+    "furigana": "次[つぎ]"
+  },
+  "飛ぶ": {
+    "reading": "とぶ",
+    "enTranslation": "to fly",
+    "furigana": "飛[と]ぶ"
+  },
+  "打つ": {
+    "reading": "うつ",
+    "enTranslation": "to hit, to strike, to knock, to beat",
+    "furigana": "打[う]つ"
+  },
+  "探す": {
+    "reading": "さがす",
+    "enTranslation": "to search (for something desired, needed, lost), to look for",
+    "furigana": "探[さが]す"
+  },
+  "捕まる": {
+    "reading": "つかまる",
+    "enTranslation": "to be caught",
+    "furigana": "捕[つか]まる"
+  },
+  "事件": {
+    "reading": "じけん",
+    "enTranslation": "incident, affair",
+    "furigana": "事件[じけん]"
+  },
+  "逃げる": {
+    "reading": "にげる",
+    "enTranslation": "to escape, to run away",
+    "furigana": "逃[に]げる"
+  },
+  "犯人": {
+    "reading": "はんにん",
+    "enTranslation": "offender, criminal",
+    "furigana": "犯人[はんにん]"
+  },
+  "現実": {
+    "reading": "げんじつ",
+    "enTranslation": "reality, actuality",
+    "furigana": "現実[げんじつ]"
+  },
+  "描く": {
+    "reading": "えがく",
+    "enTranslation": "to draw, to paint, to sketch",
+    "furigana": "描[えが]く"
+  },
+  "けが": {
+    "reading": "けが",
+    "enTranslation": "injury",
+    "furigana": "けが"
+  },
+  "せい": {
+    "reading": "せい",
+    "enTranslation": "reason, cause",
+    "furigana": "せい"
+  },
+  "変": {
+    "reading": "へん",
+    "enTranslation": "strange",
+    "furigana": "変[へん]"
+  },
+  "様子": {
+    "reading": "ようす",
+    "enTranslation": "appearance, condition",
+    "furigana": "様子[ようす]"
+  },
+  "見つける": {
+    "reading": "みつける",
+    "enTranslation": "to find, to discover",
+    "furigana": "見[み]つける"
+  },
+  "やっと": {
+    "reading": "やっと",
+    "enTranslation": "finally",
+    "furigana": "やっと"
+  },
+  "素敵": {
+    "reading": "すてき",
+    "enTranslation": "lovely, wonderful",
+    "furigana": "素敵[すてき]"
+  },
+  "駅": {
+    "reading": "えき",
+    "enTranslation": "train station",
+    "furigana": "駅[えき]"
+  },
+  "食事": {
+    "reading": "しょくじ",
+    "enTranslation": "meal",
+    "furigana": "食事[しょくじ]"
+  },
+  "眼鏡": {
+    "reading": "めがね",
+    "enTranslation": "glasses",
+    "furigana": "眼鏡[めがね]"
+  },
+  "町": {
+    "reading": "まち",
+    "enTranslation": "town",
+    "furigana": "町[まち]"
+  },
+  "あれ": {
+    "reading": "あれ",
+    "enTranslation": "that (distant)",
+    "furigana": "あれ"
+  },
+  "洗う": {
+    "reading": "あらう",
+    "enTranslation": "to wash",
+    "furigana": "洗[あら]う"
+  },
+  "顔": {
+    "reading": "かお",
+    "enTranslation": "face",
+    "furigana": "顔[かお]"
+  },
+  "少し": {
+    "reading": "すこし",
+    "enTranslation": "small quantity, little, few",
+    "furigana": "少[すこ]し"
+  },
+  "使う": {
+    "reading": "つかう",
+    "enTranslation": "to use (a thing, method, etc.)",
+    "furigana": "使[つか]う"
+  },
+  "頼む": {
+    "reading": "たのむ",
+    "enTranslation": "to rely on, to entrust to, to request, to order",
+    "furigana": "頼[たの]む"
+  },
+  "違う": {
+    "reading": "ちがう",
+    "enTranslation": "to differ",
+    "furigana": "違[ちが]う"
+  },
+  "空": {
+    "reading": "そら",
+    "enTranslation": "sky",
+    "furigana": "空[そら]"
+  },
+  "鳥": {
+    "reading": "とり",
+    "enTranslation": "bird",
+    "furigana": "鳥[とり]"
+  },
+  "そろそろ": {
+    "reading": "そろそろ",
+    "enTranslation": "soon, momentarily",
+    "furigana": "そろそろ"
+  },
+  "始める": {
+    "reading": "はじめる",
+    "enTranslation": "to start, to begin",
+    "furigana": "始[はじ]める"
+  },
+  "乗る": {
+    "reading": "のる",
+    "enTranslation": "to ride",
+    "furigana": "乗[の]る"
+  },
+  "生活": {
+    "reading": "せいかつ",
+    "enTranslation": "living, life (one's daily existence)",
+    "furigana": "生活[せいかつ]"
+  },
+  "週間": {
+    "reading": "しゅうかん",
+    "enTranslation": "week (period of time)",
+    "furigana": "週間[しゅうかん]"
+  },
+  "続く": {
+    "reading": "つづく",
+    "enTranslation": "to continue (without a break)",
+    "furigana": "続[つづ]く"
+  },
+  "赤い": {
+    "reading": "あかい",
+    "enTranslation": "red",
+    "furigana": "赤[あか]い"
+  },
+  "着る": {
+    "reading": "きる",
+    "enTranslation": "to wear clothes (shoulders down)",
+    "furigana": "着[き]る"
+  },
+  "女の子": {
+    "reading": "おんなのこ",
+    "enTranslation": "young woman, girl",
+    "furigana": "女[おんな]の 子[こ]"
+  },
+  "泣く": {
+    "reading": "なく",
+    "enTranslation": "to cry",
+    "furigana": "泣[な]く"
+  },
+  "記憶": {
+    "reading": "きおく",
+    "enTranslation": "memory",
+    "furigana": "記憶[きおく]"
+  },
+  "失う": {
+    "reading": "うしなう",
+    "enTranslation": "to lose",
+    "furigana": "失[うしな]う"
+  },
+  "昔": {
+    "reading": "むかし",
+    "enTranslation": "a long time ago",
+    "furigana": "昔[むかし]"
+  },
+  "それ": {
+    "reading": "それ",
+    "enTranslation": "that",
+    "furigana": "それ"
+  },
+  "無理": {
+    "reading": "むり",
+    "enTranslation": "unreasonable, impossible",
+    "furigana": "無理[むり]"
+  },
+  "ご飯": {
+    "reading": "ごはん",
+    "enTranslation": "meal, rice",
+    "furigana": "ご 飯[はん]"
+  },
+  "絶対": {
+    "reading": "ぜったい",
+    "enTranslation": "absolutely, certainly",
+    "furigana": "絶対[ぜったい]"
+  },
+  "怒る": {
+    "reading": "おこる",
+    "enTranslation": "to get angry, to scold",
+    "furigana": "怒[おこ]る"
+  },
+  "ちゃんと": {
+    "reading": "ちゃんと",
+    "enTranslation": "sufficiently, properly",
+    "furigana": "ちゃんと"
+  },
+  "倒れる": {
+    "reading": "たおれる",
+    "enTranslation": "to collapse",
+    "furigana": "倒[たお]れる"
+  },
+  "席": {
+    "reading": "せき",
+    "enTranslation": "seat",
+    "furigana": "席[せき]"
+  },
+  "老人": {
+    "reading": "ろうじん",
+    "enTranslation": "elderly person",
+    "furigana": "老人[ろうじん]"
+  },
+  "助ける": {
+    "reading": "たすける",
+    "enTranslation": "to help, to rescue",
+    "furigana": "助[たす]ける"
+  },
+  "捨てる": {
+    "reading": "すてる",
+    "enTranslation": "to throw away, to discard",
+    "furigana": "捨[す]てる"
+  },
+  "所": {
+    "reading": "ところ",
+    "enTranslation": "place",
+    "furigana": "所[ところ]"
+  },
+  "静か": {
+    "reading": "しずか",
+    "enTranslation": "quiet",
+    "furigana": "静[しず]か"
+  },
+  "夏休み": {
+    "reading": "なつやすみ",
+    "enTranslation": "summer vacation",
+    "furigana": "夏休[なつやす]み"
+  },
+  "最後": {
+    "reading": "さいご",
+    "enTranslation": "final, last",
+    "furigana": "最後[さいご]"
+  },
+  "戦う": {
+    "reading": "たたかう",
+    "enTranslation": "to fight, to struggle (against adversities, etc.)",
+    "furigana": "戦[たたか]う"
+  },
+  "調べる": {
+    "reading": "しらべる",
+    "enTranslation": "to look up, to investigate",
+    "furigana": "調[しら]べる"
+  },
+  "情報": {
+    "reading": "じょうほう",
+    "enTranslation": "information, data",
+    "furigana": "情報[じょうほう]"
+  },
+  "近く": {
+    "reading": "ちかく",
+    "enTranslation": "near, shortly",
+    "furigana": "近[ちか]く"
+  },
+  "住む": {
+    "reading": "すむ",
+    "enTranslation": "to live (of humans)",
+    "furigana": "住[す]む"
+  },
+  "回る": {
+    "reading": "まわる",
+    "enTranslation": "to turn, to revolve",
+    "furigana": "回[まわ]る"
+  },
+  "決まる": {
+    "reading": "きまる",
+    "enTranslation": "to be decided",
+    "furigana": "決[き]まる"
+  },
+  "当たる": {
+    "reading": "あたる",
+    "enTranslation": "to be hit, to be successful",
+    "furigana": "当[あ]たる"
+  },
+  "冗談": {
+    "reading": "じょうだん",
+    "enTranslation": "joke",
+    "furigana": "冗談[じょうだん]"
+  },
+  "付く": {
+    "reading": "つく",
+    "enTranslation": "to be attached; to adhere to",
+    "furigana": "付[つ]く"
+  },
+  "失敗": {
+    "reading": "しっぱい",
+    "enTranslation": "failure, mistake, blunder",
+    "furigana": "失敗[しっぱい]"
+  },
+  "予定": {
+    "reading": "よてい",
+    "enTranslation": "plans, arrangement",
+    "furigana": "予定[よてい]"
+  },
+  "殴る": {
+    "reading": "なぐる",
+    "enTranslation": "to punch",
+    "furigana": "殴[なぐ]る"
+  },
+  "誘う": {
+    "reading": "さそう",
+    "enTranslation": "to invite",
+    "furigana": "誘[さそ]う"
+  },
+  "暮らす": {
+    "reading": "くらす",
+    "enTranslation": "to live, to get along",
+    "furigana": "暮[く]らす"
+  },
+  "また": {
+    "reading": "また",
+    "enTranslation": "again",
+    "furigana": "また"
+  },
+  "いつ": {
+    "reading": "いつ",
+    "enTranslation": "when",
+    "furigana": "いつ"
+  },
+  "どういう": {
+    "reading": "どういう",
+    "enTranslation": "what kind of, in what way",
+    "furigana": "どういう"
+  },
+  "関係": {
+    "reading": "かんけい",
+    "enTranslation": "relationship, connection",
+    "furigana": "関係[かんけい]"
+  },
+  "時計": {
+    "reading": "とけい",
+    "enTranslation": "clock, watch",
+    "furigana": "時計[とけい]"
+  },
+  "大きな": {
+    "reading": "おおきな",
+    "enTranslation": "big, loud",
+    "furigana": "大[おお]きな"
+  },
+  "掛かる": {
+    "reading": "かかる",
+    "enTranslation": "to hang",
+    "furigana": "掛[か]かる"
+  },
+  "酷い": {
+    "reading": "ひどい",
+    "enTranslation": "awful, terrible",
+    "furigana": "酷[ひど]い"
+  },
+  "おかげ": {
+    "reading": "おかげ",
+    "enTranslation": "thanks to ...",
+    "furigana": "おかげ"
+  },
+  "けんか": {
+    "reading": "けんか",
+    "enTranslation": "fight",
+    "furigana": "けんか"
+  },
+  "親": {
+    "reading": "おや",
+    "enTranslation": "parents",
+    "furigana": "親[おや]"
+  },
+  "安い": {
+    "reading": "やすい",
+    "enTranslation": "cheap",
+    "furigana": "安[やす]い"
+  },
+  "大好き": {
+    "reading": "だいすき",
+    "enTranslation": "love",
+    "furigana": "大好[だいす]き"
+  },
+  "可愛い": {
+    "reading": "かわいい",
+    "enTranslation": "cute",
+    "furigana": "可愛[かわい]い"
+  },
+  "かなり": {
+    "reading": "かなり",
+    "enTranslation": "considerably",
+    "furigana": "かなり"
+  },
+  "数": {
+    "reading": "かず",
+    "enTranslation": "number, quantity",
+    "furigana": "数[かず]"
+  },
+  "減る": {
+    "reading": "へる",
+    "enTranslation": "to decrease",
+    "furigana": "減[へ]る"
+  },
+  "隣": {
+    "reading": "となり",
+    "enTranslation": "next to",
+    "furigana": "隣[となり]"
+  },
+  "貸す": {
+    "reading": "かす",
+    "enTranslation": "to lend, to loan",
+    "furigana": "貸[か]す"
+  },
+  "頼る": {
+    "reading": "たよる",
+    "enTranslation": "to rely on",
+    "furigana": "頼[たよ]る"
+  },
+  "集中": {
+    "reading": "しゅうちゅう",
+    "enTranslation": "concentration",
+    "furigana": "集中[しゅうちゅう]"
+  },
+  "壊れる": {
+    "reading": "こわれる",
+    "enTranslation": "to be broken",
+    "furigana": "壊[こわ]れる"
+  },
+  "魚": {
+    "reading": "さかな",
+    "enTranslation": "fish",
+    "furigana": "魚[さかな]"
+  },
+  "音楽": {
+    "reading": "おんがく",
+    "enTranslation": "music",
+    "furigana": "音楽[おんがく]"
+  },
+  "楽しむ": {
+    "reading": "たのしむ",
+    "enTranslation": "to enjoy (oneself)",
+    "furigana": "楽[たの]しむ"
+  },
+  "自然": {
+    "reading": "しぜん",
+    "enTranslation": "nature",
+    "furigana": "自然[しぜん]"
+  },
+  "豊か": {
+    "reading": "ゆたか",
+    "enTranslation": "abundant",
+    "furigana": "豊[ゆた]か"
+  },
+  "表情": {
+    "reading": "ひょうじょう",
+    "enTranslation": "facial expression",
+    "furigana": "表情[ひょうじょう]"
+  },
+  "体力": {
+    "reading": "たいりょく",
+    "enTranslation": "endurance, physical strength",
+    "furigana": "体力[たいりょく]"
+  },
+  "吸う": {
+    "reading": "すう",
+    "enTranslation": "to smoke",
+    "furigana": "吸[す]う"
+  },
+  "部活": {
+    "reading": "ぶかつ",
+    "enTranslation": "club activity",
+    "furigana": "部活[ぶかつ]"
+  },
+  "負ける": {
+    "reading": "まける",
+    "enTranslation": "to lose",
+    "furigana": "負[ま]ける"
+  },
+  "辞める": {
+    "reading": "やめる",
+    "enTranslation": "to resign, to quit",
+    "furigana": "辞[や]める"
+  },
+  "近づく": {
+    "reading": "ちかづく",
+    "enTranslation": "to approach",
+    "furigana": "近[ちか]づく"
+  },
+  "削る": {
+    "reading": "けずる",
+    "enTranslation": "to sharpen",
+    "furigana": "削[けず]る"
+  },
+  "口": {
+    "reading": "くち",
+    "enTranslation": "mouth",
+    "furigana": "口[くち]"
+  },
+  "言葉": {
+    "reading": "ことば",
+    "enTranslation": "word",
+    "furigana": "言葉[ことば]"
+  },
+  "我々": {
+    "reading": "われわれ",
+    "enTranslation": "we (formal)",
+    "furigana": "我々[われわれ]"
+  },
+  "人間": {
+    "reading": "にんげん",
+    "enTranslation": "human",
+    "furigana": "人間[にんげん]"
+  },
+  "笑う": {
+    "reading": "わらう",
+    "enTranslation": "to laugh, to smile",
+    "furigana": "笑[わら]う"
+  },
+  "歩く": {
+    "reading": "あるく",
+    "enTranslation": "to walk",
+    "furigana": "歩[ある]く"
+  },
+  "お父さん": {
+    "reading": "おとうさん",
+    "enTranslation": "father",
+    "furigana": "お 父[とう]さん"
+  },
+  "病気": {
+    "reading": "びょうき",
+    "enTranslation": "illness, disease",
+    "furigana": "病気[びょうき]"
+  },
+  "死ぬ": {
+    "reading": "しぬ",
+    "enTranslation": "to die",
+    "furigana": "死[し]ぬ"
+  },
+  "開く": {
+    "reading": "ひらく",
+    "enTranslation": "to open",
+    "furigana": "開[ひら]く"
+  },
+  "殺す": {
+    "reading": "ころす",
+    "enTranslation": "to kill",
+    "furigana": "殺[ころ]す"
+  },
+  "戻る": {
+    "reading": "もどる",
+    "enTranslation": "to return, to go back",
+    "furigana": "戻[もど]る"
+  },
+  "入れる": {
+    "reading": "いれる",
+    "enTranslation": "to put in",
+    "furigana": "入[い]れる"
+  },
+  "敵": {
+    "reading": "てき",
+    "enTranslation": "enemy, opponent, adversary",
+    "furigana": "敵[てき]"
+  },
+  "以上": {
+    "reading": "いじょう",
+    "enTranslation": "more than ...",
+    "furigana": "以上[いじょう]"
+  },
+  "振る": {
+    "reading": "ふる",
+    "enTranslation": "to wave, to shake, to turn down (somebody)",
+    "furigana": "振[ふ]る"
+  },
+  "動く": {
+    "reading": "うごく",
+    "enTranslation": "to move",
+    "furigana": "動[うご]く"
+  },
+  "必要": {
+    "reading": "ひつよう",
+    "enTranslation": "need, necessity",
+    "furigana": "必要[ひつよう]"
+  },
+  "他": {
+    "reading": "ほか",
+    "enTranslation": "other",
+    "furigana": "他[ほか]"
+  },
+  "書く": {
+    "reading": "かく",
+    "enTranslation": "to write",
+    "furigana": "書[か]く"
+  },
+  "落ちる": {
+    "reading": "おちる",
+    "enTranslation": "to fall",
+    "furigana": "落[お]ちる"
+  },
+  "引く": {
+    "reading": "ひく",
+    "enTranslation": "to pull",
+    "furigana": "引[ひ]く"
+  },
+  "練習": {
+    "reading": "れんしゅう",
+    "enTranslation": "practice",
+    "furigana": "練習[れんしゅう]"
+  },
+  "続ける": {
+    "reading": "つづける",
+    "enTranslation": "to continue",
+    "furigana": "続[つづ]ける"
+  },
+  "行う": {
+    "reading": "おこなう",
+    "enTranslation": "to perform, to do, to conduct oneself, to carry out",
+    "furigana": "行[おこな]う"
+  },
+  "残る": {
+    "reading": "のこる",
+    "enTranslation": "to remain, to be left",
+    "furigana": "残[のこ]る"
+  },
+  "ずっと": {
+    "reading": "ずっと",
+    "enTranslation": "always, throughout, continuously in some state (for a long time, distance)",
+    "furigana": "ずっと"
+  },
+  "今度": {
+    "reading": "こんど",
+    "enTranslation": "next time",
+    "furigana": "今度[こんど]"
+  },
+  "包丁": {
+    "reading": "ほうちょう",
+    "enTranslation": "knife",
+    "furigana": "包丁[ほうちょう]"
+  },
+  "新鮮": {
+    "reading": "しんせん",
+    "enTranslation": "fresh",
+    "furigana": "新鮮[しんせん]"
+  },
+  "農家": {
+    "reading": "のうか",
+    "enTranslation": "farmer",
+    "furigana": "農家[のうか]"
+  },
+  "畑": {
+    "reading": "はたけ",
+    "enTranslation": "field (fruits, vegetables)",
+    "furigana": "畑[はたけ]"
+  },
+  "野菜": {
+    "reading": "やさい",
+    "enTranslation": "vegetable",
+    "furigana": "野菜[やさい]"
+  },
+  "切る": {
+    "reading": "きる",
+    "enTranslation": "to cut, to hang up (the phone)",
+    "furigana": "切[き]る"
+  },
+  "あんな": {
+    "reading": "あんな",
+    "enTranslation": "that sort of",
+    "furigana": "あんな"
+  },
+  "奴": {
+    "reading": "やつ",
+    "enTranslation": "person (derogatory)",
+    "furigana": "奴[やつ]"
+  },
+  "驚く": {
+    "reading": "おどろく",
+    "enTranslation": "to be surprised",
+    "furigana": "驚[おどろ]く"
+  },
+  "黙る": {
+    "reading": "だまる",
+    "enTranslation": "to be silent",
+    "furigana": "黙[だま]る"
+  },
+  "説明": {
+    "reading": "せつめい",
+    "enTranslation": "explanation",
+    "furigana": "説明[せつめい]"
+  },
+  "似る": {
+    "reading": "にる",
+    "enTranslation": "to be alike, to resemble, to look like",
+    "furigana": "似[に]る"
+  },
+  "急": {
+    "reading": "きゅう",
+    "enTranslation": "sudden, unexpected, urgent",
+    "furigana": "急[きゅう]"
+  },
+  "困る": {
+    "reading": "こまる",
+    "enTranslation": "to be troubled, to have difficulty, to be in a fix, to be at a loss, to be stumped",
+    "furigana": "困[こま]る"
+  },
+  "借りる": {
+    "reading": "かりる",
+    "enTranslation": "to borrow, to rent",
+    "furigana": "借[か]りる"
+  },
+  "返す": {
+    "reading": "かえす",
+    "enTranslation": "to return (something)",
+    "furigana": "返[かえ]す"
+  },
+  "大丈夫": {
+    "reading": "だいじょうぶ",
+    "enTranslation": "undoubtedly safe, all right",
+    "furigana": "大丈夫[だいじょうぶ]"
+  },
+  "時代": {
+    "reading": "じだい",
+    "enTranslation": "era, time period",
+    "furigana": "時代[じだい]"
+  },
+  "以外": {
+    "reading": "いがい",
+    "enTranslation": "with the exception of, except",
+    "furigana": "以外[いがい]"
+  },
+  "気分": {
+    "reading": "きぶん",
+    "enTranslation": "feeling, mood",
+    "furigana": "気分[きぶん]"
+  },
+  "隠す": {
+    "reading": "かくす",
+    "enTranslation": "to hide",
+    "furigana": "隠[かく]す"
+  },
+  "仲間": {
+    "reading": "なかま",
+    "enTranslation": "friends, colleauges",
+    "furigana": "仲間[なかま]"
+  },
+  "送る": {
+    "reading": "おくる",
+    "enTranslation": "to send (a thing), to take or escort (a person somewhere)",
+    "furigana": "送[おく]る"
+  },
+  "許す": {
+    "reading": "ゆるす",
+    "enTranslation": "to forgive, to permit, to allow",
+    "furigana": "許[ゆる]す"
+  },
+  "どうぞ": {
+    "reading": "どうぞ",
+    "enTranslation": "please, by all means, go ahead",
+    "furigana": "どうぞ"
+  },
+  "こちら": {
+    "reading": "こちら",
+    "enTranslation": "this (directional)",
+    "furigana": "こちら"
+  },
+  "向く": {
+    "reading": "むく",
+    "enTranslation": "to turn toward, to look (up, down, etc.), to to go in the direction of",
+    "furigana": "向[む]く"
+  },
+  "起こす": {
+    "reading": "おこす",
+    "enTranslation": "to wake up, to cause",
+    "furigana": "起[お]こす"
+  },
+  "結果": {
+    "reading": "けっか",
+    "enTranslation": "result, outcome",
+    "furigana": "結果[けっか]"
+  },
+  "認める": {
+    "reading": "みとめる",
+    "enTranslation": "to acknowledge, to admit",
+    "furigana": "認[みと]める"
+  },
+  "地震": {
+    "reading": "じしん",
+    "enTranslation": "earthquake",
+    "furigana": "地震[じしん]"
+  },
+  "突然": {
+    "reading": "とつぜん",
+    "enTranslation": "abrupt, sudden, unexpected",
+    "furigana": "突然[とつぜん]"
+  },
+  "簡単": {
+    "reading": "かんたん",
+    "enTranslation": "easy, simple",
+    "furigana": "簡単[かんたん]"
+  },
+  "怖い": {
+    "reading": "こわい",
+    "enTranslation": "(I'm) afraid, scary",
+    "furigana": "怖[こわ]い"
+  },
+  "確認": {
+    "reading": "かくにん",
+    "enTranslation": "confirmation, verification, validation",
+    "furigana": "確認[かくにん]"
+  },
+  "生まれる": {
+    "reading": "うまれる",
+    "enTranslation": "to be born",
+    "furigana": "生[う]まれる"
+  },
+  "全員": {
+    "reading": "ぜんいん",
+    "enTranslation": "all members (group), the whole crew",
+    "furigana": "全員[ぜんいん]"
+  },
+  "途中": {
+    "reading": "とちゅう",
+    "enTranslation": "in the middle of, en route",
+    "furigana": "途中[とちゅう]"
+  },
+  "急ぐ": {
+    "reading": "いそぐ",
+    "enTranslation": "to hurry, to rush, to hasten",
+    "furigana": "急[いそ]ぐ"
+  },
+  "抜く": {
+    "reading": "ぬく",
+    "enTranslation": "to extract, to omit, to draw out",
+    "furigana": "抜[ぬ]く"
+  },
+  "噂": {
+    "reading": "うわさ",
+    "enTranslation": "rumor, gossip",
+    "furigana": "噂[うわさ]"
+  },
+  "勝手に": {
+    "reading": "かってに",
+    "enTranslation": "selfishly",
+    "furigana": "勝手[かって]に"
+  },
+  "勝手": {
+    "reading": "かって",
+    "enTranslation": "selfish",
+    "furigana": "勝手[かって]"
+  },
+  "約束": {
+    "reading": "やくそく",
+    "enTranslation": "promise",
+    "furigana": "約束[やくそく]"
+  },
+  "遅い": {
+    "reading": "おそい",
+    "enTranslation": "late, slow",
+    "furigana": "遅[おそ]い"
+  },
+  "貼る": {
+    "reading": "はる",
+    "enTranslation": "to stick, to paste, to affix",
+    "furigana": "貼[は]る"
+  },
+  "届く": {
+    "reading": "とどく",
+    "enTranslation": "to be delivered",
+    "furigana": "届[とど]く"
+  },
+  "挨拶": {
+    "reading": "あいさつ",
+    "enTranslation": "greetings",
+    "furigana": "挨拶[あいさつ]"
+  },
+  "先輩": {
+    "reading": "せんぱい",
+    "enTranslation": "senior (at work or school)",
+    "furigana": "先輩[せんぱい]"
+  },
+  "連絡": {
+    "reading": "れんらく",
+    "enTranslation": "contacting, getting in touch",
+    "furigana": "連絡[れんらく]"
+  },
+  "渡す": {
+    "reading": "わたす",
+    "enTranslation": "to hand over",
+    "furigana": "渡[わた]す"
+  },
+  "必ず": {
+    "reading": "かならず",
+    "enTranslation": "without exception, invariably",
+    "furigana": "必[かなら]ず"
+  },
+  "特に": {
+    "reading": "とくに",
+    "enTranslation": "particularly, especially",
+    "furigana": "特[とく]に"
+  },
+  "無事": {
+    "reading": "ぶじ",
+    "enTranslation": "safe, unharmed",
+    "furigana": "無事[ぶじ]"
+  },
+  "済む": {
+    "reading": "すむ",
+    "enTranslation": "to be completed",
+    "furigana": "済[す]む"
+  },
+  "大人": {
+    "reading": "おとな",
+    "enTranslation": "adult",
+    "furigana": "大人[おとな]"
+  },
+  "売る": {
+    "reading": "うる",
+    "enTranslation": "to sell",
+    "furigana": "売[う]る"
+  },
+  "準備": {
+    "reading": "じゅんび",
+    "enTranslation": "preparation",
+    "furigana": "準備[じゅんび]"
+  },
+  "嬉しい": {
+    "reading": "うれしい",
+    "enTranslation": "happy, glad, pleasant",
+    "furigana": "嬉[うれ]しい"
+  },
+  "離す": {
+    "reading": "はなす",
+    "enTranslation": "to separate, to part, to divide, to keep apart",
+    "furigana": "離[はな]す"
+  },
+  "触る": {
+    "reading": "さわる",
+    "enTranslation": "to touch, to feel",
+    "furigana": "触[さわ]る"
+  },
+  "癖": {
+    "reading": "くせ",
+    "enTranslation": "habit",
+    "furigana": "癖[くせ]"
+  },
+  "大事": {
+    "reading": "だいじ",
+    "enTranslation": "important, serious",
+    "furigana": "大事[だいじ]"
+  },
+  "鍵": {
+    "reading": "かぎ",
+    "enTranslation": "key, lock",
+    "furigana": "鍵[かぎ]"
+  },
+  "今回": {
+    "reading": "こんかい",
+    "enTranslation": "this time",
+    "furigana": "今回[こんかい]"
+  },
+  "奪う": {
+    "reading": "うばう",
+    "enTranslation": "to snatch away, to steal",
+    "furigana": "奪[うば]う"
+  },
+  "なくなる": {
+    "reading": "なくなる",
+    "enTranslation": "to be used up, to be consumed, to die",
+    "furigana": "なくなる"
+  },
+  "掴む": {
+    "reading": "つかむ",
+    "enTranslation": "to grasp, to grip, to grab, to clutch, to hold",
+    "furigana": "掴[つか]む"
+  },
+  "まるで": {
+    "reading": "まるで",
+    "enTranslation": "entirely, completely",
+    "furigana": "まるで"
+  },
+  "窓": {
+    "reading": "まど",
+    "enTranslation": "window",
+    "furigana": "窓[まど]"
+  },
+  "景色": {
+    "reading": "けしき",
+    "enTranslation": "scenery",
+    "furigana": "景色[けしき]"
+  },
+  "絵画": {
+    "reading": "かいが",
+    "enTranslation": "painting, picture",
+    "furigana": "絵画[かいが]"
+  },
+  "本物": {
+    "reading": "ほんもの",
+    "enTranslation": "genuine, the real thing",
+    "furigana": "本物[ほんもの]"
+  },
+  "気付く": {
+    "reading": "きづく",
+    "enTranslation": "to notice, to realize",
+    "furigana": "気付[きづ]く"
+  },
+  "嫌い": {
+    "reading": "きらい",
+    "enTranslation": "hate, dislike",
+    "furigana": "嫌[きら]い"
+  },
+  "面倒": {
+    "reading": "めんどう",
+    "enTranslation": "trouble, bother",
+    "furigana": "面倒[めんどう]"
+  },
+  "迷惑": {
+    "reading": "めいわく",
+    "enTranslation": "trouble, bother, annoyance",
+    "furigana": "迷惑[めいわく]"
+  },
+  "助かる": {
+    "reading": "たすかる",
+    "enTranslation": "to be saved, to be rescued",
+    "furigana": "助[たす]かる"
+  },
+  "祭": {
+    "reading": "まつり",
+    "enTranslation": "festival",
+    "furigana": "祭[まつり]"
+  },
+  "花火": {
+    "reading": "はなび",
+    "enTranslation": "fireworks",
+    "furigana": "花火[はなび]"
+  },
+  "打ち上げ": {
+    "reading": "うちあげ",
+    "enTranslation": "launch",
+    "furigana": "打[う]ち 上[あ]げ"
+  },
+  "参加": {
+    "reading": "さんか",
+    "enTranslation": "participation",
+    "furigana": "参加[さんか]"
+  },
+  "幸せ": {
+    "reading": "しあわせ",
+    "enTranslation": "happiness",
+    "furigana": "幸[しあわ]せ"
+  },
+  "恋人": {
+    "reading": "こいびと",
+    "enTranslation": "person who someone is dating",
+    "furigana": "恋人[こいびと]"
+  },
+  "寂しい": {
+    "reading": "さびしい",
+    "enTranslation": "lonely, lonesome",
+    "furigana": "寂[さび]しい"
+  },
+  "過ごす": {
+    "reading": "すごす",
+    "enTranslation": "to overdo, to do too much, to pass (time)",
+    "furigana": "過[す]ごす"
+  },
+  "断る": {
+    "reading": "ことわる",
+    "enTranslation": "to refuse, to reject, to turn down, to decline",
+    "furigana": "断[ことわ]る"
+  },
+  "真剣": {
+    "reading": "しんけん",
+    "enTranslation": "serious, earnest",
+    "furigana": "真剣[しんけん]"
+  },
+  "こう": {
+    "reading": "こう",
+    "enTranslation": "in this way, such",
+    "furigana": "こう"
+  },
+  "ばかり": {
+    "reading": "ばかり",
+    "enTranslation": "only, just (started, finished, etc.)",
+    "furigana": "ばかり"
+  },
+  "頂く": {
+    "reading": "いただく",
+    "enTranslation": "to receive (formal)",
+    "furigana": "頂[いただ]く"
+  },
+  "分": {
+    "reading": "ふん",
+    "enTranslation": "minutes",
+    "furigana": "分[ふん]"
+  },
+  "一度": {
+    "reading": "いちど",
+    "enTranslation": "once",
+    "furigana": "一度[いちど]"
+  },
+  "信じる": {
+    "reading": "しんじる",
+    "enTranslation": "to believe",
+    "furigana": "信[しん]じる"
+  },
+  "成功": {
+    "reading": "せいこう",
+    "enTranslation": "success",
+    "furigana": "成功[せいこう]"
+  },
+  "望む": {
+    "reading": "のぞむ",
+    "enTranslation": "to wish for, to desire",
+    "furigana": "望[のぞ]む"
+  },
+  "おかしい": {
+    "reading": "おかしい",
+    "enTranslation": "strange, unusual",
+    "furigana": "おかしい"
+  },
+  "うるさい": {
+    "reading": "うるさい",
+    "enTranslation": "annoying, troublesome",
+    "furigana": "うるさい"
+  },
+  "大体": {
+    "reading": "だいたい",
+    "enTranslation": "mostly",
+    "furigana": "大体[だいたい]"
+  },
+  "なるほど": {
+    "reading": "なるほど",
+    "enTranslation": "I see, indeed",
+    "furigana": "なるほど"
+  },
+  "嘘": {
+    "reading": "うそ",
+    "enTranslation": "lie",
+    "furigana": "嘘[うそ]"
+  },
+  "間に合う": {
+    "reading": "まにあう",
+    "enTranslation": "to be in time (for)",
+    "furigana": "間[ま]に 合[あ]う"
+  },
+  "どうせ": {
+    "reading": "どうせ",
+    "enTranslation": "in any case, at any rate",
+    "furigana": "どうせ"
+  },
+  "見つかる": {
+    "reading": "みつかる",
+    "enTranslation": "to be found, to be discovered",
+    "furigana": "見[み]つかる"
+  },
+  "間違い": {
+    "reading": "まちがい",
+    "enTranslation": "mistake",
+    "furigana": "間違[まちが]い"
+  },
+  "久しぶり": {
+    "reading": "ひさしぶり",
+    "enTranslation": "for the first time in a while",
+    "furigana": "久[ひさ]しぶり"
+  },
+  "致す": {
+    "reading": "いたす",
+    "enTranslation": "to do (formal)",
+    "furigana": "致[いた]す"
+  },
+  "繋ぐ": {
+    "reading": "つなぐ",
+    "enTranslation": "to connect",
+    "furigana": "繋[つな]ぐ"
+  },
+  "いきなり": {
+    "reading": "いきなり",
+    "enTranslation": "suddenly, abruptly",
+    "furigana": "いきなり"
+  },
+  "びっくり": {
+    "reading": "びっくり",
+    "enTranslation": "surprise",
+    "furigana": "びっくり"
+  },
+  "お母さん": {
+    "reading": "おかあさん",
+    "enTranslation": "mother",
+    "furigana": "お 母[かあ]さん"
+  },
+  "おる": {
+    "reading": "おる",
+    "enTranslation": "to exist (living things) {formal}",
+    "furigana": "おる"
+  },
+  "喋る": {
+    "reading": "しゃべる",
+    "enTranslation": "to chat, to talk",
+    "furigana": "喋[しゃべ]る"
+  },
+  "構う": {
+    "reading": "かまう",
+    "enTranslation": "to be concerned about",
+    "furigana": "構[かま]う"
+  },
+  "詰まる": {
+    "reading": "つまる",
+    "enTranslation": "to be packed (with)",
+    "furigana": "詰[つ]まる"
+  },
+  "仲": {
+    "reading": "なか",
+    "enTranslation": "relationship",
+    "furigana": "仲[なか]"
+  },
+  "暇": {
+    "reading": "ひま",
+    "enTranslation": "free-time",
+    "furigana": "暇[ひま]"
+  },
+  "腹": {
+    "reading": "はら",
+    "enTranslation": "abdomen, stomach",
+    "furigana": "腹[はら]"
+  },
+  "どの": {
+    "reading": "どの",
+    "enTranslation": "which",
+    "furigana": "どの"
+  },
+  "参る": {
+    "reading": "まいる",
+    "enTranslation": "to go, to come, to call",
+    "furigana": "参[まい]る"
+  },
+  "苦手": {
+    "reading": "にがて",
+    "enTranslation": "poor (at)",
+    "furigana": "苦手[にがて]"
+  },
+  "揃う": {
+    "reading": "そろう",
+    "enTranslation": "to be complete, to be satisfied (of conditions)",
+    "furigana": "揃[そろ]う"
+  },
+  "さて": {
+    "reading": "さて",
+    "enTranslation": "well, now then",
+    "furigana": "さて"
+  },
+  "大会": {
+    "reading": "たいかい",
+    "enTranslation": "tournament",
+    "furigana": "大会[たいかい]"
+  },
+  "悔しい": {
+    "reading": "くやしい",
+    "enTranslation": "frustrating, regrettable",
+    "furigana": "悔[くや]しい"
+  },
+  "腕": {
+    "reading": "うで",
+    "enTranslation": "arm",
+    "furigana": "腕[うで]"
+  },
+  "悩む": {
+    "reading": "なやむ",
+    "enTranslation": "to be worried, to be troubled",
+    "furigana": "悩[なや]む"
+  },
+  "迷う": {
+    "reading": "まよう",
+    "enTranslation": "to get lost​",
+    "furigana": "迷[まよ]う"
+  },
+  "行動": {
+    "reading": "こうどう",
+    "enTranslation": "action, conduct",
+    "furigana": "行動[こうどう]"
+  },
+  "学年": {
+    "reading": "がくねん",
+    "enTranslation": "year/grade in school",
+    "furigana": "学年[がくねん]"
+  },
+  "狙う": {
+    "reading": "ねらう",
+    "enTranslation": "to aim at",
+    "furigana": "狙[ねら]う"
+  },
+  "入学": {
+    "reading": "にゅうがく",
+    "enTranslation": "entry to school or university",
+    "furigana": "入学[にゅうがく]"
+  },
+  "希望": {
+    "reading": "きぼう",
+    "enTranslation": "hope, wish, aspiration",
+    "furigana": "希望[きぼう]"
+  },
+  "熱い": {
+    "reading": "あつい",
+    "enTranslation": "hot (to touch)",
+    "furigana": "熱[あつ]い"
+  },
+  "下がる": {
+    "reading": "さがる",
+    "enTranslation": "to go down",
+    "furigana": "下[さ]がる"
+  },
+  "お礼": {
+    "reading": "おれい",
+    "enTranslation": "thanks, gratitude​",
+    "furigana": "お 礼[れい]"
+  },
+  "素直": {
+    "reading": "すなお",
+    "enTranslation": "honest, frank",
+    "furigana": "素直[すなお]"
+  },
+  "直る": {
+    "reading": "なおる",
+    "enTranslation": "to be fixed",
+    "furigana": "直[なお]る"
+  },
+  "嫌う": {
+    "reading": "きらう",
+    "enTranslation": "to hate",
+    "furigana": "嫌[きら]う"
+  },
+  "機会": {
+    "reading": "きかい",
+    "enTranslation": "opportunity",
+    "furigana": "機会[きかい]"
+  },
+  "まくる": {
+    "reading": "まくる",
+    "enTranslation": "to roll up (sleeves/cuffs)​",
+    "furigana": "まくる"
+  },
+  "叱る": {
+    "reading": "しかる",
+    "enTranslation": "to scold",
+    "furigana": "叱[しか]る"
+  },
+  "散々": {
+    "reading": "さんざん",
+    "enTranslation": "severely, harshly",
+    "furigana": "散々[さんざん]"
+  },
+  "日々": {
+    "reading": "ひび",
+    "enTranslation": "daily, day after day",
+    "furigana": "日々[ひび]"
+  },
+  "格好": {
+    "reading": "かっこう",
+    "enTranslation": "appearance, outfit",
+    "furigana": "格好[かっこう]"
+  },
+  "めっちゃ": {
+    "reading": "めっちゃ",
+    "enTranslation": "excessive, extreme",
+    "furigana": "めっちゃ"
+  },
+  "大人しい": {
+    "reading": "おとなしい",
+    "enTranslation": "docile, quiet​",
+    "furigana": "大人[おとな]しい"
+  },
+  "拾う": {
+    "reading": "ひろう",
+    "enTranslation": "to pick up",
+    "furigana": "拾[ひろ]う"
+  },
+  "計画": {
+    "reading": "けいかく",
+    "enTranslation": "plan",
+    "furigana": "計画[けいかく]"
+  },
+  "止める": {
+    "reading": "とめる",
+    "enTranslation": "to stop",
+    "furigana": "止[と]める"
+  },
+  "健康": {
+    "reading": "けんこう",
+    "enTranslation": "health",
+    "furigana": "健康[けんこう]"
+  },
+  "やめる": {
+    "reading": "やめる",
+    "enTranslation": "to quit",
+    "furigana": "やめる"
+  },
+  "遅刻": {
+    "reading": "ちこく",
+    "enTranslation": "late",
+    "furigana": "遅刻[ちこく]"
+  },
+  "漫画": {
+    "reading": "まんが",
+    "enTranslation": "comic",
+    "furigana": "漫画[まんが]"
+  },
+  "後悔": {
+    "reading": "こうかい",
+    "enTranslation": "regret",
+    "furigana": "後悔[こうかい]"
+  },
+  "上司": {
+    "reading": "じょうし",
+    "enTranslation": "(one's) superior, (one's) boss",
+    "furigana": "上司[じょうし]"
+  },
+  "めちゃくちゃ": {
+    "reading": "めちゃくちゃ",
+    "enTranslation": "incredibly, really",
+    "furigana": "めちゃくちゃ"
+  },
+  "靴下": {
+    "reading": "くつした",
+    "enTranslation": "socks",
+    "furigana": "靴下[くつした]"
+  },
+  "紙": {
+    "reading": "かみ",
+    "enTranslation": "paper",
+    "furigana": "紙[かみ]"
+  },
+  "方向": {
+    "reading": "ほうこう",
+    "enTranslation": "direction",
+    "furigana": "方向[ほうこう]"
+  },
+  "磨く": {
+    "reading": "みがく",
+    "enTranslation": "to polish",
+    "furigana": "磨[みが]く"
+  },
+  "床": {
+    "reading": "ゆか",
+    "enTranslation": "floor",
+    "furigana": "床[ゆか]"
+  },
+  "夕方": {
+    "reading": "ゆうがた",
+    "enTranslation": "evening, dusk​",
+    "furigana": "夕方[ゆうがた]"
+  },
+  "煙": {
+    "reading": "けむり",
+    "enTranslation": "smoke",
+    "furigana": "煙[けむり]"
+  },
+  "釣り": {
+    "reading": "つり",
+    "enTranslation": "fishing",
+    "furigana": "釣[つ]り"
+  },
+  "趣味": {
+    "reading": "しゅみ",
+    "enTranslation": "hobby",
+    "furigana": "趣味[しゅみ]"
+  },
+  "集める": {
+    "reading": "あつめる",
+    "enTranslation": "to collect",
+    "furigana": "集[あつ]める"
+  },
+  "瞬間": {
+    "reading": "しゅんかん",
+    "enTranslation": "moment, second",
+    "furigana": "瞬間[しゅんかん]"
+  },
+  "試す": {
+    "reading": "ためす",
+    "enTranslation": "to try",
+    "furigana": "試[ため]す"
+  },
+  "結ぶ": {
+    "reading": "むすぶ",
+    "enTranslation": "to tie, to bind",
+    "furigana": "結[むす]ぶ"
+  },
+  "狭い": {
+    "reading": "せまい",
+    "enTranslation": "narrow",
+    "furigana": "狭[せま]い"
+  },
+  "増やす": {
+    "reading": "ふやす",
+    "enTranslation": "to increase",
+    "furigana": "増[ふ]やす"
+  },
+  "学ぶ": {
+    "reading": "まなぶ",
+    "enTranslation": "to learn",
+    "furigana": "学[まな]ぶ"
+  },
+  "目": {
+    "reading": "め",
+    "enTranslation": "eye",
+    "furigana": "目[め]"
+  },
+  "そして": {
+    "reading": "そして",
+    "enTranslation": "and then, thus, and finally",
+    "furigana": "そして"
+  },
+  "心": {
+    "reading": "こころ",
+    "enTranslation": "heart, mind, spirit, vitality",
+    "furigana": "心[こころ]"
+  },
+  "同じ": {
+    "reading": "おなじ",
+    "enTranslation": "same, identical",
+    "furigana": "同[おな]じ"
+  },
+  "遠い": {
+    "reading": "とおい",
+    "enTranslation": "far, distant",
+    "furigana": "遠[とお]い"
+  },
+  "姿": {
+    "reading": "すがた",
+    "enTranslation": "figure, form",
+    "furigana": "姿[すがた]"
+  },
+  "相手": {
+    "reading": "あいて",
+    "enTranslation": "partner, other party, opponent (sports, etc.)",
+    "furigana": "相手[あいて]"
+  },
+  "先": {
+    "reading": "さき",
+    "enTranslation": "before, ahead, prior, former",
+    "furigana": "先[さき]"
+  },
+  "胸": {
+    "reading": "むね",
+    "enTranslation": "chest, breasts",
+    "furigana": "胸[むね]"
+  },
+  "呼ぶ": {
+    "reading": "よぶ",
+    "enTranslation": "to call, to call out (to)",
+    "furigana": "呼[よ]ぶ"
+  },
+  "水": {
+    "reading": "みず",
+    "enTranslation": "water",
+    "furigana": "水[みず]"
+  },
+  "見せる": {
+    "reading": "みせる",
+    "enTranslation": "to show",
+    "furigana": "見[み]せる"
+  },
+  "娘": {
+    "reading": "むすめ",
+    "enTranslation": "daughter",
+    "furigana": "娘[むすめ]"
+  },
+  "神": {
+    "reading": "かみ",
+    "enTranslation": "god, deity",
+    "furigana": "神[かみ]"
+  },
+  "得る": {
+    "reading": "える",
+    "enTranslation": "to earn, to acquire, to gain",
+    "furigana": "得[え]る"
+  },
+  "存在": {
+    "reading": "そんざい",
+    "enTranslation": "existence, being",
+    "furigana": "存在[そんざい]"
+  },
+  "確か": {
+    "reading": "たしか",
+    "enTranslation": "If I'm not mistaken, If I remember correctly",
+    "furigana": "確[たし]か"
+  },
+  "消える": {
+    "reading": "きえる",
+    "enTranslation": "to go out, to vanish, to disappear",
+    "furigana": "消[き]える"
+  },
+  "最初": {
+    "reading": "さいしょ",
+    "enTranslation": "beginning, first",
+    "furigana": "最初[さいしょ]"
+  },
+  "きっと": {
+    "reading": "きっと",
+    "enTranslation": "surely, almost certainly, most likely (90 percent)",
+    "furigana": "きっと"
+  },
+  "場合": {
+    "reading": "ばあい",
+    "enTranslation": "case, situation",
+    "furigana": "場合[ばあい]"
+  },
+  "感じ": {
+    "reading": "かんじ",
+    "enTranslation": "feeling, sense, impression",
+    "furigana": "感[かん]じ"
+  },
+  "心配": {
+    "reading": "しんぱい",
+    "enTranslation": "worry, concern, anxiety",
+    "furigana": "心配[しんぱい]"
+  },
+  "離れる": {
+    "reading": "はなれる",
+    "enTranslation": "to be separated, to be apart, to be distant",
+    "furigana": "離[はな]れる"
+  },
+  "思い出す": {
+    "reading": "おもいだす",
+    "enTranslation": "to recall, to remember",
+    "furigana": "思[おも]い 出[だ]す"
+  },
+  "点": {
+    "reading": "てん",
+    "enTranslation": "score (exams), dot, point",
+    "furigana": "点[てん]"
+  },
+  "理由": {
+    "reading": "りゆう",
+    "enTranslation": "reason",
+    "furigana": "理由[りゆう]"
+  },
+  "押す": {
+    "reading": "おす",
+    "enTranslation": "to push, to press",
+    "furigana": "押[お]す"
+  },
+  "男の子": {
+    "reading": "おとこのこ",
+    "enTranslation": "boy",
+    "furigana": "男[おとこ]の 子[こ]"
+  },
+  "想像": {
+    "reading": "そうぞう",
+    "enTranslation": "imagination",
+    "furigana": "想像[そうぞう]"
+  },
+  "近い": {
+    "reading": "ちかい",
+    "enTranslation": "near (distance), close (in time)",
+    "furigana": "近[ちか]い"
+  },
+  "女性": {
+    "reading": "じょせい",
+    "enTranslation": "woman, feminine gender",
+    "furigana": "女性[じょせい]"
+  },
+  "事実": {
+    "reading": "じじつ",
+    "enTranslation": "fact, truth, reality",
+    "furigana": "事実[じじつ]"
+  },
+  "寝る": {
+    "reading": "ねる",
+    "enTranslation": "to lie down, to go to sleep",
+    "furigana": "寝[ね]る"
+  },
+  "理解": {
+    "reading": "りかい",
+    "enTranslation": "understanding, comprehension",
+    "furigana": "理解[りかい]"
+  },
+  "進む": {
+    "reading": "すすむ",
+    "enTranslation": "to advance, to go forward",
+    "furigana": "進[すす]む"
+  },
+  "状態": {
+    "reading": "じょうたい",
+    "enTranslation": "current status, condition, situation",
+    "furigana": "状態[じょうたい]"
+  },
+  "かしら": {
+    "reading": "かしら",
+    "enTranslation": "I wonder (female)",
+    "furigana": "かしら"
+  },
+  "完全": {
+    "reading": "かんぜん",
+    "enTranslation": "perfection, completeness",
+    "furigana": "完全[かんぜん]"
+  },
+  "当然": {
+    "reading": "とうぜん",
+    "enTranslation": "of course, obviously",
+    "furigana": "当然[とうぜん]"
+  },
+  "向こう": {
+    "reading": "むこう",
+    "enTranslation": "over there, that way",
+    "furigana": "向[む]こう"
+  },
+  "残す": {
+    "reading": "のこす",
+    "enTranslation": "to leave (behind, over), to save, to reserve",
+    "furigana": "残[のこ]す"
+  },
+  "普通": {
+    "reading": "ふつう",
+    "enTranslation": "general, ordinary, usual, normally",
+    "furigana": "普通[ふつう]"
+  },
+  "星": {
+    "reading": "ほし",
+    "enTranslation": "star",
+    "furigana": "星[ほし]"
+  },
+  "守る": {
+    "reading": "まもる",
+    "enTranslation": "to protect, to keep (a promise)",
+    "furigana": "守[まも]る"
+  },
+  "命": {
+    "reading": "いのち",
+    "enTranslation": "life",
+    "furigana": "命[いのち]"
+  },
+  "宇宙": {
+    "reading": "うちゅう",
+    "enTranslation": "universe, cosmos, space",
+    "furigana": "宇宙[うちゅう]"
+  },
+  "変える": {
+    "reading": "かえる",
+    "enTranslation": "to change, to reform, to revise, to amend",
+    "furigana": "変[か]える"
+  },
+  "重い": {
+    "reading": "おもい",
+    "enTranslation": "heavy (weight)",
+    "furigana": "重[おも]い"
+  },
+  "まさか": {
+    "reading": "まさか",
+    "enTranslation": "It couldn't be, something unexpected",
+    "furigana": "まさか"
+  },
+  "落とす": {
+    "reading": "おとす",
+    "enTranslation": "to drop",
+    "furigana": "落[お]とす"
+  },
+  "例": {
+    "reading": "れい",
+    "enTranslation": "example",
+    "furigana": "例[れい]"
+  },
+  "方法": {
+    "reading": "ほうほう",
+    "enTranslation": "method",
+    "furigana": "方法[ほうほう]"
+  },
+  "状況": {
+    "reading": "じょうきょう",
+    "enTranslation": "state of affairs (around you), situation, circumstances",
+    "furigana": "状況[じょうきょう]"
+  },
+  "自由": {
+    "reading": "じゆう",
+    "enTranslation": "freedom, liberty",
+    "furigana": "自由[じゆう]"
+  },
+  "決める": {
+    "reading": "きめる",
+    "enTranslation": "to decide, to choose",
+    "furigana": "決[き]める"
+  },
+  "結局": {
+    "reading": "けっきょく",
+    "enTranslation": "ultimately, in the end",
+    "furigana": "結局[けっきょく]"
+  },
+  "用意": {
+    "reading": "ようい",
+    "enTranslation": "preparation, arrangements",
+    "furigana": "用意[ようい]"
+  },
+  "秘密": {
+    "reading": "ひみつ",
+    "enTranslation": "secret",
+    "furigana": "秘密[ひみつ]"
+  },
+  "報告": {
+    "reading": "ほうこく",
+    "enTranslation": "report",
+    "furigana": "報告[ほうこく]"
+  },
+  "匂い": {
+    "reading": "におい",
+    "enTranslation": "scent, smell",
+    "furigana": "匂[にお]い"
+  },
+  "調子": {
+    "reading": "ちょうし",
+    "enTranslation": "condition, state of health",
+    "furigana": "調子[ちょうし]"
+  },
+  "緊張": {
+    "reading": "きんちょう",
+    "enTranslation": "nervousness",
+    "furigana": "緊張[きんちょう]"
+  },
+  "安心": {
+    "reading": "あんしん",
+    "enTranslation": "relief, peace of mind",
+    "furigana": "安心[あんしん]"
+  },
+  "他人": {
+    "reading": "たにん",
+    "enTranslation": "other people, strangers",
+    "furigana": "他人[たにん]"
+  },
+  "一体": {
+    "reading": "いったい",
+    "enTranslation": "what the ...",
+    "furigana": "一体[いったい]"
+  },
+  "大変": {
+    "reading": "たいへん",
+    "enTranslation": "greatly, terribly",
+    "furigana": "大変[たいへん]"
+  },
+  "夏": {
+    "reading": "なつ",
+    "enTranslation": "summer",
+    "furigana": "夏[なつ]"
+  },
+  "結婚": {
+    "reading": "けっこん",
+    "enTranslation": "marriage",
+    "furigana": "結婚[けっこん]"
+  },
+  "興味": {
+    "reading": "きょうみ",
+    "enTranslation": "interest (in something), curiosity (about something)",
+    "furigana": "興味[きょうみ]"
+  },
+  "事情": {
+    "reading": "じじょう",
+    "enTranslation": "circumstances, consideration, situation, state of affairs",
+    "furigana": "事情[じじょう]"
+  },
+  "少ない": {
+    "reading": "すくない",
+    "enTranslation": "few, a little, insufficient",
+    "furigana": "少[すく]ない"
+  },
+  "甘い": {
+    "reading": "あまい",
+    "enTranslation": "sweet",
+    "furigana": "甘[あま]い"
+  },
+  "元気": {
+    "reading": "げんき",
+    "enTranslation": "healthy, doing well",
+    "furigana": "元気[げんき]"
+  },
+  "作戦": {
+    "reading": "さくせん",
+    "enTranslation": "tactics, strategy",
+    "furigana": "作戦[さくせん]"
+  },
+  "教師": {
+    "reading": "きょうし",
+    "enTranslation": "teacher (formal)",
+    "furigana": "教師[きょうし]"
+  },
+  "期待": {
+    "reading": "きたい",
+    "enTranslation": "expectation, anticipation, hope",
+    "furigana": "期待[きたい]"
+  },
+  "喜ぶ": {
+    "reading": "よろこぶ",
+    "enTranslation": "to be delighted, to be glad",
+    "furigana": "喜[よろこ]ぶ"
+  },
+  "相談": {
+    "reading": "そうだん",
+    "enTranslation": "consultation, advice",
+    "furigana": "相談[そうだん]"
+  },
+  "落ち着く": {
+    "reading": "おちつく",
+    "enTranslation": "to calm down, to be calm",
+    "furigana": "落[お]ち 着[つ]く"
+  },
+  "正直": {
+    "reading": "しょうじき",
+    "enTranslation": "honestly, frankly",
+    "furigana": "正直[しょうじき]"
+  },
+  "味": {
+    "reading": "あじ",
+    "enTranslation": "(sense of) taste, flavor",
+    "furigana": "味[あじ]"
+  },
+  "自信": {
+    "reading": "じしん",
+    "enTranslation": "self-confidence, confidence (in oneself)",
+    "furigana": "自信[じしん]"
+  },
+  "覚悟": {
+    "reading": "かくご",
+    "enTranslation": "resolution, readiness, preparedness",
+    "furigana": "覚悟[かくご]"
+  },
+  "結構": {
+    "reading": "けっこう",
+    "enTranslation": "sufficient, quite, ok",
+    "furigana": "結構[けっこう]"
+  },
+  "駄目": {
+    "reading": "だめ",
+    "enTranslation": "hopeless, wasted, purposeless, no good, not allowed",
+    "furigana": "駄目[だめ]"
+  },
+  "邪魔": {
+    "reading": "じゃま",
+    "enTranslation": "hindrance, obstacle, nuisance",
+    "furigana": "邪魔[じゃま]"
+  },
+  "代わり": {
+    "reading": "かわり",
+    "enTranslation": "second helping, seconds, substitute",
+    "furigana": "代[か]わり"
+  },
+  "本気": {
+    "reading": "ほんき",
+    "enTranslation": "serious",
+    "furigana": "本気[ほんき]"
+  },
+  "意外": {
+    "reading": "いがい",
+    "enTranslation": "unexpected, surprising",
+    "furigana": "意外[いがい]"
+  },
+  "失礼": {
+    "reading": "しつれい",
+    "enTranslation": "excuse me, rude",
+    "furigana": "失礼[しつれい]"
+  },
+  "証拠": {
+    "reading": "しょうこ",
+    "enTranslation": "evidence, proof",
+    "furigana": "証拠[しょうこ]"
+  },
+  "特別": {
+    "reading": "とくべつ",
+    "enTranslation": "special",
+    "furigana": "特別[とくべつ]"
+  },
+  "大切": {
+    "reading": "たいせつ",
+    "enTranslation": "important, necessary, indispensable",
+    "furigana": "大切[たいせつ]"
+  },
+  "十分": {
+    "reading": "じゅうぶん",
+    "enTranslation": "plenty, enough, sufficient, satisfactory, adequate",
+    "furigana": "十分[じゅうぶん]"
+  },
+  "立派": {
+    "reading": "りっぱ",
+    "enTranslation": "praiseworthy, creditable, splendid, fine, elegant",
+    "furigana": "立派[りっぱ]"
+  },
+  "人生": {
+    "reading": "じんせい",
+    "enTranslation": "(human) life",
+    "furigana": "人生[じんせい]"
+  },
+  "残念": {
+    "reading": "ざんねん",
+    "enTranslation": "unfortunate",
+    "furigana": "残念[ざんねん]"
+  },
+  "焼く": {
+    "reading": "やく",
+    "enTranslation": "to bake, to grill, to burn",
+    "furigana": "焼[や]く"
+  },
+  "本人": {
+    "reading": "ほんにん",
+    "enTranslation": "the person himself",
+    "furigana": "本人[ほんにん]"
+  },
+  "野郎": {
+    "reading": "やろう",
+    "enTranslation": "guy (derogatory)",
+    "furigana": "野郎[やろう]"
+  },
+  "我慢": {
+    "reading": "がまん",
+    "enTranslation": "patience, endurance",
+    "furigana": "我慢[がまん]"
+  },
+  "責任": {
+    "reading": "せきにん",
+    "enTranslation": "responsibility",
+    "furigana": "責任[せきにん]"
+  },
+  "全て": {
+    "reading": "すべて",
+    "enTranslation": "all, entirely",
+    "furigana": "全[すべ]て"
+  },
+  "茶": {
+    "reading": "ちゃ",
+    "enTranslation": "tea",
+    "furigana": "茶[ちゃ]"
+  },
+  "多分": {
+    "reading": "たぶん",
+    "enTranslation": "perhaps, probably",
+    "furigana": "多分[たぶん]"
+  },
+  "弱い": {
+    "reading": "よわい",
+    "enTranslation": "weak, frail",
+    "furigana": "弱[よわ]い"
+  },
+  "偶然": {
+    "reading": "ぐうぜん",
+    "enTranslation": "coincidence, by chance",
+    "furigana": "偶然[ぐうぜん]"
+  },
+  "願う": {
+    "reading": "ねがう",
+    "enTranslation": "to desire, to wish, to request, to implore",
+    "furigana": "願[ねが]う"
+  },
+  "活動": {
+    "reading": "かつどう",
+    "enTranslation": "activity, action",
+    "furigana": "活動[かつどう]"
+  },
+  "親父": {
+    "reading": "おやじ",
+    "enTranslation": "one's father, middle aged man",
+    "furigana": "親父[おやじ]"
+  },
+  "別れる": {
+    "reading": "わかれる",
+    "enTranslation": "to break up",
+    "furigana": "別[わか]れる"
+  },
+  "出会う": {
+    "reading": "であう",
+    "enTranslation": "to meet (by chance), to come across",
+    "furigana": "出会[であ]う"
+  },
+  "付ける": {
+    "reading": "つける",
+    "enTranslation": "to attach, to turn on (light)",
+    "furigana": "付[つ]ける"
+  },
+  "未来": {
+    "reading": "みらい",
+    "enTranslation": "the future (usually distant)",
+    "furigana": "未来[みらい]"
+  },
+  "一応": {
+    "reading": "いちおう",
+    "enTranslation": "more or less, tentatively",
+    "furigana": "一応[いちおう]"
+  },
+  "協力": {
+    "reading": "きょうりょく",
+    "enTranslation": "cooperation, collaboration",
+    "furigana": "協力[きょうりょく]"
+  },
+  "一生": {
+    "reading": "いっしょう",
+    "enTranslation": "whole life, a lifetime",
+    "furigana": "一生[いっしょう]"
+  },
+  "最高": {
+    "reading": "さいこう",
+    "enTranslation": "best, wonderful, finest",
+    "furigana": "最高[さいこう]"
+  },
+  "同士": {
+    "reading": "どうし",
+    "enTranslation": "fellow, mutual, companion, comrade",
+    "furigana": "同士[どうし]"
+  },
+  "感謝": {
+    "reading": "かんしゃ",
+    "enTranslation": "thanks, gratitude",
+    "furigana": "感謝[かんしゃ]"
+  },
+  "紹介": {
+    "reading": "しょうかい",
+    "enTranslation": "introduction",
+    "furigana": "紹介[しょうかい]"
+  },
+  "女子": {
+    "reading": "じょし",
+    "enTranslation": "girl",
+    "furigana": "女子[じょし]"
+  },
+  "せめて": {
+    "reading": "せめて",
+    "enTranslation": "at least",
+    "furigana": "せめて"
+  },
+  "平気": {
+    "reading": "へいき",
+    "enTranslation": "calmness, composure, unconcern",
+    "furigana": "平気[へいき]"
+  },
+  "事故": {
+    "reading": "じこ",
+    "enTranslation": "accident, incident",
+    "furigana": "事故[じこ]"
+  },
+  "足りる": {
+    "reading": "たりる",
+    "enTranslation": "to be sufficient, to be enough",
+    "furigana": "足[た]りる"
+  },
+  "勝負": {
+    "reading": "しょうぶ",
+    "enTranslation": "match, contest, game",
+    "furigana": "勝負[しょうぶ]"
+  },
+  "恋": {
+    "reading": "こい",
+    "enTranslation": "(romantic) love",
+    "furigana": "恋[こい]"
+  },
+  "真面目": {
+    "reading": "まじめ",
+    "enTranslation": "serious, earnest",
+    "furigana": "真面目[まじめ]"
+  },
+  "掃除": {
+    "reading": "そうじ",
+    "enTranslation": "cleaning",
+    "furigana": "掃除[そうじ]"
+  },
+  "似合う": {
+    "reading": "にあう",
+    "enTranslation": "to suit, to match",
+    "furigana": "似合[にあ]う"
+  },
+  "余計": {
+    "reading": "よけい",
+    "enTranslation": "excessive, superfluous",
+    "furigana": "余計[よけい]"
+  },
+  "申し訳": {
+    "reading": "もうしわけ",
+    "enTranslation": "apology, excuse",
+    "furigana": "申[もう]し 訳[わけ]"
+  },
+  "歌う": {
+    "reading": "うたう",
+    "enTranslation": "to sing",
+    "furigana": "歌[うた]う"
+  },
+  "無い": {
+    "reading": "ない",
+    "enTranslation": "nonexistent",
+    "furigana": "無[な]い"
+  },
+  "良い": {
+    "reading": "よい",
+    "enTranslation": "good, nice",
+    "furigana": "良[よ]い"
+  },
+  "お前": {
+    "reading": "おまえ",
+    "enTranslation": "you (slightly derogatory)",
+    "furigana": "お 前[まえ]"
+  },
+  "訳": {
+    "reading": "わけ",
+    "enTranslation": "reason, rationale",
+    "furigana": "訳[わけ]"
+  },
+  "やっぱり": {
+    "reading": "やっぱり",
+    "enTranslation": "as expected, after all",
+    "furigana": "やっぱり"
+  },
+  "あいつ": {
+    "reading": "あいつ",
+    "enTranslation": "him (informal)",
+    "furigana": "あいつ"
+  },
+  "まま": {
+    "reading": "まま",
+    "enTranslation": "as it is (moment in time)",
+    "furigana": "まま"
+  },
+  "馬鹿": {
+    "reading": "ばか",
+    "enTranslation": "idiot, stupid",
+    "furigana": "馬鹿[ばか]"
+  },
+  "嫌": {
+    "reading": "いや",
+    "enTranslation": "unpleasant, detestable",
+    "furigana": "嫌[いや]"
+  },
+  "ただ": {
+    "reading": "ただ",
+    "enTranslation": "simply, merely",
+    "furigana": "ただ"
+  },
+  "はず": {
+    "reading": "はず",
+    "enTranslation": "should be, must be",
+    "furigana": "はず"
+  },
+  "達": {
+    "reading": "たち",
+    "enTranslation": "pluralizing suffix (for people and animals)",
+    "furigana": "達[たち]"
+  },
+  "つもり": {
+    "reading": "つもり",
+    "enTranslation": "intention",
+    "furigana": "つもり"
+  },
+  "さっき": {
+    "reading": "さっき",
+    "enTranslation": "a short while ago",
+    "furigana": "さっき"
+  },
+  "全く": {
+    "reading": "まったく",
+    "enTranslation": "truly, entirely",
+    "furigana": "全[まった]く"
+  },
+  "実": {
+    "reading": "じつ",
+    "enTranslation": "truth, reality",
+    "furigana": "実[じつ]"
+  },
+  "なぜ": {
+    "reading": "なぜ",
+    "enTranslation": "why (formal)",
+    "furigana": "なぜ"
+  },
+  "しかし": {
+    "reading": "しかし",
+    "enTranslation": "however",
+    "furigana": "しかし"
+  },
+  "祖母": {
+    "reading": "そぼ",
+    "enTranslation": "grandmother",
+    "furigana": "祖母[そぼ]"
+  },
+  "ほど": {
+    "reading": "ほど",
+    "enTranslation": "degree, extent",
+    "furigana": "ほど"
+  },
+  "さすが": {
+    "reading": "さすが",
+    "enTranslation": "as you'd expect",
+    "furigana": "さすが"
+  },
+  "こいつ": {
+    "reading": "こいつ",
+    "enTranslation": "this (informal)",
+    "furigana": "こいつ"
+  },
+  "あまり": {
+    "reading": "あまり",
+    "enTranslation": "not much, not very",
+    "furigana": "あまり"
+  },
+  "おはよう": {
+    "reading": "おはよう",
+    "enTranslation": "good morning",
+    "furigana": "おはよう"
+  },
+  "者": {
+    "reading": "もの",
+    "enTranslation": "person",
+    "furigana": "者[もの]"
+  },
+  "まじ": {
+    "reading": "まじ",
+    "enTranslation": "serious",
+    "furigana": "まじ"
+  },
+  "まず": {
+    "reading": "まず",
+    "enTranslation": "first",
+    "furigana": "まず"
+  },
+  "とにかく": {
+    "reading": "とにかく",
+    "enTranslation": "anyway",
+    "furigana": "とにかく"
+  },
+  "祖父": {
+    "reading": "そふ",
+    "enTranslation": "grandfather",
+    "furigana": "祖父[そふ]"
+  },
+  "そちら": {
+    "reading": "そちら",
+    "enTranslation": "there (location)",
+    "furigana": "そちら"
+  },
+  "お願い": {
+    "reading": "おねがい",
+    "enTranslation": "favor",
+    "furigana": "お 願[ねが]い"
+  },
+  "付き合う": {
+    "reading": "つきあう",
+    "enTranslation": "to go out with (romantically)",
+    "furigana": "付[つ]き 合[あ]う"
+  },
+  "今まで": {
+    "reading": "いままで",
+    "enTranslation": "until now",
+    "furigana": "今[いま]まで"
+  },
+  "どっち": {
+    "reading": "どっち",
+    "enTranslation": "which",
+    "furigana": "どっち"
+  },
+  "下": {
+    "reading": "した",
+    "enTranslation": "below",
+    "furigana": "下[した]"
+  },
+  "など": {
+    "reading": "など",
+    "enTranslation": "etc",
+    "furigana": "など"
+  },
+  "しっかり": {
+    "reading": "しっかり",
+    "enTranslation": "dependable",
+    "furigana": "しっかり"
+  },
+  "辛い": {
+    "reading": "からい",
+    "enTranslation": "spicy",
+    "furigana": "辛[から]い"
+  },
+  "せっかく": {
+    "reading": "せっかく",
+    "enTranslation": "with trouble, at great pains",
+    "furigana": "せっかく"
+  },
+  "しかも": {
+    "reading": "しかも",
+    "enTranslation": "moreover",
+    "furigana": "しかも"
+  },
+  "円": {
+    "reading": "えん",
+    "enTranslation": "yen",
+    "furigana": "円[えん]"
+  },
+  "つまり": {
+    "reading": "つまり",
+    "enTranslation": "in other words",
+    "furigana": "つまり"
+  },
+  "形": {
+    "reading": "かたち",
+    "enTranslation": "shape",
+    "furigana": "形[かたち]"
+  },
+  "いくら": {
+    "reading": "いくら",
+    "enTranslation": "how much",
+    "furigana": "いくら"
+  },
+  "無し": {
+    "reading": "なし",
+    "enTranslation": "without",
+    "furigana": "無[な]し"
+  },
+  "とりあえず": {
+    "reading": "とりあえず",
+    "enTranslation": "for now, at once",
+    "furigana": "とりあえず"
+  },
+  "仕方ない": {
+    "reading": "しかたない",
+    "enTranslation": "cannot be helped, unavoidable",
+    "furigana": "仕方[しかた]ない"
+  },
+  "諦める": {
+    "reading": "あきらめる",
+    "enTranslation": "to give up",
+    "furigana": "諦[あきら]める"
+  },
+  "ただいま": {
+    "reading": "ただいま",
+    "enTranslation": "I'm home!",
+    "furigana": "ただいま"
+  },
+  "謝る": {
+    "reading": "あやまる",
+    "enTranslation": "to apologize",
+    "furigana": "謝[あやま]る"
+  },
+  "お兄ちゃん": {
+    "reading": "おにいちゃん",
+    "enTranslation": "older brother (informal)",
+    "furigana": "お 兄[にい]ちゃん"
+  },
+  "もしもし": {
+    "reading": "もしもし",
+    "enTranslation": "hello (on phone)",
+    "furigana": "もしもし"
+  },
+  "感じる": {
+    "reading": "かんじる",
+    "enTranslation": "to feel",
+    "furigana": "感[かん]じる"
+  },
+  "あっち": {
+    "reading": "あっち",
+    "enTranslation": "over there",
+    "furigana": "あっち"
+  },
+  "無駄": {
+    "reading": "むだ",
+    "enTranslation": "waste (of time, etc), pointlessness",
+    "furigana": "無駄[むだ]"
+  },
+  "何度": {
+    "reading": "なんど",
+    "enTranslation": "how many times",
+    "furigana": "何度[なんど]"
+  },
+  "件": {
+    "reading": "けん",
+    "enTranslation": "matter, incident",
+    "furigana": "件[けん]"
+  },
+  "ちょうど": {
+    "reading": "ちょうど",
+    "enTranslation": "exact",
+    "furigana": "ちょうど"
+  },
+  "随分": {
+    "reading": "ずいぶん",
+    "enTranslation": "considerably, awfully",
+    "furigana": "随分[ずいぶん]"
+  },
+  "やばい": {
+    "reading": "やばい",
+    "enTranslation": "terrible, crap (slang)",
+    "furigana": "やばい"
+  },
+  "第": {
+    "reading": "だい",
+    "enTranslation": "prefix for forming ordinal numbers",
+    "furigana": "第[だい]"
+  },
+  "楽しみ": {
+    "reading": "たのしみ",
+    "enTranslation": "enjoyment, anticipation",
+    "furigana": "楽[たの]しみ"
+  },
+  "側": {
+    "reading": "そば",
+    "enTranslation": "near",
+    "furigana": "側[そば]"
+  },
+  "ばれる": {
+    "reading": "ばれる",
+    "enTranslation": "to be exposed (a lie, etc.)",
+    "furigana": "ばれる"
+  },
+  "番": {
+    "reading": "ばん",
+    "enTranslation": "number (in a series), turn (in line)",
+    "furigana": "番[ばん]"
+  },
+  "お腹": {
+    "reading": "おなか",
+    "enTranslation": "stomach",
+    "furigana": "お 腹[なか]"
+  },
+  "わざわざ": {
+    "reading": "わざわざ",
+    "enTranslation": "especially, taking the trouble (to do)",
+    "furigana": "わざわざ"
+  },
+  "まずい": {
+    "reading": "まずい",
+    "enTranslation": "bad (taste)",
+    "furigana": "まずい"
+  },
+  "伯父": {
+    "reading": "おじ",
+    "enTranslation": "uncle",
+    "furigana": "伯父[おじ]"
+  },
+  "いい加減": {
+    "reading": "いいかげん",
+    "enTranslation": "irresponsible, careless",
+    "furigana": "いい 加減[かげん]"
+  },
+  "おめでとう": {
+    "reading": "おめでとう",
+    "enTranslation": "congratulations",
+    "furigana": "おめでとう"
+  },
+  "身": {
+    "reading": "み",
+    "enTranslation": "body, oneself",
+    "furigana": "身[み]"
+  },
+  "くそ": {
+    "reading": "くそ",
+    "enTranslation": "damn, shit",
+    "furigana": "くそ"
+  },
+  "いろんな": {
+    "reading": "いろんな",
+    "enTranslation": "various",
+    "furigana": "いろんな"
+  },
+  "可能性": {
+    "reading": "かのうせい",
+    "enTranslation": "possibly, potentially",
+    "furigana": "可能性[かのうせい]"
+  },
+  "互い": {
+    "reading": "たがい",
+    "enTranslation": "each other, one another​",
+    "furigana": "互[たが]い"
+  },
+  "臭い": {
+    "reading": "くさい",
+    "enTranslation": "smelly",
+    "furigana": "臭[くさ]い"
+  },
+  "愛する": {
+    "reading": "あいする",
+    "enTranslation": "to love",
+    "furigana": "愛[あい]する"
+  },
+  "たまに": {
+    "reading": "たまに",
+    "enTranslation": "occasionally",
+    "furigana": "たまに"
+  },
+  "さっさと": {
+    "reading": "さっさと",
+    "enTranslation": "quickly",
+    "furigana": "さっさと"
+  },
+  "今更": {
+    "reading": "いまさら",
+    "enTranslation": "now (when it is already much too late)",
+    "furigana": "今更[いまさら]"
+  },
+  "知り合い": {
+    "reading": "しりあい",
+    "enTranslation": "acquaintance",
+    "furigana": "知[し]り 合[あ]い"
+  },
+  "つい": {
+    "reading": "つい",
+    "enTranslation": "unintentionally",
+    "furigana": "つい"
+  },
+  "大した": {
+    "reading": "たいした",
+    "enTranslation": "considerable",
+    "furigana": "大[たい]した"
+  },
+  "偉い": {
+    "reading": "えらい",
+    "enTranslation": "distinguished",
+    "furigana": "偉[えら]い"
+  },
+  "一言": {
+    "reading": "ひとこと",
+    "enTranslation": "a few words",
+    "furigana": "一言[ひとこと]"
+  },
+  "相変わらず": {
+    "reading": "あいかわらず",
+    "enTranslation": "as usual",
+    "furigana": "相変[あいか]わらず"
+  },
+  "ほとんど": {
+    "reading": "ほとんど",
+    "enTranslation": "mostly, nearly",
+    "furigana": "ほとんど"
+  },
+  "よろしい": {
+    "reading": "よろしい",
+    "enTranslation": "OK, all right",
+    "furigana": "よろしい"
+  },
+  "工事": {
+    "reading": "こうじ",
+    "enTranslation": "construction",
+    "furigana": "工事[こうじ]"
+  },
+  "ばばあ": {
+    "reading": "ばばあ",
+    "enTranslation": "old woman (informal)",
+    "furigana": "ばばあ"
+  },
+  "どちら": {
+    "reading": "どちら",
+    "enTranslation": "which",
+    "furigana": "どちら"
+  },
+  "増える": {
+    "reading": "ふえる",
+    "enTranslation": "to increase",
+    "furigana": "増[ふ]える"
+  },
+  "そもそも": {
+    "reading": "そもそも",
+    "enTranslation": "in the first place",
+    "furigana": "そもそも"
+  },
+  "逆": {
+    "reading": "ぎゃく",
+    "enTranslation": "opposite",
+    "furigana": "逆[ぎゃく]"
+  },
+  "裏": {
+    "reading": "うら",
+    "enTranslation": "opposite side",
+    "furigana": "裏[うら]"
+  },
+  "不安": {
+    "reading": "ふあん",
+    "enTranslation": "anxiety, uneasiness",
+    "furigana": "不安[ふあん]"
+  },
+  "既に": {
+    "reading": "すでに",
+    "enTranslation": "already",
+    "furigana": "既[すで]に"
+  },
+  "そいつ": {
+    "reading": "そいつ",
+    "enTranslation": "person (informal)",
+    "furigana": "そいつ"
+  },
+  "深い": {
+    "reading": "ふかい",
+    "enTranslation": "deep",
+    "furigana": "深[ふか]い"
+  },
+  "限り": {
+    "reading": "かぎり",
+    "enTranslation": "limit",
+    "furigana": "限[かぎ]り"
+  },
+  "珍しい": {
+    "reading": "めずらしい",
+    "enTranslation": "rare",
+    "furigana": "珍[めずら]しい"
+  },
+  "傷つく": {
+    "reading": "きずつく",
+    "enTranslation": "to get hurt, to be hurt",
+    "furigana": "傷[きず]つく"
+  },
+  "納得": {
+    "reading": "なっとく",
+    "enTranslation": "agreement, understanding",
+    "furigana": "納得[なっとく]"
+  },
+  "懸命": {
+    "reading": "けんめい",
+    "enTranslation": "earnest, with utmost effort",
+    "furigana": "懸命[けんめい]"
+  },
+  "まあまあ": {
+    "reading": "まあまあ",
+    "enTranslation": "so-so",
+    "furigana": "まあまあ"
+  },
+  "慣れる": {
+    "reading": "なれる",
+    "enTranslation": "to get used to",
+    "furigana": "慣[な]れる"
+  },
+  "可哀想": {
+    "reading": "かわいそう",
+    "enTranslation": "pitiful​",
+    "furigana": "可哀想[かわいそう]"
+  },
+  "現れる": {
+    "reading": "あらわれる",
+    "enTranslation": "to show",
+    "furigana": "現[あらわ]れる"
+  },
+  "元々": {
+    "reading": "もともと",
+    "enTranslation": "originally",
+    "furigana": "元々[もともと]"
+  },
+  "直す": {
+    "reading": "なおす",
+    "enTranslation": "to repair",
+    "furigana": "直[なお]す"
+  },
+  "勘違い": {
+    "reading": "かんちがい",
+    "enTranslation": "misunderstanding, mistaken idea",
+    "furigana": "勘違[かんちが]い"
+  },
+  "辺": {
+    "reading": "へん",
+    "enTranslation": "area",
+    "furigana": "辺[へん]"
+  },
+  "早速": {
+    "reading": "さっそく",
+    "enTranslation": "at once, immediately",
+    "furigana": "早速[さっそく]"
+  },
+  "場": {
+    "reading": "ば",
+    "enTranslation": "place",
+    "furigana": "場[ば]"
+  },
+  "年間": {
+    "reading": "ねんかん",
+    "enTranslation": "period of years",
+    "furigana": "年間[ねんかん]"
+  },
+  "素晴らしい": {
+    "reading": "すばらしい",
+    "enTranslation": "great, amazing",
+    "furigana": "素晴[すば]らしい"
+  },
+  "正しい": {
+    "reading": "ただしい",
+    "enTranslation": "correct",
+    "furigana": "正[ただ]しい"
+  },
+  "運ぶ": {
+    "reading": "はこぶ",
+    "enTranslation": "to carry",
+    "furigana": "運[はこ]ぶ"
+  },
+  "求める": {
+    "reading": "もとめる",
+    "enTranslation": "to request",
+    "furigana": "求[もと]める"
+  },
+  "苦しい": {
+    "reading": "くるしい",
+    "enTranslation": "painful",
+    "furigana": "苦[くる]しい"
+  },
+  "今後": {
+    "reading": "こんご",
+    "enTranslation": "from now on, hereafter",
+    "furigana": "今後[こんご]"
+  },
+  "休み": {
+    "reading": "やすみ",
+    "enTranslation": "rest",
+    "furigana": "休[やす]み"
+  },
+  "羨ましい": {
+    "reading": "うらやましい",
+    "enTranslation": "envious",
+    "furigana": "羨[うらや]ましい"
+  },
+  "遠慮": {
+    "reading": "えんりょ",
+    "enTranslation": "restraint",
+    "furigana": "遠慮[えんりょ]"
+  },
+  "以来": {
+    "reading": "いらい",
+    "enTranslation": "since, henceforth",
+    "furigana": "以来[いらい]"
+  },
+  "受け取る": {
+    "reading": "うけとる",
+    "enTranslation": "to take",
+    "furigana": "受[う]け 取[と]る"
+  },
+  "最悪": {
+    "reading": "さいあく",
+    "enTranslation": "worst",
+    "furigana": "最悪[さいあく]"
+  },
+  "意識": {
+    "reading": "いしき",
+    "enTranslation": "consciousness",
+    "furigana": "意識[いしき]"
+  },
+  "越える": {
+    "reading": "こえる",
+    "enTranslation": "to pass (through/over)",
+    "furigana": "越[こ]える"
+  },
+  "正面": {
+    "reading": "しょうめん",
+    "enTranslation": "front",
+    "furigana": "正面[しょうめん]"
+  },
+  "完璧": {
+    "reading": "かんぺき",
+    "enTranslation": "perfect",
+    "furigana": "完璧[かんぺき]"
+  },
+  "普段": {
+    "reading": "ふだん",
+    "enTranslation": "usually, normally",
+    "furigana": "普段[ふだん]"
+  },
+  "誤解": {
+    "reading": "ごかい",
+    "enTranslation": "misunderstanding",
+    "furigana": "誤解[ごかい]"
+  },
+  "下手": {
+    "reading": "へた",
+    "enTranslation": "poor (at)",
+    "furigana": "下手[へた]"
+  },
+  "たとえ": {
+    "reading": "たとえ",
+    "enTranslation": "even if, no matter (what)",
+    "furigana": "たとえ"
+  },
+  "固い": {
+    "reading": "かたい",
+    "enTranslation": "hard",
+    "furigana": "固[かた]い"
+  },
+  "きつい": {
+    "reading": "きつい",
+    "enTranslation": "tight",
+    "furigana": "きつい"
+  },
+  "空気": {
+    "reading": "くうき",
+    "enTranslation": "air",
+    "furigana": "空気[くうき]"
+  },
+  "具合": {
+    "reading": "ぐあい",
+    "enTranslation": "condition",
+    "furigana": "具合[ぐあい]"
+  },
+  "違い": {
+    "reading": "ちがい",
+    "enTranslation": "difference",
+    "furigana": "違[ちが]い"
+  },
+  "お姉ちゃん": {
+    "reading": "おねえちゃん",
+    "enTranslation": "older sister (informal)",
+    "furigana": "お 姉[ねえ]ちゃん"
+  },
+  "ちなみに": {
+    "reading": "ちなみに",
+    "enTranslation": "by the way",
+    "furigana": "ちなみに"
+  },
+  "思い出": {
+    "reading": "おもで",
+    "enTranslation": "memory",
+    "furigana": "思[おも]い出[で]"
+  },
+  "内容": {
+    "reading": "ないよう",
+    "enTranslation": "contents",
+    "furigana": "内容[ないよう]"
+  },
+  "なめる": {
+    "reading": "なめる",
+    "enTranslation": "to underestimate",
+    "furigana": "なめる"
+  },
+  "昼": {
+    "reading": "ひる",
+    "enTranslation": "daytime, midday",
+    "furigana": "昼[ひる]"
+  },
+  "去年": {
+    "reading": "きょねん",
+    "enTranslation": "last year",
+    "furigana": "去年[きょねん]"
+  },
+  "温かい": {
+    "reading": "あたたかい",
+    "enTranslation": "warm",
+    "furigana": "温[あたた]かい"
+  },
+  "きっかけ": {
+    "reading": "きっかけ",
+    "enTranslation": "chance",
+    "furigana": "きっかけ"
+  },
+  "手前": {
+    "reading": "てまえ",
+    "enTranslation": "towards oneself, in front of oneself",
+    "furigana": "手前[てまえ]"
+  },
+  "バイト": {
+    "reading": "バイト",
+    "enTranslation": "part-time job",
+    "furigana": "バイト"
+  },
+  "年生": {
+    "reading": "ねんせい",
+    "enTranslation": "grade (school year)",
+    "furigana": "年生[ねんせい]"
+  },
+  "泳ぐ": {
+    "reading": "およぐ",
+    "enTranslation": "to swim",
+    "furigana": "泳[およ]ぐ"
+  },
+  "着替える": {
+    "reading": "きがえる",
+    "enTranslation": "change clothes",
+    "furigana": "着替[きが]える"
+  },
+  "男子": {
+    "reading": "だんし",
+    "enTranslation": "boy",
+    "furigana": "男子[だんし]"
+  },
+  "水着": {
+    "reading": "みずぎ",
+    "enTranslation": "swimsuit",
+    "furigana": "水着[みずぎ]"
+  },
+  "セリフ": {
+    "reading": "セリフ",
+    "enTranslation": "speech, words",
+    "furigana": "セリフ"
+  },
+  "少女": {
+    "reading": "しょうじょ",
+    "enTranslation": "little girl",
+    "furigana": "少女[しょうじょ]"
+  },
+  "会話": {
+    "reading": "かいわ",
+    "enTranslation": "conversation",
+    "furigana": "会話[かいわ]"
+  },
+  "変態": {
+    "reading": "へんたい",
+    "enTranslation": "pervert",
+    "furigana": "変態[へんたい]"
+  },
+  "衣装": {
+    "reading": "いしょう",
+    "enTranslation": "clothing",
+    "furigana": "衣装[いしょう]"
+  },
+  "勝ち": {
+    "reading": "かち",
+    "enTranslation": "victory",
+    "furigana": "勝[か]ち"
+  },
+  "恋愛": {
+    "reading": "れんあい",
+    "enTranslation": "love",
+    "furigana": "恋愛[れんあい]"
+  },
+  "お弁当": {
+    "reading": "おべんとう",
+    "enTranslation": "box lunch",
+    "furigana": "お 弁当[べんとう]"
+  },
+  "制服": {
+    "reading": "せいふく",
+    "enTranslation": "uniform (clothing)",
+    "furigana": "制服[せいふく]"
+  },
+  "開始": {
+    "reading": "かいし",
+    "enTranslation": "start",
+    "furigana": "開始[かいし]"
+  },
+  "禁止": {
+    "reading": "きんし",
+    "enTranslation": "prohibited",
+    "furigana": "禁止[きんし]"
+  },
+  "体調": {
+    "reading": "たいちょう",
+    "enTranslation": "body condition",
+    "furigana": "体調[たいちょう]"
+  },
+  "告白": {
+    "reading": "こくはく",
+    "enTranslation": "confession",
+    "furigana": "告白[こくはく]"
+  },
+  "どきどき": {
+    "reading": "どきどき",
+    "enTranslation": "throbbing (heart), thump-thump",
+    "furigana": "どきどき"
+  },
+  "まし": {
+    "reading": "まし",
+    "enTranslation": "better",
+    "furigana": "まし"
+  },
+  "中学": {
+    "reading": "ちゅうがく",
+    "enTranslation": "middle school",
+    "furigana": "中学[ちゅうがく]"
+  },
+  "用事": {
+    "reading": "ようじ",
+    "enTranslation": "errand",
+    "furigana": "用事[ようじ]"
+  },
+  "泊まる": {
+    "reading": "とまる",
+    "enTranslation": "to stay overnight",
+    "furigana": "泊[と]まる"
+  },
+  "ガキ": {
+    "reading": "ガキ",
+    "enTranslation": "brat (small, annoying kid)",
+    "furigana": "ガキ"
+  },
+  "全力": {
+    "reading": "ぜんりょく",
+    "enTranslation": "all one's power (strength, energy, efforts)",
+    "furigana": "全力[ぜんりょく]"
+  },
+  "指": {
+    "reading": "ゆび",
+    "enTranslation": "finger",
+    "furigana": "指[ゆび]"
+  },
+  "話し掛ける": {
+    "reading": "はなしかける",
+    "enTranslation": "to start a conversation",
+    "furigana": "話[はな]し 掛[か]ける"
+  },
+  "反応": {
+    "reading": "はんのう",
+    "enTranslation": "reaction, response",
+    "furigana": "反応[はんのう]"
+  },
+  "気合い": {
+    "reading": "きあい",
+    "enTranslation": "(fighting) spirit, motivation",
+    "furigana": "気合[きあ]い"
+  },
+  "試験": {
+    "reading": "しけん",
+    "enTranslation": "test",
+    "furigana": "試験[しけん]"
+  },
+  "やる気": {
+    "reading": "やるき",
+    "enTranslation": "willingness (to do something), eagerness",
+    "furigana": "やる 気[き]"
+  },
+  "勇気": {
+    "reading": "ゆうき",
+    "enTranslation": "courage",
+    "furigana": "勇気[ゆうき]"
+  },
+  "穴": {
+    "reading": "あな",
+    "enTranslation": "hole",
+    "furigana": "穴[あな]"
+  },
+  "ありがたい": {
+    "reading": "ありがたい",
+    "enTranslation": "appreciated",
+    "furigana": "ありがたい"
+  },
+  "秒": {
+    "reading": "びょう",
+    "enTranslation": "second (time)",
+    "furigana": "秒[びょう]"
+  },
+  "廊下": {
+    "reading": "ろうか",
+    "enTranslation": "hallway",
+    "furigana": "廊下[ろうか]"
+  },
+  "光": {
+    "reading": "ひかり",
+    "enTranslation": "light",
+    "furigana": "光[ひかり]"
+  },
+  "まさに": {
+    "reading": "まさに",
+    "enTranslation": "surely, certainly",
+    "furigana": "まさに"
+  },
+  "初": {
+    "reading": "はつ",
+    "enTranslation": "first",
+    "furigana": "初[はつ]"
+  },
+  "終了": {
+    "reading": "しゅうりょう",
+    "enTranslation": "end, termination",
+    "furigana": "終了[しゅうりょう]"
+  },
+  "避ける": {
+    "reading": "さける",
+    "enTranslation": "to avoid",
+    "furigana": "避[さ]ける"
+  },
+  "攻撃": {
+    "reading": "こうげき",
+    "enTranslation": "attack",
+    "furigana": "攻撃[こうげき]"
+  },
+  "背中": {
+    "reading": "せなか",
+    "enTranslation": "back (human body)",
+    "furigana": "背中[せなか]"
+  },
+  "友人": {
+    "reading": "ゆうじん",
+    "enTranslation": "friend",
+    "furigana": "友人[ゆうじん]"
+  },
+  "性格": {
+    "reading": "せいかく",
+    "enTranslation": "personality",
+    "furigana": "性格[せいかく]"
+  },
+  "広い": {
+    "reading": "ひろい",
+    "enTranslation": "wide, spacious",
+    "furigana": "広[ひろ]い"
+  },
+  "手伝い": {
+    "reading": "てつだい",
+    "enTranslation": "help, assistance",
+    "furigana": "手伝[てつだ]い"
+  },
+  "遊園地": {
+    "reading": "ゆうえんち",
+    "enTranslation": "amusement park",
+    "furigana": "遊園地[ゆうえんち]"
+  },
+  "待ち合わせ": {
+    "reading": "まちあわせ",
+    "enTranslation": "appointment",
+    "furigana": "待[ま]ち 合[あ]わせ"
+  },
+  "郵便局": {
+    "reading": "ゆうびんきょく",
+    "enTranslation": "post office",
+    "furigana": "郵便局[ゆうびんきょく]"
+  },
+  "引っ越す": {
+    "reading": "ひっこす",
+    "enTranslation": "to move (house)",
+    "furigana": "引[ひ]っ 越[こ]す"
+  },
+  "教科書": {
+    "reading": "きょうかしょ",
+    "enTranslation": "textbook",
+    "furigana": "教科書[きょうかしょ]"
+  },
+  "文房具": {
+    "reading": "ぶんぼうぐ",
+    "enTranslation": "stationery; notepaper",
+    "furigana": "文房具[ぶんぼうぐ]"
+  },
+  "天井": {
+    "reading": "てんじょう",
+    "enTranslation": "ceiling",
+    "furigana": "天井[てんじょう]"
+  },
+  "投げる": {
+    "reading": "なげる",
+    "enTranslation": "to throw",
+    "furigana": "投[な]げる"
+  },
+  "飽きる": {
+    "reading": "あきる",
+    "enTranslation": "to get tired of, to lose interest in",
+    "furigana": "飽[あ]きる"
+  },
+  "完了": {
+    "reading": "かんりょう",
+    "enTranslation": "completion, conclusion",
+    "furigana": "完了[かんりょう]"
+  },
+  "過去": {
+    "reading": "かこ",
+    "enTranslation": "the past, bygone days",
+    "furigana": "過去[かこ]"
+  },
+  "触れる": {
+    "reading": "ふれる",
+    "enTranslation": "to touch, to feel",
+    "furigana": "触[ふ]れる"
+  },
+  "微妙": {
+    "reading": "びみょう",
+    "enTranslation": "difficult, complex, subtle",
+    "furigana": "微妙[びみょう]"
+  },
+  "詳しい": {
+    "reading": "くわしい",
+    "enTranslation": "detailed",
+    "furigana": "詳[くわ]しい"
+  },
+  "消す": {
+    "reading": "けす",
+    "enTranslation": "to extinguish, to put out",
+    "furigana": "消[け]す"
+  },
+  "まとめる": {
+    "reading": "まとめる",
+    "enTranslation": "to collect, to consolidate, to summarize",
+    "furigana": "まとめる"
+  },
+  "比べる": {
+    "reading": "くらべる",
+    "enTranslation": "to compare",
+    "furigana": "比[くら]べる"
+  },
+  "証明": {
+    "reading": "しょうめい",
+    "enTranslation": "proof, testimony",
+    "furigana": "証明[しょうめい]"
+  },
+  "満足": {
+    "reading": "まんぞく",
+    "enTranslation": "satisfaction",
+    "furigana": "満足[まんぞく]"
+  },
+  "才能": {
+    "reading": "さいのう",
+    "enTranslation": "talent",
+    "furigana": "才能[さいのう]"
+  },
+  "永遠": {
+    "reading": "えいえん",
+    "enTranslation": "eternity",
+    "furigana": "永遠[えいえん]"
+  },
+  "心臓": {
+    "reading": "しんぞう",
+    "enTranslation": "heart",
+    "furigana": "心臓[しんぞう]"
+  },
+  "勝利": {
+    "reading": "しょうり",
+    "enTranslation": "victory",
+    "furigana": "勝利[しょうり]"
+  },
+  "季節": {
+    "reading": "きせつ",
+    "enTranslation": "season",
+    "furigana": "季節[きせつ]"
+  },
+  "値段": {
+    "reading": "ねだん",
+    "enTranslation": "price",
+    "furigana": "値段[ねだん]"
+  },
+  "預ける": {
+    "reading": "あずける",
+    "enTranslation": "to leave (in someone's keeping)",
+    "furigana": "預[あず]ける"
+  },
+  "与える": {
+    "reading": "あたえる",
+    "enTranslation": "to give (esp. to someone of lower status)",
+    "furigana": "与[あた]える"
+  },
+  "慌てる": {
+    "reading": "あわてる",
+    "enTranslation": "to be flustered, to panic",
+    "furigana": "慌[あわ]てる"
+  }
+}
