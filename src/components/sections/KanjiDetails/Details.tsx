@@ -8,7 +8,7 @@ import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
-import { SampleVocabulary } from "./SampleVocabulary";
+import { SampleVocabulary, TextbookVocabulary } from "./SampleVocabulary";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
@@ -77,6 +77,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           </ErrorBoundary>
         </SimpleAccordion>
       }
+      <SimpleAccordion trigger={`Textbook Vocabulary`}>
+        <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
+          <TextbookVocabulary kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
