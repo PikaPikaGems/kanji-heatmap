@@ -19,7 +19,7 @@ const root = resolve(__dirname, "..");
 
 // ── Load kanjidict.txt ──
 
-const raw = readFileSync(resolve(root, "docs/data/kanjidict.txt"), "utf-8");
+const raw = readFileSync(resolve(root, "raw-data/kanjidict.txt"), "utf-8");
 const rows = raw
   .trim()
   .split("\n")
