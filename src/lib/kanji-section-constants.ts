@@ -1,7 +1,7 @@
 // Types for the kanji reading data
 // Types for the kanji reading data
 export type ReadingType = "ON" | "KUN";
-export type FrequencyCategory = "↑" | "↔" | "↓";
+export type FrequencyCategory = "↑" | "↔" | "↓" | "↑↑" | "↑↑↑";
 
 export interface KanjiReadingEntrySmall {
   r: string;
@@ -22,12 +22,16 @@ export type KanjiReadingsData = Record<string, KanjiReadingEntry[]>;
 // Frequency display mappings
 export const frequencyLabels: Record<FrequencyCategory, string> = {
   "↑": "Often Used",
+  "↑↑": "Very Often Used",
+  "↑↑↑": "Very Often Used",
   "↔": "Sometimes Used",
   "↓": "Almost Never Used",
 };
 
 export const frequencyColors: Record<FrequencyCategory, string> = {
   "↑": "text-green-500",
+  "↑↑": "text-cyan-500",
+  "↑↑↑": "text-cyan-300",
   "↔": "text-yellow-500",
   "↓": "text-red-500",
 };

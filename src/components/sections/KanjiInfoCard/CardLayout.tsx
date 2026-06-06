@@ -15,27 +15,28 @@ export const KanjiCardLayout = ({
 }) => {
   const hasWords = firstWord && secondWord;
   return (
-    <article className="w-full rounded-lg border-2 border-dotted animate-fade-in">
+    <article className="w-full border-2 border-dotted rounded-lg animate-fade-in">
+
       <div className="hidden sm:flex">
-        <div className=" border-r-2 border-dotted">{main}</div>
+        <div className="border-r-2 border-dotted">{main}</div>
         {firstWord && (
-          <div className="px-2 w-full pb-4 pt-4">
+          <div className="w-full px-2 pt-4 pb-4">
             {firstWord}
             {hasWords && (
-              <div className="mt-6 mb-2 border-b-2 border-dotted w-full" />
+              <div className="w-full mt-6 mb-2 border-b-2 border-dotted" />
             )}
             {secondWord}
           </div>
         )}
       </div>
 
-      <div className="flex flex-col sm:hidden">
+      <div className="relative flex flex-col sm:hidden">
         <div>{main}</div>
         {firstWord && (
-          <div className="px-2 w-full py-2 mt-2 border-t-2 border-dotted flex flex-col justify-center">
+          <div className="flex flex-col justify-center w-full px-2 py-2 mt-2 border-t-2 border-dotted">
             {firstWord}
             {hasWords && (
-              <div className="mt-2 mb-2 border-b-2 border-dotted w-full" />
+              <div className="w-full mt-2 mb-2 border-b-2 border-dotted" />
             )}
             {secondWord}
           </div>
@@ -43,13 +44,13 @@ export const KanjiCardLayout = ({
       </div>
       {components && (
         <>
-          <div className="flex justify-center flex-wrap mr-4 border-t-2 border-dotted pt-1 w-full">
+          <div className="flex flex-wrap justify-center w-full pt-1 mr-4 border-t-2 border-dotted">
             {components}
           </div>
         </>
       )}
       {badges && (
-        <div className="flex space-x-1 justify-center flex-wrap space-y-1 border-t-2 border-dotted mt-1 mb-2 pt-1 px-2">
+        <div className="flex flex-wrap justify-center px-2 pt-1 mt-1 mb-2 space-x-1 space-y-1 border-t-2 border-dotted">
           <div />
           {badges}
         </div>

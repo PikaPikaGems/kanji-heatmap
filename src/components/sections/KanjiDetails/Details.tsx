@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, ReactNode, Suspense } from "react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { DefaultErrorFallback, ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -8,7 +8,7 @@ import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
 import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
-import { SampleVocabulary } from "./SampleVocabulary";
+import { SampleVocabulary, TextbookVocabulary } from "./SampleVocabulary";
 import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
@@ -45,7 +45,7 @@ export const ImprovementCTA = () => {
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
-export const KanjiDetails = ({ kanji }: { kanji: string }) => {
+export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
   const getInfo = useGetKanjiInfoFn();
 
   if (getInfo == null) {
@@ -60,6 +60,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
+      <div className="relative p-0 m-0 md:hidden">
+        <SimpleAccordion trigger={"Quick Cheatsheet"} defaultOpen={true}>
+          {smallScreenNode}
+        </SimpleAccordion>
+      </div>
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
@@ -77,6 +82,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           </ErrorBoundary>
         </SimpleAccordion>
       }
+      <SimpleAccordion trigger={`Textbook Vocabulary`}>
+        <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
+          <TextbookVocabulary kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
@@ -95,6 +105,10 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
           <ExternalKanjiLinks kanji={kanji} />
         </div>
       </SimpleAccordion>
+      <p className="my-4 text-xs text-left">
+        <strong>Note:</strong> The Speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
+      </p>
+
       <div className="flex justify-start w-full mt-4 space-x-1">
         <LinksOutItems />
         <KanjiKeyboardShortcuts kanji={kanji} />

@@ -233,7 +233,7 @@ export const readingFrequencySourceLinks = [
     url: "https://www.researchgate.net/publication/357163811_Joyo_Kanji_Readings_ver_11",
   },
   {
-    text: "Kanji Readings excel sheet to JSON Converter by Piyush",
+    text: "Piyush's Reading Excel Sheet to JSON Converter",
     url: "https://github.com/piyush8512/Kanji-Readings-Converter",
   },
 ];

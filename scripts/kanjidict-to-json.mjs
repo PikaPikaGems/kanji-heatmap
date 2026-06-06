@@ -14,7 +14,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-const raw = readFileSync(resolve(root, "docs/data/kanjidict.txt"), "utf-8");
+const raw = readFileSync(resolve(root, "raw-data/kanjidict.txt"), "utf-8");
 
 const main = JSON.parse(
   readFileSync(resolve(root, "public/json/kanji_main.json"), "utf-8")
@@ -102,7 +102,7 @@ for (const r of rows) {
 // Generate public/json/yagays-components.json from yagays/kanji2composition/kanji2radical.json
 function generateYagaysComponents() {
   const raw = JSON.parse(
-    readFileSync(resolve(root, "docs/data/yagays/kanji2composition/kanji2radical.json"), "utf-8")
+    readFileSync(resolve(root, "raw-data/yagays/kanji2composition/kanji2radical.json"), "utf-8")
   );
 
   const result = {};
@@ -147,7 +147,7 @@ generateYagaysComponents();
 // Generate public/json/scott-components.json from ScottOglesby-kanji-composition-map.txt
 function generateScottComponents() {
   const raw = readFileSync(
-    resolve(root, "docs/data/ScottOglesby-kanji-composition-map.txt"),
+    resolve(root, "raw-data/ScottOglesby-kanji-composition-map.txt"),
     "utf-8"
   );
 
@@ -229,7 +229,7 @@ console.log("=".repeat(60));
 console.log("=".repeat(60));
 console.log("KANJIDICT TO JSON CONVERSION");
 console.log("=".repeat(60));
-console.log(`\nInput:  docs/data/kanjidict.txt (${rows.length} rows)`);
+console.log(`\nInput:  raw-data/kanjidict.txt (${rows.length} rows)`);
 console.log(`Output: public/json/kanji-structure-v2-plus-more.json`);
 console.log(`Total kanji entries: ${Object.keys(result).length}`);
 

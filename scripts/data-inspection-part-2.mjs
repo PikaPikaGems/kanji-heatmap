@@ -20,7 +20,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-const raw = readFileSync(resolve(root, "docs/data/kanjidict.txt"), "utf-8");
+const raw = readFileSync(resolve(root, "raw-data/kanjidict.txt"), "utf-8");
 const rows = raw
   .trim()
   .split("\n")

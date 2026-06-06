@@ -10,7 +10,7 @@ import {
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { DefaultErrorFallback } from "@/components/error";
-import assetsPaths from "@/lib/assets-paths";
+import { SAMPLE_VOCAB_PATH, TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Pagination, usePagination } from "./Pagination";
 import { useEffect, useMemo, useState } from "react";
@@ -22,7 +22,7 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
-type CommonWordEntry = { w: string, r?: string, t: string, e?: string, k?: number, j?: number };
+type CommonWordEntry = { w: string, r?: string, t?: string, e?: string, k?: number, j?: number };
 
 const FreqCategoryMap: Record<string, string> = {
   "🌱": "basic",
@@ -82,7 +82,7 @@ const sortWordData = (data: CommonWordEntry[]) => {
 
     // Frequency tier: basic > common > fluent > advanced/uncommon
     const freqScore: Record<string, number> = { "🌱": 60, "☘️": 50, "🌷": 30, "📚": 10, "🦉": 0 };
-    s += freqScore[entry.t] ?? 0;
+    s += freqScore[entry.t ?? "🦉"] ?? 0;
 
     return s;
   };
@@ -187,13 +187,10 @@ const TableSkeleton = () => {
     </div>
   )
 }
-const PATH = import.meta.env.MODE === "development" ||
-  window.location.protocol === "http:"
-  ? assetsPaths.dev.KANJI_VOCAB
-  : assetsPaths.KANJI_VOCAB
+
 
 export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
-  const url = `${PATH}/${kanji}.json`;
+  const url = `${SAMPLE_VOCAB_PATH}/${kanji}.json`;
   const { data, status, error } = useJsonFetch<CommonWordEntry[]>(url);
 
   if (status === "pending" || status === "idle") {
@@ -202,31 +199,67 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
     );
   }
 
-  if (status === "error" || error) {
+  if (status === "error" || error || !data || data.length === 0) {
     return (
-      <DefaultErrorFallback message="Cannot fetch data at this time. Try again later." />
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="py-4 text-sm text-left text-muted-foreground ">
-        {"There are no sample words for this kanji yet."}
-      </div>
+      <DefaultErrorFallback message={`There are no entries for ${kanji} right now.`} showDefaultCta={false} />
     );
   }
 
   return (
     <div>
       <PaginatedVocabulary data={data} />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">See also:</div>
+      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Sources:</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="PikaPikaGems' Japanese Word Rank Lookup Website" /></li>
-        <li className="ml-6">🐙 <ExternalTextLink href={"https://github.com/PikaPikaGems/japanese-word-frequency"} text="PikaPikaGems' Japanese Word Frequency Compilation" /></li>
-
-
+        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="Japanese Word Rank Lookup" /></li>
+        <li className="ml-6">🐙 <ExternalTextLink href={"https://github.com/PikaPikaGems/japanese-word-frequency"} text="Japanese Word Frequencies" /></li>
       </ul>
     </div>
+  );
+};
 
+type Reading = string
+type Translation = string
+type WordString = string
+
+type TextbookWordEntry = Record<WordString, [Reading, Translation]>;
+
+export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
+  const url = `${TEXT_BOOK_VOCAB_PATH}/${kanji}.json`;
+  const { data, status, error } = useJsonFetch<TextbookWordEntry>(url);
+
+  if (status === "pending" || status === "idle") {
+    return (
+      <TableSkeleton />
+    );
+  }
+
+  if (status === "error" || error || !data || Object.keys(data?.[kanji] ?? {}).length === 0) {
+    return (
+      <DefaultErrorFallback message={`There are no entries for ${kanji} right now.`} showDefaultCta={false} />
+    );
+  }
+
+
+
+  // convert data to CommonWordEntry[]
+  const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation]]) => ({
+    w: word,
+    r: reading,
+    e: translation,
+  } as CommonWordEntry));
+
+
+  return (
+    <div>
+      <PaginatedVocabulary data={commonWordData} />
+      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Sources:</div>
+      <ul className="mx-6 mb-6 italic text-left list-disc">
+        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1564742924"} text="Anki Deck: 1564742924" /></li>
+        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/779483253"} text="Anki Deck: 779483253" /></li>
+        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/2106223612"} text="Anki Deck: 2106223612" /></li>
+        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1468618470"} text="Anki Deck: 1468618470" /></li>
+        <li className="ml-6"><ExternalTextLink href={"https://kanjimastery.blogspot.com/"} text="Kanji Mastery Blog" /></li>
+      </ul>
+    </div>
   );
 };
