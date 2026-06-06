@@ -233,7 +233,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
     );
   }
 
-  if (status === "error" || error || !data || Object.keys(data[kanji]).length === 0) {
+  if (status === "error" || error || !data || Object.keys(data?.[kanji] ?? {}).length === 0) {
     return (
       <DefaultErrorFallback message={`There are no entries for ${kanji} right now.`} showDefaultCta={false} />
     );
