@@ -12,6 +12,8 @@ node_modules
 dist
 
 public/kanji-words/*
+public/kanji-textbook-words/*
+docs/data/kanji-textbook-vocab/*
 
 dist-ssr
 *.local
