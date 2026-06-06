@@ -164,6 +164,15 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) =>
       `https://www.kanjipedia.jp/search?k=${kanji}&kt=1&sk=leftHand`,
   },
+  {
+    name: "Immersion Kit",
+    url: (kanji: string) =>
+      `https://www.immersionkit.com/dictionary?keyword=${kanji}`,
+  },
+  {
+    name: "Nadeshiko",
+    url: (kanji: string) => `https://nadeshiko.co/search/${kanji}`,
+  },
 ];
 
 //www.ldoceonline.com/dictionary/見る
@@ -204,9 +213,8 @@ export const vocabExternalLinks = [
       `https://www.immersionkit.com/dictionary?keyword=${word}`,
   },
   {
-    name: "Tatoeba",
-    url: (word: string) =>
-      `https://tatoeba.org/en/sentences/search?from=jpn&query=${word}&to=eng`,
+    name: "Nadeshiko",
+    url: (word: string) => `https://nadeshiko.co/search/${word}`,
   },
   {
     name: "Jisho.org",
@@ -231,6 +239,11 @@ export const vocabExternalLinks = [
   {
     name: "Takoboto",
     url: (word: string) => `https://takoboto.jp/?q=${word}`,
+  },
+  {
+    name: "Tatoeba",
+    url: (word: string) =>
+      `https://tatoeba.org/en/sentences/search?from=jpn&query=${word}&to=eng`,
   },
   {
     name: "Ichi Moe",
