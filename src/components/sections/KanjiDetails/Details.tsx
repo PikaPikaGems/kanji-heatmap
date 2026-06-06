@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, ReactNode, Suspense } from "react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { DefaultErrorFallback, ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -45,7 +45,7 @@ export const ImprovementCTA = () => {
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
-export const KanjiDetails = ({ kanji }: { kanji: string }) => {
+export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
   const getInfo = useGetKanjiInfoFn();
 
   if (getInfo == null) {
@@ -60,6 +60,11 @@ export const KanjiDetails = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-2 mx-2">
+      <div className="relative p-0 m-0 md:hidden">
+        <SimpleAccordion trigger={"Quick Cheatsheet"} defaultOpen={true}>
+          {smallScreenNode}
+        </SimpleAccordion>
+      </div>
       <SimpleAccordion trigger={"General"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>

@@ -73,9 +73,10 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
   return (
     <KanjiCardLayout
       main={
-        <div className="mr-4 pl-2 rounded-3xl">
-          <span className="text-[120px] kanji-font">{kanji}</span>
-          <div className="text-md uppercase -mt-4">{info.keyword}</div>
+        <div className="relative pl-2 mr-4 rounded-3xl">
+          <span className="text-[120px] leading-none kanji-font">{kanji}</span>
+          <div className="mt-4 uppercase text-md">{info.keyword}</div>
+
         </div>
       }
       firstWord={word1Props && <WordCard {...word1Props} />}

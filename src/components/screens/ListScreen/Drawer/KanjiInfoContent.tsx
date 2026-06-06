@@ -21,14 +21,16 @@ const Layout = ({
 }) => {
   return (
     <>
-      <div className="w-full flex flex-col overflow-y-scroll overflow-x-hidden md:flex-row md:space-x-1 ">
+      <div className="flex flex-col w-full overflow-x-hidden overflow-y-scroll md:flex-row md:space-x-1 ">
         <div className="px-1 md:sticky md:top-[0px] md:left-[0px] md:min-w-96 md:max-w-96 md:w-96">
-          <ErrorBoundary details="Kanji Card in KanjiDrawer Layout">
-            <div className="block md:hidden">{actionBar}</div>
-            {first}
-          </ErrorBoundary>
+          <div className="block md:hidden">{actionBar}</div>
+          <div className="hidden md:block">
+            <ErrorBoundary details="Kanji Card in KanjiDrawer Layout">
+              {first}
+            </ErrorBoundary>
+          </div>
         </div>
-        <div className="grow min-w-0">
+        <div className="min-w-0 grow">
           <ErrorBoundary details="Kanji Details in KanjiDrawer Layout">
             <div className="hidden md:block">{actionBar}</div>
             {second}
@@ -49,12 +51,13 @@ export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
 
   const info = getFn?.(kanji);
 
+  const card = <KanjiCard key={kanji} kanji={kanji} />
   if (info != null) {
     return (
       <Layout
         actionBar={<KanjiActionsBtns kanji={kanji} />}
-        first={<KanjiCard key={kanji} kanji={kanji} />}
-        second={<KanjiDetails kanji={kanji} />}
+        first={card}
+        second={<KanjiDetails kanji={kanji} smallScreenNode={card} />}
       />
     );
   }
