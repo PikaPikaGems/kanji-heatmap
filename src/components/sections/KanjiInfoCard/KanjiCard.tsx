@@ -13,7 +13,6 @@ import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 
 import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
-import { SingleKanjiPart } from "@/components/dependent/site-wide/SingleKanjiPart";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 
 const transformKanjiWordDetails = (
@@ -62,14 +61,6 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
   const word1Props = transformKanjiWordDetails(kanji, info.mainVocab?.first);
   const word2Props = transformKanjiWordDetails(kanji, info.mainVocab?.second);
 
-  const parts = info.parts
-    .filter((item) => item.part !== kanji)
-    .filter((item) => {
-      return item.part != info.phonetic?.phonetic;
-    });
-
-  const hasParts = parts.length > 0 || info.phonetic;
-
   return (
     <KanjiCardLayout
       main={
@@ -81,30 +72,6 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
       }
       firstWord={word1Props && <WordCard {...word1Props} />}
       secondWord={word2Props && <WordCard {...word2Props} />}
-      components={
-        hasParts && (
-          <>
-            {parts.map((item) => {
-              return (
-                <SingleKanjiPart
-                  key={item.part}
-                  kanji={item.part}
-                  keyword={item.keyword}
-                  isKanji={item.isKanji}
-                />
-              );
-            })}
-            {info.phonetic && (
-              <SingleKanjiPart
-                kanji={info.phonetic.phonetic}
-                keyword={info.phonetic.keyword}
-                phonetics={info.phonetic.sound}
-                isKanji={info.phonetic.isKanji}
-              />
-            )}
-          </>
-        )
-      }
       badges={
         <>
           <JLPTBadge jlpt={info.jlpt} />
