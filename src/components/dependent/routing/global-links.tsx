@@ -12,7 +12,7 @@ const cnJPCardLink = `${cnJPCard} hover:bg-foreground/5`;
 const JPCardInner = ({
   label,
   character,
-  fontSize = 'text-2xl',
+  fontSize = 'text-3xl',
   badgeClassName,
   badgeVariant,
 }: {

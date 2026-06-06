@@ -201,7 +201,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
 
   if (status === "error" || error || !data || data.length === 0) {
     return (
-      <DefaultErrorFallback message="There are no words for this kanji right now." />
+      <DefaultErrorFallback message={`There are no entries for this ${kanji} right now.`} showDefaultCta={false} />
     );
   }
 
@@ -235,7 +235,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   if (status === "error" || error || !data || Object.keys(data).length === 0) {
     return (
-      <DefaultErrorFallback message={`There are no entries for this ${kanji} right now.`} />
+      <DefaultErrorFallback message={`There are no entries for this ${kanji} right now.`} showDefaultCta={false} />
     );
   }
 
