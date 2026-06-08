@@ -116,6 +116,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
 
   return (
     <div className="px-2 mt-4 -mx-2 overflow-x-auto animate-fade-in" key={`${start}-${end}`}>
+      <p className="w-full px-4 text-left">{data.length} total item(s) found.</p>
       {pagination}
       <Table className="w-full min-w-[400px] mt-4">
         <TableHeader>
@@ -209,8 +210,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
       <PaginatedVocabulary data={data} />
       <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Sources:</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="Japanese Word Rank Lookup" /></li>
-        <li className="ml-6">🐙 <ExternalTextLink href={"https://github.com/PikaPikaGems/japanese-word-frequency"} text="Japanese Word Frequencies" /></li>
+        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Rank Lookup" /></li>
       </ul>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { ChartLine, Menu, SearchIcon, } from "lucide-react";
+import { ChartLine, Menu, RefreshCw, SearchIcon, } from "lucide-react";
 import pageItems from "@/components/items/page-items";
 import { docPages } from "@/components/items/nav-items";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
@@ -35,6 +35,12 @@ const infoLinks = [
 ];
 
 
+
+const RefreshPageBtn = () => (
+  <Button variant="outline" size="icon" className="w-8 h-8 rounded-xl" onClick={() => window.location.reload()} aria-label="Refresh page">
+    <RefreshCw className="w-[1.2rem] h-[1.2rem]" />
+  </Button>
+);
 
 const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -87,6 +93,9 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           </div>
         </div>
 
+      </div>
+      <div className="mt-auto pt-4 flex justify-end">
+        <RefreshPageBtn />
       </div>
     </div>
   )
