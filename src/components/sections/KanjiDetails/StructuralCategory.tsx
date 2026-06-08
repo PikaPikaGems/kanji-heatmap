@@ -119,6 +119,10 @@ const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {
 
   if (status === "pending" || status === "idle") return "...";
 
+  if (hlorenzi?.phonetic == null && hlorenzi?.semantic == null) {
+    return <span className="text-[10px] uppercase">Not available</span>
+  }
+
   return (
     <Wrapper>
       {semanticResolved && (

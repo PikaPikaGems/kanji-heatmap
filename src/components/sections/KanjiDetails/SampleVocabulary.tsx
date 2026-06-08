@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/table";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
-import { DefaultErrorFallback } from "@/components/error";
 import { SAMPLE_VOCAB_PATH, TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Pagination, usePagination } from "./Pagination";
@@ -124,7 +123,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
             <TableHead className="text-left w-fit">Speak</TableHead>
             <TableHead className="text-center w-fit">Word</TableHead>
             <TableHead className="text-center w-fit">Reading</TableHead>
-            <TableHead className="text-center max-w-12">Translation</TableHead>
+            <TableHead className="text-center min-w-16 max-w-24">Translation</TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
           </TableRow>
         </TableHeader>
@@ -159,7 +158,7 @@ const TableSkeleton = () => {
             <TableHead className="text-center w-fit">Word</TableHead>
             <TableHead className="text-center w-fit">Reading</TableHead>
             <TableHead className="w-12 text-center">Translation</TableHead>
-            <TableHead className="text-center w-fit">Tags</TableHead>
+            <TableHead className="text-center w-fit min-w-16 max-w-24">Tags</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -201,8 +200,8 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
 
   if (status === "error" || error || !data || data.length === 0) {
     return (
-      <DefaultErrorFallback message={`There are no entries for ${kanji} right now.`} showDefaultCta={false} />
-    );
+      <div className="w-full p-4 text-base text-center">{`There are no entries for ${kanji} right now.`}</div>
+    )
   }
 
   return (
@@ -235,8 +234,8 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   if (status === "error" || error || !data || Object.keys(data?.[kanji] ?? {}).length === 0) {
     return (
-      <DefaultErrorFallback message={`There are no entries for ${kanji} right now.`} showDefaultCta={false} />
-    );
+      <div className="w-full p-4 text-base text-center">{`There are no entries for ${kanji} right now.`}</div>
+    )
   }
 
 
