@@ -27,13 +27,9 @@ export const RadicalsScreenDialog = ({
           Search by Radical
         </DrawerDescription>
         <ErrorBoundary>{children}</ErrorBoundary>
-        <DrawerClose asChild className="absolute top-0 right-0 z-50">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="mx-1 mt-1 rounded-full border-2 border-dotted flex justify-center item-center"
-          >
-            <CircleX />
+        <DrawerClose asChild className="absolute z-50 top-2 right-2">
+          <Button variant="ghost" size="icon" className="p-4 border-2 border-dashed rounded-xl bg-background">
+            <CircleX className="size-8" />
           </Button>
         </DrawerClose>
       </DrawerContent>

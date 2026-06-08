@@ -161,7 +161,7 @@ export const SearchInput = ({
       />
       {parsedValue.length > 0 && (
         <Button
-          className="absolute right-[120px] top-[6px] m-0 p-1  h-6 rounded-full"
+          className="absolute right-[110px] top-[6px] m-0 p-1  h-6 rounded-full"
           variant={"secondary"}
           onClick={() => {
             onSyncAll("", searchType);
