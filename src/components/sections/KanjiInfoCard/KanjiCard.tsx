@@ -14,6 +14,7 @@ import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
+import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
 
 const transformKanjiWordDetails = (
   kanji: string,
@@ -71,6 +72,7 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
       }
       firstWord={word1Props && <WordCard {...word1Props} />}
       secondWord={word2Props && <WordCard {...word2Props} />}
+      componentBreakdown={<OriginalKanjiComponentBreakdown kanji={kanji} showNotAvailable={false} />}
       badges={
         <>
           <JLPTBadge jlpt={info.jlpt} />
