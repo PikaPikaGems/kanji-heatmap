@@ -23,8 +23,8 @@ const JPCardInner = ({
   badgeVariant?: React.ComponentProps<typeof Badge>['variant'];
 }) => (
   <>
-    <Badge className={`justify-center text-center ${badgeClassName ?? ''}`} variant={badgeVariant}>{label}</Badge>
-    <div className={`kanji-font ${fontSize}`}>{character}</div>
+    <Badge className={`justify-center text-center whitespace-nowrap ${badgeClassName ?? ''}`} variant={badgeVariant}>{label}</Badge>
+    <div className={`kanji-font whitespace-nowrap ${fontSize}`}>{character}</div>
   </>
 );
 

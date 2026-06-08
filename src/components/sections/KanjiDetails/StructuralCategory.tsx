@@ -67,7 +67,7 @@ const ComponentLink = ({
 };
 
 const Wrapper = ({ children }: { children: ReactNode }) => {
-  return <div className="flex flex-wrap items-center gap-4 justify-left w-fit">{children}</div>
+  return <div className="flex items-center gap-4 overflow-x-auto justify-left w-fit">{children}</div>
 }
 
 const NoInfo = () => { return <span className="text-[10px] uppercase">Not available</span>; }
