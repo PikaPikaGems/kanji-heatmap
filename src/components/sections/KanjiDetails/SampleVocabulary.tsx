@@ -116,7 +116,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
 
   return (
     <div className="px-2 mt-4 -mx-2 overflow-x-auto animate-fade-in" key={`${start}-${end}`}>
-      <p className="w-full px-4 text-left">{data.length} total items found.</p>
+      <p className="w-full px-4 text-left">{data.length} total item(s) found.</p>
       {pagination}
       <Table className="w-full min-w-[400px] mt-4">
         <TableHeader>
