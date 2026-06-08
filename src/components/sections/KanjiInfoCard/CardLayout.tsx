@@ -5,11 +5,13 @@ export const KanjiCardLayout = ({
   firstWord,
   secondWord,
   badges,
+  componentBreakdown
 }: {
   main: ReactNode;
   firstWord: ReactNode;
   secondWord: ReactNode;
   badges?: ReactNode;
+  componentBreakdown: ReactNode
 }) => {
   const hasWords = firstWord && secondWord;
   return (
@@ -27,8 +29,12 @@ export const KanjiCardLayout = ({
           </div>
         )}
       </div>
+
+      <div className="flex flex-wrap justify-center px-2 py-3 space-x-1 space-y-1 border-t-2 border-dotted">
+        {componentBreakdown}
+      </div>
       {badges && (
-        <div className="flex flex-wrap justify-center px-2 py-3 mt-1 mb-2 space-x-1 space-y-1 border-t-2 border-dotted">
+        <div className="flex flex-wrap justify-center px-2 py-3 space-x-1 space-y-1 border-t-2 border-dotted">
           {badges}
         </div>
       )}
