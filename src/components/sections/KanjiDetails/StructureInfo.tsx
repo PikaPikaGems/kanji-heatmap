@@ -12,8 +12,6 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { useIsKanjiWorkerReady, useKanjiInfo } from "@/kanji-worker/kanji-worker-hooks";
 import { HoverItemReturnData } from "@/lib/kanji/kanji-info-types";
 import { SingleKanjiPart } from "@/components/dependent/site-wide/SingleKanjiPart";
-import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
-import { DefaultErrorFallback } from "@/components/error";
 
 const TableCellFixed = ({
     children,
@@ -36,12 +34,12 @@ const OriginalKanjiComponentBreakdown = ({ kanji }: { kanji: string }) => {
     const data = useKanjiInfo(kanji, "hover-card");
     const ready = useIsKanjiWorkerReady();
 
-    if (data.error) {
-        return <DefaultErrorFallback message="Failed to load data." />;
+    if (!ready || data.status === "loading" || data.data == null) {
+        return <span className="text-[10px] uppercase">...</span>;
     }
 
-    if (!ready || data.status === "loading" || data.data == null) {
-        return <CardLoadingScreen />;
+    if (data.error || data.data == null) {
+        return <span className="text-[10px] uppercase">Not available</span>;
     }
 
     const info = data.data as HoverItemReturnData;
@@ -51,6 +49,10 @@ const OriginalKanjiComponentBreakdown = ({ kanji }: { kanji: string }) => {
         .filter((item) => item.part !== info.phonetic?.phonetic);
 
     const hasParts = parts.length > 0 || info.phonetic;
+
+    if (!hasParts) {
+        return <span className="text-[10px] uppercase">Not available</span>;
+    }
 
     return <>
         {hasParts && (

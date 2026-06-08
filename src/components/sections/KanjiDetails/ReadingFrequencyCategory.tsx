@@ -89,10 +89,8 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
 
   if (!kanjiReadingData || kanjiReadingData.length === 0) {
     return (
-      <div className="py-4 text-sm text-left text-muted-foreground">
-        No reading frequency data available for this kanji.
-      </div>
-    );
+      <div className="w-full p-4 text-base text-center">{`There is no reading usefulness data for ${kanji} right now.`}</div>
+    )
   }
 
   return (
