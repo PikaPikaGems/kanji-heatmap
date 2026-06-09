@@ -106,7 +106,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
         </div>
       </SimpleAccordion>
       <p className="my-4 text-xs text-left">
-        <strong>Note:</strong> The Speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
+        <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
       </p>
 
       <div className="flex justify-start w-full mt-4 space-x-1">
