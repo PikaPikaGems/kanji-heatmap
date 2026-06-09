@@ -82,7 +82,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           </ErrorBoundary>
         </SimpleAccordion>
       }
-      <SimpleAccordion trigger={`Textbook Vocabulary containing ${kanji}`}>
+      <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
         </ErrorBoundary>
