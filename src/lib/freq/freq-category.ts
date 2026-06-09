@@ -25,11 +25,11 @@ export const freqRankMaxMin: Record<
   FreqCategory,
   { min: number; max: number }
 > = {
-  0: { min: 1700, max: Infinity },
-  1: { min: 1100, max: 1700 },
-  2: { min: 650, max: 1100 },
-  3: { min: 300, max: 650 },
-  4: { min: 0, max: 300 },
+  0: { min: 1800, max: Infinity },
+  1: { min: 1200, max: 1800 },
+  2: { min: 750, max: 1200 },
+  3: { min: 350, max: 750 },
+  4: { min: 0, max: 350 },
 };
 
 export const getFreqCategory = (freqRank?: number | null) => {
