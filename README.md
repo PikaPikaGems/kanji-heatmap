@@ -11,9 +11,26 @@
 ## Development
 
 ```
+$ nvm use 22
 $ pnpm install
-$ pnpm run dev --host
+$ pnpm run dev
 ```
+
+> **Note:** When using `pnpm run dev`, clicking the book icon (Jisho lookup) in the vocabulary table will not load data — it requires a Cloudflare Worker running locally. All other features work normally.
+
+### Full functionality (with Jisho lookup)
+
+The Jisho lookup feature proxies requests through a [Cloudflare Pages Function](./functions/api/jisho.ts) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
+
+```
+# Terminal 1
+$ pnpm run dev
+
+# Terminal 2
+$ pnpm run dev:cf
+```
+
+Then open `http://localhost:5173` (wrangler's port, not Vite's).
 
 ## Updating Data
 

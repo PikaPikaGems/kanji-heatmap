@@ -63,7 +63,7 @@ const MethodologyNote = () => (
     <p className="text-left">
       All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary.
     </p>
-    <div className="pt-4 font-bold">Primary Data Sources:</div>
+    <div className="pt-4 font-bold">Primary Data Source(s):</div>
     <div className="pl-6">
       {readingFrequencySourceLinks.map((link) => (
         <li key={link.text}>

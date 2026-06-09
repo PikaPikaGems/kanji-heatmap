@@ -16,7 +16,7 @@ export const GenericPopover = ({
   return (
     <Popover>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-auto p-0 m-0">
+      <PopoverContent className="w-auto p-0 m-0" collisionPadding={16}>
         <PopoverCardArrow />
         {content}
       </PopoverContent>

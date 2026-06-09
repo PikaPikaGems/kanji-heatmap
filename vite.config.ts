@@ -56,6 +56,20 @@ const pwaConfig = {
     globPatterns: ["**/*.{js,css,html}"],
     runtimeCaching: [
       // **********************
+      // JISHO API (proxied via Cloudflare Pages Function)
+      // **********************
+      {
+        urlPattern: /\/api\/jisho(\?.*)?$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "jisho-api-cache",
+          expiration: {
+            maxEntries: 200,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      // **********************
       // FONTS
       // **********************
       {

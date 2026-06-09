@@ -20,7 +20,7 @@ export const SingleKanjiPart = ({
     <GenericPopover
       trigger={
         <button
-          className={`flex flex-col m-1 kanji-font text-3xl border-2 rounded-2xl p-1 hover:border-solid hover:border-[#2effff] ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`}
+          className={`flex flex-col m-1 kanji-font text-3xl border-2 rounded-2xl p-2 hover:border-solid hover:border-[#2effff] ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`}
         >
           {kanji}
         </button>

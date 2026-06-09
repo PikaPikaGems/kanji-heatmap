@@ -26,7 +26,9 @@ export const KanjiFunctionalityProvider = ({
         <KanjiReadingCategoryProvider>
           <KanjiStructureProvider>
             <MultiKanjiStructureProvider>
-              <ItemSettingsProvider>{children}</ItemSettingsProvider>
+              <ItemSettingsProvider>
+                {children}
+              </ItemSettingsProvider>
             </MultiKanjiStructureProvider>
           </KanjiStructureProvider>
         </KanjiReadingCategoryProvider>
