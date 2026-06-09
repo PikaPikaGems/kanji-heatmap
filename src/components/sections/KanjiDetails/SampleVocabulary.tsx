@@ -18,6 +18,7 @@ import { JLTPTtypes } from "@/lib/jlpt";
 import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import { Badge } from "@/components/ui/badge";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { JishoBtn } from "@/components/common/JishoBtn";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
@@ -58,6 +59,9 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           }
           {entry.t && entry.t !== "📚" && entry.t !== "🦉" && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🦉"]}</Badge>}
           {(jlpt || (entry.k && entry.k === 1) || entry.t && entry.t !== "📚" && entry.t !== "🦉") ? "" : "-"}
+        </TableCell>
+        <TableCell className="w-12">
+          <JishoBtn word={entry.w} />
         </TableCell>
       </TableRow>
     </>
@@ -126,6 +130,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
             <TableHead className="text-center w-fit">Reading</TableHead>
             <TableHead className="text-center min-w-16 max-w-24">Translation</TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
+            <TableHead className="w-24 text-left">Jisho.org</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -160,6 +165,8 @@ const TableSkeleton = () => {
             <TableHead className="text-center w-fit">Reading</TableHead>
             <TableHead className="w-12 text-center">Translation</TableHead>
             <TableHead className="text-center w-fit min-w-16 max-w-24">Tags</TableHead>
+            <TableHead className="w-24 text-left">Jisho.org</TableHead>
+
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -179,6 +186,9 @@ const TableSkeleton = () => {
               </TableCell>
               <TableCell className="w-full">
                 <div className="w-full h-5 rounded-full bg-muted" />
+              </TableCell>
+              <TableCell className="w-12">
+                <div className="w-8 h-8 rounded-xl bg-muted" />
               </TableCell>
             </TableRow>
           ))}
@@ -208,7 +218,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
   return (
     <div>
       <PaginatedVocabulary data={data} />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Sources:</div>
+      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
         <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Rank Lookup" /></li>
       </ul>
@@ -251,7 +261,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
   return (
     <div>
       <PaginatedVocabulary data={commonWordData} />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Sources:</div>
+      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
         <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1564742924"} text="Anki Deck: 1564742924" /></li>
         <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/779483253"} text="Anki Deck: 779483253" /></li>
