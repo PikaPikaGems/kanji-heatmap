@@ -8,7 +8,6 @@ import { ItemSettingsProvider } from "./item-settings-provider";
 import { KanjiReadingCategoryProvider } from "./kanji-reading-category-provider";
 import { KanjiStructureProvider } from "./kanji-structure-provider";
 import { MultiKanjiStructureProvider } from "./multiple-kanji-structure-provider";
-import { JishoCacheProvider } from "./jisho-cache-provider";
 
 export const KanjiFunctionalityProvider = ({
   children,
@@ -28,10 +27,8 @@ export const KanjiFunctionalityProvider = ({
           <KanjiStructureProvider>
             <MultiKanjiStructureProvider>
               <ItemSettingsProvider>
-                <JishoCacheProvider>
-
-                  {children}
-                </JishoCacheProvider></ItemSettingsProvider>
+                {children}
+              </ItemSettingsProvider>
             </MultiKanjiStructureProvider>
           </KanjiStructureProvider>
         </KanjiReadingCategoryProvider>
