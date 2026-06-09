@@ -3,7 +3,24 @@ import { BookOpen } from "lucide-react";
 import { GenericPopover } from "./GenericPopover";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
-import { useJishoCache, type JishoApiResponse } from "@/providers/jisho-cache-provider";
+
+type JishoJapanese = { word?: string; reading: string };
+type JishoSense = {
+    english_definitions: string[];
+    parts_of_speech: string[];
+    restrictions: string[];
+};
+type JishoEntry = {
+    slug: string;
+    is_common: boolean;
+    jlpt: string[];
+    japanese: JishoJapanese[];
+    senses: JishoSense[];
+};
+type JishoApiResponse = {
+    meta: { status: number };
+    data: JishoEntry[];
+};
 
 const JLPT_COLORS: Record<string, string> = {
     "jlpt-n1": "border-red-500 text-red-500",
@@ -14,20 +31,11 @@ const JLPT_COLORS: Record<string, string> = {
 };
 
 export const JishoContent = ({ word }: { word: string }) => {
-    const cacheRef = useJishoCache();
-    const cached = cacheRef.current.get(word);
-
     const { data, status } = useJsonFetch<JishoApiResponse>(
-        `/api/jisho?keyword=${encodeURIComponent(word)}`,
-        !cached
+        `/api/jisho?keyword=${encodeURIComponent(word)}`
     );
 
-    if (data && !cached) cacheRef.current.set(word, data);
-
-
-    const result = cached ?? data;
-
-    if (!result) {
+    if (!data) {
         if (status === "error") {
             return (
                 <div className="py-2 text-xs">
@@ -38,16 +46,17 @@ export const JishoContent = ({ word }: { word: string }) => {
         return <div className="py-2 text-xs text-muted-foreground">Loading…</div>;
     }
 
-    if (result.data.length === 0) {
+    if (data.data.length === 0) {
         return (
-            <div className="py-2 text-xs text-muted-foreground">Jisho.org does not contain information about this word.</div>
+            <div className="py-2 text-xs text-muted-foreground">
+                Jisho.org does not contain information about this word.
+            </div>
         );
     }
 
-    console.log({ data })
     return (
         <div className="space-y-3">
-            {result.data.slice(0, 3).map((entry, i) => (
+            {data.data.map((entry, i) => (
                 <div key={entry.slug} className={i > 0 ? "border-t pt-3" : ""}>
                     <div className="flex items-baseline gap-1.5 mb-1">
                         {entry.japanese[0]?.word && (
@@ -107,7 +116,7 @@ export const JishoBtn = ({ word }: { word: string }) => {
                 </Button>
             }
             content={
-                <div className="w-56 p-4">
+                <div className="p-4 overflow-y-auto max-h-48 min-w-36 max-w-96" onWheel={(e) => e.stopPropagation()}>
                     <JishoContent word={word} />
                 </div>
             }
