@@ -38,17 +38,17 @@ export const SortAndFilterSettingsDialog = ({
             />
           </DialogTrigger>
         </HoverCardTrigger>
-        <HoverCardContent className="p-2 w-24 text-xs z-50 rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
+        <HoverCardContent className="z-50 w-24 p-2 text-xs border rounded-md shadow-md outline-none bg-popover text-popover-foreground">
           Sort and Filter Settings
         </HoverCardContent>
       </HoverCard>
       <DialogContent
         className={
-          "overflow-y-auto max-h-svh z-50 flex flex-col px-4 pt-8 pb-4"
+          "max-h-svh z-50 flex flex-col min-h-0 px-1 md:px-4 pb-4"
         }
       >
         <DialogHeader>
-          <DialogTitle className="text-left pb-4 m-0">
+          <DialogTitle className="m-0 text-left">
             Sorting and Filtering Settings
           </DialogTitle>
           <DialogDescription className="sr-only">
