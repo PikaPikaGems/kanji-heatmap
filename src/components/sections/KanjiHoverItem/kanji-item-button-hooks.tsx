@@ -54,7 +54,7 @@ export const useItemBtnCn = (kanji: string) => {
     ? JLPTListItems[jlpt].cnBorder
     : dontIncludeFreq === false || freqRankCategory === 0
       ? "border-black border-opacity-10 dark:border-white dark:border-opacity-10"
-      : `border-theme-color-with-opacity-${20 * freqRankCategory}`;
+      : `border-theme-color-with-opacity-${25 * freqRankCategory}`;
 
   const bgColor = dontIncludeFreq
     ? ""
