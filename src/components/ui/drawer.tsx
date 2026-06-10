@@ -46,7 +46,7 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="mx-auto my-2 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto my-2 max-h-2 min-h-2 h-2 bg-muted w-[100px] rounded-full bg-theme" />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
