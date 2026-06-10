@@ -29,6 +29,7 @@ export const DrawingPad = ({
     setStrokes: setControlledStrokes,
     showSubmitBtn = false,
     onClickSubmit,
+    onClickClear,
 }: {
     svgSize: number;
     // Optional controlled strokes. When provided, the parent owns the strokes
@@ -37,6 +38,7 @@ export const DrawingPad = ({
     setStrokes?: Dispatch<SetStateAction<Stroke[]>>;
     showSubmitBtn?: boolean;
     onClickSubmit?: (payload: DrawingSubmitPayload) => void;
+    onClickClear?: () => void;
 }) => {
     const [internalStrokes, setInternalStrokes] = useState<Stroke[]>([]);
     const strokes = controlledStrokes ?? internalStrokes;
@@ -46,6 +48,10 @@ export const DrawingPad = ({
     const svgRef = useRef<SVGSVGElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const isDrawing = useRef(false);
+    // Mirror of the in-progress stroke so endStroke can commit it without
+    // nesting setStrokes inside the setCurrentPoints updater (that would update
+    // a parent component during render and trigger a React warning).
+    const currentPointsRef = useRef<[number, number][] | null>(null);
     const patternId = useId();
 
     useEffect(() => {
@@ -66,32 +72,36 @@ export const DrawingPad = ({
         e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         isDrawing.current = true;
-        setCurrentPoints([toSvgPoint(e)]);
+        const point = toSvgPoint(e);
+        currentPointsRef.current = [point];
+        setCurrentPoints([point]);
     };
 
     const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
         e.stopPropagation();
         if (!isDrawing.current) return;
-        setCurrentPoints((prev) => [...(prev ?? []), toSvgPoint(e)]);
+        const next = [...(currentPointsRef.current ?? []), toSvgPoint(e)];
+        currentPointsRef.current = next;
+        setCurrentPoints(next);
     };
 
     const endStroke = () => {
         if (!isDrawing.current) return;
         isDrawing.current = false;
-        setCurrentPoints((prev) => {
-            if (prev && prev.length > 0) {
-                setStrokes((s) => [...s, prev]);
-            }
-            return null;
-        });
+        const points = currentPointsRef.current;
+        if (points && points.length > 0) {
+            setStrokes((s) => [...s, points]);
+        }
+        currentPointsRef.current = null;
+        setCurrentPoints(null);
     };
 
     const renderStrokePath = (points: [number, number][]) => {
         if (!getStrokeFn || !points.length) return null;
         const outline = getStrokeFn(points, {
-            size: 9,                    // base stroke width in pixels
-            thinning: 0.5,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
-            smoothing: 0.5,             // smoothing applied to the stroke outline
+            size: 12,                    // base stroke width in pixels
+            thinning: 0.7,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
+            smoothing: 0.7,             // smoothing applied to the stroke outline
             streamline: 0.5,            // how much to reduce jitter / iron out wiggles
             easing: (t: number) => t,   // easing for simulated pressure curve
             simulatePressure: true,     // simulate pen pressure from pointer velocity
@@ -103,7 +113,7 @@ export const DrawingPad = ({
             },
             end: {
                 cap: true,                // draw a round cap at stroke end
-                taper: 0,                 // distance over which end tapers (0 = no taper)
+                taper: 0.1,                 // distance over which end tapers (0 = no taper)
                 easing: (t: number) => t,
             },
         });
@@ -120,56 +130,56 @@ export const DrawingPad = ({
                 onPointerUp={endStroke}
                 onPointerCancel={endStroke}
             >
-            <svg
-                ref={svgRef}
-                width={svgSize}
-                height={svgSize}
-                viewBox={`0 0 ${svgSize} ${svgSize}`}
-                className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
-                style={{ background: "hsl(var(--background))", touchAction: "none" }}
-            >
-                {/* Decorative layer: grid dots + dashed center axes */}
-                <defs>
-                    <pattern
-                        id={patternId}
-                        x="14"
-                        y="14"
-                        width="28"
-                        height="28"
-                        patternUnits="userSpaceOnUse"
-                    >
-                        <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
-                    </pattern>
-                </defs>
-                <rect width={svgSize} height={svgSize} fill={`url(#${patternId})`} />
-                <line
-                    x1={0} y1={svgSize / 2} x2={svgSize} y2={svgSize / 2}
-                    stroke="hsl(var(--foreground))"
-                    strokeDasharray="10 4"
-                    opacity={1}
-                />
-                <line
-                    x1={svgSize / 2} y1={0} x2={svgSize / 2} y2={svgSize}
-                    stroke="hsl(var(--foreground))"
-                    strokeDasharray="10 4"
-                    opacity={1}
-                />
+                <svg
+                    ref={svgRef}
+                    width={svgSize}
+                    height={svgSize}
+                    viewBox={`0 0 ${svgSize} ${svgSize}`}
+                    className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
+                    style={{ background: "hsl(var(--background))", touchAction: "none" }}
+                >
+                    {/* Decorative layer: grid dots + dashed center axes */}
+                    <defs>
+                        <pattern
+                            id={patternId}
+                            x="14"
+                            y="14"
+                            width="28"
+                            height="28"
+                            patternUnits="userSpaceOnUse"
+                        >
+                            <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
+                        </pattern>
+                    </defs>
+                    <rect width={svgSize} height={svgSize} fill={`url(#${patternId})`} />
+                    <line
+                        x1={0} y1={svgSize / 2} x2={svgSize} y2={svgSize / 2}
+                        stroke="hsl(var(--foreground))"
+                        strokeDasharray="10 4"
+                        opacity={1}
+                    />
+                    <line
+                        x1={svgSize / 2} y1={0} x2={svgSize / 2} y2={svgSize}
+                        stroke="hsl(var(--foreground))"
+                        strokeDasharray="10 4"
+                        opacity={1}
+                    />
 
-                {/* User strokes */}
-                {strokes.map((pts, i) => {
-                    const d = renderStrokePath(pts);
-                    return d ? (
-                        <path key={i} d={d} style={{ fill: "rgba(var(--theme-color-selected), 1)" }} />
-                    ) : null;
-                })}
-                {currentPoints &&
-                    (() => {
-                        const d = renderStrokePath(currentPoints);
+                    {/* User strokes */}
+                    {strokes.map((pts, i) => {
+                        const d = renderStrokePath(pts);
                         return d ? (
-                            <path d={d} style={{ fill: "hsl(var(--primary))" }} />
+                            <path key={i} d={d} style={{ fill: "rgba(var(--theme-color-selected), 1)" }} />
                         ) : null;
-                    })()}
-            </svg>
+                    })}
+                    {currentPoints &&
+                        (() => {
+                            const d = renderStrokePath(currentPoints);
+                            return d ? (
+                                <path d={d} style={{ fill: "hsl(var(--primary))" }} />
+                            ) : null;
+                        })()}
+                </svg>
             </div>
             <div className="flex justify-center mt-2 space-x-2">
                 <Button
@@ -186,6 +196,7 @@ export const DrawingPad = ({
                     onClick={() => {
                         setStrokes([]);
                         setCurrentPoints(null);
+                        onClickClear?.();
                     }}
                     className="disabled:opacity-25"
                     disabled={strokes.length === 0 && !currentPoints}

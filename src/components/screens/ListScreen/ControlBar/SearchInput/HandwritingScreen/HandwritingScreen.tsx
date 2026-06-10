@@ -4,117 +4,52 @@ import {
   DrawingSubmitPayload,
   Stroke,
 } from "@/components/dependent/DrawingPad";
-import { CircleX } from "@/components/icons";
-import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
+import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
+import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
+import { SmallUnexpectedErrorFallback, SmallUnexpectedErrorFallbackTxt } from "@/components/error/SmallUnexpectedErrorFallback";
+import { ErrorBoundary } from "@/components/error";
 
 type RecognitionStatus = "idle" | "loading" | "success" | "error";
 
 const TitleLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <span
-      className="
-        font-bold px-1 rounded-full text-sm
-        dark:bg-black dark:text-white bg-white text-black
-      "
-    >
+    <span className="px-1 text-sm font-bold text-black bg-white rounded-full dark:bg-black dark:text-white">
       {children}
     </span>
   );
 };
 
-const SelectedKanjiTitle = ({ count }: { count: number }) => {
-  return <TitleLayout>Kanji Selected {`(${count})`}</TitleLayout>;
-};
-
-const CandidatesTitle = ({ count }: { count: number }) => {
-  return (
-    <TitleLayout> Results Preview {count > 0 ? `(${count})` : ""}</TitleLayout>
-  );
-};
-
 const HandwritingScreenLayout = ({
   top,
-  middle,
   bottom,
-  count,
+  candidatesCount,
 }: {
   top: ReactNode;
-  middle: ReactNode;
   bottom: ReactNode;
-  count: number;
+  candidatesCount: number;
 }) => {
   return (
-    <div className="mx-auto w-full h-full px-1 relative flex flex-col">
-      <div className="flex-1 min-h-0 flex items-center justify-center overflow-y-auto">
+    <div className="relative w-full px-1 mx-auto">
+      {/* Draw a Kanji */}
+      <div className="absolute z-50 w-full m-auto -top-1">
+        <TitleLayout>Draw a Kanji</TitleLayout>
+      </div>
+      <div
+        className="relative flex flex-wrap items-start justify-center w-full py-3 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
+        style={{ maxHeight: "calc(100dvh - 185px)" }}
+      >
         {top}
       </div>
 
-      {count > 0 && (
-        <div className="relative w-full">
-          <div className="absolute -top-1 w-full m-auto z-50">
-            <SelectedKanjiTitle count={count} />
-          </div>
-          <div className="w-full h-24 mt-1 pt-3 mb-1 pb-0 overflow-x-auto overflow-y-hidden flex rounded-md scrollbar-thin relative transition-all animate-fade-in">
-            {middle}
-          </div>
-        </div>
-      )}
-
-      <div className="relative w-full">
-        <div className="absolute -top-1 w-full m-auto z-50">
-          <CandidatesTitle count={count} />
-        </div>
-        <div className="border-2 border-dotted dark:border-slate-600 pt-3 mt-2 w-full h-36 my-1 py-1 overflow-x-auto overflow-y-hidden flex rounded-md scrollbar-thin z-40 animate-fade-in">
-          {bottom}
-        </div>
+      {/* Results Preview */}
+      <div className="z-50 flex w-full py-1 pt-3 mt-3 mb-3 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md dark:border-slate-600 h-36 scrollbar-thin animate-fade-in">
+        {bottom}
       </div>
-    </div>
-  );
-};
-
-const CandidateBtn = ({
-  kanji,
-  isSelected,
-  onClick,
-}: {
-  kanji: string;
-  isSelected: boolean;
-  onClick: () => void;
-}) => {
-  const cn2 = isSelected
-    ? "rounded-xl bg-black text-white dark:bg-white dark:text-black"
-    : "border border-dotted border-current rounded-sm hover:bg-[#2effff] hover:text-black";
-
-  return (
-    <button
-      onClick={onClick}
-      className={`shrink-0 w-[55px] h-[55px] transition-all duration-300 ml-1 my-auto kanji-font text-3xl ${cn2}`}
-    >
-      {kanji}
-    </button>
-  );
-};
-
-const SelectedKanjiBtn = ({
-  kanji,
-  onClick,
-}: {
-  kanji: string;
-  onClick: () => void;
-}) => {
-  return (
-    <div
-      className="
-        relative shrink-0 w-[70px] h-full ml-1 my-auto py-0
-        flex flex-col justify-center items-center
-        rounded-xl bg-black text-white dark:bg-white dark:text-black
-      "
-    >
-      <button onClick={onClick}>
-        <CircleX className="absolute top-1 right-1 scale-75 hover:text-red-500" />
-        <span className="sr-only">Remove {kanji}</span>
-      </button>
-      <span className="block text-4xl kanji-font">{kanji}</span>
+      <div className="absolute bottom-[142px] w-full m-auto z-50">
+        <TitleLayout>
+          Results Preview {candidatesCount > 0 ? `(${candidatesCount})` : ""}
+        </TitleLayout>
+      </div>
     </div>
   );
 };
@@ -159,55 +94,58 @@ const parseCandidates = (data: unknown): string[] => {
   return [];
 };
 
-const CandidatesPreview = ({
+const messageBoxCN =
+  "w-full text-xs h-full font-bold flex justify-center items-center p-2 text-center";
+
+const HandwritingResultsPreview = ({
   status,
   candidates,
-  selectedSet,
-  onSelect,
+  onClick,
 }: {
   status: RecognitionStatus;
   candidates: string[];
-  selectedSet: Set<string>;
-  onSelect: (kanji: string) => void;
+  onClick: () => void;
 }) => {
+
   if (status === "loading") {
     return (
-      <div className="w-full text-xs h-full font-bold flex justify-center items-center p-2">
+      <div className={messageBoxCN}>
         <div>認識中 {`(Recognizing..)`}</div>
       </div>
     );
   }
 
   if (status === "error") {
-    return <SmallUnexpectedErrorFallback />;
-  }
-
-  if (status === "idle") {
-    return (
-      <div className="w-full text-xs h-full font-medium flex justify-center items-center p-2 text-center text-muted-foreground">
-        <div>Draw a kanji above, then tap the search button to see matches.</div>
-      </div>
-    );
+    return <SmallUnexpectedErrorFallbackTxt txt={"Google's handwriting API can't be accessed right now."} />;
   }
 
   if (candidates.length === 0) {
+    // Recognition ran but matched nothing in our dataset.
+    if (status === "success") {
+      return (
+        <div className={messageBoxCN}>
+          <div>すみません 🙇🏽‍♀️ No match found. Try drawing again.</div>
+        </div>
+      );
+    }
+
+    // Nothing drawn / searched yet.
     return (
-      <div className="w-full text-xs h-full font-bold flex justify-center items-center p-2 text-center">
-        <div>すみません 🙇🏽‍♀️ No match found. Try drawing again.</div>
+      <div className={`${messageBoxCN} font-medium text-muted-foreground`}>
+        <div>Draw a kanji above, then tap the search button to see matches.</div>
       </div>
     );
   }
 
   return (
     <>
-      {candidates.map((kanji) => (
-        <CandidateBtn
-          key={kanji}
-          kanji={kanji}
-          isSelected={selectedSet.has(kanji)}
-          onClick={() => onSelect(kanji)}
-        />
-      ))}
+      <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
+        {candidates.map((kanji) => {
+          return (
+            <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
+          );
+        })}
+      </ErrorBoundary>
     </>
   );
 };
@@ -217,20 +155,23 @@ export const HandWritingDrawingPad = ({
   onChange,
   strokes,
   setStrokes,
+  onResultClick,
 }: {
   value: string;
   onChange: (newValue: string) => void;
   strokes: Stroke[];
   setStrokes: React.Dispatch<React.SetStateAction<Stroke[]>>;
+  onResultClick: () => void;
 }) => {
-  const [candidates, setCandidates] = useState<string[]>([]);
   const [status, setStatus] = useState<RecognitionStatus>("idle");
   const [svgSize] = useState(() =>
     Math.min(300, (typeof window !== "undefined" ? window.innerWidth : 360) - 56)
   );
+  const getBasicInfo = useGetKanjiInfoFn();
 
-  const selected = [...value];
-  const selectedSet = new Set(selected);
+  // The results preview is derived from the search text so it stays in sync
+  // with the input field and survives the drawer closing/reopening.
+  const candidates = [...value];
 
   const onSubmit = async (payload: DrawingSubmitPayload) => {
     if (payload.strokes.length === 0) {
@@ -250,24 +191,25 @@ export const HandWritingDrawingPad = ({
       }
 
       const data = await response.json();
-      setCandidates(parseCandidates(data));
+      // Keep only the candidates that exist in our kanji dataset.
+      const available = parseCandidates(data).filter(
+        (kanji) => {
+          return getBasicInfo == null || getBasicInfo(kanji)?.on != null || getBasicInfo(kanji)?.kun != null
+        }
+      );
+
+      // Drop the recognized kanji into the search text (multi-kanji style)
+      // so the main list reflects them and the input keeps them on close.
+      onChange(available.join(""));
       setStatus("success");
     } catch {
       setStatus("error");
     }
   };
 
-  const toggleKanji = (kanji: string) => {
-    if (selectedSet.has(kanji)) {
-      onChange(selected.filter((k) => k !== kanji).join(""));
-      return;
-    }
-    onChange(value + kanji);
-  };
-
   return (
     <HandwritingScreenLayout
-      count={selected.length}
+      candidatesCount={candidates.length}
       top={
         <DrawingPad
           svgSize={svgSize}
@@ -275,21 +217,18 @@ export const HandWritingDrawingPad = ({
           setStrokes={setStrokes}
           showSubmitBtn={true}
           onClickSubmit={onSubmit}
+          onClickClear={() => {
+            setStatus("idle");
+            // Clearing the drawing also clears the search text / input field.
+            onChange("");
+          }}
         />
       }
-      middle={selected.map((kanji) => (
-        <SelectedKanjiBtn
-          key={kanji}
-          kanji={kanji}
-          onClick={() => toggleKanji(kanji)}
-        />
-      ))}
       bottom={
-        <CandidatesPreview
+        <HandwritingResultsPreview
           status={status}
           candidates={candidates}
-          selectedSet={selectedSet}
-          onSelect={toggleKanji}
+          onClick={onResultClick}
         />
       }
     />
