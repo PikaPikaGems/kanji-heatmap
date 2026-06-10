@@ -61,14 +61,14 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
   return (
     <div className="py-2 mx-2">
       <div className="relative p-0 m-0 md:hidden">
-        <SimpleAccordion trigger={"Reference Card"} defaultOpen={true}>
+        <SimpleAccordion trigger={`${kanji} Reference Card`} defaultOpen={true}>
           {smallScreenNode}
         </SimpleAccordion>
       </div>
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={` ${kanji} Stroke Order`}>
+      <SimpleAccordion trigger={`Stroke Order`}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>
             <StrokeAnimation kanji={kanji} />
