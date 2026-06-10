@@ -20,6 +20,7 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
     const [currentPoints, setCurrentPoints] = useState<[number, number][] | null>(null);
     const [getStrokeFn, setGetStrokeFn] = useState<any>(null);
     const svgRef = useRef<SVGSVGElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const isDrawing = useRef(false);
     const patternId = useId();
 
@@ -29,22 +30,22 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
         });
     }, []);
 
-    const toSvgPoint = (e: React.PointerEvent<SVGSVGElement>): [number, number] => {
-        const rect = svgRef.current!.getBoundingClientRect();
+    const toSvgPoint = (e: React.PointerEvent<HTMLDivElement>): [number, number] => {
+        const rect = wrapperRef.current!.getBoundingClientRect();
         return [
             ((e.clientX - rect.left) / rect.width) * svgSize,
             ((e.clientY - rect.top) / rect.height) * svgSize,
         ];
     };
 
-    const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+    const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
         e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         isDrawing.current = true;
         setCurrentPoints([toSvgPoint(e)]);
     };
 
-    const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
         e.stopPropagation();
         if (!isDrawing.current) return;
         setCurrentPoints((prev) => [...(prev ?? []), toSvgPoint(e)]);
@@ -87,6 +88,14 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
 
     return (
         <div className="flex flex-col items-center gap-2 m-4">
+            <div
+                ref={wrapperRef}
+                style={{ touchAction: "none", lineHeight: 0 }}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={endStroke}
+                onPointerCancel={endStroke}
+            >
             <svg
                 ref={svgRef}
                 width={svgSize}
@@ -94,10 +103,6 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                 viewBox={`0 0 ${svgSize} ${svgSize}`}
                 className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
                 style={{ background: "hsl(var(--background))", touchAction: "none" }}
-                onPointerDown={onPointerDown}
-                onPointerMove={onPointerMove}
-                onPointerUp={endStroke}
-                onPointerLeave={endStroke}
             >
                 {/* Decorative layer: grid dots + dashed center axes */}
                 <defs>
@@ -141,6 +146,7 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                         ) : null;
                     })()}
             </svg>
+            </div>
             <div className="flex justify-center mt-2 space-x-2">
                 <Button
                     onClick={() => setStrokes((s) => s.slice(0, -1))}
