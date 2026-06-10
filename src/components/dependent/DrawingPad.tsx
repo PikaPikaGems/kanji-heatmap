@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useId, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Undo2, Trash2 } from "@/components/icons";
+import { Undo2, Trash2, Search } from "@/components/icons";
+
+export type Stroke = [number, number][];
+
+export type DrawingSubmitPayload = {
+    strokes: Stroke[];
+    width: number;
+    height: number;
+};
 
 function getSvgPathFromStroke(stroke: number[][]): string {
     if (!stroke.length) return "";
@@ -15,8 +23,24 @@ function getSvgPathFromStroke(stroke: number[][]): string {
     return d.join(" ");
 }
 
-export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
-    const [strokes, setStrokes] = useState<[number, number][][]>([]);
+export const DrawingPad = ({
+    svgSize,
+    strokes: controlledStrokes,
+    setStrokes: setControlledStrokes,
+    showSubmitBtn = false,
+    onClickSubmit,
+}: {
+    svgSize: number;
+    // Optional controlled strokes. When provided, the parent owns the strokes
+    // so they survive this component unmounting (e.g. closing a drawer).
+    strokes?: Stroke[];
+    setStrokes?: Dispatch<SetStateAction<Stroke[]>>;
+    showSubmitBtn?: boolean;
+    onClickSubmit?: (payload: DrawingSubmitPayload) => void;
+}) => {
+    const [internalStrokes, setInternalStrokes] = useState<Stroke[]>([]);
+    const strokes = controlledStrokes ?? internalStrokes;
+    const setStrokes = setControlledStrokes ?? setInternalStrokes;
     const [currentPoints, setCurrentPoints] = useState<[number, number][] | null>(null);
     const [getStrokeFn, setGetStrokeFn] = useState<any>(null);
     const svgRef = useRef<SVGSVGElement>(null);
@@ -163,6 +187,22 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                     <Trash2 className="scale-150" />
                     <span className="sr-only">Clear</span>
                 </Button>
+                {showSubmitBtn && (
+                    <Button
+                        onClick={() =>
+                            onClickSubmit?.({
+                                strokes,
+                                width: svgSize,
+                                height: svgSize,
+                            })
+                        }
+                        disabled={strokes.length === 0}
+                        className="disabled:opacity-25"
+                    >
+                        <Search className="scale-150" />
+                        <span className="sr-only">Search</span>
+                    </Button>
+                )}
             </div>
         </div>
     );

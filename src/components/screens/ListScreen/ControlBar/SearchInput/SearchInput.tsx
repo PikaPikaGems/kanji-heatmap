@@ -19,6 +19,9 @@ import {
   RadicalsSelected,
 } from "./RadicalScreen/RadicalScreen";
 import { RadicalsScreenDialog } from "./RadicalScreen/RadicalScreenDialog";
+import { HandWritingDrawingPad } from "./HandwritingScreen/HandwritingScreen";
+import { HandwritingScreenDialog } from "./HandwritingScreen/HandwritingScreenDialog";
+import { Stroke } from "@/components/dependent/DrawingPad";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 
@@ -41,6 +44,10 @@ export const SearchInput = ({
   );
 
   const [isOpenRadicals, setIsOpenRadicals] = useState(false);
+  const [isOpenHandwriting, setIsOpenHandwriting] = useState(false);
+  // Strokes live here (not inside the drawer) so closing the drawer keeps the
+  // drawing. Switching search type or clearing resets them.
+  const [handwritingStrokes, setHandwritingStrokes] = useState<Stroke[]>([]);
 
   // sync internal state when props change (e.g. navigating via link) example for radical search
   const [prevInitialText, setPrevInitialText] = useState(initialText);
@@ -85,6 +92,9 @@ export const SearchInput = ({
         onClick={() => {
           if (searchType === "radicals") {
             setIsOpenRadicals(true);
+          }
+          if (searchType === "handwriting") {
+            setIsOpenHandwriting(true);
           }
         }}
         onChange={(e) => {
@@ -176,9 +186,18 @@ export const SearchInput = ({
         onChange={(val) => {
           const newType = val as SearchType;
 
+          // Switching search type always starts the drawing pad fresh.
+          setHandwritingStrokes([]);
+
           if (newType === "radicals") {
             onSyncAll("", "radicals");
             setIsOpenRadicals(true);
+            return;
+          }
+
+          if (newType === "handwriting") {
+            onSyncAll("", "handwriting");
+            setIsOpenHandwriting(true);
             return;
           }
 
@@ -243,6 +262,24 @@ export const SearchInput = ({
           />
         </ErrorBoundary>
       </RadicalsScreenDialog>
+
+      <HandwritingScreenDialog
+        isOpen={isOpenHandwriting}
+        onClose={() => {
+          setIsOpenHandwriting(false);
+        }}
+      >
+        <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
+          <HandWritingDrawingPad
+            value={parsedValue}
+            onChange={(newStr) => {
+              onSyncAll(newStr, "handwriting");
+            }}
+            strokes={handwritingStrokes}
+            setStrokes={setHandwritingStrokes}
+          />
+        </ErrorBoundary>
+      </HandwritingScreenDialog>
     </section>
   );
 };

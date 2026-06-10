@@ -109,7 +109,7 @@ export const filterKanji = (
         : trimmedSearchText;
 
   const kanjisToSearchList =
-    textSearch.type === "multi-kanji"
+    textSearch.type === "multi-kanji" || textSearch.type === "handwriting"
       ? textToSearch.split("").filter((character) => {
           return (
             wanakana.isHiragana(character) === false &&
@@ -167,7 +167,10 @@ export const filterKanji = (
             );
           }
 
-          if (textSearch.type === "multi-kanji") {
+          if (
+            textSearch.type === "multi-kanji" ||
+            textSearch.type === "handwriting"
+          ) {
             return kanjiToSearchSet.has(kanji);
           }
 
