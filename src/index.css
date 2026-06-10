@@ -206,3 +206,16 @@ button:focus-visible {
     opacity: 100;
   }
 }
+
+@theme {
+  --animate-fade-in: fade-in 1s ease-out forwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

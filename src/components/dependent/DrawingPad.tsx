@@ -1,0 +1,169 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Undo2, Trash2 } from "@/components/icons";
+
+function getSvgPathFromStroke(stroke: number[][]): string {
+    if (!stroke.length) return "";
+    const d: (string | number)[] = ["M", ...stroke[0], "Q"];
+    for (let i = 0; i < stroke.length; i++) {
+        const [x0, y0] = stroke[i];
+        const [x1, y1] = stroke[(i + 1) % stroke.length];
+        d.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+    }
+    d.push("Z");
+    return d.join(" ");
+}
+
+export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
+    const [strokes, setStrokes] = useState<[number, number][][]>([]);
+    const [currentPoints, setCurrentPoints] = useState<[number, number][] | null>(null);
+    const [getStrokeFn, setGetStrokeFn] = useState<any>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
+    const isDrawing = useRef(false);
+    const patternId = useId();
+
+    useEffect(() => {
+        import("perfect-freehand").then((m) => {
+            setGetStrokeFn(() => m.getStroke);
+        });
+    }, []);
+
+    const toSvgPoint = (e: React.PointerEvent<SVGSVGElement>): [number, number] => {
+        const rect = svgRef.current!.getBoundingClientRect();
+        return [
+            ((e.clientX - rect.left) / rect.width) * svgSize,
+            ((e.clientY - rect.top) / rect.height) * svgSize,
+        ];
+    };
+
+    const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+        e.stopPropagation();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        isDrawing.current = true;
+        setCurrentPoints([toSvgPoint(e)]);
+    };
+
+    const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+        e.stopPropagation();
+        if (!isDrawing.current) return;
+        setCurrentPoints((prev) => [...(prev ?? []), toSvgPoint(e)]);
+    };
+
+    const endStroke = () => {
+        if (!isDrawing.current) return;
+        isDrawing.current = false;
+        setCurrentPoints((prev) => {
+            if (prev && prev.length > 0) {
+                setStrokes((s) => [...s, prev]);
+            }
+            return null;
+        });
+    };
+
+    const renderStrokePath = (points: [number, number][]) => {
+        if (!getStrokeFn || !points.length) return null;
+        const outline = getStrokeFn(points, {
+            size: 9,                    // base stroke width in pixels
+            thinning: 0.5,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
+            smoothing: 0.5,             // smoothing applied to the stroke outline
+            streamline: 0.5,            // how much to reduce jitter / iron out wiggles
+            easing: (t: number) => t,   // easing for simulated pressure curve
+            simulatePressure: true,     // simulate pen pressure from pointer velocity
+            last: true,                 // cleanly close the final point
+            start: {
+                cap: true,                // draw a round cap at stroke start
+                taper: 0,                 // distance over which start tapers (0 = no taper)
+                easing: (t: number) => t,
+            },
+            end: {
+                cap: true,                // draw a round cap at stroke end
+                taper: 0,                 // distance over which end tapers (0 = no taper)
+                easing: (t: number) => t,
+            },
+        });
+        return getSvgPathFromStroke(outline);
+    };
+
+    return (
+        <div className="flex flex-col items-center gap-2 m-4">
+            <svg
+                ref={svgRef}
+                width={svgSize}
+                height={svgSize}
+                viewBox={`0 0 ${svgSize} ${svgSize}`}
+                className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
+                style={{ background: "hsl(var(--background))", touchAction: "none" }}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={endStroke}
+                onPointerLeave={endStroke}
+            >
+                {/* Decorative layer: grid dots + dashed center axes */}
+                <defs>
+                    <pattern
+                        id={patternId}
+                        x="14"
+                        y="14"
+                        width="28"
+                        height="28"
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
+                    </pattern>
+                </defs>
+                <rect width={svgSize} height={svgSize} fill={`url(#${patternId})`} />
+                <line
+                    x1={0} y1={svgSize / 2} x2={svgSize} y2={svgSize / 2}
+                    stroke="hsl(var(--foreground))"
+                    strokeDasharray="10 4"
+                    opacity={1}
+                />
+                <line
+                    x1={svgSize / 2} y1={0} x2={svgSize / 2} y2={svgSize}
+                    stroke="hsl(var(--foreground))"
+                    strokeDasharray="10 4"
+                    opacity={1}
+                />
+
+                {/* User strokes */}
+                {strokes.map((pts, i) => {
+                    const d = renderStrokePath(pts);
+                    return d ? (
+                        <path key={i} d={d} style={{ fill: "rgba(var(--theme-color-selected), 1)" }} />
+                    ) : null;
+                })}
+                {currentPoints &&
+                    (() => {
+                        const d = renderStrokePath(currentPoints);
+                        return d ? (
+                            <path d={d} style={{ fill: "hsl(var(--primary))" }} />
+                        ) : null;
+                    })()}
+            </svg>
+            <div className="flex justify-center mt-2 space-x-2">
+                <Button
+                    onClick={() => setStrokes((s) => s.slice(0, -1))}
+                    disabled={strokes.length === 0}
+                    className="disabled:opacity-25"
+
+                >
+                    <Undo2 className="scale-150" />
+                    <span className="sr-only">Undo</span>
+                </Button>
+                <Button
+                    variant="secondary"
+                    onClick={() => {
+                        setStrokes([]);
+                        setCurrentPoints(null);
+                    }}
+                    className="disabled:opacity-25"
+                    disabled={strokes.length === 0 && !currentPoints}
+                >
+                    <Trash2 className="scale-150" />
+                    <span className="sr-only">Clear</span>
+                </Button>
+            </div>
+        </div>
+    );
+};

@@ -68,7 +68,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Stroke Order Animation"}>
+      <SimpleAccordion trigger={"Stroke Order"}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>
             <StrokeAnimation kanji={kanji} />

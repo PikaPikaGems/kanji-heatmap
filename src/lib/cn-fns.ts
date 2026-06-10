@@ -28,7 +28,7 @@ export const randomCn2Colorful = () => {
 
 export const cnNormal = () => {
   const a = selectRandom(jlpts);
-  const b = freqCategoryCn[selectRandom([0, 1, 2, 3, 4, 5] as const)] ?? 0;
+  const b = freqCategoryCn[selectRandom([0, 1, 2, 3, 4] as const)] ?? 0;
   const c = selectRandom(duration);
   const d = selectRandom(delay);
   return `${JLPTListItems[a].cnBorder} ${b} ${c} ${d}`;
