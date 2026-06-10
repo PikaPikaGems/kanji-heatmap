@@ -32,6 +32,12 @@ $ pnpm run dev:cf
 
 Then open `http://localhost:5173` (wrangler's port, not Vite's).
 
+Note
+
+```
+If you ever see a port bump to 5175, it means a stale vite is still holding 5174 — clear it with lsof -ti:5174,5173 | xargs kill and restart both.
+```
+
 ## Updating Data
 
 If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same directory, you can directly copy its output files
