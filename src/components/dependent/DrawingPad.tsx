@@ -99,7 +99,7 @@ export const DrawingPad = ({
     const renderStrokePath = (points: [number, number][]) => {
         if (!getStrokeFn || !points.length) return null;
         const outline = getStrokeFn(points, {
-            size: 12,                    // base stroke width in pixels
+            size: 16,                    // base stroke width in pixels
             thinning: 0.7,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
             smoothing: 0.7,             // smoothing applied to the stroke outline
             streamline: 0.5,            // how much to reduce jitter / iron out wiggles
@@ -113,7 +113,7 @@ export const DrawingPad = ({
             },
             end: {
                 cap: true,                // draw a round cap at stroke end
-                taper: 0.1,                 // distance over which end tapers (0 = no taper)
+                taper: 0,                 // distance over which end tapers (0 = no taper)
                 easing: (t: number) => t,
             },
         });
