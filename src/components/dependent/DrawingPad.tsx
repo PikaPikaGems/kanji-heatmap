@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useId, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Undo2, Trash2 } from "@/components/icons";
+import { Undo2, Trash2, Search } from "@/components/icons";
+
+export type Stroke = [number, number][];
+
+export type DrawingSubmitPayload = {
+    strokes: Stroke[];
+    width: number;
+    height: number;
+};
 
 function getSvgPathFromStroke(stroke: number[][]): string {
     if (!stroke.length) return "";
@@ -15,13 +23,35 @@ function getSvgPathFromStroke(stroke: number[][]): string {
     return d.join(" ");
 }
 
-export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
-    const [strokes, setStrokes] = useState<[number, number][][]>([]);
+export const DrawingPad = ({
+    svgSize,
+    strokes: controlledStrokes,
+    setStrokes: setControlledStrokes,
+    showSubmitBtn = false,
+    onClickSubmit,
+    onClickClear,
+}: {
+    svgSize: number;
+    // Optional controlled strokes. When provided, the parent owns the strokes
+    // so they survive this component unmounting (e.g. closing a drawer).
+    strokes?: Stroke[];
+    setStrokes?: Dispatch<SetStateAction<Stroke[]>>;
+    showSubmitBtn?: boolean;
+    onClickSubmit?: (payload: DrawingSubmitPayload) => void;
+    onClickClear?: () => void;
+}) => {
+    const [internalStrokes, setInternalStrokes] = useState<Stroke[]>([]);
+    const strokes = controlledStrokes ?? internalStrokes;
+    const setStrokes = setControlledStrokes ?? setInternalStrokes;
     const [currentPoints, setCurrentPoints] = useState<[number, number][] | null>(null);
     const [getStrokeFn, setGetStrokeFn] = useState<any>(null);
     const svgRef = useRef<SVGSVGElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const isDrawing = useRef(false);
+    // Mirror of the in-progress stroke so endStroke can commit it without
+    // nesting setStrokes inside the setCurrentPoints updater (that would update
+    // a parent component during render and trigger a React warning).
+    const currentPointsRef = useRef<[number, number][] | null>(null);
     const patternId = useId();
 
     useEffect(() => {
@@ -42,32 +72,36 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
         e.stopPropagation();
         e.currentTarget.setPointerCapture(e.pointerId);
         isDrawing.current = true;
-        setCurrentPoints([toSvgPoint(e)]);
+        const point = toSvgPoint(e);
+        currentPointsRef.current = [point];
+        setCurrentPoints([point]);
     };
 
     const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
         e.stopPropagation();
         if (!isDrawing.current) return;
-        setCurrentPoints((prev) => [...(prev ?? []), toSvgPoint(e)]);
+        const next = [...(currentPointsRef.current ?? []), toSvgPoint(e)];
+        currentPointsRef.current = next;
+        setCurrentPoints(next);
     };
 
     const endStroke = () => {
         if (!isDrawing.current) return;
         isDrawing.current = false;
-        setCurrentPoints((prev) => {
-            if (prev && prev.length > 0) {
-                setStrokes((s) => [...s, prev]);
-            }
-            return null;
-        });
+        const points = currentPointsRef.current;
+        if (points && points.length > 0) {
+            setStrokes((s) => [...s, points]);
+        }
+        currentPointsRef.current = null;
+        setCurrentPoints(null);
     };
 
     const renderStrokePath = (points: [number, number][]) => {
         if (!getStrokeFn || !points.length) return null;
         const outline = getStrokeFn(points, {
-            size: 9,                    // base stroke width in pixels
-            thinning: 0.5,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
-            smoothing: 0.5,             // smoothing applied to the stroke outline
+            size: 16,                    // base stroke width in pixels
+            thinning: 0.7,              // how much stroke thins at ends (0 = uniform, 1 = max taper)
+            smoothing: 0.7,             // smoothing applied to the stroke outline
             streamline: 0.5,            // how much to reduce jitter / iron out wiggles
             easing: (t: number) => t,   // easing for simulated pressure curve
             simulatePressure: true,     // simulate pen pressure from pointer velocity
@@ -96,56 +130,56 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                 onPointerUp={endStroke}
                 onPointerCancel={endStroke}
             >
-            <svg
-                ref={svgRef}
-                width={svgSize}
-                height={svgSize}
-                viewBox={`0 0 ${svgSize} ${svgSize}`}
-                className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
-                style={{ background: "hsl(var(--background))", touchAction: "none" }}
-            >
-                {/* Decorative layer: grid dots + dashed center axes */}
-                <defs>
-                    <pattern
-                        id={patternId}
-                        x="14"
-                        y="14"
-                        width="28"
-                        height="28"
-                        patternUnits="userSpaceOnUse"
-                    >
-                        <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
-                    </pattern>
-                </defs>
-                <rect width={svgSize} height={svgSize} fill={`url(#${patternId})`} />
-                <line
-                    x1={0} y1={svgSize / 2} x2={svgSize} y2={svgSize / 2}
-                    stroke="hsl(var(--foreground))"
-                    strokeDasharray="10 4"
-                    opacity={1}
-                />
-                <line
-                    x1={svgSize / 2} y1={0} x2={svgSize / 2} y2={svgSize}
-                    stroke="hsl(var(--foreground))"
-                    strokeDasharray="10 4"
-                    opacity={1}
-                />
+                <svg
+                    ref={svgRef}
+                    width={svgSize}
+                    height={svgSize}
+                    viewBox={`0 0 ${svgSize} ${svgSize}`}
+                    className="border-2 border-dotted select-none border-foreground rounded-3xl cursor-crosshair"
+                    style={{ background: "hsl(var(--background))", touchAction: "none" }}
+                >
+                    {/* Decorative layer: grid dots + dashed center axes */}
+                    <defs>
+                        <pattern
+                            id={patternId}
+                            x="14"
+                            y="14"
+                            width="28"
+                            height="28"
+                            patternUnits="userSpaceOnUse"
+                        >
+                            <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
+                        </pattern>
+                    </defs>
+                    <rect width={svgSize} height={svgSize} fill={`url(#${patternId})`} />
+                    <line
+                        x1={0} y1={svgSize / 2} x2={svgSize} y2={svgSize / 2}
+                        stroke="hsl(var(--foreground))"
+                        strokeDasharray="10 4"
+                        opacity={1}
+                    />
+                    <line
+                        x1={svgSize / 2} y1={0} x2={svgSize / 2} y2={svgSize}
+                        stroke="hsl(var(--foreground))"
+                        strokeDasharray="10 4"
+                        opacity={1}
+                    />
 
-                {/* User strokes */}
-                {strokes.map((pts, i) => {
-                    const d = renderStrokePath(pts);
-                    return d ? (
-                        <path key={i} d={d} style={{ fill: "rgba(var(--theme-color-selected), 1)" }} />
-                    ) : null;
-                })}
-                {currentPoints &&
-                    (() => {
-                        const d = renderStrokePath(currentPoints);
+                    {/* User strokes */}
+                    {strokes.map((pts, i) => {
+                        const d = renderStrokePath(pts);
                         return d ? (
-                            <path d={d} style={{ fill: "hsl(var(--primary))" }} />
+                            <path key={i} d={d} style={{ fill: "rgba(var(--theme-color-selected), 1)" }} />
                         ) : null;
-                    })()}
-            </svg>
+                    })}
+                    {currentPoints &&
+                        (() => {
+                            const d = renderStrokePath(currentPoints);
+                            return d ? (
+                                <path d={d} style={{ fill: "hsl(var(--primary))" }} />
+                            ) : null;
+                        })()}
+                </svg>
             </div>
             <div className="flex justify-center mt-2 space-x-2">
                 <Button
@@ -162,6 +196,7 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                     onClick={() => {
                         setStrokes([]);
                         setCurrentPoints(null);
+                        onClickClear?.();
                     }}
                     className="disabled:opacity-25"
                     disabled={strokes.length === 0 && !currentPoints}
@@ -169,6 +204,22 @@ export const DrawingPad = ({ svgSize }: { svgSize: number }) => {
                     <Trash2 className="scale-150" />
                     <span className="sr-only">Clear</span>
                 </Button>
+                {showSubmitBtn && (
+                    <Button
+                        onClick={() =>
+                            onClickSubmit?.({
+                                strokes,
+                                width: svgSize,
+                                height: svgSize,
+                            })
+                        }
+                        disabled={strokes.length === 0}
+                        className="disabled:opacity-25"
+                    >
+                        <Search className="scale-150" />
+                        <span className="sr-only">Search</span>
+                    </Button>
+                )}
             </div>
         </div>
     );

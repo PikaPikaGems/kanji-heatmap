@@ -19,6 +19,9 @@ import {
   RadicalsSelected,
 } from "./RadicalScreen/RadicalScreen";
 import { RadicalsScreenDialog } from "./RadicalScreen/RadicalScreenDialog";
+import { HandWritingDrawingPad } from "./HandwritingScreen/HandwritingScreen";
+import { HandwritingScreenDialog } from "./HandwritingScreen/HandwritingScreenDialog";
+import { Stroke } from "@/components/dependent/DrawingPad";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 
@@ -41,6 +44,10 @@ export const SearchInput = ({
   );
 
   const [isOpenRadicals, setIsOpenRadicals] = useState(false);
+  const [isOpenHandwriting, setIsOpenHandwriting] = useState(false);
+  // Strokes live here (not inside the drawer) so closing the drawer keeps the
+  // drawing. Switching search type resets them.
+  const [handwritingStrokes, setHandwritingStrokes] = useState<Stroke[]>([]);
 
   // sync internal state when props change (e.g. navigating via link) example for radical search
   const [prevInitialText, setPrevInitialText] = useState(initialText);
@@ -85,6 +92,9 @@ export const SearchInput = ({
         onClick={() => {
           if (searchType === "radicals") {
             setIsOpenRadicals(true);
+          }
+          if (searchType === "handwriting") {
+            setIsOpenHandwriting(true);
           }
         }}
         onChange={(e) => {
@@ -159,44 +169,53 @@ export const SearchInput = ({
           "pointer-events-none absolute left-2 top-2 size-4 translate-y-0.5 select-none opacity-50"
         }
       />
-      {parsedValue.length > 0 && (
-        <Button
-          className="absolute right-[110px] top-[6px] m-0 p-1  h-6 rounded-full"
-          variant={"secondary"}
-          onClick={() => {
-            onSyncAll("", searchType);
+      <div className="absolute right-1 top-1 flex items-center gap-1">
+        {parsedValue.length > 0 && (
+          <Button
+            className="m-0 p-1 h-6 rounded-full"
+            variant={"secondary"}
+            onClick={() => {
+              onSyncAll("", searchType);
+            }}
+          >
+            <CircleX />
+            <span className="sr-only"> Clear search text</span>
+          </Button>
+        )}
+        <BasicSelect
+          value={searchType}
+          onChange={(val) => {
+            const newType = val as SearchType;
+
+            // Switching search type always starts the drawing pad fresh.
+            setHandwritingStrokes([]);
+
+            if (newType === "radicals") {
+              onSyncAll("", "radicals");
+              setIsOpenRadicals(true);
+              return;
+            }
+
+            if (newType === "handwriting") {
+              onSyncAll("", "handwriting");
+              setIsOpenHandwriting(true);
+              return;
+            }
+
+            setSearchType(newType);
+            const newParsedValue = translateValue(
+              searchType === "radicals" ? "" : parsedValue,
+              translateMap[newType]
+            );
+            setValue(newParsedValue);
+            onSettle(newParsedValue.trim(), newType);
           }}
-        >
-          <CircleX />
-          <span className="sr-only"> Clear search text</span>
-        </Button>
-      )}
-      <BasicSelect
-        value={searchType}
-        onChange={(val) => {
-          const newType = val as SearchType;
-
-          if (newType === "radicals") {
-            onSyncAll("", "radicals");
-            setIsOpenRadicals(true);
-            return;
-          }
-
-          setSearchType(newType);
-          const newParsedValue = translateValue(
-            searchType === "radicals" ? "" : parsedValue,
-            translateMap[newType]
-          );
-          setValue(newParsedValue);
-          onSettle(newParsedValue.trim(), newType);
-        }}
-        triggerCN={
-          "absolute right-1 top-1 w-[110]  px] h-7 bg-foreground text-background text-xs font-bold"
-        }
-        options={SEARCH_TYPE_OPTIONS}
-        label="Search Type"
-        isLabelSrOnly={true}
-      />
+          triggerCN="w-[110px] h-7 bg-foreground text-background text-xs font-bold"
+          options={SEARCH_TYPE_OPTIONS}
+          label="Search Type"
+          isLabelSrOnly={true}
+        />
+      </div>
 
       <RadicalsScreenDialog
         isOpen={isOpenRadicals}
@@ -243,6 +262,27 @@ export const SearchInput = ({
           />
         </ErrorBoundary>
       </RadicalsScreenDialog>
+
+      <HandwritingScreenDialog
+        isOpen={isOpenHandwriting}
+        onClose={() => {
+          setIsOpenHandwriting(false);
+        }}
+      >
+        <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
+          <HandWritingDrawingPad
+            value={parsedValue}
+            onChange={(newStr) => {
+              onSyncAll(newStr, "handwriting");
+            }}
+            strokes={handwritingStrokes}
+            setStrokes={setHandwritingStrokes}
+            onResultClick={() => {
+              setIsOpenHandwriting(false);
+            }}
+          />
+        </ErrorBoundary>
+      </HandwritingScreenDialog>
     </section>
   );
 };

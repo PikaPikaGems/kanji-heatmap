@@ -7,6 +7,7 @@ import {
   TextSearch,
 } from "@/lib/settings/settings";
 import {
+  defaultSearchType,
   toSearchParams,
   toSearchSettings,
 } from "@/lib/settings/search-settings-adapter";
@@ -34,7 +35,17 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
         if (key === "textSearch") {
           const newVal = value as TextSearch;
           const oldSearchText = prev.get(URL_PARAMS.textSearch.text) ?? "";
-          if (newVal.text === "" && oldSearchText === "") {
+          const oldSearchType =
+            prev.get(URL_PARAMS.textSearch.type) ?? defaultSearchType;
+          // Skip only when nothing meaningful changed: still no search text AND
+          // the search type already matches what's in the URL. Otherwise a type
+          // switch (e.g. radicals -> handwriting) with empty text would never
+          // be written, leaving the URL stuck on the previous type.
+          if (
+            newVal.text === "" &&
+            oldSearchText === "" &&
+            oldSearchType === newVal.type
+          ) {
             return prev;
           }
         }

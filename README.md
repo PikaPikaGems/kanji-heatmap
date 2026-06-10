@@ -20,7 +20,7 @@ $ pnpm run dev
 
 ### Full functionality (with Jisho lookup)
 
-The Jisho lookup feature proxies requests through a [Cloudflare Pages Function](./functions/api/jisho.ts) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
+The Jisho lookup feature and Google handwriting API proxies requests through a [Cloudflare Pages Function](./functions/api/) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
 
 ```
 # Terminal 1
@@ -31,6 +31,12 @@ $ pnpm run dev:cf
 ```
 
 Then open `http://localhost:5173` (wrangler's port, not Vite's).
+
+Note
+
+```
+If you ever see a port bump to 5175, it means a stale vite is still holding 5174 — clear it with lsof -ti:5174,5173 | xargs kill and restart both.
+```
 
 ## Updating Data
 
