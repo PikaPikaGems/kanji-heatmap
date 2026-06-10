@@ -169,10 +169,10 @@ export const SearchInput = ({
           "pointer-events-none absolute left-2 top-2 size-4 translate-y-0.5 select-none opacity-50"
         }
       />
-      <div className="absolute right-1 top-1 flex items-center gap-1">
+      <div className="absolute flex items-center gap-1 right-1 top-1">
         {parsedValue.length > 0 && (
           <Button
-            className="m-0 p-1 h-6 rounded-full"
+            className="h-6 p-1 m-0 rounded-full"
             variant={"secondary"}
             onClick={() => {
               onSyncAll("", searchType);
@@ -210,7 +210,7 @@ export const SearchInput = ({
             setValue(newParsedValue);
             onSettle(newParsedValue.trim(), newType);
           }}
-          triggerCN="w-[110px] h-7 bg-foreground text-background text-xs font-bold"
+          triggerCN="h-7 bg-foreground text-background text-xs font-bold"
           options={SEARCH_TYPE_OPTIONS}
           label="Search Type"
           isLabelSrOnly={true}
