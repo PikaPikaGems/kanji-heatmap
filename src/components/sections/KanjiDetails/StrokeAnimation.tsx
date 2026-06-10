@@ -145,7 +145,7 @@ const HintSection = ({ kanji }: { kanji: string }) => {
 
 const WritingPracticeMode = () => {
   return (
-    <div className="flex flex-col items-center gap-4 px-4 pt-4">
+    <div className="flex flex-col items-center gap-4 px-4 pt-4 animate-fade-in">
       <DrawingPad svgSize={SVG_SIZE} />
     </div>
   );
@@ -170,7 +170,7 @@ const StrokeAnimationWithPracticeMode = ({ kanji }: { kanji: string }) => {
             Practice writing
           </label>
 
-          {practiceMode && <div className="absolute px-2 m-4 border border-dashed -right-8 rounded-2xl -top-10 border-foreground">
+          {practiceMode && <div className="absolute px-2 m-4 border border-dashed -right-8 animate-fade-in rounded-2xl -top-10 border-foreground">
             <HintSection key={kanji} kanji={kanji} />
           </div>}
         </div>
