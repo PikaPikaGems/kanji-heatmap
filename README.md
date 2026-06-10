@@ -20,7 +20,7 @@ $ pnpm run dev
 
 ### Full functionality (with Jisho lookup)
 
-The Jisho lookup feature proxies requests through a [Cloudflare Pages Function](./functions/api/jisho.ts) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
+The Jisho lookup feature and Google handwriting API proxies requests through a [Cloudflare Pages Function](./functions/api/) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
 
 ```
 # Terminal 1
