@@ -29,10 +29,10 @@ export const SEARCH_TYPE_OPTIONS: {
 }[] = [
   { value: "keyword", label: "Keyword" },
   { value: "meanings", label: "Meanings" },
+  { value: "multi-kanji", label: "Multi-Kanji" },
+  { value: "handwriting", label: "Handwriting" },
+  { value: "radicals", label: "Radicals" },
   { value: "readings", label: "Readings" },
   { value: "onyomi", label: "Onyomi" },
   { value: "kunyomi", label: "Kunyomi" },
-  { value: "multi-kanji", label: "Multi-Kanji" },
-  { value: "radicals", label: "Radicals" },
-  { value: "handwriting", label: "Handwriting" },
 ];
