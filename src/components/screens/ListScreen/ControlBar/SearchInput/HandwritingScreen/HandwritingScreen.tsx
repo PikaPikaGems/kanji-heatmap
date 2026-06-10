@@ -35,7 +35,7 @@ const HandwritingScreenLayout = ({
         <TitleLayout>Draw a Kanji</TitleLayout>
       </div>
       <div
-        className="relative flex flex-wrap items-start justify-center w-full py-3 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
+        className="relative flex flex-wrap items-start justify-center w-full py-1 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
         style={{ maxHeight: "calc(100dvh - 185px)" }}
       >
         {top}
@@ -131,7 +131,7 @@ const HandwritingResultsPreview = ({
 
     // Nothing drawn / searched yet.
     return (
-      <div className={`${messageBoxCN} font-medium text-muted-foreground`}>
+      <div className={`${messageBoxCN} font-medium text-muted-foreground px-4`}>
         <div>Draw a kanji above, then tap the search button to see matches.</div>
       </div>
     );
