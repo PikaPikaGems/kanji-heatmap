@@ -70,6 +70,20 @@ const pwaConfig = {
         },
       },
       // **********************
+      // JOTOBA API (proxied via Cloudflare Pages Function)
+      // **********************
+      {
+        urlPattern: /\/api\/jotoba(\?.*)?$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "jotoba-api-cache",
+          expiration: {
+            maxEntries: 200,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      // **********************
       // FONTS
       // **********************
       {

@@ -19,6 +19,8 @@ import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import { Badge } from "@/components/ui/badge";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { JishoBtn } from "@/components/common/JishoBtn";
+import { JotobaBtn } from "@/components/common/JotobaBtn";
+import { BugIconErrorBoundary } from "@/components/error";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
@@ -61,7 +63,14 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           {(jlpt || (entry.k && entry.k === 1) || entry.t && entry.t !== "📚" && entry.t !== "🦉") ? "" : "-"}
         </TableCell>
         <TableCell className="w-12">
-          <JishoBtn word={entry.w} />
+          <BugIconErrorBoundary>
+            <JishoBtn word={entry.w} />
+          </BugIconErrorBoundary>
+        </TableCell>
+        <TableCell className="w-12">
+          <BugIconErrorBoundary>
+            <JotobaBtn word={entry.w} />
+          </BugIconErrorBoundary>
         </TableCell>
       </TableRow>
     </>
@@ -131,6 +140,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
             <TableHead className="text-center min-w-16 max-w-24">Translation</TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
             <TableHead className="w-24 text-left">Jisho.org</TableHead>
+            <TableHead className="w-24 text-left">Jotoba.de</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -166,7 +176,7 @@ const TableSkeleton = () => {
             <TableHead className="w-12 text-center">Translation</TableHead>
             <TableHead className="text-center w-fit min-w-16 max-w-24">Tags</TableHead>
             <TableHead className="w-24 text-left">Jisho.org</TableHead>
-
+            <TableHead className="w-24 text-left">Jotoba.de</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -186,6 +196,9 @@ const TableSkeleton = () => {
               </TableCell>
               <TableCell className="w-full">
                 <div className="w-full h-5 rounded-full bg-muted" />
+              </TableCell>
+              <TableCell className="w-12">
+                <div className="w-8 h-8 rounded-xl bg-muted" />
               </TableCell>
               <TableCell className="w-12">
                 <div className="w-8 h-8 rounded-xl bg-muted" />
