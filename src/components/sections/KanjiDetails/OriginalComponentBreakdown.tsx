@@ -29,12 +29,7 @@ export const OriginalKanjiComponentBreakdown = ({ kanji, showNotAvailable }: { k
 
     if (!hasParts) {
         if (!showNotAvailable) {
-            return <SingleKanjiPart
-                key={kanji}
-                kanji={kanji}
-                keyword={((data.data) as { keyword: string }).keyword}
-                isKanji={true}
-            />
+            return <></>
         }
 
         return <span className="text-[10px] uppercase">Not available</span>;

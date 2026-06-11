@@ -70,6 +70,20 @@ const pwaConfig = {
         },
       },
       // **********************
+      // JOTOBA API (proxied via Cloudflare Pages Function)
+      // **********************
+      {
+        urlPattern: /\/api\/jotoba(\?.*)?$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "jotoba-api-cache",
+          expiration: {
+            maxEntries: 200,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      // **********************
       // FONTS
       // **********************
       {
@@ -90,9 +104,9 @@ const pwaConfig = {
       workbox won't know if it has actually been updated
       So we don't put these json files in globPatterns/pre-cache
 
-      Trade-off: 
-        If a user visits the app offline for the first time, 
-        the JSON files won’t be available until they go online. 
+      Trade-off:
+        If a user visits the app offline for the first time,
+        the JSON files won't be available until they go online.
         After the initial fetch, offline access is supported.
       */
       {
@@ -178,6 +192,9 @@ export default defineConfig({
         })
       : null,
   ] as UserConfig["plugins"],
+  define: {
+    __BUILD_TIMESTAMP__: JSON.stringify(String(Date.now())),
+  },
   build: {
     target: "esnext", // Needed for module workers
   },
