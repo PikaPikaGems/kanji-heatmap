@@ -10,6 +10,7 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
+import { DebugInfo } from "./DebugInfo";
 
 const { kanjiPage, cumUseGraphPage } = pageItems;
 
@@ -94,7 +95,8 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
 
       </div>
-      <div className="mt-auto pt-4 flex justify-end">
+      <div className="flex items-end justify-end pt-4 mt-auto">
+        <DebugInfo />
         <RefreshPageBtn />
       </div>
     </div>
