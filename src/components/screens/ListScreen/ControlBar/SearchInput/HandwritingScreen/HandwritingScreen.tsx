@@ -132,7 +132,7 @@ const HandwritingResultsPreview = ({
     // Nothing drawn / searched yet.
     return (
       <div className={`${messageBoxCN} font-medium text-muted-foreground`}>
-        <div>Draw a kanji above, then tap the search button to see matches.</div>
+        <div>Draw a kanji above, then tap the search 🔍 button to see matches.</div>
       </div>
     );
   }
