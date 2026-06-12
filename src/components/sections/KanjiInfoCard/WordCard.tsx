@@ -25,14 +25,14 @@ export const WordCard = ({
 }) => {
   return (
     <>
-      <div className="flex justify-center -mb-2">
+      <div className="flex justify-center -mb-2 text-center">
         <HiraganaWord rawKana={spacedKana} highlightIndex={highlightIndex} />
       </div>
       <GenericPopover
         trigger={
           <Button
             variant="ghost"
-            className="flex h-auto px-2 py-3 mx-2 mb-2 text-5xl z-1 kanji-font hover:bg-foreground/5 text-clip"
+            className="items-end h-auto px-4 py-1 mt-1 text-3xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
           >
             {word}
           </Button>

@@ -10,7 +10,7 @@ const PopoverTrigger = PopoverPrimitive.Trigger;
 export const PopoverCardArrow = () => {
   return (
     <PopoverPrimitive.Arrow
-      className="-my-px border-none fill-[white] dark:fill-black drop-shadow-[0_1px_0_#dddddd] dark:drop-shadow-[0_1px_0_#262626]"
+      className="-my-px border-none fill-background drop-shadow-[0_1px_0_#dddddd] dark:drop-shadow-[0_1px_0_#262626]"
       width={15}
       height={10}
       stroke={"5"}

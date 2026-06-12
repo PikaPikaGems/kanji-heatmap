@@ -42,7 +42,7 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWor
 
   if (status !== "success") {
     return (
-      <span className="text-lg cursor-default kanji-font" title="Loading...">
+      <span className="text-3xl cursor-default kanji-font" title="Loading...">
         {word}
       </span>
     );
