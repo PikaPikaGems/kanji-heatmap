@@ -16,6 +16,9 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { StructureInfo } from "./StructureInfo";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
+import { DotIcon } from "@/components/icons";
+import { DebugInfo } from "@/components/common/DebugInfo";
+import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
 const SHOW_SAMPLE_VOCAB_SECTION = true;
 export const RirikkuCTABadge = () => {
@@ -109,14 +112,19 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
         <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
       </p>
 
-      <div className="flex justify-start w-full mt-4 space-x-1">
-        <LinksOutItems />
-        <KanjiKeyboardShortcuts kanji={kanji} />
-        <ModeToggle />
-      </div>
       <div className="my-4 w-fit">
         <PikaPikaLinks />
       </div>
+
+      <div className="flex items-center justify-start w-full mt-4 space-x-1">
+        <LinksOutItems />
+        <DotIcon className="w-2 m-0" />
+        <DebugInfo />
+        <RefreshPageBtn />
+        <KanjiKeyboardShortcuts kanji={kanji} />
+        <ModeToggle />
+      </div>
+
     </div>
   );
 };
