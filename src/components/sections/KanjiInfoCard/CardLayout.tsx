@@ -14,7 +14,7 @@ export const KanjiCardLayout = ({
   componentBreakdown: ReactNode
 }) => {
   return (
-    <article className="w-full border-2 border-dotted rounded-lg animate-fade-in">
+    <article className="w-full border-2 border-dotted rounded-3xl animate-fade-in">
 
       <div className="relative flex flex-col">
         <div className="my-2">{main}</div>

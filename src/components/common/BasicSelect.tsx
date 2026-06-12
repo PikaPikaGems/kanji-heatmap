@@ -44,7 +44,7 @@ const BasicSelect = ({
         {label}
       </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className={`w-full ${triggerCN}`} id={`select-${id}`}>
+        <SelectTrigger className={`w-full pl-2 ${triggerCN}`} id={`select-${id}`}>
           <SelectValue>
             {options.find((option) => option.value === value)?.label}
           </SelectValue>
@@ -59,7 +59,7 @@ const BasicSelect = ({
                   value={option.value}
                   disabled={option.disabled}
                 >
-                  <span className="block font-extrabold w-full">
+                  <span className="block w-full font-extrabold">
                     {option.label}
                   </span>
                   {option.description && (
