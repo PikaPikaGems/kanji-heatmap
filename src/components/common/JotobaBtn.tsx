@@ -33,7 +33,7 @@ export const JotobaContent = ({ word }: { word: string }) => {
         if (status === "error") {
             return (
                 <div className="py-2 text-xs">
-                    Jotoba.de cannot be accessed right now. Try again later.
+                    すみません. Jotoba.de cannot be accessed right now. Try again later.
                 </div>
             );
         }
@@ -43,7 +43,7 @@ export const JotobaContent = ({ word }: { word: string }) => {
     if (data.words.length === 0) {
         return (
             <div className="py-2 text-xs text-muted-foreground">
-                Jotoba.de does not contain information about this word.
+                すみません. Jotoba.de does not contain information about this word.
             </div>
         );
     }
