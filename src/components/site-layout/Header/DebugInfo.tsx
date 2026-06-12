@@ -58,7 +58,7 @@ const NetworkStatus = () => {
           {network.effectiveType}
         </span>
       )}
-      {!network.saveData && (
+      {network.saveData && (
         <>{"🐌"}</>
       )}
     </div>
