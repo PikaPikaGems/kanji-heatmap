@@ -56,6 +56,9 @@ export const JishoContent = ({ word }: { word: string }) => {
 
     return (
         <div className="space-y-3">
+            <div className="pb-1 mb-2 border-b text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+                Powered by JISHO.ORG 💪
+            </div>
             {data.data.map((entry, i) => (
                 <div key={entry.slug} className={i > 0 ? "border-t pt-3" : ""}>
                     <div className="flex items-baseline gap-1.5 mb-1">
@@ -116,7 +119,7 @@ export const JishoBtn = ({ word }: { word: string }) => {
                 </Button>
             }
             content={
-                <div className="p-4 overflow-y-auto max-h-48 min-w-36 max-w-96" onWheel={(e) => e.stopPropagation()}>
+                <div className="p-4 overflow-y-auto max-h-48 min-w-36 max-w-64" onWheel={(e) => e.stopPropagation()}>
                     <JishoContent word={word} />
                 </div>
             }
