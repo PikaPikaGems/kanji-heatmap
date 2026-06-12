@@ -110,7 +110,7 @@ const HandwritingResultsPreview = ({
   if (status === "loading") {
     return (
       <div className={messageBoxCN}>
-        <div>認識中 {`(Recognizing..)`}</div>
+        <div>認識中 · {`Recognizing...`}</div>
       </div>
     );
   }

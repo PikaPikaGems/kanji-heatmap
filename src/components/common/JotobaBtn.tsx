@@ -37,7 +37,7 @@ export const JotobaContent = ({ word }: { word: string }) => {
                 </div>
             );
         }
-        return <div className="py-2 text-xs text-muted-foreground">Loading…</div>;
+        return <div className="py-2 text-xs text-muted-foreground">読み込み中 · Loading…</div>;
     }
 
     if (data.words.length === 0) {
