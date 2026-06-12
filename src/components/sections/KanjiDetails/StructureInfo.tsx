@@ -64,7 +64,7 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
                     <TableRow className="text-left">
                         <TableCellFixed>(KHD)</TableCellFixed>
                         <TableCellGrow>
-                            <OriginalKanjiComponentBreakdown kanji={kanji} />
+                            <OriginalKanjiComponentBreakdown kanji={kanji} showNotAvailable={true} />
                         </TableCellGrow>
                     </TableRow>
                 </TableBody>

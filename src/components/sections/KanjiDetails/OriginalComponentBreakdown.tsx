@@ -2,7 +2,7 @@ import { SingleKanjiPart } from "@/components/dependent/site-wide/SingleKanjiPar
 import { useIsKanjiWorkerReady, useKanjiInfo } from "@/kanji-worker/kanji-worker-hooks";
 import { HoverItemReturnData } from "@/lib/kanji/kanji-info-types";
 
-export const OriginalKanjiComponentBreakdown = ({ kanji, showNotAvailable }: { kanji: string, showNotAvailable?: boolean }) => {
+export const OriginalKanjiComponentBreakdown = ({ kanji, showNotAvailable = true }: { kanji: string, showNotAvailable?: boolean }) => {
     const data = useKanjiInfo(kanji, "hover-card");
     const ready = useIsKanjiWorkerReady();
 
