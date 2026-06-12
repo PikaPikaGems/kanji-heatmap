@@ -54,10 +54,12 @@ export const WordCard = ({
             <DottedSeparator />
             <SeeMore definition={definition} />
             <DottedSeparator />
+            <VocabActions kana={spacedKana.split(" ").join("")} word={word} />
+            <DottedSeparator />
             <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
               Learn more from:
             </div>
-            <div className="flex flex-wrap justify-center pb-2 text-xs">
+            <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
               {vocabExternalLinks.map((item) => {
                 return (
                   <ExternalTextLink
@@ -68,8 +70,6 @@ export const WordCard = ({
                 );
               })}
             </div>
-            <DottedSeparator />
-            <VocabActions kana={spacedKana.split(" ").join("")} word={word} />
           </div>
         }
       />

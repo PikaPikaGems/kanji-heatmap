@@ -86,10 +86,12 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWor
           </>
           }
           <DottedSeparator />
+          <VocabActions kana={kana} word={word} />
+          <DottedSeparator />
           <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
             Learn more from:
           </div>
-          <div className="flex flex-wrap justify-center pb-2 text-xs">
+          <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
             {vocabExternalLinks.map((item) => (
               <ExternalTextLink
                 key={item.name}
@@ -98,8 +100,6 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWor
               />
             ))}
           </div>
-          <DottedSeparator />
-          <VocabActions kana={kana} word={word} />
         </div>
       }
     />

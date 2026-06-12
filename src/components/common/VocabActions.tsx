@@ -8,6 +8,7 @@ import { JishoBtn } from "./JishoBtn";
 import { JotobaBtn } from "./JotobaBtn";
 import { BugIconErrorBoundary } from "../error";
 
+const SHOW_ICON_MEANINGS = false;
 const IconMeanings = ({ btn, text }: { btn: ReactNode; text: string }) => {
   return (
     <>
@@ -39,33 +40,35 @@ export const VocabActions = ({
       }
       <CopyButton textToCopy={word} iconType={"clipboard"} />
 
-      <GenericPopover
-        trigger={
-          <InfoIcon className="absolute inline-block top-2 right-2" size={18} />
-        }
-        content={
-          <div className="flex flex-col w-full p-2 space-y-1 text-xs">
-            {kana.length ?
+      {SHOW_ICON_MEANINGS &&
+        <GenericPopover
+          trigger={
+            <InfoIcon className="absolute inline-block top-2 right-2" size={18} />
+          }
+          content={
+            <div className="flex flex-col w-full p-2 space-y-1 text-xs">
+              {kana.length ?
+                <IconMeanings
+                  btn={<CopyButton textToCopy={kana} iconType={"copy"} />}
+                  text={"Copy Kana"}
+                /> : ""
+              }
               <IconMeanings
-                btn={<CopyButton textToCopy={kana} iconType={"copy"} />}
-                text={"Copy Kana"}
-              /> : ""
-            }
-            <IconMeanings
-              btn={<CopyButton textToCopy={word} iconType={"clipboard"} />}
-              text={"Copy Word"}
-            />
-            <IconMeanings
-              btn={<SpeakButton word={kana} iconType={"audio-lines"} />}
-              text={"Listen to Kana reading"}
-            />
-            <IconMeanings
-              btn={<SpeakButton word={word} iconType="volume-2" />}
-              text={"Listen to default reading"}
-            />
-          </div>
-        }
-      />
+                btn={<CopyButton textToCopy={word} iconType={"clipboard"} />}
+                text={"Copy Word"}
+              />
+              <IconMeanings
+                btn={<SpeakButton word={kana} iconType={"audio-lines"} />}
+                text={"Listen to Kana reading"}
+              />
+              <IconMeanings
+                btn={<SpeakButton word={word} iconType="volume-2" />}
+                text={"Listen to default reading"}
+              />
+            </div>
+          }
+        />
+      }
     </div>
   );
 };
