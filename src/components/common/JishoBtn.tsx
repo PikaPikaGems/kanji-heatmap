@@ -39,17 +39,17 @@ export const JishoContent = ({ word }: { word: string }) => {
         if (status === "error") {
             return (
                 <div className="py-2 text-xs">
-                    Jisho.org cannot be accessed right now. Try again later.
+                    すみません. Jisho.org cannot be accessed right now. Try again later.
                 </div>
             );
         }
-        return <div className="py-2 text-xs text-muted-foreground">Loading…</div>;
+        return <div className="py-2 text-xs text-muted-foreground">読み込み中 · Loading…</div>;
     }
 
     if (data.data.length === 0) {
         return (
             <div className="py-2 text-xs text-muted-foreground">
-                Jisho.org does not contain information about this word.
+                すみません. Jisho.org does not contain information about this word.
             </div>
         );
     }

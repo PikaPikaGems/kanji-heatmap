@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { ChartLine, Menu, RefreshCw, SearchIcon, } from "lucide-react";
+import { ChartLine, Menu, SearchIcon, } from "lucide-react";
 import pageItems from "@/components/items/page-items";
 import { docPages } from "@/components/items/nav-items";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
@@ -10,7 +10,8 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
-import { DebugInfo } from "./DebugInfo";
+import { DebugInfo } from "../../common/DebugInfo";
+import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
 const { kanjiPage, cumUseGraphPage } = pageItems;
 
@@ -35,13 +36,6 @@ const infoLinks = [
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
 
-
-
-const RefreshPageBtn = () => (
-  <Button variant="outline" size="icon" className="w-8 h-8 rounded-xl" onClick={() => window.location.reload()} aria-label="Refresh page">
-    <RefreshCw className="w-[1.2rem] h-[1.2rem]" />
-  </Button>
-);
 
 const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
   return (

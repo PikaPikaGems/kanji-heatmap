@@ -230,7 +230,7 @@ export const vocabExternalLinks = [
   },
   {
     name: "Kanshudo",
-    url: (word: string) => `https://www.kanshudo.com/searchw?q=${word}`,
+    url: (word: string) => `https://www.kanshudo.com/word/${word}`,
   },
   {
     name: "JLearn",
@@ -256,9 +256,5 @@ export const vocabExternalLinks = [
   {
     name: "Sentence Search",
     url: (word: string) => `https://sentencesearch.neocities.org/#${word}`,
-  },
-  {
-    name: "Draw Me a Kanji",
-    url: (word: string) => `https://mbilbille.github.io/dmak/#${word}`,
   },
 ];
