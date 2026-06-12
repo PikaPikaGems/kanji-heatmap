@@ -257,8 +257,4 @@ export const vocabExternalLinks = [
     name: "Sentence Search",
     url: (word: string) => `https://sentencesearch.neocities.org/#${word}`,
   },
-  {
-    name: "Draw Me a Kanji",
-    url: (word: string) => `https://mbilbille.github.io/dmak/#${word}`,
-  },
 ];
