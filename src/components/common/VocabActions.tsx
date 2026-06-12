@@ -4,6 +4,9 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ReactNode } from "react";
 import { InfoIcon } from "../icons";
+import { JishoBtn } from "./JishoBtn";
+import { JotobaBtn } from "./JotobaBtn";
+import { BugIconErrorBoundary } from "../error";
 
 const IconMeanings = ({ btn, text }: { btn: ReactNode; text: string }) => {
   return (
@@ -25,10 +28,17 @@ export const VocabActions = ({
 }) => {
   return (
     <div className="relative flex flex-wrap items-center justify-center p-2 space-x-1">
-      <CopyButton textToCopy={word} iconType={"clipboard"} />
+      <BugIconErrorBoundary>
+        <JishoBtn word={word} />
+      </BugIconErrorBoundary>
+      <BugIconErrorBoundary>
+        <JotobaBtn word={word} />
+      </BugIconErrorBoundary>
       <SpeakButton word={word} iconType="volume-2" />
       {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />
       }
+      <CopyButton textToCopy={word} iconType={"clipboard"} />
+
       <GenericPopover
         trigger={
           <InfoIcon className="absolute inline-block top-2 right-2" size={18} />
