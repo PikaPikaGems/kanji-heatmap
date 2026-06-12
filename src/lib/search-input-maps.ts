@@ -33,6 +33,6 @@ export const SEARCH_TYPE_OPTIONS: {
   { value: "handwriting", label: "Handwriting" },
   { value: "radicals", label: "Radicals" },
   { value: "readings", label: "Readings" },
-  { value: "onyomi", label: "Onyomi" },
-  { value: "kunyomi", label: "Kunyomi" },
+  { value: "onyomi", label: "音読み" },
+  { value: "kunyomi", label: "訓読み" },
 ];

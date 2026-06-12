@@ -235,7 +235,8 @@ export function KanjiWorkerProvider({
             wk,
             rtk,
             strokes,
-            kklcIndex
+            kklcIndex,
+            jlpt: kanjiInfo.main.jlpt,
           } as GeneralKanjiItem;
         }
 
