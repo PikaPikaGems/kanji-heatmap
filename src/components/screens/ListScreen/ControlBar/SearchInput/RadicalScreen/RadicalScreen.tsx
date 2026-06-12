@@ -92,10 +92,10 @@ const ExpandedRadicalBtn = ({
             `}
     >
       <button onClick={onClick}>
-        <CircleX className="absolute top-1 right-1 scale-75 hover:text-red-500" />
+        <CircleX className="absolute scale-75 top-1 right-1 hover:text-red-500" />
         <span className="sr-only">Close</span>
       </button>
-      <span className="block text-4xl kanji-font mb-1">{radical}</span>
+      <span className="block mb-1 text-4xl kanji-font">{radical}</span>
       <span
         className="
           block !text-ellipsis !text-nowrap mx-4 !overflow-hidden !whitespace-nowrap 
@@ -111,10 +111,7 @@ const ExpandedRadicalBtn = ({
 const TitleLayout = ({ children }: { children: ReactNode }) => {
   return (
     <span
-      className="
-        font-bold px-1 rounded-full text-sm
-        dark:bg-black dark:text-white bg-white text-black
-      "
+      className="px-1 text-sm font-bold text-black bg-white rounded-full dark:bg-black dark:text-white"
     >
       {children}
     </span>
@@ -150,12 +147,12 @@ export const RadicalScreenLayout = ({
 }) => {
   if (count === 0) {
     return (
-      <div className="mx-auto w-full px-1 relative">
-        <div className="absolute -top-1 w-full m-auto z-50">
+      <div className="relative w-full px-1 mx-auto">
+        <div className="absolute z-50 w-full m-auto -top-1">
           <SelectRadicalTitle count={count} />
         </div>
         <div
-          className="w-full px-2 mt-2 py-3 border-2 border-dotted dark:border-slate-600 overflow-y-auto flex flex-wrap justify-center items-start rounded-md relative"
+          className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
           style={{ maxHeight: "calc(100dvh - 30px)" }}
         >
           {top}
@@ -165,22 +162,22 @@ export const RadicalScreenLayout = ({
   }
 
   return (
-    <div className="mx-auto w-full px-1 relative">
-      <div className="absolute -top-1 w-full m-auto z-50">
+    <div className="relative w-full px-1 mx-auto">
+      <div className="absolute z-50 w-full m-auto -top-1">
         <SelectRadicalTitle count={count} />
       </div>
 
       <div
-        className="w-full px-2 mt-2 py-3 border-2 border-dotted dark:border-slate-600 overflow-y-auto flex flex-wrap justify-center items-start rounded-md relative"
+        className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
         style={{ maxHeight: "calc(100dvh - 280px)" }}
       >
         {top}
       </div>
-      <div className="w-full h-24 mt-1 pt-1 mb-1 pb-0 overflow-x-auto overflow-y-hidden flex rounded-md scrollbar-thin relative transition-all animate-fade-in">
+      <div className="relative flex w-full h-24 pt-1 pb-0 mt-1 mb-1 overflow-x-auto overflow-y-hidden transition-all rounded-md scrollbar-thin animate-fade-in">
         {middle}
       </div>
 
-      <div className="border-2 border-dotted dark:border-slate-600 pt-3 mt-2 w-full h-36 my-1 py-1 overflow-x-auto overflow-y-hidden flex rounded-md scrollbar-thin z-50 animate-fade-in">
+      <div className="z-50 flex w-full py-1 pt-3 my-1 mt-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md dark:border-slate-600 h-36 scrollbar-thin animate-fade-in">
         {bottom}
       </div>
       <div className="absolute bottom-[136px] w-full m-auto z-50">
@@ -299,8 +296,8 @@ export const RadicalsResultsPreview = ({
 
   if (status === "loading" || data == null) {
     return (
-      <div className="w-full text-xs h-full font-bold flex justify-center items-center p-2">
-        <div>読み込み中 {`(Loading..)`}</div>
+      <div className="flex items-center justify-center w-full h-full p-2 text-xs font-bold">
+        <div>{`読み込み中 · Loading...`}</div>
       </div>
     );
   }
@@ -311,7 +308,7 @@ export const RadicalsResultsPreview = ({
 
   if (data.length === 0) {
     return (
-      <div className="w-full text-xs h-full font-bold flex justify-center items-center p-2">
+      <div className="flex items-center justify-center w-full h-full p-2 text-xs font-bold">
         <div>
           {"すみません 🙇🏽‍♀️ 🙇 . No match found."}
           <ClearFiltersCTA
@@ -320,7 +317,7 @@ export const RadicalsResultsPreview = ({
                 Try:
                 {externalLinks.slice(0, 5).map((item, index) => {
                   return (
-                    <span className="block-inline my-1" key={item.name}>
+                    <span className="my-1 block-inline" key={item.name}>
                       <ExternalTextLink
                         href={item.url("捜")}
                         text={item.name}
