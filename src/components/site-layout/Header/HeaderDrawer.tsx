@@ -51,7 +51,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           <div onClick={onClose}>
             <HeaderTitle />
           </div>
-          <ModeToggle />
+          <div onPointerDown={(e) => e.stopPropagation()}><ModeToggle /></div>
         </div>
         {navLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
@@ -95,7 +95,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
 
       </div>
-      <div className="flex items-end justify-end pt-4 mt-auto">
+      <div className="flex items-end justify-end pt-4 mt-auto" onPointerDown={(e) => e.stopPropagation()}>
         <DebugInfo />
         <RefreshPageBtn />
       </div>

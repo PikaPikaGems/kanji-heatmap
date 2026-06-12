@@ -11,7 +11,7 @@ export const SeeMore = ({
   const canSeeAll = definition.length <= maxLen;
 
   return (
-    <div className="text-xs py-2 px-3 text-start">
+    <div className="px-3 py-2 text-xs text-center">
       {canSeeAll || showMore ? (
         <>{definition}</>
       ) : (
@@ -20,7 +20,7 @@ export const SeeMore = ({
       <br />
       {!canSeeAll && (
         <button
-          className="underline font-bold mx-2 my-1"
+          className="mx-2 my-1 font-bold underline"
           onClick={() => {
             setShowMore((prev) => !prev);
           }}

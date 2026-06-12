@@ -21,10 +21,10 @@ export const KanjiCardLayout = ({
         <div>
           {firstWord && (
             <div className="flex flex-wrap justify-center w-full">
-              <div className="p-2 m-2 border-2 border-dotted rounded-3xl">
+              <div className="p-2 m-1 border-2 border-dotted rounded-3xl">
                 {firstWord}
               </div>
-              {secondWord && <div className="p-2 m-2 border-2 border-dotted rounded-3xl">
+              {secondWord && <div className="p-2 m-1 border-2 border-dotted rounded-3xl">
                 {secondWord}
               </div>}
             </div>
