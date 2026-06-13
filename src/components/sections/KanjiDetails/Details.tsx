@@ -1,6 +1,6 @@
 import { lazy, ReactNode, Suspense } from "react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
-import { DefaultErrorFallback, ErrorBoundary } from "@/components/error";
+import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { BasicLoading } from "@/components/common/BasicLoading";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
@@ -20,7 +20,7 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
-const SHOW_SAMPLE_VOCAB_SECTION = true;
+
 export const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
@@ -46,8 +46,78 @@ export const ImprovementCTA = () => {
     </Badge>
   );
 };
+
+export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
+  return <>
+
+    <p className="my-4 text-xs text-left">
+      <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
+    </p>
+
+    <div className="my-4 w-fit">
+      <PikaPikaLinks />
+    </div>
+
+    <div className="flex items-center justify-start w-full mt-4 space-x-1">
+      <LinksOutItems />
+      <DotIcon className="w-2 m-0" />
+      <DebugInfo />
+      <RefreshPageBtn />
+      <KanjiKeyboardShortcuts kanji={kanji} />
+      <ModeToggle />
+    </div>
+  </>
+}
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
+export const EssentialKanjiSections = ({ kanji }: { kanji: string }) => {
+  return <>
+    <SimpleAccordion trigger={`Stroke Order`}>
+      <ErrorBoundary details="StrokeAnimation in KanjiDetails">
+        <Suspense fallback={<BasicLoading />}>
+          <StrokeAnimation kanji={kanji} />
+        </Suspense>
+      </ErrorBoundary>
+    </SimpleAccordion>
+    <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
+      <ErrorBoundary details="SampleVocabulary in KanjiDetails">
+        <SampleVocabulary kanji={kanji} />
+      </ErrorBoundary>
+    </SimpleAccordion>
+    <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
+      <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
+        <TextbookVocabulary kanji={kanji} />
+      </ErrorBoundary>
+    </SimpleAccordion>
+  </>
+}
+
+export const BareKanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
+  return (
+    <>
+      <div className="py-2 mx-2">
+        <div className="relative p-0 m-0 md:hidden">
+          <SimpleAccordion trigger={`${kanji} Reference Card`} defaultOpen={true}>
+            {smallScreenNode}
+          </SimpleAccordion>
+        </div>
+        <EssentialKanjiSections kanji={kanji} />
+        <KanjiExternalDicts kanji={kanji} />
+        <KanjiDetailsBottom kanji={kanji} />
+      </div>
+    </>
+  )
+}
+
+export const KanjiExternalDicts = ({ kanji }: { kanji: string }) => {
+  return <>
+    <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
+      <div className="mt-2 text-left">
+        <ExternalKanjiLinks kanji={kanji} />
+      </div>
+    </SimpleAccordion>
+  </>
+}
 export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
   const getInfo = useGetKanjiInfoFn();
 
@@ -58,7 +128,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
   const data = getInfo(kanji);
 
   if (data == null) {
-    return <DefaultErrorFallback message="Failed to load data." />;
+    return <BareKanjiDetails kanji={kanji} smallScreenNode={smallScreenNode} />;
   }
 
   return (
@@ -71,25 +141,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={`Stroke Order`}>
-        <ErrorBoundary details="StrokeAnimation in KanjiDetails">
-          <Suspense fallback={<BasicLoading />}>
-            <StrokeAnimation kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
-      {SHOW_SAMPLE_VOCAB_SECTION &&
-        <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
-          <ErrorBoundary details="SampleVocabulary in KanjiDetails">
-            <SampleVocabulary kanji={kanji} />
-          </ErrorBoundary>
-        </SimpleAccordion>
-      }
-      <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
-        <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
-          <TextbookVocabulary kanji={kanji} />
-        </ErrorBoundary>
-      </SimpleAccordion>
+      <EssentialKanjiSections kanji={kanji} />
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
@@ -103,28 +155,8 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
-        <div className="mt-2 text-left">
-          <ExternalKanjiLinks kanji={kanji} />
-        </div>
-      </SimpleAccordion>
-      <p className="my-4 text-xs text-left">
-        <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
-      </p>
-
-      <div className="my-4 w-fit">
-        <PikaPikaLinks />
-      </div>
-
-      <div className="flex items-center justify-start w-full mt-4 space-x-1">
-        <LinksOutItems />
-        <DotIcon className="w-2 m-0" />
-        <DebugInfo />
-        <RefreshPageBtn />
-        <KanjiKeyboardShortcuts kanji={kanji} />
-        <ModeToggle />
-      </div>
-
+      <KanjiExternalDicts kanji={kanji} />
+      <KanjiDetailsBottom kanji={kanji} />
     </div>
   );
 };
