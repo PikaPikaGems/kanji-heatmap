@@ -233,7 +233,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
       <PaginatedVocabulary data={data} />
       <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Rank Lookup" /></li>
+        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Ranks Lookup" /></li>
       </ul>
     </div>
   );

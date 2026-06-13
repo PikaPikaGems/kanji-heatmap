@@ -26,7 +26,7 @@ export const WordCard = ({
         trigger={
           <Button
             variant="ghost"
-            className="items-end h-auto px-4 py-1 mt-1 text-3xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
+            className="items-end h-auto px-4 py-1 mt-1 text-4xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
           >
             {word}
           </Button>

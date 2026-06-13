@@ -7,7 +7,6 @@ import {
   useKanjiInfo,
 } from "@/kanji-worker/kanji-worker-hooks";
 
-import { DefaultErrorFallback } from "@/components/error";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 
@@ -45,12 +44,21 @@ const transformKanjiWordDetails = (
   return result;
 };
 
+export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
+  return <>
+    <article className="w-full pt-6 pb-20 border-2 border-dotted rounded-3xl animate-fade-in">
+      <div className="relative pl-2 mr-4 rounded-3xl">
+        <span className="text-[220px] leading-none kanji-font">{kanji}</span>
+      </div>
+    </article>
+  </>
+}
 export const KanjiCard = ({ kanji }: { kanji: string }) => {
   const data = useKanjiInfo(kanji, "hover-card");
   const ready = useIsKanjiWorkerReady();
 
   if (data.error) {
-    return <DefaultErrorFallback message="Failed to load data." />;
+    return <KanjiCardBare kanji={kanji} />;
   }
 
   if (!ready || data.status === "loading" || data.data == null) {
@@ -67,7 +75,7 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
       main={
         <div className="relative pl-2 mr-4 rounded-3xl">
           <span className="text-[140px] leading-none kanji-font">{kanji}</span>
-          <div className="mt-4 uppercase text-md">{info.keyword}</div>
+          <div className="mt-4 font-bold uppercase -translate-y-1 text-md">{info.keyword}</div>
         </div>
       }
       firstWord={word1Props && <WordCard {...word1Props} />}

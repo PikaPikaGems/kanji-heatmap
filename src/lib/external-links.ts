@@ -38,7 +38,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://jisho.hlorenzi.com/search/${kanji}%20%23k`,
   },
   {
-    name: "Kai",
+    name: "KanjiKai",
     url: (kanji: string) => `https://kai.kanjiapi.dev/#!/${kanji}`,
   },
   {
@@ -163,6 +163,14 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "Kanjipedia",
     url: (kanji: string) =>
       `https://www.kanjipedia.jp/search?k=${kanji}&kt=1&sk=leftHand`,
+  },
+  {
+    name: "KanjiFlash",
+    url: (kanji: string) => `https://kanjiflash.com/card/${kanji}`,
+  },
+  {
+    name: "KanjiMap",
+    url: (kanji: string) => `https://www.kanjimap.eu/kanji/${kanji}`,
   },
   {
     name: "Immersion Kit",

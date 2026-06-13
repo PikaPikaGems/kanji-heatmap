@@ -36,7 +36,7 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition }: Voca
       <VocabActions kana={kana} word={word} />
       <DottedSeparator />
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
-        Explore this word further
+        🧐 Explore this word further →
       </div>
       <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
         {vocabExternalLinks.map((item) => (
