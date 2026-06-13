@@ -116,7 +116,7 @@ export const General = ({ kanji }: { kanji: string }) => {
           </TableRow>
           <TableRow className="text-left">
             <LabelCell
-              label="訓読み"
+              label="Onyomi"
               description={<>Native Japanese readings used in Japanese-origin words. e.g., 山 → <strong>やま</strong> (yama), 水 → <strong>みず</strong> (mizu)</>}
             />
             <TableCellGrow>
@@ -128,7 +128,7 @@ export const General = ({ kanji }: { kanji: string }) => {
           </TableRow>
           <TableRow className="text-left">
             <LabelCell
-              label="音読み"
+              label="Kunyomi"
               description={<>Sino-Japanese readings used in compound words. e.g., 山 → <strong>サン</strong> (san) as in 富士山, 水 → <strong>スイ</strong> (sui) as in 水泳</>}
             />
             <TableCellGrow>
