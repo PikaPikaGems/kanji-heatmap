@@ -70,54 +70,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
 }
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
-export const EssentialKanjiSections = ({ kanji }: { kanji: string }) => {
-  return <>
-    <SimpleAccordion trigger={`Stroke Order`}>
-      <ErrorBoundary details="StrokeAnimation in KanjiDetails">
-        <Suspense fallback={<BasicLoading />}>
-          <StrokeAnimation kanji={kanji} />
-        </Suspense>
-      </ErrorBoundary>
-    </SimpleAccordion>
-    <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
-      <ErrorBoundary details="SampleVocabulary in KanjiDetails">
-        <SampleVocabulary kanji={kanji} />
-      </ErrorBoundary>
-    </SimpleAccordion>
-    <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
-      <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
-        <TextbookVocabulary kanji={kanji} />
-      </ErrorBoundary>
-    </SimpleAccordion>
-  </>
-}
 
-export const BareKanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
-  return (
-    <>
-      <div className="py-2 mx-2">
-        <div className="relative p-0 m-0 md:hidden">
-          <SimpleAccordion trigger={`${kanji} Reference Card`} defaultOpen={true}>
-            {smallScreenNode}
-          </SimpleAccordion>
-        </div>
-        <EssentialKanjiSections kanji={kanji} />
-        <KanjiExternalDicts kanji={kanji} />
-        <KanjiDetailsBottom kanji={kanji} />
-      </div>
-    </>
-  )
-}
-
-export const KanjiExternalDicts = ({ kanji }: { kanji: string }) => {
-  return <>
-    <SimpleAccordion trigger={`Quick External Links to ${kanji}`} defaultOpen={true}>
-      <div className="mt-2 text-left">
-        <ExternalKanjiLinks kanji={kanji} />
-      </div>
-    </SimpleAccordion>
-  </>
-}
 export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
   const getInfo = useGetKanjiInfoFn();
 
@@ -137,7 +90,23 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-      <EssentialKanjiSections kanji={kanji} />
+      <SimpleAccordion trigger={`Stroke Order`}>
+        <ErrorBoundary details="StrokeAnimation in KanjiDetails">
+          <Suspense fallback={<BasicLoading />}>
+            <StrokeAnimation kanji={kanji} />
+          </Suspense>
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
+        <ErrorBoundary details="SampleVocabulary in KanjiDetails">
+          <SampleVocabulary kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
+        <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
+          <TextbookVocabulary kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
@@ -151,7 +120,11 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
-      <KanjiExternalDicts kanji={kanji} />
+      <SimpleAccordion trigger={`Quick External Links to ${kanji}`} defaultOpen={true}>
+        <div className="mt-2 text-left">
+          <ExternalKanjiLinks kanji={kanji} />
+        </div>
+      </SimpleAccordion>
       <KanjiDetailsBottom kanji={kanji} />
     </div>
   );
