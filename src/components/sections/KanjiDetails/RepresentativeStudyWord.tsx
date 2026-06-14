@@ -10,6 +10,7 @@ import { vocabExternalLinksCore } from "@/lib/external-links";
 
 import { DotIcon, PlusCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useCrossfade } from "@/hooks/use-crossfade";
 
 const MarkAsKnownBadge = ({ word }: { word: string }) => {
   const [data, setItem] = useLocalStorage(`known:${word}`, { known: false });
@@ -52,12 +53,13 @@ const ViewVocabDetails = () => (
 );
 
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
-  const data = useKanjiRepresentativeWord(kanji);
+  const { displayed, opacity } = useCrossfade(kanji);
+  const data = useKanjiRepresentativeWord(displayed);
 
   if (!data) {
     return (
       <div className="w-full p-4 text-sm text-center text-muted-foreground">
-        No representative word available for {kanji}.
+        No representative word available for {displayed}.
       </div>
     );
   }
@@ -65,10 +67,10 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   const { word, reading, englishGloss, tags } = data;
 
   return (
-    <div className="px-2 py-3 space-y-3">
+    <div style={{ opacity, transition: "opacity 180ms ease" }} className="px-2 py-3 space-y-3">
       <div className="flex justify-between gap-1">
         <MemorizeThisWord />
-        <MarkAsKnownBadge word={word} />
+        <MarkAsKnownBadge word={word} key={word} />
       </div>
 
       <div className="flex flex-col gap-3 pt-6">
