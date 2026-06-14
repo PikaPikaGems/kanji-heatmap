@@ -111,7 +111,7 @@ export const BareKanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, sm
 
 export const KanjiExternalDicts = ({ kanji }: { kanji: string }) => {
   return <>
-    <SimpleAccordion trigger={"External Dictionaries"} defaultOpen={true}>
+    <SimpleAccordion trigger={`Quick External Links to ${kanji}`} defaultOpen={true}>
       <div className="mt-2 text-left">
         <ExternalKanjiLinks kanji={kanji} />
       </div>
@@ -126,10 +126,6 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
   }
 
   const data = getInfo(kanji);
-
-  if (data == null) {
-    return <BareKanjiDetails kanji={kanji} smallScreenNode={smallScreenNode} />;
-  }
 
   return (
     <div className="py-2 mx-2">
@@ -148,7 +144,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>
-        <FrequencyInfo freqRankInfo={data.frequency} />
+        <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
       </SimpleAccordion>
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">

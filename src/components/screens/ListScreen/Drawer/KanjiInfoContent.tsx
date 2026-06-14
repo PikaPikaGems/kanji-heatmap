@@ -6,8 +6,8 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 
 import { ErrorBoundary } from "@/components/error";
-import { KanjiCard, KanjiCardBare } from "@/components/sections/KanjiInfoCard/KanjiCard";
-import { BareKanjiDetails, KanjiDetails } from "@/components/sections/KanjiDetails/Details";
+import { KanjiCard } from "@/components/sections/KanjiInfoCard/KanjiCard";
+import { KanjiDetails } from "@/components/sections/KanjiDetails/Details";
 import { KanjiActionsBtns } from "@/components/dependent/site-wide/KanjiActionBtns";
 
 const Layout = ({
@@ -51,24 +51,15 @@ export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
 
   const info = getFn?.(kanji);
 
+  console.log("--->", kanji, info)
 
-  if (info != null) {
-    const card = <KanjiCard key={kanji} kanji={kanji} />
-    return (
-      <Layout
-        actionBar={<KanjiActionsBtns kanji={kanji} />}
-        first={card}
-        second={<KanjiDetails kanji={kanji} smallScreenNode={card} />}
-      />
-    );
-  }
 
-  const card = <KanjiCardBare kanji={kanji} />
+  const card = <KanjiCard key={kanji} kanji={kanji} />
   return (
     <Layout
       actionBar={<KanjiActionsBtns kanji={kanji} />}
       first={card}
-      second={<BareKanjiDetails kanji={kanji} smallScreenNode={card} />}
+      second={<KanjiDetails kanji={kanji} smallScreenNode={card} />}
     />
   );
 };

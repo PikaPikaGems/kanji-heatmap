@@ -1,8 +1,6 @@
 import { GeneralKanjiItem } from "@/lib/kanji/kanji-info-types";
 import { useKanjiInfo } from "@/kanji-worker/kanji-worker-hooks";
 
-import { DefaultErrorFallback } from "@/components/error";
-
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { PrimaryBadgeWithPopover } from "@/components/dependent/PrimaryBadgeWithPopover";
@@ -15,6 +13,8 @@ import { ReactNode } from "react";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { jpdbFn, kanshudoFn } from "@/lib/external-links";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -44,11 +44,24 @@ const LabelCell = ({ label, description }: { label: ReactNode; description: Reac
   </TableCellFixed>
 );
 
+export const BareGeneral = ({ kanji }: { kanji: string }) => {
+
+  return (
+    <>
+      <div className="w-full p-4 text-base text-center">No entry for {kanji} right now. Look it up on
+        <ExternalTextLink href={jpdbFn(kanji)} text="JPDB" /> or <ExternalTextLink href={kanshudoFn(kanji)} text="Kanshudo" /> instead.
+      </div>
+    </>
+  )
+
+}
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
 
   if (info.error) {
-    return <DefaultErrorFallback message="Failed to load data." />;
+    return <>
+      <BareGeneral kanji={kanji} />
+    </>
   }
 
   if (info.data == null) {
