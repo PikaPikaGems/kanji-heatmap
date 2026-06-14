@@ -10,10 +10,6 @@ export const OriginalKanjiComponentBreakdown = ({ kanji, showNotAvailable = true
         return <span className="text-[10px] uppercase">...</span>;
     }
 
-    if (data.data == null) {
-        return <span className="text-[10px] uppercase">Not available</span>;
-    }
-
     if (data.error || data.data == null) {
 
         if (!showNotAvailable) {
