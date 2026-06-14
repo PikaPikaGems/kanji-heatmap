@@ -14,7 +14,7 @@ import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { jpdbFn, kanshudoFn } from "@/lib/external-links";
+import { jitenMoeFn, jpdbFn, kanshudoFn } from "@/lib/external-links";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -49,7 +49,7 @@ export const BareGeneral = ({ kanji }: { kanji: string }) => {
   return (
     <>
       <div className="w-full p-4 text-base text-center">No entry for {kanji} right now. Look it up on
-        <ExternalTextLink href={jpdbFn(kanji)} text="JPDB" /> or <ExternalTextLink href={kanshudoFn(kanji)} text="Kanshudo" /> instead.
+        <ExternalTextLink href={jpdbFn(kanji)} text="JPDB" />, <ExternalTextLink href={jitenMoeFn(kanji)} text="Jiten.Moe" />,  or <ExternalTextLink href={kanshudoFn(kanji)} text="Kanshudo" /> instead.
       </div>
     </>
   )
