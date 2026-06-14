@@ -31,7 +31,7 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
 const MemorizeThisWord = () => (
   <GenericPopover
     trigger={
-      <button className={`flex gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-500`}>
+      <button className={`flex gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
         <PlusCircle size={16} className="translate-y-1" /> Memorize this word
       </button>
     }
