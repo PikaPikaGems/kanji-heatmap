@@ -6,7 +6,7 @@ export const OriginalKanjiComponentBreakdown = ({ kanji, showNotAvailable = true
     const data = useKanjiInfo(kanji, "hover-card");
     const ready = useIsKanjiWorkerReady();
 
-    if (!ready || data.status === "loading" || data.data == null) {
+    if (!ready || data.status === "loading") {
         return <span className="text-[10px] uppercase">...</span>;
     }
 

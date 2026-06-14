@@ -17,12 +17,14 @@ import { frequencyRankNamesOrdered } from "@/lib/options/options-constants";
 
 export const FrequencyInfo = ({
   freqRankInfo,
+  kanji
 }: {
   freqRankInfo?: KanjiInfoFrequency;
+  kanji: string
 }) => {
 
   if (freqRankInfo == null) {
-    return <div className="w-full p-4 text-base text-center">No frequency rank information available.</div>;
+    return <div className="w-full p-4 text-base text-center">There is no frequency rank data for {kanji} right now.</div>;
   }
 
   return (

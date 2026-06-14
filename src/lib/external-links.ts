@@ -1,10 +1,14 @@
+export const jpdbFn = (kanji: string) => `https://jpdb.io/kanji/${kanji}#a`;
+export const kanshudoFn = (kanji: string) =>
+  `https://www.kanshudo.com/kanji/${kanji}`;
+
 export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "Kagi Translate",
     url: (kanji: string) =>
       `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
   },
-  { name: "JPDB", url: (kanji: string) => `https://jpdb.io/kanji/${kanji}#a` },
+  { name: "JPDB", url: jpdbFn },
   {
     name: "Jotoba",
     url: (kanji: string) => `https://jotoba.de/search/1/${kanji}?l=en-US`,
@@ -47,7 +51,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   },
   {
     name: "Kanshudo",
-    url: (kanji: string) => `https://www.kanshudo.com/kanji/${kanji}`,
+    url: kanshudoFn,
   },
   {
     name: "Kanji Garden",
