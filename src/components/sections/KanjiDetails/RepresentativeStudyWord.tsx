@@ -13,6 +13,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useCrossfade } from "@/hooks/use-crossfade";
 import { CopyButton } from "@/components/common/CopyButton";
 
+
 const MarkAsKnownBadge = ({ word }: { word: string }) => {
   const [data, setItem] = useLocalStorage(`known:${word}`, { known: false });
   const toggle = () => setItem("known", !data.known);
@@ -95,6 +96,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <JishoBtn word={word} />
           <JotobaBtn word={word} />
           <SpeakButton word={word} iconType="volume-2" />
+          <SpeakButton word={reading} iconType="audio-lines" />
           <CopyButton textToCopy={word} iconType="copy" />
         </div>
 
