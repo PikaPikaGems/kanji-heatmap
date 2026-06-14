@@ -69,7 +69,7 @@ writeFileSync(outPath, JSON.stringify(filteredStructure), "utf-8");
 
 const readings = JSON.parse(
   readFileSync(
-    resolve(root, "public/json/kanji-readings-details.json"),
+    resolve(root, "raw-data/piyush/kanji-readings-details.json"),
     "utf-8"
   )
 );
