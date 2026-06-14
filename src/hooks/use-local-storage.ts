@@ -1,27 +1,30 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 type DispatchFunction<T> = (key: keyof T, value: T[keyof T]) => void;
 
-export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
-  const [storageData, setStorageData] = useState<T>(() => {
-    try {
-      const storedData = localStorage.getItem(storageKey);
-      const result = storedData ? JSON.parse(storedData) : defaultValue;
-
-      if (storedData == null) {
-        localStorage.setItem(storageKey, JSON.stringify(defaultValue));
-      }
-      return result;
-    } catch (error) {
-      console.error("Error reading from localStorage:", error);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(defaultValue));
-      } catch {
-        return defaultValue;
-      }
+const readFromStorage = <T>(storageKey: string, defaultValue: T): T => {
+  try {
+    const storedData = localStorage.getItem(storageKey);
+    if (storedData == null) {
+      localStorage.setItem(storageKey, JSON.stringify(defaultValue));
       return defaultValue;
     }
-  });
+    return JSON.parse(storedData);
+  } catch {
+    return defaultValue;
+  }
+};
+
+export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
+  const defaultValueRef = useRef(defaultValue);
+
+  const [storageData, setStorageData] = useState<T>(() =>
+    readFromStorage(storageKey, defaultValueRef.current)
+  );
+
+  useEffect(() => {
+    setStorageData(readFromStorage(storageKey, defaultValueRef.current));
+  }, [storageKey]);
 
   const setItem = useCallback<DispatchFunction<T>>(
     (key, value) => {
