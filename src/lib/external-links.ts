@@ -208,7 +208,7 @@ export const otherOutLinks = {
   jmdictFurigana: "https://github.com/Doublevil/JmdictFurigana",
 };
 
-export const vocabExternalLinks = [
+export const vocabExternalLinksCore = [
   {
     name: "Kagi Translate",
     url: (word: string) =>
@@ -220,14 +220,26 @@ export const vocabExternalLinks = [
       `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
   },
   {
-    name: "Immersion Kit",
-    url: (word: string) =>
-      `https://www.immersionkit.com/dictionary?keyword=${word}`,
+    name: "JPDB.io",
+    url: (word: string) => `https://jpdb.io/search?q=${word}&lang=english#a`,
+  },
+  {
+    name: "Kanshudo",
+    url: (word: string) => `https://www.kanshudo.com/word/${word}`,
   },
   {
     name: "Nadeshiko",
     url: (word: string) => `https://nadeshiko.co/search/${word}`,
   },
+  {
+    name: "Immersion Kit",
+    url: (word: string) =>
+      `https://www.immersionkit.com/dictionary?keyword=${word}`,
+  },
+];
+
+export const vocabExternalLinks = [
+  ...vocabExternalLinksCore,
   {
     name: "Jisho.org",
     url: (word: string) => `https://jisho.org/word/${word}`,
@@ -235,14 +247,6 @@ export const vocabExternalLinks = [
   {
     name: "Jotoba",
     url: (word: string) => `https://jotoba.de/search/0/${word}?l=en-US`,
-  },
-  {
-    name: "JPDB.io",
-    url: (word: string) => `https://jpdb.io/search?q=${word}&lang=english#a`,
-  },
-  {
-    name: "Kanshudo",
-    url: (word: string) => `https://www.kanshudo.com/word/${word}`,
   },
   {
     name: "JLearn",
