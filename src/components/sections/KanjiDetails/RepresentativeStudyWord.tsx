@@ -11,6 +11,7 @@ import { vocabExternalLinksCore } from "@/lib/external-links";
 import { DotIcon, PlusCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useCrossfade } from "@/hooks/use-crossfade";
+import { CopyButton } from "@/components/common/CopyButton";
 
 const MarkAsKnownBadge = ({ word }: { word: string }) => {
   const [data, setItem] = useLocalStorage(`known:${word}`, { known: false });
@@ -93,7 +94,8 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <DotIcon className="w-3 p-0 m-0" />
           <JishoBtn word={word} />
           <JotobaBtn word={word} />
-          <SpeakButton word={word} iconType="headphones" />
+          <SpeakButton word={word} iconType="volume-2" />
+          <CopyButton textToCopy={word} iconType="copy" />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
