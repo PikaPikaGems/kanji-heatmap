@@ -169,7 +169,7 @@ export const RadicalScreenLayout = ({
 
       <div
         className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
-        style={{ maxHeight: "calc(100dvh - 280px)" }}
+        style={{ maxHeight: "calc(100dvh - 314px)" }}
       >
         {top}
       </div>
@@ -177,10 +177,10 @@ export const RadicalScreenLayout = ({
         {middle}
       </div>
 
-      <div className="z-50 flex w-full py-1 pt-3 my-1 mt-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md dark:border-slate-600 h-36 scrollbar-thin animate-fade-in">
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 dark:border-slate-600 scrollbar-thin animate-fade-in">
         {bottom}
       </div>
-      <div className="absolute bottom-[136px] w-full m-auto z-50">
+      <div className="absolute bottom-[170px] w-full m-auto z-50">
         <ResultPreviewTitle />
       </div>
     </div>

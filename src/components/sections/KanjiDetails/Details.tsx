@@ -15,10 +15,12 @@ import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { StructureInfo } from "./StructureInfo";
+import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 
 
 export const RirikkuCTABadge = () => {
@@ -70,6 +72,20 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
 }
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
+const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
+
+  const info = useKanjiRepresentativeWord(kanji)
+  if (info?.word == null) {
+    return <></>
+  }
+
+  return <>
+    <SimpleAccordion trigger={`${kanji} Study Word ${info?.word ? `→ ${info?.word}` : ""}`} defaultOpen={true}>
+      <RepresentativeStudyWord kanji={kanji} />
+    </SimpleAccordion >
+  </>
+
+}
 
 export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
   const getInfo = useGetKanjiInfoFn();
@@ -90,6 +106,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
+      <RepresentativeStudyWordAccordion kanji={kanji} />
       <SimpleAccordion trigger={`Stroke Order`}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>
@@ -120,7 +137,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={`Quick External Links to ${kanji}`} defaultOpen={true}>
+      <SimpleAccordion trigger={`External Links for ${kanji}`} defaultOpen={true}>
         <div className="mt-2 text-left">
           <ExternalKanjiLinks kanji={kanji} />
         </div>

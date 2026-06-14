@@ -6,8 +6,8 @@ export const TILE_SIZE = {
     height: 55,
   },
   lg: {
-    width: 135,
-    height: 118,
+    width: 132,
+    height: 135,
   },
 };
 
