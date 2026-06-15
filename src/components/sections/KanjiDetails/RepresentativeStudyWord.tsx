@@ -28,11 +28,11 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
   );
 };
 
-const MemorizeThisWord = () => (
+const MemorizeThisWord = ({ word }: { word: string }) => (
   <GenericPopover
     trigger={
       <button className={`flex gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
-        <PlusCircle size={16} className="translate-y-1" /> Memorize this word
+        <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to My Review Pile
       </button>
     }
     content={
@@ -71,7 +71,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   return (
     <div style={{ opacity, transition: "opacity 180ms ease" }} className="px-2 py-3 space-y-3">
       <div className="flex justify-between gap-1">
-        <MemorizeThisWord />
+        <MemorizeThisWord word={word} />
         <MarkAsKnownBadge word={word} key={word} />
       </div>
 
@@ -82,7 +82,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <ExampleWordPopover word={word} wordTranslationOverride={englishGloss} className="text-[100px]/[1] p-8" />
         </div>
 
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="text-base font-bold">{englishGloss}</span>
           {tags.length > 0 && (
             <FreqTagBadges tags={tags} />
@@ -105,7 +105,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
         </div>
 
 
-        <div className="mt-6 text-xs">↓ ↓  Explore {word} in the wild ↓ ↓ </div>
+        <div className="mt-6 text-xs">👇  Explore {word} in the wild 👇 </div>
         <div className="flex flex-wrap items-center justify-center gap-1">
           {vocabExternalLinksCore.map(({ name, url }) => (
             <a

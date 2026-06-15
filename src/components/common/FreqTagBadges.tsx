@@ -6,14 +6,14 @@ const FreqCategoryMap: Record<string, string> = {
     "🌷": "fluent",
     "📚": "advanced",
     "🦉": "niche",
-    "📖": "textbook"
+    "📖": "textbook",
 };
 
 export const FreqTagBadges = ({ tags }: { tags: string[] }) => {
     return <> <div className="flex flex-wrap gap-1">
         {tags.map((tag) => (
             <Badge key={tag} variant="outline" className="px-2">
-                {tag} {FreqCategoryMap[tag] ?? "book"}
+                {tag} {FreqCategoryMap[tag] ?? "handpicked"}
             </Badge>
         ))}
     </div>
