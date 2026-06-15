@@ -46,6 +46,22 @@ If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heat
 cp ../kanji-heatmap-data/output/*.json ./public/json
 ```
 
+### Regenerating structure and reading files
+
+The following files in `public/json/` are generated from raw sources in `raw-data/` and filtered to the kanji in `public/json/filtered_kanji.json`:
+
+- `kanji-structure-filtered-hlorenzi.json`
+- `kanji-readings-details-filtered.json`
+- `kanji-structure-kanjium.json`
+- `scott-components.json`
+- `yagays-components.json`
+
+To regenerate them:
+
+```
+pnpm run generate-more-info
+```
+
 ## Build Analysis
 
 Analyze the build with
