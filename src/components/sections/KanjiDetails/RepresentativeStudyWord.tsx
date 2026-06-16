@@ -32,7 +32,7 @@ const MemorizeThisWord = ({ word }: { word: string }) => (
   <GenericPopover
     trigger={
       <button className={`flex gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
-        <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to My Review Pile
+        <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to my review pile
       </button>
     }
     content={
@@ -61,7 +61,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   if (!data) {
     return (
       <div className="w-full p-4 text-sm text-center text-muted-foreground">
-        No representative word available for {displayed}.
+        No representative study word available for {displayed}.
       </div>
     );
   }
@@ -122,11 +122,10 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
       </div>
       <p className="pt-24 text-sm text-left">
 
-        <strong>What is a (Representative) Study Word?</strong>
+        <strong>What is a Study Word? (Experimental Feature)</strong>
         <br />
-        It is a Japanese word algorithmically selected by the Kanji
-        Heatmap team to help remember this specific kanji. Each word is unique for each of the
-        ~2000 kanji available in Kanji Heatmap.
+        A Study Word is a Japanese word chosen by the Kanji Heatmap Data selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
+        The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
       </p>
     </div>
   );
