@@ -42,10 +42,10 @@ const HandwritingScreenLayout = ({
       </div>
 
       {/* Results Preview */}
-      <div className="z-50 flex w-full py-1 pt-3 mt-3 mb-3 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md dark:border-slate-600 h-36 scrollbar-thin animate-fade-in">
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 dark:border-slate-600 scrollbar-thin animate-fade-in">
         {bottom}
       </div>
-      <div className="absolute bottom-[142px] w-full m-auto z-50">
+      <div className="absolute bottom-[170px] w-full m-auto z-50">
         <TitleLayout>
           Results Preview {candidatesCount > 0 ? `(${candidatesCount})` : ""}
         </TitleLayout>

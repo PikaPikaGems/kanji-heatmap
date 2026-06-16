@@ -14,6 +14,7 @@ import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 
 const transformKanjiWordDetails = (
   kanji: string,
@@ -53,6 +54,19 @@ export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
     </article>
   </>
 }
+
+const RepWordKanji = ({ kanji }: { kanji: string }) => {
+  const repWord = useKanjiRepresentativeWord(kanji);
+
+  return <>
+    {repWord && (
+      <div className="flex justify-center gap-2 m-auto">
+        <span className="text-sm kanji-font">{repWord.tags?.[0]} {repWord.word} ({repWord.reading})</span>
+      </div>
+    )}
+  </>
+}
+
 export const KanjiCard = ({ kanji }: { kanji: string }) => {
   const data = useKanjiInfo(kanji, "hover-card");
   const ready = useIsKanjiWorkerReady();
@@ -73,9 +87,10 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
   return (
     <KanjiCardLayout
       main={
-        <div className="relative pl-2 mr-4 rounded-3xl">
+        <div className="relative py-2 pl-2 mr-4 rounded-3xl">
           <span className="text-[140px] leading-none kanji-font">{kanji}</span>
           <div className="mt-4 font-bold uppercase -translate-y-1 text-md">{info.keyword}</div>
+          <RepWordKanji kanji={kanji} />
         </div>
       }
       firstWord={word1Props && <WordCard {...word1Props} />}

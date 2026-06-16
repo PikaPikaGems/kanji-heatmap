@@ -31,14 +31,15 @@ const FreqCategoryMap: Record<string, string> = {
   "☘️": "common",
   "🌷": "fluent",
   "📚": "advanced",
-  "🦉": "uncommon"
+  "🦉": "unranked",
+  "🌶️": "niche"
 }
 
 const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
 
   const jlptNum = entry.j ? Number(entry.j) : -1
   const jlpt = [1, 2, 3, 4, 5].includes(jlptNum) ? `n${jlptNum}` as JLTPTtypes : null
-
+  const hasTierEntry = entry.t && FreqCategoryMap[entry.t]
   return (
     <>
       <TableRow>
@@ -59,8 +60,8 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           {entry.k && entry.k === 1 &&
             (<BadgeWithPopover name="✓ Kaishi 1.5k" desc={"This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners "} />)
           }
-          {entry.t && entry.t !== "📚" && entry.t !== "🦉" && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🦉"]}</Badge>}
-          {(jlpt || (entry.k && entry.k === 1) || entry.t && entry.t !== "📚" && entry.t !== "🦉") ? "" : "-"}
+          {hasTierEntry && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🌶️"]}</Badge>}
+          {(jlpt || (entry.k && entry.k === 1) || hasTierEntry) ? "" : "-"}
         </TableCell>
         <TableCell className="w-12">
           <BugIconErrorBoundary>
@@ -264,10 +265,11 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
 
   // convert data to CommonWordEntry[]
-  const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation]]) => ({
+  const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation, jlpt]]) => ({
     w: word,
     r: reading,
     e: translation,
+    j: Number(jlpt)
   } as CommonWordEntry));
 
 

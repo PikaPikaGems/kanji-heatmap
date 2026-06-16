@@ -9,7 +9,7 @@ import {
   WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
 
-const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
+const SmallFuriganaPart = ({ part, className = "" }: { part: WordPartDetail, className?: string }) => {
   const [text, reading] = part;
 
   if (!reading) {
@@ -17,10 +17,10 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
   }
 
   return (
-    <ruby>
+    <ruby className={className}>
       {text}
       <rp>(</rp>
-      <rt className="text-[0.6em]">{reading}</rt>
+      <rt className="text-[0.5em]">{reading}</rt>
       <rp>)</rp>
     </ruby>
   );
@@ -29,15 +29,16 @@ const SmallFuriganaPart = ({ part }: { part: WordPartDetail }) => {
 interface ExampleWordPopoverProps {
   word: string;
   wordTranslationOverride?: string;
+  className?: string
 }
 
-export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWordPopoverProps) => {
+export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-4xl" }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
   if (status !== "success") {
     return (
-      <span className="text-3xl cursor-default kanji-font" title="読み込み中 · Loading...">
+      <span className={`text-3xl cursor-default kanji-font ${className}`} title="読み込み中 · Loading...">
         {word}
       </span>
     );
@@ -51,10 +52,10 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride }: ExampleWor
       trigger={
         <Button
           variant="outline"
-          className="items-end h-auto px-4 py-3 text-4xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
+          className={`items-end h-auto px-4 py-3  border-dashed rounded-2xl kanji-font hover:bg-foreground/5 ${className}`}
         >
           {vocabInfo?.parts == null
-            ? word
+            ? <span>{word}</span>
             : vocabInfo.parts.map((part, index) => (
               <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
             ))}
