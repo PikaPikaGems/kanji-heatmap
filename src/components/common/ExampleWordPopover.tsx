@@ -32,7 +32,7 @@ interface ExampleWordPopoverProps {
   className?: string
 }
 
-export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-5xl" }: ExampleWordPopoverProps) => {
+export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-4xl" }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
