@@ -29,15 +29,18 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, option
         </div>
       )}
 
-      {definition && (
-        <>
-          <DottedSeparator />
-
-          <SeeMore definition={definition} maxLen={150} />  {optionalSection}
-        </>
-      )}
-      <VocabActions kana={kana} word={word} />
       <DottedSeparator />
+      <div className="mt-2">
+        {optionalSection}
+        {definition && (
+          <>
+            <SeeMore definition={definition} maxLen={150} />
+          </>
+        )}
+      </div>
+      <DottedSeparator />
+      <VocabActions kana={kana} word={word} />
+
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore this word further →
