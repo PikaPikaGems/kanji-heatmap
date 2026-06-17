@@ -8,18 +8,18 @@ import { NextPrevLinks } from "../routing/NextPrevLinks";
 export const KanjiActionsBtns = ({ kanji }: { kanji: string }) => {
   return (
     <>
-      <div className="flex items-center py-2 space-x-1">
+      <div className="flex flex-wrap items-center px-4 py-3 space-x-1">
+        <NextPrevLinks currentKanji={kanji} />
+        <div className="border-2 rounded-lg">
+          <ChangeFontButton />
+        </div>
+        <DotIcon className="w-3 m-0" />
         <CopyButton
           textToCopy={`https://kanjiheatmap.com/?${URL_PARAMS.openKanji}=${kanji}`}
           iconType="link"
         />
         <CopyButton textToCopy={kanji} iconType="clipboard" />
         <SpeakButton word={kanji} iconType="volume-2" />
-        <div className="border-2 rounded-lg">
-          <ChangeFontButton />
-        </div>
-        <DotIcon className="w-3 m-0" />
-        <NextPrevLinks currentKanji={kanji} />
       </div>
     </>
   );
