@@ -50,11 +50,11 @@ export const SortOrderSectionLayout = ({
         title="Sort Order ***"
         icon={<ArrowDownWideNarrow size={15} />}
       />
-      <section className="flex flex-col space-x-0 md:space-y-0 md:flex-row md:space-x-2  w-full text-left">
+      <section className="flex flex-col w-full space-x-0 space-y-2 text-left md:space-y-0 md:flex-row md:space-x-2">
         <div className="md:w-1/2">{primaryField}</div>
         {secondaryField && <div className="md:w-1/2">{secondaryField}</div>}
       </section>
-      <div className="text-xs flex mt-3 flex-wrap items-center justify-start">
+      <div className="flex flex-wrap items-center justify-start mt-3 text-xs">
         {additionalInfo}
       </div>
     </section>

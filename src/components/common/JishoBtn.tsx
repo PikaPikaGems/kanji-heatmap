@@ -119,7 +119,7 @@ export const JishoBtn = ({ word }: { word: string }) => {
                 </Button>
             }
             content={
-                <div className="p-4 overflow-y-auto max-h-48 min-w-36 max-w-64" onWheel={(e) => e.stopPropagation()}>
+                <div className="p-4 overflow-y-scroll max-h-48 min-w-36 max-w-64" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }} onWheel={(e) => e.stopPropagation()}>
                     <JishoContent word={word} />
                 </div>
             }

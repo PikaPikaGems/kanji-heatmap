@@ -3,15 +3,12 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
-import { JishoBtn } from "@/components/common/JishoBtn";
-import { JotobaBtn } from "@/components/common/JotobaBtn";
-import { SpeakButton } from "@/components/common/SpeakButton";
 import { vocabExternalLinksCore } from "@/lib/external-links";
 
 import { DotIcon, PlusCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useCrossfade } from "@/hooks/use-crossfade";
-import { CopyButton } from "@/components/common/CopyButton";
+import { VocabActions } from "@/components/common/VocabActions";
 
 
 const MarkAsKnownBadge = ({ word }: { word: string }) => {
@@ -21,9 +18,12 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
   return (
     <button
       onClick={toggle}
-      className={`inline-flex items-center px-3 text-xs border font-bold rounded-full hover:bg-muted-foreground/5 ${data.known ? "text-green-500 border-green-500" : "text-muted-foreground border-dashed"}`}
+      className={`inline-flex items-center gap-1.5 px-4 py-1 my-1 text-xs font-semibold rounded-full transition-colors ${data.known
+        ? "bg-green-500/15 text-green-500 border border-green-500"
+        : "border border-dashed text-muted-foreground hover:text-foreground"
+        }`}
     >
-      {data.known ? "✓ Known" : "Unmarked"}
+      {data.known ? "✓ Known" : "⊙ Mark as known"}
     </button>
   );
 };
@@ -31,7 +31,7 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
 const MemorizeThisWord = ({ word }: { word: string }) => (
   <GenericPopover
     trigger={
-      <button className={`flex gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
+      <button className={`flex gap-2 px-2 py-2 whitespace-nowrap text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
         <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to my review pile
       </button>
     }
@@ -44,7 +44,7 @@ const MemorizeThisWord = ({ word }: { word: string }) => (
 const ViewVocabDetails = () => (
   <GenericPopover
     trigger={
-      <button className="flex p-1 tracking-widest underline uppercase text-muted-foreground decoration-dotted underline-offset-8">
+      <button className="flex p-1 text-base tracking-widest underline uppercase hover:text-foreground text-muted-foreground decoration-dashed underline-offset-8">
         View Vocabulary Details
       </button>
     }
@@ -60,8 +60,8 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
   if (!data) {
     return (
-      <div className="w-full p-4 text-sm text-center text-muted-foreground">
-        No representative study word available for {displayed}.
+      <div className="w-full p-4 text-base text-center">
+        No (representative) study word available for {displayed}.
       </div>
     );
   }
@@ -70,7 +70,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
   return (
     <div style={{ opacity, transition: "opacity 180ms ease" }} className="px-2 py-3 space-y-3">
-      <div className="flex justify-between gap-1">
+      <div className="flex flex-wrap justify-between gap-1">
         <MemorizeThisWord word={word} />
         <MarkAsKnownBadge word={word} key={word} />
       </div>
@@ -78,8 +78,8 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
       <div className="flex flex-col gap-3 pt-6">
 
 
-        <div>
-          <ExampleWordPopover word={word} wordTranslationOverride={englishGloss} className="text-[100px]/[1] p-8" />
+        <div className="overflow-auto">
+          <ExampleWordPopover word={word} wordTranslationOverride={englishGloss} className="text-7xl sm:text-[100px]/[1] p-8" />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2">
@@ -90,14 +90,11 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
         </div>
 
 
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex flex-wrap items-center justify-center gap-1">
+
           <RomajiBadge kana={reading} />
           <DotIcon className="w-3 p-0 m-0" />
-          <JishoBtn word={word} />
-          <JotobaBtn word={word} />
-          <SpeakButton word={word} iconType="volume-2" />
-          <SpeakButton word={reading} iconType="audio-lines" />
-          <CopyButton textToCopy={word} iconType="copy" />
+          <VocabActions word={word} kana={reading} />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
@@ -105,15 +102,15 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
         </div>
 
 
-        <div className="mt-6 text-xs">👇  Explore {word} in the wild 👇 </div>
-        <div className="flex flex-wrap items-center justify-center gap-1">
+        <div className="mt-6 text-sm">👇  Explore <span className="font-bold">{word}</span> in the wild 👇 </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {vocabExternalLinksCore.map(({ name, url }) => (
             <a
               key={name}
               href={url(word)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center rounded-md border border-dotted px-2 py-0.5 text-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex items-center px-3 py-1 text-sm transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
             >
               {name}
             </a>
@@ -124,7 +121,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
         <strong>What is a Study Word? (Experimental Feature)</strong>
         <br />
-        A Study Word is a Japanese word chosen by the Kanji Heatmap Data selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
+        A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
         The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
       </p>
     </div>

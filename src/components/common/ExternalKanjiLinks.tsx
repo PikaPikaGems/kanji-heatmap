@@ -9,7 +9,7 @@ export const ExternalKanjiLinks = ({ kanji }: { kanji: string }) => {
             <a href={`${item.url(kanji)}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center px-3 py-1 text-sm transition-colors border border-dotted rounded-full hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex items-center px-3 py-1 text-sm transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
             > {item.name}</a>
           </li>
         );

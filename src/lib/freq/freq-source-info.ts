@@ -53,7 +53,7 @@ export const FREQ_RANK_SOURCES_INFO: Record<
   }
 > = {
   [K_RANK_JITEN]: {
-    description: "Dataset from jiten.moe/other",
+    description: "Dataset from jiten.moe/other (2026-03-30)",
     links: ["https://jiten.moe/other"],
     rankType: "1224",
   },

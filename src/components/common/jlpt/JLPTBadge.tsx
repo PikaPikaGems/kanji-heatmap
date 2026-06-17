@@ -8,7 +8,7 @@ export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
       {jlpt !== "none" && (
         <GenericPopover
           trigger={
-            <button className="inline-flex h-6 items-center justify-center rounded-full border px-2.5 text-xs font-semibold text-nowrap m-1 hover:bg-[#2effff] hover:text-black">
+            <button className="inline-flex h-6 items-center justify-center rounded-full border px-2.5 text-xs font-semibold text-nowrap m-1 bg-foreground text-background hover:bg-[#2effff] hover:text-black">
               <span
                 className={`h-2 w-2 block ${JLPTListItems[jlpt].cn} !rounded-full mr-1`}
               />

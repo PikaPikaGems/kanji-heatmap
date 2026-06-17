@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { SeeMore } from "@/components/common/SeeMore";
@@ -10,9 +11,10 @@ interface VocabPopoverContentProps {
   kana: string;
   wordKanjis: { kanji: string; keyword: string }[];
   definition?: string;
+  optionalSection?: ReactNode;
 }
 
-export const VocabPopoverContent = ({ word, kana, wordKanjis, definition }: VocabPopoverContentProps) => {
+export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, optionalSection }: VocabPopoverContentProps) => {
   return (
     <div className="p-2 w-72">
       {wordKanjis.length > 0 && (
@@ -26,15 +28,20 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition }: Voca
           ))}
         </div>
       )}
-      {definition && (
-        <>
-          <DottedSeparator />
-          <SeeMore definition={definition} maxLen={150} />
-        </>
-      )}
+
+      <DottedSeparator />
+      <div className="mt-2">
+        {optionalSection}
+        {definition && (
+          <>
+            <SeeMore definition={definition} maxLen={150} />
+          </>
+        )}
+      </div>
       <DottedSeparator />
       <VocabActions kana={kana} word={word} />
-      <DottedSeparator />
+
+
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore this word further →
       </div>

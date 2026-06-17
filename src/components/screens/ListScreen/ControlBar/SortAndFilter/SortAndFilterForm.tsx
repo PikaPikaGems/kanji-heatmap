@@ -210,7 +210,7 @@ export const SortAndFilterSettingsForm = ({
         />
 
       </div>
-      <div className="px-2 pt-2 border-t">
+      <div className="px-2 pt-4 mt-4 border-t">
         {!isDisabled && (
           <ItemCount
             settings={{ ...initialValue, filterSettings: filterValues }}
