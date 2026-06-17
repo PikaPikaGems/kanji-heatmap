@@ -7,11 +7,11 @@ const assetsPaths = {
   VOCAB_FURIGANA: "/json/vocab_furigana.json",
   CUM_USE: "/json/cum_use.json",
   KANJI_SVGS: "https://assets.pikapikagems.com/kanji/",
-  KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v3b", // Note: No slash at the end is intentional
-  TEXT_BOOK_VOCAB: "https://assets.pikapikagems.com/kanji-textbook-words/v2", // Note: No slash at the end is intentional
+  KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v3c", // Note: No slash at the end is intentional
+  TEXT_BOOK_VOCAB: "https://assets.pikapikagems.com/kanji-textbook-words/v3", // Note: No slash at the end is intentional
   dev: {
     KANJI_SVGS: "https://kanjivg.tagaini.net/kanjivg/kanji/",
-    KANJI_VOCAB: "/kanji-words/v3b", // Note: No slash at the end is intentional
+    KANJI_VOCAB: "/kanji-words/v3c", // Note: No slash at the end is intentional
     TEXT_BOOK_VOCAB: "/kanji-textbook-words-min", // Note: No slash at the end is intentional
   },
   KANJI_REPRESENTATIVE_WORDS: "/json/kanji_representative_words.json",
