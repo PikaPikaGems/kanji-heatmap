@@ -12,7 +12,7 @@ export const RomajiBadge = ({ kana }: { kana: string }) => {
   return (
     <Badge
       variant={"outline"}
-      className={`m-1 cursor-pointer text-xl ${cn} hover:bg-[#2effff] hover:text-black`}
+      className={`m-1 cursor-pointer text-xl ${cn} hover:bg-[#2effff] hover:text-black whitespace-nowrap`}
       onClick={(e) => {
         setIsKana((prev) => !prev);
         e.preventDefault();
