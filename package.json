@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --port 5174",
     "dev:cf": "vite --port 5173",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/generate-more-info.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
