@@ -35,11 +35,46 @@ const FreqCategoryMap: Record<string, string> = {
   //   "🌶️": "niche"
 }
 
-const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
+const WordTagBadges = ({
+  jlpt,
+  isKaishi,
+  tier,
+  isUncommonForm,
+  showEmptyState = false,
+  breakAfterJlpt = false,
+}: {
+  jlpt: JLTPTtypes | null;
+  isKaishi: boolean;
+  tier?: string;
+  isUncommonForm?: boolean;
+  showEmptyState?: boolean;
+  breakAfterJlpt?: boolean;
+}) => {
+  const freqLabel = tier ? FreqCategoryMap[tier] : undefined;
+  const hasAnyTag = jlpt || isKaishi || freqLabel || isUncommonForm;
 
+  return (
+    <>
+      {jlpt && <>{<JLPTBadge jlpt={jlpt} />}{breakAfterJlpt && <br />}</>}
+      {isKaishi && (
+        <BadgeWithPopover name="✓ Kaishi 1.5k" desc="This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners" />
+      )}
+      {freqLabel && (
+        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{tier} {freqLabel}</Badge>
+      )}
+      {isUncommonForm && (
+        <BadgeWithPopover name="⚠️ Variant" desc="This word might not be usually written or read this way" />
+      )}
+      {showEmptyState && !hasAnyTag && "-"}
+    </>
+  );
+};
+
+const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const jlptNum = entry.j ? Number(entry.j) : -1
   const jlpt = [1, 2, 3, 4, 5].includes(jlptNum) ? `n${jlptNum}` as JLTPTtypes : null
-  const hasTierEntry = entry.t && FreqCategoryMap[entry.t]
+  const isKaishi = entry.k === 1
+  const tier = entry.t && FreqCategoryMap[entry.t] ? entry.t : undefined
 
   return (
     <>
@@ -52,12 +87,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
             word={entry.w}
             wordTranslationOverride={entry.e}
             optionalSection={
-              <>
-                {jlpt && <JLPTBadge jlpt={jlpt} />}
-                {entry.k && entry.k === 1 && <BadgeWithPopover name="✓ Kaishi 1.5k" desc="This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners" />}
-                {entry.uncommon_form && <BadgeWithPopover name="⚠️ Variant" desc="This word is not usually written this way" />}
-                {hasTierEntry && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🌶️"]}</Badge>}
-              </>
+              <WordTagBadges jlpt={jlpt} isKaishi={isKaishi} tier={tier} isUncommonForm={entry.uncommon_form} />
             }
           />
         </TableCell>
@@ -65,16 +95,10 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           {entry.r && entry.r !== "-" ? <RomajiBadge kana={entry.r} /> : "-"}
         </TableCell>
         <TableCell className="w-fit max-w-24">
-          {entry.e && entry.e !== "-" ? <span className="text-xs font-bold" >{entry.e}</span> : "-"}
+          {entry.e && entry.e !== "-" ? <span className="text-xs font-bold">{entry.e}</span> : "-"}
         </TableCell>
         <TableCell className="gap-2 px-4 text-sm text-muted-foreground max-w-36">
-          {jlpt && <><JLPTBadge jlpt={jlpt} /><br /></>}
-          {entry.k && entry.k === 1 &&
-            (<BadgeWithPopover name="✓ Kaishi 1.5k" desc={"This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners "} />)
-          }
-          {entry.uncommon_form && <BadgeWithPopover name="⚠️ Variant" desc="This word is not usually written this way" />}
-          {hasTierEntry && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🌶️"]}</Badge>}
-          {(jlpt || (entry.k && entry.k === 1) || hasTierEntry) || entry.uncommon_form ? "" : "-"}
+          <WordTagBadges jlpt={jlpt} isKaishi={isKaishi} tier={tier} isUncommonForm={entry.uncommon_form} showEmptyState breakAfterJlpt />
         </TableCell>
         <TableCell className="w-12">
           <BugIconErrorBoundary>
