@@ -1,5 +1,6 @@
 import path from "path";
 import { defineConfig, UserConfig } from "vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -176,6 +177,7 @@ const visualizer_templates: TemplateType[] = [
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    cloudflare(),
     react(),
     VitePWA(pwaConfig),
     process.env.ANALYZE
