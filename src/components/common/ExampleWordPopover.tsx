@@ -13,7 +13,7 @@ const SmallFuriganaPart = ({ part, className = "" }: { part: WordPartDetail, cla
   const [text, reading] = part;
 
   if (!reading) {
-    return <span>{text}</span>;
+    return <ruby className={className}>{text}<rt /></ruby>;
   }
 
   return (

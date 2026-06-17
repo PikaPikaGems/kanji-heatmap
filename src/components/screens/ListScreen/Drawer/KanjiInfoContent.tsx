@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 
 import {
-  useGetKanjiInfoFn,
   useIsKanjiWorkerReady,
 } from "@/kanji-worker/kanji-worker-hooks";
 
@@ -43,15 +42,10 @@ const Layout = ({
 
 export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
   const ready = useIsKanjiWorkerReady();
-  const getFn = useGetKanjiInfoFn();
 
   if (!ready) {
     return null;
   }
-
-  const info = getFn?.(kanji);
-
-  console.log("--->", kanji, info)
 
 
   const card = <KanjiCard key={kanji} kanji={kanji} />

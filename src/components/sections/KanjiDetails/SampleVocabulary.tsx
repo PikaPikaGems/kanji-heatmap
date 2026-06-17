@@ -24,7 +24,7 @@ import { BugIconErrorBoundary } from "@/components/error";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
-type CommonWordEntry = { w: string, r?: string, t?: string, e?: string, k?: number, j?: number };
+type CommonWordEntry = { w: string, r?: string, t?: string, e?: string, k?: number | boolean, j?: number, uncommon_form?: boolean };
 
 const FreqCategoryMap: Record<string, string> = {
   "🌱": "basic",
@@ -40,6 +40,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const jlptNum = entry.j ? Number(entry.j) : -1
   const jlpt = [1, 2, 3, 4, 5].includes(jlptNum) ? `n${jlptNum}` as JLTPTtypes : null
   const hasTierEntry = entry.t && FreqCategoryMap[entry.t]
+
   return (
     <>
       <TableRow>
@@ -47,7 +48,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           <SpeakButton iconType="headphones" word={entry.w} />
         </TableCell>
         <TableCell className="text-base kanji-font w-fit">
-          <ExampleWordPopover word={entry.w} />
+          <ExampleWordPopover word={entry.w} wordTranslationOverride={entry.e} />
         </TableCell>
         <TableCell className="text-base kanji-font w-fit whitespace-nowrap">
           {entry.r && entry.r !== "-" ? <RomajiBadge kana={entry.r} /> : "-"}
@@ -60,8 +61,9 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           {entry.k && entry.k === 1 &&
             (<BadgeWithPopover name="✓ Kaishi 1.5k" desc={"This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners "} />)
           }
+          {entry.uncommon_form && <BadgeWithPopover name="⚠️ Variant" desc="This word is not usually written this way" />}
           {hasTierEntry && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🌶️"]}</Badge>}
-          {(jlpt || (entry.k && entry.k === 1) || hasTierEntry) ? "" : "-"}
+          {(jlpt || (entry.k && entry.k === 1) || hasTierEntry) || entry.uncommon_form ? "" : "-"}
         </TableCell>
         <TableCell className="w-12">
           <BugIconErrorBoundary>
@@ -84,17 +86,15 @@ const sortWordData = (data: CommonWordEntry[]) => {
     let s = 0;
 
     // Kaishi 1.5k: explicitly curated beginner vocab — strong signal
-    if (entry.k != null && entry.k >= 1) s += 500;
+    if (entry.k != null && entry.k) s += 500;
 
-    // English translation: primary usability signal for learners
-    if (entry.e && entry.e !== "-") s += 300;
 
     // JLPT level: N5 (easiest) → N1 (hardest); no JLPT = 0
-    const jlptScore: Record<number, number> = { 5: 200, 4: 160, 3: 80, 2: 40, 1: 20 };
+    const jlptScore: Record<number, number> = { 5: 250, 4: 200, 3: 100, 2: 40, 1: 20 };
     s += jlptScore[entry.j ?? -1] ?? 0;
 
     // Frequency tier: basic > common > fluent > advanced/uncommon
-    const freqScore: Record<string, number> = { "🌱": 60, "☘️": 50, "🌷": 30, "📚": 10, "🦉": 0 };
+    const freqScore: Record<string, number> = { "🌱": 250, "☘️": 200, "🌷": 100, "📚": 10, "🌶️": 0, "🦉": 0 };
     s += freqScore[entry.t ?? "🦉"] ?? 0;
 
     return s;

@@ -75,12 +75,9 @@ const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
 
   const info = useKanjiRepresentativeWord(kanji)
-  if (info?.word == null) {
-    return <></>
-  }
 
   return <>
-    <SimpleAccordion trigger={`${kanji} Study Word ${info?.word ? `→ ${info?.word}` : ""}`} defaultOpen={true}>
+    <SimpleAccordion trigger={`${kanji} Study Word ${info?.word ? `~ ${info?.word}` : ""}`} defaultOpen={info?.word != null}>
       <RepresentativeStudyWord kanji={kanji} />
     </SimpleAccordion >
   </>

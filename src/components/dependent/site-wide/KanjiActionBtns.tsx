@@ -8,7 +8,7 @@ import { NextPrevLinks } from "../routing/NextPrevLinks";
 export const KanjiActionsBtns = ({ kanji }: { kanji: string }) => {
   return (
     <>
-      <div className="flex space-x-1 items-center py-2">
+      <div className="flex items-center py-2 space-x-1">
         <CopyButton
           textToCopy={`https://kanjiheatmap.com/?${URL_PARAMS.openKanji}=${kanji}`}
           iconType="link"

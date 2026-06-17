@@ -6,11 +6,15 @@ const RepWordKanji = ({ kanji }: { kanji: string }) => {
   const repWord = useKanjiRepresentativeWord(kanji);
 
   return <>
-    {repWord && (
+    {repWord ? (
       <span className={`${ellipsisCn} block text-sm kanji-font`}>
         {repWord.word} ({repWord.reading})
+      </span>) : (
+      <span className={`${ellipsisCn} block text-sm kanji-font`}>
+        ·
       </span>
-    )}
+    )
+    }
   </>
 }
 
