@@ -30,9 +30,9 @@ const FreqCategoryMap: Record<string, string> = {
   "🌱": "basic",
   "☘️": "common",
   "🌷": "fluent",
-  "📚": "advanced",
-  "🦉": "unranked",
-  "🌶️": "niche"
+  //   "📚": "advanced",
+  //   "🦉": "unranked",
+  //   "🌶️": "niche"
 }
 
 const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
@@ -48,7 +48,18 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           <SpeakButton iconType="headphones" word={entry.w} />
         </TableCell>
         <TableCell className="text-base kanji-font w-fit">
-          <ExampleWordPopover word={entry.w} wordTranslationOverride={entry.e} />
+          <ExampleWordPopover
+            word={entry.w}
+            wordTranslationOverride={entry.e}
+            optionalSection={
+              <>
+                {jlpt && <JLPTBadge jlpt={jlpt} />}
+                {entry.k && entry.k === 1 && <BadgeWithPopover name="✓ Kaishi 1.5k" desc="This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners" />}
+                {entry.uncommon_form && <BadgeWithPopover name="⚠️ Variant" desc="This word is not usually written this way" />}
+                {hasTierEntry && <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">{entry.t} {FreqCategoryMap[entry.t ?? "🌶️"]}</Badge>}
+              </>
+            }
+          />
         </TableCell>
         <TableCell className="text-base kanji-font w-fit whitespace-nowrap">
           {entry.r && entry.r !== "-" ? <RomajiBadge kana={entry.r} /> : "-"}

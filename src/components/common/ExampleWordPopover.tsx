@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -29,10 +30,11 @@ const SmallFuriganaPart = ({ part, className = "" }: { part: WordPartDetail, cla
 interface ExampleWordPopoverProps {
   word: string;
   wordTranslationOverride?: string;
-  className?: string
+  className?: string;
+  optionalSection?: ReactNode;
 }
 
-export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-4xl" }: ExampleWordPopoverProps) => {
+export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-4xl", optionalSection }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
@@ -67,6 +69,7 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride, className = 
           kana={kana}
           wordKanjis={wordKanjis}
           definition={meaning}
+          optionalSection={optionalSection}
         />
       }
     />
