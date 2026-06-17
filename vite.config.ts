@@ -175,10 +175,9 @@ const visualizer_templates: TemplateType[] = [
   "flamegraph",
 ] as const;
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig(() => ({
   plugins: [
-    // we use since proxy will be deprecated on dev mode but but need to remove to prevent issues in production
-    command === "serve" ? cloudflare() : null,
+    process.env.CF_PAGES ? null : cloudflare(),
     react(),
     VitePWA(pwaConfig),
     process.env.ANALYZE
