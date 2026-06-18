@@ -16,6 +16,7 @@ const ChangeFontButton = () => {
           className="px-2 rounded-md h-7 kanji-font"
           variant={"secondary"}
           onClick={nextFont}
+          tabIndex={-1}
         >
           字体
         </Button>

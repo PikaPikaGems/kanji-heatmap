@@ -31,15 +31,16 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, option
 
       {(definition || optionalSection) && <>
         <DottedSeparator />
+        <div className="my-2">
+          {optionalSection}
+          {definition && (
+            <>
+              <SeeMore definition={definition} maxLen={150} />
+            </>
+          )}
+        </div>
+
       </>}
-      <div className="mt-2">
-        {optionalSection}
-        {definition && (
-          <>
-            <SeeMore definition={definition} maxLen={150} />
-          </>
-        )}
-      </div>
       <DottedSeparator />
       <VocabActions kana={kana} word={word} />
 
