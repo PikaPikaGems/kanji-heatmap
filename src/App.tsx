@@ -1,6 +1,5 @@
 import "./JFonts.css";
 import "./theme.css";
-import React from "react";
 
 import { ThemeProvider } from "@/providers/theme-provider";
 import { KanjiFunctionalityProvider } from "./providers/kanji-functionality-provider";
@@ -16,9 +15,6 @@ import { Header } from "@/components/site-layout/";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
-const LazyBottomBanner = React.lazy(
-  () => import("./components/site-layout/BottomBanner")
-);
 
 const { kanjiPage, cumUseGraphPage, aboutPage, termsPage, privacyPage } =
   pageItems;
@@ -81,7 +77,6 @@ const App = () => {
           </main>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
-      <LazyBottomBanner />
     </ErrorBoundary>
   );
 };
