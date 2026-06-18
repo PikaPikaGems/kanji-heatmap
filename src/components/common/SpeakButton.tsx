@@ -12,9 +12,11 @@ const audioIcons: Record<AudioIconType, ReactNode> = {
 export const SpeakButton = ({
   word,
   iconType,
+  autoFocus,
 }: {
   word: string;
   iconType: AudioIconType;
+  autoFocus?: boolean;
 }) => {
   const speak = useSpeak(word);
 
@@ -26,6 +28,7 @@ export const SpeakButton = ({
       onClick={() => {
         speak();
       }}
+      autoFocus={autoFocus}
     >
       {audioIcons[iconType]}
     </Button>

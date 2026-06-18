@@ -53,14 +53,14 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return <>
 
     <p className="my-4 text-xs text-left">
-      <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in all browsers.
+      <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in some devices.
     </p>
 
     <div className="my-4 w-fit">
       <PikaPikaLinks />
     </div>
 
-    <div className="flex items-center justify-start w-full mt-4 space-x-1">
+    <div className="flex items-center justify-start w-full mt-4 mb-8 space-x-1">
       <LinksOutItems />
       <DotIcon className="w-2 m-0" />
       <DebugInfo />

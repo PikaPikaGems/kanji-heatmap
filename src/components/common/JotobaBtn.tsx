@@ -108,7 +108,7 @@ export const JotobaBtn = ({ word }: { word: string }) => {
                 </Button>
             }
             content={
-                <div className="px-4 py-2 overflow-y-scroll max-w-64 min-w-36 max-h-48" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }} onWheel={(e) => e.stopPropagation()}>
+                <div className="px-4 py-2 overflow-y-scroll max-w-64 min-w-36 max-h-48" data-vaul-no-drag style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }} onWheel={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()}>
                     <JotobaContent word={word} />
                 </div>
             }

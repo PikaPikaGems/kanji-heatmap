@@ -19,7 +19,7 @@ export const KanjiActionsBtns = ({ kanji }: { kanji: string }) => {
           iconType="link"
         />
         <CopyButton textToCopy={kanji} iconType="clipboard" />
-        <SpeakButton word={kanji} iconType="volume-2" />
+        <SpeakButton word={kanji} iconType="volume-2" autoFocus />
       </div>
     </>
   );

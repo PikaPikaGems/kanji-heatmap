@@ -28,7 +28,7 @@ export function KanjiDrawerRaw({
   // Also: autoFocus=true prevents the issue of search input from unnecessarily retaining focus
   return (
     <Drawer open={isOpen} onClose={onClose} autoFocus={true}>
-      <DrawerContent className="!select-text h-[95dvh] !duration-200 border-2 border-t-4 border-dashed ">
+      <DrawerContent className="!select-text h-[calc(100dvh_-_50px)] !duration-200 border-2 border-t-4 [border-top-style:dashed]">
         <DrawerTitle className="sr-only">Information for Kanji</DrawerTitle>
         <DrawerDescription className="sr-only">
           Includes Sample Usage, Semantic Phonetic Compositions etc.
