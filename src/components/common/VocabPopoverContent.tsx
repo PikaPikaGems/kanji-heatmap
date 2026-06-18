@@ -29,7 +29,9 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, option
         </div>
       )}
 
-      <DottedSeparator />
+      {(definition || optionalSection) && <>
+        <DottedSeparator />
+      </>}
       <div className="mt-2">
         {optionalSection}
         {definition && (
