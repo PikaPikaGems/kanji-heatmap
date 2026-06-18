@@ -5,7 +5,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
 import { vocabExternalLinksCore } from "@/lib/external-links";
 
-import { DotIcon, PlusCircle } from "lucide-react";
+import { DotIcon, InfoIcon, PlusCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useCrossfade } from "@/hooks/use-crossfade";
 import { VocabActions } from "@/components/common/VocabActions";
@@ -18,12 +18,12 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
   return (
     <button
       onClick={toggle}
-      className={`inline-flex items-center gap-1.5 px-4 py-1 my-1 text-xs font-semibold rounded-full transition-colors ${data.known
+      className={`inline-flex items-center gap-1.5 px-2 py-1 my-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap ${data.known
         ? "bg-green-500/15 text-green-500 border border-green-500"
-        : "border border-dashed text-muted-foreground hover:text-foreground"
+        : "border border-dashed border-foreground/50 text-muted-foreground hover:text-foreground"
         }`}
     >
-      {data.known ? "✓ Known" : "⊙ Mark as known"}
+      {data.known ? "✓ Known" : "Unmarked"}
     </button>
   );
 };
@@ -31,7 +31,7 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
 const MemorizeThisWord = ({ word }: { word: string }) => (
   <GenericPopover
     trigger={
-      <button className={`flex gap-2 px-2 py-2 whitespace-nowrap text-sm font-bold underline rounded-lg decoration-dotted underline-offset-8 hover:text-green-400 text-green-500 hover:decoration-solid`}>
+      <button className={`flex text-left gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-4 hover:text-green-400 text-green-500 hover:decoration-solid`}>
         <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to my review pile
       </button>
     }
@@ -69,8 +69,8 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   const { word, reading, englishGloss, tags } = data;
 
   return (
-    <div style={{ opacity, transition: "opacity 180ms ease" }} className="px-2 py-3 space-y-3">
-      <div className="flex flex-wrap justify-between gap-1">
+    <div style={{ opacity, transition: "opacity 180ms ease" }} className="py-3 space-y-3 ">
+      <div className="flex items-start justify-between">
         <MemorizeThisWord word={word} />
         <MarkAsKnownBadge word={word} key={word} />
       </div>
@@ -117,13 +117,22 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           ))}
         </div>
       </div>
-      <p className="pt-24 text-sm text-left">
+      <div className="pt-16 pl-2 text-left">
+        <GenericPopover
+          trigger={
+            <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
+              <strong>What is a Study Word? (Experimental Feature)</strong><InfoIcon size={14} />
+            </span>
+          }
 
-        <strong>What is a Study Word? (Experimental Feature)</strong>
-        <br />
-        A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
-        The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
-      </p>
+          content={
+            <div className="p-4 text-xs w-96">
+              A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
+              The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
+            </div>
+          }
+        />
+      </div>
     </div>
   );
 };
