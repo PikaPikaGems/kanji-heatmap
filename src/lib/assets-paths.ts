@@ -22,7 +22,12 @@ const assetsPaths = {
   KANJI_STRUCTURE_SCOTT: "/json/kanji-structure-scott.json",
   KANJI_STRUCTURE_YAGAYS: "/json/kanji-structure-yagays.json",
   ICON_SVG: "/img/app-icon.svg",
+  SPEED_KATAKANA_CHALLENGE_SET: "/json/katakana/challenge-set-", // append `<setNumber>.json`
+  SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",
 };
+
+export const SPEED_KATAKANA_TOTAL_SETS = 200;
+export const SPEED_KATAKANA_FONT_COUNT = 15;
 
 export const SAMPLE_VOCAB_PATH =
   import.meta.env.MODE === "development" || window.location.protocol === "http:"

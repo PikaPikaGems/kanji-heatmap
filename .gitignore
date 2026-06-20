@@ -15,6 +15,7 @@ dist
 public/kanji-words/*
 public/kanji-textbook-words/*
 public/kanji-textbook-words-min/*
+public/json/katakana/*
 
 dist-ssr
 *.local

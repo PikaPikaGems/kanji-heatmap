@@ -16,8 +16,14 @@ import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
 
-const { kanjiPage, cumUseGraphPage, aboutPage, termsPage, privacyPage } =
-  pageItems;
+const {
+  kanjiPage,
+  cumUseGraphPage,
+  aboutPage,
+  termsPage,
+  privacyPage,
+  speedKatakanaPage,
+} = pageItems;
 
 const App = () => {
   return (
@@ -31,50 +37,60 @@ const App = () => {
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <GlobalKeyboardShortcutProvider>
-          <Header />
-          <main className="bg-background">
-            <ErrorBoundary
-              details="App"
-              fallback={
-                <div className="w-full pr-4 mt-14">
-                  <DefaultErrorFallback />
-                </div>
-              }
-            >
-              <KanjiFunctionalityProvider>
-                <Switch>
-                  <Route
-                    path={cumUseGraphPage.href}
-                    component={cumUseGraphPage.Component}
-                  />
-                  <Route
-                    path={kanjiPage.href}
-                    component={kanjiPage.Component}
-                  />
-                  <Route
-                    path={aboutPage.href}
-                    component={aboutPage.Component}
-                  />
-                  <Route
-                    path={termsPage.href}
-                    component={termsPage.Component}
-                  />
-                  <Route
-                    path={privacyPage.href}
-                    component={privacyPage.Component}
-                  />
-                  <Route path="/docs">
-                    <Redirect to="/about" />
-                  </Route>
-                  <Route path="*">
+          <Switch>
+            {/* Speed Katakana renders its own slim header and doesn't need the
+                kanji data providers, so it lives outside the layout below. */}
+            <Route
+              path={speedKatakanaPage.href}
+              component={speedKatakanaPage.Component}
+            />
+            <Route>
+              <Header />
+              <main className="bg-background">
+                <ErrorBoundary
+                  details="App"
+                  fallback={
                     <div className="w-full pr-4 mt-14">
-                      <PageNotFound />
+                      <DefaultErrorFallback />
                     </div>
-                  </Route>
-                </Switch>
-              </KanjiFunctionalityProvider>
-            </ErrorBoundary>
-          </main>
+                  }
+                >
+                  <KanjiFunctionalityProvider>
+                    <Switch>
+                      <Route
+                        path={cumUseGraphPage.href}
+                        component={cumUseGraphPage.Component}
+                      />
+                      <Route
+                        path={kanjiPage.href}
+                        component={kanjiPage.Component}
+                      />
+                      <Route
+                        path={aboutPage.href}
+                        component={aboutPage.Component}
+                      />
+                      <Route
+                        path={termsPage.href}
+                        component={termsPage.Component}
+                      />
+                      <Route
+                        path={privacyPage.href}
+                        component={privacyPage.Component}
+                      />
+                      <Route path="/docs">
+                        <Redirect to="/about" />
+                      </Route>
+                      <Route path="*">
+                        <div className="w-full pr-4 mt-14">
+                          <PageNotFound />
+                        </div>
+                      </Route>
+                    </Switch>
+                  </KanjiFunctionalityProvider>
+                </ErrorBoundary>
+              </main>
+            </Route>
+          </Switch>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
     </ErrorBoundary>

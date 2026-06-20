@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { ChartLine, Menu, SearchIcon, } from "lucide-react";
+import { ChartLine, Keyboard, Menu, SearchIcon, } from "lucide-react";
 import pageItems from "@/components/items/page-items";
 import { docPages } from "@/components/items/nav-items";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
@@ -13,7 +13,7 @@ import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
-const { kanjiPage, cumUseGraphPage } = pageItems;
+const { kanjiPage, cumUseGraphPage, speedKatakanaPage } = pageItems;
 
 const navLinks = [
   {
@@ -27,6 +27,12 @@ const navLinks = [
     title: cumUseGraphPage.title,
     description: cumUseGraphPage.description,
     Icon: ChartLine
+  },
+  {
+    href: speedKatakanaPage.href,
+    title: speedKatakanaPage.title,
+    description: speedKatakanaPage.description,
+    Icon: Keyboard
   },
 ];
 
