@@ -1,10 +1,25 @@
 @import "@fontsource/klee-one/japanese-600.css";
 @import "@fontsource/noto-sans-jp/japanese-500.css";
-@import "@fontsource/yuji-mai/japanese-400.css";
 @import "@fontsource/noto-serif-jp/japanese-500.css";
 @import "@fontsource/kiwi-maru/japanese-500.css";
 @import "@fontsource/dotgothic16/japanese-400.css";
 @import "@fontsource/reggae-one/japanese-400.css";
+@import "@fontsource/zen-kurenaido/japanese-400.css";
+@import "@fontsource/hachi-maru-pop/japanese-400.css";
+@import "@fontsource/stick/japanese-400.css";
+@import "@fontsource/yusei-magic/japanese-400.css";
+@import "@fontsource/potta-one/japanese-400.css";
+@import "@fontsource/yuji-mai/japanese-400.css";
+@import "@fontsource/yuji-boku/japanese-400.css";
+@import "@fontsource/zen-old-mincho/japanese-400.css";
+
+@font-face {
+  font-family: "BIZ UDGothic";
+  src: url("/font/BIZUDGothic-Regular.subset.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --jap-font-0: "Klee One";
@@ -14,6 +29,32 @@
   --jap-font-4: "DotGothic16";
   --jap-font-5: "Reggae One";
   --jap-font-6: "Kiwi Maru";
+  --jap-font-7: "Zen Kurenaido";
+  --jap-font-8: "Hachi Maru Pop";
+  --jap-font-9: "Stick";
+  --jap-font-10: "Yuji Boku";
+  --jap-font-11: "Yusei Magic";
+  --jap-font-12: "Potta One";
+  --jap-font-13: "BIZ UDGothic";
+  --jap-font-14: "Zen Old Mincho";
+  --kanji-font: var(--jap-font-0);
+}
+:root {
+  --jap-font-0: "BIZ UDGothic";
+  --jap-font-1: "Noto Sans JP";
+  --jap-font-2: "Noto Serif JP";
+  --jap-font-3: "Zen Old Mincho";
+  --jap-font-4: "Yuji Boku";
+  --jap-font-5: "Yuji Mai";
+  --jap-font-6: "Klee One";
+  --jap-font-7: "Kiwi Maru";
+  --jap-font-8: "Hachi Maru Pop";
+  --jap-font-9: "DotGothic16";
+  --jap-font-10: "Reggae One";
+  --jap-font-11: "Zen Kurenaido";
+  --jap-font-12: "Stick";
+  --jap-font-13: "Yusei Magic";
+  --jap-font-14: "Potta One";
   --kanji-font: var(--jap-font-0);
 }
 

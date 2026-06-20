@@ -8,6 +8,7 @@ import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
 import { SmallUnexpectedErrorFallback, SmallUnexpectedErrorFallbackTxt } from "@/components/error/SmallUnexpectedErrorFallback";
 import { ErrorBoundary } from "@/components/error";
+import { Recognizer } from "./recognizers";
 
 type RecognitionStatus = "idle" | "loading" | "success" | "error";
 
@@ -23,16 +24,17 @@ const HandwritingScreenLayout = ({
   top,
   bottom,
   candidatesCount,
+  title = "Draw a Kanji"
 }: {
   top: ReactNode;
   bottom: ReactNode;
   candidatesCount: number;
+  title?: string
 }) => {
   return (
     <div className="relative w-full px-1 mx-auto">
-      {/* Draw a Kanji */}
       <div className="absolute z-50 w-full m-auto -top-1">
-        <TitleLayout>Draw a Kanji</TitleLayout>
+        <TitleLayout>{title}</TitleLayout>
       </div>
       <div
         className="relative flex flex-wrap items-start justify-center w-full py-1 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
@@ -54,56 +56,18 @@ const HandwritingScreenLayout = ({
   );
 };
 
-const buildInkPayload = ({ strokes, width, height }: DrawingSubmitPayload) => {
-  const ink = strokes.map((stroke) => {
-    const xs: number[] = [];
-    const ys: number[] = [];
-    stroke.forEach(([x, y]) => {
-      xs.push(Math.round(x));
-      ys.push(Math.round(y));
-    });
-    return [xs, ys];
-  });
-
-  return {
-    options: "enable_pre_space",
-    requests: [
-      {
-        writing_guide: {
-          writing_area_width: width,
-          writing_area_height: height,
-        },
-        ink,
-        language: "ja",
-      },
-    ],
-  };
-};
-
-const parseCandidates = (data: unknown): string[] => {
-  // Expected shape: ["SUCCESS", [["<hash>", ["時","持",...], [], {...}]]]
-  if (
-    Array.isArray(data) &&
-    data[0] === "SUCCESS" &&
-    Array.isArray(data[1]) &&
-    Array.isArray(data[1][0]) &&
-    Array.isArray(data[1][0][1])
-  ) {
-    return data[1][0][1] as string[];
-  }
-  return [];
-};
-
 const messageBoxCN =
   "w-full text-xs h-full font-bold flex justify-center items-center p-2 text-center";
 
 const HandwritingResultsPreview = ({
   status,
   candidates,
+  errorText,
   onClick,
 }: {
   status: RecognitionStatus;
   candidates: string[];
+  errorText: string;
   onClick: () => void;
 }) => {
 
@@ -116,7 +80,7 @@ const HandwritingResultsPreview = ({
   }
 
   if (status === "error") {
-    return <SmallUnexpectedErrorFallbackTxt txt={"Google's handwriting API can't be accessed right now."} />;
+    return <SmallUnexpectedErrorFallbackTxt txt={errorText} />;
   }
 
   if (candidates.length === 0) {
@@ -156,12 +120,18 @@ export const HandWritingDrawingPad = ({
   strokes,
   setStrokes,
   onResultClick,
+  recognize,
+  errorText,
 }: {
   value: string;
   onChange: (newValue: string) => void;
   strokes: Stroke[];
   setStrokes: React.Dispatch<React.SetStateAction<Stroke[]>>;
   onResultClick: () => void;
+  // How drawn strokes are turned into candidate kanji (online API vs on-device).
+  recognize: Recognizer;
+  // Shown in the results preview when recognition fails.
+  errorText: string;
 }) => {
   const [status, setStatus] = useState<RecognitionStatus>("idle");
   const [svgSize] = useState(() =>
@@ -180,23 +150,15 @@ export const HandWritingDrawingPad = ({
 
     setStatus("loading");
     try {
-      const response = await fetch("/api/handwriting", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildInkPayload(payload)),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Handwriting API error: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const recognized = await recognize(payload);
       // Keep only the candidates that exist in our kanji dataset.
-      const available = parseCandidates(data).filter(
-        (kanji) => {
-          return getBasicInfo == null || getBasicInfo(kanji)?.on != null || getBasicInfo(kanji)?.kun != null
-        }
-      );
+      const available = recognized.filter((kanji) => {
+        return (
+          getBasicInfo == null ||
+          getBasicInfo(kanji)?.on != null ||
+          getBasicInfo(kanji)?.kun != null
+        );
+      });
 
       // Drop the recognized kanji into the search text (multi-kanji style)
       // so the main list reflects them and the input keeps them on close.
@@ -228,6 +190,7 @@ export const HandWritingDrawingPad = ({
         <HandwritingResultsPreview
           status={status}
           candidates={candidates}
+          errorText={errorText}
           onClick={onResultClick}
         />
       }
