@@ -63,7 +63,12 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
     <div className="py-3 space-y-3 ">
       <div className="flex flex-col gap-3 pt-6">
         <div className="overflow-auto">
-          <ExampleWordPopover word={word} wordTranslationOverride={englishGloss} className="text-7xl sm:text-[100px]/[1] p-8" />
+          <ExampleWordPopover
+            word={word}
+            wordTranslationOverride={englishGloss}
+            readingOverride={reading}
+            className="text-7xl sm:text-[100px]/[1] p-8"
+          />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2">

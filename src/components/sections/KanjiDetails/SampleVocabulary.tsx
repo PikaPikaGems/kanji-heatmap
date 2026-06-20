@@ -85,9 +85,15 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
         <TableCell className="text-base kanji-font w-fit">
           <ExampleWordPopover
             word={entry.w}
+            readingOverride={entry.r}
             wordTranslationOverride={entry.e}
             optionalSection={
-              <WordTagBadges jlpt={jlpt} isKaishi={isKaishi} tier={tier} isUncommonForm={entry.uncommon_form} />
+              <WordTagBadges
+                jlpt={jlpt}
+                isKaishi={isKaishi}
+                tier={tier}
+                isUncommonForm={entry.uncommon_form}
+              />
             }
           />
         </TableCell>
