@@ -15,6 +15,29 @@ const readFromStorage = <T>(storageKey: string, defaultValue: T): T => {
   }
 };
 
+export function useLocalStorage2(storageKey: string) {
+  const [value, setValue] = useState(() => localStorage.getItem(storageKey) === "true");
+
+  useEffect(() => {
+    setValue(localStorage.getItem(storageKey) === "true");
+  }, [storageKey]);
+
+  const set = useCallback(
+    (next: boolean) => {
+      if (next) {
+        localStorage.setItem(storageKey, "true");
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+      setValue(next);
+      window.dispatchEvent(new StorageEvent("storage", { key: storageKey }));
+    },
+    [storageKey]
+  );
+
+  return [value, set] as [boolean, (next: boolean) => void];
+}
+
 export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
   const defaultValueRef = useRef(defaultValue);
 

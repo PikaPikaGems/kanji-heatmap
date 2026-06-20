@@ -1,22 +1,21 @@
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PlusCircle } from "lucide-react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-
+import { useLocalStorage2 } from "@/hooks/use-local-storage";
 
 const MarkAsKnownBadge = ({ word }: { word: string }) => {
-    const [data, setItem] = useLocalStorage(`known:${word}`, { known: false });
-    const toggle = () => setItem("known", !data.known);
+    const [isKnown, setIsKnown] = useLocalStorage2(`k:${word}`);
+    const toggle = () => setIsKnown(!isKnown);
 
     return (
         <button
             onClick={toggle}
-            className={`inline-flex items-center gap-1.5 px-2 py-1 my-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap ${data.known
+            className={`inline-flex items-center gap-1.5 px-2 py-1 my-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap ${isKnown
                 ? "bg-green-500/15 text-green-500 border border-green-500"
                 : "border border-dashed border-foreground/50 text-muted-foreground hover:text-foreground"
                 }`}
         >
-            {data.known ? "✓ Known" : "Unmarked"}
+            {isKnown ? "✓ Known" : "Unmarked"}
         </button>
     );
 };

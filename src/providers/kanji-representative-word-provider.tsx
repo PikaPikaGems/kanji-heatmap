@@ -73,3 +73,8 @@ export const useKanjiRepresentativeWord = (kanji: string): RepresentativeWordDat
   const { getRepresentativeWord } = useKanjiRepresentativeWordContext();
   return useMemo(() => getRepresentativeWord(kanji), [getRepresentativeWord, kanji]);
 };
+
+export const useGetRepresentativeWordFn = () => {
+  const { getRepresentativeWord } = useKanjiRepresentativeWordContext();
+  return getRepresentativeWord;
+};

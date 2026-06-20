@@ -9,14 +9,7 @@ const useKnownCount = () => {
       let n = 0;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith("known:")) {
-          try {
-            const val = JSON.parse(localStorage.getItem(key) ?? "{}");
-            if (val.known) n++;
-          } catch {
-            // ignore malformed entries
-          }
-        }
+        if (key?.startsWith("k:") && localStorage.getItem(key) === "true") n++;
       }
       setCount(n);
     };
@@ -24,7 +17,7 @@ const useKnownCount = () => {
     compute();
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith("known:")) compute();
+      if (e.key?.startsWith("k:")) compute();
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);

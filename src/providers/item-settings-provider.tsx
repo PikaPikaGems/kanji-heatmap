@@ -12,8 +12,10 @@ export function ItemSettingsProvider({ children }: { children: ReactNode }) {
     defaultItemSettingsValue
   );
 
+  const mergedSettings = { ...defaultItemSettingsValue, ...storageData };
+
   return (
-    <itemSettings.StateContext.Provider value={storageData}>
+    <itemSettings.StateContext.Provider value={mergedSettings}>
       <itemSettings.DispatchContext.Provider value={setItem}>
         {children}
       </itemSettings.DispatchContext.Provider>

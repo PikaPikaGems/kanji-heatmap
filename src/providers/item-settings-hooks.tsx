@@ -4,7 +4,7 @@ import { ItemSettings } from "@/lib/settings/settings";
 
 export const defaultItemSettingsValue: ItemSettings = {
   cardType: "expanded",
-  borderColorAttached: true,
+  borderColorMeaning: "jlpt",
 };
 
 export const itemSettings = createContextComponents<ItemSettings>(
