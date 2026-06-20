@@ -11,8 +11,7 @@ const STUDY_STATUS_ITEMS = [
 export const StudyStatusBorderMeanings = () => {
   return (
     <>
-      <h3 className="mt-4 mb-1 text-xs font-extrabold"> Study Status </h3>
-      <ul className="flex flex-wrap mb-2">
+      <ul className="flex flex-wrap my-2">
         {STUDY_STATUS_ITEMS.map((item) => (
           <JLPTListItem
             key={item.label}
