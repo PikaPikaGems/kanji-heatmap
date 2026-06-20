@@ -9,7 +9,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) =>
       `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
   },
-  { name: "⭐️ JPDB", url: jpdbFn },
+  { name: "⭐️ JPDB.io", url: jpdbFn },
   {
     name: "⭐️ Jiten.Moe",
     url: jitenMoeFn,
@@ -23,7 +23,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
   },
   {
-    name: "⭐️ WaniKani",
+    name: "WaniKani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
   },
   {
@@ -215,11 +215,6 @@ export const otherOutLinks = {
 
 export const vocabExternalLinksCore = [
   {
-    name: "Kagi Translate",
-    url: (word: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
-  },
-  {
     name: "JP Word Ranks",
     url: (word: string) =>
       `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
@@ -246,13 +241,18 @@ export const vocabExternalLinksCore = [
 
     url: (word: string) => `https://jiten.moe/parse?text=${word}&parsed=true`,
   },
+  {
+    name: "Kagi Translate",
+    url: (word: string) =>
+      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
+  },
 ];
 
 export const vocabExternalLinks = [
   ...vocabExternalLinksCore,
   {
     name: "Jisho.org",
-    url: (word: string) => `https://jisho.org/word/${word}`,
+    url: (word: string) => `https://jisho.org/search/${word}%20%23words`,
   },
   {
     name: "Jotoba",

@@ -30,11 +30,12 @@ const SmallFuriganaPart = ({ part, className = "" }: { part: WordPartDetail, cla
 interface ExampleWordPopoverProps {
   word: string;
   wordTranslationOverride?: string;
+  readingOverride?: string,
   className?: string;
   optionalSection?: ReactNode;
 }
 
-export const ExampleWordPopover = ({ word, wordTranslationOverride, className = "text-4xl", optionalSection }: ExampleWordPopoverProps) => {
+export const ExampleWordPopover = ({ word, wordTranslationOverride, readingOverride, className = "text-4xl", optionalSection }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
@@ -46,7 +47,7 @@ export const ExampleWordPopover = ({ word, wordTranslationOverride, className = 
     );
   }
 
-  const kana = (vocabInfo ?? { parts: [] }).parts.map((part) => part[1] || part[0]).join("");
+  const kana = readingOverride ?? (vocabInfo ?? { parts: [] }).parts.map((part) => part[1] || part[0]).join("");
   const meaning = wordTranslationOverride ?? vocabInfo?.meaning;
 
   return (

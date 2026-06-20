@@ -21,6 +21,7 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 
 
 export const RirikkuCTABadge = () => {
@@ -95,6 +96,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
 
   return (
     <div className="py-2 mx-2">
+      <KanjiWordStatusActions kanji={kanji} />
       <div className="relative p-0 m-0 md:hidden">
         <SimpleAccordion trigger={`${kanji} Reference Card`} defaultOpen={true}>
           {smallScreenNode}

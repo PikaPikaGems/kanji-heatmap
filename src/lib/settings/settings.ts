@@ -39,7 +39,9 @@ export type SearchSettings = {
   sortSettings: SortSettings;
 };
 
+export type BorderColorMeaning = "jlpt" | "study-status" | "none";
+
 export type ItemSettings = {
   cardType: "compact" | "expanded";
-  borderColorAttached: boolean;
+  borderColorMeaning: BorderColorMeaning;
 };

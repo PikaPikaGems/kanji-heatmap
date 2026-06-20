@@ -73,7 +73,7 @@ const WordTagBadges = ({
 const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const jlptNum = entry.j ? Number(entry.j) : -1
   const jlpt = [1, 2, 3, 4, 5].includes(jlptNum) ? `n${jlptNum}` as JLTPTtypes : null
-  const isKaishi = entry.k === 1
+  const isKaishi = entry.k === true || entry.k === 1
   const tier = entry.t && FreqCategoryMap[entry.t] ? entry.t : undefined
 
   return (
@@ -85,9 +85,15 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
         <TableCell className="text-base kanji-font w-fit">
           <ExampleWordPopover
             word={entry.w}
+            readingOverride={entry.r}
             wordTranslationOverride={entry.e}
             optionalSection={
-              <WordTagBadges jlpt={jlpt} isKaishi={isKaishi} tier={tier} isUncommonForm={entry.uncommon_form} />
+              <WordTagBadges
+                jlpt={jlpt}
+                isKaishi={isKaishi}
+                tier={tier}
+                isUncommonForm={entry.uncommon_form}
+              />
             }
           />
         </TableCell>

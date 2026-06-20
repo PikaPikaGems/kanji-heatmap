@@ -4,42 +4,14 @@ import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
 import { vocabExternalLinksCore } from "@/lib/external-links";
-
-import { DotIcon, InfoIcon, PlusCircle } from "lucide-react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
+import { DotIcon, InfoIcon } from "lucide-react";
 
 import { VocabActions } from "@/components/common/VocabActions";
 
 
-const MarkAsKnownBadge = ({ word }: { word: string }) => {
-  const [data, setItem] = useLocalStorage(`known:${word}`, { known: false });
-  const toggle = () => setItem("known", !data.known);
 
-  return (
-    <button
-      onClick={toggle}
-      className={`inline-flex items-center gap-1.5 px-2 py-1 my-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap ${data.known
-        ? "bg-green-500/15 text-green-500 border border-green-500"
-        : "border border-dashed border-foreground/50 text-muted-foreground hover:text-foreground"
-        }`}
-    >
-      {data.known ? "✓ Known" : "Unmarked"}
-    </button>
-  );
-};
 
-const MemorizeThisWord = ({ word }: { word: string }) => (
-  <GenericPopover
-    trigger={
-      <button className={`flex text-left gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-4 hover:text-green-400 text-green-500 hover:decoration-solid`}>
-        <PlusCircle size={16} className="translate-y-0.5" /> Add {word} to my review pile
-      </button>
-    }
-    content={
-      <div className="p-3 text-sm">Coming soon!</div>
-    }
-  />
-);
+
 
 const ViewVocabDetails = () => (
   <GenericPopover
@@ -53,6 +25,26 @@ const ViewVocabDetails = () => (
     }
   />
 );
+
+const WhatIsARepresentativeStudyWord = () => {
+  return (
+    <>
+      <GenericPopover
+        trigger={
+          <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
+            <strong>What is a Study Word? (Experimental Feature)</strong><InfoIcon size={14} />
+          </span>
+        }
+
+        content={
+          <div className="p-4 text-xs w-96">
+            A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
+            The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
+          </div>
+        }
+      /></>
+  )
+}
 
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   const data = useKanjiRepresentativeWord(kanji);
@@ -69,16 +61,14 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
   return (
     <div className="py-3 space-y-3 ">
-      <div className="flex items-start justify-between">
-        <MemorizeThisWord word={word} />
-        <MarkAsKnownBadge word={word} key={word} />
-      </div>
-
       <div className="flex flex-col gap-3 pt-6">
-
-
         <div className="overflow-auto">
-          <ExampleWordPopover word={word} wordTranslationOverride={englishGloss} className="text-7xl sm:text-[100px]/[1] p-8" />
+          <ExampleWordPopover
+            word={word}
+            wordTranslationOverride={englishGloss}
+            readingOverride={reading}
+            className="text-7xl sm:text-[100px]/[1] p-8"
+          />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2">
@@ -117,20 +107,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
         </div>
       </div>
       <div className="pt-16 pl-2 text-left">
-        <GenericPopover
-          trigger={
-            <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
-              <strong>What is a Study Word? (Experimental Feature)</strong><InfoIcon size={14} />
-            </span>
-          }
-
-          content={
-            <div className="p-4 text-xs w-96">
-              A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
-              The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
-            </div>
-          }
-        />
+        <WhatIsARepresentativeStudyWord />
       </div>
     </div>
   );
