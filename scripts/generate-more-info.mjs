@@ -20,7 +20,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
 const allowedKanji = new Set(
-  JSON.parse(readFileSync(resolve(root, "public/json/filtered_kanji.json"), "utf-8"))
+  JSON.parse(
+    readFileSync(resolve(root, "public/json/filtered_kanji.json"), "utf-8")
+  )
 );
 console.log(`Allowed kanji: ${allowedKanji.size}`);
 
@@ -33,18 +35,21 @@ function generateHlorenzi() {
     if (allowedKanji.has(k)) result[k] = v;
   }
   writeFileSync(
-    resolve(root, "public/json/kanji-structure-filtered-hlorenzi.json"),
+    resolve(root, "public/json/kanji-structure-hlorenzi.json"),
     JSON.stringify(result),
     "utf-8"
   );
   console.log(
-    `kanji-structure-filtered-hlorenzi.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
+    `kanji-structure-hlorenzi.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
   );
 }
 
 function generateReadings() {
   const raw = JSON.parse(
-    readFileSync(resolve(root, "raw-data/piyush/kanji-readings-details.json"), "utf-8")
+    readFileSync(
+      resolve(root, "raw-data/piyush/kanji-readings-details.json"),
+      "utf-8"
+    )
   );
   const result = {};
   for (const [k, values] of Object.entries(raw)) {
@@ -57,18 +62,21 @@ function generateReadings() {
     }));
   }
   writeFileSync(
-    resolve(root, "public/json/kanji-readings-details-filtered.json"),
+    resolve(root, "public/json/kanji-readings-details.json"),
     JSON.stringify(result),
     "utf-8"
   );
   console.log(
-    `kanji-readings-details-filtered.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
+    `kanji-readings-details.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
   );
 }
 
 function generateKanjium() {
   const raw = readFileSync(resolve(root, "raw-data/kanjidict.txt"), "utf-8");
-  const rows = raw.trim().split("\n").map((line) => line.split("\t"));
+  const rows = raw
+    .trim()
+    .split("\n")
+    .map((line) => line.split("\t"));
 
   function orNull(val) {
     return val?.trim() || null;
@@ -109,16 +117,19 @@ function generateScott() {
     if (colonIdx === -1) continue;
     const kanji = trimmed.slice(0, colonIdx).trim();
     if (!kanji || !allowedKanji.has(kanji)) continue;
-    const rest = trimmed.slice(colonIdx + 1).replace(/#.*$/, "").trim();
+    const rest = trimmed
+      .slice(colonIdx + 1)
+      .replace(/#.*$/, "")
+      .trim();
     const parts = rest.split(/\s+/).filter(Boolean);
     if (parts.length > 0) result[kanji] = parts;
   }
   writeFileSync(
-    resolve(root, "public/json/scott-components.json"),
+    resolve(root, "public/json/kanji-structure-scott.json"),
     JSON.stringify(result),
     "utf-8"
   );
-  console.log(`scott-components.json: ${Object.keys(result).length} keys`);
+  console.log(`kanji-structure-scott.json: ${Object.keys(result).length} keys`);
 }
 
 function generateYagays() {
@@ -133,12 +144,12 @@ function generateYagays() {
     if (allowedKanji.has(k)) result[k] = parts;
   }
   writeFileSync(
-    resolve(root, "public/json/yagays-components.json"),
+    resolve(root, "public/json/kanji-structure-yagays.json"),
     JSON.stringify(result),
     "utf-8"
   );
   console.log(
-    `yagays-components.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
+    `kanji-structure-yagays.json: ${Object.keys(raw).length} → ${Object.keys(result).length} keys`
   );
 }
 

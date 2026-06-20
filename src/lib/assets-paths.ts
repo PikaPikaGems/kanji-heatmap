@@ -16,11 +16,11 @@ const assetsPaths = {
   },
   KANJI_REPRESENTATIVE_WORDS: "/json/kanji_representative_words.json",
   KANJI_DECOMPOSITION: "/json/kanji_decomposition.json",
-  KANJI_READING_DETAILS: "/json/kanji-readings-details-filtered.json",
-  KANJI_STRUCTURE_DETAILS: "/json/kanji-structure-filtered-hlorenzi.json",
+  KANJI_READING_DETAILS: "/json/kanji-readings-details.json",
+  KANJI_STRUCTURE_DETAILS: "/json/kanji-structure-hlorenzi.json",
   KANJI_STRUCTURE_KANJIUM: "/json/kanji-structure-kanjium.json",
-  KANJI_STRUCTURE_SCOTT: "/json/scott-components.json",
-  KANJI_STRUCTURE_YAGAYS: "/json/yagays-components.json",
+  KANJI_STRUCTURE_SCOTT: "/json/kanji-structure-scott.json",
+  KANJI_STRUCTURE_YAGAYS: "/json/kanji-structure-yagays.json",
   ICON_SVG: "/img/app-icon.svg",
 };
 
