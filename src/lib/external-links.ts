@@ -252,7 +252,7 @@ export const vocabExternalLinks = [
   ...vocabExternalLinksCore,
   {
     name: "Jisho.org",
-    url: (word: string) => `https://jisho.org/word/${word}`,
+    url: (word: string) => `https://jisho.org/search/${word}%20%23words`,
   },
   {
     name: "Jotoba",
