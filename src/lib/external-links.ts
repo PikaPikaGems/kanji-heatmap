@@ -9,7 +9,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) =>
       `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
   },
-  { name: "⭐️ JPDB", url: jpdbFn },
+  { name: "⭐️ JPDB.io", url: jpdbFn },
   {
     name: "⭐️ Jiten.Moe",
     url: jitenMoeFn,
@@ -23,7 +23,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
   },
   {
-    name: "⭐️ WaniKani",
+    name: "WaniKani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
   },
   {
