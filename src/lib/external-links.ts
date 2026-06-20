@@ -215,11 +215,6 @@ export const otherOutLinks = {
 
 export const vocabExternalLinksCore = [
   {
-    name: "Kagi Translate",
-    url: (word: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
-  },
-  {
     name: "JP Word Ranks",
     url: (word: string) =>
       `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
@@ -245,6 +240,11 @@ export const vocabExternalLinksCore = [
     name: "Jiten.Moe",
 
     url: (word: string) => `https://jiten.moe/parse?text=${word}&parsed=true`,
+  },
+  {
+    name: "Kagi Translate",
+    url: (word: string) =>
+      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
   },
 ];
 
