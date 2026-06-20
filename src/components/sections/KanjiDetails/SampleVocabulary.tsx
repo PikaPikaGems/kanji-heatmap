@@ -73,7 +73,7 @@ const WordTagBadges = ({
 const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const jlptNum = entry.j ? Number(entry.j) : -1
   const jlpt = [1, 2, 3, 4, 5].includes(jlptNum) ? `n${jlptNum}` as JLTPTtypes : null
-  const isKaishi = entry.k === 1
+  const isKaishi = entry.k === true || entry.k === 1
   const tier = entry.t && FreqCategoryMap[entry.t] ? entry.t : undefined
 
   return (
