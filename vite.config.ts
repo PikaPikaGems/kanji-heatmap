@@ -55,7 +55,26 @@ const pwaConfig = {
 
   workbox: {
     globPatterns: ["**/*.{js,css,html}"],
+    // The kanjicanvas reference patterns are a ~6.4MB lazy chunk only needed for
+    // "Handwriting Alt". Too big to precache (and wasteful to ship to everyone),
+    // so exclude it from precache and cache it at runtime on first use instead.
+    globIgnores: ["**/ref-patterns-*.js"],
     runtimeCaching: [
+      // **********************
+      // KANJICANVAS reference patterns (lazy, on-device handwriting recognition)
+      // **********************
+      {
+        urlPattern: /assets\/ref-patterns-.*\.js$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "kanjicanvas-patterns-cache",
+          expiration: {
+            maxEntries: 2,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+          },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
       // **********************
       // JISHO API (proxied via Cloudflare Pages Function)
       // **********************
@@ -203,6 +222,10 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // kanjicanvas is installed straight from GitHub and ships no package.json,
+      // so bare deep imports won't resolve during the production (Rollup) build.
+      // Point the specifier at the installed package dir explicitly.
+      kanjicanvas: path.resolve(__dirname, "./node_modules/kanjicanvas"),
     },
   },
 }));

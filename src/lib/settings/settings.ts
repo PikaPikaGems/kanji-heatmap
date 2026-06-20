@@ -10,6 +10,7 @@ export const SEARCH_TYPE_ARR = [
   "multi-kanji",
   "radicals",
   "handwriting",
+  "handwriting-alt",
 ] as const;
 
 export type SearchType = (typeof SEARCH_TYPE_ARR)[number];

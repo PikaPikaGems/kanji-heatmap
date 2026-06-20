@@ -12,20 +12,16 @@ import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
 import { defaultSearchType } from "@/lib/settings/search-settings-adapter";
 
-import {
-  RadicalScreenContent,
-  RadicalScreenLayout,
-  RadicalsResultsPreview,
-  RadicalsSelected,
-} from "./RadicalScreen/RadicalScreen";
-import { RadicalsScreenDialog } from "./RadicalScreen/RadicalScreenDialog";
-import { HandWritingDrawingPad } from "./HandwritingScreen/HandwritingScreen";
-import { HandwritingScreenDialog } from "./HandwritingScreen/HandwritingScreenDialog";
-import { Stroke } from "@/components/dependent/DrawingPad";
-import { ErrorBoundary } from "@/components/error";
-import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
+import { RadicalsControl } from "./RadicalScreen/RadicalsControl";
+import { HandwritingControl } from "./HandwritingScreen/HandwritingControl";
 
 const INPUT_DEBOUNCE_TIME = 400;
+
+// Search types that open a drawer instead of accepting typed input.
+type DialogType = "radicals" | "handwriting" | "handwriting-alt";
+const DIALOG_TYPES: DialogType[] = ["radicals", "handwriting", "handwriting-alt"];
+const isDialogType = (type: SearchType): type is DialogType =>
+  (DIALOG_TYPES as SearchType[]).includes(type);
 
 export const SearchInput = ({
   initialSearchType = defaultSearchType,
@@ -43,11 +39,14 @@ export const SearchInput = ({
     translateValue(initialText, translateMap[searchType])
   );
 
-  const [isOpenRadicals, setIsOpenRadicals] = useState(false);
-  const [isOpenHandwriting, setIsOpenHandwriting] = useState(false);
-  // Strokes live here (not inside the drawer) so closing the drawer keeps the
-  // drawing. Switching search type resets them.
-  const [handwritingStrokes, setHandwritingStrokes] = useState<Stroke[]>([]);
+  // Which drawer (if any) is currently open. The drawn strokes themselves live
+  // inside <HandwritingControl/>, not here.
+  const [openDialogType, setOpenDialogType] = useState<DialogType | "none">(
+    "none"
+  );
+  // Bumping this remounts <HandwritingControl/>, discarding its strokes. Used to
+  // reset the drawing pad when the search text is cleared from the input bar.
+  const [handwritingResetKey, setHandwritingResetKey] = useState(0);
 
   // sync internal state when props change (e.g. navigating via link) example for radical search
   const [prevInitialText, setPrevInitialText] = useState(initialText);
@@ -90,11 +89,8 @@ export const SearchInput = ({
         )}
         value={parsedValue}
         onClick={() => {
-          if (searchType === "radicals") {
-            setIsOpenRadicals(true);
-          }
-          if (searchType === "handwriting") {
-            setIsOpenHandwriting(true);
+          if (isDialogType(searchType)) {
+            setOpenDialogType(searchType);
           }
         }}
         onChange={(e) => {
@@ -127,7 +123,7 @@ export const SearchInput = ({
           }
 
           if (hasKanji(processedText)) {
-            // if has selection overwrite selection, else append to existing text 
+            // if has selection overwrite selection, else append to existing text
             const start = inputRef.current?.selectionStart ?? null;
             const end = inputRef.current?.selectionEnd ?? null;
             const hasSelection = start !== null && end !== null && start !== end;
@@ -176,6 +172,8 @@ export const SearchInput = ({
             variant={"secondary"}
             onClick={() => {
               onSyncAll("", searchType);
+              // Also clears the drawing pad (see handwritingResetKey).
+              setHandwritingResetKey((key) => key + 1);
             }}
           >
             <CircleX />
@@ -187,18 +185,9 @@ export const SearchInput = ({
           onChange={(val) => {
             const newType = val as SearchType;
 
-            // Switching search type always starts the drawing pad fresh.
-            setHandwritingStrokes([]);
-
-            if (newType === "radicals") {
-              onSyncAll("", "radicals");
-              setIsOpenRadicals(true);
-              return;
-            }
-
-            if (newType === "handwriting") {
-              onSyncAll("", "handwriting");
-              setIsOpenHandwriting(true);
+            if (isDialogType(newType)) {
+              onSyncAll("", newType);
+              setOpenDialogType(newType);
               return;
             }
 
@@ -217,72 +206,26 @@ export const SearchInput = ({
         />
       </div>
 
-      <RadicalsScreenDialog
-        isOpen={isOpenRadicals}
-        onClose={() => {
-          setIsOpenRadicals(false);
-        }}
-      >
-        <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
-          <RadicalScreenLayout
-            count={[...parsedValue].length}
-            top={
-              <ErrorBoundary>
-                <RadicalScreenContent
-                  value={new Set([...parsedValue])}
-                  setValue={(radicals) => {
-                    const newStr = [...radicals].join("");
-                    onSyncAll(newStr, "radicals");
-                  }}
-                />
-              </ErrorBoundary>
-            }
-            middle={
-              <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
-                <RadicalsSelected
-                  value={[...parsedValue]}
-                  onClick={(radical) => {
-                    const radicals = new Set([...parsedValue]);
-                    radicals.delete(radical);
-                    const newStr = [...radicals].join("");
-                    onSyncAll(newStr, "radicals");
-                  }}
-                />
-              </ErrorBoundary>
-            }
-            bottom={
-              <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
-                <RadicalsResultsPreview
-                  onClick={() => {
-                    setIsOpenRadicals(false);
-                  }}
-                />
-              </ErrorBoundary>
-            }
-          />
-        </ErrorBoundary>
-      </RadicalsScreenDialog>
+      <RadicalsControl
+        isOpen={openDialogType === "radicals"}
+        onClose={() => setOpenDialogType("none")}
+        value={parsedValue}
+        onChange={(newStr) => onSyncAll(newStr, "radicals")}
+      />
 
-      <HandwritingScreenDialog
-        isOpen={isOpenHandwriting}
-        onClose={() => {
-          setIsOpenHandwriting(false);
-        }}
-      >
-        <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
-          <HandWritingDrawingPad
-            value={parsedValue}
-            onChange={(newStr) => {
-              onSyncAll(newStr, "handwriting");
-            }}
-            strokes={handwritingStrokes}
-            setStrokes={setHandwritingStrokes}
-            onResultClick={() => {
-              setIsOpenHandwriting(false);
-            }}
-          />
-        </ErrorBoundary>
-      </HandwritingScreenDialog>
+      {(searchType === "handwriting" || searchType === "handwriting-alt") && (
+        // Keyed by search type + reset counter so switching variants or clearing
+        // the input starts the drawing pad fresh. Mounted regardless of the
+        // drawer's open state so the drawing survives closing/reopening it.
+        <HandwritingControl
+          key={`${searchType}-${handwritingResetKey}`}
+          variant={searchType === "handwriting" ? "google" : "kanjicanvas"}
+          isOpen={openDialogType === searchType}
+          onClose={() => setOpenDialogType("none")}
+          value={parsedValue}
+          onChange={(newStr) => onSyncAll(newStr, searchType)}
+        />
+      )}
     </section>
   );
 };
