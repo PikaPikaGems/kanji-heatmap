@@ -1,10 +1,33 @@
+import fs from "fs";
 import path from "path";
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig, UserConfig, Plugin } from "vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 import { TemplateType } from "rollup-plugin-visualizer/dist/plugin/template-types";
+
+// Copies ref-patterns.js out of node_modules into public/js/ so Rollup never
+// bundles it (removing the 6.4 MB chunk warning). It's still lazy-loaded at
+// runtime via a <script> tag and cached by the service worker.
+const REF_PATTERNS_SRC = path.resolve(
+  __dirname,
+  "node_modules/kanjicanvas/docs/resources/javascript/ref-patterns.js"
+);
+const REF_PATTERNS_DEST_DIR = path.resolve(__dirname, "public/js");
+const REF_PATTERNS_DEST = path.join(REF_PATTERNS_DEST_DIR, "ref-patterns.js");
+
+const copyRefPatterns = (): void => {
+  if (!fs.existsSync(REF_PATTERNS_DEST_DIR))
+    fs.mkdirSync(REF_PATTERNS_DEST_DIR, { recursive: true });
+  fs.copyFileSync(REF_PATTERNS_SRC, REF_PATTERNS_DEST);
+};
+
+const kanjiCanvasRefPatternsPlugin: Plugin = {
+  name: "kanjicanvas-ref-patterns",
+  configureServer: copyRefPatterns,
+  buildStart: copyRefPatterns,
+};
 
 const pwaConfig = {
   // registerType: 'prompt' <-- if we want to ensure user updates
@@ -58,13 +81,13 @@ const pwaConfig = {
     // The kanjicanvas reference patterns are a ~6.4MB lazy chunk only needed for
     // "Handwriting Alt". Too big to precache (and wasteful to ship to everyone),
     // so exclude it from precache and cache it at runtime on first use instead.
-    globIgnores: ["**/ref-patterns-*.js"],
+    globIgnores: ["**/ref-patterns.js"],
     runtimeCaching: [
       // **********************
       // KANJICANVAS reference patterns (lazy, on-device handwriting recognition)
       // **********************
       {
-        urlPattern: /assets\/ref-patterns-.*\.js$/i,
+        urlPattern: /\/js\/ref-patterns\.js$/i,
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanjicanvas-patterns-cache",
@@ -196,6 +219,7 @@ const visualizer_templates: TemplateType[] = [
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [
+    kanjiCanvasRefPatternsPlugin,
     process.env.CF_PAGES ? null : cloudflare(),
     react(),
     VitePWA(pwaConfig),

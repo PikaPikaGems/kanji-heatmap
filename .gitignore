@@ -16,6 +16,7 @@ public/kanji-words/*
 public/kanji-textbook-words/*
 public/kanji-textbook-words-min/*
 public/json/katakana/*
+public/js/*
 
 dist-ssr
 *.local
