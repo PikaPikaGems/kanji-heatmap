@@ -63,6 +63,10 @@ export const Game = ({
   // During composition we must not re-transform the value, or iOS Safari renders
   // the committed character twice. See onChange handler below.
   const isComposingRef = useRef(false);
+  // Set right after compositionend so the redundant trailing change event that
+  // desktop browsers fire isn't processed a second time. Cleared on a macrotask
+  // so it only ever swallows that one synchronous follow-up event.
+  const suppressNextChangeRef = useRef(false);
 
   // Stats live in refs so per-keystroke bookkeeping doesn't trigger re-renders.
   const startTimeRef = useRef<number | null>(null);
@@ -160,9 +164,15 @@ export const Game = ({
     // too (e.g. typing "paasento" → パアセント still clears パーセント).
     const targetRomaji = tryConvertRomaji(target);
 
+    // iOS autocomplete / the IME suggestion bar appends a trailing space (often
+    // the full-width U+3000) to the inserted word. Strip all whitespace so a
+    // correct-but-spaced commit like the full-width-spaced word still matches.
+    // JS \s already covers the full-width U+3000 and other Unicode spaces.
+    const cleaned = converted.replace(/\s+/g, "");
+
     // Ignore a trailing partial romaji tail (e.g. "k" before "ka" → "カ") so
     // mid-syllable typing isn't mistaken for an error.
-    const committedKana = converted.replace(/[a-zA-Z]+$/, "");
+    const committedKana = cleaned.replace(/[a-zA-Z]+$/, "");
     const committedRomaji = tryConvertRomaji(committedKana);
     const isOnTrack = targetRomaji.startsWith(committedRomaji);
     if (!isOnTrack && !inErrorStateRef.current) {
@@ -170,7 +180,7 @@ export const Game = ({
     }
     inErrorStateRef.current = !isOnTrack;
 
-    if (tryConvertRomaji(converted) === targetRomaji) {
+    if (tryConvertRomaji(cleaned) === targetRomaji) {
       correctCharsRef.current += target.length;
       inErrorStateRef.current = false;
       playFeedback();
@@ -243,7 +253,7 @@ export const Game = ({
             {current.english}
           </p>
         )}
-        <div className="pb-6 mt-1 ">
+        <div className="pb-6 mt-1">
           <button
             className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
             tabIndex={-1}
@@ -276,23 +286,38 @@ export const Game = ({
           className="w-full text-2xl text-center border-2 rounded-2xl h-14 kanji-font"
           onCompositionStart={() => {
             isComposingRef.current = true;
+            // A new composition means any pending suppression is stale.
+            suppressNextChangeRef.current = false;
           }}
-          onCompositionEnd={() => {
+          onCompositionEnd={(e) => {
             isComposingRef.current = false;
+            // iOS commits hiragana and fires no trailing change event, so the
+            // conversion + match logic must run here or the value stays raw
+            // hiragana. Desktop *does* fire a trailing change, so suppress that
+            // one duplicate (cleared on a macrotask, after it has fired).
+            suppressNextChangeRef.current = true;
+            setTimeout(() => {
+              suppressNextChangeRef.current = false;
+            }, 0);
+            handleChange(e.currentTarget.value);
           }}
           onChange={(e) => {
             const raw = e.target.value;
             // While an IME is composing, keep the field exactly as the IME has
             // it (no romaji→katakana transform). Transforming mid-composition
-            // makes iOS Safari duplicate the committed character. The trailing
-            // change event after compositionend (isComposing === false) runs the
-            // real conversion + match logic exactly once.
+            // makes iOS Safari duplicate the committed character; the real
+            // conversion runs in onCompositionEnd instead.
             // nativeEvent is typed as Event; isComposing lives on InputEvent.
             const composing =
               "isComposing" in e.nativeEvent &&
               (e.nativeEvent as InputEvent).isComposing;
             if (isComposingRef.current || composing) {
               setInputValue(raw);
+              return;
+            }
+            // Swallow the redundant change desktop fires right after commit.
+            if (suppressNextChangeRef.current) {
+              suppressNextChangeRef.current = false;
               return;
             }
             handleChange(raw);
