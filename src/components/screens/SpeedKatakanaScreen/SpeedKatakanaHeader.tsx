@@ -11,7 +11,7 @@ import assetsPaths from "@/lib/assets-paths";
  */
 export const SpeedKatakanaHeader = ({ progress }: { progress: number }) => {
   return (
-    <header className="fixed top-0 left-0 z-50 flex items-center justify-between w-full gap-3 px-2 border-b-4 border-dashed fix-scroll-layout-shift-right bg-background backdrop-blur-sm">
+    <header className="flex items-center justify-between w-full gap-3 px-2 border-b-4 border-dashed shrink-0 fix-scroll-layout-shift-right bg-background">
       <Link
         to="/"
         className="flex items-center py-1.5 shrink-0 hover:opacity-80 transition-opacity"

@@ -74,7 +74,6 @@ const SpeedKatakanaScreen = () => {
 
   return (
     <>
-      <SpeedKatakanaHeader progress={headerProgress} />
       {/*
         Off-screen but focusable. Focusing it inside the Start gesture opens the
         iOS keyboard before the game's input has mounted; focus then transfers.
@@ -87,38 +86,43 @@ const SpeedKatakanaScreen = () => {
         autoComplete="off"
       />
       {/*
-        Pinned to the visual viewport so the play area is exactly the space above
-        the keyboard — no scroll, input anchored at the bottom. `top` tracks any
-        iOS scroll-into-view shift; normally 0.
+        One container pinned to the visual viewport — the area above the on-screen
+        keyboard. The header lives in-flow at its top and the play area fills the
+        rest, so both stay glued to the visible region (iOS anchors `position:
+        fixed` to the layout viewport, which drifts when the keyboard opens).
+        `top` tracks any iOS scroll-into-view shift; normally 0.
       */}
-      <main
-        className="fixed inset-x-0 px-4 pt-12 overflow-hidden bg-background"
+      <div
+        className="fixed inset-x-0 flex flex-col overflow-hidden bg-background"
         style={{ top: viewport.offsetTop, height: viewport.height }}
       >
-        {phase === "initial" && (
-          <InitialScreen onStart={startGame} />
-        )}
+        <SpeedKatakanaHeader progress={headerProgress} />
+        <main className="flex-1 min-h-0 px-4 overflow-hidden">
+          {phase === "initial" && (
+            <InitialScreen onStart={startGame} />
+          )}
 
-        {phase === "playing" && (
-          // Remount per challenge set so all game state resets cleanly.
-          <Game
-            key={settings.challengeSet}
-            settings={settings}
-            onProgress={setProgress}
-            onComplete={finishGame}
-            onEnd={goToInitial}
-          />
-        )}
+          {phase === "playing" && (
+            // Remount per challenge set so all game state resets cleanly.
+            <Game
+              key={settings.challengeSet}
+              settings={settings}
+              onProgress={setProgress}
+              onComplete={finishGame}
+              onEnd={goToInitial}
+            />
+          )}
 
-        {phase === "ended" && stats && (
-          <EndSession
-            stats={stats}
-            onNext={startNextChallenge}
-            onEnd={goToInitial}
-            completedSets={completedSetsCount}
-          />
-        )}
-      </main>
+          {phase === "ended" && stats && (
+            <EndSession
+              stats={stats}
+              onNext={startNextChallenge}
+              onEnd={goToInitial}
+              completedSets={completedSetsCount}
+            />
+          )}
+        </main>
+      </div>
     </>
   );
 };

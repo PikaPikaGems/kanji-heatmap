@@ -196,7 +196,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
 
           <div className="flex flex-col gap-3 pt-4">
             <div className="flex items-center justify-between">
-              <Label className="text-sm">Challenge set</Label>
+              <Label className="text-sm">Select a challenge set</Label>
               <span className="text-sm font-semibold tabular-nums">
                 {settings.challengeSet} / {SPEED_KATAKANA_TOTAL_SETS}
               </span>
