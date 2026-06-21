@@ -21,7 +21,7 @@ export const HandwritingScreenDialog = ({
 }) => {
   return (
     <Drawer open={isOpen} onClose={onClose} autoFocus={true}>
-      <DrawerContent className="!select-text max-h-[100dvh] !duration-200">
+      <DrawerContent className="!select-text max-h-[100dvh] !duration-200 border-2 border-t-4 [border-top-style:dashed]">
         <DrawerTitle className="sr-only">Handwriting Search</DrawerTitle>
         <DrawerDescription className="sr-only">
           Search by drawing a kanji

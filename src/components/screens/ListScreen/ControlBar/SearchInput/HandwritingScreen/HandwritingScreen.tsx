@@ -14,7 +14,7 @@ type RecognitionStatus = "idle" | "loading" | "success" | "error";
 
 const TitleLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <span className="px-1 text-sm font-bold text-black bg-white rounded-full dark:bg-black dark:text-white">
+    <span className="px-2 text-sm font-bold rounded-full text-foreground bg-background ">
       {children}
     </span>
   );
@@ -37,14 +37,14 @@ const HandwritingScreenLayout = ({
         <TitleLayout>{title}</TitleLayout>
       </div>
       <div
-        className="relative flex flex-wrap items-start justify-center w-full py-1 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
+        className="relative flex flex-wrap items-start justify-center w-full py-1 mt-2 overflow-x-hidden overflow-y-auto border-2 border-dotted rounded-md border-foreground/30"
         style={{ maxHeight: "calc(100dvh - 185px)" }}
       >
         {top}
       </div>
 
       {/* Results Preview */}
-      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 dark:border-slate-600 scrollbar-thin animate-fade-in">
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 border-foreground/30 scrollbar-thin animate-fade-in">
         {bottom}
       </div>
       <div className="absolute bottom-[170px] w-full m-auto z-50">

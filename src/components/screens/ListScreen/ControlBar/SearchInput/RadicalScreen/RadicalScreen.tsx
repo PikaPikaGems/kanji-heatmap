@@ -100,7 +100,7 @@ const ExpandedRadicalBtn = ({
         className="
           block !text-ellipsis !text-nowrap mx-4 !overflow-hidden !whitespace-nowrap 
           text-xs font-bold px-2 rounded-full
-          dark:bg-black dark:text-white bg-white text-black"
+          bg-foreground text-background"
       >
         {radicalKeyword}
       </span>
@@ -111,7 +111,7 @@ const ExpandedRadicalBtn = ({
 const TitleLayout = ({ children }: { children: ReactNode }) => {
   return (
     <span
-      className="px-1 text-sm font-bold text-black bg-white rounded-full dark:bg-black dark:text-white"
+      className="px-1 text-sm font-bold rounded-full text-foreground bg-background"
     >
       {children}
     </span>
@@ -152,7 +152,7 @@ export const RadicalScreenLayout = ({
           <SelectRadicalTitle count={count} />
         </div>
         <div
-          className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
+          className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md border-foreground/40"
           style={{ maxHeight: "calc(100dvh - 30px)" }}
         >
           {top}
@@ -168,7 +168,7 @@ export const RadicalScreenLayout = ({
       </div>
 
       <div
-        className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md dark:border-slate-600"
+        className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md border-foreground/40"
         style={{ maxHeight: "calc(100dvh - 314px)" }}
       >
         {top}
@@ -177,7 +177,7 @@ export const RadicalScreenLayout = ({
         {middle}
       </div>
 
-      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 dark:border-slate-600 scrollbar-thin animate-fade-in">
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 border-foreground/40 scrollbar-thin animate-fade-in">
         {bottom}
       </div>
       <div className="absolute bottom-[170px] w-full m-auto z-50">
