@@ -39,6 +39,10 @@ export const GlobalHomeLink = () => {
   );
 };
 
+const redirectRadical: Record<string, string> = {
+  飠: "食"
+}
+
 export const GlobalRadicalLink = ({
   radical,
   keyword,
@@ -50,7 +54,7 @@ export const GlobalRadicalLink = ({
 }) => {
   return (
     <Link
-      to={`/?search-type=radicals&search-text=${radicalFalseFriends[radical] ?? radical}`}
+      to={`/?search-type=radicals&search-text=${redirectRadical[radical] ?? radicalFalseFriends[radical] ?? radical}`}
       className={cnJPCardLink}
     >
       <JPCardInner
