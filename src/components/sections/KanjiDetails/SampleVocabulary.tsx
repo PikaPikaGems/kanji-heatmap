@@ -17,7 +17,7 @@ import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import { Badge } from "@/components/ui/badge";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { JishoBtn } from "@/components/common/JishoBtn";
 import { JotobaBtn } from "@/components/common/JotobaBtn";
 import { BugIconErrorBoundary } from "@/components/error";
@@ -158,7 +158,7 @@ const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
       <Keyboard className="w-3 h-3 shrink-0" />
       <span className="flex items-center gap-2">
         <ShortcutKey label={shortcuts.prev.label} />
-        <span>prev</span>
+        <span>previous</span>
       </span>
       <span className="flex items-center gap-1.5">
         <ShortcutKey label={shortcuts.next.label} />
@@ -302,10 +302,9 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
         data={data}
         shortcuts={{ prev: { key: "a", label: "a" }, next: { key: "d", label: "d" } }}
       />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
-      <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Ranks Lookup" /></li>
-      </ul>
+      <PrimaryDataSources
+        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/" }]}
+      />
     </div>
   );
 };
@@ -347,16 +346,17 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
     <div>
       <PaginatedVocabulary
         data={commonWordData}
-        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift+A" }, next: { key: "d", shiftKey: true, label: "Shift+D" } }}
+        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
       />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
-      <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1564742924"} text="Anki Deck: 1564742924" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/779483253"} text="Anki Deck: 779483253" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/2106223612"} text="Anki Deck: 2106223612" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1468618470"} text="Anki Deck: 1468618470" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://kanjimastery.blogspot.com/"} text="Kanji Mastery Blog" /></li>
-      </ul>
+      <PrimaryDataSources
+        links={[
+          { text: "Anki Deck: 1564742924", url: "https://ankiweb.net/shared/info/1564742924" },
+          { text: "Anki Deck: 779483253", url: "https://ankiweb.net/shared/info/779483253" },
+          { text: "Anki Deck: 2106223612", url: "https://ankiweb.net/shared/info/2106223612" },
+          { text: "Anki Deck: 1468618470", url: "https://ankiweb.net/shared/info/1468618470" },
+          { text: "Kanji Mastery Blog", url: "https://kanjimastery.blogspot.com/" },
+        ]}
+      />
     </div>
   );
 };
