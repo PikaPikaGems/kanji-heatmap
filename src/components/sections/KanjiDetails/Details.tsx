@@ -103,7 +103,7 @@ const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   const info = useKanjiRepresentativeWord(kanji)
 
   return <>
-    <SimpleAccordion trigger={`${kanji} Study Word ${info?.word ? `~ ${info?.word}` : ""}`} defaultOpen={false}>
+    <SimpleAccordion trigger={`${kanji} Study Word${info?.word ? `: ${info?.word}` : ""}`} defaultOpen={false}>
       <RepresentativeStudyWord kanji={kanji} />
     </SimpleAccordion >
   </>

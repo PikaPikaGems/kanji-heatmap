@@ -218,10 +218,7 @@ export const Game = ({
   return (
     <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center">
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
-        <div className="flex flex-col items-center gap-1">
-          <span className="px-3 py-1 text-xs font-bold rounded-full">
-            {index + 1} / {words.length}
-          </span>
+        <div className="flex flex-col items-center gap-1 pt-3">
           <div className="h-4">
             {!settings.displayEnglish && flash && (
               <span
@@ -261,6 +258,11 @@ export const Game = ({
           >
             {`Skip this word`}
           </button>
+          ⚡️
+          <span className="px-3 pt-6 pb-1 text-xs font-bold rounded-full">
+            {index + 1} / {words.length}
+          </span>
+
           <span>⚡️</span>
           <button
             className="mx-3 text-xs font-bold tracking-wide underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70 text-muted-foreground"

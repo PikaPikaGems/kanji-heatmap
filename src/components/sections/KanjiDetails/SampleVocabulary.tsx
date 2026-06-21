@@ -147,16 +147,16 @@ const sortWordData = (data: CommonWordEntry[]) => {
 
 
 const ShortcutKey = ({ label }: { label: string }) => (
-  <kbd className="inline-flex items-center px-2 py-1 font-mono text-[11px] font-medium lowercase border border-dotted rounded-xl bg-background text-foreground/70" >
+  <kbd className="inline-flex whitespace-nowrap items-center px-2 py-1 font-mono text-[11px] font-medium lowercase border border-dotted rounded-xl bg-background text-foreground/70" >
     {label}
   </kbd>
 );
 
 const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
   <div className="flex justify-center mt-5 mb-1 uppercase">
-    <div className="inline-flex items-center gap-4 rounded-full  bg-muted/10 px-5 py-2 text-[10px] text-muted-foreground" >
+    <div className="inline-flex overflow-x-auto items-center gap-4 rounded-full  bg-muted/10 px-5 py-2 text-[10px] text-muted-foreground" >
       <Keyboard className="w-4 h-4 shrink-0" />
-      <span>shortcuts → </span>
+      <span>shortcuts</span>
       <span className="flex items-center gap-2">
         <ShortcutKey label={shortcuts.prev.label} />
         <span>previous</span>
