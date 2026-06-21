@@ -241,7 +241,7 @@ export const Game = ({
               }
           }
         >
-          <p className="text-6xl font-bold leading-tight break-all md:text-7xl">
+          <p className="text-5xl font-bold leading-tight break-all md:text-7xl">
             {current.katakana}
           </p>
         </div>
@@ -274,7 +274,7 @@ export const Game = ({
         </div>
       </div>
 
-      <div className="shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 pl-3 pr-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <Input
           ref={inputRef}
           value={inputValue}
@@ -285,7 +285,7 @@ export const Game = ({
           spellCheck={false}
           aria-label="Type the katakana"
           placeholder="Type romaji here"
-          className="w-full text-2xl text-center border-2 rounded-2xl h-14 kanji-font"
+          className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14 kanji-font"
           onCompositionStart={() => {
             isComposingRef.current = true;
             // A new composition means any pending suppression is stale.

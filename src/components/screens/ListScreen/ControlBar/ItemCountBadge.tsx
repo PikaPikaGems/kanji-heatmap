@@ -46,7 +46,7 @@ export const ItemCountBadge = () => {
     return null;
   }
   return (
-    <div className="absolute top-[50px] flex gap-1">
+    <div className="absolute top-[50px] flex flex-wrap gap-1">
       <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
         {result.data.length} items match your search filters
       </div>

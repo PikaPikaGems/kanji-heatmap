@@ -42,7 +42,7 @@ const RadioRow = ({
   label: string;
   onChange: (value: SoundMode) => void;
 }) => (
-  <label className="flex items-center gap-2 text-sm cursor-pointer">
+  <label className="flex items-center gap-2 pr-4 text-sm cursor-pointer">
     <input
       type="radio"
       name={name}
@@ -112,10 +112,10 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
 
   return (
-    <div className="w-full h-full overflow-auto">
+    <div className="w-full h-full pl-4 pr-2 overflow-auto">
       <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
         <div className="flex flex-col items-center gap-1 px-6">
-          <h1 className="text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
+          <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
           <SpeedKatakanaStatsSummary
             completed={summary.completed}
             averageCpm={summary.averageCpm}
@@ -173,7 +173,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               }
             />
             {soundEnabled && (
-              <div className="flex gap-4 pl-1">
+              <div className="flex flex-wrap pl-1">
                 <RadioRow
                   name="sound-mode"
                   value="speak"
