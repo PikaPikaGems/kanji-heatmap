@@ -202,7 +202,7 @@ export const Game = ({
 
   return (
     <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center">
-      <div className="flex flex-col items-center justify-center flex-1 [@media(min-height:900px)]:flex-none gap-3 text-center">
+      <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
         <div className="flex flex-col items-center gap-1">
           <span className="px-3 py-1 text-xs font-bold rounded-full">
             {index + 1} / {words.length}
@@ -257,7 +257,7 @@ export const Game = ({
         </div>
       </div>
 
-      <div className="pb-[max(2rem,env(safe-area-inset-bottom))] md:pb-0">
+      <div className="shrink-0 pb-[max(2rem,env(safe-area-inset-bottom))] md:pb-0">
         <Input
           ref={inputRef}
           value={inputValue}
