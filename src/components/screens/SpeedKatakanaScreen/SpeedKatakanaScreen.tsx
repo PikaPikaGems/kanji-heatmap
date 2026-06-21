@@ -97,7 +97,7 @@ const SpeedKatakanaScreen = () => {
         style={{ top: viewport.offsetTop, height: viewport.height }}
       >
         <SpeedKatakanaHeader progress={headerProgress} />
-        <main className="flex-1 min-h-0 px-4 overflow-hidden">
+        <main className="flex-1 min-h-0 py-4 overflow-hidden">
           {phase === "initial" && (
             <InitialScreen onStart={startGame} />
           )}

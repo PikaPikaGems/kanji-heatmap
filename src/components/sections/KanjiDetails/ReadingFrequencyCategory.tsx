@@ -88,10 +88,10 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
         <Table className="w-full min-w-[600px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-center">Reading</TableHead>
-              <TableHead className="text-center">Frequency</TableHead>
-              <TableHead className="text-center">Sample Word</TableHead>
-              <TableHead className="text-center">Type </TableHead>
+              <TableHead className="text-left">Reading</TableHead>
+              <TableHead className="text-left">Frequency</TableHead>
+              <TableHead className="text-left">Sample Word</TableHead>
+              <TableHead className="text-left">Type </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

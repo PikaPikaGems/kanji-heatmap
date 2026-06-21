@@ -62,11 +62,12 @@ export const EndSession = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-10">
-      <h2 className="text-2xl font-bold">Challenge complete!</h2>
 
-      <SpeedKatakanaStatsSummary completed={completedSets} />
-
-      <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8">
+      <div>
+        <h2 className="text-xl font-bold">🥳 Challenge Complete!</h2>
+        <SpeedKatakanaStatsSummary completed={completedSets} />
+      </div>
+      <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16">
         <Stat value={stats.accuracy} unit="%" label="Accuracy" />
         <Stat
           value={stats.charsPerMinute}

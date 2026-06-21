@@ -42,7 +42,7 @@ const RadioRow = ({
   label: string;
   onChange: (value: SoundMode) => void;
 }) => (
-  <label className="flex items-center gap-2 text-sm cursor-pointer">
+  <label className="flex items-center gap-2 pr-4 text-sm cursor-pointer">
     <input
       type="radio"
       name={name}
@@ -57,22 +57,25 @@ const RadioRow = ({
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
   const stats = useMemo(() => readSetStats(challengeSet), [challengeSet]);
-  if (!stats) return null;
+  if (!stats) return <div className="h-10"></div>;
   return (
-    <div className="flex flex-wrap gap-2 text-xs font-bold text-left">
-      <div>
-        🎯 Accuracy:{" "}
-        <span className="mr-1 text-green-500">{stats.latestAccuracy}%</span>
-        (best: {stats.bestAccuracy}%)
-      </div>
-      <div>
-        🚗 Speed:{" "}
-        <span className="mr-1 text-green-500">{stats.latestCpm} cpm</span>
-        (best: {stats.bestCpm} cpm)
-      </div>
+    <div className="flex flex-wrap gap-2 text-xs font-bold text-left min-h-10">
+      <div>Challenge # {challengeSet}:</div>
       <div>
         ⭐️ {stats.timesTaken}{" "}
         {stats.timesTaken === 1 ? "attempt" : "attempts"}
+      </div>
+      <div className="flex">
+        <div>
+          🎯 Accuracy:{" "}
+          <span className="mr-1 text-green-500">{stats.latestAccuracy}%</span>
+          (best: {stats.bestAccuracy}%)
+        </div>
+        <div className="ml-1">
+          🚗 Speed:{" "}
+          <span className="mr-1 text-green-500">{stats.latestCpm} cpm</span>
+          (best: {stats.bestCpm} cpm)
+        </div>
       </div>
     </div>
   );
@@ -109,10 +112,10 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
 
   return (
-    <div className="w-full h-full overflow-y-auto">
-      <div className="flex flex-col justify-center w-full max-w-md min-h-full gap-6 px-1 py-6 mx-auto">
-        <div className="flex flex-col items-center gap-1">
-          <h1 className="text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
+    <div className="w-full h-full pl-4 pr-2 overflow-auto">
+      <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
+        <div className="flex flex-col items-center gap-1 px-6">
+          <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
           <SpeedKatakanaStatsSummary
             completed={summary.completed}
             averageCpm={summary.averageCpm}
@@ -170,7 +173,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               }
             />
             {soundEnabled && (
-              <div className="flex gap-4 pl-1">
+              <div className="flex flex-wrap pl-1">
                 <RadioRow
                   name="sound-mode"
                   value="speak"
@@ -196,7 +199,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
 
           <div className="flex flex-col gap-3 pt-4">
             <div className="flex items-center justify-between">
-              <Label className="text-sm">Select a challenge set</Label>
+              <Label className="text-sm">Select a Challenge Set</Label>
               <span className="text-sm font-semibold tabular-nums">
                 {settings.challengeSet} / {SPEED_KATAKANA_TOTAL_SETS}
               </span>
@@ -216,6 +219,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                 </button>
               ))}
             </div>
+            <Label className="text-sm text-left">Select a Challenge</Label>
 
             <DualRangeSlider
               value={[currentPos]}
@@ -230,7 +234,6 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <p className="text-xs text-left">
               Lower sets are the most common words; higher sets are rarer.
             </p>
-            <SetStats challengeSet={settings.challengeSet} />
           </div>
         </div>
 
@@ -241,6 +244,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
         >
           Start Game
         </Button>
+        <SetStats challengeSet={settings.challengeSet} />
       </div>
     </div>
   );
