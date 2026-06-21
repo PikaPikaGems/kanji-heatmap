@@ -4,6 +4,7 @@ import {
   AboutScreen,
   TermsScreen,
   PrivacyScreen,
+  SpeedKatakanaScreen,
 } from "@/components/screens";
 
 const kanjiPage = {
@@ -38,12 +39,20 @@ const privacyPage = {
   Component: PrivacyScreen,
 };
 
+const speedKatakanaPage = {
+  href: "/speed-katakana",
+  title: "Speed Katakana",
+  description: "Practice speed typing katakana words",
+  Component: SpeedKatakanaScreen,
+};
+
 const pageItems = {
   kanjiPage,
   cumUseGraphPage,
   aboutPage,
   termsPage,
   privacyPage,
+  speedKatakanaPage,
 };
 
 export default pageItems;

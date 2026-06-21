@@ -9,12 +9,13 @@
   "scripts": {
     "dev": "vite --port 5174",
     "dev:cf": "vite --port 5173",
-    "build": "node scripts/generate-more-info.mjs && tsc -b && vite build",
+    "build": "node scripts/generate-more-info.mjs && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
     "format": "prettier --write .",
-    "generate-more-info": "node scripts/generate-more-info.mjs"
+    "generate-more-info": "node scripts/generate-more-info.mjs",
+    "generate-speed-katakana": "node scripts/generate-speed-katakana.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",

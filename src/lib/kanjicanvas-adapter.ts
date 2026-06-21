@@ -18,14 +18,23 @@ const RECOGNIZER_ID = "kanji-heatmap-handwriting-alt";
 
 let kanjiCanvasPromise: Promise<KanjiCanvasGlobal> | null = null;
 
-// Lazily load the (large, ~6.7MB) recognition engine + reference patterns the
-// first time the user actually recognizes a kanji. Both are plain browser
-// scripts imported for their side effect of populating `window.KanjiCanvas`.
+const loadScript = (src: string): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const el = document.createElement("script");
+    el.src = src;
+    el.onload = () => resolve();
+    el.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(el);
+  });
+
+// Lazily load the recognition engine + reference patterns the first time the
+// user recognizes a kanji. ref-patterns.js lives in public/js/ (not bundled)
+// so Rollup never sees it; kanji-canvas.js is small enough to bundle normally.
 const loadKanjiCanvas = (): Promise<KanjiCanvasGlobal> => {
   if (kanjiCanvasPromise == null) {
     kanjiCanvasPromise = (async () => {
       await import("kanjicanvas/docs/resources/javascript/kanji-canvas.js");
-      await import("kanjicanvas/docs/resources/javascript/ref-patterns.js");
+      await loadScript("/js/ref-patterns.js");
 
       const kanjiCanvas = (
         window as unknown as { KanjiCanvas?: KanjiCanvasGlobal }

@@ -46,7 +46,19 @@ export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
   );
 
   useEffect(() => {
+    // Re-read on mount (handles storageKey changes) and whenever another hook
+    // instance or another browser tab writes to the same key. This keeps two
+    // components that share a storageKey (e.g. a settings form and its consumer)
+    // in sync without lifting state.
     setStorageData(readFromStorage(storageKey, defaultValueRef.current));
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === storageKey) {
+        setStorageData(readFromStorage(storageKey, defaultValueRef.current));
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [storageKey]);
 
   const setItem = useCallback<DispatchFunction<T>>(
@@ -54,6 +66,10 @@ export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
       setStorageData((prevData) => {
         const newData = { ...prevData, [key]: value };
         localStorage.setItem(storageKey, JSON.stringify(newData));
+        // Dispatch so other hook instances on the same key (and the listener
+        // above) pick up the change. The browser only fires StorageEvent
+        // cross-tab automatically; same-page listeners need an explicit dispatch.
+        window.dispatchEvent(new StorageEvent("storage", { key: storageKey }));
         return newData;
       });
     },
