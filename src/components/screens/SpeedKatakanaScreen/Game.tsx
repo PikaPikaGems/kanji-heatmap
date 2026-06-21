@@ -56,6 +56,7 @@ export const Game = ({
 
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  const [flash, setFlash] = useState<{ english: string; key: number; skipped: boolean } | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Stats live in refs so per-keystroke bookkeeping doesn't trigger re-renders.
@@ -63,6 +64,8 @@ export const Game = ({
   const correctCharsRef = useRef(0);
   const errorsRef = useRef(0);
   const inErrorStateRef = useRef(false);
+  const flashKeyRef = useRef(0);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sound feedback. useSpeak is a hook, so it must run before any early return;
   // an empty word is harmless while the set is still loading.
@@ -73,6 +76,13 @@ export const Game = ({
   useEffect(() => {
     inputRef.current?.focus();
   }, [index, words.length]);
+
+  useEffect(() => {
+    const timer = flashTimerRef;
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
   if (status === "error") {
     return (
@@ -122,6 +132,12 @@ export const Game = ({
     // Skipping counts against accuracy so it isn't a free pass.
     errorsRef.current += 1;
     inErrorStateRef.current = false;
+    if (!settings.displayEnglish) {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashKeyRef.current += 1;
+      setFlash({ english: current.english, key: flashKeyRef.current, skipped: true });
+      flashTimerRef.current = setTimeout(() => setFlash(null), 1200);
+    }
     advance();
     inputRef.current?.focus();
   };
@@ -149,6 +165,12 @@ export const Game = ({
       correctCharsRef.current += target.length;
       inErrorStateRef.current = false;
       playFeedback();
+      if (!settings.displayEnglish) {
+        if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+        flashKeyRef.current += 1;
+        setFlash({ english: current.english, key: flashKeyRef.current, skipped: false });
+        flashTimerRef.current = setTimeout(() => setFlash(null), 1200);
+      }
       advance();
       return;
     }
@@ -177,9 +199,21 @@ export const Game = ({
   return (
     <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:600px)]:justify-center">
       <div className="flex flex-col items-center justify-center flex-1 [@media(min-height:600px)]:flex-none gap-3 text-center">
-        <span className="px-3 py-1 text-xs font-bold rounded-full ">
-          {index + 1} / {words.length}
-        </span>
+        <div className="flex flex-col items-center gap-1">
+          <span className="px-3 py-1 text-xs font-bold rounded-full">
+            {index + 1} / {words.length}
+          </span>
+          <div className="h-4">
+            {!settings.displayEnglish && flash && (
+              <span
+                key={flash.key}
+                className={`text-xs font-bold tracking-wide uppercase animate-english-flash ${flash.skipped ? "text-muted-foreground" : "text-green-500"}`}
+              >
+                {flash.skipped ? "→" : "✓"} {flash.english}
+              </span>
+            )}
+          </div>
+        </div>
 
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
