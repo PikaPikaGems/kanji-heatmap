@@ -32,7 +32,7 @@ const LoadingKanjisRaw = ({
       {new Array(idealRows).fill(null).map((_, i) => {
         return (
           <div
-            className="flex items-center justify-center w-full px-1"
+            className={`flex items-center justify-center w-full px-1 ${i === 0 ? "pt-6" : ""}`}
             key={`row-${i}`}
           >
             {new Array(cols).fill(null).map((_, i) => {
