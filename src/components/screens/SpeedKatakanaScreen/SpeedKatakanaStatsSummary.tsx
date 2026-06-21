@@ -10,7 +10,7 @@ export const SpeedKatakanaStatsSummary = ({
   const percent = ((completed / SPEED_KATAKANA_TOTAL_SETS) * 100).toFixed(1);
   return (
     <div className="mt-2 text-xs font-bold text-foreground">
-      {completed} / {SPEED_KATAKANA_TOTAL_SETS} sets completed ({percent}%)
+      {completed} / {SPEED_KATAKANA_TOTAL_SETS} set(s) completed ({percent}%)
       {averageCpm != null && <> 🚗 {averageCpm} avg cpm</>}
     </div>
   );
