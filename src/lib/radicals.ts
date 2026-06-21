@@ -329,7 +329,7 @@ export const moreRadicalKeywords: Record<string, string> = {
 
 export const nonRadicalVariantKeywords: Record<string, string> = {
   昜: "light of the sun",
-  訁: "say (variant)",
+  訁: "say (squished)",
   "⻗": "rain (squished)",
   氐: "bottom",
   粦: "The rice you oppose",
@@ -343,7 +343,6 @@ export const radicalFalseFriends: Record<string, string> = {
   // 罒 small net
   // small net -> fish variant / small net
   罒: "⺲",
-
   // 灬 fire sparks
   // ⺣ small fire variant
   // fire sparks -> small fire variant

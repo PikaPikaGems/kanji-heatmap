@@ -313,7 +313,7 @@ export const RadicalsResultsPreview = ({
           {"すみません 🙇🏽‍♀️ 🙇 . No match found."}
           <ClearFiltersCTA
             defaultMsg={
-              <div className="block-inline">
+              <div className="flex flex-wrap items-center justify-center space-x-1">
                 Try:
                 {externalLinks.slice(0, 5).map((item, index) => {
                   return (
