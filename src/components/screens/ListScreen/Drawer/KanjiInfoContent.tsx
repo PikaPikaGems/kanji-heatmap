@@ -54,14 +54,13 @@ export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
     return null;
   }
 
-  const card = <KanjiCard key={displayed} kanji={displayed} />
+  const fade = { style: { opacity, transition: "opacity 180ms ease" } };
+  const card = <KanjiCard key={displayed} kanji={displayed} />;
   return (
-    <div style={{ opacity, transition: "opacity 180ms ease" }} className="w-full h-full">
-      <Layout
-        actionBar={<KanjiActionsBtns kanji={displayed} />}
-        first={card}
-        second={<KanjiDetails kanji={displayed} smallScreenNode={card} />}
-      />
-    </div>
+    <Layout
+      actionBar={<KanjiActionsBtns kanji={kanji} />}
+      first={<div {...fade}>{card}</div>}
+      second={<div {...fade}><KanjiDetails kanji={displayed} smallScreenNode={card} /></div>}
+    />
   );
 };
