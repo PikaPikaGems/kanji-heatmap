@@ -59,7 +59,7 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
 };
 
 const MethodologyNote = () => (
-  <div className="p-4 text-sm text-left text-muted-foreground">
+  <div className="p-4 text-sm text-left">
     <p className="text-left">
       All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary.
     </p>

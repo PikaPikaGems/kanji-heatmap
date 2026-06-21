@@ -11,7 +11,7 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SAMPLE_VOCAB_PATH, TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { SpeakButton } from "@/components/common/SpeakButton";
-import { Pagination, usePagination } from "./Pagination";
+import { Pagination, usePagination, useKeyboardPagination, PaginationShortcuts } from "./Pagination";
 import { useEffect, useMemo, useState } from "react";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { JLTPTtypes } from "@/lib/jlpt";
@@ -21,6 +21,7 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { JishoBtn } from "@/components/common/JishoBtn";
 import { JotobaBtn } from "@/components/common/JotobaBtn";
 import { BugIconErrorBoundary } from "@/components/error";
+import { Keyboard } from "@/components/icons";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
@@ -145,7 +146,29 @@ const sortWordData = (data: CommonWordEntry[]) => {
 }
 
 
-const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
+const ShortcutKey = ({ label }: { label: string }) => (
+  <kbd className="inline-flex items-center px-2 py-1 font-mono text-[11px] font-medium uppercase border border-dotted rounded-xl bg-background text-foreground/70" >
+    {label}
+  </kbd>
+);
+
+const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
+  <div className="flex justify-center mt-5 mb-1 uppercase">
+    <div className="inline-flex items-center gap-4 rounded-full  bg-muted/10 px-5 py-2 text-[10px] text-muted-foreground" >
+      <Keyboard className="w-3 h-3 shrink-0" />
+      <span className="flex items-center gap-2">
+        <ShortcutKey label={shortcuts.prev.label} />
+        <span>prev</span>
+      </span>
+      <span className="flex items-center gap-1.5">
+        <ShortcutKey label={shortcuts.next.label} />
+        <span>next</span>
+      </span>
+    </div >
+  </div >
+);
+
+const PaginatedVocabulary = ({ data, shortcuts }: { data: CommonWordEntry[]; shortcuts?: PaginationShortcuts }) => {
   const sortedData = useMemo(() => {
     return sortWordData(data)
   }, [data])
@@ -155,6 +178,8 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
     const result = sortedData.slice(start, end);
     return result
   }, [sortedData, end, start]);
+
+  useKeyboardPagination(shortcuts, onPrev, onNext, page, totalPages);
 
   const pagination = (
     <>
@@ -173,7 +198,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
     <div className="px-2 mt-4 -mx-2 overflow-x-auto" key={`${start}-${end}`}>
       <p className="w-full px-4 text-left">{data.length} total item(s) found.</p>
       {pagination}
-      <Table className="w-full min-w-[400px] mt-4">
+      <Table className="w-full min-w-[400px] mt-4 animate-fade-in">
         <TableHeader>
           <TableRow>
             <TableHead className="text-left w-fit">Speak</TableHead>
@@ -192,6 +217,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
         </TableBody>
       </Table>
       {pagination}
+      {shortcuts && totalPages > 1 && <ShortcutHint shortcuts={shortcuts} />}
     </div>
   );
 };
@@ -272,7 +298,10 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
 
   return (
     <div>
-      <PaginatedVocabulary data={data} />
+      <PaginatedVocabulary
+        data={data}
+        shortcuts={{ prev: { key: "a", label: "a" }, next: { key: "d", label: "d" } }}
+      />
       <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
         <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Ranks Lookup" /></li>
@@ -316,7 +345,10 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   return (
     <div>
-      <PaginatedVocabulary data={commonWordData} />
+      <PaginatedVocabulary
+        data={commonWordData}
+        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift+A" }, next: { key: "d", shiftKey: true, label: "Shift+D" } }}
+      />
       <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
       <ul className="mx-6 mb-6 italic text-left list-disc">
         <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1564742924"} text="Anki Deck: 1564742924" /></li>
