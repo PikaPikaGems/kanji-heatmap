@@ -225,12 +225,14 @@ export const FREQ_RANK_SOURCES_INFO: Record<
   },
 };
 
+export const kandracPaperUrl =
+  "https://www.researchgate.net/publication/357163811_Joyo_Kanji_Readings_ver_11";
 // Source links for reading frequency data
 export const readingFrequencySourceLinks = [
   {
     text: "Dr Patrick Kandrac's Research Paper",
 
-    url: "https://www.researchgate.net/publication/357163811_Joyo_Kanji_Readings_ver_11",
+    url: kandracPaperUrl,
   },
   {
     text: "Piyush's Reading Excel Sheet to JSON Converter",

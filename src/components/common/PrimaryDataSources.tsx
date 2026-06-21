@@ -6,13 +6,10 @@ type SourceLink = { text: string; url: string };
 
 export const PrimaryDataSources = ({
   links,
-  note,
 }: {
   links: SourceLink[];
-  note?: string;
 }) => (
-  <div className="py-4 pl-2 text-left">
-    {note && <p className="mb-3 text-sm">{note}</p>}
+  <div className="pl-2 my-6 text-left ">
     <GenericPopover
       trigger={
         <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
@@ -33,4 +30,5 @@ export const PrimaryDataSources = ({
       }
     />
   </div>
+
 );
