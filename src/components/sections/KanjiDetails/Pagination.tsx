@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 
@@ -37,6 +37,33 @@ export const Pagination = ({
     </Button>
   </div>
 );
+
+export type KeyShortcut = { key: string; shiftKey?: boolean; label: string };
+
+export type PaginationShortcuts = { prev: KeyShortcut; next: KeyShortcut };
+
+export const useKeyboardPagination = (
+  shortcuts: PaginationShortcuts | undefined,
+  onPrev: () => void,
+  onNext: () => void,
+  page: number,
+  totalPages: number,
+) => {
+  useEffect(() => {
+    if (!shortcuts) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const { prev, next } = shortcuts;
+      const code = e.code;
+      const matchesPrev = code === `Key${prev.key.toUpperCase()}` && !!e.shiftKey === !!prev.shiftKey;
+      const matchesNext = code === `Key${next.key.toUpperCase()}` && !!e.shiftKey === !!next.shiftKey;
+      if (matchesPrev && page > 1) { e.preventDefault(); onPrev(); }
+      if (matchesNext && page < totalPages) { e.preventDefault(); onNext(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [shortcuts, onPrev, onNext, page, totalPages]);
+};
 
 export const usePagination = (totalItems: number, itemsPerPage: number = 5) => {
   const [page, setPage] = useState(1);

@@ -11,16 +11,17 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SAMPLE_VOCAB_PATH, TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { SpeakButton } from "@/components/common/SpeakButton";
-import { Pagination, usePagination } from "./Pagination";
+import { Pagination, usePagination, useKeyboardPagination, PaginationShortcuts } from "./Pagination";
 import { useEffect, useMemo, useState } from "react";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import { Badge } from "@/components/ui/badge";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { JishoBtn } from "@/components/common/JishoBtn";
 import { JotobaBtn } from "@/components/common/JotobaBtn";
 import { BugIconErrorBoundary } from "@/components/error";
+import { Keyboard } from "@/components/icons";
 
 // {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
 // word, reading, frequencyTier, translation, jlpt, kaishi 
@@ -78,7 +79,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
 
   return (
     <>
-      <TableRow>
+      <TableRow className="animate-fade-in">
         <TableCell className="w-12">
           <SpeakButton iconType="headphones" word={entry.w} />
         </TableCell>
@@ -145,7 +146,30 @@ const sortWordData = (data: CommonWordEntry[]) => {
 }
 
 
-const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
+const ShortcutKey = ({ label }: { label: string }) => (
+  <kbd className="inline-flex items-center px-2 py-1 font-mono text-[11px] font-medium lowercase border border-dotted rounded-xl bg-background text-foreground/70" >
+    {label}
+  </kbd>
+);
+
+const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
+  <div className="flex justify-center mt-5 mb-1 uppercase">
+    <div className="inline-flex items-center gap-4 rounded-full  bg-muted/10 px-5 py-2 text-[10px] text-muted-foreground" >
+      <Keyboard className="w-4 h-4 shrink-0" />
+      <span>shortcuts → </span>
+      <span className="flex items-center gap-2">
+        <ShortcutKey label={shortcuts.prev.label} />
+        <span>previous</span>
+      </span>
+      <span className="flex items-center gap-1.5">
+        <ShortcutKey label={shortcuts.next.label} />
+        <span>next</span>
+      </span>
+    </div >
+  </div >
+);
+
+const PaginatedVocabulary = ({ data, shortcuts }: { data: CommonWordEntry[]; shortcuts?: PaginationShortcuts }) => {
   const sortedData = useMemo(() => {
     return sortWordData(data)
   }, [data])
@@ -155,6 +179,8 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
     const result = sortedData.slice(start, end);
     return result
   }, [sortedData, end, start]);
+
+  useKeyboardPagination(shortcuts, onPrev, onNext, page, totalPages);
 
   const pagination = (
     <>
@@ -170,10 +196,10 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
   );
 
   return (
-    <div className="px-2 mt-4 -mx-2 overflow-x-auto animate-fade-in" key={`${start}-${end}`}>
+    <div className="px-2 mt-4 -mx-2 overflow-x-auto" key={`${start}-${end}`}>
       <p className="w-full px-4 text-left">{data.length} total item(s) found.</p>
       {pagination}
-      <Table className="w-full min-w-[400px] mt-4">
+      <Table className="w-full min-w-[400px] mt-4 animate-fade-in">
         <TableHeader>
           <TableRow>
             <TableHead className="text-left w-fit">Speak</TableHead>
@@ -192,6 +218,7 @@ const PaginatedVocabulary = ({ data }: { data: CommonWordEntry[] }) => {
         </TableBody>
       </Table>
       {pagination}
+      {shortcuts && totalPages > 1 && <ShortcutHint shortcuts={shortcuts} />}
     </div>
   );
 };
@@ -272,11 +299,13 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
 
   return (
     <div>
-      <PaginatedVocabulary data={data} />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
-      <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6">🔗 <ExternalTextLink href={"https://pikapikagems.github.io/japanese-word-ranks/"} text="JP Word Ranks Lookup" /></li>
-      </ul>
+      <PaginatedVocabulary
+        data={data}
+        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
+      />
+      <PrimaryDataSources
+        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/" }]}
+      />
     </div>
   );
 };
@@ -316,15 +345,19 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   return (
     <div>
-      <PaginatedVocabulary data={commonWordData} />
-      <div className="mx-4 mt-3 text-[10px] uppercase font-bold text-left">Primary Data Source(s):</div>
-      <ul className="mx-6 mb-6 italic text-left list-disc">
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1564742924"} text="Anki Deck: 1564742924" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/779483253"} text="Anki Deck: 779483253" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/2106223612"} text="Anki Deck: 2106223612" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://ankiweb.net/shared/info/1468618470"} text="Anki Deck: 1468618470" /></li>
-        <li className="ml-6"><ExternalTextLink href={"https://kanjimastery.blogspot.com/"} text="Kanji Mastery Blog" /></li>
-      </ul>
+      <PaginatedVocabulary
+        data={commonWordData}
+        shortcuts={{ prev: { key: "a", label: "a" }, next: { key: "d", label: "d" } }}
+      />
+      <PrimaryDataSources
+        links={[
+          { text: "Anki Deck: 1564742924", url: "https://ankiweb.net/shared/info/1564742924" },
+          { text: "Anki Deck: 779483253", url: "https://ankiweb.net/shared/info/779483253" },
+          { text: "Anki Deck: 2106223612", url: "https://ankiweb.net/shared/info/2106223612" },
+          { text: "Anki Deck: 1468618470", url: "https://ankiweb.net/shared/info/1468618470" },
+          { text: "Kanji Mastery Blog", url: "https://kanjimastery.blogspot.com/" },
+        ]}
+      />
     </div>
   );
 };

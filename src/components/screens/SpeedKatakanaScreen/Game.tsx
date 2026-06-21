@@ -93,7 +93,11 @@ export const Game = ({
   }
 
   if (status !== "success" || words.length === 0) {
-    return <KaomojiAnimation />;
+    return <>
+      <div className="flex items-center justify-center w-full h-full">
+        <KaomojiAnimation />
+      </div>
+    </>;
   }
 
   const current = words[index];
@@ -197,8 +201,8 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:600px)]:justify-center">
-      <div className="flex flex-col items-center justify-center flex-1 [@media(min-height:600px)]:flex-none gap-3 text-center">
+    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center">
+      <div className="flex flex-col items-center justify-center flex-1 [@media(min-height:900px)]:flex-none gap-3 text-center">
         <div className="flex flex-col items-center gap-1">
           <span className="px-3 py-1 text-xs font-bold rounded-full">
             {index + 1} / {words.length}

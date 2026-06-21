@@ -14,10 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { BasicLoading } from "@/components/common/BasicLoading";
 import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { readingFrequencySourceLinks } from "@/lib/freq/freq-source-info";
+import { kandracPaperUrl, readingFrequencySourceLinks } from "@/lib/freq/freq-source-info";
+import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { FrequencyCategory, frequencyColors, frequencyLabels, KanjiReadingEntry, readingTypeLabels } from "@/lib/kanji-section-constants";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 
 const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const label = frequencyLabels[frequency];
@@ -58,21 +59,6 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
   );
 };
 
-const MethodologyNote = () => (
-  <div className="p-4 text-sm text-left text-muted-foreground">
-    <p className="text-left">
-      All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary.
-    </p>
-    <div className="pt-4 font-bold">Primary Data Source(s):</div>
-    <div className="pl-6">
-      {readingFrequencySourceLinks.map((link) => (
-        <li key={link.text}>
-          <ExternalTextLink href={link.url} text={link.text} />
-        </li>
-      ))}
-    </div>
-  </div>
-);
 
 export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
   const { status, error, kanjiReadingData } = useKanjiReadingDetails(kanji);
@@ -96,7 +82,7 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
   return (
     <div className="animate-fade-in" key={kanji}>
       <div
-        className="px-2 mt-4 -mx-2 overflow-x-auto"
+        className="px-2 mt-4 -mx-2 overflow-x-auto text-left"
 
       >
         <Table className="w-full min-w-[600px]">
@@ -114,8 +100,14 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
             ))}
           </TableBody>
         </Table>
+        <p className="mb-4">
+          All data and the methodology used to determine the reading frequency categories are from the research of Dr. Patrick Kandrac. The frequency classifications aims to reflect how often each reading appears in common vocabulary.
+          <ExternalTextLink text="View Full Paper" href={kandracPaperUrl} />
+        </p>
+        <PrimaryDataSources
+          links={readingFrequencySourceLinks}
+        />
       </div>
-      <MethodologyNote />
     </div>
   );
 };
