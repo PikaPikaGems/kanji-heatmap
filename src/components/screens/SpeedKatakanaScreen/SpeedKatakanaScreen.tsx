@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
@@ -29,6 +30,16 @@ const SpeedKatakanaScreen = () => {
   const [stats, setStats] = useState<SessionStats | null>(null);
   const completedSetsCount = useCompletedSetsCount();
 
+  // Pin the play area to the area above the on-screen keyboard. See the hook.
+  const viewport = useVisualViewport();
+
+  // iOS only opens the keyboard when focus() runs inside the user gesture, but
+  // the game's real input doesn't exist yet at click time (the challenge set is
+  // still loading). So we focus this always-mounted primer synchronously in the
+  // Start handler to open the keyboard; the game then transfers focus to its own
+  // input once it mounts, which iOS keeps the keyboard open across.
+  const primerRef = useRef<HTMLInputElement | null>(null);
+
   const headerProgress =
     phase === "initial"
       ? (completedSetsCount / SPEED_KATAKANA_TOTAL_SETS) * 100
@@ -40,6 +51,8 @@ const SpeedKatakanaScreen = () => {
   };
 
   const startGame = () => {
+    // Must run inside the click's call stack for iOS to open the keyboard.
+    primerRef.current?.focus();
     setProgress(0);
     setPhase("playing");
   };
@@ -53,6 +66,7 @@ const SpeedKatakanaScreen = () => {
   };
 
   const startNextChallenge = () => {
+    primerRef.current?.focus();
     setSetting("challengeSet", nextChallengeSet(settings.challengeSet));
     setProgress(0);
     setPhase("playing");
@@ -61,7 +75,26 @@ const SpeedKatakanaScreen = () => {
   return (
     <>
       <SpeedKatakanaHeader progress={headerProgress} />
-      <main className="px-4 pt-12 h-dvh bg-background">
+      {/*
+        Off-screen but focusable. Focusing it inside the Start gesture opens the
+        iOS keyboard before the game's input has mounted; focus then transfers.
+      */}
+      <input
+        ref={primerRef}
+        className="sr-only"
+        aria-hidden="true"
+        tabIndex={-1}
+        autoComplete="off"
+      />
+      {/*
+        Pinned to the visual viewport so the play area is exactly the space above
+        the keyboard — no scroll, input anchored at the bottom. `top` tracks any
+        iOS scroll-into-view shift; normally 0.
+      */}
+      <main
+        className="fixed inset-x-0 px-4 pt-12 overflow-hidden bg-background"
+        style={{ top: viewport.offsetTop, height: viewport.height }}
+      >
         {phase === "initial" && (
           <InitialScreen onStart={startGame} />
         )}
