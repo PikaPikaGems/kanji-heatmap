@@ -73,6 +73,31 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
 }
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
+const StrokeAnimationLoadingScreen = () => {
+  return (
+    <div className="p-4">
+      <div className="flex px-4 pt-6 pb-2">
+        <div className="flex items-center gap-2">
+          <div className="h-5 rounded-full w-9 bg-muted animate-pulse" />
+          <div className="w-24 h-3 rounded-lg bg-muted animate-pulse" />
+        </div>
+      </div>
+      <div className="flex justify-center w-full my-4">
+        <div className="relative overflow-hidden rounded-3xl bg-muted animate-pulse" style={{ width: 280, height: 280 }}>
+          <svg width="280" height="280" className="absolute inset-0 text-foreground opacity-10" aria-hidden>
+            <line x1="140" y1="0" x2="140" y2="280" stroke="currentColor" strokeWidth="1" strokeDasharray="5 5" />
+            <line x1="0" y1="140" x2="280" y2="140" stroke="currentColor" strokeWidth="1" strokeDasharray="5 5" />
+          </svg>
+        </div>
+      </div>
+      <div className="flex justify-center space-x-2">
+        <div className="rounded-lg w-9 h-9 bg-muted animate-pulse" />
+        <div className="rounded-lg w-9 h-9 bg-muted animate-pulse" />
+      </div>
+    </div>
+  );
+};
+
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
 
   const info = useKanjiRepresentativeWord(kanji)
@@ -107,7 +132,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       </SimpleAccordion>
       <SimpleAccordion trigger={`Stroke Order`}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
-          <Suspense fallback={<BasicLoading />}>
+          <Suspense fallback={<StrokeAnimationLoadingScreen />}>
             <StrokeAnimation kanji={kanji} />
           </Suspense>
         </ErrorBoundary>
