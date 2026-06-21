@@ -234,7 +234,7 @@ export const Game = ({
               }
           }
         >
-          <p className="font-bold leading-tight break-all text-7xl">
+          <p className="text-6xl font-bold leading-tight break-all md:text-7xl">
             {current.katakana}
           </p>
         </div>
@@ -243,13 +243,13 @@ export const Game = ({
             {current.english}
           </p>
         )}
-        <div className="mt-3 mb-6 ">
+        <div className="pb-6 mt-1 ">
           <button
             className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
             tabIndex={-1}
             onClick={handleSkip}
           >
-            {`Skip this`}
+            {`Skip this word`}
           </button>
           <span>⚡️</span>
           <button
@@ -262,7 +262,7 @@ export const Game = ({
         </div>
       </div>
 
-      <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-0">
+      <div className="shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <Input
           ref={inputRef}
           value={inputValue}
