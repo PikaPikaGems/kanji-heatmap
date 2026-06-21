@@ -26,9 +26,6 @@ const assetsPaths = {
   SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",
 };
 
-export const SPEED_KATAKANA_TOTAL_SETS = 200;
-export const SPEED_KATAKANA_FONT_COUNT = 15;
-
 export const SAMPLE_VOCAB_PATH =
   import.meta.env.MODE === "development" || window.location.protocol === "http:"
     ? assetsPaths.dev.KANJI_VOCAB

@@ -30,6 +30,16 @@ export const countCompletedSets = (totalSets: number): number => {
   return count;
 };
 
+/** Returns the average latestCpm across all completed sets, or null if none. */
+export const computeAverageCpm = (totalSets: number): number | null => {
+  const cpms: number[] = [];
+  for (let i = 1; i <= totalSets; i++) {
+    const stats = readSetStats(i);
+    if (stats) cpms.push(stats.latestCpm);
+  }
+  return cpms.length > 0 ? Math.round(cpms.reduce((a, b) => a + b, 0) / cpms.length) : null;
+};
+
 /** Merges a finished session's result into the stored stats for a set. */
 export const recordSetResult = (
   setNumber: number,
@@ -45,6 +55,7 @@ export const recordSetResult = (
   };
   try {
     localStorage.setItem(statsKey(setNumber), JSON.stringify(next));
+    window.dispatchEvent(new StorageEvent("storage", { key: statsKey(setNumber) }));
   } catch {
     // ignore storage write failures (e.g. private mode quota)
   }

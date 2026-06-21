@@ -11,13 +11,12 @@ export type SoundMode = "correct" | "speak";
 export type WordCount = 24 | 48;
 
 export type SpeedKatakanaSettings = {
-  setNumber: number;
+  challengeSet: number;
   randomizeFont: boolean;
   randomizeOrder: boolean;
   displayEnglish: boolean;
   wordCount: WordCount;
-  soundEnabled: boolean;
-  soundMode: SoundMode;
+  sound: { enabled: true; type: SoundMode } | { enabled: false };
 };
 
 export type SessionStats = {

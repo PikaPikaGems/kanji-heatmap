@@ -25,9 +25,6 @@ export const SpeedKatakanaHeader = ({ progress }: { progress: number }) => {
       </Link>
 
       <Progress value={progress} className="flex-1 h-2" />
-      <span className="text-xs font-semibold tabular-nums w-9 text-right shrink-0">
-        {Math.round(progress)}%
-      </span>
 
       <section className="flex items-center pr-1 shrink-0">
         <ErrorBoundary fallback={null}>

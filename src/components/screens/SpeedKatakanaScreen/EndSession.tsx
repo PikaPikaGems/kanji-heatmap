@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SessionStats } from "./types";
+import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 
 const COUNT_UP_MS = 900;
 
@@ -53,23 +54,17 @@ export const EndSession = ({
   onNext,
   onEnd,
   completedSets,
-  totalSets,
 }: {
   stats: SessionStats;
   onNext: () => void;
   onEnd: () => void;
   completedSets: number;
-  totalSets: number;
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-10">
       <h2 className="text-2xl font-bold">Challenge complete!</h2>
 
-      <p className="text-sm">
-        <span className="font-semibold">{completedSets}</span>
-        {" / "}{totalSets} sets completed
-        ({Math.round((completedSets / totalSets) * 100)}%)
-      </p>
+      <SpeedKatakanaStatsSummary completed={completedSets} />
 
       <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8">
         <Stat value={stats.accuracy} unit="%" label="Accuracy" />

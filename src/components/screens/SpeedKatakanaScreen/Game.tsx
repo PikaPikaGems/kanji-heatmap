@@ -5,14 +5,14 @@ import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { useJsonFetch } from "@/hooks/use-json";
 import { useSpeak } from "@/hooks/use-jp-speak";
-import assetsPaths, {
-  SPEED_KATAKANA_FONT_COUNT,
-} from "@/lib/assets-paths";
+import assetsPaths from "@/lib/assets-paths";
 import {
   ChallengeSetData,
   SessionStats,
   SpeedKatakanaSettings,
 } from "./types";
+import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
+import { shuffle } from "@/lib/utils";
 
 type GameWord = {
   katakana: string;
@@ -21,14 +21,6 @@ type GameWord = {
   fontIndex: number | null;
 };
 
-const shuffle = <T,>(items: T[]): T[] => {
-  const next = [...items];
-  for (let i = next.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [next[i], next[j]] = [next[j], next[i]];
-  }
-  return next;
-};
 
 export const Game = ({
   settings,
@@ -41,7 +33,7 @@ export const Game = ({
   onComplete: (stats: SessionStats) => void;
   onEnd: () => void;
 }) => {
-  const path = `${assetsPaths.SPEED_KATAKANA_CHALLENGE_SET}${settings.setNumber}.json`;
+  const path = `${assetsPaths.SPEED_KATAKANA_CHALLENGE_SET}${settings.challengeSet}.json`;
   const { data, status } = useJsonFetch<ChallengeSetData>(path);
 
   const words = useMemo<GameWord[]>(() => {
@@ -50,7 +42,7 @@ export const Game = ({
       katakana,
       english,
       fontIndex: settings.randomizeFont
-        ? Math.floor(Math.random() * SPEED_KATAKANA_FONT_COUNT)
+        ? Math.floor(Math.random() * NUMBER_OF_FONTS)
         : null,
     }));
     const ordered = settings.randomizeOrder ? shuffle(list) : list;
@@ -97,8 +89,8 @@ export const Game = ({
   const current = words[index];
 
   const playFeedback = () => {
-    if (!settings.soundEnabled) return;
-    if (settings.soundMode === "speak") {
+    if (!settings.sound.enabled) return;
+    if (settings.sound.type === "speak") {
       speak();
       return;
     }
@@ -183,7 +175,7 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-w-md gap-4 mx-auto [@media(min-height:600px)]:justify-center">
+    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:600px)]:justify-center">
       <div className="flex flex-col items-center justify-center flex-1 [@media(min-height:600px)]:flex-none gap-3 text-center">
         <span className="px-3 py-1 text-xs font-bold rounded-full ">
           {index + 1} / {words.length}
