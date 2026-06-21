@@ -147,7 +147,7 @@ const sortWordData = (data: CommonWordEntry[]) => {
 
 
 const ShortcutKey = ({ label }: { label: string }) => (
-  <kbd className="inline-flex items-center px-2 py-1 font-mono text-[11px] font-medium uppercase border border-dotted rounded-xl bg-background text-foreground/70" >
+  <kbd className="inline-flex items-center px-2 py-1 font-mono text-[11px] font-medium lowercase border border-dotted rounded-xl bg-background text-foreground/70" >
     {label}
   </kbd>
 );
@@ -155,7 +155,8 @@ const ShortcutKey = ({ label }: { label: string }) => (
 const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
   <div className="flex justify-center mt-5 mb-1 uppercase">
     <div className="inline-flex items-center gap-4 rounded-full  bg-muted/10 px-5 py-2 text-[10px] text-muted-foreground" >
-      <Keyboard className="w-3 h-3 shrink-0" />
+      <Keyboard className="w-4 h-4 shrink-0" />
+      <span>shortcuts → </span>
       <span className="flex items-center gap-2">
         <ShortcutKey label={shortcuts.prev.label} />
         <span>previous</span>
@@ -300,7 +301,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
     <div>
       <PaginatedVocabulary
         data={data}
-        shortcuts={{ prev: { key: "a", label: "a" }, next: { key: "d", label: "d" } }}
+        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
       />
       <PrimaryDataSources
         links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/" }]}
@@ -346,7 +347,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
     <div>
       <PaginatedVocabulary
         data={commonWordData}
-        shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
+        shortcuts={{ prev: { key: "a", label: "a" }, next: { key: "d", label: "d" } }}
       />
       <PrimaryDataSources
         links={[
