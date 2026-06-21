@@ -113,14 +113,14 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
-        <ErrorBoundary details="SampleVocabulary in KanjiDetails">
-          <SampleVocabulary kanji={kanji} />
-        </ErrorBoundary>
-      </SimpleAccordion>
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger={`Selected Words Starting with ${kanji}`}>
+        <ErrorBoundary details="SampleVocabulary in KanjiDetails">
+          <SampleVocabulary kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Character Structure"}>
