@@ -59,6 +59,11 @@ export const Game = ({
   const [flash, setFlash] = useState<{ english: string; key: number; skipped: boolean } | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  // True while an IME (e.g. iOS Japanese romaji/kana keyboard) is mid-composition.
+  // During composition we must not re-transform the value, or iOS Safari renders
+  // the committed character twice. See onChange handler below.
+  const isComposingRef = useRef(false);
+
   // Stats live in refs so per-keystroke bookkeeping doesn't trigger re-renders.
   const startTimeRef = useRef<number | null>(null);
   const correctCharsRef = useRef(0);
@@ -257,7 +262,7 @@ export const Game = ({
         </div>
       </div>
 
-      <div className="shrink-0 pb-[max(2rem,env(safe-area-inset-bottom))] md:pb-0">
+      <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-0">
         <Input
           ref={inputRef}
           value={inputValue}
@@ -269,7 +274,29 @@ export const Game = ({
           aria-label="Type the katakana"
           placeholder="Type romaji here"
           className="w-full text-2xl text-center border-2 rounded-2xl h-14 kanji-font"
-          onChange={(e) => handleChange(e.target.value)}
+          onCompositionStart={() => {
+            isComposingRef.current = true;
+          }}
+          onCompositionEnd={() => {
+            isComposingRef.current = false;
+          }}
+          onChange={(e) => {
+            const raw = e.target.value;
+            // While an IME is composing, keep the field exactly as the IME has
+            // it (no romaji→katakana transform). Transforming mid-composition
+            // makes iOS Safari duplicate the committed character. The trailing
+            // change event after compositionend (isComposing === false) runs the
+            // real conversion + match logic exactly once.
+            // nativeEvent is typed as Event; isComposing lives on InputEvent.
+            const composing =
+              "isComposing" in e.nativeEvent &&
+              (e.nativeEvent as InputEvent).isComposing;
+            if (isComposingRef.current || composing) {
+              setInputValue(raw);
+              return;
+            }
+            handleChange(raw);
+          }}
         />
       </div>
     </div>
