@@ -48,7 +48,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
         <div className="flex justify-between z-1000">
-          <div onClick={onClose}>
+          <div onClick={onClose} onPointerDown={(e) => e.stopPropagation()}>
             <HeaderTitle />
           </div>
           <div onPointerDown={(e) => e.stopPropagation()}><ModeToggle /></div>
@@ -57,6 +57,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
               href={item.href}
+              onPointerDown={(e) => e.stopPropagation()}
               className="block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent"
             >
               <div className="flex items-center text-sm font-semibold">
@@ -78,6 +79,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
               href={item.href}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`${cnTextLink} whitespace-nowrap text-xs`}
             >
               {item.title}
