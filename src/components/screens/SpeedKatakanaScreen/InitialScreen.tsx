@@ -112,7 +112,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
 
   return (
-    <div className="w-full h-full pl-4 pr-2 overflow-auto">
+    <div className="w-full h-full pl-4 pr-2 overflow-auto animate-fade-in">
       <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
         <div className="flex flex-col items-center gap-1 px-6">
           <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
