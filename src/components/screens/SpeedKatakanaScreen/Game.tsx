@@ -216,21 +216,30 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center">
+    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center  animate-fade-in-fast">
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
-        <div className="flex flex-col items-center gap-1 pt-3">
-          <div className="h-4">
-            {!settings.displayEnglish && flash && (
-              <span
-                key={flash.key}
-                className={`text-xs font-bold tracking-wide uppercase animate-english-flash ${flash.skipped ? "text-muted-foreground" : "text-green-500"}`}
-              >
-                {flash.skipped ? "→" : "✓"} {flash.english}
-              </span>
-            )}
-          </div>
-        </div>
+        <div className="pt-4">
+          <button
+            className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
+            tabIndex={-1}
+            onClick={handleSkip}
+          >
+            {`Skip this word`}
+          </button>
+          ·
+          <span className="px-3 pt-6 pb-1 text-xs font-bold rounded-full">
+            {index + 1} / {words.length}
+          </span>
 
+          <span>·</span>
+          <button
+            className="mx-3 text-xs font-bold tracking-wide underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70 text-muted-foreground"
+            tabIndex={-1}
+            onClick={onEnd}
+          >
+            {`End Session`}
+          </button>
+        </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
           style={
@@ -246,32 +255,23 @@ export const Game = ({
           </p>
         </div>
         {settings.displayEnglish && (
-          <p className="text-sm font-bold tracking-wide uppercase text-muted-foreground">
+          <p className="pb-6 text-sm font-bold tracking-wide uppercase text-muted-foreground">
             {current.english}
           </p>
         )}
-        <div className="pb-6 mt-1">
-          <button
-            className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
-            tabIndex={-1}
-            onClick={handleSkip}
-          >
-            {`Skip this word`}
-          </button>
-          ⚡️
-          <span className="px-3 pt-6 pb-1 text-xs font-bold rounded-full">
-            {index + 1} / {words.length}
-          </span>
-
-          <span>⚡️</span>
-          <button
-            className="mx-3 text-xs font-bold tracking-wide underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70 text-muted-foreground"
-            tabIndex={-1}
-            onClick={onEnd}
-          >
-            {`End Session`}
-          </button>
+        <div className="flex flex-col items-center gap-1 pb-4">
+          <div className="h-4">
+            {!settings.displayEnglish && flash && (
+              <span
+                key={flash.key}
+                className={`text-xs font-bold tracking-wide uppercase animate-english-flash ${flash.skipped ? "text-muted-foreground" : "text-green-500"}`}
+              >
+                {flash.skipped ? "→" : "✓"} {flash.english}
+              </span>
+            )}
+          </div>
         </div>
+
       </div>
 
       <div className="shrink-0 pl-3 pr-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">

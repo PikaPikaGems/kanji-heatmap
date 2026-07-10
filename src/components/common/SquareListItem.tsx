@@ -1,4 +1,4 @@
-export const JLPTListItem = ({
+export const SquareListItem = ({
   label,
   color,
   cn,
@@ -8,7 +8,7 @@ export const JLPTListItem = ({
   cn: string;
 }) => {
   return (
-    <li className="flex justify-center items-center space-x-1 text-xs font-bold">
+    <li className="flex items-center justify-center space-x-1 text-xs font-bold">
       <div className={`${cn} h-4 w-4 rounded-sm`}>
         <span className="sr-only">{color}</span>
       </div>

@@ -1,4 +1,6 @@
 import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
+import { isKanji } from "@/lib/utils";
+import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { useState, useEffect } from "react";
 
 const useKnownCount = () => {
@@ -32,25 +34,38 @@ const KnownBadge = () => {
   return (<>
     {knownCount > 0 && (
       <div className="px-2 text-xs font-extrabold text-green-500 bg-opacity-75 border rounded-lg border-green-500/50 bg-background">
-        ✓ {knownCount} known
+        ✓ {knownCount} Bookmarked
       </div>
     )}
 
   </>)
 }
 
-export const ItemCountBadge = () => {
-  const result = useKanjiSearchResult();
-
-  if (result.data?.length == null || result.data.length === 0) {
-    return null;
-  }
-  return (
+const ItemsCountLayout = ({ count }: { count: number }) => {
+  return <>
     <div className="absolute top-[50px] flex flex-wrap gap-1">
       <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
-        {result.data.length} items match your search filters
+        {count} {count !== 1 ? "Items Matched" : "Item Matched"}
       </div>
       <KnownBadge />
     </div>
-  );
+
+  </>
+}
+
+export const ItemCountBadge = () => {
+  const result = useKanjiSearchResult();
+  const searchSettings = useSearchSettings();
+  const { type, text } = searchSettings.textSearch;
+  const kanjiChars = [...new Set(text.split("").filter(isKanji))];
+
+  if (result.data?.length == null) {
+    return <KnownBadge />
+  }
+
+  if (type === "multi-kanji" && kanjiChars.length > 0) {
+    return <ItemsCountLayout count={kanjiChars.length} />
+  }
+
+  return <ItemsCountLayout count={result.data.length} />
 };

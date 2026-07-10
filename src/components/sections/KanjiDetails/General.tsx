@@ -119,11 +119,14 @@ export const General = ({ kanji }: { kanji: string }) => {
               description={<>Words in english associated with this kanji. e.g., 山 → &ldquo;mountain&rdquo;, 水 → &ldquo;water&rdquo;</>}
             />
             <TableCellGrow>
-              {data.meanings.map((meaning) => (
-                <Badge key={meaning} variant={"outline"} className="m-1">
-                  {meaning}
-                </Badge>
-              ))}
+              {/** FIXME: I don't know why 回  has a meaning "#name?" */}
+              {data.meanings.filter(meaning => meaning !== "#name?").map((meaning) => {
+                return (
+                  <Badge key={meaning} variant={"outline"} className="m-1">
+                    {meaning}
+                  </Badge>
+                )
+              })}
               {data.meanings.length === 0 && <div> - </div>}
             </TableCellGrow>
           </TableRow>

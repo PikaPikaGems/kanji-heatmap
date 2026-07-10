@@ -18,7 +18,7 @@ export const PrimaryDataSources = ({
         </span>
       }
       content={
-        <div className="p-4 text-xs text-left w-96 ">
+        <div className="p-4 text-xs text-left min-w-32 ">
           <ul className="space-y-1 list-disc list-inside">
             {links.map((link) => (
               <li key={link.url}>

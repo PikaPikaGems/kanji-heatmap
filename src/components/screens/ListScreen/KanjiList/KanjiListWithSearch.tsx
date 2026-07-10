@@ -5,27 +5,7 @@ import { VirtualKanjiList } from "./VirtualKanjiList";
 import LoadingKanjis from "./LoadingKanjis";
 import { NoSearchResults } from "@/components/error/NoSearchResults";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { isKanji } from "@/lib/utils";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
-
-const UnknownKanjiList = ({ kanjis }: { kanjis: string[] }) => {
-  const setKanji = useSetOpenedParam();
-  return (
-    <div className="flex flex-col items-center justify-center w-full gap-4 p-8">
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {kanjis.map((kanji) => (
-          <button
-            key={kanji}
-            className="p-6 text-6xl border-2 border-dotted rounded-3xl hover:bg-foreground/5"
-            onClick={() => setKanji(kanji)}
-          >
-            {kanji}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
+import { isKanji, dedupe } from "@/lib/utils";
 
 const KanjiListWithSearch = () => {
   const result = useKanjiSearchResult();
@@ -40,14 +20,22 @@ const KanjiListWithSearch = () => {
     return <LoadingKanjis />;
   }
 
+  const { type, text } = searchSettings.textSearch;
+  const kanjiChars = text.split("").filter(isKanji);
+  const uniqueKanjiChars = dedupe(kanjiChars);
+
+  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
+    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
+  }
+
   if (result.data.length === 0) {
-    const { type, text } = searchSettings.textSearch;
-    const kanjiChars = text.split("").filter(isKanji);
-    if (type === "multi-kanji" && kanjiChars.length > 0) {
-      return <UnknownKanjiList kanjis={[...new Set(kanjiChars)]} />;
-    }
     return <NoSearchResults />;
   }
+
+  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
+    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
+  }
+
   return (
     <VirtualKanjiList kanjiKeys={result.data} size={itemSettings.cardType} />
   );

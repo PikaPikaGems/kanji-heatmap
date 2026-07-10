@@ -50,7 +50,7 @@ const KanjiItemButton = forwardRef<HTMLButtonElement, TriggerProps>(
 
     return (
       <button
-        className={`${btnCn} `}
+        className={`${btnCn}`}
         onClick={() => {
           onClick?.();
           setKanji(kanji);

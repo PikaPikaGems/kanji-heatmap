@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { DualRangeSlider } from "@/components/ui/dual-range-slider";
+import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
-import { DEFAULT_SETTINGS, levelOf, LEVELS, positionInLevel, setFromLevelAndPos, SETS_PER_LEVEL, SETTINGS_KEY, SPEED_KATAKANA_TOTAL_SETS } from "./constants";
+import { DEFAULT_SETTINGS, levelOf, LEVELS, positionInLevel, setFromLevelAndPos, CHALLENGES_PER_LEVEL, SETTINGS_KEY, SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
 
 
 const ToggleRow = ({
@@ -56,25 +57,44 @@ const RadioRow = ({
 );
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const stats = useMemo(() => readSetStats(challengeSet), [challengeSet]);
-  if (!stats) return <div className="h-10"></div>;
+  const currentStats = useMemo(() => readSetStats(challengeSet), [challengeSet]);
+  const stats = currentStats ?
+    {
+      timesTaken: currentStats.timesTaken,
+      latestAccuracy: `${currentStats.latestAccuracy} %`,
+      bestAccuracy: `${currentStats.bestAccuracy} %`,
+      latestCpm: `${currentStats.latestCpm} cpm`,
+      bestCpm: `${currentStats.bestCpm} cpm`,
+
+    } : {
+      timesTaken: 0,
+      latestAccuracy: "- - -",
+      bestAccuracy: " - ",
+      latestCpm: "- - -",
+      bestCpm: " -",
+    }
+
   return (
     <div className="flex flex-wrap gap-2 text-xs font-bold text-left min-h-10">
       <div>Challenge # {challengeSet}:</div>
       <div>
-        ⭐️ {stats.timesTaken}{" "}
+        {stats.timesTaken}{" "}
         {stats.timesTaken === 1 ? "attempt" : "attempts"}
       </div>
-      <div className="flex">
+      <div className="grid w-full grid-cols-2">
         <div>
           🎯 Accuracy:{" "}
-          <span className="mr-1 text-green-500">{stats.latestAccuracy}%</span>
-          (best: {stats.bestAccuracy}%)
+          <span className="mr-1 text-green-500">{stats.latestAccuracy}</span>
+          <br />
+          🚀 <>Best Accuracy: {stats.bestAccuracy}</>
         </div>
-        <div className="ml-1">
-          🚗 Speed:{" "}
-          <span className="mr-1 text-green-500">{stats.latestCpm} cpm</span>
-          (best: {stats.bestCpm} cpm)
+        <div>
+          🚙 Speed:{" "}
+          <span className="mr-1 text-green-500">{stats.latestCpm}</span>
+
+          <br />
+          🏎️ Best Speed: {stats.bestCpm}
+
         </div>
       </div>
     </div>
@@ -90,7 +110,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const summary = useMemo(() => {
     let completed = 0;
     let totalCpm = 0;
-    for (let i = 1; i <= SPEED_KATAKANA_TOTAL_SETS; i++) {
+    for (let i = 1; i <= SPEED_KATAKANA_TOTAL_CHALLENGES; i++) {
       const s = readSetStats(i);
       if (s) { completed++; totalCpm += s.latestCpm; }
     }
@@ -100,8 +120,21 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     };
   }, []);
 
+  const levelCompletion = useMemo(() => {
+    const counts: number[] = [];
+    for (let level = 1; level <= LEVELS; level++) {
+      let count = 0;
+      for (let pos = 1; pos <= CHALLENGES_PER_LEVEL; pos++) {
+        if (readSetStats(setFromLevelAndPos(level, pos))) count++;
+      }
+      counts.push(count);
+    }
+    return counts;
+  }, []);
+
   const currentLevel = levelOf(settings.challengeSet);
   const currentPos = positionInLevel(settings.challengeSet);
+  const currentLevelDone = levelCompletion[currentLevel - 1];
 
   const selectLevel = (level: number) => {
     const pos = levelOf(settings.challengeSet) === level ? currentPos : 1;
@@ -112,10 +145,10 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
 
   return (
-    <div className="w-full h-full pl-4 pr-2 overflow-auto">
+    <div className="w-full h-full pl-4 pr-2 overflow-auto animate-fade-in">
       <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
         <div className="flex flex-col items-center gap-1 px-6">
-          <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana {"⌨️"}</h1>
+          <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana</h1>
           <SpeedKatakanaStatsSummary
             completed={summary.completed}
             averageCpm={summary.averageCpm}
@@ -154,7 +187,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               />
             </div>
             {settings.wordCount !== 48 && (
-              <p className="w-full text-xs text-left">
+              <p className="w-full text-xs text-left animate-fade-in-fast">
                 ⚠️ Short sessions will not be recorded.
               </p>
             )}
@@ -173,7 +206,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               }
             />
             {soundEnabled && (
-              <div className="flex flex-wrap pl-1">
+              <div className="flex flex-wrap pl-1 animate-fade-in-fast">
                 <RadioRow
                   name="sound-mode"
                   value="speak"
@@ -191,7 +224,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               </div>
             )}
             {soundEnabled && soundType === "speak" && (
-              <p className="w-full pt-1 text-xs text-left">
+              <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
                 ⚠️ text-to-speech might not work on all devices.
               </p>
             )}
@@ -201,30 +234,39 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <div className="flex items-center justify-between">
               <Label className="text-sm">Select a Challenge Set</Label>
               <span className="text-sm font-semibold tabular-nums">
-                {settings.challengeSet} / {SPEED_KATAKANA_TOTAL_SETS}
+                {(currentLevelDone / CHALLENGES_PER_LEVEL) * 100}% done
               </span>
             </div>
 
-            <div className="flex gap-1">
-              {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => (
-                <button
-                  key={level}
-                  onClick={() => selectLevel(level)}
-                  className={`flex-1 py-1 text-xs rounded font-medium transition-colors ${currentLevel === level
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/70"
-                    }`}
-                >
-                  {level}
-                </button>
-              ))}
+
+            <div className="grid grid-cols-10 gap-1">
+              {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => {
+                const doneCount = levelCompletion[level - 1];
+                const category = Math.round(
+                  (doneCount / CHALLENGES_PER_LEVEL) * 4
+                ) as FreqCategory;
+                const bgCn = freqCategoryCn[category];
+                const textCn = category > 3 ? "text-white" : "text-foreground";
+                return (
+                  <button
+                    key={level}
+                    onClick={() => selectLevel(level)}
+                    className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentLevel === level
+                      ? "border-primary"
+                      : ""
+                      }`}
+                  >
+                    {level}
+                  </button>
+                );
+              })}
             </div>
             <Label className="text-sm text-left">Select a Challenge</Label>
 
             <DualRangeSlider
               value={[currentPos]}
               min={1}
-              max={SETS_PER_LEVEL}
+              max={CHALLENGES_PER_LEVEL}
               step={1}
               onValueChange={(value) =>
                 setSetting("challengeSet", setFromLevelAndPos(currentLevel, value[0]))
@@ -232,7 +274,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             />
 
             <p className="text-xs text-left">
-              Lower sets are the most common words; higher sets are rarer.
+              Lower challenges contain more common words.
             </p>
           </div>
         </div>

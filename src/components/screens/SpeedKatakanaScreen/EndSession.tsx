@@ -61,7 +61,7 @@ export const EndSession = ({
   completedSets: number;
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-10">
+    <div className="flex flex-col items-center justify-center w-full h-full gap-10 animate-fade-in">
 
       <div>
         <h2 className="text-xl font-bold">🥳 Challenge Complete!</h2>

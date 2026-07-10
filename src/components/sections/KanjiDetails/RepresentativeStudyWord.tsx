@@ -32,14 +32,18 @@ const WhatIsARepresentativeStudyWord = () => {
       <GenericPopover
         trigger={
           <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
-            <strong>What is a Study Word? (Experimental Feature)</strong><InfoIcon size={14} />
+            <strong>What is a Anchor Word? (Experimental Feature)</strong><InfoIcon size={14} />
           </span>
         }
 
         content={
-          <div className="p-4 text-xs w-96">
-            A Study Word is a Japanese word chosen by {`Kanji Heatmap Data's`} selection algorithm to help reinforce a specific kanji through vocabulary. Each of the ~2,000 kanji in Kanji Heatmap has a unique Study Word.
-            The selection algorithm is still being refined, so Study Words may change over time as the feature improves.
+          <div className="p-4 text-xs text-left w-96">
+            <p className="py-2">
+              An <strong>Anchor Word</strong> is a Japanese word chosen to create a strong, memorable connection between a kanji and one of its vocabulary words. Each of the ~2,000 kanji in Kanji Heatmap has one unique Anchor Word.
+            </p>
+            <p className="py-2">
+              Anchor Words are selected by {`Kanji Heatmap's`} algorithm, which is still experimental and being refined. As the algorithm improves, Anchor Words may change over time.
+            </p>
           </div>
         }
       /></>
@@ -52,7 +56,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   if (!data) {
     return (
       <div className="w-full p-4 text-base text-center">
-        No (representative) study word available for {kanji}.
+        No Anchor Word available for {kanji}.
       </div>
     );
   }
