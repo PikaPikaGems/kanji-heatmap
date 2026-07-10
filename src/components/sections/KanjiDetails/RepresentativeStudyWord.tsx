@@ -56,7 +56,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   if (!data) {
     return (
       <div className="w-full p-4 text-base text-center">
-        No Anchor word available for {kanji}.
+        No Anchor Word available for {kanji}.
       </div>
     );
   }
