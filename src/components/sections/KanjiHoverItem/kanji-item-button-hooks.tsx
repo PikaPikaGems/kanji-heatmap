@@ -52,9 +52,7 @@ export const useItemBtnCn = (kanji: string) => {
   const kanjiInfo = getInfo?.(kanji);
 
   if (
-    kanjiInfo == null ||
-    kanjiInfo.frequency == null ||
-    kanjiInfo.jlpt == null
+    kanji.length === 0
   ) {
     return loadingCn;
   }
@@ -62,8 +60,8 @@ export const useItemBtnCn = (kanji: string) => {
     bgSrc == null || bgSrc == "none" ? "none" : (freqMap[bgSrc] ?? "none");
   const dontIncludeFreq = freqType == "none";
 
-  const freqData = kanjiInfo.frequency;
-  const freqRank = freqType !== "none" ? freqData[freqType] : undefined;
+  const freqData = kanjiInfo?.frequency;
+  const freqRank = freqType !== "none" ? freqData ? freqData[freqType] : undefined : undefined;
   const freqRankCategory = getFreqCategory(freqRank);
 
   const textColor = dontIncludeFreq
@@ -71,7 +69,7 @@ export const useItemBtnCn = (kanji: string) => {
     : freqRankCategory > 3
       ? "text-white"
       : "dark:text-white text-gray-700";
-  const { jlpt } = kanjiInfo;
+  const jlpt = kanjiInfo?.jlpt ?? "none";
 
   const representativeWord = getRepresentativeWord(kanji)?.word ?? null;
   const border = getBorderCn(

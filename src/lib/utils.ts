@@ -38,6 +38,15 @@ export const isKanji = (char: string) => {
   );
 };
 
+export const dedupe = <T>(items: T[]): T[] => {
+  const seen = new Set<T>();
+  return items.filter((item) => {
+    if (seen.has(item)) return false;
+    seen.add(item);
+    return true;
+  });
+};
+
 export const shuffle = <T>(items: T[]): T[] => {
   const next = [...items];
   for (let i = next.length - 1; i > 0; i--) {
