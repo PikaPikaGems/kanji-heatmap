@@ -32,7 +32,7 @@ const KnownBadge = () => {
   return (<>
     {knownCount > 0 && (
       <div className="px-2 text-xs font-extrabold text-green-500 bg-opacity-75 border rounded-lg border-green-500/50 bg-background">
-        ✓ {knownCount} known
+        ✓ {knownCount} Bookmarked
       </div>
     )}
 

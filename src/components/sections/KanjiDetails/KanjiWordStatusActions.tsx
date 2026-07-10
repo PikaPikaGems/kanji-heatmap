@@ -15,7 +15,7 @@ const MarkAsKnownBadge = ({ word }: { word: string }) => {
                 : "border border-dashed border-foreground/50 text-muted-foreground hover:text-foreground"
                 }`}
         >
-            {isKnown ? "✓ Known" : "Unmarked"}
+            {isKnown ? "✓ Bookmarked" : "Bookmark"}
         </button>
     );
 };
