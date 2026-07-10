@@ -11,7 +11,7 @@ export const SpeedKatakanaStatsSummary = ({
   return (
     <div className="mt-2 text-xs font-bold text-foreground">
       {completed} / {SPEED_KATAKANA_TOTAL_CHALLENGES} {`${completed > 1 ? "challenges" : "challenge"}`} completed ({percent}%)
-      {averageCpm != null && <span className="pl-1"> 🚗 {averageCpm} avg cpm</span>}
+      {averageCpm != null && <span className="pl-1"> 🚙 {averageCpm} avg cpm</span>}
     </div>
   );
 };

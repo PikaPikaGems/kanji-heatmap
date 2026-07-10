@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { DualRangeSlider } from "@/components/ui/dual-range-slider";
+import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
@@ -119,8 +120,21 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     };
   }, []);
 
+  const levelCompletion = useMemo(() => {
+    const counts: number[] = [];
+    for (let level = 1; level <= LEVELS; level++) {
+      let count = 0;
+      for (let pos = 1; pos <= CHALLENGES_PER_LEVEL; pos++) {
+        if (readSetStats(setFromLevelAndPos(level, pos))) count++;
+      }
+      counts.push(count);
+    }
+    return counts;
+  }, []);
+
   const currentLevel = levelOf(settings.challengeSet);
   const currentPos = positionInLevel(settings.challengeSet);
+  const currentLevelDone = levelCompletion[currentLevel - 1];
 
   const selectLevel = (level: number) => {
     const pos = levelOf(settings.challengeSet) === level ? currentPos : 1;
@@ -220,24 +234,32 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <div className="flex items-center justify-between">
               <Label className="text-sm">Select a Challenge Set</Label>
               <span className="text-sm font-semibold tabular-nums">
-                {settings.challengeSet} / {SPEED_KATAKANA_TOTAL_CHALLENGES}
+                {(currentLevelDone / CHALLENGES_PER_LEVEL) * 100}% done
               </span>
             </div>
 
 
             <div className="grid grid-cols-10 gap-1">
-              {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => (
-                <button
-                  key={level}
-                  onClick={() => selectLevel(level)}
-                  className={`py-1 bg-muted text-foreground hover:bg-muted/70 text-xs rounded font-medium transition-colors border-2 ${currentLevel === level
-                    ? "border-primary"
-                    : ""
-                    }`}
-                >
-                  {level}
-                </button>
-              ))}
+              {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => {
+                const doneCount = levelCompletion[level - 1];
+                const category = Math.round(
+                  (doneCount / CHALLENGES_PER_LEVEL) * 4
+                ) as FreqCategory;
+                const bgCn = freqCategoryCn[category];
+                const textCn = category > 3 ? "text-white" : "text-foreground";
+                return (
+                  <button
+                    key={level}
+                    onClick={() => selectLevel(level)}
+                    className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentLevel === level
+                      ? "border-primary"
+                      : ""
+                      }`}
+                  >
+                    {level}
+                  </button>
+                );
+              })}
             </div>
             <Label className="text-sm text-left">Select a Challenge</Label>
 
