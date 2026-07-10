@@ -45,7 +45,7 @@ const ItemsCountLayout = ({ count }: { count: number }) => {
   return <>
     <div className="absolute top-[50px] flex flex-wrap gap-1">
       <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
-        {count} {count !== 1 ? "items matched" : "item matched"}
+        {count} {count !== 1 ? "Items Matched" : "Item Matched"}
       </div>
       <KnownBadge />
     </div>
