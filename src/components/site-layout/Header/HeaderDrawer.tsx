@@ -130,6 +130,9 @@ const HeaderDrawer = () => {
           <DrawerPrimitive.Title className="sr-only">
             Navigation menu
           </DrawerPrimitive.Title>
+          <DrawerPrimitive.Description className="sr-only">
+            Site navigation links and settings
+          </DrawerPrimitive.Description>
           <HeaderDrawerContent onClose={() => setIsOpen(false)} />
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
