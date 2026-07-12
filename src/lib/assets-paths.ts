@@ -7,7 +7,7 @@ const assetsPaths = {
   VOCAB_FURIGANA: "/json/vocab_furigana.json",
   CUM_USE: "/json/cum_use.json",
   KANJI_SVGS: "https://assets.pikapikagems.com/kanji/",
-  KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v34", // Note: No slash at the end is intentional
+  KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v4", // Note: No slash at the end is intentional
   TEXT_BOOK_VOCAB: "https://assets.pikapikagems.com/kanji-textbook-words/v4", // Note: No slash at the end is intentional
   dev: {
     KANJI_SVGS: "https://kanjivg.tagaini.net/kanjivg/kanji/",
