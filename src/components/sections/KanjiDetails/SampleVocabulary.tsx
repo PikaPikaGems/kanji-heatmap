@@ -99,7 +99,8 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
           />
         </TableCell>
         <TableCell className="text-base kanji-font w-fit whitespace-nowrap">
-          {entry.r && entry.r !== "-" ? <RomajiBadge kana={entry.r} /> : "-"}
+          {entry.r && entry.r !== "-"
+            ? <> {entry.r.split(",").map(r => { return <RomajiBadge key={r} kana={r} /> })}</> : "-"}
         </TableCell>
         <TableCell className="w-fit max-w-24">
           {entry.e && entry.e !== "-" ? <span className="text-xs font-bold">{entry.e}</span> : "-"}
@@ -117,7 +118,7 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
             <JotobaBtn word={entry.w} />
           </BugIconErrorBoundary>
         </TableCell>
-      </TableRow>
+      </TableRow >
     </>
 
   );
@@ -335,12 +336,18 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
 
   // convert data to CommonWordEntry[]
-  const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation, jlpt]]) => ({
-    w: word,
-    r: reading,
-    e: translation,
-    j: Number(jlpt)
-  } as CommonWordEntry));
+  const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation, jlpt, tags]]) => {
+    console.log(tags)
+
+    return {
+      w: word,
+      r: reading,
+      e: translation,
+      j: Number(jlpt),
+      k: tags === "kaishi"
+    } as CommonWordEntry
+
+  });
 
 
   return (
