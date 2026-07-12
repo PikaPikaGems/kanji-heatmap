@@ -85,7 +85,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
         <div className="flex flex-wrap items-center justify-center gap-1">
 
-          <RomajiBadge kana={reading} />
+          {reading.split("・").map(r => <RomajiBadge key={r} kana={r} />)}
           <DotIcon className="w-3 p-0 m-0" />
           <VocabActions word={word} kana={reading} />
         </div>
