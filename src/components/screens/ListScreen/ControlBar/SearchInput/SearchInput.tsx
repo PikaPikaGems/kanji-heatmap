@@ -75,6 +75,9 @@ export const SearchInput = ({
   }, []);
 
   const onSyncAll = (text: string, finalSearchType: SearchType) => {
+    // Cancel any pending typed settle so a paste/clear can't be overwritten
+    // by a debounce that still holds the pre-paste value.
+    clearTimeout(timeoutRef.current);
     setValue(text);
     onSettle(text, finalSearchType);
     setSearchType(finalSearchType);
