@@ -132,12 +132,11 @@ export const SearchInput = ({
           }
 
           if (hasKanji(processedText)) {
-            const start = inputRef.current?.selectionStart ?? null;
-            const end = inputRef.current?.selectionEnd ?? null;
-            const hasSelection = start !== null && end !== null && start !== end;
-            const newValue = hasSelection
-              ? `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`
-              : `${parsedValue}${processedText}`;
+            // Insert at the caret (or replace the current selection). Previously
+            // a collapsed caret always appended, so pasting mid-field felt broken.
+            const start = inputRef.current?.selectionStart ?? parsedValue.length;
+            const end = inputRef.current?.selectionEnd ?? start;
+            const newValue = `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`;
 
             if (searchType === "similar") {
               onSyncAll(stripToKanji(newValue), "similar");
