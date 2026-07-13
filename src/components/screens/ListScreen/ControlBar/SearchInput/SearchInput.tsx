@@ -117,6 +117,29 @@ export const SearchInput = ({
     onSettle(parsedValue.trim(), searchType);
   };
 
+  // After a controlled-value paste, React resets the caret to the end — put it
+  // back where the inserted text ended.
+  const restoreCaret = (caret: number) => {
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) {
+        return;
+      }
+      el.focus();
+      const clamped = Math.min(caret, el.value.length);
+      el.setSelectionRange(clamped, clamped);
+    });
+  };
+
+  const clearSearch = () => {
+    onSyncAll("", searchType);
+    // Also clears the drawing pad (see handwritingResetKey).
+    setHandwritingResetKey((key) => key + 1);
+    inputRef.current?.focus();
+  };
+
+  const isDrawerType = isDialogType(searchType);
+
   const fontCN =
     parsedValue === "" || searchType === "meanings" || searchType === "keyword"
       ? ""
@@ -126,13 +149,19 @@ export const SearchInput = ({
     <section className="relative w-full">
       <input
         ref={inputRef}
+        // Drawer types are click-to-open; block typing so junk doesn't land in the field.
+        readOnly={isDrawerType}
+        autoComplete="off"
+        spellCheck={false}
+        aria-label="Search kanji"
         className={cn(
           "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-7 pr-[105px] h-9",
-          fontCN
+          fontCN,
+          isDrawerType && "cursor-pointer"
         )}
         value={parsedValue}
         onClick={() => {
-          if (isDialogType(searchType)) {
+          if (isDrawerType) {
             setOpenDialogType(searchType);
           }
         }}
@@ -179,8 +208,19 @@ export const SearchInput = ({
           }, INPUT_DEBOUNCE_TIME);
         }}
         onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) {
+            return;
+          }
+
+          // Escape clears the field when no drawer is open (drawers handle Escape themselves).
+          if (e.key === "Escape" && openDialogType === "none" && parsedValue.length > 0) {
+            e.preventDefault();
+            clearSearch();
+            return;
+          }
+
           // Don't flush mid-IME; wait for compositionend.
-          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+          if (e.key === "Enter") {
             flushPendingSettle();
           }
         }}
@@ -200,46 +240,65 @@ export const SearchInput = ({
             return;
           }
 
-          if (hasKanji(processedText)) {
-            // Insert at the caret (or replace the current selection). Previously
-            // a collapsed caret always appended, so pasting mid-field felt broken.
-            const start = inputRef.current?.selectionStart ?? parsedValue.length;
-            const end = inputRef.current?.selectionEnd ?? start;
-            const newValue = `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`;
+          // Insert at the caret (or replace the current selection) for every paste path.
+          const start = inputRef.current?.selectionStart ?? parsedValue.length;
+          const end = inputRef.current?.selectionEnd ?? start;
 
+          const commitPaste = (
+            insertion: string,
+            nextType: SearchType,
+            announceSwitch: boolean
+          ) => {
+            const newValue = `${parsedValue.slice(0, start)}${insertion}${parsedValue.slice(end)}`;
+            const caret = start + insertion.length;
+            if (announceSwitch) {
+              syncFromPaste(newValue, nextType);
+            } else {
+              onSyncAll(newValue, nextType);
+            }
+            restoreCaret(caret);
+          };
+
+          if (hasKanji(processedText)) {
             if (searchType === "similar") {
-              // Stay on similar — no type-switch hint.
-              onSyncAll(stripToKanji(newValue), "similar");
+              const merged = `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`;
+              const kanjiOnly = stripToKanji(merged);
+              // hasKanji (wanakana) can disagree with isKanji — don't wipe the field.
+              if (kanjiOnly.length === 0) {
+                return;
+              }
+              onSyncAll(kanjiOnly, "similar");
+              restoreCaret(kanjiOnly.length);
               return;
             }
 
-            syncFromPaste(newValue, "multi-kanji");
+            commitPaste(processedText, "multi-kanji", true);
             return;
           }
 
           // No kanji: auto-pick a search type from the pasted script.
           if (wanakana.isKana(processedText)) {
-            syncFromPaste(processedText, "readings");
+            commitPaste(processedText, "readings", true);
             return;
           }
 
           if (wanakana.isRomaji(processedText)) {
             const nextType: SearchType =
               searchType === "keyword" ? "keyword" : "meanings";
-            const updatedValue = translateValue(
+            const insertion = translateValue(
               processedText,
               translateMap[nextType]
             );
-            syncFromPaste(updatedValue, nextType);
+            commitPaste(insertion, nextType, true);
             return;
           }
 
           // Mixed / ambiguous: keep current search type.
-          const updatedValue = translateValue(
+          const insertion = translateValue(
             processedText,
             translateMap[searchType]
           );
-          onSyncAll(updatedValue, searchType);
+          commitPaste(insertion, searchType, false);
         }}
         placeholder={placeholderMap[searchType]}
       />
@@ -254,11 +313,9 @@ export const SearchInput = ({
           <Button
             className="h-6 p-1 m-0 rounded-full"
             variant={"secondary"}
-            onClick={() => {
-              onSyncAll("", searchType);
-              // Also clears the drawing pad (see handwritingResetKey).
-              setHandwritingResetKey((key) => key + 1);
-            }}
+            // Keep focus on the input (avoids blur flush racing the clear).
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={clearSearch}
           >
             <CircleX />
             <span className="sr-only"> Clear search text</span>
@@ -279,10 +336,12 @@ export const SearchInput = ({
             // Drop any pending typed settle before switching type.
             clearTimeout(timeoutRef.current);
             hasPendingSettleRef.current = false;
-            const newParsedValue = translateValue(
-              searchType === "radicals" ? "" : parsedValue,
-              translateMap[newType]
-            );
+            const baseText = searchType === "radicals" ? "" : parsedValue;
+            // Similar only wants kanji in the field — strip leftovers from prior types.
+            const newParsedValue =
+              newType === "similar"
+                ? stripToKanji(baseText)
+                : translateValue(baseText, translateMap[newType]);
             setValue(newParsedValue);
             onSettle(newParsedValue.trim(), newType);
           }}
