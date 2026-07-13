@@ -356,7 +356,7 @@ export const SearchInput = ({
       {typeHint != null && (
         <span
           key={typeHintKey}
-          className="pointer-events-none absolute left-0 z-20 px-2 py-0.5 text-xs font-semibold border rounded-md shadow-sm -bottom-7 border-cyan-500/60 bg-background text-cyan-500 animate-search-type-hint"
+          className="pointer-events-none absolute left-0 z-20 px-2 py-0.5 text-xs font-semibold border rounded-md shadow-sm -bottom-7 border-cyan-500 bg-background dark:text-cyan-300 text-cyan-600 animate-search-type-hint"
           role="status"
           aria-live="polite"
           onAnimationEnd={() => setTypeHint(null)}
