@@ -10,6 +10,11 @@ import {
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
+import {
+    useGetKanjiInfoFn,
+    useSimilarKanjis,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { GlobalKanjiLink } from "@/components/dependent/routing";
 
 const TableCellFixed = ({
     children,
@@ -27,11 +32,53 @@ const TableCellGrow = ({ children }: { children: ReactNode }) => (
     <TableCell>{children}</TableCell>
 );
 
+const SimilarKanjis = ({ kanji }: { kanji: string }) => {
+    const similar = useSimilarKanjis(kanji);
+    const getKanjiInfo = useGetKanjiInfoFn();
+    const similars = similar.data ?? [];
+    const showEmpty = similar.status !== "loading" && similars.length === 0;
+
+    if (showEmpty || similars.length === 0) return null;
+    return (
+        <>
+            <div className="text-left animate-fade-in">
+                <h3 className="pt-3 pb-1 pl-3 mb-4 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">Visually Similar Kanji</h3>
+                <div className="flex items-center min-w-0 space-x-2 overflow-x-auto overflow-y-hidden">
+                    {similars.map((similarKanji) => (
+                        <div key={similarKanji} className="shrink-0">
+                            <GlobalKanjiLink
+                                fontSize="text-6xl"
+                                kanji={similarKanji}
+                                keyword={getKanjiInfo?.(similarKanji)?.keyword ?? "..."}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <PrimaryDataSources
+                links={[
+                    {
+                        text: "lennart-finke/kanjidist-visualiser",
+                        url: "https://github.com/lennart-finke/kanjidist-visualiser/blob/master/data/dkanjistat.json"
+
+                    },
+                    {
+                        text: "Yencken, Lars (2010) Orthographic support for passing the reading hurdle in Japanese. PhD Thesis, University of Melbourne, Melbourne, Australia",
+                        url: "https://lars.yencken.org/datasets/kanji-confusion/",
+                    },
+                ]}
+            />
+
+        </>
+    );
+};
+
 export const StructureInfo = ({ kanji }: { kanji: string }) => {
 
 
     return (
         <>
+            <h3 className="pt-3 pb-1 pl-3 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">Component Breakdown</h3>
             <Table key={kanji} className="border-b animate-fade-in ">
                 <TableBody>
                     <TableRow className="text-left">
@@ -79,6 +126,8 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
                     { text: "scriptin/topokanji", url: "https://github.com/scriptin/topokanji" },
                 ]}
             />
+
+            <SimilarKanjis kanji={kanji} />
         </>
     );
 }
