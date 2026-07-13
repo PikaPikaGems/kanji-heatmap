@@ -289,5 +289,18 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
     return;
   }
 
+  if (eventType === "kanji-similar") {
+    ensureSimilarCache()
+      .then(() => {
+        const kanji = payload as string;
+        const similars = (KANJI_SIMILAR_CACHE[kanji] ?? []).filter(
+          (similar) => KANJI_INFO_MAIN_CACHE[similar] != null
+        );
+        sendResponse(similars);
+      })
+      .catch(sendError);
+    return;
+  }
+
   sendError({ message: "Not implemented" });
 };
