@@ -119,6 +119,14 @@ export const SearchInput = ({
           }
         }}
         onChange={(e) => {
+          // During IME composition (e.g. かんじ before converting to 漢字),
+          // keep the raw value. Running translateValue here fights the IME
+          // and can swallow or mangle in-progress input.
+          if (e.nativeEvent.isComposing) {
+            setValue(e.target.value);
+            return;
+          }
+
           // Translate first (e.g. romaji → hiragana) so the field and the
           // settled search query stay in sync. Settling the raw keystrokes
           // would search a different string than what the user sees.
@@ -137,8 +145,23 @@ export const SearchInput = ({
             onSettle(updatedValue.trim(), searchType);
           }, INPUT_DEBOUNCE_TIME);
         }}
+        onCompositionEnd={(e) => {
+          // Composition just finished — now it's safe to translate and settle.
+          const updatedValue = translateValue(
+            e.currentTarget.value,
+            translateMap[searchType]
+          );
+          setValue(updatedValue);
+          clearTimeout(timeoutRef.current);
+          hasPendingSettleRef.current = true;
+          timeoutRef.current = setTimeout(() => {
+            hasPendingSettleRef.current = false;
+            onSettle(updatedValue.trim(), searchType);
+          }, INPUT_DEBOUNCE_TIME);
+        }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          // Don't flush mid-IME; wait for compositionend.
+          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
             flushPendingSettle();
           }
         }}
