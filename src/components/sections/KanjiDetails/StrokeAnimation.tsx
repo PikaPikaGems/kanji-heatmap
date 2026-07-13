@@ -5,8 +5,12 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import assetsPaths from "@/lib/assets-paths";
+import { installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { PlayCircle, Snail } from "@/components/icons";
 import { DrawingPad } from "@/components/dependent/DrawingPad";
+
+// Stock dmak crashes on null kvg: root — install our guarded loader once.
+installSafeDmakLoader();
 
 type AnimationSpeed = "fast" | "slow";
 

@@ -337,14 +337,16 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   // convert data to CommonWordEntry[]
   const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation, jlpt, tags]]) => {
-    console.log(tags)
-
+    const tagsArray = tags.split(",").map(tag => tag.trim())
+    const isKaishi = tagsArray.includes("kaishi")
+    const isUncommonForm = tagsArray.includes("alt")
     return {
       w: word,
       r: reading,
       e: translation,
       j: Number(jlpt),
-      k: tags === "kaishi"
+      k: isKaishi,
+      uncommon_form: isUncommonForm
     } as CommonWordEntry
 
   });

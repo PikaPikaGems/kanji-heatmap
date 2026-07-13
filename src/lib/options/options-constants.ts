@@ -38,10 +38,13 @@ export const GROUP_OPTIONS = [
   K_JOUYOU_KEY,
   K_STROKES,
   K_WK_LVL,
-  K_KKLC_INDEX,
 ] as const; // removed K_KUNYOMI, K_ONYOMI for now
 
-export const NONGROUP_OPTIONS = [K_RTK_INDEX, K_MEANING_KEY] as const;
+export const NONGROUP_OPTIONS = [
+  K_RTK_INDEX,
+  K_MEANING_KEY,
+  K_KKLC_INDEX,
+] as const;
 
 export const K_RANK_NONE = "none" as const;
 
