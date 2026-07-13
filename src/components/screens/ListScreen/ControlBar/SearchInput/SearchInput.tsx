@@ -39,6 +39,10 @@ export const SearchInput = ({
   onSettle: (searchText: string, searchType: SearchType) => void;
 }) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
+  // True while a typed onChange settle is waiting on the debounce timer.
+  // Used so blur/Enter only flush when there is actually something pending
+  // (avoids re-settling stale text after paste/clear).
+  const hasPendingSettleRef = useRef(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [searchType, setSearchType] = useState(initialSearchType);
   const [parsedValue, setValue] = useState(
@@ -78,9 +82,21 @@ export const SearchInput = ({
     // Cancel any pending typed settle so a paste/clear can't be overwritten
     // by a debounce that still holds the pre-paste value.
     clearTimeout(timeoutRef.current);
+    hasPendingSettleRef.current = false;
     setValue(text);
     onSettle(text, finalSearchType);
     setSearchType(finalSearchType);
+  };
+
+  // Immediately apply the current field value if a debounce is still waiting
+  // (e.g. user hits Enter or clicks away before the 400ms timer fires).
+  const flushPendingSettle = () => {
+    if (!hasPendingSettleRef.current) {
+      return;
+    }
+    clearTimeout(timeoutRef.current);
+    hasPendingSettleRef.current = false;
+    onSettle(parsedValue.trim(), searchType);
   };
 
   const fontCN =
@@ -115,10 +131,18 @@ export const SearchInput = ({
           // NOTE: this is based on https://react.dev/learn/referencing-values-with-refs
           // TODO: Read https://www.developerway.com/posts/debouncing-in-react
           clearTimeout(timeoutRef.current);
+          hasPendingSettleRef.current = true;
           timeoutRef.current = setTimeout(() => {
+            hasPendingSettleRef.current = false;
             onSettle(updatedValue.trim(), searchType);
           }, INPUT_DEBOUNCE_TIME);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            flushPendingSettle();
+          }
+        }}
+        onBlur={flushPendingSettle}
         onPaste={(event: ClipboardEvent<HTMLInputElement>) => {
           event.preventDefault();
           const clipboardData = event.clipboardData;
@@ -209,6 +233,9 @@ export const SearchInput = ({
             }
 
             setSearchType(newType);
+            // Drop any pending typed settle before switching type.
+            clearTimeout(timeoutRef.current);
+            hasPendingSettleRef.current = false;
             const newParsedValue = translateValue(
               searchType === "radicals" ? "" : parsedValue,
               translateMap[newType]
