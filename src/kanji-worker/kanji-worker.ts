@@ -15,6 +15,7 @@ import {
   fetchPartKeywordInfo,
   fetchPhoneticInfo,
   fetchSegmentedVocab,
+  fetchSimilarKanjis,
   transformToExtendedKanjiInfo,
   transformToMainKanjiInfo,
 } from "./helpers";
@@ -34,6 +35,28 @@ let KANJI_SEGMENTED_VOCAB_CACHE: Record<string, SegmentedVocabInfo> = {};
 let KANJI_PHONETIC_MAP_CACHE: Record<string, string> = {};
 let KANJI_PART_KEYWORD_MAP_CACHE: Record<string, string> = {};
 let KANJI_BY_STROKE_ORDER_CACHE: string[] = [];
+let KANJI_SIMILAR_CACHE: Record<string, string[]> = {};
+let similarCacheReady = false;
+let similarCacheLoadPromise: Promise<Record<string, string[]>> | null = null;
+
+const ensureSimilarCache = () => {
+  if (similarCacheReady) {
+    return Promise.resolve(KANJI_SIMILAR_CACHE);
+  }
+  if (similarCacheLoadPromise == null) {
+    similarCacheLoadPromise = fetchSimilarKanjis()
+      .then((map) => {
+        KANJI_SIMILAR_CACHE = map;
+        similarCacheReady = true;
+        return map;
+      })
+      .catch((error) => {
+        similarCacheLoadPromise = null;
+        throw error;
+      });
+  }
+  return similarCacheLoadPromise;
+};
 
 const loadMainKanjiInfo = (items: MainKanjiInfoResponseType) => {
   Object.keys(items).forEach((k) => {
@@ -177,6 +200,7 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
   const kanjiPool = {
     main: KANJI_INFO_MAIN_CACHE,
     extended: KANJI_INFO_EXTENDED_CACHE,
+    similar: KANJI_SIMILAR_CACHE,
   };
 
   if (eventType === "search") {
@@ -202,15 +226,48 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
       return;
     }
 
+    if (
+      settings.textSearch.type === "similar" &&
+      settings.textSearch.text !== ""
+    ) {
+      ensureSimilarCache()
+        .then(() => {
+          const pool = {
+            ...kanjiPool,
+            similar: KANJI_SIMILAR_CACHE,
+          };
+          const kanjis: string[] = searchKanji(settings, pool);
+          sendResponse({ kanjis });
+        })
+        .catch(sendError);
+      return;
+    }
+
     const kanjis: string[] = searchKanji(settings, kanjiPool);
     sendResponse({ kanjis });
     return;
   }
 
   if (eventType === "search-result-count") {
-    const allKanji = Object.keys(kanjiPool.main);
-    const filterCount = filterKanji(allKanji, settings, kanjiPool).length;
-    sendResponse(filterCount);
+    const runCount = () => {
+      const pool = {
+        ...kanjiPool,
+        similar: KANJI_SIMILAR_CACHE,
+      };
+      const allKanji = Object.keys(pool.main);
+      const filterCount = filterKanji(allKanji, settings, pool).length;
+      sendResponse(filterCount);
+    };
+
+    if (
+      settings.textSearch.type === "similar" &&
+      settings.textSearch.text !== ""
+    ) {
+      ensureSimilarCache().then(runCount).catch(sendError);
+      return;
+    }
+
+    runCount();
     return;
   }
 

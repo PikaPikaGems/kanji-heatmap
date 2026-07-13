@@ -18,10 +18,12 @@ import { FREQ_RANK_OPTIONS_NONE_REMOVED } from "@/lib/options/options-arr";
 import { getFrequency } from "@/lib/options/options-label-maps";
 import { SortKey } from "@/lib/options/options-types";
 import { radicalStrokeCountMap } from "@/lib/radicals";
+import { isKanji } from "@/lib/utils";
 
 type DataPool = {
   main: Record<string, KanjiMainInfo>;
   extended: Record<string, KanjiExtendedInfo>;
+  similar?: Record<string, string[]>;
 };
 
 const jlptSort = (a: JLTPTtypes, b: JLTPTtypes) => {
@@ -123,6 +125,29 @@ export const filterKanji = (
       : [];
 
   const kanjiToSearchSet = new Set(kanjisToSearchList);
+
+  if (textSearch.type === "similar" && textToSearch !== "") {
+    const queryKanjis = textToSearch.split("").filter(isKanji);
+    const similarMap = kanjiPool.similar ?? {};
+    const ordered: string[] = [];
+    const seen = new Set<string>();
+
+    for (const kanji of queryKanjis) {
+      if (!seen.has(kanji)) {
+        ordered.push(kanji);
+        seen.add(kanji);
+      }
+      for (const similar of similarMap[kanji] ?? []) {
+        if (!seen.has(similar)) {
+          ordered.push(similar);
+          seen.add(similar);
+        }
+      }
+    }
+
+    const inPool = ordered.filter((kanji) => kanjiPool.main[kanji] != null);
+    return filterByKanjiSimple(inPool, settings, kanjiPool);
+  }
 
   // TODO: add logic early exit (return all)
   // when we know there's no need to filter

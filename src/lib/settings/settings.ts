@@ -8,6 +8,7 @@ export const SEARCH_TYPE_ARR = [
   "onyomi",
   "kunyomi",
   "multi-kanji",
+  "similar",
   "radicals",
   "handwriting",
   "handwriting-alt",

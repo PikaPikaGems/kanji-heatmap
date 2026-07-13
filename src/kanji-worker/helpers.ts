@@ -44,6 +44,10 @@ export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
   assetsPaths.KANJI_DECOMPOSITION
 );
 
+export const fetchSimilarKanjis = createFetch<Record<string, string[]>>(
+  assetsPaths.SIMILAR_KANJIS
+);
+
 export const fetchVocabFurigana = createFetch<Record<string, WordPartDetail[]>>(
   assetsPaths.VOCAB_FURIGANA
 );

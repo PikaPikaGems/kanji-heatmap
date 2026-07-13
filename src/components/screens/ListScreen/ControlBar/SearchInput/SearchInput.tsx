@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, ClipboardEvent } from "react";
-import { cn } from "@/lib/utils";
+import { cn, isKanji } from "@/lib/utils";
 import { SearchType } from "@/lib/settings/settings";
 import {
   placeholderMap,
@@ -22,6 +22,12 @@ type DialogType = "radicals" | "handwriting" | "handwriting-alt";
 const DIALOG_TYPES: DialogType[] = ["radicals", "handwriting", "handwriting-alt"];
 const isDialogType = (type: SearchType): type is DialogType =>
   (DIALOG_TYPES as SearchType[]).includes(type);
+
+const stripToKanji = (text: string) =>
+  text
+    .split("")
+    .filter(isKanji)
+    .join("");
 
 export const SearchInput = ({
   initialSearchType = defaultSearchType,
@@ -123,34 +129,40 @@ export const SearchInput = ({
           }
 
           if (hasKanji(processedText)) {
-            // if has selection overwrite selection, else append to existing text
             const start = inputRef.current?.selectionStart ?? null;
             const end = inputRef.current?.selectionEnd ?? null;
             const hasSelection = start !== null && end !== null && start !== end;
             const newValue = hasSelection
               ? `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`
               : `${parsedValue}${processedText}`;
+
+            if (searchType === "similar") {
+              onSyncAll(stripToKanji(newValue), "similar");
+              return;
+            }
+
             onSyncAll(newValue, "multi-kanji");
             return;
           }
 
-          if (
-            wanakana.isKana(processedText) &&
-            !["kunyomi", "onyomi", "readings"].includes(searchType)
-          ) {
+          // No kanji: auto-pick a search type from the pasted script.
+          if (wanakana.isKana(processedText)) {
             onSyncAll(processedText, "readings");
             return;
           }
 
-          if (
-            wanakana.isRomaji(processedText) &&
-            !["keyword", "meanings"].includes(searchType)
-          ) {
-            onSyncAll(processedText, "keyword");
+          if (wanakana.isRomaji(processedText)) {
+            const nextType: SearchType =
+              searchType === "keyword" ? "keyword" : "meanings";
+            const updatedValue = translateValue(
+              processedText,
+              translateMap[nextType]
+            );
+            onSyncAll(updatedValue, nextType);
             return;
           }
 
-          // default behavior
+          // Mixed / ambiguous: keep current search type.
           const updatedValue = translateValue(
             processedText,
             translateMap[searchType]

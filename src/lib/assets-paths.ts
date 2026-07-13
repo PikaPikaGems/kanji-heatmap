@@ -16,6 +16,7 @@ const assetsPaths = {
   },
   KANJI_REPRESENTATIVE_WORDS: "/json/kanji_representative_words.json",
   KANJI_DECOMPOSITION: "/json/kanji_decomposition.json",
+  SIMILAR_KANJIS: "/json/similar-kanjis.json",
   KANJI_READING_DETAILS: "/json/kanji-readings-details.json",
   KANJI_STRUCTURE_DETAILS: "/json/kanji-structure-hlorenzi.json",
   KANJI_STRUCTURE_KANJIUM: "/json/kanji-structure-kanjium.json",
