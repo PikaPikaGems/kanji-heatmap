@@ -1,6 +1,6 @@
 import { JLTPTtypes } from "../jlpt";
 
-export type KanjiWorkerInfoRequestType = "kanji-extended";
+export type KanjiWorkerInfoRequestType = "kanji-extended" | "kanji-similar";
 // | "kanji-related-kanji"
 // | "kanji-notes"
 // | "kanji-other-vocab";

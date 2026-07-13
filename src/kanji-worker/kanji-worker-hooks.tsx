@@ -290,3 +290,45 @@ export const useWordKanjis = (word: string) => {
     })
     .filter((item) => item.keyword !== "Unknown" || item.isKanji);
 };
+
+export const useSimilarKanjis = (kanji: string) => {
+  const [state, setState] = useState<{
+    status: Status;
+    data?: string[];
+    error?: string | null;
+  }>({ status: "idle" });
+
+  useEffect(() => {
+    if (!kanji) {
+      setState({ status: "idle", data: [], error: null });
+      return;
+    }
+
+    let cancelled = false;
+    setState({ status: "loading", data: undefined });
+
+    requestWorker({ type: "kanji-similar", payload: kanji })
+      .then((result) => {
+        if (cancelled) return;
+        setState({
+          status: "success",
+          error: null,
+          data: result as string[],
+        });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setState({
+          status: "error",
+          error: typeof error === "string" ? error : String(error),
+          data: [],
+        });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [kanji]);
+
+  return state;
+};

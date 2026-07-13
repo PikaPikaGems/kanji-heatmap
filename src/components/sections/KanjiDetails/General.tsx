@@ -1,5 +1,9 @@
 import { GeneralKanjiItem } from "@/lib/kanji/kanji-info-types";
-import { useKanjiInfo } from "@/kanji-worker/kanji-worker-hooks";
+import {
+  useGetKanjiInfoFn,
+  useKanjiInfo,
+  useSimilarKanjis,
+} from "@/kanji-worker/kanji-worker-hooks";
 
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +18,9 @@ import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { jitenMoeFn, jpdbFn, kanshudoFn } from "@/lib/external-links";
+import { GlobalKanjiLink } from "@/components/dependent/routing";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -55,6 +61,45 @@ export const BareGeneral = ({ kanji }: { kanji: string }) => {
   )
 
 }
+const SimilarKanjiRow = ({ kanji }: { kanji: string }) => {
+  const similar = useSimilarKanjis(kanji);
+  const getKanjiInfo = useGetKanjiInfoFn();
+  const similars = similar.data ?? [];
+  const showEmpty = similar.status !== "loading" && similars.length === 0;
+
+  return (
+    <TableRow className="text-left">
+      <LabelCell
+        label="Similar"
+        description={
+          <>
+            Kanji that look visually similar to this one. Useful for spotting
+            lookalikes you might confuse while reading or writing.
+          </>
+        }
+      />
+      <TableCell className="w-full max-w-0">
+        {similars.length > 0 ? (
+          <div className="flex min-w-0 items-center space-x-2 overflow-x-auto overflow-y-hidden">
+            {similars.map((similarKanji) => (
+              <div key={similarKanji} className="shrink-0">
+                <GlobalKanjiLink
+
+                  fontSize="text-6xl"
+                  kanji={similarKanji}
+                  keyword={getKanjiInfo?.(similarKanji)?.keyword ?? "..."}
+                />
+              </div>
+            ))}
+          </div>
+        ) : showEmpty ? (
+          <div> - </div>
+        ) : null}
+      </TableCell>
+    </TableRow>
+  );
+};
+
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
 
@@ -154,8 +199,17 @@ export const General = ({ kanji }: { kanji: string }) => {
               {data.allOn.length === 0 && <div> - </div>}
             </TableCellGrow>
           </TableRow>
+          <SimilarKanjiRow kanji={kanji} />
         </TableBody>
       </Table>
+      <PrimaryDataSources
+        links={[
+          {
+            text: "Yencken, Lars (2010) Orthographic support for passing the reading hurdle in Japanese. PhD Thesis, University of Melbourne, Melbourne, Australia",
+            url: "https://lars.yencken.org/datasets/kanji-confusion/",
+          },
+        ]}
+      />
     </>
   );
 };

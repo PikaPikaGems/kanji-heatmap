@@ -305,7 +305,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
         shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
       />
       <PrimaryDataSources
-        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/" }]}
+        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/about/" }]}
       />
     </div>
   );
@@ -337,7 +337,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
 
   // convert data to CommonWordEntry[]
   const commonWordData = Object.entries(data[kanji]).map(([word, [reading, translation, jlpt, tags]]) => {
-    const tagsArray = tags.split(",").map(tag => tag.trim())
+    const tagsArray = (tags ?? "").split(",").map(tag => tag.trim())
     const isKaishi = tagsArray.includes("kaishi")
     const isUncommonForm = tagsArray.includes("alt")
     return {
