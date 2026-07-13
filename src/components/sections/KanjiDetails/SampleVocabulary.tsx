@@ -305,7 +305,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
         shortcuts={{ prev: { key: "a", shiftKey: true, label: "Shift + A" }, next: { key: "d", shiftKey: true, label: "Shift + D" } }}
       />
       <PrimaryDataSources
-        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/" }]}
+        links={[{ text: "JP Word Ranks Lookup", url: "https://pikapikagems.github.io/japanese-word-ranks/about/" }]}
       />
     </div>
   );
