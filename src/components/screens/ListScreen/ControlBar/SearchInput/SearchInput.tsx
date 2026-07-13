@@ -100,6 +100,9 @@ export const SearchInput = ({
           }
         }}
         onChange={(e) => {
+          // Translate first (e.g. romaji → hiragana) so the field and the
+          // settled search query stay in sync. Settling the raw keystrokes
+          // would search a different string than what the user sees.
           const updatedValue = translateValue(
             e.target.value,
             translateMap[searchType]
@@ -110,7 +113,7 @@ export const SearchInput = ({
           // TODO: Read https://www.developerway.com/posts/debouncing-in-react
           clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
-            onSettle(e.target.value.trim() ?? "", searchType);
+            onSettle(updatedValue.trim(), searchType);
           }, INPUT_DEBOUNCE_TIME);
         }}
         onPaste={(event: ClipboardEvent<HTMLInputElement>) => {
