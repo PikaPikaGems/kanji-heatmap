@@ -29,6 +29,9 @@ const stripToKanji = (text: string) =>
     .filter(isKanji)
     .join("");
 
+const searchTypeLabel = (type: SearchType) =>
+  SEARCH_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
+
 export const SearchInput = ({
   initialSearchType = defaultSearchType,
   initialText = "",
@@ -48,6 +51,11 @@ export const SearchInput = ({
   const [parsedValue, setValue] = useState(
     translateValue(initialText, translateMap[searchType])
   );
+  // Ephemeral "Switched to Readings" chip after paste auto-picks a type.
+  // Same idea as CopyButton's brief feedback — local state, no toast lib.
+  // typeHintKey remounts the span so the CSS animation restarts on rapid pastes.
+  const [typeHint, setTypeHint] = useState<string | null>(null);
+  const [typeHintKey, setTypeHintKey] = useState(0);
 
   // Which drawer (if any) is currently open. The drawn strokes themselves live
   // inside <HandwritingControl/>, not here.
@@ -88,6 +96,16 @@ export const SearchInput = ({
     setSearchType(finalSearchType);
   };
 
+  // Paste-driven sync: same as onSyncAll, but briefly announce when the search
+  // type was auto-changed (e.g. kana paste → Readings).
+  const syncFromPaste = (text: string, nextType: SearchType) => {
+    if (nextType !== searchType) {
+      setTypeHint(searchTypeLabel(nextType));
+      setTypeHintKey((key) => key + 1);
+    }
+    onSyncAll(text, nextType);
+  };
+
   // Immediately apply the current field value if a debounce is still waiting
   // (e.g. user hits Enter or clicks away before the 400ms timer fires).
   const flushPendingSettle = () => {
@@ -122,7 +140,8 @@ export const SearchInput = ({
           // During IME composition (e.g. かんじ before converting to 漢字),
           // keep the raw value. Running translateValue here fights the IME
           // and can swallow or mangle in-progress input.
-          if (e.nativeEvent.isComposing) {
+          const nativeEvent = e.nativeEvent as InputEvent;
+          if (nativeEvent.isComposing) {
             setValue(e.target.value);
             return;
           }
@@ -189,17 +208,18 @@ export const SearchInput = ({
             const newValue = `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`;
 
             if (searchType === "similar") {
+              // Stay on similar — no type-switch hint.
               onSyncAll(stripToKanji(newValue), "similar");
               return;
             }
 
-            onSyncAll(newValue, "multi-kanji");
+            syncFromPaste(newValue, "multi-kanji");
             return;
           }
 
           // No kanji: auto-pick a search type from the pasted script.
           if (wanakana.isKana(processedText)) {
-            onSyncAll(processedText, "readings");
+            syncFromPaste(processedText, "readings");
             return;
           }
 
@@ -210,7 +230,7 @@ export const SearchInput = ({
               processedText,
               translateMap[nextType]
             );
-            onSyncAll(updatedValue, nextType);
+            syncFromPaste(updatedValue, nextType);
             return;
           }
 
@@ -272,6 +292,19 @@ export const SearchInput = ({
           isLabelSrOnly={true}
         />
       </div>
+
+      {/* Bottom-left so it sits over the item-count badge area; motion makes the switch hard to miss. */}
+      {typeHint != null && (
+        <span
+          key={typeHintKey}
+          className="pointer-events-none absolute left-0 z-20 px-2 py-0.5 text-xs font-semibold border rounded-md shadow-sm -bottom-7 border-cyan-500/60 bg-background text-cyan-500 animate-search-type-hint"
+          role="status"
+          aria-live="polite"
+          onAnimationEnd={() => setTypeHint(null)}
+        >
+          Switched to {typeHint}
+        </span>
+      )}
 
       <RadicalsControl
         isOpen={openDialogType === "radicals"}
