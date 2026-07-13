@@ -34,11 +34,11 @@ export const SEARCH_TYPE_OPTIONS: {
   { value: "keyword", label: "Keyword" },
   { value: "meanings", label: "Meanings" },
   { value: "multi-kanji", label: "Multi-Kanji" },
-  { value: "similar", label: "Similar" },
   { value: "handwriting", label: "Handwriting" },
   { value: "handwriting-alt", label: "Handwriting Alt" },
   { value: "radicals", label: "Radicals" },
   { value: "readings", label: "Readings" },
   { value: "onyomi", label: "音読み" },
   { value: "kunyomi", label: "訓読み" },
+  { value: "similar", label: "Similar" },
 ];
