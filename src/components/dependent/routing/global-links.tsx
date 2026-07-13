@@ -4,7 +4,7 @@ import { useKanjiFromUrl } from "./routing-hooks";
 import { Link } from "./router-adapter";
 import { radicalFalseFriends } from "@/lib/radicals";
 
-type FontSize = 'text-xl' | 'text-2xl' | 'text-3xl';
+type FontSize = 'text-xl' | 'text-2xl' | 'text-3xl' | 'text-4xl' | 'text-5xl' | 'text-6xl' | 'text-7xl' | 'text-8xl' | 'text-9xl' | 'text-10xl';
 
 const cnJPCard = "flex flex-col m-1 p-1 text-xl rounded-md";
 const cnJPCardLink = `${cnJPCard} hover:bg-foreground/5`;
