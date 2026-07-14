@@ -6,6 +6,7 @@ import { ChartLine, Eye, Keyboard, Menu, SearchIcon, } from "lucide-react";
 import pageItems from "@/components/items/page-items";
 import { docPages } from "@/components/items/nav-items";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
+import { DashedNavLink } from "@/components/common/DashedNavLink";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -62,21 +63,14 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
         {navLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
-            <Link
+            <DashedNavLink
               href={item.href}
+              title={item.title}
+              description={item.description}
+              Icon={item.Icon}
               onPointerDown={(e) => e.stopPropagation()}
-              className="block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent"
-            >
-              <div className="flex items-center text-sm font-semibold">
-                <item.Icon className="mr-1 size-4" />
-                {item.title}
-              </div>
-              {item.description && (
-                <p className="mt-1 text-xs text-left text-muted-foreground">
-                  {item.description}
-                </p>
-              )}
-            </Link>
+              iconClassName="mt-0 mr-1"
+            />
           </DrawerPrimitive.Close>
         ))}
       </div>
