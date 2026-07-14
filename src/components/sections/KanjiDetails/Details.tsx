@@ -155,7 +155,7 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
       <SimpleAccordion trigger={"General Information"} defaultOpen={true}>
         <General kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger={`Stroke Order`}>
+      <SimpleAccordion trigger={`Stroke Order · Writing Practice`}>
         <ErrorBoundary details="StrokeAnimation in KanjiDetails">
           <Suspense fallback={<StrokeAnimationLoadingScreen />}>
             <StrokeAnimation kanji={kanji} />
