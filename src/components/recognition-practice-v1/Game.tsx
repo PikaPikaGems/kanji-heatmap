@@ -142,9 +142,9 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full animate-fade-in">
-      <div className="flex flex-col items-center justify-center flex-1 min-h-0 gap-3 px-4 text-center [@media(min-height:900px)]:flex-none [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:pt-8">
-        <div className="flex items-center justify-center translate-y-4">
+    <div className="flex flex-col w-full h-full gap-3 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+      <div className="flex flex-col items-center justify-start flex-1 min-h-0 gap-3 px-4 pt-2 text-center [@media(pointer:fine)]:flex-none [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:pt-8 md:flex-none md:justify-center md:pt-8 [@media(min-height:900px)]:flex-none [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:pt-8">
+        <div className="flex items-center justify-center [@media(pointer:fine)]:translate-y-4 md:translate-y-4">
           <Button
             variant="ghost"
             size="icon"
@@ -173,7 +173,7 @@ export const Game = ({
 
         <button
           type="button"
-          className={`max-w-sm text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${glossBlurred ? "blur-[5px] hover:blur-none" : ""
+          className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${glossBlurred ? "blur-[5px] hover:blur-none" : ""
             }`}
           onClick={() => setGlossBlurred((v) => !v)}
           aria-label={
@@ -184,7 +184,7 @@ export const Game = ({
         </button>
       </div>
 
-      <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0 md:pb-0">
         <Input
           ref={inputRef}
           value={inputValue}
@@ -196,7 +196,7 @@ export const Game = ({
           disabled={feedback != null}
           aria-label='Type the reading or type "forgot"'
           placeholder='Type the reading or type "forgot"'
-          className="w-full text-center border-2 z-1000 rounded-2xl h-14 kanji-font"
+          className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font"
           onKeyDown={handleKeyDown}
           onCompositionStart={() => {
             isComposingRef.current = true;
