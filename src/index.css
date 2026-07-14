@@ -260,6 +260,20 @@ button {
   animation: practice-cheer-bloom 1.35s ease-out both;
 }
 
+/* Soft settle when scroll-lock shifts the practice FAB */
+.animate-practice-fab-settle {
+  animation: practice-fab-settle 0.85s ease-out both;
+}
+
+@keyframes practice-fab-settle {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes practice-cheer-bloom {
   0% {
     opacity: 0;

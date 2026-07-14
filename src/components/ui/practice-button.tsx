@@ -22,6 +22,8 @@ const practiceButtonVariants = cva(
       variant: {
         primary:
           "background-theme-color-with-opacity-100 text-white border-theme-color-darker hover:brightness-105",
+        inverted:
+          "bg-foreground text-background border-neutral-800 dark:border-neutral-400 hover:brightness-105",
         danger:
           "bg-rose-500 text-white border-rose-800 hover:brightness-105",
         secondary:
@@ -55,7 +57,7 @@ export const PracticeButton = React.forwardRef<
     <button
       ref={ref}
       type={type}
-      className={cn(practiceButtonVariants({ variant, size, className }))}
+      className={cn(practiceButtonVariants({ variant, size }), className)}
       {...props}
     />
   );
