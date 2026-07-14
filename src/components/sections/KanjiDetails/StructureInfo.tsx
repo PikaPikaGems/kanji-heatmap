@@ -11,10 +11,8 @@ import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
 import {
-    useGetKanjiInfoFn,
     useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { GlobalKanjiLink } from "@/components/dependent/routing";
 
 const TableCellFixed = ({
     children,
@@ -34,7 +32,6 @@ const TableCellGrow = ({ children }: { children: ReactNode }) => (
 
 const SimilarKanjis = ({ kanji }: { kanji: string }) => {
     const similar = useSimilarKanjis(kanji);
-    const getKanjiInfo = useGetKanjiInfoFn();
     const similars = similar.data ?? [];
     const showEmpty = similar.status !== "loading" && similars.length === 0;
 
@@ -46,11 +43,7 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                 <div className="flex items-center min-w-0 space-x-2 overflow-x-auto overflow-y-hidden">
                     {similars.map((similarKanji) => (
                         <div key={similarKanji} className="shrink-0">
-                            <GlobalKanjiLink
-                                fontSize="text-6xl"
-                                kanji={similarKanji}
-                                keyword={getKanjiInfo?.(similarKanji)?.keyword ?? "..."}
-                            />
+                            <OriginalKanjiComponentBreakdown kanji={similarKanji} />
                         </div>
                     ))}
                 </div>

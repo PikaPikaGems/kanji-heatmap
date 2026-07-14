@@ -8,6 +8,7 @@ import assetsPaths from "@/lib/assets-paths";
 import { installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { PlayCircle, Snail } from "@/components/icons";
 import { DrawingPad } from "@/components/dependent/DrawingPad";
+import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
@@ -18,9 +19,6 @@ const SPEEDS: Record<AnimationSpeed, { rate: number }> = {
   fast: { rate: 0.0095 },
   slow: { rate: 0.022 },
 };
-
-const SVG_SIZE = 280;
-const CONTAINER_CN = `flex w-full justify-center my-4 h-[${SVG_SIZE}px]`;
 
 const KanjiDMAK = ({
   kanji,

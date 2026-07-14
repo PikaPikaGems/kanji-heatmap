@@ -3,7 +3,6 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { DualRangeSlider } from "@/components/ui/dual-range-slider";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
@@ -58,6 +57,8 @@ const RadioRow = ({
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
   const currentStats = useMemo(() => readSetStats(challengeSet), [challengeSet]);
+  const level = levelOf(challengeSet);
+  const pos = positionInLevel(challengeSet);
   const stats = currentStats ?
     {
       timesTaken: currentStats.timesTaken,
@@ -76,7 +77,9 @@ const SetStats = ({ challengeSet }: { challengeSet: number }) => {
 
   return (
     <div className="flex flex-wrap gap-2 text-xs font-bold text-left min-h-10">
-      <div>Challenge # {challengeSet}:</div>
+      <div>
+        Challenge {level}-{pos} (#{challengeSet}):
+      </div>
       <div>
         {stats.timesTaken}{" "}
         {stats.timesTaken === 1 ? "attempt" : "attempts"}
@@ -177,7 +180,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
 
           <div className="flex flex-col">
             <div className="flex items-center justify-between gap-4">
-              <Label className="text-sm">Long Session (48 words)</Label>
+              <Label className="text-sm">Full Session (48 words)</Label>
               <Switch
                 aria-label="Words per round"
                 checked={settings.wordCount === 48}
@@ -188,7 +191,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             </div>
             {settings.wordCount !== 48 && (
               <p className="w-full text-xs text-left animate-fade-in-fast">
-                ⚠️ Short sessions will not be recorded.
+                ⚠️ Practice sessions (24 words) will not be recorded.
               </p>
             )}
           </div>
@@ -263,15 +266,31 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             </div>
             <Label className="text-sm text-left">Select a Challenge</Label>
 
-            <DualRangeSlider
-              value={[currentPos]}
-              min={1}
-              max={CHALLENGES_PER_LEVEL}
-              step={1}
-              onValueChange={(value) =>
-                setSetting("challengeSet", setFromLevelAndPos(currentLevel, value[0]))
-              }
-            />
+            <div className="grid grid-cols-10 gap-1">
+              {Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) => i + 1).map(
+                (pos) => {
+                  const setNum = setFromLevelAndPos(currentLevel, pos);
+                  const completed = !!readSetStats(setNum);
+                  const bgCn = completed
+                    ? freqCategoryCn[4]
+                    : freqCategoryCn[0];
+                  const textCn = completed
+                    ? "text-white"
+                    : "text-foreground";
+                  return (
+                    <button
+                      key={pos}
+                      onClick={() => setSetting("challengeSet", setNum)}
+                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
+                        currentPos === pos ? "border-primary" : ""
+                      }`}
+                    >
+                      {pos}
+                    </button>
+                  );
+                }
+              )}
+            </div>
 
             <p className="text-xs text-left">
               Lower challenges contain more common words.
