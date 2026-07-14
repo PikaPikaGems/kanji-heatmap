@@ -2,7 +2,7 @@
 
 export const recognitionPracticePageMeta = {
   href: "/recognition-practice",
-  title: "Kanji Recognition Practice",
+  title: "Kanji Recognition",
   description: "Type the reading of kanji anchor words",
 } as const;
 

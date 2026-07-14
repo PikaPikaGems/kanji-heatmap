@@ -111,7 +111,7 @@ export const InitialScreen = ({
         <div className="flex flex-col max-w-md gap-6 px-4 py-6 mx-auto">
           <div className="text-left">
             <h1 className="pt-4 text-xl font-bold text-center">
-              👁️ Kanji Recognition Practice
+              👁️ Kanji Recognition
             </h1>
 
             <p className="mt-1 text-sm text-center text-muted-foreground">
