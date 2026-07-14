@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { CircleArrowLeft } from "lucide-react";
 import { translateValue } from "@/lib/wanakana-adapter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
@@ -18,12 +20,14 @@ export const Game = ({
   sound,
   onProgress,
   onComplete,
+  onEnd,
 }: {
   sessionItems: PracticeItem[];
   blurEnglishGloss: boolean;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
+  onEnd: () => void;
 }) => {
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
@@ -140,6 +144,18 @@ export const Game = ({
   return (
     <div className="flex flex-col w-full h-full animate-fade-in">
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 gap-3 px-4 text-center [@media(min-height:900px)]:flex-none [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:pt-8">
+        <div className="flex items-center justify-center translate-y-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
+            tabIndex={-1}
+            onClick={onEnd}
+            aria-label="End session"
+          >
+            <CircleArrowLeft />
+          </Button>
+        </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
           style={

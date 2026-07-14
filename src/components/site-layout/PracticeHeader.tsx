@@ -24,7 +24,11 @@ export const PracticeHeader = ({ progress }: { progress: number }) => {
         />
       </Link>
 
-      <Progress value={progress} className="flex-1 h-2" />
+      <Progress
+        value={progress}
+        className="flex-1 h-2"
+        primitiveCn="background-theme-color-with-opacity-100"
+      />
 
       <section className="flex items-center pr-1 space-x-1 shrink-0">
         <ErrorBoundary fallback={null}>

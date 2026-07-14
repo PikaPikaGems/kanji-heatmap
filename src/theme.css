@@ -51,3 +51,8 @@
 .border-theme-color-with-opacity-100 {
   border-color: rgba(var(--theme-color-selected), 1);
 }
+
+/* Darker shade for chunky / Duolingo-style edges */
+.border-theme-color-darker {
+  border-color: color-mix(in srgb, rgb(var(--theme-color-selected)) 65%, black);
+}

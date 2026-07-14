@@ -2,7 +2,7 @@
 import Raphael from "raphael";
 import "dmak";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import assetsPaths from "@/lib/assets-paths";
 import { installSafeDmakLoader } from "@/lib/dmak-safe-loader";
@@ -97,7 +97,8 @@ export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
         <KanjiDMAK kanji={kanji} step={SPEEDS[speed].rate} />
       </div>
       <div className="flex justify-center space-x-2">
-        <Button
+        <PracticeButton
+          size="icon"
           onClick={() => {
             setSpeed("fast");
             setKey((x) => {
@@ -105,21 +106,22 @@ export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
             });
           }}
         >
-          <PlayCircle className="scale-150" />
+          <PlayCircle />
           <span className="sr-only">Animate</span>
-        </Button>
-        <Button
+        </PracticeButton>
+        <PracticeButton
+          size="icon"
+          variant="secondary"
           onClick={() => {
             setSpeed("slow");
             setKey((x) => {
               return x + 1;
             });
           }}
-          variant={"secondary"}
         >
-          <Snail className="scale-150" />{" "}
+          <Snail />{" "}
           <span className="sr-only">Animate Slowly</span>
-        </Button>
+        </PracticeButton>
       </div>
     </div>
   );
@@ -217,7 +219,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         strokes={strokes}
         setStrokes={setStrokes}
         showSubmitBtn
-        submitIcon={<Rocket className="scale-150" />}
+        submitIcon={<Rocket />}
         submitLabel="Grade"
         submitDisabled={status === "loading"}
         onClickSubmit={onGrade}

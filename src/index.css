@@ -103,16 +103,6 @@ button {
   color: black !important;
 }
 
-.dark button:focus,
-button:focus-visible.light {
-  outline: 1px auto white;
-}
-
-.light button:focus,
-button:focus-visible {
-  outline: 1px auto black;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     background-color: #ffffff;

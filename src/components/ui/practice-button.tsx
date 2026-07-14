@@ -14,13 +14,14 @@ const practiceButtonVariants = cva(
     "active:translate-y-[3px] active:border-b-2",
     "disabled:pointer-events-none disabled:opacity-20",
     "disabled:active:translate-y-0 disabled:active:border-b-[5px] disabled:cursor-not-allowed",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+    "outline-none [-webkit-tap-highlight-color:transparent]",
+    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   ].join(" "),
   {
     variants: {
       variant: {
         primary:
-          "bg-emerald-500 text-white border-emerald-700 hover:brightness-105",
+          "background-theme-color-with-opacity-100 text-white border-theme-color-darker hover:brightness-105",
         danger:
           "bg-rose-500 text-white border-rose-800 hover:brightness-105",
         secondary:
@@ -32,6 +33,7 @@ const practiceButtonVariants = cva(
         default: "h-12 px-6 text-base",
         lg: "h-14 w-full px-8 text-lg",
         md: "h-12 w-full px-6 text-base",
+        icon: "h-12 w-12 [&_svg]:size-5",
       },
     },
     defaultVariants: {

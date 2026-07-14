@@ -145,6 +145,7 @@ const RecognitionPracticeV1 = () => {
                 sound={settings.sound ?? { enabled: true, type: "correct" }}
                 onProgress={setProgress}
                 onComplete={finishSession}
+                onEnd={goToInitial}
               />
             </div>
           )}

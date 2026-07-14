@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LogOut, SkipForward } from "lucide-react";
 import { translateValue, tryConvertRomaji } from "@/lib/wanakana-adapter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +18,7 @@ import {
 } from "./types";
 import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
 import { shuffle } from "@/lib/utils";
+import { CircleArrowLeft, DeleteIcon } from "lucide-react";
 
 type GameWord = {
   katakana: string;
@@ -249,25 +249,26 @@ export const Game = ({
           <Button
             variant="ghost"
             size="icon"
-            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+            className="text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
             tabIndex={-1}
-            onClick={handleSkip}
-            aria-label="Skip this word"
+            onClick={onEnd}
+            aria-label="End session"
           >
-            <SkipForward />
+            <CircleArrowLeft />
           </Button>
+
           <span className="px-2 text-xs font-bold tabular-nums">
             {index + 1} / {words.length}
           </span>
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground"
+            className="text-red-500 opacity-70 hover:opacity-100 hover:text-red-500 hover:bg-opacity-0"
             tabIndex={-1}
-            onClick={onEnd}
-            aria-label="End session"
+            onClick={handleSkip}
+            aria-label="Skip this word"
           >
-            <LogOut />
+            <DeleteIcon className="rotate-180" />
           </Button>
         </div>
         <div

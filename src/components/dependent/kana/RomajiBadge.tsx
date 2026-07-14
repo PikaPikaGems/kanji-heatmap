@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { badgeVariants } from "@/components/ui/badge-utils";
+import { cn } from "@/lib/utils";
 import { translateValue } from "@/lib/wanakana-adapter";
 import { useSpeak } from "@/hooks/use-jp-speak";
 
@@ -8,18 +9,26 @@ export const RomajiBadge = ({ kana }: { kana: string }) => {
   const speak = useSpeak(kana);
 
   const content = isKana ? kana : translateValue(kana, "romaji");
-  const cn = isKana ? "kanji-font" : "";
+
   return (
-    <Badge
-      variant={"outline"}
-      className={`m-1 cursor-pointer text-xl ${cn} hover:bg-[#2effff] hover:text-black whitespace-nowrap`}
-      onClick={(e) => {
+    <button
+      type="button"
+      className={cn(
+        badgeVariants({ variant: "outline" }),
+        "m-1 cursor-pointer text-xl whitespace-nowrap",
+        "hover:bg-[#2effff] hover:text-black",
+        "outline-none focus:outline-none focus:ring-0",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        isKana && "kanji-font"
+      )}
+      aria-label={`Play reading and toggle kana or romaji for ${kana}`}
+      aria-pressed={!isKana}
+      onClick={() => {
         setIsKana((prev) => !prev);
-        e.preventDefault();
         speak();
       }}
     >
       {content}
-    </Badge>
+    </button>
   );
 };
