@@ -57,6 +57,7 @@
     "fuzzysearch": "^1.0.3",
     "kanjicanvas": "github:asdfjkl/kanjicanvas",
     "lucide-react": "^0.474.0",
+    "onnxruntime-web": "^1.27.0",
     "perfect-freehand": "^1.2.3",
     "raphael": "^2.3.0",
     "react": "^18.3.1",

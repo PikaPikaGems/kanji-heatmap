@@ -18,8 +18,13 @@ import { HandwritingControl } from "./HandwritingScreen/HandwritingControl";
 const INPUT_DEBOUNCE_TIME = 400;
 
 // Search types that open a drawer instead of accepting typed input.
-type DialogType = "radicals" | "handwriting" | "handwriting-alt";
-const DIALOG_TYPES: DialogType[] = ["radicals", "handwriting", "handwriting-alt"];
+type DialogType = "radicals" | "handwriting" | "handwriting-alt" | "handwriting-alt-2";
+const DIALOG_TYPES: DialogType[] = [
+  "radicals",
+  "handwriting",
+  "handwriting-alt",
+  "handwriting-alt-2",
+];
 const isDialogType = (type: SearchType): type is DialogType =>
   (DIALOG_TYPES as SearchType[]).includes(type);
 
@@ -372,13 +377,21 @@ export const SearchInput = ({
         onChange={(newStr) => onSyncAll(newStr, "radicals")}
       />
 
-      {(searchType === "handwriting" || searchType === "handwriting-alt") && (
+      {(searchType === "handwriting" ||
+        searchType === "handwriting-alt" ||
+        searchType === "handwriting-alt-2") && (
         // Keyed by search type + reset counter so switching variants or clearing
         // the input starts the drawing pad fresh. Mounted regardless of the
         // drawer's open state so the drawing survives closing/reopening it.
         <HandwritingControl
           key={`${searchType}-${handwritingResetKey}`}
-          variant={searchType === "handwriting" ? "google" : "kanjicanvas"}
+          variant={
+            searchType === "handwriting"
+              ? "google"
+              : searchType === "handwriting-alt"
+                ? "kanjicanvas"
+                : "dakanji"
+          }
           isOpen={openDialogType === searchType}
           onClose={() => setOpenDialogType("none")}
           value={parsedValue}

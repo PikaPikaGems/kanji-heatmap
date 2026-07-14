@@ -1,22 +1,47 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Stroke } from "@/components/dependent/DrawingPad";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 import { HandWritingDrawingPad } from "./HandwritingScreen";
 import { HandwritingScreenDialog } from "./HandwritingScreenDialog";
-import { recognizeWithGoogle, recognizeWithKanjiCanvas } from "./recognizers";
+import {
+  recognizeWithDaKanji,
+  recognizeWithGoogle,
+  recognizeWithKanjiCanvas,
+} from "./recognizers";
 
-// "google" recognizes via an online API; "kanjicanvas" recognizes on-device.
-export type HandwritingVariant = "google" | "kanjicanvas";
+// "google" = online API; "kanjicanvas" / "dakanji" = on-device.
+export type HandwritingVariant = "google" | "kanjicanvas" | "dakanji";
+
+const DAKANJI_IDLE_CONTENT = (
+  <span>
+    Character recognition powered by machine learning from{" "}
+    <a
+      href="https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline underline-offset-2 hover:text-foreground"
+    >
+      Dariyooo (DaAppLab)
+    </a>
+  </span>
+);
 
 const VARIANT_CONFIG = {
   google: {
     recognize: recognizeWithGoogle,
     errorText: "Google's handwriting API can't be accessed right now.",
+    idleContent: undefined as ReactNode | undefined,
   },
   kanjicanvas: {
     recognize: recognizeWithKanjiCanvas,
     errorText: "The handwriting recognizer couldn't be loaded right now.",
+    idleContent: undefined as ReactNode | undefined,
+  },
+  dakanji: {
+    recognize: recognizeWithDaKanji,
+    errorText: "The DaKanji recognizer couldn't be loaded right now.",
+    idleContent: DAKANJI_IDLE_CONTENT,
   },
 } as const;
 
@@ -38,7 +63,7 @@ export const HandwritingControl = ({
   onChange: (newValue: string) => void;
 }) => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
-  const { recognize, errorText } = VARIANT_CONFIG[variant];
+  const { recognize, errorText, idleContent } = VARIANT_CONFIG[variant];
 
   return (
     <HandwritingScreenDialog isOpen={isOpen} onClose={onClose}>
@@ -50,8 +75,8 @@ export const HandwritingControl = ({
           setStrokes={setStrokes}
           recognize={recognize}
           errorText={errorText}
+          idleContent={idleContent}
           onResultClick={onClose}
-
         />
       </ErrorBoundary>
     </HandwritingScreenDialog>

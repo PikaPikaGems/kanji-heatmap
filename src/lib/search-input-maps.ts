@@ -12,6 +12,7 @@ export const translateMap: Record<SearchType, TranslateType> = {
   radicals: "none",
   handwriting: "none",
   "handwriting-alt": "none",
+  "handwriting-alt-2": "none",
 };
 
 export const placeholderMap: Record<SearchType, string> = {
@@ -25,6 +26,7 @@ export const placeholderMap: Record<SearchType, string> = {
   radicals: "Click to select one or more radicals",
   handwriting: "Click to draw a kanji",
   "handwriting-alt": "Click to draw a kanji (offline)",
+  "handwriting-alt-2": "Click to draw a kanji (offline)",
 };
 
 export const SEARCH_TYPE_OPTIONS: {
@@ -36,6 +38,7 @@ export const SEARCH_TYPE_OPTIONS: {
   { value: "multi-kanji", label: "Multi-Kanji" },
   { value: "handwriting", label: "Handwriting" },
   { value: "handwriting-alt", label: "Handwriting Alt" },
+  { value: "handwriting-alt-2", label: "Handwriting Alt 2" },
   { value: "radicals", label: "Radicals" },
   { value: "readings", label: "Readings" },
   { value: "onyomi", label: "音読み" },
