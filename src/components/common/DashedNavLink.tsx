@@ -42,9 +42,9 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
         )}
         {...rest}
       >
-        <div className="flex items-start text-sm font-semibold text-left">
+        <div className="flex items-center text-sm font-semibold text-left">
           {Icon && (
-            <Icon className={cn("mt-1 mr-2 size-4 shrink-0", iconClassName)} />
+            <Icon className={cn("mr-2 size-4 shrink-0", iconClassName)} />
           )}
           {title}
         </div>
