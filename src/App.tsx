@@ -23,7 +23,10 @@ const {
   termsPage,
   privacyPage,
   speedKatakanaPage,
+  recognitionPracticeV1Page,
 } = pageItems;
+
+const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
 
 const App = () => {
   return (
@@ -44,6 +47,12 @@ const App = () => {
               path={speedKatakanaPage.href}
               component={speedKatakanaPage.Component}
             />
+            {/* Recognition practice has its own header but needs kanji data + drawer. */}
+            <Route path={recognitionPracticeV1Page.href}>
+              <KanjiFunctionalityProvider>
+                <RecognitionPracticeV1 />
+              </KanjiFunctionalityProvider>
+            </Route>
             <Route>
               <Header />
               <main className="bg-background">

@@ -103,16 +103,6 @@ button {
   color: black !important;
 }
 
-.dark button:focus,
-button:focus-visible.light {
-  outline: 1px auto white;
-}
-
-.light button:focus,
-button:focus-visible {
-  outline: 1px auto black;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     background-color: #ffffff;
@@ -182,20 +172,11 @@ button:focus-visible {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 100;
-  }
+  animation: fade-in 0.5s ease-out;
 }
 
 .animate-fade-in-fast {
-  animation: fade-in 0.2s;
+  animation: fade-in 0.2s ease-out;
 }
 
 @keyframes fade-in {
@@ -203,21 +184,12 @@ button:focus-visible {
     opacity: 0;
   }
   to {
-    opacity: 100;
+    opacity: 1;
   }
 }
 
 @theme {
   --animate-fade-in: fade-in 1s ease-out forwards;
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
 }
 
 .animate-english-flash {
@@ -229,6 +201,77 @@ button:focus-visible {
   15%  { opacity: 1; }
   70%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* Practice feedback / end-screen whimsy */
+.animate-practice-pop {
+  animation: practice-pop 0.45s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+@keyframes practice-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(10px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-practice-tile-in {
+  animation: practice-tile-in 0.4s ease-out both;
+}
+
+@keyframes practice-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-practice-bounce-soft {
+  animation: practice-cheer-bloom 1.35s ease-out both;
+}
+
+/* Soft settle when scroll-lock shifts the practice FAB */
+.animate-practice-fab-settle {
+  animation: practice-fab-settle 0.85s ease-out both;
+}
+
+@keyframes practice-fab-settle {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes practice-cheer-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Paste auto-switched search type chip: slide in, nudge for attention, fade out left. */

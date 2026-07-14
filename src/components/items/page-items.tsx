@@ -6,6 +6,11 @@ import {
   PrivacyScreen,
   SpeedKatakanaScreen,
 } from "@/components/screens";
+import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
+import {
+  recognitionPracticePageMeta,
+  speedKatakanaPageMeta,
+} from "@/components/items/practice-pages";
 
 const kanjiPage = {
   href: "/",
@@ -17,7 +22,7 @@ const kanjiPage = {
 const cumUseGraphPage = {
   href: "/cumulative-use-graph",
   title: "Cumulative Use Graph",
-  description: "Inspect kanji usage vs rank trends across various data sets",
+  description: "Inspect kanji usage vs rank trends",
   Component: CumUseScreen,
 };
 
@@ -40,10 +45,13 @@ const privacyPage = {
 };
 
 const speedKatakanaPage = {
-  href: "/speed-katakana",
-  title: "Speed Katakana",
-  description: "Practice speed typing katakana words",
+  ...speedKatakanaPageMeta,
   Component: SpeedKatakanaScreen,
+};
+
+const recognitionPracticeV1Page = {
+  ...recognitionPracticePageMeta,
+  Component: RecognitionPracticeV1Screen,
 };
 
 const pageItems = {
@@ -53,6 +61,7 @@ const pageItems = {
   termsPage,
   privacyPage,
   speedKatakanaPage,
+  recognitionPracticeV1Page,
 };
 
 export default pageItems;

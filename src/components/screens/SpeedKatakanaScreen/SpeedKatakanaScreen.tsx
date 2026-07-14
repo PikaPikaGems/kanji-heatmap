@@ -99,27 +99,34 @@ const SpeedKatakanaScreen = () => {
         <SpeedKatakanaHeader progress={headerProgress} />
         <main className="flex-1 min-h-0 py-4 overflow-hidden">
           {phase === "initial" && (
-            <InitialScreen onStart={startGame} />
+            <div key="initial" className="h-full animate-fade-in">
+              <InitialScreen onStart={startGame} />
+            </div>
           )}
 
           {phase === "playing" && (
-            // Remount per challenge set so all game state resets cleanly.
-            <Game
-              key={settings.challengeSet}
-              settings={settings}
-              onProgress={setProgress}
-              onComplete={finishGame}
-              onEnd={goToInitial}
-            />
+            <div
+              key={`playing-${settings.challengeSet}`}
+              className="h-full animate-fade-in"
+            >
+              <Game
+                settings={settings}
+                onProgress={setProgress}
+                onComplete={finishGame}
+                onEnd={goToInitial}
+              />
+            </div>
           )}
 
           {phase === "ended" && stats && (
-            <EndSession
-              stats={stats}
-              onNext={startNextChallenge}
-              onEnd={goToInitial}
-              completedSets={completedSetsCount}
-            />
+            <div key="ended" className="h-full animate-fade-in">
+              <EndSession
+                stats={stats}
+                onNext={startNextChallenge}
+                onEnd={goToInitial}
+                completedSets={completedSetsCount}
+              />
+            </div>
           )}
         </main>
       </div>

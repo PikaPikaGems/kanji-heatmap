@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
+import { useEnterAction } from "@/hooks/use-enter-action";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
@@ -147,165 +148,169 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
 
+  useEnterAction(onStart);
+
   return (
-    <div className="w-full h-full pl-4 pr-2 overflow-auto animate-fade-in">
-      <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
-        <div className="flex flex-col items-center gap-1 px-6">
-          <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana</h1>
-          <SpeedKatakanaStatsSummary
-            completed={summary.completed}
-            averageCpm={summary.averageCpm}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <ToggleRow
-            id="randomize-font"
-            label="Randomize Font"
-            checked={settings.randomizeFont}
-            onChange={(v) => setSetting("randomizeFont", v)}
-          />
-          <ToggleRow
-            id="randomize-order"
-            label="Randomize Word Order"
-            checked={settings.randomizeOrder}
-            onChange={(v) => setSetting("randomizeOrder", v)}
-          />
-          <ToggleRow
-            id="display-english"
-            label="Display English Gloss"
-            checked={settings.displayEnglish}
-            onChange={(v) => setSetting("displayEnglish", v)}
-          />
-
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between gap-4">
-              <Label className="text-sm">Full Session (48 words)</Label>
-              <Switch
-                aria-label="Words per round"
-                checked={settings.wordCount === 48}
-                onCheckedChange={(checked) =>
-                  setSetting("wordCount", (checked ? 48 : 24) as WordCount)
-                }
-              />
-            </div>
-            {settings.wordCount !== 48 && (
-              <p className="w-full text-xs text-left animate-fade-in-fast">
-                ⚠️ Practice sessions (24 words) will not be recorded.
-              </p>
-            )}
+    <div className="flex flex-col w-full h-full animate-fade-in">
+      <div className="flex-1 min-h-0 pl-4 pr-2 overflow-auto">
+        <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
+          <div className="flex flex-col items-center gap-1 px-6">
+            <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana</h1>
+            <SpeedKatakanaStatsSummary
+              completed={summary.completed}
+              averageCpm={summary.averageCpm}
+            />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <ToggleRow
-              id="sound-on"
-              label="Sound On"
-              checked={soundEnabled}
-              onChange={(v) =>
-                setSetting(
-                  "sound",
-                  v ? { enabled: true, type: soundType } : { enabled: false }
-                )
-              }
+              id="randomize-font"
+              label="Randomize Font"
+              checked={settings.randomizeFont}
+              onChange={(v) => setSetting("randomizeFont", v)}
             />
-            {soundEnabled && (
-              <div className="flex flex-wrap pl-1 animate-fade-in-fast">
-                <RadioRow
-                  name="sound-mode"
-                  value="speak"
-                  current={soundType}
-                  label="Say out loud"
-                  onChange={(v) => setSetting("sound", { enabled: true, type: v })}
-                />
-                <RadioRow
-                  name="sound-mode"
-                  value="correct"
-                  current={soundType}
-                  label="Sound when correct"
-                  onChange={(v) => setSetting("sound", { enabled: true, type: v })}
+            <ToggleRow
+              id="randomize-order"
+              label="Randomize Word Order"
+              checked={settings.randomizeOrder}
+              onChange={(v) => setSetting("randomizeOrder", v)}
+            />
+            <ToggleRow
+              id="display-english"
+              label="Display English Gloss"
+              checked={settings.displayEnglish}
+              onChange={(v) => setSetting("displayEnglish", v)}
+            />
+
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between gap-4">
+                <Label className="text-sm">Full Session (48 words)</Label>
+                <Switch
+                  aria-label="Words per round"
+                  checked={settings.wordCount === 48}
+                  onCheckedChange={(checked) =>
+                    setSetting("wordCount", (checked ? 48 : 24) as WordCount)
+                  }
                 />
               </div>
-            )}
-            {soundEnabled && soundType === "speak" && (
-              <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                ⚠️ text-to-speech might not work on all devices.
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-3 pt-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Select a Challenge Set</Label>
-              <span className="text-sm font-semibold tabular-nums">
-                {(currentLevelDone / CHALLENGES_PER_LEVEL) * 100}% done
-              </span>
-            </div>
-
-
-            <div className="grid grid-cols-10 gap-1">
-              {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => {
-                const doneCount = levelCompletion[level - 1];
-                const category = Math.round(
-                  (doneCount / CHALLENGES_PER_LEVEL) * 4
-                ) as FreqCategory;
-                const bgCn = freqCategoryCn[category];
-                const textCn = category > 3 ? "text-white" : "text-foreground";
-                return (
-                  <button
-                    key={level}
-                    onClick={() => selectLevel(level)}
-                    className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentLevel === level
-                      ? "border-primary"
-                      : ""
-                      }`}
-                  >
-                    {level}
-                  </button>
-                );
-              })}
-            </div>
-            <Label className="text-sm text-left">Select a Challenge</Label>
-
-            <div className="grid grid-cols-10 gap-1">
-              {Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) => i + 1).map(
-                (pos) => {
-                  const setNum = setFromLevelAndPos(currentLevel, pos);
-                  const completed = !!readSetStats(setNum);
-                  const bgCn = completed
-                    ? freqCategoryCn[4]
-                    : freqCategoryCn[0];
-                  const textCn = completed
-                    ? "text-white"
-                    : "text-foreground";
-                  return (
-                    <button
-                      key={pos}
-                      onClick={() => setSetting("challengeSet", setNum)}
-                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
-                        currentPos === pos ? "border-primary" : ""
-                      }`}
-                    >
-                      {pos}
-                    </button>
-                  );
-                }
+              {settings.wordCount !== 48 && (
+                <p className="w-full text-xs text-left animate-fade-in-fast">
+                  ⚠️ Practice sessions (24 words) will not be recorded.
+                </p>
               )}
             </div>
 
-            <p className="text-xs text-left">
-              Lower challenges contain more common words.
-            </p>
-          </div>
-        </div>
+            <div className="flex flex-col">
+              <ToggleRow
+                id="sound-on"
+                label="Sound On"
+                checked={soundEnabled}
+                onChange={(v) =>
+                  setSetting(
+                    "sound",
+                    v ? { enabled: true, type: soundType } : { enabled: false }
+                  )
+                }
+              />
+              {soundEnabled && (
+                <div className="flex flex-wrap pl-1 animate-fade-in-fast">
+                  <RadioRow
+                    name="sound-mode"
+                    value="speak"
+                    current={soundType}
+                    label="Say out loud"
+                    onChange={(v) => setSetting("sound", { enabled: true, type: v })}
+                  />
+                  <RadioRow
+                    name="sound-mode"
+                    value="correct"
+                    current={soundType}
+                    label="Sound when correct"
+                    onChange={(v) => setSetting("sound", { enabled: true, type: v })}
+                  />
+                </div>
+              )}
+              {soundEnabled && soundType === "speak" && (
+                <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
+                  ⚠️ text-to-speech might not work on all devices.
+                </p>
+              )}
+            </div>
 
-        <Button
-          size="lg"
-          className="w-full"
-          onClick={onStart}
-        >
-          Start Game
-        </Button>
-        <SetStats challengeSet={settings.challengeSet} />
+            <div className="flex flex-col gap-3 pt-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Select a Challenge Set</Label>
+                <span className="text-sm font-semibold tabular-nums">
+                  {(currentLevelDone / CHALLENGES_PER_LEVEL) * 100}% done
+                </span>
+              </div>
+
+
+              <div className="grid grid-cols-10 gap-1">
+                {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => {
+                  const doneCount = levelCompletion[level - 1];
+                  const category = Math.round(
+                    (doneCount / CHALLENGES_PER_LEVEL) * 4
+                  ) as FreqCategory;
+                  const bgCn = freqCategoryCn[category];
+                  const textCn = category > 3 ? "text-white" : "text-foreground";
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => selectLevel(level)}
+                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentLevel === level
+                        ? "border-primary"
+                        : ""
+                        }`}
+                    >
+                      {level}
+                    </button>
+                  );
+                })}
+              </div>
+              <Label className="text-sm text-left">Select a Challenge</Label>
+
+              <div className="grid grid-cols-10 gap-1">
+                {Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) => i + 1).map(
+                  (pos) => {
+                    const setNum = setFromLevelAndPos(currentLevel, pos);
+                    const completed = !!readSetStats(setNum);
+                    const bgCn = completed
+                      ? freqCategoryCn[4]
+                      : freqCategoryCn[0];
+                    const textCn = completed
+                      ? "text-white"
+                      : "text-foreground";
+                    return (
+                      <button
+                        key={pos}
+                        onClick={() => setSetting("challengeSet", setNum)}
+                        className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentPos === pos ? "border-primary" : ""
+                          }`}
+                      >
+                        {pos}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+
+              <p className="text-xs text-left">
+                Lower challenges contain more common words.
+              </p>
+            </div>
+          </div>
+
+          <SetStats challengeSet={settings.challengeSet} />
+        </div>
+      </div>
+
+      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dashed rounded-3xl bg-background">
+        <div className="w-full max-w-lg mx-auto">
+          <PracticeButton size="lg" onClick={onStart}>
+            Start Game
+          </PracticeButton>
+        </div>
       </div>
     </div>
   );

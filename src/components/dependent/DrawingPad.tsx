@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dispatch, ReactNode, SetStateAction, useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Undo2, Trash2, Search } from "@/components/icons";
 
 export type Stroke = [number, number][];
@@ -190,30 +190,30 @@ export const DrawingPad = ({
                 </svg>
             </div>
             <div className="flex justify-center mt-2 space-x-2">
-                <Button
+                <PracticeButton
+                    size="icon"
                     onClick={() => setStrokes((s) => s.slice(0, -1))}
                     disabled={strokes.length === 0}
-                    className="disabled:opacity-25"
-
                 >
-                    <Undo2 className="scale-150" />
+                    <Undo2 />
                     <span className="sr-only">Undo</span>
-                </Button>
-                <Button
+                </PracticeButton>
+                <PracticeButton
+                    size="icon"
                     variant="secondary"
                     onClick={() => {
                         setStrokes([]);
                         setCurrentPoints(null);
                         onClickClear?.();
                     }}
-                    className="disabled:opacity-25"
                     disabled={strokes.length === 0 && !currentPoints}
                 >
-                    <Trash2 className="scale-150" />
+                    <Trash2 />
                     <span className="sr-only">Clear</span>
-                </Button>
+                </PracticeButton>
                 {showSubmitBtn && (
-                    <Button
+                    <PracticeButton
+                        size="icon"
                         onClick={() =>
                             onClickSubmit?.({
                                 strokes,
@@ -222,11 +222,10 @@ export const DrawingPad = ({
                             })
                         }
                         disabled={strokes.length === 0 || submitDisabled}
-                        className="disabled:opacity-25"
                     >
-                        {submitIcon ?? <Search className="scale-150" />}
+                        {submitIcon ?? <Search />}
                         <span className="sr-only">{submitLabel}</span>
-                    </Button>
+                    </PracticeButton>
                 )}
             </div>
         </div>

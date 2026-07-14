@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { ChartLine, Keyboard, Menu, SearchIcon, } from "lucide-react";
+import { ChartLine, Eye, Keyboard, Menu, SearchIcon, } from "lucide-react";
 import pageItems from "@/components/items/page-items";
 import { docPages } from "@/components/items/nav-items";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
+import { DashedNavLink } from "@/components/common/DashedNavLink";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -13,7 +14,7 @@ import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
-const { kanjiPage, cumUseGraphPage, speedKatakanaPage } = pageItems;
+const { kanjiPage, cumUseGraphPage, speedKatakanaPage, recognitionPracticeV1Page } = pageItems;
 
 const navLinks = [
   {
@@ -23,10 +24,10 @@ const navLinks = [
     Icon: SearchIcon
   },
   {
-    href: cumUseGraphPage.href,
-    title: cumUseGraphPage.title,
-    description: cumUseGraphPage.description,
-    Icon: ChartLine
+    href: recognitionPracticeV1Page.href,
+    title: recognitionPracticeV1Page.title,
+    description: recognitionPracticeV1Page.description,
+    Icon: Eye
   },
   {
     href: speedKatakanaPage.href,
@@ -34,6 +35,13 @@ const navLinks = [
     description: speedKatakanaPage.description,
     Icon: Keyboard
   },
+  {
+    href: cumUseGraphPage.href,
+    title: cumUseGraphPage.title,
+    description: cumUseGraphPage.description,
+    Icon: ChartLine
+  },
+
 ];
 
 const infoLinks = [
@@ -55,21 +63,14 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
         {navLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
-            <Link
+            <DashedNavLink
               href={item.href}
+              title={item.title}
+              description={item.description}
+              Icon={item.Icon}
               onPointerDown={(e) => e.stopPropagation()}
-              className="block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent"
-            >
-              <div className="flex items-center text-sm font-semibold">
-                <item.Icon className="mr-1 size-4" />
-                {item.title}
-              </div>
-              {item.description && (
-                <p className="mt-1 text-xs text-left text-muted-foreground">
-                  {item.description}
-                </p>
-              )}
-            </Link>
+              iconClassName="mt-0 mr-1"
+            />
           </DrawerPrimitive.Close>
         ))}
       </div>

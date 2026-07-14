@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { translateValue, tryConvertRomaji } from "@/lib/wanakana-adapter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
@@ -7,12 +8,17 @@ import { useJsonFetch } from "@/hooks/use-json";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import assetsPaths from "@/lib/assets-paths";
 import {
+  isForgotCommand,
+  isForgotCommandPrefix,
+} from "@/lib/practice-commands";
+import {
   ChallengeSetData,
   SessionStats,
   SpeedKatakanaSettings,
 } from "./types";
 import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
 import { shuffle } from "@/lib/utils";
+import { CircleArrowLeft, DeleteIcon } from "lucide-react";
 
 type GameWord = {
   katakana: string;
@@ -158,6 +164,12 @@ export const Game = ({
   const handleChange = (raw: string) => {
     if (startTimeRef.current === null) startTimeRef.current = Date.now();
 
+    // Keep "skip" / "forgot" as latin so the keyboard command stays typable.
+    if (isForgotCommandPrefix(raw) || isForgotCommand(raw)) {
+      setInputValue(raw.replace(/\s+/g, ""));
+      return;
+    }
+
     const converted = translateValue(raw, "katakana");
     const target = current.katakana;
     // Compare in romaji space so the long-vowel mark ー matches a doubled vowel
@@ -197,6 +209,21 @@ export const Game = ({
     setInputValue(converted);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      handleSkip();
+      return;
+    }
+
+    if (e.key === "Enter" && isForgotCommand(inputValue)) {
+      e.preventDefault();
+      handleSkip();
+    }
+  };
+
   const finish = () => {
     const elapsedMs = startTimeRef.current
       ? Date.now() - startTimeRef.current
@@ -218,27 +245,31 @@ export const Game = ({
   return (
     <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center  animate-fade-in-fast">
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
-        <div className="pt-4">
-          <button
-            className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
-            tabIndex={-1}
-            onClick={handleSkip}
-          >
-            {`Skip this word`}
-          </button>
-          ·
-          <span className="px-3 pt-6 pb-1 text-xs font-bold rounded-full">
-            {index + 1} / {words.length}
-          </span>
-
-          <span>·</span>
-          <button
-            className="mx-3 text-xs font-bold tracking-wide underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70 text-muted-foreground"
+        <div className="flex items-center justify-center gap-1 pt-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
             tabIndex={-1}
             onClick={onEnd}
+            aria-label="End session"
           >
-            {`End Session`}
-          </button>
+            <CircleArrowLeft />
+          </Button>
+
+          <span className="px-2 text-xs font-bold tabular-nums">
+            {index + 1} / {words.length}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-red-500 opacity-70 hover:opacity-100 hover:text-red-500 hover:bg-opacity-0"
+            tabIndex={-1}
+            onClick={handleSkip}
+            aria-label="Skip this word"
+          >
+            <DeleteIcon className="rotate-180" />
+          </Button>
         </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
@@ -283,9 +314,10 @@ export const Game = ({
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
-          aria-label="Type the katakana"
-          placeholder="Type romaji here"
+          aria-label='Type romaji or type "skip"'
+          placeholder='Type romaji or "skip"'
           className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14 kanji-font"
+          onKeyDown={handleKeyDown}
           onCompositionStart={() => {
             isComposingRef.current = true;
             // A new composition means any pending suppression is stale.

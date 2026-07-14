@@ -13,6 +13,7 @@ import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
 import {
     useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { dedupe } from "@/lib/utils";
 
 const TableCellFixed = ({
     children,
@@ -41,7 +42,7 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
             <div className="text-left animate-fade-in">
                 <h3 className="pt-3 pb-1 pl-3 mb-4 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">Visually Similar Kanji</h3>
                 <div className="flex items-center min-w-0 space-x-2 overflow-x-auto overflow-y-hidden">
-                    {similars.map((similarKanji) => (
+                    {dedupe(similars).map((similarKanji) => (
                         <div key={similarKanji} className="shrink-0">
                             <OriginalKanjiComponentBreakdown kanji={similarKanji} />
                         </div>

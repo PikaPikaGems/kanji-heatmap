@@ -8,6 +8,7 @@ import LoadingKanjis from "./KanjiList/LoadingKanjis";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { SuspendedKanjiList } from "./KanjiList/LazyKanjiList";
 import { ItemCountBadge } from "./ControlBar/ItemCountBadge";
+import { PracticeFab } from "./PracticeFab";
 
 const Layout = ({
   children,
@@ -29,6 +30,7 @@ const Layout = ({
       <div className="relative pt-24 -z-0 flex flex-wrap items-center justify-center overflow-x-hidden">
         {children}
       </div>
+      <PracticeFab />
     </>
   );
 };

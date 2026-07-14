@@ -1,6 +1,6 @@
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
-import { useKanjiFromUrl } from "./routing-hooks";
+import { useKanjiFromUrl, useUrlLocation } from "./routing-hooks";
 import { Link } from "./router-adapter";
 import { radicalFalseFriends } from "@/lib/radicals";
 
@@ -99,9 +99,10 @@ export const GlobalKanjiLink = ({
   keyword: string;
   fontSize?: FontSize;
 }) => {
+  const pathname = useUrlLocation();
   const urlState = useKanjiFromUrl(kanji);
   return (
-    <Link to={`/?${urlState}`} className={cnJPCardLink}>
+    <Link to={`${pathname}?${urlState}`} className={cnJPCardLink}>
       <JPCardInner label={keyword} character={kanji} fontSize={fontSize} />
     </Link>
   );

@@ -1,3 +1,4 @@
+import { BOOKMARK_KEY_PREFIX } from "@/lib/bookmarks";
 import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { isKanji } from "@/lib/utils";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
@@ -11,7 +12,11 @@ const useKnownCount = () => {
       let n = 0;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith("k:") && localStorage.getItem(key) === "true") n++;
+        if (
+          key?.startsWith(BOOKMARK_KEY_PREFIX) &&
+          localStorage.getItem(key) === "true"
+        )
+          n++;
       }
       setCount(n);
     };
@@ -19,7 +24,7 @@ const useKnownCount = () => {
     compute();
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith("k:")) compute();
+      if (e.key?.startsWith(BOOKMARK_KEY_PREFIX)) compute();
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
