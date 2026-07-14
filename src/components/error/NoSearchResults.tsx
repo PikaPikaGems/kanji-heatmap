@@ -18,14 +18,18 @@ export const NonIdealResultText = () => {
 export const NoSearchResults = () => {
   return (
     <Wrapper>
-      <Sumimasen />
-      <div className="my-2 font-bold">
-        <span>No Kanji match your search.</span>
-        <br />
-        <ClearFiltersCTA />
-      </div>
 
-      <NonIdealResultText />
+      <div className="my-6 animate-fade-in">
+
+        <Sumimasen />
+        <div className="my-2 font-bold">
+          <span>No Kanji match your search.</span>
+          <br />
+          <ClearFiltersCTA />
+        </div>
+
+        <NonIdealResultText />
+      </div>
     </Wrapper>
   );
 };
