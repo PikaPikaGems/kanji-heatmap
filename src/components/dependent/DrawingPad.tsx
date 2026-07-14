@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Dispatch, SetStateAction, useEffect, useId, useRef, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Undo2, Trash2, Search } from "@/components/icons";
 
@@ -28,6 +28,9 @@ export const DrawingPad = ({
     strokes: controlledStrokes,
     setStrokes: setControlledStrokes,
     showSubmitBtn = false,
+    submitIcon,
+    submitLabel = "Search",
+    submitDisabled = false,
     onClickSubmit,
     onClickClear,
 }: {
@@ -37,6 +40,11 @@ export const DrawingPad = ({
     strokes?: Stroke[];
     setStrokes?: Dispatch<SetStateAction<Stroke[]>>;
     showSubmitBtn?: boolean;
+    /** Defaults to Search icon when omitted. */
+    submitIcon?: ReactNode;
+    submitLabel?: string;
+    /** Extra disable (e.g. while grading). Empty strokes still disable submit. */
+    submitDisabled?: boolean;
     onClickSubmit?: (payload: DrawingSubmitPayload) => void;
     onClickClear?: () => void;
 }) => {
@@ -213,11 +221,11 @@ export const DrawingPad = ({
                                 height: svgSize,
                             })
                         }
-                        disabled={strokes.length === 0}
+                        disabled={strokes.length === 0 || submitDisabled}
                         className="disabled:opacity-25"
                     >
-                        <Search className="scale-150" />
-                        <span className="sr-only">Search</span>
+                        {submitIcon ?? <Search className="scale-150" />}
+                        <span className="sr-only">{submitLabel}</span>
                     </Button>
                 )}
             </div>

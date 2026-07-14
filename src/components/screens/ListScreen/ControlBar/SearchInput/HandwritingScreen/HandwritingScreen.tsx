@@ -63,11 +63,13 @@ const HandwritingResultsPreview = ({
   status,
   candidates,
   errorText,
+  idleContent,
   onClick,
 }: {
   status: RecognitionStatus;
   candidates: string[];
   errorText: string;
+  idleContent?: ReactNode;
   onClick: () => void;
 }) => {
 
@@ -88,15 +90,16 @@ const HandwritingResultsPreview = ({
     if (status === "success") {
       return (
         <div className={messageBoxCN}>
-          <div>すみません 🙇🏽‍♀️ No match found. Try drawing again.</div>
+          <div>すみません 🙇‍♀️ No match found. Try drawing again.</div>
         </div>
       );
     }
 
     // Nothing drawn / searched yet.
     return (
-      <div className={`${messageBoxCN} font-medium text-muted-foreground px-4`}>
-        Draw a kanji above, then tap the search 🔍 button to see matches.
+      <div className={`${messageBoxCN} font-medium px-4`}>
+        {idleContent ??
+          "Draw a kanji above, then tap the search 🔍 button to see matches."}
       </div>
     );
   }
@@ -122,6 +125,7 @@ export const HandWritingDrawingPad = ({
   onResultClick,
   recognize,
   errorText,
+  idleContent,
 }: {
   value: string;
   onChange: (newValue: string) => void;
@@ -132,6 +136,8 @@ export const HandWritingDrawingPad = ({
   recognize: Recognizer;
   // Shown in the results preview when recognition fails.
   errorText: string;
+  // Optional idle-state message (e.g. model credit). Falls back to the default tip.
+  idleContent?: ReactNode;
 }) => {
   const [status, setStatus] = useState<RecognitionStatus>("idle");
   const [svgSize] = useState(() =>
@@ -191,6 +197,7 @@ export const HandWritingDrawingPad = ({
           status={status}
           candidates={candidates}
           errorText={errorText}
+          idleContent={idleContent}
           onClick={onResultClick}
         />
       }

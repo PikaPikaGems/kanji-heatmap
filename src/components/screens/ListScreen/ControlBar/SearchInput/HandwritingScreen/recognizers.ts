@@ -1,8 +1,9 @@
 import { DrawingSubmitPayload } from "@/components/dependent/DrawingPad";
 import { recognizeKanji } from "@/lib/kanjicanvas-adapter";
+import { recognizeDaKanji } from "@/lib/dakanji-adapter";
 
 // Resolve drawn strokes into candidate kanji (best match first). Implementations
-// either call an external API (Google) or recognize on-device (kanjicanvas).
+// either call an external API (Google) or recognize on-device (kanjicanvas / DaKanji).
 export type Recognizer = (payload: DrawingSubmitPayload) => Promise<string[]>;
 
 const buildInkPayload = ({ strokes, width, height }: DrawingSubmitPayload) => {
@@ -64,3 +65,7 @@ export const recognizeWithGoogle: Recognizer = async (payload) => {
 // On-device recognition via the lazily-loaded kanjicanvas engine (no API call).
 export const recognizeWithKanjiCanvas: Recognizer = (payload) =>
   recognizeKanji(payload.strokes);
+
+// On-device recognition via Dariyooo's DaKanji ONNX model (lazy-loaded).
+export const recognizeWithDaKanji: Recognizer = (payload) =>
+  recognizeDaKanji(payload);

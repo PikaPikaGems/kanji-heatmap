@@ -81,7 +81,8 @@ const pwaConfig = {
     // The kanjicanvas reference patterns are a ~6.4MB lazy chunk only needed for
     // "Handwriting Alt". Too big to precache (and wasteful to ship to everyone),
     // so exclude it from precache and cache it at runtime on first use instead.
-    globIgnores: ["**/ref-patterns.js"],
+    // Same for DaKanji onnx assets (~2MB) used by "Handwriting Alt 2".
+    globIgnores: ["**/ref-patterns.js", "**/onnx/**"],
     runtimeCaching: [
       // **********************
       // KANJICANVAS reference patterns (lazy, on-device handwriting recognition)
@@ -93,6 +94,36 @@ const pwaConfig = {
           cacheName: "kanjicanvas-patterns-cache",
           expiration: {
             maxEntries: 2,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+          },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      // **********************
+      // DAKANJI ONNX model + labels (lazy, Handwriting Alt 2)
+      // **********************
+      {
+        urlPattern: /\/onnx\/.*/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "dakanji-onnx-cache",
+          expiration: {
+            maxEntries: 10,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+          },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      // **********************
+      // ORT wasm emitted by Vite as a hashed /assets/*.wasm chunk
+      // **********************
+      {
+        urlPattern: /\/assets\/.*\.wasm$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "dakanji-ort-wasm-cache",
+          expiration: {
+            maxEntries: 4,
             maxAgeSeconds: 365 * 24 * 60 * 60, // One year
           },
           cacheableResponse: { statuses: [0, 200] },
@@ -242,7 +273,9 @@ export default defineConfig(() => ({
   },
   build: {
     target: "esnext", // Needed for module workers
+    assetsInlineLimit: 0, // keep the ~13MB ORT wasm as a separate file
   },
+  assetsInclude: ["**/*.wasm"],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

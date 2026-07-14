@@ -7,8 +7,14 @@ import { Switch } from "@/components/ui/switch";
 import assetsPaths from "@/lib/assets-paths";
 import { installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { PlayCircle, Snail } from "@/components/icons";
-import { DrawingPad } from "@/components/dependent/DrawingPad";
+import {
+  DrawingPad,
+  DrawingSubmitPayload,
+  Stroke,
+} from "@/components/dependent/DrawingPad";
+import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
+import { Rocket } from "lucide-react";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
@@ -145,10 +151,110 @@ const HintSection = ({ kanji }: { kanji: string }) => {
   );
 };
 
-const WritingPracticeMode = () => {
+type GradeStatus = "idle" | "loading" | "success" | "error";
+
+type GradeResult = {
+  rank: number; // 0-based index in top-10, or -1 if missing
+  topGuess: string | null;
+};
+
+const gradeMessage = (kanji: string, result: GradeResult): string => {
+  const { rank, topGuess } = result;
+  if (rank === 0) {
+    return `🎯 Awesome · That's ${kanji}`;
+  }
+  if (rank >= 1 && rank <= 2) {
+    return topGuess
+      ? `💚 Solid · Near miss — a bit like ${topGuess}`
+      : `💚 Solid · Near miss — keep refining`;
+  }
+  if (rank >= 3) {
+    return topGuess
+      ? `🌀 Getting there · Looks more like ${topGuess}`
+      : `🌀 Getting there · Keep refining`;
+  }
+  return topGuess
+    ? `🙈 Not quite · Looks more like ${topGuess}`
+    : `🙈 Not quite · Try again`;
+};
+
+const DAKANJI_CREDIT_HREF =
+  "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition";
+
+const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [status, setStatus] = useState<GradeStatus>("idle");
+  const [result, setResult] = useState<GradeResult | null>(null);
+
+  const onGrade = async (payload: DrawingSubmitPayload) => {
+    if (payload.strokes.length === 0) {
+      return;
+    }
+
+    setStatus("loading");
+    setResult(null);
+    try {
+      const candidates = await recognizeWithDaKanji(payload);
+      setResult({
+        rank: candidates.indexOf(kanji),
+        topGuess: candidates[0] ?? null,
+      });
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const onClear = () => {
+    setStatus("idle");
+    setResult(null);
+  };
+
   return (
-    <div className="flex flex-col items-center gap-4 px-4 pt-4 animate-fade-in">
-      <DrawingPad svgSize={SVG_SIZE} />
+    <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-6 animate-fade-in">
+      <DrawingPad
+        svgSize={SVG_SIZE}
+        strokes={strokes}
+        setStrokes={setStrokes}
+        showSubmitBtn
+        submitIcon={<Rocket className="scale-150" />}
+        submitLabel="Grade"
+        submitDisabled={status === "loading"}
+        onClickSubmit={onGrade}
+        onClickClear={onClear}
+      />
+
+      <div className="w-full max-w-[310px] min-h-10 px-2 text-xs font-bold text-center">
+        {status === "loading" && (
+          <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
+        )}
+        {status === "error" && (
+          <div className="animate-fade-in text-destructive">
+            The DaKanji recognizer couldn&apos;t be loaded right now.
+          </div>
+        )}
+        {status === "success" && result != null && (
+          <div className="animate-fade-in">{gradeMessage(kanji, result)}</div>
+        )}
+        {status === "idle" && (
+          <div className="font-bold">
+            Draw the kanji, then tap 🚀 to Grade.
+          </div>
+        )}
+      </div>
+
+      <p className="max-w-[310px] text-center text-[11px] leading-relaxed opacity-70">
+        Grading powered by DaKanji ·{" "}
+        <a
+          href={DAKANJI_CREDIT_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold underline underline-offset-2 hover:opacity-80"
+        >
+          Dariyooo (DaAppLab)
+        </a>{" "}
+        💪
+      </p>
     </div>
   );
 };
@@ -178,7 +284,7 @@ const StrokeAnimationWithPracticeMode = ({ kanji }: { kanji: string }) => {
         </div>
       </div>
       {practiceMode ? (
-        <WritingPracticeMode />
+        <WritingPracticeMode kanji={kanji} />
       ) : (
         <StrokeAnimation kanji={kanji} />
       )}
