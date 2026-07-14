@@ -97,7 +97,7 @@ const HandwritingResultsPreview = ({
 
     // Nothing drawn / searched yet.
     return (
-      <div className={`${messageBoxCN} font-medium text-muted-foreground px-4`}>
+      <div className={`${messageBoxCN} font-medium px-4`}>
         {idleContent ??
           "Draw a kanji above, then tap the search 🔍 button to see matches."}
       </div>

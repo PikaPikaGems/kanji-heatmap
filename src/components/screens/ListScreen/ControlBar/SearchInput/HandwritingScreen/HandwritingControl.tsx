@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { Stroke } from "@/components/dependent/DrawingPad";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
@@ -13,17 +13,18 @@ import {
 // "google" = online API; "kanjicanvas" / "dakanji" = on-device.
 export type HandwritingVariant = "google" | "kanjicanvas" | "dakanji";
 
-const DAKANJI_IDLE_CONTENT = (
-  <span>
-    Character recognition powered by machine learning from{" "}
+const IdleCredit = ({ href, label }: { href: string; label: string }) => (
+  <span className="text-sm">
+    Recognition Powered by{" "}
     <a
-      href="https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition"
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="underline underline-offset-2 hover:text-foreground"
+      className="font-bold underline underline-offset-2 hover:opacity-80"
     >
-      Dariyooo (DaAppLab)
-    </a>
+      {label}
+    </a>{" "}
+    💪
   </span>
 );
 
@@ -31,17 +32,32 @@ const VARIANT_CONFIG = {
   google: {
     recognize: recognizeWithGoogle,
     errorText: "Google's handwriting API can't be accessed right now.",
-    idleContent: undefined as ReactNode | undefined,
-  },
-  kanjicanvas: {
-    recognize: recognizeWithKanjiCanvas,
-    errorText: "The handwriting recognizer couldn't be loaded right now.",
-    idleContent: undefined as ReactNode | undefined,
+    idleContent: (
+      <IdleCredit
+        href="https://www.google.com/inputtools/services/features/handwriting.html"
+        label="Google Handwriting API"
+      />
+    ),
   },
   dakanji: {
     recognize: recognizeWithDaKanji,
     errorText: "The DaKanji recognizer couldn't be loaded right now.",
-    idleContent: DAKANJI_IDLE_CONTENT,
+    idleContent: (
+      <IdleCredit
+        href="https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition"
+        label="Dariyooo (DaAppLab)"
+      />
+    ),
+  },
+  kanjicanvas: {
+    recognize: recognizeWithKanjiCanvas,
+    errorText: "The handwriting recognizer couldn't be loaded right now.",
+    idleContent: (
+      <IdleCredit
+        href="https://github.com/asdfjkl/kanjicanvas"
+        label="KanjiCanvas (asdfjkl)"
+      />
+    ),
   },
 } as const;
 
