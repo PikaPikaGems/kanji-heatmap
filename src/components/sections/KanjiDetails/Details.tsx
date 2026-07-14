@@ -22,6 +22,7 @@ import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
+import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
 
 
 export const RirikkuCTABadge = () => {
@@ -82,11 +83,35 @@ const StrokeAnimationLoadingScreen = () => {
           <div className="w-24 h-3 rounded-lg bg-muted animate-pulse" />
         </div>
       </div>
-      <div className="flex justify-center w-full my-4">
-        <div className="relative overflow-hidden rounded-3xl bg-muted animate-pulse" style={{ width: 280, height: 280 }}>
-          <svg width="280" height="280" className="absolute inset-0 text-foreground opacity-10" aria-hidden>
-            <line x1="140" y1="0" x2="140" y2="280" stroke="currentColor" strokeWidth="1" strokeDasharray="5 5" />
-            <line x1="0" y1="140" x2="280" y2="140" stroke="currentColor" strokeWidth="1" strokeDasharray="5 5" />
+      <div className={CONTAINER_CN} style={{ height: SVG_SIZE }}>
+        <div
+          className="relative overflow-hidden rounded-3xl bg-muted animate-pulse"
+          style={{ width: SVG_SIZE, height: SVG_SIZE }}
+        >
+          <svg
+            width={SVG_SIZE}
+            height={SVG_SIZE}
+            className="absolute inset-0 text-foreground opacity-10"
+            aria-hidden
+          >
+            <line
+              x1={SVG_SIZE / 2}
+              y1={0}
+              x2={SVG_SIZE / 2}
+              y2={SVG_SIZE}
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeDasharray="5 5"
+            />
+            <line
+              x1={0}
+              y1={SVG_SIZE / 2}
+              x2={SVG_SIZE}
+              y2={SVG_SIZE / 2}
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeDasharray="5 5"
+            />
           </svg>
         </div>
       </div>
