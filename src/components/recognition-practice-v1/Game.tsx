@@ -143,25 +143,24 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full gap-5 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+    <div className="relative flex flex-col w-full h-full gap-5 [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute z-10 top-0 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
+        tabIndex={-1}
+        onClick={onEnd}
+        aria-label="End session"
+      >
+        <CircleArrowLeft />
+      </Button>
+
       {/*
         Touch layout: keep the prompt + input as a top-anchored cluster with a
         fixed gap. A bottom spacer absorbs visual-viewport height changes so
         the keyboard opening/closing does not shove content around.
       */}
-      <div className="flex flex-col items-center shrink-0 gap-3 px-4 pt-2 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
-        <div className="flex items-center justify-center [@media(pointer:fine)]:translate-y-4 md:translate-y-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-            tabIndex={-1}
-            onClick={onEnd}
-            aria-label="End session"
-          >
-            <CircleArrowLeft />
-          </Button>
-        </div>
+      <div className="flex flex-col items-center shrink-0 gap-3 px-4 pt-3 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
           style={
@@ -206,7 +205,7 @@ export const Game = ({
               spellCheck={false}
               aria-label='Type the reading or type "forgot"'
               placeholder='Type the reading or type "forgot"'
-              className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font"
+              className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font focus-visible:ring-offset-0"
               onKeyDown={handleKeyDown}
               onCompositionStart={() => {
                 isComposingRef.current = true;

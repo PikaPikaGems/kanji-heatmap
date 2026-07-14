@@ -44,6 +44,26 @@ const RecognitionPracticeV1 = () => {
     }
   }, [phase, setOpenedKanji]);
 
+  // Keep the play shell pinned to the layout top. Chasing visualViewport.offsetTop
+  // while iOS animates the keyboard makes the whole UI bob; "/" doesn't do that
+  // because ListScreen isn't viewport-pinned at all.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const lockScroll = () => {
+      if (window.scrollY !== 0) window.scrollTo(0, 0);
+    };
+
+    vv.addEventListener("scroll", lockScroll);
+    vv.addEventListener("resize", lockScroll);
+    lockScroll();
+    return () => {
+      vv.removeEventListener("scroll", lockScroll);
+      vv.removeEventListener("resize", lockScroll);
+    };
+  }, []);
+
   const beginPlaying = (items: PracticeItem[], nextCursor: number) => {
     setSessionItems(items);
     setCursor(nextCursor);
@@ -126,11 +146,15 @@ const RecognitionPracticeV1 = () => {
         autoComplete="off"
       />
       <div
-        className="fixed inset-x-0 flex flex-col overflow-hidden bg-background"
-        style={{ top: viewport.offsetTop, height: viewport.height }}
+        className="fixed inset-x-0 top-0 flex flex-col overflow-hidden bg-background"
+        style={{ height: viewport.height }}
       >
         <PracticeHeader progress={progress} />
-        <main className="flex-1 min-h-0 py-2 overflow-hidden">
+        <main
+          className={`flex-1 min-h-0 overflow-hidden ${
+            phase === "playing" ? "pt-0 pb-2" : "py-2"
+          }`}
+        >
           {phase === "initial" && (
             <div key="initial" className="h-full animate-fade-in">
               <InitialScreen onStart={startGame} />
