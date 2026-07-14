@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useState } from "react";
+import { PracticeButton } from "@/components/ui/practice-button";
+import { useEnterAction } from "@/hooks/use-enter-action";
+import { pickEndCheer } from "@/lib/practice-cheers";
 import { SessionStats } from "./types";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 
@@ -37,14 +39,16 @@ const Stat = ({
 }) => {
   const animated = useCountUp(value);
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 animate-practice-tile-in">
       <div className="text-5xl font-bold tabular-nums sm:text-6xl">
         {animated}
         <span className="ml-1 text-2xl font-semibold text-muted-foreground">
           {unit}
         </span>
       </div>
-      <div className="text-xs font-bold uppercase text-muted-foreground ">{label}</div>
+      <div className="text-xs font-bold uppercase text-muted-foreground ">
+        {label}
+      </div>
     </div>
   );
 };
@@ -60,12 +64,21 @@ export const EndSession = ({
   onEnd: () => void;
   completedSets: number;
 }) => {
+  const cheer = useMemo(() => pickEndCheer(), []);
+  useEnterAction(onNext);
+
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-10 animate-fade-in">
-
-      <div>
-        <h2 className="text-xl font-bold">🥳 Challenge Complete!</h2>
-        <SpeedKatakanaStatsSummary completed={completedSets} />
+      <div className="text-center">
+        <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
+          {cheer}
+        </h2>
+        <p className="mt-1 text-xs font-bold tracking-wide uppercase text-muted-foreground">
+          Challenge complete
+        </p>
+        <div className="mt-2">
+          <SpeedKatakanaStatsSummary completed={completedSets} />
+        </div>
       </div>
       <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16">
         <Stat value={stats.accuracy} unit="%" label="Accuracy" />
@@ -77,12 +90,12 @@ export const EndSession = ({
       </div>
 
       <div className="flex flex-col w-full max-w-xs gap-3">
-        <Button size="lg" className="w-full" onClick={onNext}>
+        <PracticeButton size="lg" onClick={onNext}>
           Next Challenge
-        </Button>
-        <Button variant="ghost" size="lg" className="w-full text-foreground" onClick={onEnd}>
+        </PracticeButton>
+        <PracticeButton variant="ghost" size="md" onClick={onEnd}>
           End Session
-        </Button>
+        </PracticeButton>
       </div>
     </div>
   );

@@ -7,6 +7,10 @@ import { useJsonFetch } from "@/hooks/use-json";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import assetsPaths from "@/lib/assets-paths";
 import {
+  isForgotCommand,
+  isForgotCommandPrefix,
+} from "@/lib/practice-commands";
+import {
   ChallengeSetData,
   SessionStats,
   SpeedKatakanaSettings,
@@ -158,6 +162,12 @@ export const Game = ({
   const handleChange = (raw: string) => {
     if (startTimeRef.current === null) startTimeRef.current = Date.now();
 
+    // Keep "skip" / "forgot" as latin so the keyboard command stays typable.
+    if (isForgotCommandPrefix(raw) || isForgotCommand(raw)) {
+      setInputValue(raw.replace(/\s+/g, ""));
+      return;
+    }
+
     const converted = translateValue(raw, "katakana");
     const target = current.katakana;
     // Compare in romaji space so the long-vowel mark ー matches a doubled vowel
@@ -195,6 +205,21 @@ export const Game = ({
     }
 
     setInputValue(converted);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      handleSkip();
+      return;
+    }
+
+    if (e.key === "Enter" && isForgotCommand(inputValue)) {
+      e.preventDefault();
+      handleSkip();
+    }
   };
 
   const finish = () => {
@@ -283,9 +308,10 @@ export const Game = ({
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
-          aria-label="Type the katakana"
-          placeholder="Type romaji here"
+          aria-label='Type romaji or type "skip"'
+          placeholder='Type romaji or "skip"'
           className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14 kanji-font"
+          onKeyDown={handleKeyDown}
           onCompositionStart={() => {
             isComposingRef.current = true;
             // A new composition means any pending suppression is stale.

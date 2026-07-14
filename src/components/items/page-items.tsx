@@ -6,6 +6,7 @@ import {
   PrivacyScreen,
   SpeedKatakanaScreen,
 } from "@/components/screens";
+import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
 
 const kanjiPage = {
   href: "/",
@@ -46,6 +47,13 @@ const speedKatakanaPage = {
   Component: SpeedKatakanaScreen,
 };
 
+const recognitionPracticeV1Page = {
+  href: "/recognition-practice",
+  title: "Recognition Practice (beta)",
+  description: "Practice reading kanji anchor words",
+  Component: RecognitionPracticeV1Screen,
+};
+
 const pageItems = {
   kanjiPage,
   cumUseGraphPage,
@@ -53,6 +61,7 @@ const pageItems = {
   termsPage,
   privacyPage,
   speedKatakanaPage,
+  recognitionPracticeV1Page,
 };
 
 export default pageItems;

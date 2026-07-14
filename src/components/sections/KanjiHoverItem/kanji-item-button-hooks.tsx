@@ -5,6 +5,7 @@ import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
 import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
 import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-provider";
+import { isBookmarked } from "@/lib/bookmarks";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
 
@@ -18,14 +19,18 @@ export const useItemType = () => {
   return itemSettings.cardType;
 };
 
-const getStudyStatusBorderCn = (word: string | null): string | null => {
+const getStudyStatusBorderCn = (
+  kanji: string,
+  word: string | null
+): string | null => {
   if (!word) return null;
-  return localStorage.getItem(`k:${word}`) === "true" ? "border-green-500" : null;
+  return isBookmarked(kanji, word) ? "border-green-500" : null;
 };
 
 const getBorderCn = (
   borderColorMeaning: BorderColorMeaning,
   jlpt: JLTPTtypes,
+  kanji: string,
   representativeWord: string | null,
   dontIncludeFreq: boolean,
   freqRankCategory: number
@@ -37,7 +42,7 @@ const getBorderCn = (
 
   if (borderColorMeaning === "jlpt") return JLPTListItems[jlpt].cnBorder;
   if (borderColorMeaning === "study-status") {
-    return getStudyStatusBorderCn(representativeWord) ?? fallback;
+    return getStudyStatusBorderCn(kanji, representativeWord) ?? fallback;
   }
   return fallback;
 };
@@ -75,6 +80,7 @@ export const useItemBtnCn = (kanji: string) => {
   const border = getBorderCn(
     borderColorMeaning,
     jlpt,
+    kanji,
     representativeWord,
     dontIncludeFreq,
     freqRankCategory

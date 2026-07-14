@@ -231,6 +231,63 @@ button:focus-visible {
   100% { opacity: 0; }
 }
 
+/* Practice feedback / end-screen whimsy */
+.animate-practice-pop {
+  animation: practice-pop 0.45s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+@keyframes practice-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(10px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-practice-tile-in {
+  animation: practice-tile-in 0.4s ease-out both;
+}
+
+@keyframes practice-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-practice-bounce-soft {
+  animation: practice-cheer-bloom 1.35s ease-out both;
+}
+
+@keyframes practice-cheer-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Paste auto-switched search type chip: slide in, nudge for attention, fade out left. */
 .animate-search-type-hint {
   animation: search-type-hint 1.6s ease-out forwards;

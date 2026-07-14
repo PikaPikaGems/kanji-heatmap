@@ -2,9 +2,10 @@ import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-wor
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PlusCircle } from "lucide-react";
 import { useLocalStorage2 } from "@/hooks/use-local-storage";
+import { bookmarkStorageKey } from "@/lib/bookmarks";
 
-const MarkAsKnownBadge = ({ word }: { word: string }) => {
-    const [isKnown, setIsKnown] = useLocalStorage2(`k:${word}`);
+const MarkAsKnownBadge = ({ kanji, word }: { kanji: string; word: string }) => {
+    const [isKnown, setIsKnown] = useLocalStorage2(bookmarkStorageKey(kanji, word));
     const toggle = () => setIsKnown(!isKnown);
 
     return (
@@ -45,7 +46,7 @@ export const KanjiWordStatusActions = ({ kanji }: { kanji: string }) => {
     return (
         <div className="flex items-start justify-between">
             <MemorizeThisWord word={data.word} />
-            <MarkAsKnownBadge word={data.word} />
+            <MarkAsKnownBadge kanji={kanji} word={data.word} />
         </div>
     )
 }
