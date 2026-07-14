@@ -18,7 +18,7 @@ const kanjiPage = {
 const cumUseGraphPage = {
   href: "/cumulative-use-graph",
   title: "Cumulative Use Graph",
-  description: "Inspect kanji usage vs rank trends across various data sets",
+  description: "Inspect kanji usage vs rank trends",
   Component: CumUseScreen,
 };
 
@@ -49,8 +49,8 @@ const speedKatakanaPage = {
 
 const recognitionPracticeV1Page = {
   href: "/recognition-practice",
-  title: "Recognition Practice (beta)",
-  description: "Practice reading kanji anchor words",
+  title: "Recognition Practice",
+  description: "Type the reading of kanji anchor words",
   Component: RecognitionPracticeV1Screen,
 };
 

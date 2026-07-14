@@ -19,7 +19,7 @@ import {
 } from "./types";
 
 const RecognitionPracticeV1 = () => {
-  useHtmlDocumentTitle("Recognition Practice (beta)");
+  useHtmlDocumentTitle("Recognition Practice");
 
   const [settings] = useLocalStorage<RecognitionPracticeSettings>(
     SETTINGS_KEY,

@@ -23,10 +23,10 @@ const navLinks = [
     Icon: SearchIcon
   },
   {
-    href: cumUseGraphPage.href,
-    title: cumUseGraphPage.title,
-    description: cumUseGraphPage.description,
-    Icon: ChartLine
+    href: recognitionPracticeV1Page.href,
+    title: recognitionPracticeV1Page.title,
+    description: recognitionPracticeV1Page.description,
+    Icon: Eye
   },
   {
     href: speedKatakanaPage.href,
@@ -35,11 +35,12 @@ const navLinks = [
     Icon: Keyboard
   },
   {
-    href: recognitionPracticeV1Page.href,
-    title: recognitionPracticeV1Page.title,
-    description: recognitionPracticeV1Page.description,
-    Icon: Eye
+    href: cumUseGraphPage.href,
+    title: cumUseGraphPage.title,
+    description: cumUseGraphPage.description,
+    Icon: ChartLine
   },
+
 ];
 
 const infoLinks = [
