@@ -12,7 +12,7 @@ import {
 } from "@/lib/practice-commands";
 import { PracticeItem, SessionResult, SoundMode } from "./types";
 import { isReadingCorrect } from "./match-reading";
-import { AnswerFeedbackDrawer } from "./AnswerFeedbackDrawer";
+import { AnswerFeedback } from "./AnswerFeedback";
 
 export const Game = ({
   sessionItems,
@@ -89,8 +89,6 @@ export const Game = ({
 
   const openFeedback = (correct: boolean) => {
     if (feedback != null) return;
-    // Dismiss the mobile keyboard so the feedback sheet can use the full
-    // viewport; the top-anchored layout below keeps this from shoving content.
     inputRef.current?.blur();
     const result: SessionResult = { ...current, correct };
     resultsRef.current = [...resultsRef.current, result];
@@ -145,7 +143,7 @@ export const Game = ({
   };
 
   return (
-    <div className="relative flex flex-col w-full h-full gap-5 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+    <div className="flex flex-col w-full h-full gap-5 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
       {/*
         Touch layout: keep the prompt + input as a top-anchored cluster with a
         fixed gap. A bottom spacer absorbs visual-viewport height changes so
@@ -179,81 +177,95 @@ export const Game = ({
           </p>
         </div>
 
-        <button
-          type="button"
-          className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
-            glossBlurred ? "blur-[5px] hover:blur-none" : ""
-          }`}
-          onClick={() => setGlossBlurred((v) => !v)}
-          aria-label={
-            glossBlurred ? "Reveal English gloss" : "Blur English gloss"
-          }
-        >
-          {current.englishGloss || "—"}
-        </button>
+        {feedback == null ? (
+          <button
+            type="button"
+            className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
+              glossBlurred ? "blur-[5px] hover:blur-none" : ""
+            }`}
+            onClick={() => setGlossBlurred((v) => !v)}
+            aria-label={
+              glossBlurred ? "Reveal English gloss" : "Blur English gloss"
+            }
+          >
+            {current.englishGloss || "—"}
+          </button>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0 md:pb-0">
-        <Input
-          ref={inputRef}
-          value={inputValue}
-          autoFocus
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          spellCheck={false}
-          disabled={feedback != null}
-          aria-label='Type the reading or type "forgot"'
-          placeholder='Type the reading or type "forgot"'
-          className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font"
-          onKeyDown={handleKeyDown}
-          onCompositionStart={() => {
-            isComposingRef.current = true;
-            suppressNextChangeRef.current = false;
-          }}
-          onCompositionEnd={(e) => {
-            isComposingRef.current = false;
-            suppressNextChangeRef.current = true;
-            setTimeout(() => {
-              suppressNextChangeRef.current = false;
-            }, 0);
-            handleChange(e.currentTarget.value);
-          }}
-          onChange={(e) => {
-            const raw = e.target.value;
-            const composing =
-              "isComposing" in e.nativeEvent &&
-              (e.nativeEvent as InputEvent).isComposing;
-            if (isComposingRef.current || composing) {
-              setInputValue(raw);
-              return;
-            }
-            if (suppressNextChangeRef.current) {
-              suppressNextChangeRef.current = false;
-              return;
-            }
-            handleChange(raw);
-          }}
-        />
+        {feedback == null ? (
+          <>
+            <Input
+              ref={inputRef}
+              value={inputValue}
+              autoFocus
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
+              aria-label='Type the reading or type "forgot"'
+              placeholder='Type the reading or type "forgot"'
+              className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font"
+              onKeyDown={handleKeyDown}
+              onCompositionStart={() => {
+                isComposingRef.current = true;
+                suppressNextChangeRef.current = false;
+              }}
+              onCompositionEnd={(e) => {
+                isComposingRef.current = false;
+                suppressNextChangeRef.current = true;
+                setTimeout(() => {
+                  suppressNextChangeRef.current = false;
+                }, 0);
+                handleChange(e.currentTarget.value);
+              }}
+              onChange={(e) => {
+                const raw = e.target.value;
+                const composing =
+                  "isComposing" in e.nativeEvent &&
+                  (e.nativeEvent as InputEvent).isComposing;
+                if (isComposingRef.current || composing) {
+                  setInputValue(raw);
+                  return;
+                }
+                if (suppressNextChangeRef.current) {
+                  suppressNextChangeRef.current = false;
+                  return;
+                }
+                handleChange(raw);
+              }}
+            />
 
-        <div className="grid grid-cols-2 gap-2">
-          <PracticeButton
-            variant="danger"
-            size="md"
-            disabled={feedback != null || matched}
-            onClick={() => openFeedback(false)}
-          >
-            Forgot
-          </PracticeButton>
-          <PracticeButton
-            variant="primary"
-            size="md"
-            disabled={!matched || feedback != null}
-            onClick={() => openFeedback(true)}
-          >
-            Next
-          </PracticeButton>
-        </div>
+            <div className="grid grid-cols-2 gap-2">
+              <PracticeButton
+                variant="danger"
+                size="md"
+                disabled={matched}
+                onClick={() => openFeedback(false)}
+              >
+                Forgot
+              </PracticeButton>
+              <PracticeButton
+                variant="primary"
+                size="md"
+                disabled={!matched}
+                onClick={() => openFeedback(true)}
+              >
+                Next
+              </PracticeButton>
+            </div>
+          </>
+        ) : (
+          <AnswerFeedback
+            key={`${index}-${feedback}`}
+            correct={feedback === "correct"}
+            reading={current.reading}
+            word={current.word}
+            englishGloss={current.englishGloss}
+            onNext={advanceFromFeedback}
+          />
+        )}
       </div>
 
       {/*
@@ -264,15 +276,6 @@ export const Game = ({
       <div
         className="flex-1 min-h-0 [@media(pointer:fine)]:hidden md:hidden [@media(min-height:900px)]:hidden"
         aria-hidden="true"
-      />
-
-      <AnswerFeedbackDrawer
-        open={feedback != null}
-        correct={feedback === "correct"}
-        reading={current.reading}
-        word={current.word}
-        englishGloss={current.englishGloss}
-        onNext={advanceFromFeedback}
       />
     </div>
   );
