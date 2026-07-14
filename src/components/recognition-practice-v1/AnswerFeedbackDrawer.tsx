@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
@@ -25,12 +25,12 @@ export const AnswerFeedbackDrawer = ({
     .map((r) => r.trim())
     .filter(Boolean);
 
-  // Pick once when the drawer opens for this result
-  const cheer = useMemo(
-    () => (correct ? pickCorrectCheer() : pickForgotCheer()),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh cheer whenever drawer opens
-    [open, correct, word]
-  );
+  const [cheer, setCheer] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setCheer(correct ? pickCorrectCheer() : pickForgotCheer());
+  }, [open, correct]);
 
   useEffect(() => {
     if (!open) return;
