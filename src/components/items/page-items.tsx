@@ -7,6 +7,10 @@ import {
   SpeedKatakanaScreen,
 } from "@/components/screens";
 import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
+import {
+  recognitionPracticePageMeta,
+  speedKatakanaPageMeta,
+} from "@/components/items/practice-pages";
 
 const kanjiPage = {
   href: "/",
@@ -41,16 +45,12 @@ const privacyPage = {
 };
 
 const speedKatakanaPage = {
-  href: "/speed-katakana",
-  title: "Speed Katakana",
-  description: "Practice speed typing katakana words",
+  ...speedKatakanaPageMeta,
   Component: SpeedKatakanaScreen,
 };
 
 const recognitionPracticeV1Page = {
-  href: "/recognition-practice",
-  title: "Recognition Practice",
-  description: "Type the reading of kanji anchor words",
+  ...recognitionPracticePageMeta,
   Component: RecognitionPracticeV1Screen,
 };
 
