@@ -5,12 +5,10 @@ import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { PracticeHeader } from "@/components/site-layout/PracticeHeader";
-import { shuffle } from "@/lib/utils";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { EndSession } from "./EndSession";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
-import { withFreshFonts } from "./build-deck";
 import {
   Phase,
   PracticeItem,
@@ -32,6 +30,8 @@ const RecognitionPracticeV1 = () => {
   const [sessionItems, setSessionItems] = useState<PracticeItem[]>([]);
   const [sessionKey, setSessionKey] = useState(0);
   const [results, setResults] = useState<SessionResult[] | null>(null);
+  const [runResults, setRunResults] = useState<SessionResult[]>([]);
+  const [hasMore, setHasMore] = useState(true);
   const setOpenedKanji = useSetOpenedParam();
 
   const viewport = useVisualViewport();
@@ -56,6 +56,8 @@ const RecognitionPracticeV1 = () => {
   const goToInitial = () => {
     setProgress(0);
     setResults(null);
+    setRunResults([]);
+    setHasMore(true);
     setDeck([]);
     setCursor(0);
     setSessionItems([]);
@@ -65,16 +67,25 @@ const RecognitionPracticeV1 = () => {
   const startGame = (builtDeck: PracticeItem[]) => {
     primerRef.current?.focus();
     setDeck(builtDeck);
+    setRunResults([]);
+    setHasMore(true);
     const chunk = builtDeck.slice(0, SESSION_SIZE);
     beginPlaying(chunk, chunk.length);
   };
 
   const finishSession = (sessionResults: SessionResult[]) => {
+    const forgottens = sessionResults.filter((r) => !r.correct);
+    const moreLeft = forgottens.length > 0 || cursor < deck.length;
+
+    setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
+    setHasMore(moreLeft);
+    if (!moreLeft) setProgress(100);
     setPhase("ended");
   };
 
   const startNextSession = () => {
+    if (!hasMore) return;
     primerRef.current?.focus();
 
     const forgottens = (results ?? [])
@@ -91,28 +102,18 @@ const RecognitionPracticeV1 = () => {
           }) satisfies PracticeItem
       );
 
-    let workingDeck = deck;
-    let workingCursor = cursor;
-
-    if (workingCursor >= workingDeck.length && forgottens.length === 0) {
-      workingDeck = withFreshFonts(shuffle([...deck]), settings.randomizeFont);
-      workingCursor = 0;
-      setDeck(workingDeck);
-    }
-
-    const remaining = workingDeck.slice(workingCursor);
-    let pool = [...forgottens, ...remaining];
-
+    const remaining = deck.slice(cursor);
+    const pool = [...forgottens, ...remaining];
     if (pool.length === 0) {
-      workingDeck = withFreshFonts(shuffle([...deck]), settings.randomizeFont);
-      setDeck(workingDeck);
-      pool = workingDeck;
-      workingCursor = 0;
+      // Nothing left — treat as complete rather than looping forever.
+      setHasMore(false);
+      setPhase("ended");
+      return;
     }
 
     const chunk = pool.slice(0, SESSION_SIZE);
     const fromRemaining = Math.max(0, chunk.length - forgottens.length);
-    beginPlaying(chunk, workingCursor + fromRemaining);
+    beginPlaying(chunk, cursor + fromRemaining);
   };
 
   return (
@@ -141,9 +142,7 @@ const RecognitionPracticeV1 = () => {
               <Game
                 sessionItems={sessionItems}
                 blurEnglishGloss={settings.blurEnglishGloss}
-                sound={
-                  settings.sound ?? { enabled: true, type: "correct" }
-                }
+                sound={settings.sound ?? { enabled: true, type: "correct" }}
                 onProgress={setProgress}
                 onComplete={finishSession}
               />
@@ -151,9 +150,11 @@ const RecognitionPracticeV1 = () => {
           )}
 
           {phase === "ended" && results && (
-            <div key="ended" className="h-full animate-fade-in">
+            <div key={hasMore ? "ended" : "complete"} className="h-full animate-fade-in">
               <EndSession
-                results={results}
+                results={hasMore ? results : runResults}
+                hasMore={hasMore}
+                wordsCleared={deck.length}
                 onNext={startNextSession}
                 onEnd={goToInitial}
               />

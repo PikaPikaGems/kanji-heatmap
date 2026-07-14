@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { LogOut, SkipForward } from "lucide-react";
 import { translateValue, tryConvertRomaji } from "@/lib/wanakana-adapter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
@@ -243,27 +245,30 @@ export const Game = ({
   return (
     <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center  animate-fade-in-fast">
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
-        <div className="pt-4">
-          <button
-            className="mx-3 text-xs font-bold tracking-wide text-red-500 underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70"
+        <div className="flex items-center justify-center gap-1 pt-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
             tabIndex={-1}
             onClick={handleSkip}
+            aria-label="Skip this word"
           >
-            {`Skip this word`}
-          </button>
-          ·
-          <span className="px-3 pt-6 pb-1 text-xs font-bold rounded-full">
+            <SkipForward />
+          </Button>
+          <span className="px-2 text-xs font-bold tabular-nums">
             {index + 1} / {words.length}
           </span>
-
-          <span>·</span>
-          <button
-            className="mx-3 text-xs font-bold tracking-wide underline transition-opacity decoration-dotted underline-offset-4 hover:opacity-70 text-muted-foreground"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground"
             tabIndex={-1}
             onClick={onEnd}
+            aria-label="End session"
           >
-            {`End Session`}
-          </button>
+            <LogOut />
+          </Button>
         </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
