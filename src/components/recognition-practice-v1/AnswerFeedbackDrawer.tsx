@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { Drawer as DrawerPrimitive } from "vaul";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { pickCorrectCheer, pickForgotCheer } from "@/lib/practice-cheers";
 
+/**
+ * Inline feedback sheet for recognition practice.
+ *
+ * Rendered inside the visual-viewport-pinned game shell (not a portaled
+ * bottom drawer) so it lays out with the same keyboard-safe area as the game.
+ */
 export const AnswerFeedbackDrawer = ({
   open,
   correct,
@@ -59,56 +64,45 @@ export const AnswerFeedbackDrawer = ({
     };
   }, [open, onNext]);
 
-  return (
-    <DrawerPrimitive.Root
-      open={open}
-      dismissible={false}
-      // Non-modal: practice UI is already viewport-pinned; avoids body
-      // scrollbar lock/unlock that causes a delayed horizontal layout shift.
-      modal={false}
-      shouldScaleBackground={false}
-    >
-      <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
-        <DrawerPrimitive.Content
-          className={`fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-3xl border-2 border-t-4 [border-top-style:dashed] bg-background outline-none ${correct ? "border-green-500/50" : ""
-            }`}
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onInteractOutside={(e) => e.preventDefault()}
-        >
-          <DrawerPrimitive.Title className="sr-only">
-            {correct ? "Correct" : "Forgot"}
-          </DrawerPrimitive.Title>
-          <DrawerPrimitive.Description className="sr-only">
-            Reading feedback for {word}
-          </DrawerPrimitive.Description>
+  if (!open) return null;
 
-          <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <p
-              key={cheer}
-              className={`animate-practice-bounce-soft  text-lg font-bold tracking-wide kanji-font animate-practice-pop ${correct ? "text-green-500" : "text-muted-foreground"
-                }`}
-            >
-              {correct ? "🥳" : ""} {cheer}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-1 animate-fade-in-fast">
-              <SpeakButton word={word} iconType="volume-2" />
-              {readings.map((r) => (
-                <RomajiBadge key={r} kana={r} />
-              ))}
-              <p className="text-xl font-bold kanji-font">· {word}</p>
-            </div>
-            {englishGloss && englishGloss.length > 0 ? (
-              <p className="max-w-sm text-sm text-center text-muted-foreground animate-fade-in-fast">
-                {englishGloss}
-              </p>
-            ) : null}
-            <PracticeButton size="lg" className="max-w-xs" onClick={onNext}>
-              Continue
-            </PracticeButton>
+  return (
+    <div className="absolute inset-0 z-50 flex flex-col justify-end animate-fade-in-fast">
+      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={correct ? "Correct" : "Forgot"}
+        className={`relative z-10 flex flex-col rounded-t-3xl border-2 border-t-4 [border-top-style:dashed] bg-background outline-none animate-practice-pop ${
+          correct ? "border-green-500/50" : ""
+        }`}
+      >
+        <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <p
+            key={cheer}
+            className={`animate-practice-bounce-soft text-lg font-bold tracking-wide kanji-font animate-practice-pop ${
+              correct ? "text-green-500" : "text-muted-foreground"
+            }`}
+          >
+            {correct ? "🥳" : ""} {cheer}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1 animate-fade-in-fast">
+            <SpeakButton word={word} iconType="volume-2" />
+            {readings.map((r) => (
+              <RomajiBadge key={r} kana={r} />
+            ))}
+            <p className="text-xl font-bold kanji-font">· {word}</p>
           </div>
-        </DrawerPrimitive.Content>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+          {englishGloss && englishGloss.length > 0 ? (
+            <p className="max-w-sm text-sm text-center text-muted-foreground animate-fade-in-fast">
+              {englishGloss}
+            </p>
+          ) : null}
+          <PracticeButton size="lg" className="max-w-xs" onClick={onNext}>
+            Continue
+          </PracticeButton>
+        </div>
+      </div>
+    </div>
   );
 };

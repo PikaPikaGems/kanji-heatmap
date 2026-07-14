@@ -89,6 +89,9 @@ export const Game = ({
 
   const openFeedback = (correct: boolean) => {
     if (feedback != null) return;
+    // Dismiss the mobile keyboard so the feedback sheet can use the full
+    // viewport; the top-anchored layout below keeps this from shoving content.
+    inputRef.current?.blur();
     const result: SessionResult = { ...current, correct };
     resultsRef.current = [...resultsRef.current, result];
     if (correct) playCorrectFeedback();
@@ -142,8 +145,13 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full gap-3 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
-      <div className="flex flex-col items-center justify-start flex-1 min-h-0 gap-3 px-4 pt-2 text-center [@media(pointer:fine)]:flex-none [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:pt-8 md:flex-none md:justify-center md:pt-8 [@media(min-height:900px)]:flex-none [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:pt-8">
+    <div className="relative flex flex-col w-full h-full gap-5 animate-fade-in [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+      {/*
+        Touch layout: keep the prompt + input as a top-anchored cluster with a
+        fixed gap. A bottom spacer absorbs visual-viewport height changes so
+        the keyboard opening/closing does not shove content around.
+      */}
+      <div className="flex flex-col items-center shrink-0 gap-3 px-4 pt-2 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
         <div className="flex items-center justify-center [@media(pointer:fine)]:translate-y-4 md:translate-y-4">
           <Button
             variant="ghost"
@@ -162,8 +170,8 @@ export const Game = ({
             current.fontIndex === null
               ? undefined
               : {
-                fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
-              }
+                  fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
+                }
           }
         >
           <p className="text-6xl leading-tight break-all md:text-8xl whitespace-nowrap">
@@ -173,8 +181,9 @@ export const Game = ({
 
         <button
           type="button"
-          className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${glossBlurred ? "blur-[5px] hover:blur-none" : ""
-            }`}
+          className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
+            glossBlurred ? "blur-[5px] hover:blur-none" : ""
+          }`}
           onClick={() => setGlossBlurred((v) => !v)}
           aria-label={
             glossBlurred ? "Reveal English gloss" : "Blur English gloss"
@@ -246,6 +255,16 @@ export const Game = ({
           </PracticeButton>
         </div>
       </div>
+
+      {/*
+        Bottom spacer on coarse-pointer / short screens only. Height changes
+        from the on-screen keyboard are absorbed here instead of stretching
+        the gap between the gloss and the input.
+      */}
+      <div
+        className="flex-1 min-h-0 [@media(pointer:fine)]:hidden md:hidden [@media(min-height:900px)]:hidden"
+        aria-hidden="true"
+      />
 
       <AnswerFeedbackDrawer
         open={feedback != null}
