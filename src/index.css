@@ -172,20 +172,11 @@ button {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 100;
-  }
+  animation: fade-in 0.5s ease-out;
 }
 
 .animate-fade-in-fast {
-  animation: fade-in 0.2s;
+  animation: fade-in 0.2s ease-out;
 }
 
 @keyframes fade-in {
@@ -193,21 +184,12 @@ button {
     opacity: 0;
   }
   to {
-    opacity: 100;
+    opacity: 1;
   }
 }
 
 @theme {
   --animate-fade-in: fade-in 1s ease-out forwards;
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
 }
 
 .animate-english-flash {
