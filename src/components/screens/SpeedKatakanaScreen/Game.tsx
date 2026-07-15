@@ -18,7 +18,7 @@ import {
 } from "./types";
 import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
 import { shuffle } from "@/lib/utils";
-import { ArrowRightFromLine, CircleArrowLeft } from "lucide-react";
+import { CircleArrowLeft } from "lucide-react";
 
 type GameWord = {
   katakana: string;
@@ -243,7 +243,7 @@ export const Game = ({
   };
 
   return (
-    <div className="relative flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
+    <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
       <Button
         variant="ghost"
         size="icon"
@@ -260,16 +260,13 @@ export const Game = ({
           <span className="px-2 text-xs font-bold tabular-nums">
             {index + 1} / {words.length}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-red-500 opacity-70 hover:opacity-100 hover:text-red-500 hover:bg-opacity-0"
+          <button
+            className="text-xs font-bold tracking-wide text-red-500 transition-opacity -translate-y-[0.5px] hover:opacity-70"
             tabIndex={-1}
             onClick={handleSkip}
-            aria-label="Skip this word"
           >
-            <ArrowRightFromLine />
-          </Button>
+            {`>>`}
+          </button>
         </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
