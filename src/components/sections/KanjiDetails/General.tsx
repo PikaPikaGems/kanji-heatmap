@@ -15,6 +15,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { jitenMoeFn, jpdbFn, kanshudoFn } from "@/lib/external-links";
+import { orderDisclaimer } from "@/lib/options/options-label-maps";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -53,8 +54,8 @@ export const BareGeneral = ({ kanji }: { kanji: string }) => {
       </div>
     </>
   )
-
 }
+
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
 
@@ -91,21 +92,21 @@ export const General = ({ kanji }: { kanji: string }) => {
           <PrimaryBadgeWithPopover
             label="WK"
             value={data.wk!}
-            description="The kanji's corresponding level in the WaniKani learning system."
+            description={orderDisclaimer}
           />
         )}
         {hasData(data.rtk) && (
           <PrimaryBadgeWithPopover
-            label="RTK"
+            label="RTKA"
             value={data.rtk!}
-            description="The kanji's entry number in Remembering the Kanji (RTK) by James Heisig."
+            description={orderDisclaimer}
           />
         )}
         {hasData(data.kklcIndex) && (
           <PrimaryBadgeWithPopover
             label="KKLC"
             value={data.kklcIndex!}
-            description="The kanji's entry number in the Kodansha Kanji Learner's Course (KKLC)."
+            description={orderDisclaimer}
           />
         )}
         <JLPTBadge jlpt={data.jlpt} />

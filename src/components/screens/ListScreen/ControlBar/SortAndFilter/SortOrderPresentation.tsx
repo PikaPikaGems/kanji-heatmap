@@ -17,21 +17,16 @@ export const SortAdditionalInfo = ({
   const v1 = val1 && val1 !== "none" ? SORT_OPTION_LABELS[val1] : null;
   const v2 = val2 && v1 && val2 !== "none" ? SORT_OPTION_LABELS[val2] : null;
 
-  return (
-    <>
-      {v1 && v2 && (
-        <>
-          <div className="m-2">*** Order By</div> <Badge>{v1}</Badge>
-        </>
-      )}
+  if (!v1 || !v2) {
+    return null;
+  }
 
-      {v2 && (
-        <>
-          <div className="m-2">Then By</div>
-          <Badge>{v2} </Badge>
-        </>
-      )}
-    </>
+  return (
+    <div className="flex animate-fade-in">
+      <div className="m-2">Order By</div> <Badge>{v1}</Badge>
+      <div className="m-2">Then By</div>
+      <Badge>{v2} </Badge>
+    </div>
   );
 };
 
@@ -47,7 +42,7 @@ export const SortOrderSectionLayout = ({
   return (
     <section className="flex flex-col">
       <UppercaseHeading
-        title="Sort Order ***"
+        title="Sort Order"
         icon={<ArrowDownWideNarrow size={15} />}
       />
       <section className="flex flex-col w-full space-x-0 space-y-2 text-left md:space-y-0 md:flex-row md:space-x-2">

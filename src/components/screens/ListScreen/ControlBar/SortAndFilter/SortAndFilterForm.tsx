@@ -30,6 +30,10 @@ import {
   defaultSortSettings,
 } from "@/lib/settings/search-settings-adapter";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
+import {
+  isCommunityOrder,
+  orderDisclaimer,
+} from "@/lib/options/options-label-maps";
 
 export const SortAndFilterSettingsForm = ({
   initialValue,
@@ -99,13 +103,26 @@ export const SortAndFilterSettingsForm = ({
                 options={SORT_ORDER_SELECT}
                 label="Primary"
               />
-              <FreqRankTypeInfo value={sortValues.primary} defaultValue={null} />
+              <div key={sortValues.primary} className="animate-fade-in">
+                <FreqRankTypeInfo
+                  value={sortValues.primary}
+                  defaultValue={null}
+                />
+              </div>
+              {isCommunityOrder(sortValues.primary) && (
+                <div
+                  key={`disclaimer-${sortValues.primary}`}
+                  className="text-xs mt-1 text-left px-3 animate-fade-in"
+                >
+                  {orderDisclaimer}
+                </div>
+              )}
             </>
           }
           secondaryField={
             sortValues.secondary &&
             isGroup && (
-              <>
+              <div className="animate-fade-in">
                 <ResponsiveSelect
                   value={sortValues.secondary}
                   onChange={(newValue) =>
@@ -118,15 +135,26 @@ export const SortAndFilterSettingsForm = ({
                   })}
                   label="Secondary"
                 />
-                <FreqRankTypeInfo
-                  value={sortValues.secondary}
-                  defaultValue={null}
-                />
-              </>
+                <div key={sortValues.secondary} className="animate-fade-in">
+                  <FreqRankTypeInfo
+                    value={sortValues.secondary}
+                    defaultValue={null}
+                  />
+                </div>
+                {isCommunityOrder(sortValues.secondary) && (
+                  <div
+                    key={`disclaimer-${sortValues.secondary}`}
+                    className="text-xs mt-1 text-left px-3 animate-fade-in"
+                  >
+                    {orderDisclaimer}
+                  </div>
+                )}
+              </div>
             )
           }
           additionalInfo={
             <SortAdditionalInfo
+              key={`${sortValues.primary}-${sortValues.secondary}`}
               val1={sortValues.primary}
               val2={sortValues.secondary}
             />
@@ -185,26 +213,28 @@ export const SortAndFilterSettingsForm = ({
           }
           freqRankRangeField={
             filterValues.freq.source !== "none" && (
-              <FrequencyRankingRangeField
-                values={[
-                  filterValues.freq.rankRange.min,
-                  filterValues.freq.rankRange.max,
-                ]}
-                setValues={(val) => {
-                  setFilterValues((prev) => {
-                    return {
-                      ...prev,
-                      freq: {
-                        ...prev.freq,
-                        rankRange: {
-                          min: val[0] ?? 1,
-                          max: val[1] ?? MAX_FREQ_RANK,
+              <div className="animate-fade-in">
+                <FrequencyRankingRangeField
+                  values={[
+                    filterValues.freq.rankRange.min,
+                    filterValues.freq.rankRange.max,
+                  ]}
+                  setValues={(val) => {
+                    setFilterValues((prev) => {
+                      return {
+                        ...prev,
+                        freq: {
+                          ...prev.freq,
+                          rankRange: {
+                            min: val[0] ?? 1,
+                            max: val[1] ?? MAX_FREQ_RANK,
+                          },
                         },
-                      },
-                    };
-                  });
-                }}
-              />
+                      };
+                    });
+                  }}
+                />
+              </div>
             )
           }
         />

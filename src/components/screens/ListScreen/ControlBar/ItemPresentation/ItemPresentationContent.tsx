@@ -49,7 +49,7 @@ const BackgroundColorSection = () => {
         }}
       />
       {shouldAttachMeaning && (
-        <>
+        <div className="animate-fade-in">
           <FreqGradient />
           <FrequencyRankDataSource
             value={initialState}
@@ -57,7 +57,7 @@ const BackgroundColorSection = () => {
               dispatch(v as FrequencyType);
             }}
           />
-        </>
+        </div>
       )}
     </>
   );
@@ -88,8 +88,16 @@ const CardStateSettings = () => {
           { value: "none", label: "None" },
         ]}
       />
-      {cardState.borderColorMeaning === "jlpt" && <JLPTBordersMeanings />}
-      {cardState.borderColorMeaning === "study-status" && <StudyStatusBorderMeanings />}
+      {cardState.borderColorMeaning === "jlpt" && (
+        <div key="jlpt" className="animate-fade-in">
+          <JLPTBordersMeanings />
+        </div>
+      )}
+      {cardState.borderColorMeaning === "study-status" && (
+        <div key="study-status" className="animate-fade-in">
+          <StudyStatusBorderMeanings />
+        </div>
+      )}
     </>
   );
 };

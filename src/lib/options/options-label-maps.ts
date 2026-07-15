@@ -40,11 +40,23 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_JLPT]: "JLPT",
   [K_JOUYOU_KEY]: "Jouyou Grade",
   [K_STROKES]: "Stroke Count",
-  [K_WK_LVL]: "(WK) WaniKani Level",
-  [K_RTK_INDEX]: "(RTK) James W. Heisig's Remembering the Kanji Index",
+  [K_WK_LVL]: "WK",
+  [K_RTK_INDEX]: "RTKA",
   [K_MEANING_KEY]: "Keyword",
-  [K_KKLC_INDEX]: "(KKLC) The Kodansha Kanji Learner's Course",
+  [K_KKLC_INDEX]: "KKLC",
 };
+
+export const orderDisclaimer =
+  "⚠️ Community-based orders (WK, KKLC, RTKA, RTKB) are provided for convenience only. They may differ from official editions. For accuracy, please refer to the original books or apps.";
+
+export const COMMUNITY_ORDER_KEYS = [
+  K_WK_LVL,
+  K_KKLC_INDEX,
+  K_RTK_INDEX,
+] as const;
+
+export const isCommunityOrder = (key: string) =>
+  (COMMUNITY_ORDER_KEYS as readonly string[]).includes(key);
 
 export const freqMap: Record<
   FrequencyType,
