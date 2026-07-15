@@ -1,76 +1,47 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
+import { warmupDaKanji } from "@/lib/dakanji-adapter";
 import { InitialScreen } from "./InitialScreen";
+import { ModelLoadingScreen } from "./ModelLoadingScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import {
   Phase,
   PracticeItem,
-  RecognitionPracticeSettings,
+  ProductionPracticeSettings,
   SessionResult,
 } from "./types";
 
-const RecognitionPracticeV1 = () => {
-  useHtmlDocumentTitle("Kanji Recognition");
+const ProductionPracticeV1 = () => {
+  useHtmlDocumentTitle("Kanji Production");
 
-  const [settings] = useLocalStorage<RecognitionPracticeSettings>(
+  const [settings] = useLocalStorage<ProductionPracticeSettings>(
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
   const [phase, setPhase] = useState<Phase>("initial");
+  const [loadStatus, setLoadStatus] = useState<"loading" | "error">("loading");
   const [progress, setProgress] = useState(0);
   const [deck, setDeck] = useState<PracticeItem[]>([]);
+  const [randomKanjiPool, setRandomKanjiPool] = useState<string[]>([]);
   const [cursor, setCursor] = useState(0);
   const [sessionItems, setSessionItems] = useState<PracticeItem[]>([]);
   const [sessionKey, setSessionKey] = useState(0);
   const [results, setResults] = useState<SessionResult[] | null>(null);
   const [runResults, setRunResults] = useState<SessionResult[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [modelReady, setModelReady] = useState(false);
   const setOpenedKanji = useSetOpenedParam();
 
-  const viewport = useVisualViewport();
-  const primerRef = useRef<HTMLInputElement | null>(null);
-
-  // Kanji details drawer only on end screen; clear open param when leaving ended
   useEffect(() => {
     if (phase !== "ended") {
       setOpenedKanji(null);
     }
   }, [phase, setOpenedKanji]);
-
-  // Keep the play shell pinned to the layout top. Chasing visualViewport.offsetTop
-  // while iOS animates the keyboard makes the whole UI bob; "/" doesn't do that
-  // because ListScreen isn't viewport-pinned at all.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const lockScroll = () => {
-      if (window.scrollY !== 0) window.scrollTo(0, 0);
-    };
-
-    vv.addEventListener("scroll", lockScroll);
-    vv.addEventListener("resize", lockScroll);
-    lockScroll();
-    return () => {
-      vv.removeEventListener("scroll", lockScroll);
-      vv.removeEventListener("resize", lockScroll);
-    };
-  }, []);
-
-  const beginPlaying = (items: PracticeItem[], nextCursor: number) => {
-    setSessionItems(items);
-    setCursor(nextCursor);
-    setSessionKey((k) => k + 1);
-    setProgress(0);
-    setResults(null);
-    setPhase("playing");
-  };
 
   const goToInitial = () => {
     setProgress(0);
@@ -78,18 +49,58 @@ const RecognitionPracticeV1 = () => {
     setRunResults([]);
     setHasMore(true);
     setDeck([]);
+    setRandomKanjiPool([]);
     setCursor(0);
     setSessionItems([]);
+    setLoadStatus("loading");
     setPhase("initial");
   };
 
+  const warmAndPlay = async (
+    items: PracticeItem[],
+    nextCursor: number,
+    builtDeck?: PracticeItem[]
+  ) => {
+    if (builtDeck) {
+      setDeck(builtDeck);
+      setRandomKanjiPool(builtDeck.map((item) => item.kanji));
+    }
+    setSessionItems(items);
+    setCursor(nextCursor);
+    setSessionKey((k) => k + 1);
+    setProgress(0);
+    setResults(null);
+
+    if (modelReady) {
+      setPhase("playing");
+      return;
+    }
+
+    setLoadStatus("loading");
+    setPhase("loading");
+    try {
+      await warmupDaKanji();
+      setModelReady(true);
+      setPhase("playing");
+    } catch {
+      setLoadStatus("error");
+    }
+  };
+
   const startGame = (builtDeck: PracticeItem[]) => {
-    primerRef.current?.focus();
-    setDeck(builtDeck);
     setRunResults([]);
     setHasMore(true);
     const chunk = builtDeck.slice(0, SESSION_SIZE);
-    beginPlaying(chunk, chunk.length);
+    void warmAndPlay(chunk, chunk.length, builtDeck);
+  };
+
+  const retryWarmup = () => {
+    const items = sessionItems;
+    if (items.length === 0) {
+      goToInitial();
+      return;
+    }
+    void warmAndPlay(items, cursor);
   };
 
   const finishSession = (sessionResults: SessionResult[]) => {
@@ -105,7 +116,6 @@ const RecognitionPracticeV1 = () => {
 
   const startNextSession = () => {
     if (!hasMore) return;
-    primerRef.current?.focus();
 
     const forgottens = (results ?? [])
       .filter((r) => !r.correct)
@@ -124,7 +134,6 @@ const RecognitionPracticeV1 = () => {
     const remaining = deck.slice(cursor);
     const pool = [...forgottens, ...remaining];
     if (pool.length === 0) {
-      // Nothing left — treat as complete rather than looping forever.
       setHasMore(false);
       setPhase("ended");
       return;
@@ -132,26 +141,25 @@ const RecognitionPracticeV1 = () => {
 
     const chunk = pool.slice(0, SESSION_SIZE);
     const fromRemaining = Math.max(0, chunk.length - forgottens.length);
-    beginPlaying(chunk, cursor + fromRemaining);
+    void warmAndPlay(chunk, cursor + fromRemaining);
   };
 
   return (
     <>
-      <input
-        ref={primerRef}
-        className="sr-only"
-        aria-hidden="true"
-        tabIndex={-1}
-        autoComplete="off"
-      />
-      <PracticeShell
-        progress={progress}
-        playing={phase === "playing"}
-        height={viewport.height}
-      >
+      <PracticeShell progress={progress} playing={phase === "playing"}>
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
             <InitialScreen onStart={startGame} />
+          </div>
+        )}
+
+        {phase === "loading" && (
+          <div key="loading" className="h-full animate-fade-in">
+            <ModelLoadingScreen
+              status={loadStatus}
+              onRetry={retryWarmup}
+              onCancel={goToInitial}
+            />
           </div>
         )}
 
@@ -159,7 +167,8 @@ const RecognitionPracticeV1 = () => {
           <div key={`playing-${sessionKey}`} className="h-full animate-fade-in">
             <Game
               sessionItems={sessionItems}
-              sound={settings.sound ?? { enabled: true, type: "correct" }}
+              settings={settings}
+              randomKanjiPool={randomKanjiPool}
               onProgress={setProgress}
               onComplete={finishSession}
               onEnd={goToInitial}
@@ -188,4 +197,4 @@ const RecognitionPracticeV1 = () => {
   );
 };
 
-export default RecognitionPracticeV1;
+export default ProductionPracticeV1;

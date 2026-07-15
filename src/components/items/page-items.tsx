@@ -7,22 +7,24 @@ import {
   SpeedKatakanaScreen,
 } from "@/components/screens";
 import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
+import { ProductionPracticeV1Screen } from "@/components/production-practice-v1";
 import {
   recognitionPracticePageMeta,
+  productionPracticePageMeta,
   speedKatakanaPageMeta,
 } from "@/components/items/practice-pages";
+import {
+  cumUseGraphPageMeta,
+  exploreKanjiPageMeta,
+} from "@/components/items/nav-links";
 
 const kanjiPage = {
-  href: "/",
-  title: "Explore Kanji",
+  ...exploreKanjiPageMeta,
   Component: ListScreen,
-  description: "Advanced search, sort, filter, and usage visualization tool",
 };
 
 const cumUseGraphPage = {
-  href: "/cumulative-use-graph",
-  title: "Cumulative Use Graph",
-  description: "Inspect kanji usage vs rank trends",
+  ...cumUseGraphPageMeta,
   Component: CumUseScreen,
 };
 
@@ -54,6 +56,11 @@ const recognitionPracticeV1Page = {
   Component: RecognitionPracticeV1Screen,
 };
 
+const productionPracticeV1Page = {
+  ...productionPracticePageMeta,
+  Component: ProductionPracticeV1Screen,
+};
+
 const pageItems = {
   kanjiPage,
   cumUseGraphPage,
@@ -62,6 +69,7 @@ const pageItems = {
   privacyPage,
   speedKatakanaPage,
   recognitionPracticeV1Page,
+  productionPracticeV1Page,
 };
 
 export default pageItems;

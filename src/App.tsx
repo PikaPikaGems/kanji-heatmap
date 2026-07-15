@@ -24,9 +24,11 @@ const {
   privacyPage,
   speedKatakanaPage,
   recognitionPracticeV1Page,
+  productionPracticeV1Page,
 } = pageItems;
 
 const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
+const ProductionPracticeV1 = productionPracticeV1Page.Component;
 
 const App = () => {
   return (
@@ -51,6 +53,12 @@ const App = () => {
             <Route path={recognitionPracticeV1Page.href}>
               <KanjiFunctionalityProvider>
                 <RecognitionPracticeV1 />
+              </KanjiFunctionalityProvider>
+            </Route>
+            {/* Production (writing) practice needs kanji data, drawer, and ONNX. */}
+            <Route path={productionPracticeV1Page.href}>
+              <KanjiFunctionalityProvider>
+                <ProductionPracticeV1 />
               </KanjiFunctionalityProvider>
             </Route>
             <Route>

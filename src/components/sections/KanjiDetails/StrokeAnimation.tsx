@@ -13,6 +13,8 @@ import {
   Stroke,
 } from "@/components/dependent/DrawingPad";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
+import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
+import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
 import { Rocket } from "lucide-react";
 
@@ -155,31 +157,6 @@ const HintSection = ({ kanji }: { kanji: string }) => {
 
 type GradeStatus = "idle" | "loading" | "success" | "error";
 
-type GradeResult = {
-  rank: number; // 0-based index in top-10, or -1 if missing
-  topGuess: string | null;
-};
-
-const gradeMessage = (kanji: string, result: GradeResult): string => {
-  const { rank, topGuess } = result;
-  if (rank === 0) {
-    return `🎯 Awesome · That's ${kanji}`;
-  }
-  if (rank >= 1 && rank <= 2) {
-    return topGuess
-      ? `💚 Solid · Near miss — a bit like ${topGuess}`
-      : `💚 Solid · Near miss — keep refining`;
-  }
-  if (rank >= 3) {
-    return topGuess
-      ? `🌀 Getting there · Looks more like ${topGuess}`
-      : `🌀 Getting there · Keep refining`;
-  }
-  return topGuess
-    ? `🙈 Not quite · Looks more like ${topGuess}`
-    : `🙈 Not quite · Try again`;
-};
-
 const DAKANJI_CREDIT_HREF =
   "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition";
 
@@ -187,6 +164,13 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [status, setStatus] = useState<GradeStatus>("idle");
   const [result, setResult] = useState<GradeResult | null>(null);
+  const padSize = useFitPadSize(SVG_SIZE);
+
+  useEffect(() => {
+    setStrokes([]);
+    setStatus("idle");
+    setResult(null);
+  }, [padSize]);
 
   const onGrade = async (payload: DrawingSubmitPayload) => {
     if (payload.strokes.length === 0) {
@@ -213,9 +197,9 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-6 animate-fade-in">
+    <div className="flex flex-col items-center gap-3 px-2 pt-4 pb-6 sm:px-4 animate-fade-in">
       <DrawingPad
-        svgSize={SVG_SIZE}
+        svgSize={padSize}
         strokes={strokes}
         setStrokes={setStrokes}
         showSubmitBtn
@@ -226,7 +210,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         onClickClear={onClear}
       />
 
-      <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
+      <div className="w-full max-w-[310px] min-h-10 px-2 text-sm sm:text-base font-bold text-center">
         {status === "loading" && (
           <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
         )}
@@ -261,8 +245,15 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   );
 };
 
-const StrokeAnimationWithPracticeMode = ({ kanji }: { kanji: string }) => {
-  const [practiceMode, setPracticeMode] = useState(false);
+export const StrokeAnimationWithPracticeMode = ({
+  kanji,
+  defaultPracticeMode = false,
+}: {
+  kanji: string;
+  /** When true (e.g. practice modal), start on the drawing pad. */
+  defaultPracticeMode?: boolean;
+}) => {
+  const [practiceMode, setPracticeMode] = useState(defaultPracticeMode);
 
   return (
     <div key={kanji}>
@@ -280,16 +271,24 @@ const StrokeAnimationWithPracticeMode = ({ kanji }: { kanji: string }) => {
             Practice writing
           </label>
 
-          {practiceMode && <div className="absolute px-2 m-4 border border-dashed -right-8 animate-fade-in rounded-2xl -top-10 border-foreground">
-            <HintSection key={kanji} kanji={kanji} />
-          </div>}
+          {practiceMode && (
+            <div className="absolute z-10 px-2 m-4 border border-dashed right-0 sm:-right-8 animate-fade-in rounded-2xl -top-10 border-foreground bg-background/80">
+              <HintSection key={kanji} kanji={kanji} />
+            </div>
+          )}
         </div>
       </div>
-      {practiceMode ? (
-        <WritingPracticeMode kanji={kanji} />
-      ) : (
-        <StrokeAnimation kanji={kanji} />
-      )}
+      {/*
+        Cap min-height to the dialog/viewport so short phones don't get a
+        forced 530px panel (which overflows and feels broken).
+      */}
+      <div className="min-h-[min(530px,calc(90dvh-11rem))]">
+        {practiceMode ? (
+          <WritingPracticeMode kanji={kanji} />
+        ) : (
+          <StrokeAnimation kanji={kanji} />
+        )}
+      </div>
     </div>
   );
 };

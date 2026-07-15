@@ -34,8 +34,11 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & {
+    /** Drag handle pill at the top. Defaults to true. */
+    showHandle?: boolean;
+  }
+>(({ className, children, showHandle = true, ...props }, ref) => (
   <DrawerPortal>
     <DrawerOverlay />
     <DrawerPrimitive.Content
@@ -46,7 +49,9 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="mx-auto my-1 max-h-1 min-h-1 h-1 bg-muted w-[100px] rounded-full bg-theme" />
+      {showHandle ? (
+        <div className="mx-auto my-1 max-h-1 min-h-1 h-1 bg-muted w-[100px] rounded-full bg-theme" />
+      ) : null}
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>

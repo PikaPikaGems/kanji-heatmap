@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { ChartLine, Eye, Keyboard, Menu, SearchIcon, } from "lucide-react";
-import pageItems from "@/components/items/page-items";
+import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
+import { headerNavLinks } from "@/components/items/nav-links";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
-import { DashedNavLink } from "@/components/common/DashedNavLink";
+import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -14,42 +14,11 @@ import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 
-const { kanjiPage, cumUseGraphPage, speedKatakanaPage, recognitionPracticeV1Page } = pageItems;
-
-const navLinks = [
-  {
-    href: kanjiPage.href,
-    title: kanjiPage.title,
-    description: kanjiPage.description,
-    Icon: SearchIcon
-  },
-  {
-    href: recognitionPracticeV1Page.href,
-    title: recognitionPracticeV1Page.title,
-    description: recognitionPracticeV1Page.description,
-    Icon: Eye
-  },
-  {
-    href: speedKatakanaPage.href,
-    title: speedKatakanaPage.title,
-    description: speedKatakanaPage.description,
-    Icon: Keyboard
-  },
-  {
-    href: cumUseGraphPage.href,
-    title: cumUseGraphPage.title,
-    description: cumUseGraphPage.description,
-    Icon: ChartLine
-  },
-
-];
-
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
   { href: docPages.terms.href, title: docPages.terms.title },
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
-
 
 const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -59,20 +28,19 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
           <div onClick={onClose} onPointerDown={(e) => e.stopPropagation()}>
             <HeaderTitle />
           </div>
-          <div onPointerDown={(e) => e.stopPropagation()}><ModeToggle /></div>
+          <div onPointerDown={(e) => e.stopPropagation()}>
+            <ModeToggle />
+          </div>
         </div>
-        {navLinks.map((item) => (
-          <DrawerPrimitive.Close key={item.href} asChild>
-            <DashedNavLink
-              href={item.href}
-              title={item.title}
-              description={item.description}
-              Icon={item.Icon}
-              onPointerDown={(e) => e.stopPropagation()}
-              iconClassName="mt-0 mr-1"
-            />
-          </DrawerPrimitive.Close>
-        ))}
+        <DashedNavLinkList
+          items={headerNavLinks}
+          className="flex flex-col gap-2"
+          iconClassName="mt-0 mr-1"
+          onItemPointerDown={(e) => e.stopPropagation()}
+          wrapItem={(link) => (
+            <DrawerPrimitive.Close asChild>{link}</DrawerPrimitive.Close>
+          )}
+        />
       </div>
 
       <div className="flex flex-wrap justify-center w-full gap-2">
@@ -90,21 +58,22 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
 
         <PikaPikaLinks />
 
-
         <div className="mt-4">
           <div className="flex justify-center space-x-1">
             <LinksOutItems />
           </div>
         </div>
-
       </div>
-      <div className="flex items-end justify-end pt-4 mt-auto" onPointerDown={(e) => e.stopPropagation()}>
+      <div
+        className="flex items-end justify-end pt-4 mt-auto"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         <DebugInfo />
         <RefreshPageBtn />
       </div>
     </div>
-  )
-}
+  );
+};
 
 const HeaderDrawer = ({
   initiallyOpen = false,

@@ -153,6 +153,10 @@ const topKLabels = (probs: Float32Array, labels: string, k: number): string[] =>
   return result;
 };
 
+/** Preload ORT + model + labels so the first recognize call is fast. */
+export const warmupDaKanji = (): Promise<void> =>
+  loadRuntime().then(() => undefined);
+
 export const recognizeDaKanji = async (
   payload: DrawingSubmitPayload
 ): Promise<string[]> => {

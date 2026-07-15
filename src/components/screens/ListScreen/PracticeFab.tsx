@@ -1,28 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Eye, Keyboard, NotebookPen } from "lucide-react";
+import { NotebookPen } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { DashedNavLink } from "@/components/common/DashedNavLink";
-import { practicePageLinks } from "@/components/items/practice-pages";
+import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
+import { practiceNavLinks } from "@/components/items/nav-links";
 import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
 import { cn } from "@/lib/utils";
 
-const practiceLinkIcons = {
-  "/recognition-practice": Eye,
-  "/speed-katakana": Keyboard,
-} as const;
-
-const practiceLinks = practicePageLinks.map((page) => ({
-  ...page,
-  Icon: practiceLinkIcons[page.href],
-}));
-
 const prefetchPracticeRoutes = () => {
   void import("@/components/recognition-practice-v1/RecognitionPracticeV1");
+  void import("@/components/production-practice-v1/ProductionPracticeV1");
   void import("@/components/screens/SpeedKatakanaScreen/SpeedKatakanaScreen");
 };
 
@@ -120,19 +111,11 @@ export const PracticeFab = () => {
         <p className="px-1 mb-2 text-sm font-semibold text-left">
           What do you want to do?
         </p>
-        <div className="flex flex-row gap-2">
-          {practiceLinks.map((item) => (
-            <DashedNavLink
-              key={item.href}
-              href={item.href}
-              title={item.title}
-              description={item.description}
-              Icon={item.Icon}
-              onClick={() => setOpen(false)}
-              className="flex-1"
-            />
-          ))}
-        </div>
+        <DashedNavLinkList
+          items={practiceNavLinks}
+          className="grid grid-cols-2 gap-2"
+          onItemClick={() => setOpen(false)}
+        />
       </PopoverContent>
     </Popover>
   );

@@ -2,7 +2,7 @@ import { JLPTOptionsCount, JLTPTtypes } from "@/lib/jlpt";
 import { isBookmarked } from "@/lib/bookmarks";
 import { shuffle } from "@/lib/utils";
 import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
-import { PracticeItem, RecognitionPracticeSettings } from "./types";
+import { DeckFilterSettings, PracticeItem } from "./types";
 
 type RepEntry = [string, string, string, string];
 
@@ -15,11 +15,10 @@ export const buildPracticeDeck = ({
   repWords: Record<string, RepEntry>;
   getJlpt: (kanji: string) => JLTPTtypes | null;
   getKeyword: (kanji: string) => string;
-  settings: RecognitionPracticeSettings;
+  settings: DeckFilterSettings;
 }): PracticeItem[] => {
   const jlptSet = new Set(settings.jlpt);
-  const applyJlpt =
-    jlptSet.size > 0 && jlptSet.size < JLPTOptionsCount;
+  const applyJlpt = jlptSet.size > 0 && jlptSet.size < JLPTOptionsCount;
 
   const items: PracticeItem[] = [];
 

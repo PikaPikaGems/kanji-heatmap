@@ -1,3 +1,4 @@
+import type { PracticeItem as SharedPracticeItem } from "@/components/shared-practice";
 import { JLTPTtypes } from "@/lib/jlpt";
 
 export type SoundMode = "correct" | "speak";
@@ -10,14 +11,7 @@ export type RecognitionPracticeSettings = {
   sound: { enabled: true; type: SoundMode } | { enabled: false };
 };
 
-export type PracticeItem = {
-  kanji: string;
-  word: string;
-  reading: string;
-  englishGloss: string;
-  keyword: string;
-  fontIndex: number | null;
-};
+export type PracticeItem = SharedPracticeItem;
 
 export type SessionResult = PracticeItem & {
   correct: boolean;

@@ -6,6 +6,12 @@ export const recognitionPracticePageMeta = {
   description: "Type the reading of kanji anchor words",
 } as const;
 
+export const productionPracticePageMeta = {
+  href: "/production-practice",
+  title: "Kanji Production",
+  description: "Draw the missing kanji in anchor words",
+} as const;
+
 export const speedKatakanaPageMeta = {
   href: "/speed-katakana",
   title: "Speed Katakana",
@@ -14,5 +20,6 @@ export const speedKatakanaPageMeta = {
 
 export const practicePageLinks = [
   recognitionPracticePageMeta,
+  productionPracticePageMeta,
   speedKatakanaPageMeta,
 ] as const;

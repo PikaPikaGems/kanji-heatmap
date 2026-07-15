@@ -12,46 +12,16 @@ import assetsPaths from "@/lib/assets-paths";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { buildPracticeDeck, ToggleRow } from "@/components/shared-practice";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
-import {
-  PracticeItem,
-  RecognitionPracticeSettings,
-  SoundMode,
-} from "./types";
+import { PracticeItem, ProductionPracticeSettings } from "./types";
 
 type RepEntry = [string, string, string, string];
-
-const RadioRow = ({
-  name,
-  value,
-  current,
-  label,
-  onChange,
-}: {
-  name: string;
-  value: SoundMode;
-  current: SoundMode;
-  label: string;
-  onChange: (value: SoundMode) => void;
-}) => (
-  <label className="flex items-center gap-2 pr-4 text-sm cursor-pointer">
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      checked={current === value}
-      onChange={() => onChange(value)}
-      className="accent-primary"
-    />
-    {label}
-  </label>
-);
 
 export const InitialScreen = ({
   onStart,
 }: {
   onStart: (deck: PracticeItem[]) => void;
 }) => {
-  const [settings, setSetting] = useLocalStorage<RecognitionPracticeSettings>(
+  const [settings, setSetting] = useLocalStorage<ProductionPracticeSettings>(
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
@@ -75,14 +45,7 @@ export const InitialScreen = ({
     !workerReady || repStatus === "pending" || repStatus === "idle";
   const canStart = !loading && deck.length > 0;
 
-  const soundEnabled = settings.sound?.enabled ?? true;
-  const soundType: SoundMode =
-    settings.sound?.enabled === true ? settings.sound.type : "correct";
-
-  useEnterAction(
-    canStart ? () => onStart(deck) : null,
-    canStart
-  );
+  useEnterAction(canStart ? () => onStart(deck) : null, canStart);
 
   return (
     <div className="flex flex-col h-full">
@@ -90,11 +53,10 @@ export const InitialScreen = ({
         <div className="flex flex-col max-w-md gap-6 px-4 py-6 mx-auto">
           <div className="text-left">
             <h1 className="pt-4 text-xl font-bold text-center">
-              👁️ Kanji Recognition
+              ✍️ Kanji Writing
             </h1>
-
             <p className="mt-1 text-sm text-center text-muted-foreground">
-              Type the reading of kanji anchor words
+              Draw the missing kanji in anchor words
             </p>
           </div>
 
@@ -134,49 +96,29 @@ export const InitialScreen = ({
               checked={settings.randomizeFont}
               onChange={(v) => setSetting("randomizeFont", v)}
             />
-
-            <div className="flex flex-col">
-              <ToggleRow
-                id="sound-on"
-                label="Sound On"
-                checked={soundEnabled}
-                onChange={(v) =>
-                  setSetting(
-                    "sound",
-                    v
-                      ? { enabled: true, type: soundType }
-                      : { enabled: false }
-                  )
-                }
-              />
-              {soundEnabled && (
-                <div className="flex flex-wrap pl-1 animate-fade-in-fast">
-                  <RadioRow
-                    name="sound-mode"
-                    value="speak"
-                    current={soundType}
-                    label="Say out loud"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                  <RadioRow
-                    name="sound-mode"
-                    value="correct"
-                    current={soundType}
-                    label="Sound when correct"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                </div>
-              )}
-              {soundEnabled && soundType === "speak" && (
-                <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                  ⚠️ text-to-speech might not work on all devices.
-                </p>
-              )}
-            </div>
+            <ToggleRow
+              id="blur-gloss"
+              label="Blur English gloss"
+              checked={settings.blurEnglishGloss}
+              onChange={(v) => setSetting("blurEnglishGloss", v)}
+            />
+            <ToggleRow
+              id="hear-on-load"
+              label="Hear pronunciation on load"
+              checked={settings.hearPronunciationOnLoad}
+              onChange={(v) => setSetting("hearPronunciationOnLoad", v)}
+            />
+            {settings.hearPronunciationOnLoad && (
+              <p className="w-full text-xs text-left animate-fade-in-fast">
+                ⚠️ Text-to-speech might not work on all devices.
+              </p>
+            )}
+            <ToggleRow
+              id="celebratory-sound"
+              label="Celebratory sound on correct"
+              checked={settings.celebratorySoundOnCorrect}
+              onChange={(v) => setSetting("celebratorySoundOnCorrect", v)}
+            />
           </section>
         </div>
       </div>
