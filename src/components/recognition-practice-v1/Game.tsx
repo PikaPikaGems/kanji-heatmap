@@ -147,49 +147,45 @@ export const Game = ({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute z-10 top-0 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
+        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
         tabIndex={-1}
         onClick={onEnd}
         aria-label="End session"
       >
         <CircleArrowLeft />
       </Button>
-
       {/*
         Touch layout: keep the prompt + input as a top-anchored cluster with a
         fixed gap. A bottom spacer absorbs visual-viewport height changes so
         the keyboard opening/closing does not shove content around.
       */}
-      <div className="flex flex-col items-center shrink-0 gap-3 px-4 pt-3 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
+      <div className="flex flex-col items-center shrink-0 px-4 pt-8 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
           style={
             current.fontIndex === null
               ? undefined
               : {
-                  fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
-                }
+                fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
+              }
           }
         >
-          <p className="text-6xl leading-tight break-all md:text-8xl whitespace-nowrap">
+          <p className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} leading-tight break-all md:text-8xl whitespace-nowrap`}>
             {current.word}
           </p>
         </div>
 
-        {feedback == null ? (
-          <button
-            type="button"
-            className={`max-w-sm px-2 py-1 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
-              glossBlurred ? "blur-[5px] hover:blur-none" : ""
+        <button
+          type="button"
+          className={`max-w-sm px-2 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${glossBlurred && feedback == null ? "blur-[5px] hover:blur-none" : ""
             }`}
-            onClick={() => setGlossBlurred((v) => !v)}
-            aria-label={
-              glossBlurred ? "Reveal English gloss" : "Blur English gloss"
-            }
-          >
-            {current.englishGloss || "—"}
-          </button>
-        ) : null}
+          onClick={() => setGlossBlurred((v) => !v)}
+          aria-label={
+            glossBlurred && feedback == null ? "Reveal English gloss" : "Blur English gloss"
+          }
+        >
+          {current.englishGloss || "—"}
+        </button>
       </div>
 
       <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0 md:pb-0">
@@ -205,7 +201,7 @@ export const Game = ({
               spellCheck={false}
               aria-label='Type the reading or type "forgot"'
               placeholder='Type the reading or type "forgot"'
-              className="relative w-full text-center border-2 rounded-2xl h-14 kanji-font focus-visible:ring-offset-0"
+              className="relative w-full mt-2 text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
               onCompositionStart={() => {
                 isComposingRef.current = true;
