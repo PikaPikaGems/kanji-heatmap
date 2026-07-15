@@ -1,10 +1,7 @@
-import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
-
 import { useMultiKanjiStructure } from "@/providers/multiple-kanji-structure-provider";
 import { StructuralType, structuralTypeInfo, structuralTypeInfoB } from "@/lib/kanji-section-constants";
-import { GlobalKanjiLink } from "@/components/dependent/routing";
-import { FakeComponentLink, GlobalRadicalLink } from "@/components/dependent/routing/global-links";
-import { moreRadicalKeywords, nonRadicalVariantKeywords, radicalFalseFriends } from "@/lib/radicals";
+
+import { ComponentLink } from "@/components/dependent/routing/global-links";
 import { ReactNode } from "react";
 import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import {
@@ -12,6 +9,7 @@ import {
   CircleHelp, GitBranch, Mic, Sparkles, Minimize2,
   Lightbulb,
 } from "lucide-react";
+import { PartComponentLink, useResolvedComponent } from "./PartComponentLink";
 
 const ICON_SIZE = 15;
 
@@ -41,74 +39,12 @@ const formatStructuralTypeName = (type: StructuralType): string => {
   return `${info.name ?? "unknown"}`;
 };
 
-const ComponentLink = ({
-  component,
-  keyword,
-  title,
-  type
-}: {
-  component: string;
-  keyword: string;
-  title?: string;
-  type: 'kanji' | 'radical' | 'unknown'
-}) => {
-
-  return (
-    <div className="flex flex-col text-center w-fit ">
-      {type === 'kanji' ?
-        <GlobalKanjiLink kanji={component} keyword={keyword} /> : type === "radical" ?
-          <GlobalRadicalLink radical={component} keyword={keyword} /> : <FakeComponentLink radical={component} keyword={keyword} />
-      }
-      {title && <div className="text-[10px] uppercase opacity-70">{title}</div>}
-    </div>
-  )
-
-
-};
 
 const Wrapper = ({ children }: { children: ReactNode }) => {
   return <div className="flex items-center gap-4 overflow-x-auto justify-left w-fit">{children}</div>
 }
 
 const NoInfo = () => { return <span className="text-[10px] uppercase">Not available</span>; }
-
-const getRadicalKeyword = (component: string): string | undefined => {
-  if (moreRadicalKeywords[component]) return moreRadicalKeywords[component];
-  const canonical = radicalFalseFriends[component]?.trim();
-  if (canonical && moreRadicalKeywords[canonical]) return moreRadicalKeywords[canonical];
-  return undefined;
-};
-
-
-// --- Helper to resolve component type and keyword ---
-
-
-const useResolvedComponent = (component: string | null | undefined) => {
-  const getKanjiInfo = useGetKanjiInfoFn();
-  if (!component) return null;
-  const info = getKanjiInfo?.(component ?? radicalFalseFriends[component]) ?? null;
-  const isKanji = !!info && "on" in info;
-  const keyword = info?.keyword ?? getRadicalKeyword(component);
-  const nonRadicalKeyword = nonRadicalVariantKeywords[component] ?? "..."
-  return {
-    component,
-    keyword: keyword ?? nonRadicalKeyword ?? "...",
-    type: (isKanji ? "kanji" : keyword ? "radical" : "unknown") as "kanji" | "radical" | "unknown",
-  };
-};
-
-const PartComponentLink = ({ part }: { part: string }) => {
-  const props = useResolvedComponent(part)
-
-  if (!props) {
-    return null
-  }
-
-  return (
-    <ComponentLink {...props} />
-  );
-}
-
 
 // --- TASK 2A: Lorenzi (same pattern as KanjiStructuralData, uses multi provider) ---
 const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {

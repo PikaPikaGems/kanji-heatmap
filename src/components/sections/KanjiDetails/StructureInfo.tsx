@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import {
@@ -14,6 +13,8 @@ import {
     useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { dedupe } from "@/lib/utils";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { PartComponentLink } from "./PartComponentLink";
 
 const TableCellFixed = ({
     children,
@@ -44,7 +45,14 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                 <div className="flex items-center min-w-0 space-x-2 overflow-x-auto overflow-y-hidden">
                     {dedupe(similars).map((similarKanji) => (
                         <div key={similarKanji} className="shrink-0">
-                            <OriginalKanjiComponentBreakdown kanji={similarKanji} />
+                            <GenericPopover
+                                trigger={
+                                    <button className="flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 border-dotted hover:border-solid hover:border-[#2effff]">
+                                        {similarKanji}
+                                    </button>
+                                }
+                                content={<PartComponentLink part={similarKanji} />}
+                            />
                         </div>
                     ))}
                 </div>
@@ -54,7 +62,6 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                     {
                         text: "lennart-finke/kanjidist-visualiser",
                         url: "https://github.com/lennart-finke/kanjidist-visualiser/blob/master/data/dkanjistat.json"
-
                     },
                     {
                         text: "Yencken, Lars (2010) Orthographic support for passing the reading hurdle in Japanese. PhD Thesis, University of Melbourne, Melbourne, Australia",
@@ -62,14 +69,11 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                     },
                 ]}
             />
-
         </>
     );
 };
 
 export const StructureInfo = ({ kanji }: { kanji: string }) => {
-
-
     return (
         <>
             <h3 className="pt-3 pb-1 pl-3 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">Component Breakdown</h3>
