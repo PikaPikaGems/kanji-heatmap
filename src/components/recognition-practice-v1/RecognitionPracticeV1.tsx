@@ -165,7 +165,6 @@ const RecognitionPracticeV1 = () => {
             <div key={`playing-${sessionKey}`} className="h-full animate-fade-in">
               <Game
                 sessionItems={sessionItems}
-                blurEnglishGloss={settings.blurEnglishGloss}
                 sound={settings.sound ?? { enabled: true, type: "correct" }}
                 onProgress={setProgress}
                 onComplete={finishSession}

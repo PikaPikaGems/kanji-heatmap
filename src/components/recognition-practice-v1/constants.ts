@@ -9,6 +9,5 @@ export const DEFAULT_SETTINGS: RecognitionPracticeSettings = {
   bookmarkedOnly: false,
   randomizeOrder: true,
   randomizeFont: false,
-  blurEnglishGloss: true,
   sound: { enabled: true, type: "correct" },
 };

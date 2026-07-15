@@ -16,14 +16,12 @@ import { AnswerFeedback } from "./AnswerFeedback";
 
 export const Game = ({
   sessionItems,
-  blurEnglishGloss,
   sound,
   onProgress,
   onComplete,
   onEnd,
 }: {
   sessionItems: PracticeItem[];
-  blurEnglishGloss: boolean;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
@@ -31,7 +29,7 @@ export const Game = ({
 }) => {
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
-  const [glossBlurred, setGlossBlurred] = useState(blurEnglishGloss);
+  const [glossBlurred, setGlossBlurred] = useState(true);
   const [feedback, setFeedback] = useState<"correct" | "forgot" | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
 
@@ -49,8 +47,8 @@ export const Game = ({
   const speak = useSpeak(current?.word ?? "");
 
   useEffect(() => {
-    setGlossBlurred(blurEnglishGloss);
-  }, [blurEnglishGloss, index]);
+    setGlossBlurred(true);
+  }, [index]);
 
   useEffect(() => {
     if (feedback == null) {
