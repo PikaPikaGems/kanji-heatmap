@@ -1,5 +1,8 @@
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
-import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
+import {
+  useGetKanjiInfoFn,
+  useKanjiSearchResult,
+} from "@/kanji-worker/kanji-worker-hooks";
 import { DefaultErrorFallback } from "@/components/error";
 import { VirtualKanjiList } from "./VirtualKanjiList";
 import LoadingKanjis from "./LoadingKanjis";
@@ -11,6 +14,7 @@ const KanjiListWithSearch = () => {
   const result = useKanjiSearchResult();
   const itemSettings = useDeferredItemSettings();
   const searchSettings = useSearchSettings();
+  const getBasicInfo = useGetKanjiInfoFn();
 
   if (result.error != null) {
     return <DefaultErrorFallback message="Failed to load data." />;
@@ -20,18 +24,11 @@ const KanjiListWithSearch = () => {
     return <LoadingKanjis />;
   }
 
-  const kanjiKeys = getFinalResults(searchSettings, result.data);
-
-  // TEMP DEBUG
-  console.log("[KanjiListWithSearch]", {
-    sortPrimary: searchSettings.sortSettings.primary,
-    searchType: searchSettings.textSearch.type,
-    resultLen: result.data.length,
-    resultFirst10: result.data.slice(0, 10).join(""),
-    finalLen: kanjiKeys.length,
-    finalFirst10: kanjiKeys.slice(0, 10).join(""),
-    status: result.status,
-  });
+  const kanjiKeys = getFinalResults(
+    searchSettings,
+    result.data,
+    getBasicInfo
+  );
 
   if (kanjiKeys.length === 0) {
     return <NoSearchResults />;
