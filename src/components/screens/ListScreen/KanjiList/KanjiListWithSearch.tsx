@@ -5,7 +5,7 @@ import { VirtualKanjiList } from "./VirtualKanjiList";
 import LoadingKanjis from "./LoadingKanjis";
 import { NoSearchResults } from "@/components/error/NoSearchResults";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { isKanji, dedupe } from "@/lib/utils";
+import { getFinalResults } from "@/lib/results-utils";
 
 const KanjiListWithSearch = () => {
   const result = useKanjiSearchResult();
@@ -20,24 +20,25 @@ const KanjiListWithSearch = () => {
     return <LoadingKanjis />;
   }
 
-  const { type, text } = searchSettings.textSearch;
-  const kanjiChars = text.split("").filter(isKanji);
-  const uniqueKanjiChars = dedupe(kanjiChars);
+  const kanjiKeys = getFinalResults(searchSettings, result.data);
 
-  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
-    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
-  }
+  // TEMP DEBUG
+  console.log("[KanjiListWithSearch]", {
+    sortPrimary: searchSettings.sortSettings.primary,
+    searchType: searchSettings.textSearch.type,
+    resultLen: result.data.length,
+    resultFirst10: result.data.slice(0, 10).join(""),
+    finalLen: kanjiKeys.length,
+    finalFirst10: kanjiKeys.slice(0, 10).join(""),
+    status: result.status,
+  });
 
-  if (result.data.length === 0) {
+  if (kanjiKeys.length === 0) {
     return <NoSearchResults />;
   }
 
-  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
-    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
-  }
-
   return (
-    <VirtualKanjiList kanjiKeys={result.data} size={itemSettings.cardType} />
+    <VirtualKanjiList kanjiKeys={kanjiKeys} size={itemSettings.cardType} />
   );
 };
 

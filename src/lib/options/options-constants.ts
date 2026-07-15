@@ -10,6 +10,7 @@ export const K_KKLC_INDEX = "kklc-index";
 
 export const K_RTK_INDEX = "rtk-index";
 export const K_MEANING_KEY = "keyword";
+export const K_RTKB_INDEX = "rtkb-index";
 
 export const K_RANK_NETFLIX = "rank-netflix";
 export const K_RANK_DRAMA_SUBTITLES = "rank-drama-subtitles";
@@ -43,6 +44,7 @@ export const GROUP_OPTIONS = [
 export const NONGROUP_OPTIONS = [
   K_KKLC_INDEX,
   K_RTK_INDEX,
+  K_RTKB_INDEX,
   K_MEANING_KEY,
 ] as const;
 

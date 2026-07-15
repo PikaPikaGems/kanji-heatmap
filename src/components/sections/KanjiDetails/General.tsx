@@ -95,6 +95,13 @@ export const General = ({ kanji }: { kanji: string }) => {
             description={orderDisclaimer}
           />
         )}
+        {hasData(data.kklcIndex) && (
+          <PrimaryBadgeWithPopover
+            label="KKLC"
+            value={data.kklcIndex!}
+            description={orderDisclaimer}
+          />
+        )}
         {hasData(data.rtk) && (
           <PrimaryBadgeWithPopover
             label="RTKA"
@@ -102,10 +109,10 @@ export const General = ({ kanji }: { kanji: string }) => {
             description={orderDisclaimer}
           />
         )}
-        {hasData(data.kklcIndex) && (
+        {hasData(data.rtkb) && (
           <PrimaryBadgeWithPopover
-            label="KKLC"
-            value={data.kklcIndex!}
+            label="RTKB"
+            value={data.rtkb!}
             description={orderDisclaimer}
           />
         )}

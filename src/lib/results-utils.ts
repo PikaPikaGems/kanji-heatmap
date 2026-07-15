@@ -1,6 +1,7 @@
 import { MAX_STROKE_COUNT } from "@/lib/options/constants";
 import { JLPTOptions } from "@/lib/jlpt";
 import { FilterSettings, SearchSettings } from "@/lib/settings/settings";
+import { dedupe, isKanji } from "@/lib/utils";
 
 export const hasNoFilters = (settings: SearchSettings) => {
   const { strokeRange, freq, jlpt } = settings.filterSettings;
@@ -11,6 +12,39 @@ export const hasNoFilters = (settings: SearchSettings) => {
 
   return fullRangeStrokes && fullRangeFreq && allJLPT;
 };
+
+export const getFinalResults = (
+  searchSettings: SearchSettings,
+  resultData: string[]
+): string[] => {
+  const { type, text } = searchSettings.textSearch;
+
+  if (type !== "multi-kanji") {
+    return resultData;
+  }
+
+  const uniqueKanjiChars = dedupe(text.split("").filter(isKanji));
+  if (uniqueKanjiChars.length === 0) {
+    return resultData;
+  }
+
+  const hasSort = searchSettings.sortSettings.primary !== "none";
+  const hasFilters = !hasNoFilters(searchSettings);
+
+  if (!hasSort && !hasFilters) {
+    return uniqueKanjiChars;
+  }
+
+  // Filter only: filtered matches only (no JLPT restriction when empty / all levels)
+  if (!hasSort) {
+    return resultData;
+  }
+
+  const resultSet = new Set(resultData);
+  const remaining = uniqueKanjiChars.filter((kanji) => !resultSet.has(kanji));
+  return [...resultData, ...remaining];
+};
+
 export const shouldShowAllKanji = (settings: SearchSettings) => {
   const noText = settings.textSearch.text === "";
   return hasNoFilters(settings) && noText;
