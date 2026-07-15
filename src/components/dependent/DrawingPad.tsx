@@ -2,6 +2,7 @@
 import { Dispatch, ReactNode, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Undo2, Trash2, Search } from "@/components/icons";
+import { HelpCircle } from "lucide-react";
 
 export type Stroke = [number, number][];
 
@@ -33,6 +34,9 @@ export const DrawingPad = ({
     submitDisabled = false,
     onClickSubmit,
     onClickClear,
+    showForgotBtn = false,
+    onClickForgot,
+    forgotDisabled = false,
 }: {
     svgSize: number;
     // Optional controlled strokes. When provided, the parent owns the strokes
@@ -47,6 +51,9 @@ export const DrawingPad = ({
     submitDisabled?: boolean;
     onClickSubmit?: (payload: DrawingSubmitPayload) => void;
     onClickClear?: () => void;
+    showForgotBtn?: boolean;
+    onClickForgot?: () => void;
+    forgotDisabled?: boolean;
 }) => {
     const [internalStrokes, setInternalStrokes] = useState<Stroke[]>([]);
     const strokes = controlledStrokes ?? internalStrokes;
@@ -129,7 +136,7 @@ export const DrawingPad = ({
     };
 
     return (
-        <div className="flex flex-col items-center gap-2 m-4">
+        <div className="flex flex-col items-center gap-2 my-2 mx-auto sm:m-4">
             <div
                 ref={wrapperRef}
                 style={{ touchAction: "none", lineHeight: 0 }}
@@ -190,6 +197,17 @@ export const DrawingPad = ({
                 </svg>
             </div>
             <div className="flex justify-center mt-2 space-x-2">
+                {showForgotBtn && (
+                    <PracticeButton
+                        size="icon"
+                        variant="danger"
+                        onClick={() => onClickForgot?.()}
+                        disabled={forgotDisabled}
+                    >
+                        <HelpCircle />
+                        <span className="sr-only">Forgot</span>
+                    </PracticeButton>
+                )}
                 <PracticeButton
                     size="icon"
                     variant="secondary"

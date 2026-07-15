@@ -1,0 +1,295 @@
+import { useEffect, useRef, useState } from "react";
+import { CircleArrowLeft, Rocket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DrawingPad,
+  DrawingSubmitPayload,
+  Stroke,
+} from "@/components/dependent/DrawingPad";
+import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { SpeakButton } from "@/components/common/SpeakButton";
+import { useSpeak } from "@/hooks/use-jp-speak";
+import { useFitPadSize } from "@/hooks/use-fit-pad-size";
+import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
+import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
+import assetsPaths from "@/lib/assets-paths";
+import { ClozeWord } from "./ClozeWord";
+import { buildCandidateGrid } from "./build-candidates";
+import { DRAW_SVG_SIZE } from "./constants";
+import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
+import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
+import {
+  DrawingSnapshot,
+  GradeRankInfo,
+  PracticeItem,
+  ProductionPracticeSettings,
+  SessionResult,
+} from "./types";
+
+type CardStep =
+  | { type: "draw" }
+  | { type: "recognizing" }
+  | {
+      type: "select";
+      grade: GradeRankInfo;
+      candidates: string[];
+    }
+  | {
+      type: "feedback";
+      kind: "noKanji" | "correct" | "incorrect";
+      grade: GradeRankInfo;
+    };
+
+export const Game = ({
+  sessionItems,
+  settings,
+  randomKanjiPool,
+  onProgress,
+  onComplete,
+  onEnd,
+}: {
+  sessionItems: PracticeItem[];
+  settings: ProductionPracticeSettings;
+  randomKanjiPool: string[];
+  onProgress: (progress: number) => void;
+  onComplete: (results: SessionResult[]) => void;
+  onEnd: () => void;
+}) => {
+  const [index, setIndex] = useState(0);
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [drawing, setDrawing] = useState<DrawingSnapshot | null>(null);
+  const [glossBlurred, setGlossBlurred] = useState(settings.blurEnglishGloss);
+  const [step, setStep] = useState<CardStep>({ type: "draw" });
+  const [selected, setSelected] = useState<string | null>(null);
+  const resultsRef = useRef<SessionResult[]>([]);
+  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
+  const padSize = useFitPadSize(DRAW_SVG_SIZE);
+
+  const current = sessionItems[index];
+  const similarState = useSimilarKanjis(current?.kanji ?? "");
+  const similars = similarState.data ?? [];
+  const speak = useSpeak(current?.word ?? "");
+
+  useEffect(() => {
+    setGlossBlurred(settings.blurEnglishGloss);
+    setStrokes([]);
+    setDrawing(null);
+    setStep({ type: "draw" });
+    setSelected(null);
+  }, [index, settings.blurEnglishGloss]);
+
+  useEffect(() => {
+    setStrokes([]);
+    setDrawing(null);
+  }, [padSize]);
+
+  useEffect(() => {
+    onProgress(
+      sessionItems.length === 0 ? 0 : (index / sessionItems.length) * 100
+    );
+  }, [index, onProgress, sessionItems.length]);
+
+  useEffect(() => {
+    if (!current || !settings.hearPronunciationOnLoad) return;
+    if (step.type !== "draw") return;
+    speak();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- speak on card load only
+  }, [index, settings.hearPronunciationOnLoad]);
+
+  if (!current) {
+    return null;
+  }
+
+  const playCorrectSound = () => {
+    if (!settings.celebratorySoundOnCorrect) return;
+    try {
+      if (!correctAudioRef.current) {
+        correctAudioRef.current = new Audio(
+          assetsPaths.SPEED_KATAKANA_CORRECT_SOUND
+        );
+      }
+      correctAudioRef.current.currentTime = 0;
+      void correctAudioRef.current.play();
+    } catch {
+      // ignore playback failures
+    }
+  };
+
+  const pushResult = (correct: boolean, gradeRank: number) => {
+    const result: SessionResult = { ...current, correct, gradeRank };
+    resultsRef.current = [...resultsRef.current, result];
+  };
+
+  const advance = () => {
+    const nextIndex = index + 1;
+    const allResults = resultsRef.current;
+    if (nextIndex >= sessionItems.length) {
+      onProgress(100);
+      onComplete(allResults);
+      return;
+    }
+    setIndex(nextIndex);
+  };
+
+  const onForgotFromDraw = () => {
+    if (step.type !== "draw") return;
+    pushResult(false, -1);
+    setStep({
+      type: "feedback",
+      kind: "noKanji",
+      grade: { rank: -1, topGuess: null, inTop10: false },
+    });
+  };
+
+  const onSubmit = async (payload: DrawingSubmitPayload) => {
+    if (step.type !== "draw" || payload.strokes.length === 0) return;
+    setDrawing(payload);
+    setStep({ type: "recognizing" });
+    try {
+      const candidates = await recognizeWithDaKanji(payload);
+      const rank = candidates.indexOf(current.kanji);
+      const inTop10 = rank >= 0;
+      const grade: GradeRankInfo = {
+        rank,
+        topGuess: candidates[0] ?? null,
+        inTop10,
+      };
+      const similarList = similarState.data ?? similars;
+      const grid = buildCandidateGrid({
+        target: current.kanji,
+        inTop10,
+        modelGuesses: candidates,
+        similars: similarList,
+        randomPool: randomKanjiPool,
+      });
+      setSelected(null);
+      setStep({ type: "select", grade, candidates: grid });
+    } catch {
+      setStep({ type: "draw" });
+    }
+  };
+
+  const onSelectForgot = () => {
+    if (step.type !== "select") return;
+    pushResult(false, step.grade.rank);
+    setStep({ type: "feedback", kind: "incorrect", grade: step.grade });
+  };
+
+  const onSelectNext = () => {
+    if (step.type !== "select" || selected == null) return;
+    const pickedCorrect = selected === current.kanji;
+    const sessionCorrect = pickedCorrect && step.grade.inTop10;
+    if (sessionCorrect) playCorrectSound();
+    pushResult(sessionCorrect, step.grade.rank);
+    setStep({
+      type: "feedback",
+      kind: pickedCorrect ? "correct" : "incorrect",
+      grade: step.grade,
+    });
+  };
+
+  const recognizing = step.type === "recognizing";
+  const selectOpen = step.type === "select";
+  const feedback = step.type === "feedback" ? step : null;
+
+  return (
+    <div className="relative flex flex-col w-full h-full overflow-hidden">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
+        tabIndex={-1}
+        onClick={onEnd}
+        aria-label="End session"
+      >
+        <CircleArrowLeft />
+      </Button>
+
+      <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
+        <ClozeWord
+          word={current.word}
+          kanji={current.kanji}
+          fontIndex={current.fontIndex}
+          revealed={feedback != null}
+        />
+
+        <div className="flex flex-wrap items-center justify-center gap-1 mt-3">
+          {current.reading.split("・").map((r) => (
+            <RomajiBadge key={r} kana={r} />
+          ))}
+          <SpeakButton word={current.word} iconType="volume-2" />
+        </div>
+
+        {settings.blurEnglishGloss ? (
+          <button
+            type="button"
+            className={`max-w-sm px-2 text-xs mt-2 font-bold tracking-wide transition-all outline-none ${
+              glossBlurred ? "blur-[5px] hover:blur-none" : ""
+            }`}
+            onClick={() => setGlossBlurred((v) => !v)}
+            aria-label={
+              glossBlurred ? "Reveal English gloss" : "Blur English gloss"
+            }
+          >
+            {current.englishGloss || "—"}
+          </button>
+        ) : (
+          <p className="max-w-sm px-2 mt-1 text-xs font-bold tracking-wide">
+            {current.englishGloss || "—"}
+          </p>
+        )}
+
+        <div
+          className="relative mt-2 w-full mx-auto"
+          style={{ maxWidth: padSize + 32 }}
+        >
+          <DrawingPad
+            svgSize={padSize}
+            strokes={strokes}
+            setStrokes={setStrokes}
+            showForgotBtn
+            onClickForgot={onForgotFromDraw}
+            forgotDisabled={recognizing || step.type !== "draw"}
+            showSubmitBtn
+            submitIcon={<Rocket />}
+            submitLabel="Submit"
+            submitDisabled={recognizing || step.type !== "draw"}
+            onClickSubmit={onSubmit}
+          />
+          {recognizing && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-background/70">
+              <p className="text-sm font-bold sm:text-base animate-pulse">
+                Recognizing…
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <SelectSimilarKanjiDrawer
+        open={selectOpen}
+        grade={
+          step.type === "select"
+            ? step.grade
+            : { rank: -1, topGuess: null, inTop10: false }
+        }
+        candidates={step.type === "select" ? step.candidates : []}
+        selected={selected}
+        onSelect={setSelected}
+        onForgot={onSelectForgot}
+        onNext={onSelectNext}
+      />
+
+      <FeedbackDrawer
+        open={feedback != null}
+        kind={feedback?.kind ?? "noKanji"}
+        item={current}
+        grade={
+          feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }
+        }
+        drawing={drawing}
+        onNext={advance}
+      />
+    </div>
+  );
+};

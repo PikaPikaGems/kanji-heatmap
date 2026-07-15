@@ -1,6 +1,6 @@
 import { GlobalKanjiLink } from "@/components/dependent/routing";
 
-/** Compact recap tile — swap this component to change End Screen tile style. */
+/** Compact recap tile for practice end screens. */
 export const RecapTile = ({
   kanji,
   keyword,
@@ -12,8 +12,9 @@ export const RecapTile = ({
 }) => {
   return (
     <div
-      className={`relative rounded-xl border border-dashed ${correct ? "border-foreground" : " "
-        }`}
+      className={`relative rounded-xl border border-dashed ${
+        correct ? "border-foreground" : " "
+      }`}
     >
       <GlobalKanjiLink kanji={kanji} keyword={keyword} fontSize="text-4xl" />
     </div>

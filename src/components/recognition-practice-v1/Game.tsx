@@ -164,22 +164,27 @@ export const Game = ({
             current.fontIndex === null
               ? undefined
               : {
-                fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
-              }
+                  fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
+                }
           }
         >
-          <p className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} leading-tight break-all md:text-8xl whitespace-nowrap`}>
+          <p
+            className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} leading-tight break-all md:text-8xl whitespace-nowrap`}
+          >
             {current.word}
           </p>
         </div>
 
         <button
           type="button"
-          className={`max-w-sm px-2 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${glossBlurred && feedback == null ? "blur-[5px] hover:blur-none" : ""
-            }`}
+          className={`max-w-sm px-2 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
+            glossBlurred && feedback == null ? "blur-[5px] hover:blur-none" : ""
+          }`}
           onClick={() => setGlossBlurred((v) => !v)}
           aria-label={
-            glossBlurred && feedback == null ? "Reveal English gloss" : "Blur English gloss"
+            glossBlurred && feedback == null
+              ? "Reveal English gloss"
+              : "Blur English gloss"
           }
         >
           {current.englishGloss || "—"}
@@ -199,7 +204,7 @@ export const Game = ({
               spellCheck={false}
               aria-label='Type the reading or type "forgot"'
               placeholder='Type the reading or type "forgot"'
-              className="relative w-full mt-2 text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
+              className="relative w-full p-0 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
               onCompositionStart={() => {
                 isComposingRef.current = true;

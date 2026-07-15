@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
-import { SessionResult } from "./types";
+import { PracticeSessionResult } from "./types";
 import { RecapTile } from "./RecapTile";
 
 const COUNT_UP_MS = 900;
@@ -60,7 +60,7 @@ export const EndSession = ({
   onNext,
   onEnd,
 }: {
-  results: SessionResult[];
+  results: PracticeSessionResult[];
   /** False when every word in the deck has been answered correctly. */
   hasMore: boolean;
   /** Total words in the filtered deck (used on the final complete screen). */
