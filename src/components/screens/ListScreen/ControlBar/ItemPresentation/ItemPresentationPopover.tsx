@@ -32,7 +32,7 @@ const ItemPresentationSettingsPopover = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="mx-4 max-h-[80svh] overflow-y-auto overflow-x-hidden z-40">
-        {children}
+        {isOpen ? children : null}
       </PopoverContent>
     </Popover>
   );

@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, ClipboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  ClipboardEvent,
+  lazy,
+  Suspense,
+} from "react";
 import { cn, isKanji } from "@/lib/utils";
 import { SearchType } from "@/lib/settings/settings";
 import {
@@ -12,8 +19,16 @@ import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
 import { defaultSearchType } from "@/lib/settings/search-settings-adapter";
 
-import { RadicalsControl } from "./RadicalScreen/RadicalsControl";
-import { HandwritingControl } from "./HandwritingScreen/HandwritingControl";
+const RadicalsControl = lazy(() =>
+  import("./RadicalScreen/RadicalsControl").then((m) => ({
+    default: m.RadicalsControl,
+  }))
+);
+const HandwritingControl = lazy(() =>
+  import("./HandwritingScreen/HandwritingControl").then((m) => ({
+    default: m.HandwritingControl,
+  }))
+);
 
 const INPUT_DEBOUNCE_TIME = 400;
 
@@ -408,12 +423,16 @@ export const SearchInput = ({
         </span>
       )}
 
-      <RadicalsControl
-        isOpen={openDialogType === "radicals"}
-        onClose={() => setOpenDialogType("none")}
-        value={parsedValue}
-        onChange={(newStr) => onSyncAll(newStr, "radicals")}
-      />
+      {(openDialogType === "radicals" || searchType === "radicals") && (
+        <Suspense fallback={null}>
+          <RadicalsControl
+            isOpen={openDialogType === "radicals"}
+            onClose={() => setOpenDialogType("none")}
+            value={parsedValue}
+            onChange={(newStr) => onSyncAll(newStr, "radicals")}
+          />
+        </Suspense>
+      )}
 
       {(searchType === "handwriting" ||
         searchType === "handwriting-alt" ||
@@ -421,20 +440,22 @@ export const SearchInput = ({
         // Keyed by search type + reset counter so switching variants or clearing
         // the input starts the drawing pad fresh. Mounted regardless of the
         // drawer's open state so the drawing survives closing/reopening it.
-        <HandwritingControl
-          key={`${searchType}-${handwritingResetKey}`}
-          variant={
-            searchType === "handwriting"
-              ? "google"
-              : searchType === "handwriting-alt"
-                ? "kanjicanvas"
-                : "dakanji"
-          }
-          isOpen={openDialogType === searchType}
-          onClose={() => setOpenDialogType("none")}
-          value={parsedValue}
-          onChange={(newStr) => onSyncAll(newStr, searchType)}
-        />
+        <Suspense fallback={null}>
+          <HandwritingControl
+            key={`${searchType}-${handwritingResetKey}`}
+            variant={
+              searchType === "handwriting"
+                ? "google"
+                : searchType === "handwriting-alt"
+                  ? "kanjicanvas"
+                  : "dakanji"
+            }
+            isOpen={openDialogType === searchType}
+            onClose={() => setOpenDialogType("none")}
+            value={parsedValue}
+            onChange={(newStr) => onSyncAll(newStr, searchType)}
+          />
+        </Suspense>
       )}
     </section>
   );

@@ -3,7 +3,7 @@ import { ErrorBoundary } from "@/components/error";
 import { Progress } from "@/components/ui/progress";
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
 import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
-import HeaderDrawer from "@/components/site-layout/Header/HeaderDrawer";
+import LazyHeaderDrawer from "@/components/site-layout/Header/LazyHeaderDrawer";
 import assetsPaths from "@/lib/assets-paths";
 
 /**
@@ -34,7 +34,7 @@ export const PracticeHeader = ({ progress }: { progress: number }) => {
         <ErrorBoundary fallback={null}>
           <ChangeFontButton />
           <ChangeThemeColorBtn />
-          <HeaderDrawer />
+          <LazyHeaderDrawer />
         </ErrorBoundary>
       </section>
     </header>
