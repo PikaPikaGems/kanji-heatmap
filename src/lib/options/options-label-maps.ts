@@ -42,7 +42,7 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_STROKES]: "Stroke Count",
   [K_WK_LVL]: "WK",
   [K_RTK_INDEX]: "RTKA",
-  [K_MEANING_KEY]: "Keyword",
+  [K_MEANING_KEY]: "English Keyword",
   [K_KKLC_INDEX]: "KKLC",
 };
 
