@@ -192,6 +192,7 @@ export const DrawingPad = ({
             <div className="flex justify-center mt-2 space-x-2">
                 <PracticeButton
                     size="icon"
+                    variant="secondary"
                     onClick={() => setStrokes((s) => s.slice(0, -1))}
                     disabled={strokes.length === 0}
                 >

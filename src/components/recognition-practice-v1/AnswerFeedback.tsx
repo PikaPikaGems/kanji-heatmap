@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
-import { pickCorrectCheer, pickForgotCheer } from "@/lib/practice-cheers";
 
 /** Inline answer reveal shown in place of the input controls. */
 export const AnswerFeedback = ({
   correct,
   reading,
   word,
-  englishGloss,
   onNext,
 }: {
   correct: boolean;
@@ -22,10 +20,6 @@ export const AnswerFeedback = ({
     .split("・")
     .map((r) => r.trim())
     .filter(Boolean);
-
-  const [cheer] = useState(() =>
-    correct ? pickCorrectCheer() : pickForgotCheer()
-  );
 
   useEffect(() => {
     // Don't treat the Enter that opened feedback as "Continue".
@@ -59,26 +53,13 @@ export const AnswerFeedback = ({
       aria-live="polite"
       aria-label={correct ? "Correct" : "Forgot"}
     >
-      <p
-        key={cheer}
-        className={`animate-practice-bounce-soft text-lg font-bold tracking-wide kanji-font animate-practice-pop ${
-          correct ? "text-green-500" : "text-muted-foreground"
-        }`}
-      >
-        {correct ? "🥳" : ""} {cheer}
-      </p>
       <div className="flex flex-wrap items-center justify-center gap-1">
+        <p >{correct ? "🎉 ·" : ""}</p>
         <SpeakButton word={word} iconType="volume-2" />
         {readings.map((r) => (
           <RomajiBadge key={r} kana={r} />
         ))}
-        <p className="text-xl font-bold kanji-font">· {word}</p>
       </div>
-      {englishGloss && englishGloss.length > 0 ? (
-        <p className="max-w-sm text-sm text-center text-muted-foreground">
-          {englishGloss}
-        </p>
-      ) : null}
       <PracticeButton size="lg" className="max-w-xs" onClick={onNext}>
         Continue
       </PracticeButton>

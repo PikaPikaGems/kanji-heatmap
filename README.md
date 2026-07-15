@@ -46,20 +46,41 @@ If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heat
 cp ../kanji-heatmap-data/output/*.json ./public/json
 ```
 
-### Regenerating structure and reading files
+### Regenerating derived JSON
 
-The following files in `public/json/` are generated from raw sources in `raw-data/` and filtered to the kanji in `public/json/filtered_kanji.json`:
+`pnpm run build` regenerates derived JSON before compiling and bundling:
 
-- `kanji-structure-filtered-hlorenzi.json`
-- `kanji-readings-details-filtered.json`
-- `kanji-structure-kanjium.json`
-- `scott-components.json`
-- `yagays-components.json`
+```
+node scripts/generate-more-info.mjs && node scripts/generate-speed-katakana.mjs && tsc -b && vite build
+```
 
-To regenerate them:
+You can also run the generators on their own:
 
 ```
 pnpm run generate-more-info
+pnpm run generate-speed-katakana
+```
+
+#### Structure and reading files
+
+These files in `public/json/` are generated from raw sources in `raw-data/` and filtered to the kanji in `public/json/filtered_kanji.json`:
+
+- `kanji-structure-hlorenzi.json`
+- `kanji-readings-details.json`
+- `kanji-structure-kanjium.json`
+- `kanji-structure-scott.json`
+- `kanji-structure-yagays.json`
+
+```
+pnpm run generate-more-info
+```
+
+#### Speed Katakana challenge sets
+
+The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
+
+```
+pnpm run generate-speed-katakana
 ```
 
 ## Build Analysis
@@ -96,19 +117,25 @@ Uncompress and store the json files in `./public/json`
 tar -xzf ./kanji-heatmap-data.tar.gz -C ./public/json/
 ```
 
-You should have the following files updated
+You should have the following files updated (among others from the release)
 
 ```
 ls -la public/json
 
-    1759 component_keyword.json
-    2118 cum_use.json
-  369264 kanji_extended.json
-  284376 kanji_main.json
-    2187 phonetic.json
-  200687 vocab_furigana.json
-  191712 vocab_meaning.json
+    component_keyword.json
+    cum_use.json
+    extra_kanji_keyword.json
+    filtered_kanji.json
+    kanji_extended.json
+    kanji_main.json
+    kanji_representative_words.json
+    phonetic.json
+    similar-kanjis.json
+    vocab_furigana.json
+    vocab_meaning.json
 ```
+
+Derived files (`kanji-structure-*.json`, `kanji-readings-details.json`, `katakana/`) are produced by the generators above, not by this tarball.
 
 Delete the `tar.gz` file since it's not needed anymore
 

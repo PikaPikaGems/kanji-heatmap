@@ -56,9 +56,9 @@ export const SearchInput = ({
   const [parsedValue, setValue] = useState(
     translateValue(initialText, translateMap[searchType])
   );
-  // Ephemeral "Switched to Readings" chip after paste auto-picks a type.
+  // Ephemeral "Switched to Readings" chip after paste/IME auto-picks a type.
   // Same idea as CopyButton's brief feedback — local state, no toast lib.
-  // typeHintKey remounts the span so the CSS animation restarts on rapid pastes.
+  // typeHintKey remounts the span so the CSS animation restarts on rapid switches.
   const [typeHint, setTypeHint] = useState<string | null>(null);
   const [typeHintKey, setTypeHintKey] = useState(0);
 
@@ -101,14 +101,33 @@ export const SearchInput = ({
     setSearchType(finalSearchType);
   };
 
-  // Paste-driven sync: same as onSyncAll, but briefly announce when the search
-  // type was auto-changed (e.g. kana paste → Readings).
-  const syncFromPaste = (text: string, nextType: SearchType) => {
+  // Same as onSyncAll, but briefly announce when the search type was
+  // auto-changed (e.g. kana paste/Enter → Readings).
+  const syncAndAnnounceType = (text: string, nextType: SearchType) => {
     if (nextType !== searchType) {
       setTypeHint(searchTypeLabel(nextType));
       setTypeHintKey((key) => key + 1);
     }
     onSyncAll(text, nextType);
+  };
+
+  // Infer a search type from Japanese IME / typed input. Returns null when
+  // the script is ambiguous or already matches the current type.
+  const inferSearchTypeFromText = (text: string): SearchType | null => {
+    if (text.length === 0) {
+      return null;
+    }
+    if (hasKanji(text)) {
+      return "multi-kanji";
+    }
+    if (wanakana.isKana(text)) {
+      return "readings";
+    }
+    // Multi-kanji expects Japanese characters — a roman word belongs in meanings.
+    if (searchType === "multi-kanji" && wanakana.isRomaji(text)) {
+      return "meanings";
+    }
+    return null;
   };
 
   // Immediately apply the current field value if a debounce is still waiting
@@ -199,11 +218,19 @@ export const SearchInput = ({
           }, INPUT_DEBOUNCE_TIME);
         }}
         onCompositionEnd={(e) => {
-          // Composition just finished — now it's safe to translate and settle.
-          const updatedValue = translateValue(
-            e.currentTarget.value,
-            translateMap[searchType]
-          );
+          // Composition just finished (IME confirm — often via Enter).
+          // Infer from the raw committed text before translateValue: if the
+          // current type maps to romaji, toRomaji would turn かんじ → kanji
+          // and we'd miss the readings switch.
+          const raw = e.currentTarget.value;
+          const text = raw.trim();
+          const inferred = inferSearchTypeFromText(text);
+          if (inferred != null && inferred !== searchType) {
+            syncAndAnnounceType(text, inferred);
+            return;
+          }
+
+          const updatedValue = translateValue(raw, translateMap[searchType]);
           setValue(updatedValue);
           clearTimeout(timeoutRef.current);
           hasPendingSettleRef.current = true;
@@ -213,6 +240,8 @@ export const SearchInput = ({
           }, INPUT_DEBOUNCE_TIME);
         }}
         onKeyDown={(e) => {
+          // IME is still composing (first Enter confirms a candidate) — don't
+          // treat it as a search submit; compositionend handles the switch.
           if (e.nativeEvent.isComposing) {
             return;
           }
@@ -224,8 +253,17 @@ export const SearchInput = ({
             return;
           }
 
-          // Don't flush mid-IME; wait for compositionend.
+          // Fallback when composition already ended (e.g. second Enter, or
+          // text entered without IME). Same script → type rules as paste.
           if (e.key === "Enter") {
+            const text = (
+              inputRef.current?.value ?? parsedValue
+            ).trim();
+            const inferred = inferSearchTypeFromText(text);
+            if (inferred != null && inferred !== searchType) {
+              syncAndAnnounceType(text, inferred);
+              return;
+            }
             flushPendingSettle();
           }
         }}
@@ -257,7 +295,7 @@ export const SearchInput = ({
             const newValue = `${parsedValue.slice(0, start)}${insertion}${parsedValue.slice(end)}`;
             const caret = start + insertion.length;
             if (announceSwitch) {
-              syncFromPaste(newValue, nextType);
+              syncAndAnnounceType(newValue, nextType);
             } else {
               onSyncAll(newValue, nextType);
             }

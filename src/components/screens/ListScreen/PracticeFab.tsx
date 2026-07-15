@@ -34,7 +34,7 @@ const isBodyScrollLocked = () => {
     body.style.paddingRight !== "" ||
     body.hasAttribute("data-scroll-locked") ||
     getComputedStyle(body).getPropertyValue("--removed-body-scroll-bar-size").trim() !==
-      ""
+    ""
   );
 };
 
@@ -118,7 +118,7 @@ export const PracticeFab = () => {
         className="z-50 w-[min(100vw-1.5rem,28rem)] p-3"
       >
         <p className="px-1 mb-2 text-sm font-semibold text-left">
-          Choose a Practice Mode
+          What do you want to do?
         </p>
         <div className="flex flex-row gap-2">
           {practiceLinks.map((item) => (

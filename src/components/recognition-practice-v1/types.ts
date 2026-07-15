@@ -7,7 +7,6 @@ export type RecognitionPracticeSettings = {
   bookmarkedOnly: boolean;
   randomizeOrder: boolean;
   randomizeFont: boolean;
-  blurEnglishGloss: boolean;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
 };
 

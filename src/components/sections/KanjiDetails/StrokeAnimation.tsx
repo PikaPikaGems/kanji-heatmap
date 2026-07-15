@@ -226,7 +226,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         onClickClear={onClear}
       />
 
-      <div className="w-full max-w-[310px] min-h-10 px-2 text-xs font-bold text-center">
+      <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
         {status === "loading" && (
           <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
         )}
@@ -240,7 +240,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         )}
         {status === "idle" && (
           <div className="font-bold">
-            Draw the kanji, then tap 🚀 to Grade.
+            Draw the kanji, then tap 🚀 to grade.
           </div>
         )}
       </div>

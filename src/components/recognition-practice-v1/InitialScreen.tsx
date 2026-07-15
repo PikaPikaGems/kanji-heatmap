@@ -155,12 +155,6 @@ export const InitialScreen = ({
               checked={settings.randomizeFont}
               onChange={(v) => setSetting("randomizeFont", v)}
             />
-            <ToggleRow
-              id="blur-gloss"
-              label="Blur English gloss"
-              checked={settings.blurEnglishGloss}
-              onChange={(v) => setSetting("blurEnglishGloss", v)}
-            />
 
             <div className="flex flex-col">
               <ToggleRow

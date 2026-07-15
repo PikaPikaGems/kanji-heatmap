@@ -18,7 +18,7 @@ import {
 } from "./types";
 import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
 import { shuffle } from "@/lib/utils";
-import { CircleArrowLeft, DeleteIcon } from "lucide-react";
+import { CircleArrowLeft } from "lucide-react";
 
 type GameWord = {
   katakana: string;
@@ -243,33 +243,30 @@ export const Game = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-w-lg gap-4 mx-auto [@media(min-height:900px)]:justify-center  animate-fade-in-fast">
+    <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
+        tabIndex={-1}
+        onClick={onEnd}
+        aria-label="End session"
+      >
+        <CircleArrowLeft />
+      </Button>
+
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
         <div className="flex items-center justify-center gap-1 pt-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-            tabIndex={-1}
-            onClick={onEnd}
-            aria-label="End session"
-          >
-            <CircleArrowLeft />
-          </Button>
-
           <span className="px-2 text-xs font-bold tabular-nums">
             {index + 1} / {words.length}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-red-500 opacity-70 hover:opacity-100 hover:text-red-500 hover:bg-opacity-0"
+          <button
+            className="text-xs font-bold tracking-wide text-red-500 transition-opacity -translate-y-[0.5px] hover:opacity-70"
             tabIndex={-1}
             onClick={handleSkip}
-            aria-label="Skip this word"
           >
-            <DeleteIcon className="rotate-180" />
-          </Button>
+            {`>>`}
+          </button>
         </div>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
@@ -316,7 +313,7 @@ export const Game = ({
           spellCheck={false}
           aria-label='Type romaji or type "skip"'
           placeholder='Type romaji or "skip"'
-          className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14 kanji-font"
+          className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14"
           onKeyDown={handleKeyDown}
           onCompositionStart={() => {
             isComposingRef.current = true;

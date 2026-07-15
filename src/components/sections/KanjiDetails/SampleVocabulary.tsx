@@ -198,7 +198,7 @@ const PaginatedVocabulary = ({ data, shortcuts }: { data: CommonWordEntry[]; sho
 
   return (
     <div className="px-2 mt-4 -mx-2 overflow-x-auto" key={`${start}-${end}`}>
-      <p className="w-full px-4 text-left">{data.length} total item(s) found.</p>
+      <p className="w-full px-4 text-left">{data.length} total {data.length === 1 ? "item" : "items"}</p>
       {pagination}
       <Table className="w-full min-w-[400px] mt-4 animate-fade-in">
         <TableHeader>
