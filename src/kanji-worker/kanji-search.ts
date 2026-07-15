@@ -11,6 +11,7 @@ import {
   K_KKLC_INDEX,
   K_MEANING_KEY,
   K_RTK_INDEX,
+  K_RTKB_INDEX,
   K_STROKES,
   K_WK_LVL,
 } from "@/lib/options/options-constants";
@@ -247,6 +248,10 @@ export const sortKanji = (
 
       if (sortKey === K_RTK_INDEX) {
         return numericSort(exInfoA.rtk, exInfoB.rtk);
+      }
+
+      if (sortKey === K_RTKB_INDEX) {
+        return numericSort(exInfoA.rtkb, exInfoB.rtkb);
       }
 
       if (sortKey === K_KKLC_INDEX) {

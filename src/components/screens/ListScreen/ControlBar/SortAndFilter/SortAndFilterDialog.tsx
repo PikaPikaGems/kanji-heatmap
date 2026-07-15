@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { SearchSettings } from "@/lib/settings/settings";
 import { ErrorBoundary } from "@/components/error";
 import {
@@ -14,8 +14,13 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { SortAndFilterSettingsForm } from "./SortAndFilterForm";
 import { SortAndFilterButton } from "./SortAndFilterButton";
+
+const SortAndFilterSettingsForm = lazy(() =>
+  import("./SortAndFilterForm").then((m) => ({
+    default: m.SortAndFilterSettingsForm,
+  }))
+);
 
 export const SortAndFilterSettingsDialog = ({
   initialValue,
@@ -55,15 +60,25 @@ export const SortAndFilterSettingsDialog = ({
             Manage your Sorting and Filtering Settings
           </DialogDescription>
         </DialogHeader>
-        <ErrorBoundary>
-          <SortAndFilterSettingsForm
-            initialValue={initialValue}
-            onSettle={(val) => {
-              onSettle(val);
-              setIsOpen(false);
-            }}
-          />
-        </ErrorBoundary>
+        {isOpen && (
+          <ErrorBoundary>
+            <Suspense
+              fallback={
+                <div className="py-8 text-sm text-center text-muted-foreground">
+                  Loading settings…
+                </div>
+              }
+            >
+              <SortAndFilterSettingsForm
+                initialValue={initialValue}
+                onSettle={(val) => {
+                  onSettle(val);
+                  setIsOpen(false);
+                }}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </DialogContent>
     </Dialog>
   );

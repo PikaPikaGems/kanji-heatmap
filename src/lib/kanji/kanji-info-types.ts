@@ -45,6 +45,7 @@ export type GeneralKanjiItem = {
   jouyouGrade: number;
   wk: number;
   rtk: number;
+  rtkb: number;
   strokes: number;
   kklcIndex: number;
   jlpt: JLTPTtypes;

@@ -38,7 +38,9 @@ export function FrequencyRankDataSource({
           label={label}
           isLabelSrOnly={false}
         />
-        <FreqRankTypeInfo value={value} defaultValue={null} />
+        <div key={value} className="animate-fade-in">
+          <FreqRankTypeInfo value={value} defaultValue={null} />
+        </div>
       </>
     );
   }
@@ -75,7 +77,9 @@ export function FrequencyRankDataSource({
           isLabelSrOnly={false}
         />
       </div>
-      <FreqRankTypeInfo value={value} defaultValue={null} />
+      <div key={value} className="animate-fade-in">
+        <FreqRankTypeInfo value={value} defaultValue={null} />
+      </div>
     </>
   );
 }

@@ -274,6 +274,47 @@ export default defineConfig(() => ({
   build: {
     target: "esnext", // Needed for module workers
     assetsInlineLimit: 0, // keep the ~13MB ORT wasm as a separate file
+    rollupOptions: {
+      output: {
+        // Keep the app entry lean by isolating large, cache-friendly vendor groups.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) {
+            return;
+          }
+
+          if (
+            id.includes("/.pnpm/react@") ||
+            id.includes("/.pnpm/react-dom@") ||
+            id.includes("/.pnpm/scheduler@") ||
+            id.includes("/node_modules/react/") ||
+            id.includes("/node_modules/react-dom/") ||
+            id.includes("/node_modules/scheduler/")
+          ) {
+            return "react-vendor";
+          }
+
+          if (id.includes("@radix-ui")) {
+            return "radix-ui";
+          }
+
+          if (id.includes("lucide-react")) {
+            return "lucide";
+          }
+
+          if (id.includes("/vaul")) {
+            return "vaul";
+          }
+
+          if (id.includes("wanakana")) {
+            return "wanakana";
+          }
+
+          if (id.includes("/cmdk")) {
+            return "cmdk";
+          }
+        },
+      },
+    },
   },
   assetsInclude: ["**/*.wasm"],
   resolve: {

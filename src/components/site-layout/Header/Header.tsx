@@ -1,7 +1,7 @@
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
 import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
 import { ErrorBoundary } from "@/components/error";
-import HeaderDrawer from "./HeaderDrawer";
+import LazyHeaderDrawer from "./LazyHeaderDrawer";
 import { HeaderTitle } from "./HeaderTitle";
 
 const Header = () => {
@@ -13,7 +13,7 @@ const Header = () => {
         <ErrorBoundary fallback={null}>
           <ChangeFontButton />
           <ChangeThemeColorBtn />
-          <HeaderDrawer />
+          <LazyHeaderDrawer />
         </ErrorBoundary>
       </section>
     </header>

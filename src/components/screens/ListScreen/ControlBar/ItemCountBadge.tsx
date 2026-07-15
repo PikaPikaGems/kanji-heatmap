@@ -3,6 +3,7 @@ import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { isKanji } from "@/lib/utils";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { useState, useEffect } from "react";
+import { KANJI_COUNT } from "@/lib/options/constants";
 
 const useKnownCount = () => {
   const [count, setCount] = useState(0);
@@ -50,7 +51,7 @@ const ItemsCountLayout = ({ count }: { count: number }) => {
   return <>
     <div className="absolute top-[50px] flex flex-wrap gap-1">
       <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
-        {count} {count !== 1 ? "Items" : "Item"}
+        {count} {count !== 1 ? "Items" : "Item"} {KANJI_COUNT !== count ? "Matched" : ""}
       </div>
       <KnownBadge />
     </div>

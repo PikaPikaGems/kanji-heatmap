@@ -1,16 +1,20 @@
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
-import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
+import {
+  useGetKanjiInfoFn,
+  useKanjiSearchResult,
+} from "@/kanji-worker/kanji-worker-hooks";
 import { DefaultErrorFallback } from "@/components/error";
 import { VirtualKanjiList } from "./VirtualKanjiList";
 import LoadingKanjis from "./LoadingKanjis";
 import { NoSearchResults } from "@/components/error/NoSearchResults";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { isKanji, dedupe } from "@/lib/utils";
+import { getFinalResults } from "@/lib/results-utils";
 
 const KanjiListWithSearch = () => {
   const result = useKanjiSearchResult();
   const itemSettings = useDeferredItemSettings();
   const searchSettings = useSearchSettings();
+  const getBasicInfo = useGetKanjiInfoFn();
 
   if (result.error != null) {
     return <DefaultErrorFallback message="Failed to load data." />;
@@ -20,24 +24,18 @@ const KanjiListWithSearch = () => {
     return <LoadingKanjis />;
   }
 
-  const { type, text } = searchSettings.textSearch;
-  const kanjiChars = text.split("").filter(isKanji);
-  const uniqueKanjiChars = dedupe(kanjiChars);
+  const kanjiKeys = getFinalResults(
+    searchSettings,
+    result.data,
+    getBasicInfo
+  );
 
-  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
-    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
-  }
-
-  if (result.data.length === 0) {
+  if (kanjiKeys.length === 0) {
     return <NoSearchResults />;
   }
 
-  if (type === "multi-kanji" && uniqueKanjiChars.length > 0) {
-    return <VirtualKanjiList kanjiKeys={uniqueKanjiChars} size={itemSettings.cardType} />
-  }
-
   return (
-    <VirtualKanjiList kanjiKeys={result.data} size={itemSettings.cardType} />
+    <VirtualKanjiList kanjiKeys={kanjiKeys} size={itemSettings.cardType} />
   );
 };
 

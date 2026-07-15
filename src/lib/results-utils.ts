@@ -1,6 +1,9 @@
 import { MAX_STROKE_COUNT } from "@/lib/options/constants";
 import { JLPTOptions } from "@/lib/jlpt";
 import { FilterSettings, SearchSettings } from "@/lib/settings/settings";
+import { dedupe, isKanji } from "@/lib/utils";
+import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import { K_MEANING_KEY } from "@/lib/options/options-constants";
 
 export const hasNoFilters = (settings: SearchSettings) => {
   const { strokeRange, freq, jlpt } = settings.filterSettings;
@@ -11,6 +14,68 @@ export const hasNoFilters = (settings: SearchSettings) => {
 
   return fullRangeStrokes && fullRangeFreq && allJLPT;
 };
+
+const alphaSort = (a: string, b: string) => {
+  const lowerA = a.toLowerCase();
+  const lowerB = b.toLowerCase();
+  if (lowerA < lowerB) return -1;
+  if (lowerA > lowerB) return 1;
+  return 0;
+};
+
+export const getFinalResults = (
+  searchSettings: SearchSettings,
+  resultData: string[],
+  getBasicInfo?: GetBasicKanjiInfo | null
+): string[] => {
+  const { type, text } = searchSettings.textSearch;
+
+  if (type !== "multi-kanji") {
+    return resultData;
+  }
+
+  const uniqueKanjiChars = dedupe(text.split("").filter(isKanji));
+  if (uniqueKanjiChars.length === 0) {
+    return resultData;
+  }
+
+  const hasSort = searchSettings.sortSettings.primary !== "none";
+  const hasFilters = !hasNoFilters(searchSettings);
+
+  if (!hasSort && !hasFilters) {
+    return uniqueKanjiChars;
+  }
+
+  if (!hasSort) {
+    return resultData;
+  }
+
+  // Keyword sort is client-side so component-keyword-only kanji are included.
+  if (
+    searchSettings.sortSettings.primary === K_MEANING_KEY &&
+    getBasicInfo != null
+  ) {
+    const withKeyword: { kanji: string; keyword: string }[] = [];
+    const withoutKeyword: string[] = [];
+
+    for (const kanji of uniqueKanjiChars) {
+      const keyword = getBasicInfo(kanji)?.keyword?.trim() ?? "";
+      if (keyword.length > 0) {
+        withKeyword.push({ kanji, keyword });
+      } else {
+        withoutKeyword.push(kanji);
+      }
+    }
+
+    withKeyword.sort((a, b) => alphaSort(a.keyword, b.keyword));
+    return [...withKeyword.map((item) => item.kanji), ...withoutKeyword];
+  }
+
+  const resultSet = new Set(resultData);
+  const remaining = uniqueKanjiChars.filter((kanji) => !resultSet.has(kanji));
+  return [...resultData, ...remaining];
+};
+
 export const shouldShowAllKanji = (settings: SearchSettings) => {
   const noText = settings.textSearch.text === "";
   return hasNoFilters(settings) && noText;

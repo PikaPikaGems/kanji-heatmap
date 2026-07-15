@@ -1,10 +1,16 @@
+import { lazy, Suspense } from "react";
 import { ReportBugIconBtn } from "@/components/common/ReportBugIconBtn";
 
 import ItemPresentationSettingsPopover from "./ItemPresentation/ItemPresentationPopover";
-import { ItemPresentationSettingsContent } from "./ItemPresentation/ItemPresentationContent";
 import { SettledSearchInput } from "./SearchInput/SettledSearchInput";
 import { SettledSortAndFilter } from "./SortAndFilter/SettledSortAndFilter";
 import { ErrorBoundary } from "@/components/error";
+
+const ItemPresentationSettingsContent = lazy(() =>
+  import("./ItemPresentation/ItemPresentationContent").then((m) => ({
+    default: m.ItemPresentationSettingsContent,
+  }))
+);
 
 export const ControlBar = () => {
   return (
@@ -39,7 +45,9 @@ export const ControlBar = () => {
       >
         <ItemPresentationSettingsPopover>
           <ErrorBoundary details="ItemPresentationSettingsContent in ControlBar">
-            <ItemPresentationSettingsContent />
+            <Suspense fallback={null}>
+              <ItemPresentationSettingsContent />
+            </Suspense>
           </ErrorBoundary>
         </ItemPresentationSettingsPopover>
       </ErrorBoundary>

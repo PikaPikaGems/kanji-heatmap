@@ -49,6 +49,7 @@ export type KanjiExtendedInfo = {
   parts: Set<string>;
   strokes: number;
   rtk: number;
+  rtkb: number;
   wk: number;
   jouyouGrade: number;
   meanings: string[];
@@ -108,6 +109,7 @@ export type ExtendedKanjiInfoItemType = [
   string, // semantic phonetic if any
   string[], // sample vocabulary,
   number, // kklc index
+  number, // rtkb index
 ];
 export type ExtendedKanjiInfoResponseType = Record<
   string,

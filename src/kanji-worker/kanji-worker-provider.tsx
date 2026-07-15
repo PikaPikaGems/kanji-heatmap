@@ -224,8 +224,17 @@ export function KanjiWorkerProvider({
         }
 
         if (type === "general") {
-          const { allKun, allOn, meanings, jouyouGrade, wk, rtk, strokes, kklcIndex } =
-            kanjiInfo.extended;
+          const {
+            allKun,
+            allOn,
+            meanings,
+            jouyouGrade,
+            wk,
+            rtk,
+            rtkb,
+            strokes,
+            kklcIndex,
+          } = kanjiInfo.extended;
 
           return {
             allKun: Array.from(allKun),
@@ -234,6 +243,7 @@ export function KanjiWorkerProvider({
             jouyouGrade,
             wk,
             rtk,
+            rtkb,
             strokes,
             kklcIndex,
             jlpt: kanjiInfo.main.jlpt,

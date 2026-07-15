@@ -106,8 +106,12 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-const HeaderDrawer = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const HeaderDrawer = ({
+  initiallyOpen = false,
+}: {
+  initiallyOpen?: boolean;
+}) => {
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
 
   return (
     <DrawerPrimitive.Root
