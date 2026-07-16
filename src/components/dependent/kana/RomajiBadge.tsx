@@ -15,7 +15,7 @@ export const RomajiBadge = ({ kana }: { kana: string }) => {
       type="button"
       className={cn(
         badgeVariants({ variant: "outline" }),
-        "m-1 cursor-pointer text-xl whitespace-nowrap",
+        "m-1 cursor-pointer text-2xl whitespace-nowrap",
         "hover:bg-[#2effff] hover:text-black",
         "outline-none focus:outline-none focus:ring-0",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",

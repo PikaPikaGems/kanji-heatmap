@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -28,6 +29,9 @@ export const WritingPracticeModal = ({
           <DialogTitle className="flex items-center text-center">
             <span className="text-3xl kanji-font">{kanji}</span>
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Practice writing stroke order for {kanji}
+          </DialogDescription>
         </DialogHeader>
         <ErrorBoundary details="StrokeAnimation in WritingPracticeModal">
           <Suspense fallback={<StrokeAnimationLoadingScreen />}>

@@ -223,7 +223,9 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
           </div>
         )}
         {status === "success" && result != null && (
-          <div className="animate-fade-in">{gradeMessage(kanji, result)}</div>
+          <div className="animate-practice-bounce-soft">
+            {gradeMessage(kanji, result)}
+          </div>
         )}
         {status === "idle" && (
           <div className="font-bold">Draw the kanji, then tap 🚀 to grade.</div>
