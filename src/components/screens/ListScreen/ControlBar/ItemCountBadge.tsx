@@ -48,17 +48,19 @@ const KnownBadge = () => {
   );
 };
 
-const ItemsCountLayout = ({ count }: { count: number }) => {
+const ItemsCountLayout = ({ count }: { count: number | null }) => {
   return (
-    <>
-      <div className="absolute top-[50px] flex flex-wrap gap-1">
+    // Always absolute so this never joins the ControlBar flex row and
+    // squeezes the sort/presentation icon buttons out of view.
+    <div className="absolute top-[50px] flex flex-wrap gap-1">
+      {count != null ? (
         <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
           {count} {count !== 1 ? "Items" : "Item"}{" "}
           {KANJI_COUNT !== count ? "Matched" : ""}
         </div>
-        <KnownBadge />
-      </div>
-    </>
+      ) : null}
+      <KnownBadge />
+    </div>
   );
 };
 
@@ -69,7 +71,7 @@ export const ItemCountBadge = () => {
   const kanjiChars = [...new Set(text.split("").filter(isKanji))];
 
   if (result.data?.length == null) {
-    return <KnownBadge />;
+    return <ItemsCountLayout count={null} />;
   }
 
   if (type === "multi-kanji" && kanjiChars.length > 0) {

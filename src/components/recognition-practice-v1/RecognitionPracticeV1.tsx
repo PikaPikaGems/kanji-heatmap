@@ -6,6 +6,7 @@ import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks"
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
+import { recordActivity } from "@/lib/activity";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
@@ -100,6 +101,7 @@ const RecognitionPracticeV1 = () => {
     const forgottens = sessionResults.filter((r) => !r.correct);
     const moreLeft = forgottens.length > 0 || cursor < deck.length;
 
+    recordActivity("recognition");
     setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
     setHasMore(moreLeft);

@@ -8,6 +8,7 @@ import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { EndSession } from "./EndSession";
 import { SessionStats, SpeedKatakanaSettings } from "./types";
+import { recordActivity } from "@/lib/activity";
 import { recordSetResult } from "./storage";
 import { useCompletedSetsCount } from "./use-completed-sets-count";
 import {
@@ -63,6 +64,7 @@ const SpeedKatakanaScreen = () => {
   const finishGame = (sessionStats: SessionStats) => {
     if (settings.wordCount === 48) {
       recordSetResult(settings.challengeSet, sessionStats);
+      recordActivity("speedKatakana");
     }
     setStats(sessionStats);
     setPhase("ended");

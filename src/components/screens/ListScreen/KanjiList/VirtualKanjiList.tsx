@@ -14,7 +14,7 @@ const KanjiListRaw = ({
   const { cols, rows } = useVirtualListDims(kanjiKeys.length, size);
 
   return (
-    <>
+    <div className="w-full animate-fade-in">
       <WindowVirtualizer>
         {Array.from({ length: rows }).map((_, rowIndex) => {
           const isNotLast = rowIndex < rows - 1;
@@ -23,7 +23,7 @@ const KanjiListRaw = ({
           return (
             <div
               key={rowIndex}
-              className={`flex items-center justify-center w-full pr-1 ${rowIndex === 0 ? "pt-6 pb-1" : isNotLast ? "pb-1" : "pb-16"}`}
+              className={`flex items-center justify-center w-full pr-1 ${rowIndex === 0 ? "pt-6 pb-1" : isNotLast ? "pb-1" : "pb-28"}`}
             >
               {new Array(items).fill(null).map((_, colIndex: number) => {
                 const index = cols * rowIndex + colIndex;
@@ -41,7 +41,7 @@ const KanjiListRaw = ({
           );
         })}
       </WindowVirtualizer>
-    </>
+    </div>
   );
 };
 

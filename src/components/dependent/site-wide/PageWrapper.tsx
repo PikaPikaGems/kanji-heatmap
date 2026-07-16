@@ -4,7 +4,7 @@ import { ErrorBoundary } from "@/components/error";
 
 const PageWrapper = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="pt-12 pb-20 px-2 h-dvh">
+    <div className="min-h-dvh bg-background pt-12 pb-28 px-2">
       <ErrorBoundary>
         <Suspense fallback={<KaomojiAnimation />}>{children}</Suspense>
       </ErrorBoundary>

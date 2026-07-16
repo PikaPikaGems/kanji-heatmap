@@ -5,6 +5,8 @@ import {
   TermsScreen,
   PrivacyScreen,
   SpeedKatakanaScreen,
+  DashboardScreen,
+  MasteryScreen,
 } from "@/components/screens";
 import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
 import { ProductionPracticeV1Screen } from "@/components/production-practice-v1";
@@ -15,7 +17,9 @@ import {
 } from "@/components/items/practice-pages";
 import {
   cumUseGraphPageMeta,
+  dashboardPageMeta,
   exploreKanjiPageMeta,
+  masteryPageMeta,
 } from "@/components/items/nav-links";
 
 const kanjiPage = {
@@ -26,6 +30,16 @@ const kanjiPage = {
 const cumUseGraphPage = {
   ...cumUseGraphPageMeta,
   Component: CumUseScreen,
+};
+
+const dashboardPage = {
+  ...dashboardPageMeta,
+  Component: DashboardScreen,
+};
+
+const masteryPage = {
+  ...masteryPageMeta,
+  Component: MasteryScreen,
 };
 
 const aboutPage = {
@@ -64,6 +78,8 @@ const productionPracticeV1Page = {
 const pageItems = {
   kanjiPage,
   cumUseGraphPage,
+  dashboardPage,
+  masteryPage,
   aboutPage,
   termsPage,
   privacyPage,

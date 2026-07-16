@@ -26,7 +26,7 @@ const ItemPresentationSettingsPopover = ({
         }}
         asChild
       >
-        <Button variant="outline" size="icon" className="h-9 w-9">
+        <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
           <Flower />
           <span className="sr-only">Card Presentation Settings</span>
         </Button>

@@ -135,7 +135,7 @@ export const Game = ({
       */}
       <div className="flex flex-col items-center shrink-0 px-4 pt-8 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
         <div
-          className={current.fontIndex === null ? "kanji-font" : undefined}
+          className={current.fontIndex === null ? "kanji-font" : ""}
           style={
             current.fontIndex === null
               ? undefined
@@ -155,7 +155,7 @@ export const Game = ({
           text={current.englishGloss}
           resetKey={index}
           forceReveal={feedback != null}
-          className="focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+          className="mt-6 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
         />
       </div>
 

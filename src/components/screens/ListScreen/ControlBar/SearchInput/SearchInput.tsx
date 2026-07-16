@@ -185,7 +185,7 @@ export const SearchInput = ({
       : "kanji-font";
 
   return (
-    <section className="relative w-full">
+    <section className="relative flex-1 min-w-0">
       <input
         ref={inputRef}
         // Drawer types are click-to-open; block typing so junk doesn't land in the field.

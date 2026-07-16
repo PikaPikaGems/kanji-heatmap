@@ -11,13 +11,16 @@ import {
   PageNotFound,
   DefaultErrorFallback,
 } from "./components/error";
-import { Header } from "@/components/site-layout/";
+import { Header, FloatingIsland, PracticeFab } from "@/components/site-layout/";
+import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
 const {
   kanjiPage,
   cumUseGraphPage,
+  dashboardPage,
+  masteryPage,
   aboutPage,
   termsPage,
   privacyPage,
@@ -62,7 +65,7 @@ const App = () => {
             </Route>
             <Route>
               <Header />
-              <main className="bg-background">
+              <main className="min-h-dvh bg-background">
                 <ErrorBoundary
                   details="App"
                   fallback={
@@ -72,39 +75,51 @@ const App = () => {
                   }
                 >
                   <KanjiFunctionalityProvider>
-                    <Switch>
-                      <Route
-                        path={cumUseGraphPage.href}
-                        component={cumUseGraphPage.Component}
-                      />
-                      <Route
-                        path={kanjiPage.href}
-                        component={kanjiPage.Component}
-                      />
-                      <Route
-                        path={aboutPage.href}
-                        component={aboutPage.Component}
-                      />
-                      <Route
-                        path={termsPage.href}
-                        component={termsPage.Component}
-                      />
-                      <Route
-                        path={privacyPage.href}
-                        component={privacyPage.Component}
-                      />
-                      <Route path="/docs">
-                        <Redirect to="/about" />
-                      </Route>
-                      <Route path="*">
-                        <div className="w-full pr-4 mt-14">
-                          <PageNotFound />
-                        </div>
-                      </Route>
-                    </Switch>
+                    <PageFadeIn>
+                      <Switch>
+                        <Route
+                          path={dashboardPage.href}
+                          component={dashboardPage.Component}
+                        />
+                        <Route
+                          path={masteryPage.href}
+                          component={masteryPage.Component}
+                        />
+                        <Route
+                          path={cumUseGraphPage.href}
+                          component={cumUseGraphPage.Component}
+                        />
+                        <Route
+                          path={kanjiPage.href}
+                          component={kanjiPage.Component}
+                        />
+                        <Route
+                          path={aboutPage.href}
+                          component={aboutPage.Component}
+                        />
+                        <Route
+                          path={termsPage.href}
+                          component={termsPage.Component}
+                        />
+                        <Route
+                          path={privacyPage.href}
+                          component={privacyPage.Component}
+                        />
+                        <Route path="/docs">
+                          <Redirect to="/about" />
+                        </Route>
+                        <Route path="*">
+                          <div className="w-full pr-4 mt-14">
+                            <PageNotFound />
+                          </div>
+                        </Route>
+                      </Switch>
+                    </PageFadeIn>
                   </KanjiFunctionalityProvider>
                 </ErrorBoundary>
               </main>
+              <FloatingIsland />
+              <PracticeFab />
             </Route>
           </Switch>
         </GlobalKeyboardShortcutProvider>
