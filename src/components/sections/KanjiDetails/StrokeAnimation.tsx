@@ -258,7 +258,7 @@ export const StrokeAnimationWithPracticeMode = ({
 
   return (
     <div key={kanji}>
-      <div className="flex px-4 pt-6">
+      <div className="flex px-4 pt-6 pb-3">
         <div className="relative flex items-center w-full gap-2 mb-4">
           <Switch
             id="practice-mode"

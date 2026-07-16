@@ -4,7 +4,7 @@ import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
 export const StrokeAnimationLoadingScreen = () => {
   return (
     <div className="p-4">
-      <div className="flex px-4 pt-6 pb-2">
+      <div className="flex px-4 pt-6 pb-3">
         <div className="flex items-center gap-2">
           <div className="h-5 rounded-full w-9 bg-muted animate-pulse" />
           <div className="w-24 h-3 rounded-lg bg-muted animate-pulse" />
