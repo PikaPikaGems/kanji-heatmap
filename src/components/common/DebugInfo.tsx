@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Wifi, WifiOff, Info } from "lucide-react";
 import { getUserAgentData } from "@/lib/ua-utils";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 declare const __BUILD_TIMESTAMP__: string;
 
@@ -11,7 +15,7 @@ type NavWithConnection = {
   connection?: NetworkInfo & {
     addEventListener?: (t: string, fn: () => void) => void;
     removeEventListener?: (t: string, fn: () => void) => void;
-  }
+  };
 };
 
 const useNetworkState = (): NetworkInfo => {
@@ -24,7 +28,8 @@ const useNetworkState = (): NetworkInfo => {
   useEffect(() => {
     const c = conn();
     if (!c?.addEventListener) return;
-    const update = () => setState({ saveData: c.saveData, effectiveType: c.effectiveType });
+    const update = () =>
+      setState({ saveData: c.saveData, effectiveType: c.effectiveType });
     c.addEventListener("change", update);
     return () => c.removeEventListener?.("change", update);
   }, []);
@@ -41,44 +46,51 @@ const NetworkStatus = () => {
     const off = () => setOnline(false);
     window.addEventListener("online", on);
     window.addEventListener("offline", off);
-    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
+    return () => {
+      window.removeEventListener("online", on);
+      window.removeEventListener("offline", off);
+    };
   }, []);
 
   return (
     <div className="flex items-center gap-1.5">
-      {online
-        ? <Wifi className="text-green-500 size-3" aria-label="Online" />
-        : <WifiOff className="size-3 text-muted-foreground" aria-label="Offline" />
-      }
+      {online ? (
+        <Wifi className="text-green-500 size-3" aria-label="Online" />
+      ) : (
+        <WifiOff
+          className="size-3 text-muted-foreground"
+          aria-label="Offline"
+        />
+      )}
       <span className={online ? "text-green-500" : "text-muted-foreground"}>
         {online ? "online" : "offline"}
       </span>
-      {network.effectiveType && (
-        <span>
-          {network.effectiveType}
-        </span>
-      )}
-      {network.saveData && (
-        <>{"🐌"}</>
-      )}
+      {network.effectiveType && <span>{network.effectiveType}</span>}
+      {network.saveData && <>{"🐌"}</>}
     </div>
   );
 };
 
-const SwVersion = () => (
-  <span>v{__BUILD_TIMESTAMP__}</span>
-);
+const SwVersion = () => <span>v{__BUILD_TIMESTAMP__}</span>;
 
 const WindowDims = () => {
-  const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
+  const [dims, setDims] = useState({
+    w: window.innerWidth,
+    h: window.innerHeight,
+  });
 
   useEffect(() => {
-    const handler = () => setDims({ w: window.innerWidth, h: window.innerHeight });
+    const handler = () =>
+      setDims({ w: window.innerWidth, h: window.innerHeight });
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
 
-  return <span>{dims.w}×{dims.h}</span>;
+  return (
+    <span>
+      {dims.w}×{dims.h}
+    </span>
+  );
 };
 
 const DeviceSpecs = () => {
@@ -86,8 +98,12 @@ const DeviceSpecs = () => {
   const { browser, os, platform } = getUserAgentData(navigator.userAgent);
   return (
     <div>
-      <div>{os.name} · {os.version} · {platform.platform}</div>
-      <div>{browser.name} · {browser.version}</div>
+      <div>
+        {os.name} · {os.version} · {platform.platform}
+      </div>
+      <div>
+        {browser.name} · {browser.version}
+      </div>
     </div>
   );
 };
@@ -95,7 +111,12 @@ const DeviceSpecs = () => {
 export const DebugInfo = () => (
   <Popover>
     <PopoverTrigger asChild>
-      <Button variant="outline" size="iconXl" className="mr-1" aria-label="Debug info">
+      <Button
+        variant="outline"
+        size="iconXl"
+        className="mr-1"
+        aria-label="Debug info"
+      >
         <Info className="w-[1.2rem] h-[1.2rem]" />
       </Button>
     </PopoverTrigger>
@@ -118,6 +139,5 @@ export const DebugInfo = () => (
         </div>
       </div>
     </PopoverContent>
-
-  </Popover >
+  </Popover>
 );

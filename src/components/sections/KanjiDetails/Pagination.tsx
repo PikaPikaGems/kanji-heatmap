@@ -47,18 +47,32 @@ export const useKeyboardPagination = (
   onPrev: () => void,
   onNext: () => void,
   page: number,
-  totalPages: number,
+  totalPages: number
 ) => {
   useEffect(() => {
     if (!shortcuts) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
+        return;
       const { prev, next } = shortcuts;
       const code = e.code;
-      const matchesPrev = code === `Key${prev.key.toUpperCase()}` && !!e.shiftKey === !!prev.shiftKey;
-      const matchesNext = code === `Key${next.key.toUpperCase()}` && !!e.shiftKey === !!next.shiftKey;
-      if (matchesPrev && page > 1) { e.preventDefault(); onPrev(); }
-      if (matchesNext && page < totalPages) { e.preventDefault(); onNext(); }
+      const matchesPrev =
+        code === `Key${prev.key.toUpperCase()}` &&
+        !!e.shiftKey === !!prev.shiftKey;
+      const matchesNext =
+        code === `Key${next.key.toUpperCase()}` &&
+        !!e.shiftKey === !!next.shiftKey;
+      if (matchesPrev && page > 1) {
+        e.preventDefault();
+        onPrev();
+      }
+      if (matchesNext && page < totalPages) {
+        e.preventDefault();
+        onNext();
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);

@@ -1,4 +1,10 @@
-import { createContext, useContext, useMemo, ReactNode, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  ReactNode,
+  useCallback,
+} from "react";
 import { useJsonFetch } from "@/hooks/use-json";
 import assetsPaths from "@/lib/assets-paths";
 
@@ -27,9 +33,9 @@ export const KanjiRepresentativeWordProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const { data, status, error } = useJsonFetch<Record<string, RepresentativeWordEntry>>(
-    assetsPaths.KANJI_REPRESENTATIVE_WORDS
-  );
+  const { data, status, error } = useJsonFetch<
+    Record<string, RepresentativeWordEntry>
+  >(assetsPaths.KANJI_REPRESENTATIVE_WORDS);
 
   const getRepresentativeWord = useCallback(
     (kanji: string): RepresentativeWordData | null => {
@@ -69,9 +75,14 @@ const useKanjiRepresentativeWordContext = () => {
   return context;
 };
 
-export const useKanjiRepresentativeWord = (kanji: string): RepresentativeWordData | null => {
+export const useKanjiRepresentativeWord = (
+  kanji: string
+): RepresentativeWordData | null => {
   const { getRepresentativeWord } = useKanjiRepresentativeWordContext();
-  return useMemo(() => getRepresentativeWord(kanji), [getRepresentativeWord, kanji]);
+  return useMemo(
+    () => getRepresentativeWord(kanji),
+    [getRepresentativeWord, kanji]
+  );
 };
 
 export const useGetRepresentativeWordFn = () => {

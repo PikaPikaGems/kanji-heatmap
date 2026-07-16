@@ -275,7 +275,8 @@ export const AboutSection = () => {
           </ul>
         </li>
         <li>
-          Data sources not listed here are credited either in the relevant sections of the website where they are used or in the
+          Data sources not listed here are credited either in the relevant
+          sections of the website where they are used or in the
           <CustomLink href="https://github.com/PikaPikaGems/kanji-heatmap-data">
             Kanji Heatmap Data
           </CustomLink>

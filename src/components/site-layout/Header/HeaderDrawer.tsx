@@ -89,11 +89,7 @@ const HeaderDrawer = ({
       onOpenChange={setIsOpen}
     >
       <DrawerPrimitive.Trigger asChild>
-        <Button
-          variant="outline"
-          size="iconXl"
-          aria-label="Open menu"
-        >
+        <Button variant="outline" size="iconXl" aria-label="Open menu">
           <Menu className="w-7 h-7" />
         </Button>
       </DrawerPrimitive.Trigger>

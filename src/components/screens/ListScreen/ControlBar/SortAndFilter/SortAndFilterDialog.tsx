@@ -48,9 +48,7 @@ export const SortAndFilterSettingsDialog = ({
         </HoverCardContent>
       </HoverCard>
       <DialogContent
-        className={
-          "max-h-svh z-50 flex flex-col min-h-0 px-1 md:px-4 pb-4"
-        }
+        className={"max-h-svh z-50 flex flex-col min-h-0 px-1 md:px-4 pb-4"}
       >
         <DialogHeader>
           <DialogTitle className="m-0 text-left">

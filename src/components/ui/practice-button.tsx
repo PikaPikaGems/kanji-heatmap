@@ -24,8 +24,7 @@ const practiceButtonVariants = cva(
           "background-theme-color-with-opacity-100 text-white border-theme-color-darker hover:brightness-105",
         inverted:
           "bg-foreground text-background border-neutral-800 dark:border-neutral-400 hover:brightness-105",
-        danger:
-          "bg-rose-500 text-white border-rose-800 hover:brightness-105",
+        danger: "bg-rose-500 text-white border-rose-800 hover:brightness-105",
         secondary:
           "bg-background text-foreground border-foreground/30 hover:bg-accent",
         ghost:
@@ -47,7 +46,7 @@ const practiceButtonVariants = cva(
 
 export interface PracticeButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof practiceButtonVariants> { }
+    VariantProps<typeof practiceButtonVariants> {}
 
 export const PracticeButton = React.forwardRef<
   HTMLButtonElement,

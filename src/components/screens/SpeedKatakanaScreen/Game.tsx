@@ -13,11 +13,7 @@ import {
   isForgotCommand,
   isForgotCommandPrefix,
 } from "@/lib/practice-commands";
-import {
-  ChallengeSetData,
-  SessionStats,
-  SpeedKatakanaSettings,
-} from "./types";
+import { ChallengeSetData, SessionStats, SpeedKatakanaSettings } from "./types";
 import { randomFontIndex } from "@/hooks/use-change-font";
 import { percent, shuffle } from "@/lib/utils";
 import { CircleArrowLeft } from "lucide-react";
@@ -28,7 +24,6 @@ type GameWord = {
   /** Index into the --jap-font-* CSS vars, or null to use the default font. */
   fontIndex: number | null;
 };
-
 
 export const Game = ({
   settings,
@@ -62,7 +57,11 @@ export const Game = ({
 
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
-  const [flash, setFlash] = useState<{ english: string; key: number; skipped: boolean } | null>(null);
+  const [flash, setFlash] = useState<{
+    english: string;
+    key: number;
+    skipped: boolean;
+  } | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Stats live in refs so per-keystroke bookkeeping doesn't trigger re-renders.
@@ -103,11 +102,13 @@ export const Game = ({
   }
 
   if (status !== "success" || words.length === 0) {
-    return <>
-      <div className="flex items-center justify-center w-full h-full">
-        <KaomojiAnimation />
-      </div>
-    </>;
+    return (
+      <>
+        <div className="flex items-center justify-center w-full h-full">
+          <KaomojiAnimation />
+        </div>
+      </>
+    );
   }
 
   const current = words[index];
@@ -140,7 +141,11 @@ export const Game = ({
     if (!settings.displayEnglish) {
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       flashKeyRef.current += 1;
-      setFlash({ english: current.english, key: flashKeyRef.current, skipped: true });
+      setFlash({
+        english: current.english,
+        key: flashKeyRef.current,
+        skipped: true,
+      });
       flashTimerRef.current = setTimeout(() => setFlash(null), 1200);
     }
     advance();
@@ -185,7 +190,11 @@ export const Game = ({
       if (!settings.displayEnglish) {
         if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
         flashKeyRef.current += 1;
-        setFlash({ english: current.english, key: flashKeyRef.current, skipped: false });
+        setFlash({
+          english: current.english,
+          key: flashKeyRef.current,
+          skipped: false,
+        });
         flashTimerRef.current = setTimeout(() => setFlash(null), 1200);
       }
       advance();
@@ -257,8 +266,8 @@ export const Game = ({
             current.fontIndex === null
               ? undefined
               : {
-                fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
-              }
+                  fontFamily: `var(--jap-font-${current.fontIndex}), "Noto Sans JP", system-ui`,
+                }
           }
         >
           <p className="text-5xl font-bold leading-tight break-all md:text-7xl">
@@ -282,7 +291,6 @@ export const Game = ({
             )}
           </div>
         </div>
-
       </div>
 
       <div className="shrink-0 pl-3 pr-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">

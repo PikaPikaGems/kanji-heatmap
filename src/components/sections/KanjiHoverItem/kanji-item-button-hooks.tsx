@@ -56,9 +56,7 @@ export const useItemBtnCn = (kanji: string) => {
 
   const kanjiInfo = getInfo?.(kanji);
 
-  if (
-    kanji.length === 0
-  ) {
+  if (kanji.length === 0) {
     return loadingCn;
   }
   const freqType =
@@ -66,7 +64,12 @@ export const useItemBtnCn = (kanji: string) => {
   const dontIncludeFreq = freqType == "none";
 
   const freqData = kanjiInfo?.frequency;
-  const freqRank = freqType !== "none" ? freqData ? freqData[freqType] : undefined : undefined;
+  const freqRank =
+    freqType !== "none"
+      ? freqData
+        ? freqData[freqType]
+        : undefined
+      : undefined;
   const freqRankCategory = getFreqCategory(freqRank);
 
   const textColor = dontIncludeFreq

@@ -258,9 +258,7 @@ export const Game = ({
         open={feedback != null}
         kind={feedback?.kind ?? "noKanji"}
         item={current}
-        grade={
-          feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }
-        }
+        grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
         drawing={drawing}
         onNext={advance}
       />

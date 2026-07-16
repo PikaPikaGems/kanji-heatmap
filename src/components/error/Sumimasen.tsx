@@ -1,4 +1,3 @@
-
 export const APOLOGIZING_SYMBOL = [
   "(シ_ _)シ",
   "m(_ _)m",

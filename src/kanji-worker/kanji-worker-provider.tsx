@@ -79,9 +79,9 @@ const extractKanjiHoverData = (
         : undefined,
       second: vocab?.second
         ? {
-          ...vocab.second,
-          partsList: getPartsList(vocab.second.word),
-        }
+            ...vocab.second,
+            partsList: getPartsList(vocab.second.word),
+          }
         : undefined,
     },
     parts: Array.from(kanjiInfoExtended.parts).map((part) => {
@@ -278,9 +278,10 @@ export function KanjiWorkerProvider({
 
   const getKanjiBasicInfo: GetBasicKanjiInfo = useCallback((kanji) => {
     const main = kanjiCacheRef.current?.[kanji]?.main;
-    const mainAlt = kanjiCacheRef.current?.[radicalFalseFriends[kanji]]?.main
-    const keyword = partKeywordCacheRef.current?.[kanji] ?? partKeywordCacheRef.current?.[radicalFalseFriends[kanji]]
-
+    const mainAlt = kanjiCacheRef.current?.[radicalFalseFriends[kanji]]?.main;
+    const keyword =
+      partKeywordCacheRef.current?.[kanji] ??
+      partKeywordCacheRef.current?.[radicalFalseFriends[kanji]];
 
     return main ? main : mainAlt ? mainAlt : keyword ? { keyword } : null;
   }, []);

@@ -9,7 +9,5 @@ const BugIconFallback = () => (
 );
 
 export const BugIconErrorBoundary = ({ children }: { children: ReactNode }) => (
-  <ErrorBoundary fallback={<BugIconFallback />}>
-    {children}
-  </ErrorBoundary>
+  <ErrorBoundary fallback={<BugIconFallback />}>{children}</ErrorBoundary>
 );

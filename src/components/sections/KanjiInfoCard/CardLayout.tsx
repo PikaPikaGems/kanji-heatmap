@@ -5,17 +5,16 @@ export const KanjiCardLayout = ({
   firstWord,
   secondWord,
   badges,
-  componentBreakdown
+  componentBreakdown,
 }: {
   main: ReactNode;
   firstWord: ReactNode;
   secondWord: ReactNode;
   badges?: ReactNode;
-  componentBreakdown: ReactNode
+  componentBreakdown: ReactNode;
 }) => {
   return (
     <article className="w-full py-2 border-2 border-dotted rounded-3xl animate-fade-in">
-
       <div className="relative flex flex-col">
         <div className="my-2">{main}</div>
         <div>
@@ -24,9 +23,11 @@ export const KanjiCardLayout = ({
               <div className="p-2 m-1 border-2 border-dotted rounded-3xl">
                 {firstWord}
               </div>
-              {secondWord && <div className="p-2 m-1 border-2 border-dotted rounded-3xl">
-                {secondWord}
-              </div>}
+              {secondWord && (
+                <div className="p-2 m-1 border-2 border-dotted rounded-3xl">
+                  {secondWord}
+                </div>
+              )}
             </div>
           )}
         </div>

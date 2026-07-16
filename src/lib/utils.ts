@@ -20,7 +20,9 @@ export const percent = (part: number, total: number, fallback = 0) =>
 
 /** Rounded mean of a numeric array, or null when empty. */
 export const roundedMean = (nums: number[]): number | null =>
-  nums.length ? Math.round(nums.reduce((a, b) => a + b, 0) / nums.length) : null;
+  nums.length
+    ? Math.round(nums.reduce((a, b) => a + b, 0) / nums.length)
+    : null;
 
 export const toNum = (str?: string | null | number, fallback?: number) => {
   if (typeof str === "string" && !Number.isNaN(Number(str))) {

@@ -8,28 +8,38 @@ export const ComponentLink = ({
   component,
   keyword,
   title,
-  type
+  type,
 }: {
   component: string;
   keyword: string;
   title?: string;
-  type: 'kanji' | 'radical' | 'unknown'
+  type: "kanji" | "radical" | "unknown";
 }) => {
-
   return (
     <div className="flex flex-col text-center w-fit ">
-      {type === 'kanji' ?
-        <GlobalKanjiLink kanji={component} keyword={keyword} /> : type === "radical" ?
-          <GlobalRadicalLink radical={component} keyword={keyword} /> : <FakeComponentLink radical={component} keyword={keyword} />
-      }
+      {type === "kanji" ? (
+        <GlobalKanjiLink kanji={component} keyword={keyword} />
+      ) : type === "radical" ? (
+        <GlobalRadicalLink radical={component} keyword={keyword} />
+      ) : (
+        <FakeComponentLink radical={component} keyword={keyword} />
+      )}
       {title && <div className="text-[10px] uppercase opacity-70">{title}</div>}
     </div>
-  )
-
-
+  );
 };
 
-type FontSize = 'text-xl' | 'text-2xl' | 'text-3xl' | 'text-4xl' | 'text-5xl' | 'text-6xl' | 'text-7xl' | 'text-8xl' | 'text-9xl' | 'text-10xl';
+type FontSize =
+  | "text-xl"
+  | "text-2xl"
+  | "text-3xl"
+  | "text-4xl"
+  | "text-5xl"
+  | "text-6xl"
+  | "text-7xl"
+  | "text-8xl"
+  | "text-9xl"
+  | "text-10xl";
 
 const cnJPCard = "flex flex-col m-1 p-1 text-xl rounded-md";
 const cnJPCardLink = `${cnJPCard} hover:bg-foreground/5`;
@@ -37,7 +47,7 @@ const cnJPCardLink = `${cnJPCard} hover:bg-foreground/5`;
 const JPCardInner = ({
   label,
   character,
-  fontSize = 'text-3xl',
+  fontSize = "text-3xl",
   badgeClassName,
   badgeVariant,
 }: {
@@ -45,14 +55,18 @@ const JPCardInner = ({
   character: string;
   fontSize?: FontSize;
   badgeClassName?: string;
-  badgeVariant?: React.ComponentProps<typeof Badge>['variant'];
+  badgeVariant?: React.ComponentProps<typeof Badge>["variant"];
 }) => (
   <>
     <Badge
-      className={`justify-center text-center whitespace-nowrap ${badgeClassName ?? ''}`}
-      variant={badgeVariant}>{label === "Unknown" ? "..." : label}
+      className={`justify-center text-center whitespace-nowrap ${badgeClassName ?? ""}`}
+      variant={badgeVariant}
+    >
+      {label === "Unknown" ? "..." : label}
     </Badge>
-    <div className={`kanji-font whitespace-nowrap ${fontSize}`}>{character}</div>
+    <div className={`kanji-font whitespace-nowrap ${fontSize}`}>
+      {character}
+    </div>
   </>
 );
 
@@ -65,8 +79,8 @@ export const GlobalHomeLink = () => {
 };
 
 const redirectRadical: Record<string, string> = {
-  飠: "食"
-}
+  飠: "食",
+};
 
 export const GlobalRadicalLink = ({
   radical,

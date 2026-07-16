@@ -1,4 +1,7 @@
-import type { DrawingSubmitPayload, Stroke } from "@/components/dependent/DrawingPad";
+import type {
+  DrawingSubmitPayload,
+  Stroke,
+} from "@/components/dependent/DrawingPad";
 
 // On-device single-character recognition via Dariyooo's DaKanji ONNX model.
 // Everything (ORT JS, wasm, model, labels) loads only on the first recognize call.
@@ -37,7 +40,9 @@ const loadRuntime = (): Promise<DaKanjiRuntime> => {
         import("onnxruntime-web/ort-wasm-simd-threaded.wasm?url"),
         fetch(LABELS_URL).then((response) => {
           if (!response.ok) {
-            throw new Error(`Failed to load DaKanji labels: ${response.status}`);
+            throw new Error(
+              `Failed to load DaKanji labels: ${response.status}`
+            );
           }
           return response.text();
         }),
@@ -76,7 +81,9 @@ const rasterizeStrokes = (
   canvas.height = height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (ctx == null) {
-    throw new Error("Could not create 2D canvas context for DaKanji rasterization");
+    throw new Error(
+      "Could not create 2D canvas context for DaKanji rasterization"
+    );
   }
 
   ctx.fillStyle = "#000000";
@@ -139,7 +146,11 @@ const rasterizeStrokes = (
   return { pixels, width: sw, height: sh };
 };
 
-const topKLabels = (probs: Float32Array, labels: string, k: number): string[] => {
+const topKLabels = (
+  probs: Float32Array,
+  labels: string,
+  k: number
+): string[] => {
   const indexed = Array.from({ length: probs.length }, (_, i) => i);
   indexed.sort((a, b) => probs[b]! - probs[a]!);
 

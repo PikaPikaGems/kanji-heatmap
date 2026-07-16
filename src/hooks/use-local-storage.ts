@@ -17,7 +17,9 @@ const readFromStorage = <T>(storageKey: string, defaultValue: T): T => {
 };
 
 export function useLocalStorage2(storageKey: string) {
-  const [value, setValue] = useState(() => localStorage.getItem(storageKey) === "true");
+  const [value, setValue] = useState(
+    () => localStorage.getItem(storageKey) === "true"
+  );
 
   useEffect(() => {
     setValue(localStorage.getItem(storageKey) === "true");

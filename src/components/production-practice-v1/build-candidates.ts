@@ -28,10 +28,7 @@ export const buildCandidateGrid = ({
     );
   }
 
-  return padCandidates([], target, similars, [
-    ...modelGuesses,
-    ...randomPool,
-  ]);
+  return padCandidates([], target, similars, [...modelGuesses, ...randomPool]);
 };
 
 const padCandidates = (

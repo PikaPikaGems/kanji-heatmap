@@ -238,7 +238,6 @@ export const SortAndFilterSettingsForm = ({
             )
           }
         />
-
       </div>
       <div className="px-2 pt-4 mt-4 border-t">
         {!isDisabled && (
@@ -252,7 +251,6 @@ export const SortAndFilterSettingsForm = ({
           </div>
         )}
         <div className="flex justify-end px-0 pt-2 space-x-1">
-
           <Button
             variant="outline"
             onClick={(e) => {
@@ -269,7 +267,6 @@ export const SortAndFilterSettingsForm = ({
           </Button>
         </div>
       </div>
-
     </form>
   );
 };

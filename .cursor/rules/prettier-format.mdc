@@ -1,0 +1,36 @@
+---
+description: Run Prettier on edited files so agent output matches repo formatting
+alwaysApply: true
+---
+
+# Prettier formatting
+
+This repo uses Prettier (`.prettierrc.json`). Do not rely on approximate style — run the formatter.
+
+## After editing files
+
+When you create or modify source files, run Prettier on **only those paths** before finishing:
+
+```bash
+pnpm exec prettier --write path/to/file1.tsx path/to/file2.ts
+```
+
+Do **not** run `pnpm run format` / `prettier --write .` unless the user explicitly asks for a full-repo format.
+
+## Config to match (do not fight these)
+
+- `printWidth`: 80
+- `tabWidth`: 2, `useTabs`: false
+- `semi`: true
+- `singleQuote`: false
+- `trailingComma`: "es5"
+- `arrowParens`: "always"
+
+## Skip
+
+- Files ignored by `.prettierignore` (currently `*.json`, `*.yaml`, `*.yml`)
+- Generated / binary assets under `public/` data dumps unless the user asked to edit them
+
+## Do not put Prettier in `dev` or `build`
+
+Keep formatting out of those scripts. Use this post-edit step (and optional format-on-save / pre-commit) instead.

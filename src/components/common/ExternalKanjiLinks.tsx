@@ -6,11 +6,15 @@ export const ExternalKanjiLinks = ({ kanji }: { kanji: string }) => {
       {externalLinks.map((item) => {
         return (
           <li key={item.name} className="px-1 py-1">
-            <a href={`${item.url(kanji)}`}
+            <a
+              href={`${item.url(kanji)}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center px-3 py-1 text-sm transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
-            > {item.name}</a>
+            >
+              {" "}
+              {item.name}
+            </a>
           </li>
         );
       })}

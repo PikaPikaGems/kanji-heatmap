@@ -12,7 +12,6 @@ export const SmallUnexpectedErrorFallback = () => {
   );
 };
 
-
 export const SmallUnexpectedErrorFallbackTxt = ({ txt }: { txt: string }) => {
   return (
     <div className="flex items-center justify-center w-full h-full p-2 text-xs font-bold">

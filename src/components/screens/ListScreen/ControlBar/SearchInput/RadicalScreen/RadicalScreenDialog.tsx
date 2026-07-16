@@ -28,7 +28,11 @@ export const RadicalsScreenDialog = ({
         </DrawerDescription>
         <ErrorBoundary>{children}</ErrorBoundary>
         <DrawerClose asChild className="absolute z-50 top-2 right-2">
-          <Button variant="ghost" size="icon" className="p-4 border-2 border-dashed rounded-xl bg-background">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-4 border-2 border-dashed rounded-xl bg-background"
+          >
             <CircleX className="size-8" />
           </Button>
         </DrawerClose>

@@ -33,7 +33,11 @@ const HandwritingControl = lazy(() =>
 const INPUT_DEBOUNCE_TIME = 400;
 
 // Search types that open a drawer instead of accepting typed input.
-type DialogType = "radicals" | "handwriting" | "handwriting-alt" | "handwriting-alt-2";
+type DialogType =
+  | "radicals"
+  | "handwriting"
+  | "handwriting-alt"
+  | "handwriting-alt-2";
 const DIALOG_TYPES: DialogType[] = [
   "radicals",
   "handwriting",
@@ -43,11 +47,7 @@ const DIALOG_TYPES: DialogType[] = [
 const isDialogType = (type: SearchType): type is DialogType =>
   (DIALOG_TYPES as SearchType[]).includes(type);
 
-const stripToKanji = (text: string) =>
-  text
-    .split("")
-    .filter(isKanji)
-    .join("");
+const stripToKanji = (text: string) => text.split("").filter(isKanji).join("");
 
 const searchTypeLabel = (type: SearchType) =>
   SEARCH_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
@@ -262,7 +262,11 @@ export const SearchInput = ({
           }
 
           // Escape clears the field when no drawer is open (drawers handle Escape themselves).
-          if (e.key === "Escape" && openDialogType === "none" && parsedValue.length > 0) {
+          if (
+            e.key === "Escape" &&
+            openDialogType === "none" &&
+            parsedValue.length > 0
+          ) {
             e.preventDefault();
             clearSearch();
             return;
@@ -271,9 +275,7 @@ export const SearchInput = ({
           // Fallback when composition already ended (e.g. second Enter, or
           // text entered without IME). Same script → type rules as paste.
           if (e.key === "Enter") {
-            const text = (
-              inputRef.current?.value ?? parsedValue
-            ).trim();
+            const text = (inputRef.current?.value ?? parsedValue).trim();
             const inferred = inferSearchTypeFromText(text);
             if (inferred != null && inferred !== searchType) {
               syncAndAnnounceType(text, inferred);

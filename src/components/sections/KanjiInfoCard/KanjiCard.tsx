@@ -46,26 +46,32 @@ const transformKanjiWordDetails = (
 };
 
 export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
-  return <>
-    <article className="w-full pt-6 pb-20 border-2 border-dotted rounded-3xl animate-fade-in">
-      <div className="relative pl-2 mr-4 rounded-3xl">
-        <span className="text-[220px] leading-none kanji-font">{kanji}</span>
-      </div>
-    </article>
-  </>
-}
+  return (
+    <>
+      <article className="w-full pt-6 pb-20 border-2 border-dotted rounded-3xl animate-fade-in">
+        <div className="relative pl-2 mr-4 rounded-3xl">
+          <span className="text-[220px] leading-none kanji-font">{kanji}</span>
+        </div>
+      </article>
+    </>
+  );
+};
 
 const RepWordKanji = ({ kanji }: { kanji: string }) => {
   const repWord = useKanjiRepresentativeWord(kanji);
 
-  return <>
-    {repWord && (
-      <div className="flex justify-center gap-2 m-auto">
-        <span className="text-sm kanji-font">{repWord.tags?.[0]} {repWord.word} ({repWord.reading})</span>
-      </div>
-    )}
-  </>
-}
+  return (
+    <>
+      {repWord && (
+        <div className="flex justify-center gap-2 m-auto">
+          <span className="text-sm kanji-font">
+            {repWord.tags?.[0]} {repWord.word} ({repWord.reading})
+          </span>
+        </div>
+      )}
+    </>
+  );
+};
 
 export const KanjiCard = ({ kanji }: { kanji: string }) => {
   const data = useKanjiInfo(kanji, "hover-card");
@@ -89,13 +95,20 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
       main={
         <div className="relative py-2 pl-2 mr-4 rounded-3xl">
           <span className="text-[140px] leading-none kanji-font">{kanji}</span>
-          <div className="mt-4 font-bold uppercase -translate-y-1 text-md">{info.keyword}</div>
+          <div className="mt-4 font-bold uppercase -translate-y-1 text-md">
+            {info.keyword}
+          </div>
           <RepWordKanji kanji={kanji} />
         </div>
       }
       firstWord={word1Props && <WordCard {...word1Props} />}
       secondWord={word2Props && <WordCard {...word2Props} />}
-      componentBreakdown={<OriginalKanjiComponentBreakdown kanji={kanji} showNotAvailable={false} />}
+      componentBreakdown={
+        <OriginalKanjiComponentBreakdown
+          kanji={kanji}
+          showNotAvailable={false}
+        />
+      }
       badges={
         <>
           <JLPTBadge jlpt={info.jlpt} />

@@ -61,7 +61,10 @@ export const ModeToggle = () => {
       window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
-    <Button variant="outline" size="iconXl" className="relative"
+    <Button
+      variant="outline"
+      size="iconXl"
+      className="relative"
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

@@ -1,4 +1,6 @@
-export const onRequest = async (context: { request: Request }): Promise<Response> => {
+export const onRequest = async (context: {
+  request: Request;
+}): Promise<Response> => {
   const url = new URL(context.request.url);
   const keyword = url.searchParams.get("keyword") ?? "";
   let response: Response;

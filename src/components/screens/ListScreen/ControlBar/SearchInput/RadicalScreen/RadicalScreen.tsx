@@ -110,9 +110,7 @@ const ExpandedRadicalBtn = ({
 
 const TitleLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <span
-      className="px-1 text-sm font-bold rounded-full text-foreground bg-background"
-    >
+    <span className="px-1 text-sm font-bold rounded-full text-foreground bg-background">
       {children}
     </span>
   );

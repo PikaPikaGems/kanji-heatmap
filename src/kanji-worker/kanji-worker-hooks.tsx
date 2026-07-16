@@ -268,7 +268,6 @@ export const useVocabDetails = (word: string) => {
   return state;
 };
 
-
 export const useWordKanjis = (word: string) => {
   const getKanjiInfo = useGetKanjiInfoFn();
 

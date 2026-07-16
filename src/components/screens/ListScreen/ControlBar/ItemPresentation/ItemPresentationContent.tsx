@@ -79,7 +79,9 @@ const CardStateSettings = () => {
       <H2>Border Color Meaning</H2>
       <BasicSelect
         value={cardState.borderColorMeaning}
-        onChange={(v) => dispatch("borderColorMeaning", v as BorderColorMeaning)}
+        onChange={(v) =>
+          dispatch("borderColorMeaning", v as BorderColorMeaning)
+        }
         label="Border Color Meaning"
         isLabelSrOnly={true}
         options={[

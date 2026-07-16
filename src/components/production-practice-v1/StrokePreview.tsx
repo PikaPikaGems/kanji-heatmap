@@ -71,10 +71,20 @@ export const StrokePreview = ({
           height="28"
           patternUnits="userSpaceOnUse"
         >
-          <circle cx="0" cy="0" r="1" fill="hsl(var(--foreground))" opacity="0.25" />
+          <circle
+            cx="0"
+            cy="0"
+            r="1"
+            fill="hsl(var(--foreground))"
+            opacity="0.25"
+          />
         </pattern>
       </defs>
-      <rect width={sourceSize} height={sourceSize} fill={`url(#${patternId})`} />
+      <rect
+        width={sourceSize}
+        height={sourceSize}
+        fill={`url(#${patternId})`}
+      />
       <line
         x1={0}
         y1={sourceSize / 2}
