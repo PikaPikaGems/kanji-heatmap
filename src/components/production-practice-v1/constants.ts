@@ -4,6 +4,13 @@ import { ProductionPracticeSettings } from "./types";
 export const SESSION_SIZE = 10;
 /** Look-alike grid size: always 4×3. */
 export const CANDIDATE_COUNT = 12;
+/** Ranks that count as “in top 10” for session scoring. */
+export const GRADE_TOP_K = 10;
+/**
+ * Extra DaKanji guesses for the grid. After dropping kana/radicals we still
+ * need enough real kanji to pad to CANDIDATE_COUNT (especially on small decks).
+ */
+export const RECOGNIZE_TOP_K = 40;
 export const SETTINGS_KEY = "production-practice-v1-settings";
 
 export const DEFAULT_SETTINGS: ProductionPracticeSettings = {

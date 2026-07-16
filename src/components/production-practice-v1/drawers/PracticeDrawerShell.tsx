@@ -17,6 +17,7 @@ export const PracticeDrawerShell = ({
   children,
   footer,
   showHandle = false,
+  autoFocus = false,
 }: {
   open: boolean;
   title: ReactNode;
@@ -26,9 +27,11 @@ export const PracticeDrawerShell = ({
   footer?: ReactNode;
   /** Top drag-handle pill. Hide on feedback drawers. */
   showHandle?: boolean;
+  /** Focus first focusable on open (vaul). See KanjiDrawer. */
+  autoFocus?: boolean;
 }) => {
   return (
-    <Drawer open={open} dismissible={false}>
+    <Drawer open={open} dismissible={false} autoFocus={autoFocus}>
       <DrawerContent
         showHandle={showHandle}
         className="max-h-[92dvh] border-2 border-t-4 [border-top-style:dashed]"

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
 import {
   DrawingPad,
@@ -10,16 +10,18 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { useJsonFetch } from "@/hooks/use-json";
 import { BlurredGloss } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   useGetKanjiInfoFn,
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
+import { recognizeDaKanji } from "@/lib/dakanji-adapter";
+import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
-import { DRAW_SVG_SIZE } from "./constants";
+import { DRAW_SVG_SIZE, GRADE_TOP_K, RECOGNIZE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
 import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
 import {
@@ -74,6 +76,13 @@ export const Game = ({
   const similarState = useSimilarKanjis(current?.kanji ?? "");
   const similars = similarState.data ?? [];
   const getKanjiInfo = useGetKanjiInfoFn();
+  const { data: similarMap } = useJsonFetch<Record<string, string[]>>(
+    assetsPaths.SIMILAR_KANJIS
+  );
+  const getSimilars = useMemo(() => {
+    const map = similarMap;
+    return (k: string) => map?.[k] ?? [];
+  }, [similarMap]);
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
@@ -160,9 +169,9 @@ export const Game = ({
     setDrawing(payload);
     setStep({ type: "recognizing" });
     try {
-      const candidates = await recognizeWithDaKanji(payload);
+      const candidates = await recognizeDaKanji(payload, RECOGNIZE_TOP_K);
       const rank = candidates.indexOf(current.kanji);
-      const inTop10 = rank >= 0;
+      const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
       const grade: GradeRankInfo = {
         rank,
         topGuess: candidates[0] ?? null,
@@ -178,6 +187,7 @@ export const Game = ({
         modelGuesses: candidates,
         similars: similarList,
         randomPool: randomKanjiPool,
+        getSimilars,
         isRealKanji,
       });
       setSelected(null);

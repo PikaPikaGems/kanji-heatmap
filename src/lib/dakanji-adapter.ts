@@ -8,7 +8,7 @@ import type {
 
 const MODEL_URL = "/onnx/char_classifier.onnx";
 const LABELS_URL = "/onnx/char_classifier_labels.txt";
-const TOP_K = 10;
+const DEFAULT_TOP_K = 10;
 // Match DrawingPad's perfect-freehand `size` so the raster looks like what the user drew.
 const STROKE_WIDTH = 16;
 
@@ -169,7 +169,8 @@ export const warmupDaKanji = (): Promise<void> =>
   loadRuntime().then(() => undefined);
 
 export const recognizeDaKanji = async (
-  payload: DrawingSubmitPayload
+  payload: DrawingSubmitPayload,
+  topK: number = DEFAULT_TOP_K
 ): Promise<string[]> => {
   if (payload.strokes.length === 0) {
     return [];
@@ -195,5 +196,5 @@ export const recognizeDaKanji = async (
   }
 
   const probs = output.data as Float32Array;
-  return topKLabels(probs, labels, TOP_K);
+  return topKLabels(probs, labels, topK);
 };
