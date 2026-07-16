@@ -7,10 +7,9 @@ const HoverCard = HoverCardPrimitive.Root;
 const HoverCardArrow = () => {
   return (
     <HoverCardPrimitive.Arrow
-      className="-my-px border-none fill-[white] dark:fill-black drop-shadow-[0_1px_0_#dddddd] dark:drop-shadow-[0_1px_0_#262626]"
+      className="-my-px fill-popover drop-shadow-[0_1px_0_hsl(var(--border))]"
       width={15}
       height={10}
-      stroke={"3"}
       aria-hidden="true"
     />
   );
