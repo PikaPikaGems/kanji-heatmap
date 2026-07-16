@@ -35,7 +35,10 @@ export const WritingPracticeModal = ({
         </DialogHeader>
         <ErrorBoundary details="StrokeAnimation in WritingPracticeModal">
           <Suspense fallback={<StrokeAnimationLoadingScreen />}>
-            <StrokeAnimation key={kanji} kanji={kanji} defaultPracticeMode />
+            {/* Remount when opened so stroke order restarts from the first stroke. */}
+            {open && (
+              <StrokeAnimation key={kanji} kanji={kanji} defaultPracticeMode />
+            )}
           </Suspense>
         </ErrorBoundary>
       </DialogContent>

@@ -169,7 +169,9 @@ export const Game = ({
         inTop10,
       };
       const similarList = similarState.data ?? similars;
-      const isRealKanji = (k: string) => getKanjiInfo?.(k) != null;
+      // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
+      // part-keywords (e.g. 囗 → "closed box"), which must not count.
+      const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
       const grid = buildCandidateGrid({
         target: current.kanji,
         inTop10,

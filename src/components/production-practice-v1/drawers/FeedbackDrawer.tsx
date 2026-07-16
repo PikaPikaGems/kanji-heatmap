@@ -82,7 +82,10 @@ export const FeedbackDrawer = ({
       >
         {kind === "noKanji" ? (
           <div className="flex flex-col items-center gap-2 px-3 pb-2 mt-4 overflow-y-auto sm:px-4">
-            <StrokeOrderPlayer kanji={item.kanji} size={PREVIEW_SIZE + 30} />
+            {/* Mount only while open so DMAK doesn't finish animating off-screen. */}
+            {open && (
+              <StrokeOrderPlayer kanji={item.kanji} size={PREVIEW_SIZE + 30} />
+            )}
             <PracticeButton
               size="default"
               variant="ghost"
@@ -127,7 +130,9 @@ export const FeedbackDrawer = ({
                 <p className="text-xs font-bold uppercase text-muted-foreground">
                   Stroke Order
                 </p>
-                <StrokeOrderPlayer kanji={item.kanji} size={PREVIEW_SIZE} />
+                {open && (
+                  <StrokeOrderPlayer kanji={item.kanji} size={PREVIEW_SIZE} />
+                )}
               </div>
             </div>
           </div>
