@@ -48,19 +48,23 @@ export const AnswerFeedback = ({
 
   return (
     <div
-      className="flex flex-col items-center gap-3 animate-practice-bounce-soft"
+      className="flex flex-col items-center gap-3"
       role="status"
       aria-live="polite"
       aria-label={correct ? "Correct" : "Forgot"}
     >
-      <div className="flex flex-wrap items-center justify-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1 animate-practice-bounce-soft">
         <p>{correct ? "🎉 ·" : ""}</p>
         <SpeakButton word={word} iconType="volume-2" />
         {readings.map((r) => (
           <RomajiBadge key={r} kana={r} />
         ))}
       </div>
-      <PracticeButton size="lg" className="max-w-xs" onClick={onNext}>
+      <PracticeButton
+        size="lg"
+        className="max-w-xs animate-fade-in"
+        onClick={onNext}
+      >
         Continue
       </PracticeButton>
     </div>

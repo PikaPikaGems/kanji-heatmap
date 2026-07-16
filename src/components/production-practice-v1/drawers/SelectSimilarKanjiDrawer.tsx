@@ -1,8 +1,11 @@
 import { PracticeButton } from "@/components/ui/practice-button";
+import { useEnterAction } from "@/hooks/use-enter-action";
 import { gradeHeadline } from "@/lib/dakanji-grade";
 import { cn } from "@/lib/utils";
 import type { GradeRankInfo } from "../types";
 import { PracticeDrawerShell } from "./PracticeDrawerShell";
+
+const CONFIRM_KEYS = ["Enter", " "] as const;
 
 export const SelectSimilarKanjiDrawer = ({
   open,
@@ -22,6 +25,8 @@ export const SelectSimilarKanjiDrawer = ({
   onNext: () => void;
 }) => {
   const hasSelection = selected != null;
+
+  useEnterAction(onNext, open && hasSelection, CONFIRM_KEYS);
 
   return (
     <PracticeDrawerShell
@@ -52,7 +57,7 @@ export const SelectSimilarKanjiDrawer = ({
       }
     >
       <div className="px-3 pb-2 overflow-y-auto sm:px-4">
-        <div className="grid max-w-md grid-cols-4 sm:grid-cols-5 gap-1.5 mx-auto sm:gap-2">
+        <div className="grid max-w-md grid-cols-4 gap-1.5 mx-auto sm:gap-2">
           {candidates.map((c) => {
             const isSelected = selected === c;
             return (

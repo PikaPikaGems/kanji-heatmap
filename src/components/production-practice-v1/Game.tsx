@@ -12,7 +12,10 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { BlurredGloss } from "@/components/shared-practice";
-import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
+import {
+  useGetKanjiInfoFn,
+  useSimilarKanjis,
+} from "@/kanji-worker/kanji-worker-hooks";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
@@ -62,11 +65,15 @@ export const Game = ({
   const [step, setStep] = useState<CardStep>({ type: "draw" });
   const [selected, setSelected] = useState<string | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
+  const drawSubmitRef = useRef<(payload: DrawingSubmitPayload) => void>(
+    () => {}
+  );
   const padSize = useFitPadSize(DRAW_SVG_SIZE);
 
   const current = sessionItems[index];
   const similarState = useSimilarKanjis(current?.kanji ?? "");
   const similars = similarState.data ?? [];
+  const getKanjiInfo = useGetKanjiInfoFn();
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
@@ -94,6 +101,29 @@ export const Game = ({
     speak();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- speak on card load only
   }, [index, settings.hearPronunciationOnLoad]);
+
+  // Enter/Space grades when there are strokes. Never Forgot via keyboard.
+  useEffect(() => {
+    if (step.type !== "draw" || strokes.length === 0) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.key !== "Enter" && e.key !== " ") || e.isComposing) return;
+      const el = e.target as HTMLElement | null;
+      if (!el) return;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (el.isContentEditable) return;
+      e.preventDefault();
+      drawSubmitRef.current({
+        strokes,
+        width: padSize,
+        height: padSize,
+      });
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [step.type, strokes, padSize]);
 
   if (!current) {
     return null;
@@ -139,12 +169,14 @@ export const Game = ({
         inTop10,
       };
       const similarList = similarState.data ?? similars;
+      const isRealKanji = (k: string) => getKanjiInfo?.(k) != null;
       const grid = buildCandidateGrid({
         target: current.kanji,
         inTop10,
         modelGuesses: candidates,
         similars: similarList,
         randomPool: randomKanjiPool,
+        isRealKanji,
       });
       setSelected(null);
       setStep({ type: "select", grade, candidates: grid });
@@ -152,6 +184,8 @@ export const Game = ({
       setStep({ type: "draw" });
     }
   };
+
+  drawSubmitRef.current = onSubmit;
 
   const onSelectForgot = () => {
     if (step.type !== "select") return;
@@ -214,7 +248,7 @@ export const Game = ({
         />
 
         <div
-          className="relative mt-2 w-full mx-auto"
+          className="relative w-full mx-auto mt-2"
           style={{ maxWidth: padSize + 32 }}
         >
           <DrawingPad

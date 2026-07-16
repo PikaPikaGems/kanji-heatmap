@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
@@ -27,6 +27,41 @@ export const FeedbackDrawer = ({
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
+
+  // Enter/Space → Next Kanji. Arm after a beat so the key that opened
+  // feedback (e.g. Enter on Select → Next) doesn't also advance.
+  useEffect(() => {
+    if (!open || practiceOpen) return;
+
+    let armed = false;
+    const arm = () => {
+      armed = true;
+    };
+    const armTimeout = window.setTimeout(arm, 300);
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") arm();
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!armed || (e.key !== "Enter" && e.key !== " ") || e.isComposing) {
+        return;
+      }
+      const el = e.target as HTMLElement | null;
+      if (!el) return;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (el.isContentEditable) return;
+      e.preventDefault();
+      onNext();
+    };
+
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.clearTimeout(armTimeout);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, practiceOpen, onNext]);
 
   const title =
     kind === "noKanji"

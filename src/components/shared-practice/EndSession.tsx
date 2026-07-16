@@ -7,6 +7,8 @@ import { Stat } from "./CountUpStat";
 import { PracticeSessionResult } from "./types";
 import { RecapTile } from "./RecapTile";
 
+const CONTINUE_KEYS = ["Enter", " "] as const;
+
 export const EndSession = ({
   results,
   hasMore,
@@ -26,7 +28,7 @@ export const EndSession = ({
   const correctCount = results.filter((r) => r.correct).length;
   const accuracy = percent(correctCount, results.length, 100);
 
-  useEnterAction(hasMore ? onNext : onEnd);
+  useEnterAction(hasMore ? onNext : onEnd, true, CONTINUE_KEYS);
 
   if (!hasMore) {
     return (

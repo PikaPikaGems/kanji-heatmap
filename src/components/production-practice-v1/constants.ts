@@ -2,7 +2,8 @@ import { JLPT_TYPE_ARR, JLTPTtypes } from "@/lib/jlpt";
 import { ProductionPracticeSettings } from "./types";
 
 export const SESSION_SIZE = 10;
-export const CANDIDATE_COUNT = 10;
+/** Look-alike grid size: always 4×3. */
+export const CANDIDATE_COUNT = 12;
 export const SETTINGS_KEY = "production-practice-v1-settings";
 
 export const DEFAULT_SETTINGS: ProductionPracticeSettings = {

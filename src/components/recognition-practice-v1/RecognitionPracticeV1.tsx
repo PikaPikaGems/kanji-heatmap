@@ -16,6 +16,9 @@ import {
   SessionResult,
 } from "./types";
 
+/** Toggle off to size the shell with `bottom-0` instead of visualViewport height. */
+const visualPortOn = true;
+
 const RecognitionPracticeV1 = () => {
   useHtmlDocumentTitle(recognitionPracticePageMeta.heading);
 
@@ -148,7 +151,7 @@ const RecognitionPracticeV1 = () => {
       <PracticeShell
         progress={progress}
         playing={phase === "playing"}
-        height={viewport.height}
+        height={visualPortOn ? viewport.height : undefined}
       >
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
