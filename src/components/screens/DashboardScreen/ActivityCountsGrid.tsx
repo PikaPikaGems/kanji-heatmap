@@ -1,4 +1,9 @@
 import { CalendarDays, Eye, Keyboard, PenLine } from "lucide-react";
+import {
+  productionPracticePageMeta,
+  recognitionPracticePageMeta,
+  speedKatakanaPageMeta,
+} from "@/components/items/practice-pages";
 import { OverviewStat } from "./OverviewStat";
 
 export type ActivityCountsDisplay = {
@@ -22,17 +27,17 @@ export const ActivityCountsGrid = ({
     />
     <OverviewStat
       value={stats.speedKatakanaSessions}
-      label="Speed Katakana"
+      label={speedKatakanaPageMeta.shortLabel}
       Icon={Keyboard}
     />
     <OverviewStat
       value={stats.productionRounds}
-      label="Kanji Production"
+      label={productionPracticePageMeta.shortLabel}
       Icon={PenLine}
     />
     <OverviewStat
       value={stats.recognitionRounds}
-      label="Kanji Recognition"
+      label={recognitionPracticePageMeta.shortLabel}
       Icon={Eye}
     />
   </div>

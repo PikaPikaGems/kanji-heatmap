@@ -11,7 +11,7 @@ export const StatsOverview = () => {
   return (
     <DashboardPanel>
       <SectionHeading
-        title="Activity Overview"
+        title="All-time Overview"
         description="All-time activity since your first recorded session."
       />
       <ActivityCountsGrid

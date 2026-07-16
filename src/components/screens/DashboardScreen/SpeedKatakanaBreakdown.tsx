@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,
@@ -58,7 +59,7 @@ export const SpeedKatakanaBreakdown = () => {
   return (
     <DashboardPanel>
       <SectionHeading
-        title="Speed Katakana"
+        title={speedKatakanaPageMeta.shortLabel}
         description="Each bar is one challenge set (10 challenges), grouped by best CPM. Only attempts with accuracy > 70% count. Brighter = higher CPM. Clear a full 48-word run above 70% accuracy to fill these bars."
       />
       <div className="grid grid-cols-4 grid-rows-5 grid-flow-col gap-x-3 gap-y-2.5 sm:gap-x-4 sm:gap-y-3">

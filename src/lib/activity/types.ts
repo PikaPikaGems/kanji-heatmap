@@ -1,3 +1,9 @@
+import {
+  productionPracticePageMeta,
+  recognitionPracticePageMeta,
+  speedKatakanaPageMeta,
+} from "@/components/items/practice-pages";
+
 export type ActivityKind = "speedKatakana" | "production" | "recognition";
 
 export type AllTimeActivity = {
@@ -55,9 +61,9 @@ export const DEFAULT_KIND_FILTERS: ActivityKindFilters = {
 };
 
 export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
-  speedKatakana: "Speed Katakana",
-  production: "Kanji Production",
-  recognition: "Kanji Recognition",
+  speedKatakana: speedKatakanaPageMeta.shortLabel,
+  production: productionPracticePageMeta.shortLabel,
+  recognition: recognitionPracticePageMeta.shortLabel,
 };
 
 export const ALL_ACTIVITY_KINDS: ActivityKind[] = [

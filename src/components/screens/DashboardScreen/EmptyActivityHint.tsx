@@ -6,9 +6,18 @@ import {
 } from "@/components/items/practice-pages";
 
 const practiceLinks = [
-  { href: speedKatakanaPageMeta.href, label: "Speed Katakana" },
-  { href: productionPracticePageMeta.href, label: "Production" },
-  { href: recognitionPracticePageMeta.href, label: "Recognition" },
+  {
+    href: speedKatakanaPageMeta.href,
+    label: speedKatakanaPageMeta.shortLabel,
+  },
+  {
+    href: productionPracticePageMeta.href,
+    label: productionPracticePageMeta.shortLabel,
+  },
+  {
+    href: recognitionPracticePageMeta.href,
+    label: recognitionPracticePageMeta.shortLabel,
+  },
 ] as const;
 
 export const EmptyActivityHint = ({
