@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { NotebookPen } from "lucide-react";
 import {
   Popover,
@@ -9,6 +9,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
 import { practiceNavLinks } from "@/components/items/nav-links";
 import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
+import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
 
 const prefetchPracticeRoutes = () => {
@@ -17,65 +18,11 @@ const prefetchPracticeRoutes = () => {
   void import("@/components/screens/SpeedKatakanaScreen/SpeedKatakanaScreen");
 };
 
-/** True when radix/remove-scroll has locked the body (modals, selects, etc.). */
-const isBodyScrollLocked = () => {
-  const { body } = document;
-  return (
-    body.style.overflow === "hidden" ||
-    body.style.paddingRight !== "" ||
-    body.hasAttribute("data-scroll-locked") ||
-    getComputedStyle(body)
-      .getPropertyValue("--removed-body-scroll-bar-size")
-      .trim() !== ""
-  );
-};
-
-/** Bumps whenever scroll-lock toggles so the FAB can fade instead of hard-jumping. */
-const useScrollLockFadeTick = () => {
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    let prev = isBodyScrollLocked();
-
-    const onChange = () => {
-      const next = isBodyScrollLocked();
-      if (next === prev) return;
-      prev = next;
-      setTick((n) => n + 1);
-    };
-
-    const observer = new MutationObserver(onChange);
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["style", "class", "data-scroll-locked"],
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["style", "class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return tick;
-};
-
 export const PracticeFab = () => {
   const [open, setOpen] = useState(false);
   const bgSrc = useBgSrc();
   const hasBgMeaning = bgSrc !== "none";
-  const fadeTick = useScrollLockFadeTick();
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (fadeTick === 0) return;
-    const el = buttonRef.current;
-    if (!el) return;
-    el.classList.remove("animate-practice-fab-settle");
-    // Force reflow so the animation can restart.
-    void el.offsetWidth;
-    el.classList.add("animate-practice-fab-settle");
-  }, [fadeTick]);
+  const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
 
   return (
     <Popover

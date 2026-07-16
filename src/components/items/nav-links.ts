@@ -1,6 +1,7 @@
 import {
   ChartLine,
   Eye,
+  GraduationCap,
   Keyboard,
   LayoutDashboard,
   PenLine,
@@ -42,6 +43,12 @@ export const dashboardPageMeta = {
   description: "Activity stats, calendar, and progress breakdowns",
 } as const;
 
+export const masteryPageMeta = {
+  href: "/mastery",
+  title: "Mastery",
+  description: "Track mastery progress — coming soon",
+} as const;
+
 /** Practice destinations shown in the FAB menu. */
 export const practiceNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
@@ -49,10 +56,18 @@ export const practiceNavLinks: NavLinkItem[] = [
   { ...speedKatakanaPageMeta, Icon: Keyboard },
 ];
 
+/** Bottom floating island tabs (Dashboard / Explore / Mastery). */
+export const floatingIslandNavLinks: NavLinkItem[] = [
+  { ...dashboardPageMeta, Icon: LayoutDashboard },
+  { ...exploreKanjiPageMeta, Icon: SearchIcon },
+  { ...masteryPageMeta, Icon: GraduationCap },
+];
+
 /** Primary destinations in the header drawer. */
 export const headerNavLinks: NavLinkItem[] = [
   { ...exploreKanjiPageMeta, Icon: SearchIcon },
   { ...dashboardPageMeta, Icon: LayoutDashboard },
+  { ...masteryPageMeta, Icon: GraduationCap },
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
   { ...speedKatakanaPageMeta, Icon: Keyboard },

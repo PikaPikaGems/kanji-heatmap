@@ -3,6 +3,7 @@ import { CumUseScreen } from "./CumUseScreen";
 import { AboutScreen, TermsScreen, PrivacyScreen } from "./DocsScreen";
 import { SpeedKatakanaScreen } from "./SpeedKatakanaScreen";
 import { DashboardScreen } from "./DashboardScreen";
+import { MasteryScreen } from "./MasteryScreen";
 
 export {
   CumUseScreen,
@@ -12,4 +13,5 @@ export {
   PrivacyScreen,
   SpeedKatakanaScreen,
   DashboardScreen,
+  MasteryScreen,
 };

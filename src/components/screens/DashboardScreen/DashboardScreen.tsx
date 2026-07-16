@@ -28,7 +28,7 @@ const DashboardScreen = () => {
       <BookmarksBreakdown />
       <SpeedKatakanaBreakdown />
       <div className="pt-4 mt-4 border-t-2 border-dotted">
-        <BottomBar />
+        <BottomBar justify="center" />
       </div>
     </div>
   );
