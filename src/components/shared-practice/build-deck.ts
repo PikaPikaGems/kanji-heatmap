@@ -1,7 +1,7 @@
 import { JLPTOptionsCount, JLTPTtypes } from "@/lib/jlpt";
 import { isBookmarked } from "@/lib/bookmarks";
 import { shuffle } from "@/lib/utils";
-import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
+import { randomFontIndex } from "@/hooks/use-change-font";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
 type RepEntry = [string, string, string, string];
@@ -39,9 +39,7 @@ export const buildPracticeDeck = ({
       reading,
       englishGloss: englishGloss ?? "",
       keyword: getKeyword(kanji) || "...",
-      fontIndex: settings.randomizeFont
-        ? Math.floor(Math.random() * NUMBER_OF_FONTS)
-        : null,
+      fontIndex: settings.randomizeFont ? randomFontIndex() : null,
     });
   }
 
@@ -58,6 +56,6 @@ export const withFreshFonts = (
   }
   return items.map((item) => ({
     ...item,
-    fontIndex: Math.floor(Math.random() * NUMBER_OF_FONTS),
+    fontIndex: randomFontIndex(),
   }));
 };

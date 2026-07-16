@@ -48,13 +48,13 @@ export const AnswerFeedback = ({
 
   return (
     <div
-      className="flex flex-col items-center gap-3 animate-fade-in-fast"
+      className="flex flex-col items-center gap-3 animate-practice-bounce-soft"
       role="status"
       aria-live="polite"
       aria-label={correct ? "Correct" : "Forgot"}
     >
       <div className="flex flex-wrap items-center justify-center gap-1">
-        <p >{correct ? "🎉 ·" : ""}</p>
+        <p>{correct ? "🎉 ·" : ""}</p>
         <SpeakButton word={word} iconType="volume-2" />
         {readings.map((r) => (
           <RomajiBadge key={r} kana={r} />

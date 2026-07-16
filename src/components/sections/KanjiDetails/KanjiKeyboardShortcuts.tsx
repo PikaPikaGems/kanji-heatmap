@@ -60,8 +60,8 @@ export const KanjiKeyboardShortcuts = ({ kanji }: { kanji: string }) => {
     return (
       <Button
         variant={"outline"}
-        size="icon"
-        className="h-8 w-8 relative rounded-xl"
+        size="iconXl"
+        className="relative"
         disabled={true}
       >
         <Keyboard />

@@ -5,6 +5,7 @@ import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
+import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
@@ -16,7 +17,7 @@ import {
 } from "./types";
 
 const RecognitionPracticeV1 = () => {
-  useHtmlDocumentTitle("Kanji Recognition");
+  useHtmlDocumentTitle(recognitionPracticePageMeta.heading);
 
   const [settings] = useLocalStorage<RecognitionPracticeSettings>(
     SETTINGS_KEY,

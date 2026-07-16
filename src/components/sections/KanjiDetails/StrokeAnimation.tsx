@@ -33,14 +33,14 @@ const KanjiDMAK = ({
   step = SPEEDS.slow.rate,
   size = SVG_SIZE,
   staticMode = false,
-  gridShow = true
+  gridShow = true,
 }: {
   kanji: string;
   step?: number;
   size?: number;
   // when true: draws all strokes instantly with stroke-order numbers visible
   staticMode?: boolean;
-  gridShow?: boolean
+  gridShow?: boolean;
 }) => {
   const dmakInstanceRef = useRef<any>(null);
   const id = useId();
@@ -57,7 +57,7 @@ const KanjiDMAK = ({
       element: kanjiId,
       uri:
         import.meta.env.MODE === "development" ||
-          window.location.protocol === "http:"
+        window.location.protocol === "http:"
           ? assetsPaths.dev.KANJI_SVGS
           : assetsPaths.KANJI_SVGS,
       height: size,
@@ -67,13 +67,13 @@ const KanjiDMAK = ({
       // Passing a plain boolean breaks stroke.animated.drawing access — do not change.
       stroke: staticMode
         ? {
-          animated: { drawing: false, erasing: false },
-          order: { visible: true },
-          attr: { stroke: "random" },
-        }
+            animated: { drawing: false, erasing: false },
+            order: { visible: true },
+            attr: { stroke: "random" },
+          }
         : { attr: { stroke: "random" } },
 
-      grid: { show: gridShow }
+      grid: { show: gridShow },
     });
 
     return () => {
@@ -121,14 +121,12 @@ export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
             });
           }}
         >
-          <Snail />{" "}
-          <span className="sr-only">Animate Slowly</span>
+          <Snail /> <span className="sr-only">Animate Slowly</span>
         </PracticeButton>
       </div>
     </div>
   );
 };
-
 
 const HINT_SVG_SIZE = 85;
 
@@ -149,7 +147,12 @@ const HintSection = ({ kanji }: { kanji: string }) => {
           pointerEvents: "none",
         }}
       >
-        <KanjiDMAK kanji={kanji} staticMode size={HINT_SVG_SIZE} gridShow={false} />
+        <KanjiDMAK
+          kanji={kanji}
+          staticMode
+          size={HINT_SVG_SIZE}
+          gridShow={false}
+        />
       </div>
     </div>
   );
@@ -210,7 +213,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         onClickClear={onClear}
       />
 
-      <div className="w-full max-w-[310px] min-h-10 px-2 text-sm sm:text-base font-bold text-center">
+      <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
         {status === "loading" && (
           <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
         )}
@@ -223,9 +226,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
           <div className="animate-fade-in">{gradeMessage(kanji, result)}</div>
         )}
         {status === "idle" && (
-          <div className="font-bold">
-            Draw the kanji, then tap 🚀 to grade.
-          </div>
+          <div className="font-bold">Draw the kanji, then tap 🚀 to grade.</div>
         )}
       </div>
 
@@ -257,7 +258,7 @@ export const StrokeAnimationWithPracticeMode = ({
 
   return (
     <div key={kanji}>
-      <div className="flex px-4 pt-6">
+      <div className="flex px-4 pt-6 pb-3">
         <div className="relative flex items-center w-full gap-2 mb-4">
           <Switch
             id="practice-mode"
@@ -272,7 +273,7 @@ export const StrokeAnimationWithPracticeMode = ({
           </label>
 
           {practiceMode && (
-            <div className="absolute z-10 px-2 m-4 border border-dashed right-0 sm:-right-8 animate-fade-in rounded-2xl -top-10 border-foreground bg-background/80">
+            <div className="absolute right-0 z-10 px-2 m-4 border border-dashed sm:-right-8 animate-fade-in rounded-2xl -top-10 border-foreground bg-background/80">
               <HintSection key={kanji} kanji={kanji} />
             </div>
           )}

@@ -1,8 +1,13 @@
-import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
-import { GenericPopover } from "./GenericPopover";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
+import {
+  DictEmpty,
+  DictError,
+  DictHeader,
+  DictionaryPopoverShell,
+  DictLoading,
+} from "./DictionaryPopover";
 
 type JishoJapanese = { word?: string; reading: string };
 type JishoSense = {
@@ -36,29 +41,16 @@ export const JishoContent = ({ word }: { word: string }) => {
     );
 
     if (!data) {
-        if (status === "error") {
-            return (
-                <div className="py-2 text-xs">
-                    すみません. Jisho.org cannot be accessed right now. Try again later.
-                </div>
-            );
-        }
-        return <div className="py-2 text-xs text-muted-foreground">読み込み中 · Loading…</div>;
+        return status === "error" ? <DictError service="Jisho.org" /> : <DictLoading />;
     }
 
     if (data.data.length === 0) {
-        return (
-            <div className="py-2 text-xs text-muted-foreground">
-                すみません. Jisho.org does not contain information about this word.
-            </div>
-        );
+        return <DictEmpty service="Jisho.org" />;
     }
 
     return (
         <div className="space-y-3">
-            <div className="pb-1 mb-2 border-b text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-                Powered by JISHO.ORG 💪
-            </div>
+            <DictHeader label="JISHO.ORG" />
             {data.data.map((entry, i) => (
                 <div key={entry.slug} className={i > 0 ? "border-t pt-3" : ""}>
                     <div className="flex items-baseline gap-1.5 mb-1">
@@ -112,17 +104,11 @@ export const JishoContent = ({ word }: { word: string }) => {
 
 export const JishoBtn = ({ word }: { word: string }) => {
     return (
-        <GenericPopover
-            trigger={
-                <Button variant={"outline"} size="icon" className="relative w-8 h-8 rounded-xl">
-                    <BookOpen />
-                </Button>
-            }
-            content={
-                <div className="p-4 overflow-y-scroll max-h-48 min-w-36 max-w-64" data-vaul-no-drag style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }} onWheel={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()}>
-                    <JishoContent word={word} />
-                </div>
-            }
-        />
+        <DictionaryPopoverShell
+            icon={<BookOpen />}
+            contentClassName="p-4 overflow-y-scroll max-h-48 min-w-36 max-w-64"
+        >
+            <JishoContent word={word} />
+        </DictionaryPopoverShell>
     );
 };

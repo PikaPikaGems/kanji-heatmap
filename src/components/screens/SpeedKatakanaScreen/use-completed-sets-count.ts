@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { countCompletedSets } from "./storage";
+import { countCompletedSets, STATS_KEY_PREFIX } from "./storage";
 import { SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
 
 export const useCompletedSetsCount = () => {
@@ -9,7 +9,7 @@ export const useCompletedSetsCount = () => {
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith("speed-katakana-stats-")) {
+      if (e.key?.startsWith(STATS_KEY_PREFIX)) {
         setCount(countCompletedSets(SPEED_KATAKANA_TOTAL_CHALLENGES));
       }
     };

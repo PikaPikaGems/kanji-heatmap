@@ -24,8 +24,9 @@ const isBodyScrollLocked = () => {
     body.style.overflow === "hidden" ||
     body.style.paddingRight !== "" ||
     body.hasAttribute("data-scroll-locked") ||
-    getComputedStyle(body).getPropertyValue("--removed-body-scroll-bar-size").trim() !==
-    ""
+    getComputedStyle(body)
+      .getPropertyValue("--removed-body-scroll-bar-size")
+      .trim() !== ""
   );
 };
 
@@ -109,7 +110,7 @@ export const PracticeFab = () => {
         className="z-50 w-[min(100vw-1.5rem,28rem)] p-3"
       >
         <p className="px-1 mb-2 text-sm font-semibold text-left">
-          What do you want to do?
+          Select a mode
         </p>
         <DashedNavLinkList
           items={practiceNavLinks}

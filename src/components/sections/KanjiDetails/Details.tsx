@@ -24,14 +24,14 @@ import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-wor
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 
-
 export const RirikkuCTABadge = () => {
   return (
     <Badge className="w-full py-2 mb-3 rounded-md">
       <a href={outLinks.ririkku} target="_blank" rel="noopener noreferrer">
         Lyrics make Japanese stick.{" "}
         <span className="underline">{"Ririkku,"}</span> the{" Internet's"}{" "}
-        coolest music player™ helps you absorb real Japanese from memorable songs.
+        coolest music player™ helps you absorb real Japanese from memorable
+        songs.
       </a>
     </Badge>
   );
@@ -52,41 +52,53 @@ export const ImprovementCTA = () => {
 };
 
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
-  return <>
+  return (
+    <>
+      <p className="my-4 text-xs text-left">
+        <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your{" "}
+        {"browser's"} built-in text-to-speech, which may not work in some
+        devices.
+      </p>
 
-    <p className="my-4 text-xs text-left">
-      <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your {"browser's"} built-in text-to-speech, which may not work in some devices.
-    </p>
+      <div className="my-4 w-fit">
+        <PikaPikaLinks />
+      </div>
 
-    <div className="my-4 w-fit">
-      <PikaPikaLinks />
-    </div>
-
-    <div className="flex items-center justify-start w-full mt-4 mb-8 space-x-1">
-      <LinksOutItems />
-      <DotIcon className="w-2 m-0" />
-      <DebugInfo />
-      <RefreshPageBtn />
-      <KanjiKeyboardShortcuts kanji={kanji} />
-      <ModeToggle />
-    </div>
-  </>
-}
+      <div className="flex items-center justify-start w-full mt-4 mb-8 space-x-1">
+        <LinksOutItems />
+        <DotIcon className="w-2 m-0" />
+        <DebugInfo />
+        <RefreshPageBtn />
+        <KanjiKeyboardShortcuts kanji={kanji} />
+        <ModeToggle />
+      </div>
+    </>
+  );
+};
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
+  const info = useKanjiRepresentativeWord(kanji);
 
-  const info = useKanjiRepresentativeWord(kanji)
+  return (
+    <>
+      <SimpleAccordion
+        trigger={`Anchor Word${info?.word ? `: ${info?.word}` : ""}`}
+        defaultOpen={false}
+      >
+        <RepresentativeStudyWord kanji={kanji} />
+      </SimpleAccordion>
+    </>
+  );
+};
 
-  return <>
-    <SimpleAccordion trigger={`Anchor Word${info?.word ? `: ${info?.word}` : ""}`} defaultOpen={false}>
-      <RepresentativeStudyWord kanji={kanji} />
-    </SimpleAccordion >
-  </>
-
-}
-
-export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallScreenNode: ReactNode }) => {
+export const KanjiDetails = ({
+  kanji,
+  smallScreenNode,
+}: {
+  kanji: string;
+  smallScreenNode: ReactNode;
+}) => {
   const getInfo = useGetKanjiInfoFn();
 
   if (getInfo == null) {
@@ -137,7 +149,10 @@ export const KanjiDetails = ({ kanji, smallScreenNode }: { kanji: string, smallS
           <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={`External Links for ${kanji}`} defaultOpen={true}>
+      <SimpleAccordion
+        trigger={`External Links for ${kanji}`}
+        defaultOpen={true}
+      >
         <div className="mt-2 text-left">
           <ExternalKanjiLinks kanji={kanji} />
         </div>

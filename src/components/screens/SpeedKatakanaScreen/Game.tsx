@@ -6,6 +6,8 @@ import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { useJsonFetch } from "@/hooks/use-json";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { useKanaInput } from "@/hooks/use-kana-input";
 import assetsPaths from "@/lib/assets-paths";
 import {
   isForgotCommand,
@@ -16,8 +18,8 @@ import {
   SessionStats,
   SpeedKatakanaSettings,
 } from "./types";
-import { NUMBER_OF_FONTS } from "@/hooks/use-change-font";
-import { shuffle } from "@/lib/utils";
+import { randomFontIndex } from "@/hooks/use-change-font";
+import { percent, shuffle } from "@/lib/utils";
 import { CircleArrowLeft } from "lucide-react";
 
 type GameWord = {
@@ -47,9 +49,7 @@ export const Game = ({
     const list: GameWord[] = data.data.map(([katakana, english]) => ({
       katakana,
       english,
-      fontIndex: settings.randomizeFont
-        ? Math.floor(Math.random() * NUMBER_OF_FONTS)
-        : null,
+      fontIndex: settings.randomizeFont ? randomFontIndex() : null,
     }));
     const ordered = settings.randomizeOrder ? shuffle(list) : list;
     return ordered.slice(0, settings.wordCount);
@@ -65,15 +65,6 @@ export const Game = ({
   const [flash, setFlash] = useState<{ english: string; key: number; skipped: boolean } | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // True while an IME (e.g. iOS Japanese romaji/kana keyboard) is mid-composition.
-  // During composition we must not re-transform the value, or iOS Safari renders
-  // the committed character twice. See onChange handler below.
-  const isComposingRef = useRef(false);
-  // Set right after compositionend so the redundant trailing change event that
-  // desktop browsers fire isn't processed a second time. Cleared on a macrotask
-  // so it only ever swallows that one synchronous follow-up event.
-  const suppressNextChangeRef = useRef(false);
-
   // Stats live in refs so per-keystroke bookkeeping doesn't trigger re-renders.
   const startTimeRef = useRef<number | null>(null);
   const correctCharsRef = useRef(0);
@@ -85,7 +76,11 @@ export const Game = ({
   // Sound feedback. useSpeak is a hook, so it must run before any early return;
   // an empty word is harmless while the set is still loading.
   const speak = useSpeak(words[index]?.katakana ?? "");
-  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
+  const playCorrect = useCorrectSound();
+  const kanaInput = useKanaInput({
+    setRawValue: setInputValue,
+    onCommit: (raw) => handleChange(raw),
+  });
 
   // Keep the input focused as words advance and once the set has loaded.
   useEffect(() => {
@@ -118,22 +113,13 @@ export const Game = ({
   const current = words[index];
 
   const playFeedback = () => {
-    if (!settings.sound.enabled) return;
-    if (settings.sound.type === "speak") {
-      speak();
-      return;
-    }
-    try {
-      if (!correctAudioRef.current) {
-        correctAudioRef.current = new Audio(
-          assetsPaths.SPEED_KATAKANA_CORRECT_SOUND
-        );
-      }
-      correctAudioRef.current.currentTime = 0;
-      void correctAudioRef.current.play();
-    } catch {
-      // ignore audio playback failures
-    }
+    playCorrect({
+      enabled: settings.sound.enabled,
+      speak:
+        settings.sound.enabled && settings.sound.type === "speak"
+          ? speak
+          : undefined,
+    });
   };
 
   const advance = () => {
@@ -233,10 +219,7 @@ export const Game = ({
       minutes > 0 ? Math.round(correctCharsRef.current / minutes) : 0;
 
     const attempts = correctCharsRef.current + errorsRef.current;
-    const accuracy =
-      attempts > 0
-        ? Math.round((100 * correctCharsRef.current) / attempts)
-        : 100;
+    const accuracy = percent(correctCharsRef.current, attempts, 100);
 
     onProgress(100);
     onComplete({ accuracy, charsPerMinute });
@@ -315,44 +298,7 @@ export const Game = ({
           placeholder='Type romaji or "skip"'
           className="w-full text-2xl text-center border-2 z-1000 rounded-2xl h-14"
           onKeyDown={handleKeyDown}
-          onCompositionStart={() => {
-            isComposingRef.current = true;
-            // A new composition means any pending suppression is stale.
-            suppressNextChangeRef.current = false;
-          }}
-          onCompositionEnd={(e) => {
-            isComposingRef.current = false;
-            // iOS commits hiragana and fires no trailing change event, so the
-            // conversion + match logic must run here or the value stays raw
-            // hiragana. Desktop *does* fire a trailing change, so suppress that
-            // one duplicate (cleared on a macrotask, after it has fired).
-            suppressNextChangeRef.current = true;
-            setTimeout(() => {
-              suppressNextChangeRef.current = false;
-            }, 0);
-            handleChange(e.currentTarget.value);
-          }}
-          onChange={(e) => {
-            const raw = e.target.value;
-            // While an IME is composing, keep the field exactly as the IME has
-            // it (no romaji→katakana transform). Transforming mid-composition
-            // makes iOS Safari duplicate the committed character; the real
-            // conversion runs in onCompositionEnd instead.
-            // nativeEvent is typed as Event; isComposing lives on InputEvent.
-            const composing =
-              "isComposing" in e.nativeEvent &&
-              (e.nativeEvent as InputEvent).isComposing;
-            if (isComposingRef.current || composing) {
-              setInputValue(raw);
-              return;
-            }
-            // Swallow the redundant change desktop fires right after commit.
-            if (suppressNextChangeRef.current) {
-              suppressNextChangeRef.current = false;
-              return;
-            }
-            handleChange(raw);
-          }}
+          {...kanaInput}
         />
       </div>
     </div>

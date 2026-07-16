@@ -91,8 +91,7 @@ const HeaderDrawer = ({
       <DrawerPrimitive.Trigger asChild>
         <Button
           variant="outline"
-          size="icon"
-          className="w-8 h-8 rounded-xl"
+          size="iconXl"
           aria-label="Open menu"
         >
           <Menu className="w-7 h-7" />

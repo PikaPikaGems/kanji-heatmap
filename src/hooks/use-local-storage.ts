@@ -1,18 +1,19 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { safeReadJson, notifyStorage } from "@/lib/storage";
 
 type DispatchFunction<T> = (key: keyof T, value: T[keyof T]) => void;
 
 const readFromStorage = <T>(storageKey: string, defaultValue: T): T => {
-  try {
-    const storedData = localStorage.getItem(storageKey);
-    if (storedData == null) {
+  // Seed storage with the default the first time the key is read.
+  if (localStorage.getItem(storageKey) == null) {
+    try {
       localStorage.setItem(storageKey, JSON.stringify(defaultValue));
-      return defaultValue;
+    } catch {
+      // ignore write failures (e.g. private mode quota)
     }
-    return JSON.parse(storedData);
-  } catch {
     return defaultValue;
   }
+  return safeReadJson(storageKey, defaultValue);
 };
 
 export function useLocalStorage2(storageKey: string) {
@@ -30,7 +31,7 @@ export function useLocalStorage2(storageKey: string) {
         localStorage.removeItem(storageKey);
       }
       setValue(next);
-      window.dispatchEvent(new StorageEvent("storage", { key: storageKey }));
+      notifyStorage(storageKey);
     },
     [storageKey]
   );
@@ -66,10 +67,10 @@ export function useLocalStorage<T>(storageKey: string, defaultValue: T) {
       setStorageData((prevData) => {
         const newData = { ...prevData, [key]: value };
         localStorage.setItem(storageKey, JSON.stringify(newData));
-        // Dispatch so other hook instances on the same key (and the listener
-        // above) pick up the change. The browser only fires StorageEvent
-        // cross-tab automatically; same-page listeners need an explicit dispatch.
-        window.dispatchEvent(new StorageEvent("storage", { key: storageKey }));
+        // Notify other hook instances on the same key (and the listener above).
+        // The browser only fires StorageEvent cross-tab automatically;
+        // same-page listeners need an explicit dispatch.
+        notifyStorage(storageKey);
         return newData;
       });
     },

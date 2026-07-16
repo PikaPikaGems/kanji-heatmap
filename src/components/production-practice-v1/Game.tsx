@@ -10,9 +10,10 @@ import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
+import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { BlurredGloss } from "@/components/shared-practice";
 import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
-import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
 import { DRAW_SVG_SIZE } from "./constants";
@@ -58,25 +59,23 @@ export const Game = ({
   const [index, setIndex] = useState(0);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [drawing, setDrawing] = useState<DrawingSnapshot | null>(null);
-  const [glossBlurred, setGlossBlurred] = useState(settings.blurEnglishGloss);
   const [step, setStep] = useState<CardStep>({ type: "draw" });
   const [selected, setSelected] = useState<string | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
-  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
   const padSize = useFitPadSize(DRAW_SVG_SIZE);
 
   const current = sessionItems[index];
   const similarState = useSimilarKanjis(current?.kanji ?? "");
   const similars = similarState.data ?? [];
   const speak = useSpeak(current?.word ?? "");
+  const playCorrect = useCorrectSound();
 
   useEffect(() => {
-    setGlossBlurred(settings.blurEnglishGloss);
     setStrokes([]);
     setDrawing(null);
     setStep({ type: "draw" });
     setSelected(null);
-  }, [index, settings.blurEnglishGloss]);
+  }, [index]);
 
   useEffect(() => {
     setStrokes([]);
@@ -99,21 +98,6 @@ export const Game = ({
   if (!current) {
     return null;
   }
-
-  const playCorrectSound = () => {
-    if (!settings.celebratorySoundOnCorrect) return;
-    try {
-      if (!correctAudioRef.current) {
-        correctAudioRef.current = new Audio(
-          assetsPaths.SPEED_KATAKANA_CORRECT_SOUND
-        );
-      }
-      correctAudioRef.current.currentTime = 0;
-      void correctAudioRef.current.play();
-    } catch {
-      // ignore playback failures
-    }
-  };
 
   const pushResult = (correct: boolean, gradeRank: number) => {
     const result: SessionResult = { ...current, correct, gradeRank };
@@ -179,7 +163,9 @@ export const Game = ({
     if (step.type !== "select" || selected == null) return;
     const pickedCorrect = selected === current.kanji;
     const sessionCorrect = pickedCorrect && step.grade.inTop10;
-    if (sessionCorrect) playCorrectSound();
+    if (sessionCorrect) {
+      playCorrect({ enabled: settings.celebratorySoundOnCorrect });
+    }
     pushResult(sessionCorrect, step.grade.rank);
     setStep({
       type: "feedback",
@@ -220,24 +206,12 @@ export const Game = ({
           <SpeakButton word={current.word} iconType="volume-2" />
         </div>
 
-        {settings.blurEnglishGloss ? (
-          <button
-            type="button"
-            className={`max-w-sm px-2 text-xs mt-2 font-bold tracking-wide transition-all outline-none ${
-              glossBlurred ? "blur-[5px] hover:blur-none" : ""
-            }`}
-            onClick={() => setGlossBlurred((v) => !v)}
-            aria-label={
-              glossBlurred ? "Reveal English gloss" : "Blur English gloss"
-            }
-          >
-            {current.englishGloss || "—"}
-          </button>
-        ) : (
-          <p className="max-w-sm px-2 mt-1 text-xs font-bold tracking-wide">
-            {current.englishGloss || "—"}
-          </p>
-        )}
+        <BlurredGloss
+          text={current.englishGloss}
+          resetKey={index}
+          blurrable={settings.blurEnglishGloss}
+          className="mt-2"
+        />
 
         <div
           className="relative mt-2 w-full mx-auto"

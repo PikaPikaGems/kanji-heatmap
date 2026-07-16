@@ -1,13 +1,11 @@
-import type { PracticeItem as SharedPracticeItem } from "@/components/shared-practice";
-import { JLTPTtypes } from "@/lib/jlpt";
+import type {
+  DeckFilterSettings,
+  PracticeItem as SharedPracticeItem,
+} from "@/components/shared-practice";
 
 export type SoundMode = "correct" | "speak";
 
-export type RecognitionPracticeSettings = {
-  jlpt: JLTPTtypes[];
-  bookmarkedOnly: boolean;
-  randomizeOrder: boolean;
-  randomizeFont: boolean;
+export type RecognitionPracticeSettings = DeckFilterSettings & {
   sound: { enabled: true; type: SoundMode } | { enabled: false };
 };
 

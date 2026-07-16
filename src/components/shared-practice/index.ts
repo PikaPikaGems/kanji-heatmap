@@ -1,4 +1,6 @@
 export { buildPracticeDeck, withFreshFonts } from "./build-deck";
+export { BlurredGloss } from "./BlurredGloss";
+export { Stat } from "./CountUpStat";
 export { EndSession } from "./EndSession";
 export { PracticeShell } from "./PracticeShell";
 export { RecapTile } from "./RecapTile";

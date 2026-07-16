@@ -7,8 +7,7 @@ const HeaderDrawer = lazy(() => import("./HeaderDrawer"));
 const MenuTriggerFallback = ({ disabled = false }: { disabled?: boolean }) => (
   <Button
     variant="outline"
-    size="icon"
-    className="w-8 h-8 rounded-xl"
+    size="iconXl"
     aria-label="Open menu"
     disabled={disabled}
   >
@@ -26,8 +25,7 @@ const LazyHeaderDrawer = () => {
     return (
       <Button
         variant="outline"
-        size="icon"
-        className="w-8 h-8 rounded-xl"
+        size="iconXl"
         aria-label="Open menu"
         onClick={() => setShouldLoad(true)}
       >

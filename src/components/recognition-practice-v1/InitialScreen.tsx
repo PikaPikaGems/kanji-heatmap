@@ -11,12 +11,9 @@ import { JLTPTtypes } from "@/lib/jlpt";
 import assetsPaths from "@/lib/assets-paths";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { buildPracticeDeck, ToggleRow } from "@/components/shared-practice";
+import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
-import {
-  PracticeItem,
-  RecognitionPracticeSettings,
-  SoundMode,
-} from "./types";
+import { PracticeItem, RecognitionPracticeSettings, SoundMode } from "./types";
 
 type RepEntry = [string, string, string, string];
 
@@ -79,10 +76,7 @@ export const InitialScreen = ({
   const soundType: SoundMode =
     settings.sound?.enabled === true ? settings.sound.type : "correct";
 
-  useEnterAction(
-    canStart ? () => onStart(deck) : null,
-    canStart
-  );
+  useEnterAction(canStart ? () => onStart(deck) : null, canStart);
 
   return (
     <div className="flex flex-col h-full">
@@ -90,11 +84,11 @@ export const InitialScreen = ({
         <div className="flex flex-col max-w-md gap-6 px-4 py-6 mx-auto">
           <div className="text-left">
             <h1 className="pt-4 text-xl font-bold text-center">
-              👁️ Kanji Recognition
+              {recognitionPracticePageMeta.heading}
             </h1>
 
             <p className="mt-1 text-sm text-center text-muted-foreground">
-              Type the reading of kanji anchor words
+              {recognitionPracticePageMeta.description}
             </p>
           </div>
 
@@ -143,9 +137,7 @@ export const InitialScreen = ({
                 onChange={(v) =>
                   setSetting(
                     "sound",
-                    v
-                      ? { enabled: true, type: soundType }
-                      : { enabled: false }
+                    v ? { enabled: true, type: soundType } : { enabled: false }
                   )
                 }
               />
