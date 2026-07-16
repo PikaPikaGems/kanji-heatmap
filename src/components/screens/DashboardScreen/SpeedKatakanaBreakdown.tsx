@@ -62,7 +62,7 @@ export const SpeedKatakanaBreakdown = () => {
         title={speedKatakanaPageMeta.shortLabel}
         description="Each bar is one challenge set (10 challenges), grouped by best CPM. Only attempts with accuracy > 70% count. Brighter = higher CPM. Clear a full 48-word run above 70% accuracy to fill these bars."
       />
-      <div className="grid grid-cols-4 grid-rows-5 grid-flow-col gap-x-3 gap-y-2.5 sm:gap-x-4 sm:gap-y-3">
+      <div className="grid grid-flow-col grid-cols-4 grid-rows-5 gap-x-2 gap-y-2 sm:gap-x-2 sm:gap-y-2">
         {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => (
           <LevelCell key={level} level={level} />
         ))}

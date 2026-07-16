@@ -61,13 +61,13 @@ export const BookmarksBreakdown = () => {
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-1 ">
             {JLPT_TYPE_ARR.map((jlpt) => {
               const { bookmarked: n, total } = counts[jlpt];
               const pct = total > 0 ? (n / total) * 100 : 0;
               const meta = JLPTListItems[jlpt];
               return (
-                <div key={jlpt} className="flex items-center gap-3">
+                <div key={jlpt} className="flex items-center gap-2">
                   <div className="flex items-center w-10 gap-2 text-sm font-extrabold shrink-0">
                     <span
                       className={`inline-block size-2.5 shrink-0 rounded-full ${meta.cn}`}
@@ -75,7 +75,7 @@ export const BookmarksBreakdown = () => {
                     {meta.label !== "Not in JLPT" ? meta.label : "~"}
                   </div>
                   <Progress
-                    className="h-2.5 flex-1 border border-border/60"
+                    className="flex-1 h-2.5 border border-border/60"
                     value={pct}
                     primitiveCn={meta.cn}
                   />
