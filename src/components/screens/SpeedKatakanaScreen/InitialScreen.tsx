@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 import { roundedMean } from "@/lib/utils";
 import { useEnterAction } from "@/hooks/use-enter-action";
+import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
@@ -155,7 +156,9 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
       <div className="flex-1 min-h-0 pl-4 pr-2 overflow-auto">
         <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
           <div className="flex flex-col items-center gap-1 px-6">
-            <h1 className="pt-4 text-lg font-bold text-center">🐇 Speed Katakana</h1>
+            <h1 className="pt-4 text-lg font-bold text-center">
+              {speedKatakanaPageMeta.heading}
+            </h1>
             <SpeedKatakanaStatsSummary
               completed={summary.completed}
               averageCpm={summary.averageCpm}

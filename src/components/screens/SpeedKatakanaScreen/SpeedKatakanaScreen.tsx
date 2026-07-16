@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
+import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
@@ -19,7 +20,7 @@ const nextChallengeSet = (current: number) =>
   current >= SPEED_KATAKANA_TOTAL_CHALLENGES ? 1 : current + 1;
 
 const SpeedKatakanaScreen = () => {
-  useHtmlDocumentTitle("Speed Katakana");
+  useHtmlDocumentTitle(speedKatakanaPageMeta.heading);
 
   const [phase, setPhase] = useState<Phase>("initial");
   const [settings, setSetting] = useLocalStorage<SpeedKatakanaSettings>(

@@ -4,6 +4,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
+import { productionPracticePageMeta } from "@/components/items/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
@@ -17,7 +18,7 @@ import {
 } from "./types";
 
 const ProductionPracticeV1 = () => {
-  useHtmlDocumentTitle("Kanji Production");
+  useHtmlDocumentTitle(productionPracticePageMeta.heading);
 
   const [settings] = useLocalStorage<ProductionPracticeSettings>(
     SETTINGS_KEY,
