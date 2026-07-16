@@ -26,7 +26,7 @@ export const SortAndFilterButton = forwardRef<
       ref={ref}
       variant="outline"
       size="icon"
-      className="h-9 w-9 relative"
+      className="relative h-9 w-9 shrink-0"
       onClick={onClick}
     >
       <Settings2 />

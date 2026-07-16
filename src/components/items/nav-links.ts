@@ -1,4 +1,11 @@
-import { ChartLine, Eye, Keyboard, PenLine, SearchIcon } from "lucide-react";
+import {
+  ChartLine,
+  Eye,
+  Keyboard,
+  LayoutDashboard,
+  PenLine,
+  SearchIcon,
+} from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import {
   productionPracticePageMeta,
@@ -29,6 +36,12 @@ export const cumUseGraphPageMeta = {
   description: "Inspect kanji usage vs rank trends",
 } as const;
 
+export const dashboardPageMeta = {
+  href: "/dashboard",
+  title: "Dashboard",
+  description: "Activity stats, calendar, and progress breakdowns",
+} as const;
+
 /** Practice destinations shown in the FAB menu. */
 export const practiceNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
@@ -39,6 +52,7 @@ export const practiceNavLinks: NavLinkItem[] = [
 /** Primary destinations in the header drawer. */
 export const headerNavLinks: NavLinkItem[] = [
   { ...exploreKanjiPageMeta, Icon: SearchIcon },
+  { ...dashboardPageMeta, Icon: LayoutDashboard },
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
   { ...speedKatakanaPageMeta, Icon: Keyboard },

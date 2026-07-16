@@ -38,17 +38,9 @@ const Layout = ({
 export const ListScreen = () => {
   const ready = useIsKanjiWorkerReady();
 
-  if (!ready) {
-    return (
-      <Layout>
-        <LoadingKanjis />;
-      </Layout>
-    );
-  }
-
   return (
     <Layout badge={<ItemCountBadge />}>
-      <SuspendedKanjiList />
+      {ready ? <SuspendedKanjiList /> : <LoadingKanjis />}
     </Layout>
   );
 };

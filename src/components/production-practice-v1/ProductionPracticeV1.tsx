@@ -6,6 +6,7 @@ import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawe
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { productionPracticePageMeta } from "@/components/items/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
+import { recordActivity } from "@/lib/activity";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
 import { Game } from "./Game";
@@ -108,6 +109,7 @@ const ProductionPracticeV1 = () => {
     const forgottens = sessionResults.filter((r) => !r.correct);
     const moreLeft = forgottens.length > 0 || cursor < deck.length;
 
+    recordActivity("production");
     setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
     setHasMore(moreLeft);

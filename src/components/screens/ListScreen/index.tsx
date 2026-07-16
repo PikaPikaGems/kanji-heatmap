@@ -4,14 +4,31 @@ const LazyListScreen = lazy(() =>
   import("./ListScreen").then((m) => ({ default: m.ListScreen }))
 );
 
-// Keep this shell light — LoadingKanjis pulls item-settings/virtual-list hooks
-// that belong in the ListScreen chunk, not the app entry.
+/** Reserves ControlBar space so nav from other routes doesn't flash empty. */
 const ListScreenFallback = () => (
-  <div
-    className="relative pt-24 -z-0 flex min-h-48 items-center justify-center overflow-x-hidden"
-    role="status"
-    aria-label="Loading"
-  />
+  <>
+    <div className="fix-scroll-layout-shift-right fixed w-full pt-12 pb-2 z-40 bg-background">
+      <section className="mx-auto max-w-screen-xl flex border-0 space-x-1 sticky pt-1 pl-2 pr-1 w-full">
+        <div
+          className="h-9 flex-1 min-w-0 rounded-md border bg-muted/40"
+          aria-hidden
+        />
+        <div
+          className="h-9 w-9 shrink-0 rounded-md border bg-muted/40 animate-pulse"
+          aria-hidden
+        />
+        <div
+          className="h-9 w-9 shrink-0 rounded-md border bg-muted/40 animate-pulse"
+          aria-hidden
+        />
+      </section>
+    </div>
+    <div
+      className="relative pt-24 -z-0 flex min-h-48 items-center justify-center overflow-x-hidden"
+      role="status"
+      aria-label="Loading"
+    />
+  </>
 );
 
 const ListScreen = () => (

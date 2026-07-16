@@ -18,6 +18,7 @@ import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shor
 const {
   kanjiPage,
   cumUseGraphPage,
+  dashboardPage,
   aboutPage,
   termsPage,
   privacyPage,
@@ -62,7 +63,7 @@ const App = () => {
             </Route>
             <Route>
               <Header />
-              <main className="bg-background">
+              <main className="min-h-dvh bg-background">
                 <ErrorBoundary
                   details="App"
                   fallback={
@@ -73,6 +74,10 @@ const App = () => {
                 >
                   <KanjiFunctionalityProvider>
                     <Switch>
+                      <Route
+                        path={dashboardPage.href}
+                        component={dashboardPage.Component}
+                      />
                       <Route
                         path={cumUseGraphPage.href}
                         component={cumUseGraphPage.Component}

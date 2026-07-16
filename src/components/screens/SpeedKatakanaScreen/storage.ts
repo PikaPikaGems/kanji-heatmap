@@ -8,6 +8,11 @@ export type ChallengeSetStats = {
   latestCpm: number;
   bestCpm: number;
   timesTaken: number;
+  /**
+   * Best CPM among attempts with accuracy > 70%.
+   * Missing/0 means no qualifying attempt yet (dashboard treats as not attempted).
+   */
+  bestCpmWithAccuracyOver70?: number;
 };
 
 export const STATS_KEY_PREFIX = "speed-katakana-stats-";
@@ -49,6 +54,10 @@ export const recordSetResult = (
     latestCpm: charsPerMinute,
     bestCpm: Math.max(charsPerMinute, prev?.bestCpm ?? 0),
     timesTaken: (prev?.timesTaken ?? 0) + 1,
+    bestCpmWithAccuracyOver70:
+      accuracy > 70
+        ? Math.max(charsPerMinute, prev?.bestCpmWithAccuracyOver70 ?? 0)
+        : prev?.bestCpmWithAccuracyOver70,
   };
   try {
     localStorage.setItem(statsKey(setNumber), JSON.stringify(next));
