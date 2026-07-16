@@ -1,4 +1,5 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
+import { BottomBar } from "@/components/common/BottomBar";
 import { StatsOverview } from "./StatsOverview";
 import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaBreakdown } from "./SpeedKatakanaBreakdown";
@@ -26,6 +27,9 @@ const DashboardScreen = () => {
       <ActivityCalendarHeatmap />
       <BookmarksBreakdown />
       <SpeedKatakanaBreakdown />
+      <div className="pt-4 mt-4 border-t-2 border-dotted">
+        <BottomBar />
+      </div>
     </div>
   );
 };

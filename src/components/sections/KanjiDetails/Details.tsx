@@ -3,7 +3,6 @@ import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { BasicLoading } from "@/components/common/BasicLoading";
-import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
@@ -13,13 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { outLinks } from "@/lib/external-links";
 import { ExternalKanjiLinks } from "@/components/common/ExternalKanjiLinks";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { StructureInfo } from "./StructureInfo";
 import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
-import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
-import { DotIcon } from "@/components/icons";
-import { DebugInfo } from "@/components/common/DebugInfo";
-import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
+import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
@@ -60,18 +55,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
         devices.
       </p>
 
-      <div className="my-4 w-fit">
-        <PikaPikaLinks />
-      </div>
-
-      <div className="flex items-center justify-start w-full mt-4 mb-8 space-x-1">
-        <LinksOutItems />
-        <DotIcon className="w-2 m-0" />
-        <DebugInfo />
-        <RefreshPageBtn />
-        <KanjiKeyboardShortcuts kanji={kanji} />
-        <ModeToggle />
-      </div>
+      <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
     </>
   );
 };
