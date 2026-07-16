@@ -15,6 +15,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { SortAndFilterButton } from "./SortAndFilterButton";
+import KaoMojiLoadingSpinner from "@/components/common/KaomojiLoading";
 
 const SortAndFilterSettingsForm = lazy(() =>
   import("./SortAndFilterForm").then((m) => ({
@@ -51,7 +52,7 @@ export const SortAndFilterSettingsDialog = ({
         className={"max-h-svh z-50 flex flex-col min-h-0 px-1 md:px-4 pb-4"}
       >
         <DialogHeader>
-          <DialogTitle className="m-0 text-left">
+          <DialogTitle className="px-2 m-0 text-left">
             Sorting and Filtering Settings
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -63,7 +64,8 @@ export const SortAndFilterSettingsDialog = ({
             <Suspense
               fallback={
                 <div className="py-8 text-sm text-center text-muted-foreground">
-                  Loading settings…
+                  <KaoMojiLoadingSpinner />
+                  Loading...
                 </div>
               }
             >
