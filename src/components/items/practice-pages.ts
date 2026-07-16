@@ -2,14 +2,14 @@
 
 export const recognitionPracticePageMeta = {
   href: "/recognition-practice",
-  title: "Kanji Recognition",
+  title: "Kanji Recognition Practice",
   description: "Type the reading of kanji anchor words",
 } as const;
 
 export const productionPracticePageMeta = {
   href: "/production-practice",
-  title: "Kanji Production",
-  description: "Draw the missing kanji in anchor words",
+  title: "Kanji Production Practice",
+  description: "Draw the missing kanji of anchor words",
 } as const;
 
 export const speedKatakanaPageMeta = {

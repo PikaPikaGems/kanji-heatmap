@@ -2,7 +2,9 @@ import { ComponentType, SVGProps, forwardRef } from "react";
 import { Link } from "@/components/dependent/routing";
 import { cn } from "@/lib/utils";
 
-type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
+type IconComponent = ComponentType<
+  SVGProps<SVGSVGElement> & { className?: string }
+>;
 
 type DashedNavLinkProps = {
   href: string;
@@ -42,9 +44,11 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
         )}
         {...rest}
       >
-        <div className="flex items-center text-sm font-semibold text-left">
+        <div className="flex text-sm font-semibold text-left">
           {Icon && (
-            <Icon className={cn("mr-2 size-4 shrink-0", iconClassName)} />
+            <Icon
+              className={cn("mr-2 mt-0.5 size-4 shrink-0", iconClassName)}
+            />
           )}
           {title}
         </div>
