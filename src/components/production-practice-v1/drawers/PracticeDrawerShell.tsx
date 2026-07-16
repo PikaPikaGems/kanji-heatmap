@@ -16,7 +16,7 @@ export const PracticeDrawerShell = ({
   description,
   children,
   footer,
-  showHandle = true,
+  showHandle = false,
 }: {
   open: boolean;
   title: ReactNode;
