@@ -23,7 +23,7 @@ export const gradeMessage = (kanji: string, result: GradeResult): string => {
   }
   if (rank >= 1 && rank <= 2) {
     return topGuess
-      ? `💚 Solid · Near miss — a bit like ${topGuess}`
+      ? `💚 Solid · Near miss — Looks a bit like ${topGuess}`
       : `💚 Solid · Near miss — keep refining`;
   }
   if (rank >= 3) {

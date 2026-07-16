@@ -2,7 +2,11 @@
  * Stock dmak crashes when an SVG loads (HTTP 200) but has no `kvg:{code}` root:
  * it calls getElementById, gets null, then immediately reads `.childNodes`.
  *
- * Replaces window.DmakLoader with the same API plus a null guard.
+ * It also crashes when the React host unmounts before the async SVG fetch
+ * finishes: prepare() still runs and Raphael throws "SVG container not found."
+ *
+ * Replaces window.DmakLoader with a guarded loader, and no-ops prepare() when
+ * the target element is already gone.
  */
 
 type StrokePath = {
@@ -15,6 +19,41 @@ type LoaderCallbacks = {
   done: (index: number, data: StrokePath[]) => void;
   error: (msg: string) => void;
 };
+
+type DmakLike = {
+  options: { element: string | HTMLElement };
+  prepare: (data: StrokePath[][]) => void;
+  pause?: () => void;
+};
+
+type DmakConstructor = {
+  fn: { prepare: (this: DmakLike, data: StrokePath[][]) => void };
+  __kanjiHeatmapGuards?: boolean;
+};
+
+/** Instances torn down by React (Strict Mode remount / unmount) before SVG XHR finishes. */
+const abandonedDmakInstances = new WeakSet<object>();
+
+/** Pause + ignore later prepare/render from this instance; clear host SVG separately. */
+export function abandonDmak(dmak: object | null | undefined) {
+  if (dmak == null) return;
+  abandonedDmakInstances.add(dmak);
+  try {
+    (dmak as DmakLike).pause?.();
+  } catch {
+    // ignore — may be mid-load / already torn down
+  }
+}
+
+function resolveElement(
+  element: string | HTMLElement | null | undefined
+): HTMLElement | null {
+  if (element == null) return null;
+  if (typeof element === "string") {
+    return document.getElementById(element);
+  }
+  return element.isConnected ? element : null;
+}
 
 function parseResponse(response: string, code: string): StrokePath[] {
   const data: StrokePath[] = [];
@@ -80,6 +119,8 @@ function loadSvg(
     if (xhr.readyState !== 4) return;
     if (xhr.status === 200) {
       callbacks.done(index, parseResponse(xhr.response, code));
+    } else if (xhr.status === 0) {
+      // Aborted / navigated away — ignore.
     } else {
       callbacks.error(xhr.statusText);
       // Still complete so Dmak.prepare runs instead of hanging forever.
@@ -120,7 +161,27 @@ class SafeDmakLoader {
   }
 }
 
+function installPrepareGuard() {
+  const Dmak = (window as unknown as { Dmak?: DmakConstructor }).Dmak;
+  if (!Dmak?.fn?.prepare || Dmak.__kanjiHeatmapGuards) return;
+
+  const originalPrepare = Dmak.fn.prepare;
+  Dmak.fn.prepare = function (data) {
+    // Strict Mode remounts keep the same host div: an abandoned instance's
+    // late XHR must not append a second SVG. Also skip if the host is gone.
+    if (
+      abandonedDmakInstances.has(this) ||
+      !resolveElement(this.options.element)
+    ) {
+      return;
+    }
+    return originalPrepare.call(this, data);
+  };
+  Dmak.__kanjiHeatmapGuards = true;
+}
+
 export function installSafeDmakLoader() {
   (window as unknown as { DmakLoader: typeof SafeDmakLoader }).DmakLoader =
     SafeDmakLoader;
+  installPrepareGuard();
 }

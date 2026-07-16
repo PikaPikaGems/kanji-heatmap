@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { CircleArrowLeft, Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Rocket } from "lucide-react";
 import {
   DrawingPad,
   DrawingSubmitPayload,
@@ -11,12 +10,18 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { useJsonFetch } from "@/hooks/use-json";
 import { BlurredGloss } from "@/components/shared-practice";
-import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
-import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
+import { EndSession } from "@/components/shared-practice/EndSessionButton";
+import {
+  useGetKanjiInfoFn,
+  useSimilarKanjis,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { recognizeDaKanji } from "@/lib/dakanji-adapter";
+import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
-import { DRAW_SVG_SIZE } from "./constants";
+import { DRAW_SVG_SIZE, GRADE_TOP_K, RECOGNIZE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
 import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
 import {
@@ -62,11 +67,22 @@ export const Game = ({
   const [step, setStep] = useState<CardStep>({ type: "draw" });
   const [selected, setSelected] = useState<string | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
+  const drawSubmitRef = useRef<(payload: DrawingSubmitPayload) => void>(
+    () => {}
+  );
   const padSize = useFitPadSize(DRAW_SVG_SIZE);
 
   const current = sessionItems[index];
   const similarState = useSimilarKanjis(current?.kanji ?? "");
   const similars = similarState.data ?? [];
+  const getKanjiInfo = useGetKanjiInfoFn();
+  const { data: similarMap } = useJsonFetch<Record<string, string[]>>(
+    assetsPaths.SIMILAR_KANJIS
+  );
+  const getSimilars = useMemo(() => {
+    const map = similarMap;
+    return (k: string) => map?.[k] ?? [];
+  }, [similarMap]);
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
@@ -94,6 +110,29 @@ export const Game = ({
     speak();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- speak on card load only
   }, [index, settings.hearPronunciationOnLoad]);
+
+  // Enter/Space grades when there are strokes. Never Forgot via keyboard.
+  useEffect(() => {
+    if (step.type !== "draw" || strokes.length === 0) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.key !== "Enter" && e.key !== " ") || e.isComposing) return;
+      const el = e.target as HTMLElement | null;
+      if (!el) return;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (el.isContentEditable) return;
+      e.preventDefault();
+      drawSubmitRef.current({
+        strokes,
+        width: padSize,
+        height: padSize,
+      });
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [step.type, strokes, padSize]);
 
   if (!current) {
     return null;
@@ -130,21 +169,26 @@ export const Game = ({
     setDrawing(payload);
     setStep({ type: "recognizing" });
     try {
-      const candidates = await recognizeWithDaKanji(payload);
+      const candidates = await recognizeDaKanji(payload, RECOGNIZE_TOP_K);
       const rank = candidates.indexOf(current.kanji);
-      const inTop10 = rank >= 0;
+      const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
       const grade: GradeRankInfo = {
         rank,
         topGuess: candidates[0] ?? null,
         inTop10,
       };
       const similarList = similarState.data ?? similars;
+      // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
+      // part-keywords (e.g. 囗 → "closed box"), which must not count.
+      const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
       const grid = buildCandidateGrid({
         target: current.kanji,
         inTop10,
         modelGuesses: candidates,
         similars: similarList,
         randomPool: randomKanjiPool,
+        getSimilars,
+        isRealKanji,
       });
       setSelected(null);
       setStep({ type: "select", grade, candidates: grid });
@@ -152,6 +196,8 @@ export const Game = ({
       setStep({ type: "draw" });
     }
   };
+
+  drawSubmitRef.current = onSubmit;
 
   const onSelectForgot = () => {
     if (step.type !== "select") return;
@@ -180,16 +226,7 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-        tabIndex={-1}
-        onClick={onEnd}
-        aria-label="End session"
-      >
-        <CircleArrowLeft />
-      </Button>
+      <EndSession onClick={onEnd} />
 
       <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
         <ClozeWord
@@ -214,7 +251,7 @@ export const Game = ({
         />
 
         <div
-          className="relative mt-2 w-full mx-auto"
+          className="relative w-full mx-auto mt-2"
           style={{ maxWidth: padSize + 32 }}
         >
           <DrawingPad

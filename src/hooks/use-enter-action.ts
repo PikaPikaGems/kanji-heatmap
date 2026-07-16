@@ -1,15 +1,20 @@
 import { useEffect } from "react";
 
 /**
- * Fire `action` on Enter when focus isn't in a text field / select.
- * Skips while IME is composing.
+ * Fire `action` on the given keys when focus isn't in a text field / select.
+ * Skips while IME is composing. Default key is Enter; pass `["Enter", " "]`
+ * to also accept Space.
  */
-export const useEnterAction = (action: (() => void) | null, enabled = true) => {
+export const useEnterAction = (
+  action: (() => void) | null,
+  enabled = true,
+  keys: readonly string[] = ["Enter"]
+) => {
   useEffect(() => {
     if (!enabled || !action) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Enter" || e.isComposing) return;
+      if (!keys.includes(e.key) || e.isComposing) return;
       const el = e.target as HTMLElement | null;
       if (!el) return;
       const tag = el.tagName;
@@ -24,5 +29,5 @@ export const useEnterAction = (action: (() => void) | null, enabled = true) => {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [action, enabled]);
+  }, [action, enabled, keys]);
 };

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { translateValue, tryConvertRomaji } from "@/lib/wanakana-adapter";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
@@ -13,10 +12,10 @@ import {
   isForgotCommand,
   isForgotCommandPrefix,
 } from "@/lib/practice-commands";
+import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import { ChallengeSetData, SessionStats, SpeedKatakanaSettings } from "./types";
 import { randomFontIndex } from "@/hooks/use-change-font";
 import { percent, shuffle } from "@/lib/utils";
-import { CircleArrowLeft } from "lucide-react";
 
 type GameWord = {
   katakana: string;
@@ -236,16 +235,7 @@ export const Game = ({
 
   return (
     <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-        tabIndex={-1}
-        onClick={onEnd}
-        aria-label="End session"
-      >
-        <CircleArrowLeft />
-      </Button>
+      <EndSession onClick={onEnd} />
 
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
         <div className="flex items-center justify-center gap-1 pt-4">

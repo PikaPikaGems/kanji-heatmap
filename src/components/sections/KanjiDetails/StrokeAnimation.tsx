@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Raphael from "raphael";
 import "dmak";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import assetsPaths from "@/lib/assets-paths";
-import { installSafeDmakLoader } from "@/lib/dmak-safe-loader";
+import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { PlayCircle, Snail } from "@/components/icons";
 import {
   DrawingPad,
@@ -42,18 +42,13 @@ const KanjiDMAK = ({
   staticMode?: boolean;
   gridShow?: boolean;
 }) => {
-  const dmakInstanceRef = useRef<any>(null);
   const id = useId();
   const kanjiId = `${id}-${kanji}-draw`;
 
   useEffect(() => {
     (window as any).Raphael = Raphael;
 
-    if (dmakInstanceRef.current) {
-      return;
-    }
-
-    dmakInstanceRef.current = new (window as any).Dmak(kanji, {
+    const dmak = new (window as any).Dmak(kanji, {
       element: kanjiId,
       uri:
         import.meta.env.MODE === "development" ||
@@ -77,7 +72,10 @@ const KanjiDMAK = ({
     });
 
     return () => {
-      (window as any).Raphael = null;
+      abandonDmak(dmak);
+      // Strict Mode re-runs this effect on the same host — clear leftover SVG.
+      document.getElementById(kanjiId)?.replaceChildren();
+      // Keep window.Raphael set; other KanjiDMAK instances may still need it.
     };
   }, [kanji, kanjiId, step, size, staticMode, gridShow]);
 
@@ -87,25 +85,35 @@ const KanjiDMAK = ({
 export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
   const [key, setKey] = useState(1);
   const [speed, setSpeed] = useState<AnimationSpeed>("fast");
+  const replay = () => setKey((x) => x + 1);
 
   return (
     <div className="p-4">
       {/** key needed to redraw on change  */}
       <div
-        className={CONTAINER_CN}
+        role="button"
+        tabIndex={0}
+        title="Replay stroke order"
+        className={`${CONTAINER_CN} cursor-pointer`}
         style={{ height: SVG_SIZE }}
-        key={`${kanji}-${speed}-${key}`}
+        onClick={replay}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            replay();
+          }
+        }}
       >
-        <KanjiDMAK kanji={kanji} step={SPEEDS[speed].rate} />
+        <div key={`${kanji}-${speed}-${key}`}>
+          <KanjiDMAK kanji={kanji} step={SPEEDS[speed].rate} />
+        </div>
       </div>
       <div className="flex justify-center space-x-2">
         <PracticeButton
           size="icon"
           onClick={() => {
             setSpeed("fast");
-            setKey((x) => {
-              return x + 1;
-            });
+            replay();
           }}
         >
           <PlayCircle />
@@ -116,9 +124,7 @@ export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
           variant="secondary"
           onClick={() => {
             setSpeed("slow");
-            setKey((x) => {
-              return x + 1;
-            });
+            replay();
           }}
         >
           <Snail /> <span className="sr-only">Animate Slowly</span>
@@ -223,7 +229,9 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
           </div>
         )}
         {status === "success" && result != null && (
-          <div className="animate-fade-in">{gradeMessage(kanji, result)}</div>
+          <div className="animate-practice-bounce-soft">
+            {gradeMessage(kanji, result)}
+          </div>
         )}
         {status === "idle" && (
           <div className="font-bold">Draw the kanji, then tap 🚀 to grade.</div>
