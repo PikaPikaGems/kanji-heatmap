@@ -101,8 +101,12 @@ export const SearchInput = ({
     setValue(translateValue(initialText, translateMap[initialSearchType]));
   }
 
-  // force focus input ref on mount
+  // Autofocus on fine-pointer devices only — avoids opening the soft
+  // keyboard on touch screens when landing on "/".
   useEffect(() => {
+    if (!window.matchMedia("(pointer: fine)").matches) {
+      return;
+    }
     inputRef.current?.focus?.();
   }, []);
 
