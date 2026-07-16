@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-utils";
+import { cn } from "@/lib/utils";
 import { useSearchParams } from "./routing-hooks";
 import { Link } from "./router-adapter";
 import { useNextPrevKanji } from "@/hooks/use-next-prev-kanji";
@@ -32,8 +34,11 @@ const useNextPrevUrls = (currentKanji: string) => {
   return nextPrevUrls;
 };
 
-const btnLinkCn =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 relative rounded-xl";
+// Links aren't <Button>, so borrow the same visual via buttonVariants.
+const btnLinkCn = cn(
+  buttonVariants({ variant: "outline", size: "iconXl" }),
+  "relative"
+);
 export const NextPrevLinks = ({ currentKanji }: { currentKanji: string }) => {
   const links = useNextPrevUrls(currentKanji);
   return (
@@ -45,9 +50,9 @@ export const NextPrevLinks = ({ currentKanji }: { currentKanji: string }) => {
       ) : (
         <Button
           disabled
-          size="icon"
+          size="iconXl"
           variant={"outline"}
-          className="h-8 w-8 relative rounded-xl cursor-not-allowed"
+          className="relative cursor-not-allowed"
         >
           <ArrowLeft />
         </Button>
@@ -59,9 +64,9 @@ export const NextPrevLinks = ({ currentKanji }: { currentKanji: string }) => {
       ) : (
         <Button
           disabled
-          size="icon"
+          size="iconXl"
           variant={"outline"}
-          className="h-8 w-8 relative rounded-xl cursor-not-allowed"
+          className="relative cursor-not-allowed"
         >
           <ArrowRight />
         </Button>

@@ -1,57 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
+import { percent } from "@/lib/utils";
+import { Stat } from "./CountUpStat";
 import { PracticeSessionResult } from "./types";
 import { RecapTile } from "./RecapTile";
-
-const COUNT_UP_MS = 900;
-
-const useCountUp = (target: number) => {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    let frame = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / COUNT_UP_MS, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(target * eased));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [target]);
-
-  return value;
-};
-
-const Stat = ({
-  value,
-  unit,
-  label,
-}: {
-  value: number;
-  unit: string;
-  label: string;
-}) => {
-  const animated = useCountUp(value);
-  return (
-    <div className="flex flex-col items-center gap-1 animate-practice-tile-in">
-      <div className="text-5xl font-bold tabular-nums sm:text-6xl">
-        {animated}
-        {unit ? (
-          <span className="ml-1 text-2xl font-semibold text-muted-foreground">
-            {unit}
-          </span>
-        ) : null}
-      </div>
-      <div className="text-xs font-bold uppercase text-muted-foreground">
-        {label}
-      </div>
-    </div>
-  );
-};
 
 export const EndSession = ({
   results,
@@ -70,10 +24,7 @@ export const EndSession = ({
 }) => {
   const cheer = useMemo(() => pickEndCheer(), []);
   const correctCount = results.filter((r) => r.correct).length;
-  const accuracy =
-    results.length > 0
-      ? Math.round((100 * correctCount) / results.length)
-      : 100;
+  const accuracy = percent(correctCount, results.length, 100);
 
   useEnterAction(hasMore ? onNext : onEnd);
 

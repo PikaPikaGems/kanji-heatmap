@@ -1,12 +1,10 @@
 import type { Stroke } from "@/components/dependent/DrawingPad";
-import type { PracticeItem as SharedPracticeItem } from "@/components/shared-practice";
-import { JLTPTtypes } from "@/lib/jlpt";
+import type {
+  DeckFilterSettings,
+  PracticeItem as SharedPracticeItem,
+} from "@/components/shared-practice";
 
-export type ProductionPracticeSettings = {
-  jlpt: JLTPTtypes[];
-  bookmarkedOnly: boolean;
-  randomizeOrder: boolean;
-  randomizeFont: boolean;
+export type ProductionPracticeSettings = DeckFilterSettings & {
   blurEnglishGloss: boolean;
   hearPronunciationOnLoad: boolean;
   celebratorySoundOnCorrect: boolean;

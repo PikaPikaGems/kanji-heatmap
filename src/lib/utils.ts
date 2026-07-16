@@ -14,6 +14,14 @@ export const clamp = (num: number, min: number, max: number) => {
   return Math.min(max, Math.max(num, min));
 };
 
+/** Rounded percentage of `part` out of `total`, or `fallback` when total is 0. */
+export const percent = (part: number, total: number, fallback = 0) =>
+  total > 0 ? Math.round((100 * part) / total) : fallback;
+
+/** Rounded mean of a numeric array, or null when empty. */
+export const roundedMean = (nums: number[]): number | null =>
+  nums.length ? Math.round(nums.reduce((a, b) => a + b, 0) / nums.length) : null;
+
 export const toNum = (str?: string | null | number, fallback?: number) => {
   if (typeof str === "string" && !Number.isNaN(Number(str))) {
     return Number(str);

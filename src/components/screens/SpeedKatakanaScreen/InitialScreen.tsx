@@ -4,6 +4,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
+import { roundedMean } from "@/lib/utils";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
@@ -112,15 +113,14 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   );
 
   const summary = useMemo(() => {
-    let completed = 0;
-    let totalCpm = 0;
+    const cpms: number[] = [];
     for (let i = 1; i <= SPEED_KATAKANA_TOTAL_CHALLENGES; i++) {
       const s = readSetStats(i);
-      if (s) { completed++; totalCpm += s.latestCpm; }
+      if (s) cpms.push(s.latestCpm);
     }
     return {
-      completed,
-      averageCpm: completed > 0 ? Math.round(totalCpm / completed) : null,
+      completed: cpms.length,
+      averageCpm: roundedMean(cpms),
     };
   }, []);
 

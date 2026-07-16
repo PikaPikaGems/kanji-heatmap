@@ -22,8 +22,8 @@ export const CopyButton = ({
   return (
     <Button
       variant={"outline"}
-      size="icon"
-      className={"h-8 w-8 relative rounded-xl"}
+      size="iconXl"
+      className="relative"
       onClick={(e) => {
         copy(textToCopy, e);
         e.preventDefault();

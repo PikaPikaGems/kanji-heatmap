@@ -1,8 +1,13 @@
-import { Button } from "@/components/ui/button";
 import { Library } from "lucide-react";
-import { GenericPopover } from "./GenericPopover";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
+import {
+  DictEmpty,
+  DictError,
+  DictHeader,
+  DictionaryPopoverShell,
+  DictLoading,
+} from "./DictionaryPopover";
 
 type JotobaReading = { kana: string; kanji?: string; furigana?: string };
 type JotobaSense = {
@@ -30,29 +35,16 @@ export const JotobaContent = ({ word }: { word: string }) => {
     );
 
     if (!data) {
-        if (status === "error") {
-            return (
-                <div className="py-2 text-xs">
-                    すみません. Jotoba.de cannot be accessed right now. Try again later.
-                </div>
-            );
-        }
-        return <div className="py-2 text-xs text-muted-foreground">読み込み中 · Loading…</div>;
+        return status === "error" ? <DictError service="Jotoba.de" /> : <DictLoading />;
     }
 
     if (data.words.length === 0) {
-        return (
-            <div className="py-2 text-xs text-muted-foreground">
-                すみません. Jotoba.de does not contain information about this word.
-            </div>
-        );
+        return <DictEmpty service="Jotoba.de" />;
     }
 
     return (
         <div className="w-48 space-y-3">
-            <div className="pb-1 mb-2 border-b text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-                Powered by Jotoba.de 💪
-            </div>
+            <DictHeader label="Jotoba.de" />
             {data.words.slice(0, 5).map((entry, i) => (
                 <div key={i} className={i > 0 ? "border-t pt-3" : ""}>
                     <div className="flex items-center gap-1.5 mb-1 flex-wrap">
@@ -101,17 +93,11 @@ export const JotobaContent = ({ word }: { word: string }) => {
 
 export const JotobaBtn = ({ word }: { word: string }) => {
     return (
-        <GenericPopover
-            trigger={
-                <Button variant={"outline"} size="icon" className="relative w-8 h-8 rounded-xl">
-                    <Library />
-                </Button>
-            }
-            content={
-                <div className="px-4 py-2 overflow-y-scroll max-w-64 min-w-36 max-h-48" data-vaul-no-drag style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }} onWheel={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()}>
-                    <JotobaContent word={word} />
-                </div>
-            }
-        />
+        <DictionaryPopoverShell
+            icon={<Library />}
+            contentClassName="px-4 py-2 overflow-y-scroll max-w-64 min-w-36 max-h-48"
+        >
+            <JotobaContent word={word} />
+        </DictionaryPopoverShell>
     );
 };

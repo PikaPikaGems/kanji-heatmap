@@ -3,6 +3,10 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 const LOCAL_STORAGE_KANJI_FONT_KEY = "kanji-font";
 export const NUMBER_OF_FONTS = 15;
 
+/** A random valid kanji-font index. */
+export const randomFontIndex = () =>
+  Math.floor(Math.random() * NUMBER_OF_FONTS);
+
 export const useChangeFont = () => {
   const fontIdRef = useRef(0);
 

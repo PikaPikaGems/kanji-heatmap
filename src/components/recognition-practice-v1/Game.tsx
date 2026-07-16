@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
-import assetsPaths from "@/lib/assets-paths";
+import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { useKanaInput } from "@/hooks/use-kana-input";
+import { BlurredGloss } from "@/components/shared-practice";
 import {
   isForgotCommand,
   isForgotCommandPrefix,
@@ -29,14 +31,10 @@ export const Game = ({
 }) => {
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
-  const [glossBlurred, setGlossBlurred] = useState(true);
   const [feedback, setFeedback] = useState<"correct" | "forgot" | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const isComposingRef = useRef(false);
-  const suppressNextChangeRef = useRef(false);
-  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const current = sessionItems[index];
   const matched = current
@@ -45,10 +43,21 @@ export const Game = ({
   const forgotTyped = isForgotCommand(inputValue);
 
   const speak = useSpeak(current?.word ?? "");
+  const playCorrect = useCorrectSound();
 
-  useEffect(() => {
-    setGlossBlurred(true);
-  }, [index]);
+  const handleChange = (raw: string) => {
+    // Keep "forgot" / "skip" as latin so the command stays typable.
+    if (isForgotCommandPrefix(raw)) {
+      setInputValue(raw.replace(/\s+/g, ""));
+      return;
+    }
+    setInputValue(translateValue(raw, "hiragana"));
+  };
+
+  const kanaInput = useKanaInput({
+    setRawValue: setInputValue,
+    onCommit: handleChange,
+  });
 
   useEffect(() => {
     if (feedback == null) {
@@ -66,31 +75,17 @@ export const Game = ({
     return null;
   }
 
-  const playCorrectFeedback = () => {
-    if (!sound.enabled) return;
-    if (sound.type === "speak") {
-      speak();
-      return;
-    }
-    try {
-      if (!correctAudioRef.current) {
-        correctAudioRef.current = new Audio(
-          assetsPaths.SPEED_KATAKANA_CORRECT_SOUND
-        );
-      }
-      correctAudioRef.current.currentTime = 0;
-      void correctAudioRef.current.play();
-    } catch {
-      // ignore playback failures
-    }
-  };
-
   const openFeedback = (correct: boolean) => {
     if (feedback != null) return;
     inputRef.current?.blur();
     const result: SessionResult = { ...current, correct };
     resultsRef.current = [...resultsRef.current, result];
-    if (correct) playCorrectFeedback();
+    if (correct) {
+      playCorrect({
+        enabled: sound.enabled,
+        speak: sound.enabled && sound.type === "speak" ? speak : undefined,
+      });
+    }
     setFeedback(correct ? "correct" : "forgot");
   };
 
@@ -108,15 +103,6 @@ export const Game = ({
     }
 
     setIndex(nextIndex);
-  };
-
-  const handleChange = (raw: string) => {
-    // Keep "forgot" / "skip" as latin so the command stays typable.
-    if (isForgotCommandPrefix(raw)) {
-      setInputValue(raw.replace(/\s+/g, ""));
-      return;
-    }
-    setInputValue(translateValue(raw, "hiragana"));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -175,20 +161,12 @@ export const Game = ({
           </p>
         </div>
 
-        <button
-          type="button"
-          className={`max-w-sm px-2 text-xs font-bold tracking-wide transition-all outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 ${
-            glossBlurred && feedback == null ? "blur-[5px] hover:blur-none" : ""
-          }`}
-          onClick={() => setGlossBlurred((v) => !v)}
-          aria-label={
-            glossBlurred && feedback == null
-              ? "Reveal English gloss"
-              : "Blur English gloss"
-          }
-        >
-          {current.englishGloss || "—"}
-        </button>
+        <BlurredGloss
+          text={current.englishGloss}
+          resetKey={index}
+          forceReveal={feedback != null}
+          className="focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+        />
       </div>
 
       <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0 md:pb-0">
@@ -206,33 +184,7 @@ export const Game = ({
               placeholder='Type the reading or type "forgot"'
               className="relative w-full p-0 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
-              onCompositionStart={() => {
-                isComposingRef.current = true;
-                suppressNextChangeRef.current = false;
-              }}
-              onCompositionEnd={(e) => {
-                isComposingRef.current = false;
-                suppressNextChangeRef.current = true;
-                setTimeout(() => {
-                  suppressNextChangeRef.current = false;
-                }, 0);
-                handleChange(e.currentTarget.value);
-              }}
-              onChange={(e) => {
-                const raw = e.target.value;
-                const composing =
-                  "isComposing" in e.nativeEvent &&
-                  (e.nativeEvent as InputEvent).isComposing;
-                if (isComposingRef.current || composing) {
-                  setInputValue(raw);
-                  return;
-                }
-                if (suppressNextChangeRef.current) {
-                  suppressNextChangeRef.current = false;
-                  return;
-                }
-                handleChange(raw);
-              }}
+              {...kanaInput}
             />
 
             <div className="grid grid-cols-2 gap-2">

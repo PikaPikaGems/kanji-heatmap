@@ -95,7 +95,7 @@ const DeviceSpecs = () => {
 export const DebugInfo = () => (
   <Popover>
     <PopoverTrigger asChild>
-      <Button variant="outline" size="icon" className="w-8 h-8 mr-1 rounded-xl" aria-label="Debug info">
+      <Button variant="outline" size="iconXl" className="mr-1" aria-label="Debug info">
         <Info className="w-[1.2rem] h-[1.2rem]" />
       </Button>
     </PopoverTrigger>

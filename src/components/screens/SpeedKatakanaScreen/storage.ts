@@ -1,3 +1,5 @@
+import { safeReadJson, notifyStorage } from "@/lib/storage";
+import { roundedMean } from "@/lib/utils";
 import { SessionStats } from "./types";
 
 export type ChallengeSetStats = {
@@ -8,18 +10,13 @@ export type ChallengeSetStats = {
   timesTaken: number;
 };
 
-const statsKey = (setNumber: number) =>
-  `speed-katakana-stats-${setNumber}`;
+export const STATS_KEY_PREFIX = "speed-katakana-stats-";
+
+const statsKey = (setNumber: number) => `${STATS_KEY_PREFIX}${setNumber}`;
 
 /** Returns the stored stats for a challenge set, or null if never attempted. */
-export const readSetStats = (setNumber: number): ChallengeSetStats | null => {
-  try {
-    const raw = localStorage.getItem(statsKey(setNumber));
-    return raw ? (JSON.parse(raw) as ChallengeSetStats) : null;
-  } catch {
-    return null;
-  }
-};
+export const readSetStats = (setNumber: number): ChallengeSetStats | null =>
+  safeReadJson<ChallengeSetStats | null>(statsKey(setNumber), null);
 
 /** Returns how many unique sets have recorded stats out of totalSets. */
 export const countCompletedSets = (totalSets: number): number => {
@@ -37,7 +34,7 @@ export const computeAverageCpm = (totalSets: number): number | null => {
     const stats = readSetStats(i);
     if (stats) cpms.push(stats.latestCpm);
   }
-  return cpms.length > 0 ? Math.round(cpms.reduce((a, b) => a + b, 0) / cpms.length) : null;
+  return roundedMean(cpms);
 };
 
 /** Merges a finished session's result into the stored stats for a set. */
@@ -55,7 +52,7 @@ export const recordSetResult = (
   };
   try {
     localStorage.setItem(statsKey(setNumber), JSON.stringify(next));
-    window.dispatchEvent(new StorageEvent("storage", { key: statsKey(setNumber) }));
+    notifyStorage(statsKey(setNumber));
   } catch {
     // ignore storage write failures (e.g. private mode quota)
   }
