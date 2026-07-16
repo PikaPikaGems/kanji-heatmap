@@ -44,7 +44,10 @@ const BasicSelect = ({
         {label}
       </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className={`w-full pl-2 ${triggerCN}`} id={`select-${id}`}>
+        <SelectTrigger
+          className={`w-full pl-2 ${triggerCN}`}
+          id={`select-${id}`}
+        >
           <SelectValue>
             {options.find((option) => option.value === value)?.label}
           </SelectValue>

@@ -15,7 +15,6 @@ import { Header } from "@/components/site-layout/";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
-
 const {
   kanjiPage,
   cumUseGraphPage,

@@ -26,7 +26,9 @@ const TableCellFixed = ({
   children: ReactNode;
   className?: string;
 }) => (
-  <TableCell className={`w-28 sm:w-32 text-[10px] uppercase ${className ?? ""}`}>
+  <TableCell
+    className={`w-28 sm:w-32 text-[10px] uppercase ${className ?? ""}`}
+  >
     {children}
   </TableCell>
 );
@@ -35,34 +37,52 @@ const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell>{children}</TableCell>
 );
 
-const LabelCell = ({ label, description }: { label: ReactNode; description: ReactNode }) => (
+const LabelCell = ({
+  label,
+  description,
+}: {
+  label: ReactNode;
+  description: ReactNode;
+}) => (
   <TableCellFixed>
-
     <GenericPopover
-      trigger={<span className="cursor-pointer"> {label} <InfoIcon className="inline-block -translate-y-0.5 pl-1 cursor-pointer" size={12} /> </span>}
+      trigger={
+        <span className="cursor-pointer">
+          {" "}
+          {label}{" "}
+          <InfoIcon
+            className="inline-block -translate-y-0.5 pl-1 cursor-pointer"
+            size={12}
+          />{" "}
+        </span>
+      }
       content={<div className="w-48 px-4 py-3 text-xs">{description}</div>}
     />
   </TableCellFixed>
 );
 
 export const BareGeneral = ({ kanji }: { kanji: string }) => {
-
   return (
     <>
-      <div className="w-full p-4 text-base text-center">No entry for {kanji} right now. Look it up on
-        <ExternalTextLink href={jpdbFn(kanji)} text="JPDB" />, <ExternalTextLink href={jitenMoeFn(kanji)} text="Jiten.Moe" />,  or <ExternalTextLink href={kanshudoFn(kanji)} text="Kanshudo" /> instead.
+      <div className="w-full p-4 text-base text-center">
+        No entry for {kanji} right now. Look it up on
+        <ExternalTextLink href={jpdbFn(kanji)} text="JPDB" />,{" "}
+        <ExternalTextLink href={jitenMoeFn(kanji)} text="Jiten.Moe" />, or{" "}
+        <ExternalTextLink href={kanshudoFn(kanji)} text="Kanshudo" /> instead.
       </div>
     </>
-  )
-}
+  );
+};
 
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
 
   if (info.error) {
-    return <>
-      <BareGeneral kanji={kanji} />
-    </>
+    return (
+      <>
+        <BareGeneral kanji={kanji} />
+      </>
+    );
   }
 
   if (info.data == null) {
@@ -124,24 +144,37 @@ export const General = ({ kanji }: { kanji: string }) => {
           <TableRow className="text-left">
             <LabelCell
               label="Meanings"
-              description={<>Words in english associated with this kanji. e.g., 山 → &ldquo;mountain&rdquo;, 水 → &ldquo;water&rdquo;</>}
+              description={
+                <>
+                  Words in english associated with this kanji. e.g., 山 →
+                  &ldquo;mountain&rdquo;, 水 → &ldquo;water&rdquo;
+                </>
+              }
             />
             <TableCellGrow>
               {/** FIXME: I don't know why 回  has a meaning "#name?" */}
-              {data.meanings.filter(meaning => meaning !== "#name?").map((meaning) => {
-                return (
-                  <Badge key={meaning} variant={"outline"} className="m-1">
-                    {meaning}
-                  </Badge>
-                )
-              })}
+              {data.meanings
+                .filter((meaning) => meaning !== "#name?")
+                .map((meaning) => {
+                  return (
+                    <Badge key={meaning} variant={"outline"} className="m-1">
+                      {meaning}
+                    </Badge>
+                  );
+                })}
               {data.meanings.length === 0 && <div> - </div>}
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
             <LabelCell
               label="Kunyomi"
-              description={<>Native Japanese readings used in Japanese-origin words. e.g., 山 → <strong>やま</strong> (yama), 水 → <strong>みず</strong> (mizu)</>}
+              description={
+                <>
+                  Native Japanese readings used in Japanese-origin words. e.g.,
+                  山 → <strong>やま</strong> (yama), 水 → <strong>みず</strong>{" "}
+                  (mizu)
+                </>
+              }
             />
             <TableCellGrow>
               {data.allKun.map((kun) => (
@@ -153,7 +186,13 @@ export const General = ({ kanji }: { kanji: string }) => {
           <TableRow className="text-left">
             <LabelCell
               label="Onyomi"
-              description={<>Sino-Japanese readings used in compound words. e.g., 山 → <strong>サン</strong> (san) as in 富士山, 水 → <strong>スイ</strong> (sui) as in 水泳</>}
+              description={
+                <>
+                  Sino-Japanese readings used in compound words. e.g., 山 →{" "}
+                  <strong>サン</strong> (san) as in 富士山, 水 →{" "}
+                  <strong>スイ</strong> (sui) as in 水泳
+                </>
+              }
             />
             <TableCellGrow>
               {data.allOn.map((on) => (

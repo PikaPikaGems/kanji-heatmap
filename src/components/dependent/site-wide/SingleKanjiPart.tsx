@@ -31,24 +31,27 @@ export const SingleKanjiPart = ({
             <RomajiBadge key={phonetic} kana={phonetic} />
           ))}
 
-          {keyword == null
-            ? <FakeComponentLink radical={kanji} keyword={nonRadicalVariantKeywords[kanji] ?? "..."} />
-            : isKanji ? (
-              <>
-                <GlobalKanjiLink keyword={keyword} kanji={kanji} />
-                <span className="italic font-normal">{"(Kanji)"}</span>
-              </>
-            ) : isKnownRadical(kanji) ? (
-              <>
-                <GlobalRadicalLink radical={kanji} keyword={keyword} />
-                <span className="italic font-normal">{"(Radical)"}</span>
-              </>
-            ) : (
-              <>
-                <FakeComponentLink radical={kanji} keyword={keyword} />
-                <span className="italic font-normal">{"(Component)"}</span>
-              </>
-            )}
+          {keyword == null ? (
+            <FakeComponentLink
+              radical={kanji}
+              keyword={nonRadicalVariantKeywords[kanji] ?? "..."}
+            />
+          ) : isKanji ? (
+            <>
+              <GlobalKanjiLink keyword={keyword} kanji={kanji} />
+              <span className="italic font-normal">{"(Kanji)"}</span>
+            </>
+          ) : isKnownRadical(kanji) ? (
+            <>
+              <GlobalRadicalLink radical={kanji} keyword={keyword} />
+              <span className="italic font-normal">{"(Radical)"}</span>
+            </>
+          ) : (
+            <>
+              <FakeComponentLink radical={kanji} keyword={keyword} />
+              <span className="italic font-normal">{"(Component)"}</span>
+            </>
+          )}
         </div>
       }
     />

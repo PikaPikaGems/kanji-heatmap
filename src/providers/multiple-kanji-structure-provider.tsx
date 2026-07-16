@@ -76,12 +76,12 @@ export const MultiKanjiStructureProvider = ({
       if (!h && !k && !s && !y) return null;
       return { hlorenzi: h, kanjium: k, scott: s, yagays: y };
     },
-    [rawData],
+    [rawData]
   );
 
   const value = useMemo(
     () => ({ status, error, getStructureForKanji }),
-    [status, error, getStructureForKanji],
+    [status, error, getStructureForKanji]
   );
 
   return (
@@ -95,7 +95,7 @@ export const useMultiKanjiStructureContext = () => {
   const context = useContext(MultiKanjiStructureContext);
   if (!context) {
     throw new Error(
-      "useMultiKanjiStructureContext must be used within a MultiKanjiStructureProvider",
+      "useMultiKanjiStructureContext must be used within a MultiKanjiStructureProvider"
     );
   }
   return context;
@@ -111,6 +111,6 @@ export const useMultiKanjiStructure = (kanji: string) => {
       status,
       error,
     }),
-    [getStructureForKanji, kanji, status, error],
+    [getStructureForKanji, kanji, status, error]
   );
 };

@@ -37,27 +37,30 @@ const useKnownCount = () => {
 const KnownBadge = () => {
   const knownCount = useKnownCount();
 
-  return (<>
-    {knownCount > 0 && (
-      <div className="px-2 text-xs font-extrabold text-green-500 bg-opacity-75 border rounded-lg border-green-500/50 bg-background">
-        ✓ {knownCount} Bookmarked
-      </div>
-    )}
-
-  </>)
-}
+  return (
+    <>
+      {knownCount > 0 && (
+        <div className="px-2 text-xs font-extrabold text-green-500 bg-opacity-75 border rounded-lg border-green-500/50 bg-background">
+          ✓ {knownCount} Bookmarked
+        </div>
+      )}
+    </>
+  );
+};
 
 const ItemsCountLayout = ({ count }: { count: number }) => {
-  return <>
-    <div className="absolute top-[50px] flex flex-wrap gap-1">
-      <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
-        {count} {count !== 1 ? "Items" : "Item"} {KANJI_COUNT !== count ? "Matched" : ""}
+  return (
+    <>
+      <div className="absolute top-[50px] flex flex-wrap gap-1">
+        <div className="px-2 text-xs font-extrabold bg-opacity-75 border rounded-lg bg-background">
+          {count} {count !== 1 ? "Items" : "Item"}{" "}
+          {KANJI_COUNT !== count ? "Matched" : ""}
+        </div>
+        <KnownBadge />
       </div>
-      <KnownBadge />
-    </div>
-
-  </>
-}
+    </>
+  );
+};
 
 export const ItemCountBadge = () => {
   const result = useKanjiSearchResult();
@@ -66,12 +69,12 @@ export const ItemCountBadge = () => {
   const kanjiChars = [...new Set(text.split("").filter(isKanji))];
 
   if (result.data?.length == null) {
-    return <KnownBadge />
+    return <KnownBadge />;
   }
 
   if (type === "multi-kanji" && kanjiChars.length > 0) {
-    return <ItemsCountLayout count={kanjiChars.length} />
+    return <ItemsCountLayout count={kanjiChars.length} />;
   }
 
-  return <ItemsCountLayout count={result.data.length} />
+  return <ItemsCountLayout count={result.data.length} />;
 };

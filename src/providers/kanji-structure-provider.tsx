@@ -1,13 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useMemo, ReactNode } from "react";
 import { useJsonFetch } from "@/hooks/use-json";
 import assetsPaths from "@/lib/assets-paths";
-import { KanjiStructureData, KanjiStructureEntry } from "@/lib/kanji-section-constants";
-
+import {
+  KanjiStructureData,
+  KanjiStructureEntry,
+} from "@/lib/kanji-section-constants";
 
 // Context
 interface KanjiStructureContextValue {
@@ -31,23 +28,20 @@ export const KanjiStructureProvider = ({
     assetsPaths.KANJI_STRUCTURE_DETAILS
   );
 
-  const value = useMemo(
-    () => {
-      const { data, status, error } = jsonFetchValue
-      return {
-        data,
-        status,
-        error,
-        getStructureForKanji: (kanji: string): KanjiStructureEntry | null => {
-          if (!data || !kanji) {
-            return null;
-          }
-          return data[kanji] || null;
+  const value = useMemo(() => {
+    const { data, status, error } = jsonFetchValue;
+    return {
+      data,
+      status,
+      error,
+      getStructureForKanji: (kanji: string): KanjiStructureEntry | null => {
+        if (!data || !kanji) {
+          return null;
         }
-      }
-    },
-    [jsonFetchValue]
-  );
+        return data[kanji] || null;
+      },
+    };
+  }, [jsonFetchValue]);
 
   return (
     <KanjiStructureContext.Provider value={value}>
@@ -74,8 +68,8 @@ export const useKanjiStructure = (kanji: string) => {
     return {
       kanjiStructureData: value.getStructureForKanji(kanji),
       status: value.status,
-      error: value.error
-    }
+      error: value.error,
+    };
   }, [value, kanji]);
 
   return state;

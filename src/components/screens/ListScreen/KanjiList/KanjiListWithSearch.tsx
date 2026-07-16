@@ -24,11 +24,7 @@ const KanjiListWithSearch = () => {
     return <LoadingKanjis />;
   }
 
-  const kanjiKeys = getFinalResults(
-    searchSettings,
-    result.data,
-    getBasicInfo
-  );
+  const kanjiKeys = getFinalResults(searchSettings, result.data, getBasicInfo);
 
   if (kanjiKeys.length === 0) {
     return <NoSearchResults />;

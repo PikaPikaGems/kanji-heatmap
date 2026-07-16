@@ -4,10 +4,7 @@ import { useEffect } from "react";
  * Fire `action` on Enter when focus isn't in a text field / select.
  * Skips while IME is composing.
  */
-export const useEnterAction = (
-  action: (() => void) | null,
-  enabled = true
-) => {
+export const useEnterAction = (action: (() => void) | null, enabled = true) => {
   useEffect(() => {
     if (!enabled || !action) return;
 

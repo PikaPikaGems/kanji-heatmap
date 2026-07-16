@@ -10,11 +10,13 @@ import { EndSession } from "./EndSession";
 import { SessionStats, SpeedKatakanaSettings } from "./types";
 import { recordSetResult } from "./storage";
 import { useCompletedSetsCount } from "./use-completed-sets-count";
-import { DEFAULT_SETTINGS, SETTINGS_KEY, SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
-
+import {
+  DEFAULT_SETTINGS,
+  SETTINGS_KEY,
+  SPEED_KATAKANA_TOTAL_CHALLENGES,
+} from "./constants";
 
 type Phase = "initial" | "playing" | "ended";
-
 
 const nextChallengeSet = (current: number) =>
   current >= SPEED_KATAKANA_TOTAL_CHALLENGES ? 1 : current + 1;

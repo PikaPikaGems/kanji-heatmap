@@ -17,14 +17,17 @@ import { frequencyRankNamesOrdered } from "@/lib/options/options-constants";
 
 export const FrequencyInfo = ({
   freqRankInfo,
-  kanji
+  kanji,
 }: {
   freqRankInfo?: KanjiInfoFrequency;
-  kanji: string
+  kanji: string;
 }) => {
-
   if (freqRankInfo == null) {
-    return <div className="w-full p-4 text-base text-center">There is no frequency rank data for {kanji} right now.</div>;
+    return (
+      <div className="w-full p-4 text-base text-center">
+        There is no frequency rank data for {kanji} right now.
+      </div>
+    );
   }
 
   return (
@@ -48,8 +51,7 @@ export const FrequencyInfo = ({
                   trigger={
                     <button className="pl-2 text-left text-xs flex justify-between items-center w-[225px] lg:w-[280px] py-1 ">
                       <span className="font-extrabold">
-                        {label}{" "}
-                        <InfoIcon className="inline-block" size={12} />
+                        {label} <InfoIcon className="inline-block" size={12} />
                       </span>{" "}
                       {rank !== -1 && (
                         <span className="inline-block w-12 -mb-0_5 grow text-end">

@@ -67,7 +67,7 @@ function loadSvg(
   charCode: string,
   callbacks: LoaderCallbacks
 ) {
-  const code = (`00000${charCode}`).slice(-5);
+  const code = `00000${charCode}`.slice(-5);
 
   if (code === "00020" || code === "03000") {
     callbacks.done(index, []);

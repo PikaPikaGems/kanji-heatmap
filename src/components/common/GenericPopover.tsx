@@ -20,10 +20,14 @@ export const GenericPopover = ({
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className="w-auto p-0 m-0" collisionPadding={16}>
         <PopoverCardArrow />
-        <ErrorBoundary fallback={<div className="p-4"><SmallUnexpectedErrorFallback /></div>}
+        <ErrorBoundary
+          fallback={
+            <div className="p-4">
+              <SmallUnexpectedErrorFallback />
+            </div>
+          }
         >
           {content}
-
         </ErrorBoundary>
       </PopoverContent>
     </Popover>

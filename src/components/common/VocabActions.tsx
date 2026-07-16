@@ -36,23 +36,27 @@ export const VocabActions = ({
         <JotobaBtn word={word} />
       </BugIconErrorBoundary>
       <SpeakButton word={word} iconType="volume-2" />
-      {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />
-      }
+      {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />}
       <CopyButton textToCopy={word} iconType={"clipboard"} />
 
-      {SHOW_ICON_MEANINGS &&
+      {SHOW_ICON_MEANINGS && (
         <GenericPopover
           trigger={
-            <InfoIcon className="absolute inline-block top-2 right-2" size={18} />
+            <InfoIcon
+              className="absolute inline-block top-2 right-2"
+              size={18}
+            />
           }
           content={
             <div className="flex flex-col w-full p-2 space-y-1 text-xs">
-              {kana.length ?
+              {kana.length ? (
                 <IconMeanings
                   btn={<CopyButton textToCopy={kana} iconType={"copy"} />}
                   text={"Copy Kana"}
-                /> : ""
-              }
+                />
+              ) : (
+                ""
+              )}
               <IconMeanings
                 btn={<CopyButton textToCopy={word} iconType={"clipboard"} />}
                 text={"Copy Word"}
@@ -68,7 +72,7 @@ export const VocabActions = ({
             </div>
           }
         />
-      }
+      )}
     </div>
   );
 };

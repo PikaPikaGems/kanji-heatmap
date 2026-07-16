@@ -10,8 +10,16 @@ import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
-import { DEFAULT_SETTINGS, levelOf, LEVELS, positionInLevel, setFromLevelAndPos, CHALLENGES_PER_LEVEL, SETTINGS_KEY, SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
-
+import {
+  DEFAULT_SETTINGS,
+  levelOf,
+  LEVELS,
+  positionInLevel,
+  setFromLevelAndPos,
+  CHALLENGES_PER_LEVEL,
+  SETTINGS_KEY,
+  SPEED_KATAKANA_TOTAL_CHALLENGES,
+} from "./constants";
 
 const ToggleRow = ({
   id,
@@ -59,24 +67,27 @@ const RadioRow = ({
 );
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const currentStats = useMemo(() => readSetStats(challengeSet), [challengeSet]);
+  const currentStats = useMemo(
+    () => readSetStats(challengeSet),
+    [challengeSet]
+  );
   const level = levelOf(challengeSet);
   const pos = positionInLevel(challengeSet);
-  const stats = currentStats ?
-    {
-      timesTaken: currentStats.timesTaken,
-      latestAccuracy: `${currentStats.latestAccuracy} %`,
-      bestAccuracy: `${currentStats.bestAccuracy} %`,
-      latestCpm: `${currentStats.latestCpm} cpm`,
-      bestCpm: `${currentStats.bestCpm} cpm`,
-
-    } : {
-      timesTaken: 0,
-      latestAccuracy: "- - -",
-      bestAccuracy: " - ",
-      latestCpm: "- - -",
-      bestCpm: " -",
-    }
+  const stats = currentStats
+    ? {
+        timesTaken: currentStats.timesTaken,
+        latestAccuracy: `${currentStats.latestAccuracy} %`,
+        bestAccuracy: `${currentStats.bestAccuracy} %`,
+        latestCpm: `${currentStats.latestCpm} cpm`,
+        bestCpm: `${currentStats.bestCpm} cpm`,
+      }
+    : {
+        timesTaken: 0,
+        latestAccuracy: "- - -",
+        bestAccuracy: " - ",
+        latestCpm: "- - -",
+        bestCpm: " -",
+      };
 
   return (
     <div className="flex flex-wrap gap-2 text-xs font-bold text-left min-h-10">
@@ -84,8 +95,7 @@ const SetStats = ({ challengeSet }: { challengeSet: number }) => {
         Challenge {level}-{pos} (#{challengeSet}):
       </div>
       <div>
-        {stats.timesTaken}{" "}
-        {stats.timesTaken === 1 ? "attempt" : "attempts"}
+        {stats.timesTaken} {stats.timesTaken === 1 ? "attempt" : "attempts"}
       </div>
       <div className="grid w-full grid-cols-2">
         <div>
@@ -97,10 +107,8 @@ const SetStats = ({ challengeSet }: { challengeSet: number }) => {
         <div>
           🚙 Speed:{" "}
           <span className="mr-1 text-green-500">{stats.latestCpm}</span>
-
           <br />
           🏎️ Best Speed: {stats.bestCpm}
-
         </div>
       </div>
     </div>
@@ -147,7 +155,9 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   };
 
   const soundEnabled = settings.sound.enabled;
-  const soundType: SoundMode = settings.sound.enabled ? settings.sound.type : "correct";
+  const soundType: SoundMode = settings.sound.enabled
+    ? settings.sound.type
+    : "correct";
 
   useEnterAction(onStart);
 
@@ -222,14 +232,18 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                     value="speak"
                     current={soundType}
                     label="Say out loud"
-                    onChange={(v) => setSetting("sound", { enabled: true, type: v })}
+                    onChange={(v) =>
+                      setSetting("sound", { enabled: true, type: v })
+                    }
                   />
                   <RadioRow
                     name="sound-mode"
                     value="correct"
                     current={soundType}
                     label="Sound when correct"
-                    onChange={(v) => setSetting("sound", { enabled: true, type: v })}
+                    onChange={(v) =>
+                      setSetting("sound", { enabled: true, type: v })
+                    }
                   />
                 </div>
               )}
@@ -248,54 +262,55 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                 </span>
               </div>
 
-
               <div className="grid grid-cols-10 gap-1">
-                {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => {
-                  const doneCount = levelCompletion[level - 1];
-                  const category = Math.round(
-                    (doneCount / CHALLENGES_PER_LEVEL) * 4
-                  ) as FreqCategory;
-                  const bgCn = freqCategoryCn[category];
-                  const textCn = category > 3 ? "text-white" : "text-foreground";
-                  return (
-                    <button
-                      key={level}
-                      onClick={() => selectLevel(level)}
-                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentLevel === level
-                        ? "border-primary"
-                        : ""
-                        }`}
-                    >
-                      {level}
-                    </button>
-                  );
-                })}
-              </div>
-              <Label className="text-sm text-left">Select a Challenge</Label>
-
-              <div className="grid grid-cols-10 gap-1">
-                {Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) => i + 1).map(
-                  (pos) => {
-                    const setNum = setFromLevelAndPos(currentLevel, pos);
-                    const completed = !!readSetStats(setNum);
-                    const bgCn = completed
-                      ? freqCategoryCn[4]
-                      : freqCategoryCn[0];
-                    const textCn = completed
-                      ? "text-white"
-                      : "text-foreground";
+                {Array.from({ length: LEVELS }, (_, i) => i + 1).map(
+                  (level) => {
+                    const doneCount = levelCompletion[level - 1];
+                    const category = Math.round(
+                      (doneCount / CHALLENGES_PER_LEVEL) * 4
+                    ) as FreqCategory;
+                    const bgCn = freqCategoryCn[category];
+                    const textCn =
+                      category > 3 ? "text-white" : "text-foreground";
                     return (
                       <button
-                        key={pos}
-                        onClick={() => setSetting("challengeSet", setNum)}
-                        className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${currentPos === pos ? "border-primary" : ""
-                          }`}
+                        key={level}
+                        onClick={() => selectLevel(level)}
+                        className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
+                          currentLevel === level ? "border-primary" : ""
+                        }`}
                       >
-                        {pos}
+                        {level}
                       </button>
                     );
                   }
                 )}
+              </div>
+              <Label className="text-sm text-left">Select a Challenge</Label>
+
+              <div className="grid grid-cols-10 gap-1">
+                {Array.from(
+                  { length: CHALLENGES_PER_LEVEL },
+                  (_, i) => i + 1
+                ).map((pos) => {
+                  const setNum = setFromLevelAndPos(currentLevel, pos);
+                  const completed = !!readSetStats(setNum);
+                  const bgCn = completed
+                    ? freqCategoryCn[4]
+                    : freqCategoryCn[0];
+                  const textCn = completed ? "text-white" : "text-foreground";
+                  return (
+                    <button
+                      key={pos}
+                      onClick={() => setSetting("challengeSet", setNum)}
+                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
+                        currentPos === pos ? "border-primary" : ""
+                      }`}
+                    >
+                      {pos}
+                    </button>
+                  );
+                })}
               </div>
 
               <p className="text-xs text-left">

@@ -6,7 +6,10 @@ import {
 } from "@/components/dependent/DrawingPad";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
-import { SmallUnexpectedErrorFallback, SmallUnexpectedErrorFallbackTxt } from "@/components/error/SmallUnexpectedErrorFallback";
+import {
+  SmallUnexpectedErrorFallback,
+  SmallUnexpectedErrorFallbackTxt,
+} from "@/components/error/SmallUnexpectedErrorFallback";
 import { ErrorBoundary } from "@/components/error";
 import { Recognizer } from "./recognizers";
 
@@ -24,12 +27,12 @@ const HandwritingScreenLayout = ({
   top,
   bottom,
   candidatesCount,
-  title = "Draw a Kanji"
+  title = "Draw a Kanji",
 }: {
   top: ReactNode;
   bottom: ReactNode;
   candidatesCount: number;
-  title?: string
+  title?: string;
 }) => {
   return (
     <div className="relative w-full px-1 mx-auto">
@@ -72,7 +75,6 @@ const HandwritingResultsPreview = ({
   idleContent?: ReactNode;
   onClick: () => void;
 }) => {
-
   if (status === "loading") {
     return (
       <div className={messageBoxCN}>
@@ -109,7 +111,11 @@ const HandwritingResultsPreview = ({
       <ErrorBoundary fallback={<SmallUnexpectedErrorFallback />}>
         {candidates.map((kanji) => {
           return (
-            <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
+            <KanjiItemSimpleButton
+              key={kanji}
+              kanji={kanji}
+              onClick={onClick}
+            />
           );
         })}
       </ErrorBoundary>
@@ -141,7 +147,10 @@ export const HandWritingDrawingPad = ({
 }) => {
   const [status, setStatus] = useState<RecognitionStatus>("idle");
   const [svgSize] = useState(() =>
-    Math.min(300, (typeof window !== "undefined" ? window.innerWidth : 360) - 56)
+    Math.min(
+      300,
+      (typeof window !== "undefined" ? window.innerWidth : 360) - 56
+    )
   );
   const getBasicInfo = useGetKanjiInfoFn();
 

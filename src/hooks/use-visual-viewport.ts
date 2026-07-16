@@ -28,7 +28,8 @@ export function useVisualViewport(): VisualViewportRect {
     const vv = window.visualViewport;
     if (!vv) return;
 
-    const update = () => setRect({ height: vv.height, offsetTop: vv.offsetTop });
+    const update = () =>
+      setRect({ height: vv.height, offsetTop: vv.offsetTop });
 
     vv.addEventListener("resize", update);
     vv.addEventListener("scroll", update);

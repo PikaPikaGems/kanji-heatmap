@@ -4,7 +4,9 @@ import { GenericPopover } from "./GenericPopover";
 
 /** "読み込み中 · Loading…" state shared by dictionary lookups. */
 export const DictLoading = () => (
-  <div className="py-2 text-xs text-muted-foreground">読み込み中 · Loading…</div>
+  <div className="py-2 text-xs text-muted-foreground">
+    読み込み中 · Loading…
+  </div>
 );
 
 /** Service-unreachable state (network/API error). */

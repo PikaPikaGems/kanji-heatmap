@@ -28,7 +28,12 @@ const LinkOutIcon = ({
           className={cnOverride ?? `h-8 w-8`}
           size={"icon"}
         >
-          <a href={href} target="_blank" rel="noreferrer" onPointerDown={(e) => e.stopPropagation()}>
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             {icon}
             <span className="sr-only">{srOnlyText}</span>
           </a>

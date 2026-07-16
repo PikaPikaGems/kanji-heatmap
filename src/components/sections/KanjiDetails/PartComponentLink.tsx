@@ -9,14 +9,16 @@ import {
 const getRadicalKeyword = (component: string): string | undefined => {
   if (moreRadicalKeywords[component]) return moreRadicalKeywords[component];
   const canonical = radicalFalseFriends[component]?.trim();
-  if (canonical && moreRadicalKeywords[canonical]) return moreRadicalKeywords[canonical];
+  if (canonical && moreRadicalKeywords[canonical])
+    return moreRadicalKeywords[canonical];
   return undefined;
 };
 
 export const useResolvedComponent = (component: string | null | undefined) => {
   const getKanjiInfo = useGetKanjiInfoFn();
   if (!component) return null;
-  const info = getKanjiInfo?.(component ?? radicalFalseFriends[component]) ?? null;
+  const info =
+    getKanjiInfo?.(component ?? radicalFalseFriends[component]) ?? null;
   const isKanji = !!info && "on" in info;
   const keyword = info?.keyword ?? getRadicalKeyword(component);
   const nonRadicalKeyword = nonRadicalVariantKeywords[component] ?? "...";

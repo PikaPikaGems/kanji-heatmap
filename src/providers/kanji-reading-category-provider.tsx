@@ -8,7 +8,10 @@ import {
 import { useJsonFetch } from "@/hooks/use-json";
 import assetsPaths from "@/lib/assets-paths";
 
-import type { KanjiReadingEntry, KanjiReadingEntrySmall } from "@/lib/kanji-section-constants"
+import type {
+  KanjiReadingEntry,
+  KanjiReadingEntrySmall,
+} from "@/lib/kanji-section-constants";
 
 interface KanjiReadingCategoryContextValue {
   data: Record<string, KanjiReadingEntrySmall[]> | null;
@@ -25,9 +28,9 @@ export const KanjiReadingCategoryProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const { data, status, error } = useJsonFetch<Record<string, KanjiReadingEntrySmall[]>>(
-    assetsPaths.KANJI_READING_DETAILS
-  );
+  const { data, status, error } = useJsonFetch<
+    Record<string, KanjiReadingEntrySmall[]>
+  >(assetsPaths.KANJI_READING_DETAILS);
 
   const getReadingsForKanji = useCallback(
     (kanji: string): KanjiReadingEntry[] | null => {
@@ -35,18 +38,18 @@ export const KanjiReadingCategoryProvider = ({
         return null;
       }
 
-      const kanjiData = data[kanji]
+      const kanjiData = data[kanji];
 
       if (!kanjiData || kanjiData.length <= 0) {
-        return null
+        return null;
       }
-      return kanjiData.map(data => {
+      return kanjiData.map((data) => {
         return {
           reading: data.r,
           type: data.t,
           frequency: data.f,
-          example_word: data.w
-        }
+          example_word: data.w,
+        };
       });
     },
     [data]

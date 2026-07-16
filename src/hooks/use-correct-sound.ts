@@ -19,7 +19,9 @@ export const useCorrectSound = () => {
       }
       try {
         if (!audioRef.current) {
-          audioRef.current = new Audio(assetsPaths.SPEED_KATAKANA_CORRECT_SOUND);
+          audioRef.current = new Audio(
+            assetsPaths.SPEED_KATAKANA_CORRECT_SOUND
+          );
         }
         audioRef.current.currentTime = 0;
         void audioRef.current.play();

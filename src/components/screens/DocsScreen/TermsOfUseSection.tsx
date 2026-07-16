@@ -1,4 +1,7 @@
-import { CustomLink, CustomMailLink } from "@/components/common/docs/CustomLink";
+import {
+  CustomLink,
+  CustomMailLink,
+} from "@/components/common/docs/CustomLink";
 
 export const TermsOfUseSection = () => {
   return (

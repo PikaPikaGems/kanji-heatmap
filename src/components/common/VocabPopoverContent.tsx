@@ -14,7 +14,13 @@ interface VocabPopoverContentProps {
   optionalSection?: ReactNode;
 }
 
-export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, optionalSection }: VocabPopoverContentProps) => {
+export const VocabPopoverContent = ({
+  word,
+  kana,
+  wordKanjis,
+  definition,
+  optionalSection,
+}: VocabPopoverContentProps) => {
   return (
     <div className="p-2 w-72">
       {wordKanjis.length > 0 && (
@@ -29,28 +35,32 @@ export const VocabPopoverContent = ({ word, kana, wordKanjis, definition, option
         </div>
       )}
 
-      {(definition || optionalSection) && <>
-        <DottedSeparator />
-        <div className="my-2">
-          {optionalSection}
-          {definition && (
-            <>
-              <SeeMore definition={definition} maxLen={150} />
-            </>
-          )}
-        </div>
-
-      </>}
+      {(definition || optionalSection) && (
+        <>
+          <DottedSeparator />
+          <div className="my-2">
+            {optionalSection}
+            {definition && (
+              <>
+                <SeeMore definition={definition} maxLen={150} />
+              </>
+            )}
+          </div>
+        </>
+      )}
       <DottedSeparator />
       <VocabActions kana={kana} word={word} />
-
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore this word further →
       </div>
       <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
         {vocabExternalLinks.map((item) => (
-          <ExternalTextLink key={item.name} href={item.url(word)} text={item.name} />
+          <ExternalTextLink
+            key={item.name}
+            href={item.url(word)}
+            text={item.name}
+          />
         ))}
       </div>
     </div>

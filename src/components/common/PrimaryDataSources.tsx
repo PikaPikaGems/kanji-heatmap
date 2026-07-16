@@ -6,7 +6,7 @@ type SourceLink = { text: string; url: string };
 
 export const PrimaryDataSources = ({
   links,
-  title = "View Primary Data Sources"
+  title = "View Primary Data Sources",
 }: {
   links: SourceLink[];
   title?: string;
@@ -36,5 +36,4 @@ export const PrimaryDataSources = ({
       }
     />
   </div>
-
 );
