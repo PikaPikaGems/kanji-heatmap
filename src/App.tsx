@@ -11,7 +11,7 @@ import {
   PageNotFound,
   DefaultErrorFallback,
 } from "./components/error";
-import { Header, FloatingIsland } from "@/components/site-layout/";
+import { Header, FloatingIsland, PracticeFab } from "@/components/site-layout/";
 import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
@@ -119,6 +119,7 @@ const App = () => {
                 </ErrorBoundary>
               </main>
               <FloatingIsland />
+              <PracticeFab />
             </Route>
           </Switch>
         </GlobalKeyboardShortcutProvider>

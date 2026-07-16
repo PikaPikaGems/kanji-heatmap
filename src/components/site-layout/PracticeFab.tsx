@@ -7,10 +7,16 @@ import {
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
-import { practiceNavLinks } from "@/components/items/nav-links";
+import {
+  floatingIslandNavLinks,
+  practiceNavLinks,
+} from "@/components/items/nav-links";
 import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
+import { useLocation } from "@/components/dependent/routing/router-adapter";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
+
+const fabHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
 const prefetchPracticeRoutes = () => {
   void import("@/components/recognition-practice-v1/RecognitionPracticeV1");
@@ -19,10 +25,15 @@ const prefetchPracticeRoutes = () => {
 };
 
 export const PracticeFab = () => {
+  const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const bgSrc = useBgSrc();
   const hasBgMeaning = bgSrc !== "none";
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
+
+  if (!fabHrefs.has(location)) {
+    return null;
+  }
 
   return (
     <Popover
