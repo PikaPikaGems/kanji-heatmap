@@ -23,7 +23,7 @@ export const WritingPracticeModal = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90dvh] overflow-y-auto px-4 py-0 sm:rounded-2xl">
+      <DialogContent className="max-w-md max-h-[90dvh] overflow-y-auto px-4 py-0">
         <DialogHeader className="px-6 pt-6 pb-0">
           <DialogTitle className="flex items-center text-center">
             <span className="text-3xl kanji-font">{kanji}</span>
