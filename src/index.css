@@ -175,8 +175,10 @@ button {
  * iOS standalone PWAs can paint fixed elements at stale scroll coordinates.
  * A dedicated compositor layer keeps persistent viewport UI visually pinned.
  */
-.fixed-viewport-layer {
-  transform: translateZ(0);
+@media (display-mode: standalone) {
+  .fixed-viewport-layer {
+    transform: translateZ(0);
+  }
 }
 
 .animate-fade-in {
