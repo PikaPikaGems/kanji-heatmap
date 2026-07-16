@@ -22,7 +22,7 @@ export const FloatingIsland = () => {
     <nav
       ref={settleRef}
       aria-label="Primary"
-      className="fixed z-40 left-[calc(0.75rem+env(safe-area-inset-left))] bottom-[calc(0.75rem+env(safe-area-inset-bottom))]"
+      className="fixed-viewport-layer fixed z-40 left-[calc(0.75rem+env(safe-area-inset-left))] bottom-[calc(0.75rem+env(safe-area-inset-bottom))]"
     >
       <div
         className={cn(
