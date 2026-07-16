@@ -61,7 +61,7 @@ export const FeedbackDrawer = ({
           <div className="px-2 pt-4 pb-2 mt-2 overflow-y-auto sm:px-3">
             {/* flex + w-fit keeps the two columns tight (grid max-w-* stretched them apart). */}
             <div className="flex flex-row items-start justify-center gap-2 mx-auto w-fit sm:gap-3">
-              <div className="flex flex-col items-center gap-2 shrink-0">
+              <div className="flex flex-col items-center gap-2 shrink-0 min-w-[155px]">
                 <p className="text-xs font-bold uppercase text-muted-foreground">
                   You Drew
                 </p>
@@ -88,7 +88,7 @@ export const FeedbackDrawer = ({
                   Practice More
                 </PracticeButton>
               </div>
-              <div className="flex flex-col items-center gap-2 shrink-0">
+              <div className="flex flex-col items-center gap-2  shrink-0 min-w-[155px]">
                 <p className="text-xs font-bold uppercase text-muted-foreground">
                   Stroke Order
                 </p>
