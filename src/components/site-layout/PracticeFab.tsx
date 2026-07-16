@@ -50,7 +50,7 @@ export const PracticeFab = () => {
           size="icon"
           variant={hasBgMeaning ? "secondary" : "primary"}
           className={cn(
-            "fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom))]",
+            "fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px+env(safe-area-inset-right,0px))] bottom-[calc(1rem+env(safe-area-inset-bottom,0px))]",
             hasBgMeaning && "border-foreground/40"
           )}
           aria-label="Open practice menu"

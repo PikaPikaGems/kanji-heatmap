@@ -18,15 +18,15 @@ const Layout = ({
 }) => {
   return (
     <>
-      <div className="fix-scroll-layout-shift-right fixed w-full pt-12 pb-2 z-40 bg-background">
-        <section className="mx-auto max-w-screen-xl flex border-0 space-x-1 sticky pt-1 pl-2 pr-1 w-full ">
+      <div className="fix-scroll-layout-shift-right fixed top-0 left-0 w-full pt-[calc(var(--app-header-height)+env(safe-area-inset-top,0px))] pb-2 z-40 bg-background">
+        <section className="mx-auto max-w-screen-xl flex border-0 space-x-1 pt-1 pl-2 pr-1 w-full">
           <ErrorBoundary fallback={<LinksOutItems />}>
             <ControlBar />
             {badge}
           </ErrorBoundary>
         </section>
       </div>
-      <div className="relative pt-24 -z-0 flex flex-wrap items-center justify-center overflow-x-hidden">
+      <div className="relative pt-[calc(6rem+env(safe-area-inset-top,0px))] -z-0 flex flex-wrap items-center justify-center overflow-x-hidden">
         {children}
       </div>
     </>
