@@ -39,7 +39,7 @@ export const DurationNav = ({
       >
         <ChevronLeft className="size-5" />
       </button>
-      <div className="min-w-[9.5rem] text-center text-base font-extrabold tabular-nums">
+      <div className="min-w-[7rem] text-center text-base font-extrabold tabular-nums">
         {durationOptionLabel(value)}
       </div>
       <button
