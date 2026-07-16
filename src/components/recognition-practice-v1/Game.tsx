@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { CircleArrowLeft } from "lucide-react";
 import { translateValue } from "@/lib/wanakana-adapter";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import { BlurredGloss } from "@/components/shared-practice";
+import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   isForgotCommand,
   isForgotCommandPrefix,
@@ -128,16 +127,7 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full gap-5 [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-        tabIndex={-1}
-        onClick={onEnd}
-        aria-label="End session"
-      >
-        <CircleArrowLeft />
-      </Button>
+      <EndSession onClick={onEnd} />
       {/*
         Touch layout: keep the prompt + input as a top-anchored cluster with a
         fixed gap. A bottom spacer absorbs visual-viewport height changes so

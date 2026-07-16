@@ -29,6 +29,7 @@ export const EndSession = ({
   const accuracy = percent(correctCount, results.length, 100);
 
   useEnterAction(hasMore ? onNext : onEnd, true, CONTINUE_KEYS);
+  useEnterAction(onEnd, true, ["Escape"]);
 
   if (!hasMore) {
     return (

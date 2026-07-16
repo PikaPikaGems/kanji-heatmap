@@ -19,6 +19,7 @@ export const EndSession = ({
 }) => {
   const cheer = useMemo(() => pickEndCheer(), []);
   useEnterAction(onNext);
+  useEnterAction(onEnd, true, ["Escape"]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-10 animate-fade-in">

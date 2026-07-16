@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CircleArrowLeft, Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Rocket } from "lucide-react";
 import {
   DrawingPad,
   DrawingSubmitPayload,
@@ -12,6 +11,7 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { BlurredGloss } from "@/components/shared-practice";
+import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   useGetKanjiInfoFn,
   useSimilarKanjis,
@@ -216,16 +216,7 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute z-10 top-1 left-1 text-foreground opacity-70 hover:opacity-100 hover:bg-opacity-0"
-        tabIndex={-1}
-        onClick={onEnd}
-        aria-label="End session"
-      >
-        <CircleArrowLeft />
-      </Button>
+      <EndSession onClick={onEnd} />
 
       <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
         <ClozeWord
