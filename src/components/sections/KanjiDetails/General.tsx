@@ -178,7 +178,7 @@ export const General = ({ kanji }: { kanji: string }) => {
             />
             <TableCellGrow>
               {data.allKun.map((kun) => (
-                <RomajiBadge key={kun} kana={kun} />
+                <RomajiBadge key={kun} kana={kun} className="text-lg" />
               ))}
               {data.allKun.length === 0 && <div> - </div>}
             </TableCellGrow>

@@ -4,7 +4,13 @@ import { cn } from "@/lib/utils";
 import { translateValue } from "@/lib/wanakana-adapter";
 import { useSpeak } from "@/hooks/use-jp-speak";
 
-export const RomajiBadge = ({ kana }: { kana: string }) => {
+export const RomajiBadge = ({
+  kana,
+  className,
+}: {
+  kana: string;
+  className?: string;
+}) => {
   const [isKana, setIsKana] = useState(true);
   const speak = useSpeak(kana);
 
@@ -15,10 +21,11 @@ export const RomajiBadge = ({ kana }: { kana: string }) => {
       type="button"
       className={cn(
         badgeVariants({ variant: "outline" }),
-        "m-1 py-2 px-3 cursor-pointer text-2xl whitespace-nowrap",
+        "m-1 py-2 px-3 cursor-pointer whitespace-nowrap",
         "hover:bg-[#2effff] hover:text-black",
         "outline-none focus:outline-none focus:ring-0",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-2xl",
+        className,
         isKana && "kanji-font"
       )}
       aria-label={`Play reading and toggle kana or romaji for ${kana}`}
