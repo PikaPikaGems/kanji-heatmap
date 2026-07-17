@@ -38,3 +38,29 @@ export const useStorageValue = <T>(
 
   return value;
 };
+
+/**
+ * Counter that increments on every matching storage event. For components
+ * that don't read a value themselves but need to re-render (or remount a
+ * child via `key`) when storage changes underneath it.
+ */
+export const useStorageRevision = (
+  matchesKey: (key: string | null) => boolean
+): number => {
+  const matchesKeyRef = useRef(matchesKey);
+  matchesKeyRef.current = matchesKey;
+
+  const [revision, setRevision] = useState(0);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (matchesKeyRef.current(e.key)) {
+        setRevision((n) => n + 1);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  return revision;
+};
