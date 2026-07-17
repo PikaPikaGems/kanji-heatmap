@@ -106,7 +106,8 @@ const CalendarDayCell = ({
           title={label}
           style={{ width: CELL_PX, height: CELL_PX }}
           className={cn(
-            "rounded-[2px] outline-none",
+            "cursor-pointer rounded-[2px] outline-none transition-colors",
+            "hover:bg-cyan-400 hover:border-foreground",
             "hover:ring-2 hover:ring-foreground/30 hover:ring-offset-1 hover:ring-offset-background",
             "focus-visible:ring-2 focus-visible:ring-ring",
             fillCn
