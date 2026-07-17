@@ -59,7 +59,7 @@ export const BookmarksBreakdown = () => {
           <KaomojiAnimation />
         </div>
       ) : (
-        <Table className="my-4">
+        <Table>
           <TableBody>
             {JLPT_TYPE_ARR.map((jlpt) => {
               const { bookmarked: n, total } = counts[jlpt];

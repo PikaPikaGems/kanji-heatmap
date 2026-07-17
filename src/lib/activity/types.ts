@@ -67,7 +67,7 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
 };
 
 export const ALL_ACTIVITY_KINDS: ActivityKind[] = [
-  "speedKatakana",
   "production",
   "recognition",
+  "speedKatakana",
 ];

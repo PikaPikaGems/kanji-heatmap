@@ -19,16 +19,11 @@ export const ActivityCountsGrid = ({
 }: {
   stats: ActivityCountsDisplay;
 }) => (
-  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
     <OverviewStat
       value={stats.daysActive}
       label="Days active"
       Icon={CalendarDays}
-    />
-    <OverviewStat
-      value={stats.speedKatakanaSessions}
-      label={speedKatakanaPageMeta.shortLabel}
-      Icon={Keyboard}
     />
     <OverviewStat
       value={stats.productionRounds}
@@ -39,6 +34,11 @@ export const ActivityCountsGrid = ({
       value={stats.recognitionRounds}
       label={recognitionPracticePageMeta.shortLabel}
       Icon={Eye}
+    />
+    <OverviewStat
+      value={stats.speedKatakanaSessions}
+      label={speedKatakanaPageMeta.shortLabel}
+      Icon={Keyboard}
     />
   </div>
 );
