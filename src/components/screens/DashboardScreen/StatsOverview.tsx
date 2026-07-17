@@ -6,7 +6,13 @@ import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { DashboardPanel } from "./DashboardPanel";
 
 export const StatsOverview = () => {
-  const { allTime, daysActive } = useActivityData();
+  const {
+    allTime,
+    daysActive,
+    speedKatakanaDays,
+    productionDays,
+    recognitionDays,
+  } = useActivityData();
 
   return (
     <DashboardPanel>
@@ -17,6 +23,9 @@ export const StatsOverview = () => {
       <ActivityCountsGrid
         stats={{
           daysActive,
+          speedKatakanaDays,
+          productionDays,
+          recognitionDays,
           speedKatakanaSessions: allTime.speedKatakanaSessions,
           productionRounds: allTime.productionRounds,
           recognitionRounds: allTime.recognitionRounds,

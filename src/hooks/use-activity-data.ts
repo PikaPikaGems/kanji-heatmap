@@ -9,11 +9,14 @@ import {
   readAllTimeActivity,
 } from "@/lib/activity";
 
-const readSnapshot = () => ({
-  allTime: readAllTimeActivity(),
-  byDay: readActivityByDay(),
-  daysActive: countAllDaysActive(readActivityByDay()),
-});
+const readSnapshot = () => {
+  const byDay = readActivityByDay();
+  return {
+    allTime: readAllTimeActivity(),
+    byDay,
+    ...countAllDaysActive(byDay),
+  };
+};
 
 /**
  * Reactive all-time + by-day activity. Re-reads on storage events for the
@@ -43,5 +46,8 @@ export const useActivityData = () => {
     allTime: AllTimeActivity;
     byDay: ActivityByDay;
     daysActive: number;
+    speedKatakanaDays: number;
+    productionDays: number;
+    recognitionDays: number;
   };
 };

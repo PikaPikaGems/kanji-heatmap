@@ -45,8 +45,8 @@ export const dashboardPageMeta = {
 
 export const masteryPageMeta = {
   href: "/mastery",
-  title: "Mastery",
-  description: "Track mastery progress — coming soon",
+  title: "Visualize Mastery",
+  description: "See how well you know each kanji — coming soon",
 } as const;
 
 /** Practice destinations shown in the FAB menu. */
