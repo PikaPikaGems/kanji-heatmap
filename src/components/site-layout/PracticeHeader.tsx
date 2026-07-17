@@ -1,9 +1,13 @@
+import { Suspense } from "react";
 import { Link } from "@/components/dependent/routing";
 import { ErrorBoundary } from "@/components/error";
 import { Progress } from "@/components/ui/progress";
+import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
 import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
-import LazyHeaderDrawer from "@/components/site-layout/Header/LazyHeaderDrawer";
+import LazyHeaderDrawer, {
+  HeaderDrawerLoadingFallback,
+} from "@/components/site-layout/Header/LazyHeaderDrawer";
 import assetsPaths from "@/lib/assets-paths";
 
 /**
@@ -34,7 +38,14 @@ export const PracticeHeader = ({ progress }: { progress: number }) => {
         <ErrorBoundary fallback={null}>
           <ChangeFontButton />
           <ChangeThemeColorBtn />
-          <LazyHeaderDrawer />
+          <ErrorBoundary
+            details="LazyHeaderDrawer in PracticeHeader"
+            fallback={<RefreshPageBtn />}
+          >
+            <Suspense fallback={<HeaderDrawerLoadingFallback />}>
+              <LazyHeaderDrawer />
+            </Suspense>
+          </ErrorBoundary>
         </ErrorBoundary>
       </section>
     </header>

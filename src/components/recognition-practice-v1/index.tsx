@@ -1,16 +1,15 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/error";
+import { PracticeRouteLoadingFallback } from "@/components/shared-practice/PracticeRouteLoadingFallback";
 
 const LazyRecognitionPracticeV1 = lazy(() => import("./RecognitionPracticeV1"));
-
-const PracticeRouteFallback = () => (
-  <div className="fixed inset-0 bg-background animate-fade-in" aria-hidden />
-);
 
 const RecognitionPracticeV1Screen = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<PracticeRouteFallback />}>
+      <Suspense
+        fallback={<PracticeRouteLoadingFallback label="recognition practice" />}
+      >
         <LazyRecognitionPracticeV1 />
       </Suspense>
     </ErrorBoundary>

@@ -1,16 +1,15 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/error";
+import { PracticeRouteLoadingFallback } from "@/components/shared-practice/PracticeRouteLoadingFallback";
 
 const LazySpeedKatakanaScreen = lazy(() => import("./SpeedKatakanaScreen"));
-
-const PracticeRouteFallback = () => (
-  <div className="fixed inset-0 bg-background animate-fade-in" aria-hidden />
-);
 
 const SpeedKatakanaScreen = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<PracticeRouteFallback />}>
+      <Suspense
+        fallback={<PracticeRouteLoadingFallback label="speed katakana" />}
+      >
         <LazySpeedKatakanaScreen />
       </Suspense>
     </ErrorBoundary>

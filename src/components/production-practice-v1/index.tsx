@@ -1,16 +1,15 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/error";
+import { PracticeRouteLoadingFallback } from "@/components/shared-practice/PracticeRouteLoadingFallback";
 
 const LazyProductionPracticeV1 = lazy(() => import("./ProductionPracticeV1"));
-
-const PracticeRouteFallback = () => (
-  <div className="fixed inset-0 bg-background animate-fade-in" aria-hidden />
-);
 
 const ProductionPracticeV1Screen = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<PracticeRouteFallback />}>
+      <Suspense
+        fallback={<PracticeRouteLoadingFallback label="writing practice" />}
+      >
         <LazyProductionPracticeV1 />
       </Suspense>
     </ErrorBoundary>
