@@ -27,7 +27,7 @@ export const ActivityCalendarHeatmap = () => {
 
   const range = getDurationRange(duration);
   const weeks = buildCalendarWeeks(range);
-  const monthLabels = monthLabelsForWeeks(weeks);
+  const monthLabels = monthLabelsForWeeks(weeks, "japanese-numbers");
   const maxN = maxDayTotalInRange(byDay, range, filters);
   const windowed = summarizeActivityInRange(byDay, range, filters);
 
@@ -42,9 +42,7 @@ export const ActivityCalendarHeatmap = () => {
         description="Daily practice events. Brighter days mean more activity relative to your busiest day in this range."
       />
 
-      <div className="mb-4">
-        <DurationNav value={duration} onChange={setDuration} />
-      </div>
+      <DurationNav value={duration} onChange={setDuration} />
 
       <CalendarGrid
         weeks={weeks}
@@ -54,9 +52,7 @@ export const ActivityCalendarHeatmap = () => {
         maxN={maxN}
       />
 
-      <div className="my-5">
-        <ActivityKindFiltersRow filters={filters} onChange={setKind} />
-      </div>
+      <ActivityKindFiltersRow filters={filters} onChange={setKind} />
 
       <div className="mt-6">
         <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">

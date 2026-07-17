@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/hover-card";
 
 /** Sun→Sat; only Mon / Wed / Fri labeled (Cursor/GitHub-style). */
-const DAY_LABELS = ["", "M", "", "W", "", "F", ""] as const;
+const DAY_LABELS = ["", "月", "", "水", "", "金", ""] as const;
 
 const CELL_PX = 12;
 const GAP_PX = 3;
@@ -178,6 +178,7 @@ export const CalendarGrid = ({
             gap: GAP_PX,
           }}
         >
+          {/** TODO: When the grid is "today" */}
           {weeks.map((week, weekIndex) =>
             week.map((dateKey, dayIndex) => (
               <CalendarDayCell
