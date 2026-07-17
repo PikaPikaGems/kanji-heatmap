@@ -94,6 +94,7 @@ export const General = ({ kanji }: { kanji: string }) => {
   return (
     <>
       <div className="mt-6 text-left">
+        <JLPTBadge jlpt={data.jlpt} />
         {hasData(data.jouyouGrade) && (
           <PrimaryBadgeWithPopover
             label="Grade"
@@ -136,7 +137,6 @@ export const General = ({ kanji }: { kanji: string }) => {
             description={orderDisclaimer}
           />
         )}
-        <JLPTBadge jlpt={data.jlpt} />
       </div>
       <DottedSeparator className="my-4 border-b-2" />
       <Table>
