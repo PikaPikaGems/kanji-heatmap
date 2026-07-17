@@ -70,7 +70,7 @@ const StatValue = ({
   className?: string;
 }) => {
   const valueClassName = cn(
-    "text-sm font-extrabold leading-none tabular-nums sm:text-base",
+    "text-lg font-extrabold leading-none tabular-nums",
     className
   );
 
@@ -107,14 +107,18 @@ const StatValue = ({
 
 export const OverviewStat = ({
   value,
-  label,
+  title,
+  unit,
   Icon,
   className,
-  /** Tighter 3-up cells: hide icon on small screens, show from `sm` up. */
+  /** 3-up mobile: no icon, centered text. Icon + left stack from `sm` up. */
   compact = false,
 }: {
   value: number | string;
-  label: string;
+  /** Activity name, e.g. "Speed Katakana" or "Total". */
+  title: string;
+  /** Metric unit, e.g. "Days", "Sessions", "Rounds". */
+  unit: string;
   Icon: LucideIcon;
   className?: string;
   compact?: boolean;
@@ -127,29 +131,44 @@ export const OverviewStat = ({
   return (
     <div
       className={cn(
-        "flex h-full min-w-0 items-start gap-2 rounded-2xl border border-foreground/10 bg-muted/20 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3 sm:py-3",
+        "flex h-full w-full max-w-[12rem] min-w-0 items-start gap-2 rounded-xl border border-foreground/5 bg-muted/10 px-2 py-2 text-left sm:gap-2.5 sm:px-3 sm:py-2.5",
         compact &&
-          "flex-col items-center gap-1 px-2 text-center sm:flex-row sm:items-start sm:gap-3 sm:text-left",
+          "max-w-none flex-col items-center justify-center gap-1 px-1.5 py-3 text-center sm:max-w-[12rem] sm:flex-row sm:items-start sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-left",
         className
       )}
     >
       <div
         className={cn(
-          "flex size-8 shrink-0 items-center justify-center rounded-xl border border-foreground/10 bg-background text-foreground/70 sm:size-9",
+          "flex size-7 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground/65 sm:size-8 sm:rounded-xl",
           compact && "hidden sm:flex"
         )}
       >
         <Icon className="size-3.5 sm:size-4" aria-hidden />
       </div>
+
       <div
         className={cn(
-          "min-w-0",
-          compact && "flex w-full flex-col items-center sm:items-start"
+          "flex min-w-0 flex-col gap-0.5",
+          compact && "w-full items-center sm:w-auto sm:items-start"
         )}
       >
-        <StatValue display={display} raw={raw} abbreviated={abbreviated} />
-        <div className="mt-0.5 text-[10px] font-bold uppercase leading-snug tracking-wide text-muted-foreground sm:mt-1 sm:text-[11px]">
-          {label}
+        <StatValue
+          display={display}
+          raw={raw}
+          abbreviated={abbreviated}
+          className={cn(!compact && "pt-1", compact && "sm:pt-1")}
+        />
+        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          {unit}
+        </div>
+        <div
+          className={cn(
+            "text-[11px] font-bold leading-snug text-foreground/80 sm:text-xs",
+            compact &&
+              "max-w-full truncate sm:whitespace-normal sm:overflow-visible"
+          )}
+        >
+          {title}
         </div>
       </div>
     </div>
