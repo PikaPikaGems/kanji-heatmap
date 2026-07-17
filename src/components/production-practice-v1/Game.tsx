@@ -102,12 +102,6 @@ export const Game = ({
   }, [padSize]);
 
   useEffect(() => {
-    onProgress(
-      sessionItems.length === 0 ? 0 : (index / sessionItems.length) * 100
-    );
-  }, [index, onProgress, sessionItems.length]);
-
-  useEffect(() => {
     if (!current || !settings.hearPronunciationOnLoad) return;
     if (step.type !== "draw") return;
     speak();
@@ -142,6 +136,9 @@ export const Game = ({
       onComplete(allResults);
       return;
     }
+    // Progress is reported here (the only place index advances) rather than
+    // via an effect; the parent resets it to 0 when a session starts.
+    onProgress((nextIndex / sessionItems.length) * 100);
     setIndex(nextIndex);
   };
 

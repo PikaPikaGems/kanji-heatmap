@@ -64,12 +64,6 @@ export const Game = ({
     }
   }, [index, feedback]);
 
-  useEffect(() => {
-    onProgress(
-      sessionItems.length === 0 ? 0 : (index / sessionItems.length) * 100
-    );
-  }, [index, onProgress, sessionItems.length]);
-
   if (!current) {
     return null;
   }
@@ -101,6 +95,9 @@ export const Game = ({
       return;
     }
 
+    // Progress is reported here (the only place index advances) rather than
+    // via an effect; the parent resets it to 0 when a session starts.
+    onProgress((nextIndex / sessionItems.length) * 100);
     setIndex(nextIndex);
   };
 

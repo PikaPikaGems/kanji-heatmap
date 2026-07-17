@@ -124,9 +124,10 @@ const KaomojiAnimation = ({
 export const DelayedLoadingKaomoji = () => {
   const [showLoading, setShowLoading] = useState(false);
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setShowLoading(true);
     }, 150);
+    return () => clearTimeout(timeout);
   }, []);
 
   if (!showLoading) {

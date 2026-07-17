@@ -296,7 +296,8 @@ const PaginatedVocabulary = ({
 const TableSkeleton = () => {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    setTimeout(() => setShow(true), 200);
+    const timeout = setTimeout(() => setShow(true), 200);
+    return () => clearTimeout(timeout);
   }, []);
 
   if (!show) {
