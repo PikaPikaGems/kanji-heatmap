@@ -1,5 +1,6 @@
-import { useEffect, useId, useState } from "react";
+import { useId } from "react";
 import type { Stroke } from "@/components/dependent/DrawingPad";
+import { useGetStrokeFn } from "@/hooks/use-get-stroke-fn";
 
 function getSvgPathFromStroke(stroke: number[][]): string {
   if (!stroke.length) return "";
@@ -28,15 +29,7 @@ export const StrokePreview = ({
   displaySize: number;
 }) => {
   const patternId = useId();
-  const [getStrokeFn, setGetStrokeFn] = useState<
-    ((points: number[][], options: object) => number[][]) | null
-  >(null);
-
-  useEffect(() => {
-    void import("perfect-freehand").then((m) => {
-      setGetStrokeFn(() => m.getStroke);
-    });
-  }, []);
+  const getStrokeFn = useGetStrokeFn();
 
   const renderPath = (points: Stroke) => {
     if (!getStrokeFn || !points.length) return null;
