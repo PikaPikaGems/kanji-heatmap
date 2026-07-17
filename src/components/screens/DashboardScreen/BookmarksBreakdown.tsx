@@ -8,6 +8,7 @@ import { toSearchSettings } from "@/lib/settings/search-settings-adapter";
 import { JLPT_TYPE_ARR, JLPTListItems, JLTPTtypes } from "@/lib/jlpt";
 import { useBookmarkedKanji } from "@/hooks/use-bookmarked-kanji";
 import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { SectionHeading } from "./SectionHeading";
 import { DashboardPanel } from "./DashboardPanel";
@@ -47,52 +48,52 @@ export const BookmarksBreakdown = () => {
   const loading =
     !ready || search.status === "loading" || search.status === "idle";
 
-  const totalBookmarked = bookmarked.length;
-
   return (
     <DashboardPanel>
       <SectionHeading
         title="Bookmarks"
-        description="How much of each JLPT band you've bookmarked."
+        description="How much of each JLPT band you've bookmarked.  Bookmark a word from a kanji’s detail drawer to start filling these bars."
       />
       {loading ? (
         <div className="py-8">
           <KaomojiAnimation />
         </div>
       ) : (
-        <>
-          <div className="flex flex-col gap-1 ">
+        <Table className="my-4">
+          <TableBody>
             {JLPT_TYPE_ARR.map((jlpt) => {
               const { bookmarked: n, total } = counts[jlpt];
               const pct = total > 0 ? (n / total) * 100 : 0;
               const meta = JLPTListItems[jlpt];
               return (
-                <div key={jlpt} className="flex items-center gap-2">
-                  <div className="flex items-center w-10 gap-2 text-sm font-extrabold shrink-0">
-                    <span
-                      className={`inline-block size-2.5 shrink-0 rounded-full ${meta.cn}`}
+                <TableRow key={jlpt} className="p-0 my-1 text-left">
+                  <TableCell className="p-0">
+                    <div className="flex items-center justify-between py-1 pl-2 text-xs text-left ">
+                      <span
+                        className={`h-3 w-3 inline-block ${meta.cn} rounded-full`}
+                      />
+                      <span className="mx-2 font-extrabold ">
+                        {meta.label !== "Not in JLPT" ? meta.label : "~"}
+                      </span>{" "}
+                    </div>
+                  </TableCell>
+                  <TableCell className="w-full px-0 py-2">
+                    <Progress
+                      className="h-1"
+                      value={pct}
+                      primitiveCn="background-theme-color-with-opacity-100"
                     />
-                    {meta.label !== "Not in JLPT" ? meta.label : "~"}
-                  </div>
-                  <Progress
-                    className="flex-1 h-2.5 border border-border/60"
-                    value={pct}
-                    primitiveCn={meta.cn}
-                  />
-                  <div className="w-8 text-xs font-bold text-right shrink-0 tabular-nums text-muted-foreground">
-                    {n}/{total}
-                  </div>
-                </div>
+                  </TableCell>
+                  <TableCell className="p-0 text-[10px]">
+                    <span className="inline-block w-12 -mb-0_5 grow text-end">
+                      {n} / {total}
+                    </span>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </div>
-          {totalBookmarked === 0 ? (
-            <p className="mt-5 text-sm font-semibold text-center text-muted-foreground">
-              Bookmark a word from a kanji’s detail drawer to start filling
-              these bars.
-            </p>
-          ) : null}
-        </>
+          </TableBody>
+        </Table>
       )}
     </DashboardPanel>
   );
