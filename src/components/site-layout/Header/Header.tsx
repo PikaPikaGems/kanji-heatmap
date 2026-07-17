@@ -1,8 +1,11 @@
+import { Suspense } from "react";
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
 import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
 import { ErrorBoundary } from "@/components/error";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
-import LazyHeaderDrawer from "./LazyHeaderDrawer";
+import LazyHeaderDrawer, {
+  HeaderDrawerLoadingFallback,
+} from "./LazyHeaderDrawer";
 import { HeaderTitle } from "./HeaderTitle";
 
 const Header = () => {
@@ -17,7 +20,9 @@ const Header = () => {
             details="LazyHeaderDrawer in Header"
             fallback={<RefreshPageBtn />}
           >
-            <LazyHeaderDrawer />
+            <Suspense fallback={<HeaderDrawerLoadingFallback />}>
+              <LazyHeaderDrawer />
+            </Suspense>
           </ErrorBoundary>
         </ErrorBoundary>
       </section>
