@@ -8,6 +8,7 @@ import {
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useJsonFetch } from "@/hooks/use-json";
@@ -31,6 +32,8 @@ import {
   ProductionPracticeSettings,
   SessionResult,
 } from "./types";
+
+const ENTER_OR_SPACE = ["Enter", " "] as const;
 
 type CardStep =
   | { type: "draw" }
@@ -112,27 +115,15 @@ export const Game = ({
   }, [index, settings.hearPronunciationOnLoad]);
 
   // Enter/Space grades when there are strokes. Never Forgot via keyboard.
-  useEffect(() => {
-    if (step.type !== "draw" || strokes.length === 0) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if ((e.key !== "Enter" && e.key !== " ") || e.isComposing) return;
-      const el = e.target as HTMLElement | null;
-      if (!el) return;
-      const tag = el.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (el.isContentEditable) return;
-      e.preventDefault();
-      drawSubmitRef.current({
-        strokes,
-        width: padSize,
-        height: padSize,
-      });
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [step.type, strokes, padSize]);
+  const submitViaKeyboard = useMemo(
+    () =>
+      step.type === "draw" && strokes.length > 0
+        ? () =>
+            drawSubmitRef.current({ strokes, width: padSize, height: padSize })
+        : null,
+    [step.type, strokes, padSize]
+  );
+  useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
 
   if (!current) {
     return null;
