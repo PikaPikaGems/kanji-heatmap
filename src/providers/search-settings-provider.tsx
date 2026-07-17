@@ -1,4 +1,10 @@
-import { ReactNode, useCallback, useLayoutEffect, useMemo } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import {
   FilterSettings,
@@ -12,6 +18,10 @@ import {
   toSearchSettings,
 } from "@/lib/settings/search-settings-adapter";
 import {
+  getLastHomeSearchParams,
+  rememberHomeSearchParams,
+} from "@/lib/settings/last-home-search-params";
+import {
   useSearchParams,
   useUrlLocation,
 } from "@/components/dependent/routing/routing-hooks";
@@ -20,9 +30,32 @@ import { URL_PARAMS } from "@/lib/settings/url-params";
 
 const ALLOWED_LOCATIONS = ["/"];
 
+const isEmptySearchParams = (params: URLSearchParams) => {
+  return [...params.keys()].length === 0;
+};
+
+const normalizeSearchParams = (params: URLSearchParams) => {
+  const searchSettings = toSearchSettings(params);
+  const partial1 = toSearchParams(
+    params,
+    "textSearch",
+    searchSettings.textSearch
+  );
+  const partial2 = toSearchParams(
+    partial1,
+    "filterSettings",
+    searchSettings.filterSettings
+  );
+  return toSearchParams(partial2, "sortSettings", searchSettings.sortSettings);
+};
+
 export function SearchSettingsProvider({ children }: { children: ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useUrlLocation();
+  // When landing on bare `/`, the restore write and the "remember" sync can
+  // run in the same commit while searchParams is still empty. Skip that one
+  // empty remember so we do not clobber the session cache mid-restore.
+  const skipEmptyRememberRef = useRef(false);
 
   const updateItem = useCallback(
     (
@@ -63,28 +96,36 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
     }
     setSearchParams(
       (prev) => {
-        const searchSettings = toSearchSettings(prev);
-        const partial1 = toSearchParams(
-          prev,
-          "textSearch",
-          searchSettings.textSearch
-        );
-        const partial2 = toSearchParams(
-          partial1,
-          "filterSettings",
-          searchSettings.filterSettings
-        );
-        const final = toSearchParams(
-          partial2,
-          "sortSettings",
-          searchSettings.sortSettings
-        );
+        // Bare `/` links drop the query string. Rehydrate the last home search
+        // from this session so filters/sort/bg-src/search survive navigation.
+        const cached = getLastHomeSearchParams();
+        const shouldRestore = isEmptySearchParams(prev) && Boolean(cached);
+        if (shouldRestore) {
+          skipEmptyRememberRef.current = true;
+        }
 
+        const base = shouldRestore
+          ? new URLSearchParams(cached as string)
+          : prev;
+        const final = normalizeSearchParams(base);
+        rememberHomeSearchParams(final);
         return final;
       },
       { replace: true }
     );
   }, [setSearchParams, location]);
+
+  useLayoutEffect(() => {
+    if (!ALLOWED_LOCATIONS.includes(location)) {
+      return;
+    }
+    if (skipEmptyRememberRef.current && isEmptySearchParams(searchParams)) {
+      skipEmptyRememberRef.current = false;
+      return;
+    }
+    skipEmptyRememberRef.current = false;
+    rememberHomeSearchParams(searchParams);
+  }, [location, searchParams]);
 
   const storageData: SearchSettings = useMemo(() => {
     return toSearchSettings(searchParams);
