@@ -1,6 +1,7 @@
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
 import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
 import { ErrorBoundary } from "@/components/error";
+import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import LazyHeaderDrawer from "./LazyHeaderDrawer";
 import { HeaderTitle } from "./HeaderTitle";
 
@@ -12,7 +13,12 @@ const Header = () => {
         <ErrorBoundary fallback={null}>
           <ChangeFontButton />
           <ChangeThemeColorBtn />
-          <LazyHeaderDrawer />
+          <ErrorBoundary
+            details="LazyHeaderDrawer in Header"
+            fallback={<RefreshPageBtn />}
+          >
+            <LazyHeaderDrawer />
+          </ErrorBoundary>
         </ErrorBoundary>
       </section>
     </header>
