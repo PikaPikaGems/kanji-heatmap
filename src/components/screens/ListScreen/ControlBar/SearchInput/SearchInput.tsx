@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
 import { defaultSearchType } from "@/lib/settings/search-settings-adapter";
 import { RadicalsLoadingFallback } from "./RadicalScreen/RadicalsLoadingFallback";
+import { HandwritingLoadingFallback } from "./HandwritingScreen/HandwritingLoadingFallback";
 
 const RadicalsControl = lazy(() =>
   import("./RadicalScreen/RadicalsControl").then((m) => ({
@@ -454,7 +455,14 @@ export const SearchInput = ({
         // Keyed by search type + reset counter so switching variants or clearing
         // the input starts the drawing pad fresh. Mounted regardless of the
         // drawer's open state so the drawing survives closing/reopening it.
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <HandwritingLoadingFallback
+              isOpen={openDialogType === searchType}
+              onClose={() => setOpenDialogType("none")}
+            />
+          }
+        >
           <HandwritingControl
             key={`${searchType}-${handwritingResetKey}`}
             variant={
