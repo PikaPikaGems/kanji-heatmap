@@ -18,7 +18,7 @@ import {
 /** Sun→Sat; only Mon / Wed / Fri labeled (Cursor/GitHub-style). */
 const DAY_LABELS = ["", "M", "", "W", "", "F", ""] as const;
 
-const CELL_PX = 11;
+const CELL_PX = 12;
 const GAP_PX = 3;
 const EMPTY_CELL =
   "bg-muted/50 border border-border dark:bg-muted/30 dark:border-border";
@@ -95,7 +95,7 @@ const CalendarDayCell = ({ dateKey, byDay, filters, maxN }: CellProps) => {
           )}
         />
       </HoverCardTrigger>
-      <HoverCardContent className="w-52 p-3" side="top">
+      <HoverCardContent className="p-3 w-52" side="top">
         <DayDetail dateKey={dateKey} byDay={byDay} filters={filters} />
       </HoverCardContent>
     </HoverCard>
@@ -123,7 +123,7 @@ export const CalendarGrid = ({
   const weekCount = weeks.length;
 
   return (
-    <div className="overflow-x-auto pb-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
+    <div className="overflow-x-auto pb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
       <div
         className="inline-grid"
         style={{
