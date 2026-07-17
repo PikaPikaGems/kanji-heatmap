@@ -4,7 +4,7 @@ import { DefaultErrorFallback } from "@/components/error";
 
 import { ChartData } from "@/components/sections/KanjiCumUseChart/helpers";
 import { KanjiCumUseChart } from "@/components/sections/KanjiCumUseChart";
-import KaomojiAnimation from "@/components/common/KaomojiLoading";
+import { PageLoadingFallback } from "@/components/dependent/site-wide/PageWrapper";
 import assetsPaths from "@/lib/assets-paths";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import pageItems from "@/components/items/page-items";
@@ -14,7 +14,7 @@ const CumUseScreen = () => {
   useHtmlDocumentTitle(pageItems.cumUseGraphPage.title);
 
   if (status == "pending") {
-    return <KaomojiAnimation />;
+    return <PageLoadingFallback />;
   }
 
   if (status === "error" || data == null) {
