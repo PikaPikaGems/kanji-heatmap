@@ -23,11 +23,12 @@
 
   padding: 0;
   margin: 0;
-  display: flex;
 
   --scrollbar-bg: hsl(var(--background));
   --thumb-bg: rgba(0, 0, 0, 0.3);
   scrollbar-color: var(--thumb-bg) var(--scrollbar-bg);
+  /* Header bar height (excl. notch/status safe area). */
+  --app-header-height: 3rem;
 
   margin: 0 auto;
   text-align: center;
@@ -69,14 +70,23 @@
   box-sizing: border-box;
 }
 
+/*
+ * Keep the *document* as the scrollport. A height-constrained body with
+ * overflow-y: scroll becomes a nested scroller on iOS Safari/PWA and makes
+ * position:fixed chrome (header, control bar, island, FAB) drift while scrolling.
+ */
+html {
+  overflow-y: scroll;
+  overscroll-behavior-y: none;
+}
+
 body {
   min-height: 100dvh;
-  height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow-y: scroll;
+  overscroll-behavior-y: none;
 }
 
 p,
