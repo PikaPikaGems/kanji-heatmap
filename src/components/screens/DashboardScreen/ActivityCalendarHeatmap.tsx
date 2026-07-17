@@ -58,17 +58,16 @@ export const ActivityCalendarHeatmap = () => {
         <ActivityKindFiltersRow filters={filters} onChange={setKind} />
       </div>
 
-      <div className="flex items-center justify-center w-full">
-        <div>
-          <FreqGradient />
-        </div>
-      </div>
-
       <div className="mt-6">
-        <p className="mb-3 text-xs font-extrabold tracking-wide text-center uppercase text-muted-foreground">
+        <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
           In this period
         </p>
         <ActivityCountsGrid stats={windowed} />
+      </div>
+      <div className="flex items-center justify-center w-full mt-6">
+        <div>
+          <FreqGradient />
+        </div>
       </div>
     </DashboardPanel>
   );
