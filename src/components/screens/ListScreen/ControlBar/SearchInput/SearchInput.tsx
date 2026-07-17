@@ -18,6 +18,7 @@ import { CircleX, Search } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
 import { defaultSearchType } from "@/lib/settings/search-settings-adapter";
+import { RadicalsLoadingFallback } from "./RadicalScreen/RadicalsLoadingFallback";
 
 const RadicalsControl = lazy(() =>
   import("./RadicalScreen/RadicalsControl").then((m) => ({
@@ -430,7 +431,14 @@ export const SearchInput = ({
       )}
 
       {(openDialogType === "radicals" || searchType === "radicals") && (
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <RadicalsLoadingFallback
+              isOpen={openDialogType === "radicals"}
+              onClose={() => setOpenDialogType("none")}
+            />
+          }
+        >
           <RadicalsControl
             isOpen={openDialogType === "radicals"}
             onClose={() => setOpenDialogType("none")}
