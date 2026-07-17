@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import KaoMojiLoadingSpinner from "@/components/common/KaomojiLoading";
 import { ReportBugIconBtn } from "@/components/common/ReportBugIconBtn";
 
 import ItemPresentationSettingsPopover from "./ItemPresentation/ItemPresentationPopover";
@@ -45,7 +46,17 @@ export const ControlBar = () => {
       >
         <ItemPresentationSettingsPopover>
           <ErrorBoundary details="ItemPresentationSettingsContent in ControlBar">
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={
+                <div
+                  className="py-8 text-sm text-center text-muted-foreground"
+                  role="status"
+                >
+                  <KaoMojiLoadingSpinner />
+                  Loading...
+                </div>
+              }
+            >
               <ItemPresentationSettingsContent />
             </Suspense>
           </ErrorBoundary>
