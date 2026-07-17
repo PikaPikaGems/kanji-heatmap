@@ -52,8 +52,9 @@ export const ActivityCalendarHeatmap = () => {
         maxN={maxN}
       />
 
-      <ActivityKindFiltersRow filters={filters} onChange={setKind} />
-
+      <div className="mt-2">
+        <ActivityKindFiltersRow filters={filters} onChange={setKind} />
+      </div>
       <div className="mt-6">
         <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
           In this period

@@ -6,6 +6,7 @@ import {
   formatActivityDay,
   getActivityLevel,
   getDayCounts,
+  toLocalDateKey,
 } from "@/lib/activity";
 import { freqCategoryCn } from "@/lib/freq/freq-category";
 import { cn } from "@/lib/utils";
@@ -20,30 +21,35 @@ const DAY_LABELS = ["", "月", "", "水", "", "金", ""] as const;
 
 const CELL_PX = 12;
 const GAP_PX = 3;
-const EMPTY_CELL =
-  "bg-muted/50 border border-border dark:bg-muted/30 dark:border-border";
+
+const TODAY_BORDER =
+  "border border-solid border-foreground dark:border-foreground";
 
 type CellProps = {
   dateKey: string | null;
   byDay: ActivityByDay;
   filters: ActivityKindFilters;
   maxN: number;
+  todayKey: string;
 };
 
 const DayDetail = ({
   dateKey,
   byDay,
   filters,
+  isToday,
 }: {
   dateKey: string;
   byDay: ActivityByDay;
   filters: ActivityKindFilters;
+  isToday: boolean;
 }) => {
   const day = getDayCounts(byDay, dateKey);
   const total = dayTotalForFilters(day, filters);
 
   return (
     <div className="space-y-1.5 text-xs">
+      {isToday ? <div className="font-extrabold">Today</div> : null}
       <div className="font-extrabold">{formatActivityDay(dateKey)}</div>
       <div className="text-muted-foreground">
         {total === 0
@@ -62,22 +68,34 @@ const DayDetail = ({
   );
 };
 
-const CalendarDayCell = ({ dateKey, byDay, filters, maxN }: CellProps) => {
+const CalendarDayCell = ({
+  dateKey,
+  byDay,
+  filters,
+  maxN,
+  todayKey,
+}: CellProps) => {
   if (dateKey == null) {
     return <div aria-hidden style={{ width: CELL_PX, height: CELL_PX }} />;
   }
 
+  const isToday = dateKey === todayKey;
   const n = dayTotalForFilters(getDayCounts(byDay, dateKey), filters);
   const level = getActivityLevel(n, maxN);
   const fillCn =
     level === 0
-      ? EMPTY_CELL
+      ? cn(
+          "bg-muted/50 dark:bg-muted/30",
+          isToday ? TODAY_BORDER : "border border-border dark:border-border"
+        )
       : cn(
           freqCategoryCn[level],
-          "border border-black/10 dark:border-white/10"
+          isToday ? TODAY_BORDER : "border border-black/10 dark:border-white/10"
         );
 
-  const label = `${formatActivityDay(dateKey)}: ${n} events`;
+  const label = isToday
+    ? `Today, ${formatActivityDay(dateKey)}: ${n} events`
+    : `${formatActivityDay(dateKey)}: ${n} events`;
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
@@ -96,7 +114,12 @@ const CalendarDayCell = ({ dateKey, byDay, filters, maxN }: CellProps) => {
         />
       </HoverCardTrigger>
       <HoverCardContent className="p-3 w-52" side="top">
-        <DayDetail dateKey={dateKey} byDay={byDay} filters={filters} />
+        <DayDetail
+          dateKey={dateKey}
+          byDay={byDay}
+          filters={filters}
+          isToday={isToday}
+        />
       </HoverCardContent>
     </HoverCard>
   );
@@ -121,9 +144,10 @@ export const CalendarGrid = ({
 }) => {
   const labelByWeek = new Map(monthLabels.map((m) => [m.weekIndex, m.label]));
   const weekCount = weeks.length;
+  const todayKey = toLocalDateKey();
 
   return (
-    <div className="overflow-x-auto pb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
+    <div className="overflow-x-auto pb-2 mb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
       <div
         className="inline-grid"
         style={{
@@ -178,7 +202,6 @@ export const CalendarGrid = ({
             gap: GAP_PX,
           }}
         >
-          {/** TODO: When the grid is "today" */}
           {weeks.map((week, weekIndex) =>
             week.map((dateKey, dayIndex) => (
               <CalendarDayCell
@@ -187,6 +210,7 @@ export const CalendarGrid = ({
                 byDay={byDay}
                 filters={filters}
                 maxN={maxN}
+                todayKey={todayKey}
               />
             ))
           )}
