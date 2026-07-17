@@ -11,10 +11,10 @@ import {
 import { freqCategoryCn } from "@/lib/freq/freq-category";
 import { cn } from "@/lib/utils";
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 /** Sun→Sat; only Mon / Wed / Fri labeled (Cursor/GitHub-style). */
 const DAY_LABELS = ["", "月", "", "水", "", "金", ""] as const;
@@ -98,8 +98,8 @@ const CalendarDayCell = ({
     : `${formatActivityDay(dateKey)}: ${n} events`;
 
   return (
-    <HoverCard openDelay={200} closeDelay={100}>
-      <HoverCardTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <button
           type="button"
           aria-label={label}
@@ -112,16 +112,16 @@ const CalendarDayCell = ({
             fillCn
           )}
         />
-      </HoverCardTrigger>
-      <HoverCardContent className="p-3 w-52" side="top">
+      </PopoverTrigger>
+      <PopoverContent className="p-3 w-52" side="top">
         <DayDetail
           dateKey={dateKey}
           byDay={byDay}
           filters={filters}
           isToday={isToday}
         />
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   );
 };
 

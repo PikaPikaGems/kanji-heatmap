@@ -13,10 +13,10 @@ import { CPM_BAND_LABELS, cpmToBand } from "@/lib/activity";
 import { freqCategoryCn } from "@/lib/freq/freq-category";
 import { cn } from "@/lib/utils";
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const CELL_PX = 20;
 const GAP_PX = 3;
@@ -95,8 +95,8 @@ const ChallengeSetCell = ({ setNumber }: { setNumber: number }) => {
     : `Set ${setNumber}: not attempted`;
 
   return (
-    <HoverCard openDelay={200} closeDelay={100}>
-      <HoverCardTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <button
           type="button"
           aria-label={label}
@@ -109,11 +109,11 @@ const ChallengeSetCell = ({ setNumber }: { setNumber: number }) => {
             fillCn
           )}
         />
-      </HoverCardTrigger>
-      <HoverCardContent className="p-3 w-52" side="top">
+      </PopoverTrigger>
+      <PopoverContent className="p-3 w-52" side="top">
         <SetDetail setNumber={setNumber} stats={stats} band={band} />
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   );
 };
 
