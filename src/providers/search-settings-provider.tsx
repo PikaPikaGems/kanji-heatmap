@@ -17,6 +17,7 @@ import {
 } from "@/components/dependent/routing/routing-hooks";
 import { searchSettings } from "./search-settings-hooks";
 import { URL_PARAMS } from "@/lib/settings/url-params";
+import { rememberHomeSearch } from "@/lib/home-search-memory";
 
 const ALLOWED_LOCATIONS = ["/"];
 
@@ -85,6 +86,12 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
       { replace: true }
     );
   }, [setSearchParams, location]);
+
+  useLayoutEffect(() => {
+    if (ALLOWED_LOCATIONS.includes(location)) {
+      rememberHomeSearch(searchParams.toString());
+    }
+  }, [location, searchParams]);
 
   const storageData: SearchSettings = useMemo(() => {
     return toSearchSettings(searchParams);
