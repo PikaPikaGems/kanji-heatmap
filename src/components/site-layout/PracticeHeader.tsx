@@ -1,4 +1,4 @@
-import { Link } from "@/components/dependent/routing";
+import { Link, useHomeHref } from "@/components/dependent/routing";
 import { ErrorBoundary } from "@/components/error";
 import { Progress } from "@/components/ui/progress";
 import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
@@ -10,10 +10,11 @@ import assetsPaths from "@/lib/assets-paths";
  * Slim header for practice routes: logo, progress bar, font/color controls, sidebar.
  */
 export const PracticeHeader = ({ progress }: { progress: number }) => {
+  const homeHref = useHomeHref();
   return (
     <header className="flex items-center justify-between w-full gap-3 px-2 border-b-4 border-dashed shrink-0 fix-scroll-layout-shift-right bg-background">
       <Link
-        to="/"
+        to={homeHref}
         className="flex items-center py-1.5 shrink-0 hover:opacity-80 transition-opacity"
         aria-label="Kanji Heatmap home"
       >

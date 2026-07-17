@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { DashedNavLink } from "@/components/common/DashedNavLink";
+import { useHomeHref } from "@/components/dependent/routing";
 import type { NavLinkItem } from "@/components/items/nav-links";
 import { cn } from "@/lib/utils";
 
@@ -22,12 +23,15 @@ export const DashedNavLinkList = ({
   onItemPointerDown,
   wrapItem,
 }: DashedNavLinkListProps) => {
+  const homeHref = useHomeHref();
+
   return (
     <div className={cn(className)}>
       {items.map((item) => {
+        const href = item.href === "/" ? homeHref : item.href;
         const link = (
           <DashedNavLink
-            href={item.href}
+            href={href}
             title={item.title}
             description={item.description}
             Icon={item.Icon}

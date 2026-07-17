@@ -1,4 +1,4 @@
-import { Link } from "@/components/dependent/routing";
+import { Link, useHomeHref } from "@/components/dependent/routing";
 import { useLocation } from "@/components/dependent/routing/router-adapter";
 import { floatingIslandNavLinks } from "@/components/items/nav-links";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
@@ -8,6 +8,7 @@ const islandHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
 export const FloatingIsland = () => {
   const [location] = useLocation();
+  const homeHref = useHomeHref();
   const settleRef = useScrollLockSettleRef<HTMLElement>();
 
   if (!islandHrefs.has(location)) {
@@ -49,11 +50,12 @@ export const FloatingIsland = () => {
         {floatingIslandNavLinks.map((link) => {
           const isActive = link.href === location;
           const Icon = link.Icon;
+          const href = link.href === "/" ? homeHref : link.href;
 
           return (
             <Link
               key={link.href}
-              href={link.href}
+              href={href}
               aria-label={link.title}
               aria-current={isActive ? "page" : undefined}
               className={cn(

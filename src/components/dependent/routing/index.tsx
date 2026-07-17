@@ -4,6 +4,7 @@ import {
   GlobalHomeLink,
   GlobalKanjiLink,
 } from "./global-links";
+export { useHomeHref } from "./use-home-href";
 export {
   Route,
   Switch,

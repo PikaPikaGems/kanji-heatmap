@@ -1,10 +1,11 @@
-import { Link } from "@/components/dependent/routing";
+import { Link, useHomeHref } from "@/components/dependent/routing";
 import assetsPaths from "@/lib/assets-paths";
 
 export const HeaderTitle = () => {
+  const homeHref = useHomeHref();
   return (
     <Link
-      to="/"
+      to={homeHref}
       className="flex items-center gap-2 py-1.5 hover:opacity-80 transition-opacity"
     >
       <img

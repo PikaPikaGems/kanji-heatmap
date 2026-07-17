@@ -1,6 +1,7 @@
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { useKanjiFromUrl, useUrlLocation } from "./routing-hooks";
+import { useHomeHref } from "./use-home-href";
 import { Link } from "./router-adapter";
 import { radicalFalseFriends } from "@/lib/radicals";
 
@@ -71,8 +72,9 @@ const JPCardInner = ({
 );
 
 export const GlobalHomeLink = () => {
+  const homeHref = useHomeHref();
   return (
-    <Link to={"/"} className={cnTextLink}>
+    <Link to={homeHref} className={cnTextLink}>
       home.
     </Link>
   );
@@ -148,5 +150,6 @@ export const GlobalKanjiLink = ({
 };
 
 export const GlobalHomeHeaderLink = () => {
-  return <Link to={"/"}>Kanji Heatmap</Link>;
+  const homeHref = useHomeHref();
+  return <Link to={homeHref}>Kanji Heatmap</Link>;
 };
