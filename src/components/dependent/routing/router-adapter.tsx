@@ -1,11 +1,7 @@
-import {
-  ComponentPropsWithoutRef,
-  ComponentRef,
-  forwardRef,
-  useSyncExternalStore,
-} from "react";
+import { forwardRef, useSyncExternalStore } from "react";
 import {
   Link as WouterLink,
+  LinkProps,
   Route,
   Switch,
   useLocation,
@@ -17,26 +13,30 @@ import {
   subscribeToRememberedHomeSearch,
 } from "@/lib/home-search-memory";
 
-type LinkProps = ComponentPropsWithoutRef<typeof WouterLink>;
+const Link = forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const rememberedHomeHref = useSyncExternalStore(
+    subscribeToRememberedHomeSearch,
+    getRememberedHomeHref,
+    getRememberedHomeHref
+  );
 
-const Link = forwardRef<ComponentRef<typeof WouterLink>, LinkProps>(
-  ({ href, to, ...props }, ref) => {
-    const rememberedHomeHref = useSyncExternalStore(
-      subscribeToRememberedHomeSearch,
-      getRememberedHomeHref,
-      getRememberedHomeHref
-    );
+  const resolvedProps =
+    "to" in props && props.to !== undefined
+      ? {
+          ...props,
+          to: props.to === "/" ? rememberedHomeHref : props.to,
+        }
+      : {
+          ...props,
+          href: props.href === "/" ? rememberedHomeHref : props.href,
+        };
 
-    return (
-      <WouterLink
-        {...props}
-        ref={ref}
-        href={href === "/" ? rememberedHomeHref : href}
-        to={to === "/" ? rememberedHomeHref : to}
-      />
-    );
+  if (resolvedProps.asChild) {
+    return <WouterLink {...resolvedProps} />;
   }
-);
+
+  return <WouterLink {...resolvedProps} ref={ref} />;
+});
 Link.displayName = "Link";
 
 export { Route, Switch, Link, useLocation, useSearch, useSearchParams };
