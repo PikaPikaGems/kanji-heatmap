@@ -25,8 +25,8 @@ const DashboardScreen = () => {
 
       <StatsOverview />
       <ActivityCalendarHeatmap />
-      <BookmarksBreakdown />
       <SpeedKatakanaHeatmap />
+      <BookmarksBreakdown />
       <div className="pt-4 mt-4 border-t-2 border-dotted">
         <BottomBar justify="center" />
       </div>

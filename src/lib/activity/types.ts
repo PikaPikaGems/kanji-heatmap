@@ -36,6 +36,9 @@ export type ActivityKindFilters = Record<ActivityKind, boolean>;
 
 export type WindowedActivityStats = {
   daysActive: number;
+  speedKatakanaDays: number;
+  productionDays: number;
+  recognitionDays: number;
   speedKatakanaSessions: number;
   productionRounds: number;
   recognitionRounds: number;

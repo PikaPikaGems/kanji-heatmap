@@ -62,13 +62,17 @@ const StatValue = ({
   display,
   raw,
   abbreviated,
+  className,
 }: {
   display: string;
   raw: string;
   abbreviated: boolean;
+  className?: string;
 }) => {
-  const valueClassName =
-    "text-sm font-extrabold leading-none tabular-nums sm:text-base";
+  const valueClassName = cn(
+    "text-sm font-extrabold leading-none tabular-nums sm:text-base",
+    className
+  );
 
   if (!abbreviated) {
     return <div className={valueClassName}>{display}</div>;
@@ -106,11 +110,14 @@ export const OverviewStat = ({
   label,
   Icon,
   className,
+  /** Tighter 3-up cells: hide icon on small screens, show from `sm` up. */
+  compact = false,
 }: {
   value: number | string;
   label: string;
   Icon: LucideIcon;
   className?: string;
+  compact?: boolean;
 }) => {
   const isNumber = typeof value === "number";
   const raw = isNumber ? formatRawCount(value) : value;
@@ -120,16 +127,28 @@ export const OverviewStat = ({
   return (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-2 rounded-2xl border border-foreground/10 bg-muted/20 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3 sm:py-3",
+        "flex h-full min-w-0 items-start gap-2 rounded-2xl border border-foreground/10 bg-muted/20 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3 sm:py-3",
+        compact &&
+          "flex-col items-center gap-1 px-2 text-center sm:flex-row sm:items-start sm:gap-3 sm:text-left",
         className
       )}
     >
-      <div className="flex items-center justify-center border size-8 shrink-0 rounded-xl border-foreground/10 bg-background text-foreground/70 sm:size-9">
+      <div
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-xl border border-foreground/10 bg-background text-foreground/70 sm:size-9",
+          compact && "hidden sm:flex"
+        )}
+      >
         <Icon className="size-3.5 sm:size-4" aria-hidden />
       </div>
-      <div className="min-w-0">
+      <div
+        className={cn(
+          "min-w-0",
+          compact && "flex w-full flex-col items-center sm:items-start"
+        )}
+      >
         <StatValue display={display} raw={raw} abbreviated={abbreviated} />
-        <div className="mt-0.5 text-[10px] font-bold uppercase leading-tight tracking-wide text-muted-foreground sm:mt-1 sm:text-[11px]">
+        <div className="mt-0.5 text-[10px] font-bold uppercase leading-snug tracking-wide text-muted-foreground sm:mt-1 sm:text-[11px]">
           {label}
         </div>
       </div>
