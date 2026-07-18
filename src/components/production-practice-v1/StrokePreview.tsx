@@ -1,18 +1,7 @@
 import { useId } from "react";
 import type { Stroke } from "@/components/dependent/DrawingPad";
 import { useGetStrokeFn } from "@/hooks/use-get-stroke-fn";
-
-function getSvgPathFromStroke(stroke: number[][]): string {
-  if (!stroke.length) return "";
-  const d: (string | number)[] = ["M", ...stroke[0], "Q"];
-  for (let i = 0; i < stroke.length; i++) {
-    const [x0, y0] = stroke[i];
-    const [x1, y1] = stroke[(i + 1) % stroke.length];
-    d.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
-  }
-  d.push("Z");
-  return d.join(" ");
-}
+import { getSvgPathFromStroke } from "@/lib/svg-path";
 
 /**
  * Read-only replay of a DrawingPad stroke snapshot.
