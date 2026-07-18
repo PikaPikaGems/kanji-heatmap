@@ -1,4 +1,4 @@
-import { Stroke } from "@/components/dependent/DrawingPad";
+import { Stroke } from "@/lib/stroke-types";
 
 // Minimal surface of the global `window.KanjiCanvas` object that we drive
 // directly. KanjiCanvas.recognize() is hard-wired to a real <canvas> element,

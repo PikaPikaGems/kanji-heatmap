@@ -1,4 +1,4 @@
-import type { Stroke } from "@/components/dependent/DrawingPad";
+import type { Stroke } from "@/lib/stroke-types";
 import type {
   DeckFilterSettings,
   PracticeItem as SharedPracticeItem,

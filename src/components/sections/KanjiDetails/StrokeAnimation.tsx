@@ -3,9 +3,8 @@ import { Switch } from "@/components/ui/switch";
 import { KanjiDMAK, StrokeOrderReplay } from "@/components/common/KanjiDmak";
 import {
   DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
 } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";

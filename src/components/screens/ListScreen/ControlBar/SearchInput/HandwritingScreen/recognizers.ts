@@ -1,4 +1,4 @@
-import { DrawingSubmitPayload } from "@/components/dependent/DrawingPad";
+import { DrawingSubmitPayload } from "@/lib/stroke-types";
 import { recognizeKanji } from "@/lib/kanjicanvas-adapter";
 import { recognizeDaKanji } from "@/lib/dakanji-adapter";
 

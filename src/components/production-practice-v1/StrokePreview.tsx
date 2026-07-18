@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { Stroke } from "@/components/dependent/DrawingPad";
+import type { Stroke } from "@/lib/stroke-types";
 import { useGetStrokeFn } from "@/hooks/use-get-stroke-fn";
 import { getSvgPathFromStroke } from "@/lib/svg-path";
 
