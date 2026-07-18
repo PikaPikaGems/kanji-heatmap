@@ -3,6 +3,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 import { roundedMean } from "@/lib/utils";
 import { useEnterAction } from "@/hooks/use-enter-action";
@@ -20,51 +21,6 @@ import {
   SETTINGS_KEY,
   SPEED_KATAKANA_TOTAL_CHALLENGES,
 } from "./constants";
-
-const ToggleRow = ({
-  id,
-  label,
-  checked,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) => (
-  <div className="flex items-center justify-between gap-4">
-    <Label htmlFor={id} className="text-sm cursor-pointer">
-      {label}
-    </Label>
-    <Switch id={id} checked={checked} onCheckedChange={onChange} />
-  </div>
-);
-
-const RadioRow = ({
-  name,
-  value,
-  current,
-  label,
-  onChange,
-}: {
-  name: string;
-  value: SoundMode;
-  current: SoundMode;
-  label: string;
-  onChange: (value: SoundMode) => void;
-}) => (
-  <label className="flex items-center gap-2 pr-4 text-sm cursor-pointer">
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      checked={current === value}
-      onChange={() => onChange(value)}
-      className="accent-primary"
-    />
-    {label}
-  </label>
-);
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
   const currentStats = readSetStats(challengeSet);
