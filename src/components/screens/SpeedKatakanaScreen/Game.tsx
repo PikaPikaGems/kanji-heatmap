@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { translateValue, tryConvertRomaji } from "@/lib/wanakana-adapter";
+import { translateValue } from "@/lib/wanakana-adapter";
+import { isMatch, isOnTrack } from "@/lib/speed-katakana-match";
 import { Input } from "@/components/ui/input";
 import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
@@ -163,27 +164,16 @@ export const Game = ({
 
     const converted = translateValue(raw, "katakana");
     const target = current.katakana;
-    // Compare in romaji space so the long-vowel mark ー matches a doubled vowel
-    // too (e.g. typing "paasento" → パアセント still clears パーセント).
-    const targetRomaji = tryConvertRomaji(target);
 
-    // iOS autocomplete / the IME suggestion bar appends a trailing space (often
-    // the full-width U+3000) to the inserted word. Strip all whitespace so a
-    // correct-but-spaced commit like the full-width-spaced word still matches.
-    // JS \s already covers the full-width U+3000 and other Unicode spaces.
-    const cleaned = converted.replace(/\s+/g, "");
-
-    // Ignore a trailing partial romaji tail (e.g. "k" before "ka" → "カ") so
-    // mid-syllable typing isn't mistaken for an error.
-    const committedKana = cleaned.replace(/[a-zA-Z]+$/, "");
-    const committedRomaji = tryConvertRomaji(committedKana);
-    const isOnTrack = targetRomaji.startsWith(committedRomaji);
-    if (!isOnTrack && !inErrorStateRef.current) {
+    // Matching happens in romaji space (see lib/speed-katakana-match) so the
+    // long-vowel mark, IME whitespace, and mid-syllable typing behave.
+    const onTrack = isOnTrack(converted, target);
+    if (!onTrack && !inErrorStateRef.current) {
       errorsRef.current += 1;
     }
-    inErrorStateRef.current = !isOnTrack;
+    inErrorStateRef.current = !onTrack;
 
-    if (tryConvertRomaji(cleaned) === targetRomaji) {
+    if (isMatch(converted, target)) {
       correctCharsRef.current += target.length;
       inErrorStateRef.current = false;
       playFeedback();
