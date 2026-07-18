@@ -166,7 +166,6 @@ export const Game = ({
         topGuess: candidates[0] ?? null,
         inTop10,
       };
-      const similarList = similarState.data ?? similars;
       // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
       // part-keywords (e.g. 囗 → "closed box"), which must not count.
       const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
@@ -174,7 +173,7 @@ export const Game = ({
         target: current.kanji,
         inTop10,
         modelGuesses: candidates,
-        similars: similarList,
+        similars,
         randomPool: randomKanjiPool,
         getSimilars,
         isRealKanji,
