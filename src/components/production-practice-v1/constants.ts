@@ -1,7 +1,10 @@
-import { JLPT_TYPE_ARR, JLTPTtypes } from "@/lib/jlpt";
+import {
+  DEFAULT_DECK_FILTER_SETTINGS,
+  PRACTICE_SESSION_SIZE,
+} from "@/components/shared-practice/constants";
 import { ProductionPracticeSettings } from "./types";
 
-export const SESSION_SIZE = 10;
+export const SESSION_SIZE = PRACTICE_SESSION_SIZE;
 /** Look-alike grid size: always 4×3. */
 export const CANDIDATE_COUNT = 12;
 /** Ranks that count as “in top 10” for session scoring. */
@@ -14,10 +17,7 @@ export const RECOGNIZE_TOP_K = 40;
 export const SETTINGS_KEY = "production-practice-v1-settings";
 
 export const DEFAULT_SETTINGS: ProductionPracticeSettings = {
-  jlpt: [...JLPT_TYPE_ARR] as JLTPTtypes[],
-  bookmarkedOnly: false,
-  randomizeOrder: true,
-  randomizeFont: false,
+  ...DEFAULT_DECK_FILTER_SETTINGS,
   blurEnglishGloss: true,
   hearPronunciationOnLoad: false,
   celebratorySoundOnCorrect: true,

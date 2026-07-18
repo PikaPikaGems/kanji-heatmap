@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 
 import { ItemSettings } from "@/lib/settings/settings";
@@ -12,7 +12,12 @@ export function ItemSettingsProvider({ children }: { children: ReactNode }) {
     defaultItemSettingsValue
   );
 
-  const mergedSettings = { ...defaultItemSettingsValue, ...storageData };
+  // Memoized: context value must keep a stable identity or every consumer
+  // re-renders on any provider render.
+  const mergedSettings = useMemo(
+    () => ({ ...defaultItemSettingsValue, ...storageData }),
+    [storageData]
+  );
 
   return (
     <itemSettings.StateContext.Provider value={mergedSettings}>

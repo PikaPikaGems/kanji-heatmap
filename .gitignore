@@ -32,3 +32,8 @@ dist-ssr
 *.sln
 *.sw?
 *.tar.gz
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/

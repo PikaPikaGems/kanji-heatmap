@@ -1,3 +1,6 @@
 *.json
 *.yaml
 *.yml
+playwright-report/
+test-results/
+coverage/

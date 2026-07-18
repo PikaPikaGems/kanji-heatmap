@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
+import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 
 /** Inline answer reveal shown in place of the input controls. */
 export const AnswerFeedback = ({
@@ -21,30 +21,8 @@ export const AnswerFeedback = ({
     .map((r) => r.trim())
     .filter(Boolean);
 
-  useEffect(() => {
-    // Don't treat the Enter that opened feedback as "Continue".
-    let armed = false;
-    const arm = () => {
-      armed = true;
-    };
-    const armTimeout = window.setTimeout(arm, 300);
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Enter") arm();
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!armed || e.key !== "Enter" || e.isComposing) return;
-      e.preventDefault();
-      onNext();
-    };
-
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.clearTimeout(armTimeout);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [onNext]);
+  // Don't treat the Enter that opened feedback as "Continue".
+  useArmedConfirmKey({ onConfirm: onNext });
 
   return (
     <div

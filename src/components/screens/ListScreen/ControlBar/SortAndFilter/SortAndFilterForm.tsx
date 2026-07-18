@@ -1,14 +1,5 @@
-import { useState } from "react";
-
-import { FrequencyType, SortKey } from "@/lib/options/options-types";
-import { isEqualFilters } from "@/lib/results-utils";
 import { SORT_ORDER_SELECT } from "@/lib/options/options-arr";
-import { MAX_FREQ_RANK, MAX_STROKE_COUNT } from "@/lib/options/constants";
-import {
-  FilterSettings,
-  SearchSettings,
-  SortSettings,
-} from "@/lib/settings/settings";
+import { SearchSettings } from "@/lib/settings/settings";
 
 import { Button } from "@/components/ui/button";
 
@@ -24,16 +15,12 @@ import {
   SortAdditionalInfo,
   SortOrderSectionLayout,
 } from "./SortOrderPresentation";
-import { GROUP_OPTIONS } from "@/lib/options/options-constants";
-import {
-  defaultFilterSettings,
-  defaultSortSettings,
-} from "@/lib/settings/search-settings-adapter";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import {
   isCommunityOrder,
   orderDisclaimer,
 } from "@/lib/options/options-label-maps";
+import { useSortAndFilterForm } from "./use-sort-and-filter-form";
 
 export const SortAndFilterSettingsForm = ({
   initialValue,
@@ -42,37 +29,15 @@ export const SortAndFilterSettingsForm = ({
   onSettle: (x: SearchSettings) => void;
   initialValue: SearchSettings;
 }) => {
-  const [sortValues, setSortValues] = useState<SortSettings>(
-    initialValue.sortSettings
-  );
-  const [filterValues, setFilterValues] = useState<FilterSettings>(
-    initialValue.filterSettings
-  );
-
-  const noChangeInSortValues =
-    sortValues.primary === initialValue.sortSettings.primary &&
-    sortValues.secondary == initialValue.sortSettings.secondary;
-
-  const noChangeInFilterValues = isEqualFilters(
-    initialValue.filterSettings,
-    filterValues
-  );
-
-  const isDisabled = noChangeInFilterValues && noChangeInSortValues;
-  const isGroup = (GROUP_OPTIONS as readonly string[]).includes(
-    sortValues.primary
-  );
+  const form = useSortAndFilterForm(initialValue);
+  const { sortValues, filterValues, isDisabled, isGroup } = form;
 
   return (
     <form
       className="flex flex-col flex-1 min-h-0"
       onSubmit={(e) => {
         e.preventDefault();
-        onSettle({
-          ...initialValue,
-          filterSettings: filterValues,
-          sortSettings: sortValues,
-        });
+        onSettle(form.buildSettings());
       }}
     >
       <div className="flex-1 min-h-0 px-2 space-y-4 overflow-y-auto">
@@ -81,25 +46,7 @@ export const SortAndFilterSettingsForm = ({
             <>
               <ResponsiveSelect
                 value={sortValues.primary}
-                onChange={(newValue) => {
-                  const isGroup = (GROUP_OPTIONS as readonly string[]).includes(
-                    newValue
-                  );
-
-                  setSortValues((prev) => {
-                    const newSecondary =
-                      newValue === prev.secondary
-                        ? "none"
-                        : isGroup
-                          ? prev.secondary
-                          : "none";
-                    return {
-                      ...prev,
-                      primary: newValue as SortKey,
-                      secondary: newSecondary,
-                    };
-                  });
-                }}
+                onChange={form.setPrimarySort}
                 options={SORT_ORDER_SELECT}
                 label="Primary"
               />
@@ -125,11 +72,7 @@ export const SortAndFilterSettingsForm = ({
               <div className="animate-fade-in">
                 <ResponsiveSelect
                   value={sortValues.secondary}
-                  onChange={(newValue) =>
-                    setSortValues((prev) => {
-                      return { ...prev, secondary: newValue as SortKey };
-                    })
-                  }
+                  onChange={form.setSecondarySort}
                   options={SORT_ORDER_SELECT.filter((item) => {
                     return item.value !== sortValues.primary;
                   })}
@@ -168,47 +111,19 @@ export const SortAndFilterSettingsForm = ({
                 filterValues.strokeRange.min,
                 filterValues.strokeRange.max,
               ]}
-              setValues={(val) => {
-                setFilterValues((prev) => {
-                  return {
-                    ...prev,
-                    strokeRange: {
-                      min: val[0] ?? 0,
-                      max: val[1] ?? MAX_STROKE_COUNT,
-                    },
-                  };
-                });
-              }}
+              setValues={form.setStrokeRange}
             />
           }
           jlptField={
             <JLPTSelector
               selectedJLPT={filterValues.jlpt}
-              setSelectedJLPT={(val) => {
-                setFilterValues((prev) => {
-                  return { ...prev, jlpt: val };
-                });
-              }}
+              setSelectedJLPT={form.setJlpt}
             />
           }
           freqRankSourceField={
             <FrequencyRankDataSource
               value={filterValues.freq.source}
-              setValue={(val) => {
-                setFilterValues((prev) => {
-                  return {
-                    ...prev,
-                    freq: {
-                      ...prev.freq,
-                      source: val as FrequencyType,
-                      rankRange:
-                        val === "none"
-                          ? { min: 1, max: MAX_FREQ_RANK }
-                          : prev.freq.rankRange,
-                    },
-                  };
-                });
-              }}
+              setValue={form.setFreqSource}
             />
           }
           freqRankRangeField={
@@ -219,20 +134,7 @@ export const SortAndFilterSettingsForm = ({
                     filterValues.freq.rankRange.min,
                     filterValues.freq.rankRange.max,
                   ]}
-                  setValues={(val) => {
-                    setFilterValues((prev) => {
-                      return {
-                        ...prev,
-                        freq: {
-                          ...prev.freq,
-                          rankRange: {
-                            min: val[0] ?? 1,
-                            max: val[1] ?? MAX_FREQ_RANK,
-                          },
-                        },
-                      };
-                    });
-                  }}
+                  setValues={form.setFreqRankRange}
                 />
               </div>
             )
@@ -255,8 +157,7 @@ export const SortAndFilterSettingsForm = ({
             variant="outline"
             onClick={(e) => {
               e.preventDefault();
-              setSortValues(defaultSortSettings);
-              setFilterValues(defaultFilterSettings);
+              form.resetToDefaults();
               e.stopPropagation();
             }}
           >

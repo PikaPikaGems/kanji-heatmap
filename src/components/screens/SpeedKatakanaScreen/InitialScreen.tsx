@@ -1,76 +1,19 @@
-import { useMemo } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
-import { roundedMean } from "@/lib/utils";
+import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
-import {
-  DEFAULT_SETTINGS,
-  levelOf,
-  LEVELS,
-  positionInLevel,
-  setFromLevelAndPos,
-  CHALLENGES_PER_LEVEL,
-  SETTINGS_KEY,
-  SPEED_KATAKANA_TOTAL_CHALLENGES,
-} from "./constants";
-
-const ToggleRow = ({
-  id,
-  label,
-  checked,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) => (
-  <div className="flex items-center justify-between gap-4">
-    <Label htmlFor={id} className="text-sm cursor-pointer">
-      {label}
-    </Label>
-    <Switch id={id} checked={checked} onCheckedChange={onChange} />
-  </div>
-);
-
-const RadioRow = ({
-  name,
-  value,
-  current,
-  label,
-  onChange,
-}: {
-  name: string;
-  value: SoundMode;
-  current: SoundMode;
-  label: string;
-  onChange: (value: SoundMode) => void;
-}) => (
-  <label className="flex items-center gap-2 pr-4 text-sm cursor-pointer">
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      checked={current === value}
-      onChange={() => onChange(value)}
-      className="accent-primary"
-    />
-    {label}
-  </label>
-);
+import { DEFAULT_SETTINGS, levelOf, positionInLevel, SETTINGS_KEY } from "./constants";
+import { useSpeedKatakanaProgress } from "./use-speed-katakana-progress";
+import { ChallengeSetSelector } from "./ChallengeSetSelector";
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const currentStats = useMemo(
-    () => readSetStats(challengeSet),
-    [challengeSet]
-  );
+  const currentStats = readSetStats(challengeSet);
   const level = levelOf(challengeSet);
   const pos = positionInLevel(challengeSet);
   const stats = currentStats
@@ -121,38 +64,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     DEFAULT_SETTINGS
   );
 
-  const summary = useMemo(() => {
-    const cpms: number[] = [];
-    for (let i = 1; i <= SPEED_KATAKANA_TOTAL_CHALLENGES; i++) {
-      const s = readSetStats(i);
-      if (s) cpms.push(s.latestCpm);
-    }
-    return {
-      completed: cpms.length,
-      averageCpm: roundedMean(cpms),
-    };
-  }, []);
-
-  const levelCompletion = useMemo(() => {
-    const counts: number[] = [];
-    for (let level = 1; level <= LEVELS; level++) {
-      let count = 0;
-      for (let pos = 1; pos <= CHALLENGES_PER_LEVEL; pos++) {
-        if (readSetStats(setFromLevelAndPos(level, pos))) count++;
-      }
-      counts.push(count);
-    }
-    return counts;
-  }, []);
-
-  const currentLevel = levelOf(settings.challengeSet);
-  const currentPos = positionInLevel(settings.challengeSet);
-  const currentLevelDone = levelCompletion[currentLevel - 1];
-
-  const selectLevel = (level: number) => {
-    const pos = levelOf(settings.challengeSet) === level ? currentPos : 1;
-    setSetting("challengeSet", setFromLevelAndPos(level, pos));
-  };
+  const { summary, levelCompletion } = useSpeedKatakanaProgress();
 
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled
@@ -254,69 +166,11 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               )}
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Select a Challenge Set</Label>
-                <span className="text-sm font-semibold tabular-nums">
-                  {(currentLevelDone / CHALLENGES_PER_LEVEL) * 100}% done
-                </span>
-              </div>
-
-              <div className="grid grid-cols-10 gap-1">
-                {Array.from({ length: LEVELS }, (_, i) => i + 1).map(
-                  (level) => {
-                    const doneCount = levelCompletion[level - 1];
-                    const category = Math.round(
-                      (doneCount / CHALLENGES_PER_LEVEL) * 4
-                    ) as FreqCategory;
-                    const bgCn = freqCategoryCn[category];
-                    const textCn =
-                      category > 3 ? "text-white" : "text-foreground";
-                    return (
-                      <button
-                        key={level}
-                        onClick={() => selectLevel(level)}
-                        className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
-                          currentLevel === level ? "border-primary" : ""
-                        }`}
-                      >
-                        {level}
-                      </button>
-                    );
-                  }
-                )}
-              </div>
-              <Label className="text-sm text-left">Select a Challenge</Label>
-
-              <div className="grid grid-cols-10 gap-1">
-                {Array.from(
-                  { length: CHALLENGES_PER_LEVEL },
-                  (_, i) => i + 1
-                ).map((pos) => {
-                  const setNum = setFromLevelAndPos(currentLevel, pos);
-                  const completed = !!readSetStats(setNum);
-                  const bgCn = completed
-                    ? freqCategoryCn[4]
-                    : freqCategoryCn[0];
-                  const textCn = completed ? "text-white" : "text-foreground";
-                  return (
-                    <button
-                      key={pos}
-                      onClick={() => setSetting("challengeSet", setNum)}
-                      className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
-                        currentPos === pos ? "border-primary" : ""
-                      }`}
-                    >
-                      {pos}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <p className="text-xs text-left">
-                Lower challenges contain more common words.
-              </p>
-            </div>
+            <ChallengeSetSelector
+              challengeSet={settings.challengeSet}
+              levelCompletion={levelCompletion}
+              onSelect={(setNumber) => setSetting("challengeSet", setNumber)}
+            />
           </div>
 
           <SetStats challengeSet={settings.challengeSet} />

@@ -42,6 +42,8 @@ export const useAsync = <T>(
     }
   }, [asyncFunction]);
 
+  // Effect needed: kicks off the async fetch on mount / when the fetcher
+  // changes (data loading is an external side effect, not render logic).
   useEffect(() => {
     if (immediate) {
       execute();

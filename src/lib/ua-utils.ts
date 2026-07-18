@@ -15,83 +15,117 @@ interface UserAgentData {
   platform: PlatformInfo;
 }
 
-function getBrowserName(userAgent: string): string {
+// One roster drives both browser name and version detection, so the two can't
+// drift apart (previously they were parallel if-chains that had to be kept in
+// sync by hand). First matching rule wins; `version` regexes are tried in
+// order so Chromium-based browsers can fall back to the engine's version.
+type BrowserRule = {
+  name: string;
+  /** Any of these lowercase tokens marks the browser as present. */
+  match: string[];
+  /** All of these must be absent (e.g. Chrome is chrome/ without edg/). */
+  exclude?: string[];
+  /** First regex with a capture that matches provides the version. */
+  version: RegExp[];
+};
+
+const BROWSER_RULES: BrowserRule[] = [
+  { name: "Microsoft Edge", match: ["edg/"], version: [/Edg\/([0-9.]+)/] },
+  {
+    name: "Microsoft Edge Android",
+    match: ["edga/"],
+    version: [/EdgA\/([0-9.]+)/i],
+  },
+  {
+    name: "Microsoft Edge iOS",
+    match: ["edgios/"],
+    version: [/EdgiOS\/([0-9.]+)/i],
+  },
+  {
+    name: "Opera",
+    match: ["opr/", "oprgx/", "opera/"],
+    version: [/OPR\/([0-9.]+)/, /Opera\/([0-9.]+)/, /Opera ([0-9.]+)/],
+  },
+  {
+    name: "Samsung Internet",
+    match: ["samsungbrowser/"],
+    version: [/SamsungBrowser\/([0-9.]+)/],
+  },
+  {
+    name: "UC Browser",
+    match: ["ucbrowser/"],
+    version: [/UCBrowser\/([0-9.]+)/],
+  },
+  {
+    name: "Brave",
+    match: ["brave/", "brave chrome/"],
+    version: [/Brave\/([0-9.]+)/, /Chrome\/([0-9.]+)/],
+  },
+  { name: "Vivaldi", match: ["vivaldi/"], version: [/Vivaldi\/([0-9.]+)/] },
+  {
+    name: "Yandex Browser",
+    match: ["yabrowser/"],
+    version: [/YaBrowser\/([0-9.]+)/],
+  },
+  {
+    name: "Naver Whale",
+    match: ["whale/"],
+    version: [/Whale\/([0-9.]+)/, /Chrome\/([0-9.]+)/],
+  },
+  {
+    name: "Arc",
+    match: ["arc/"],
+    version: [/Arc\/([0-9.]+)/, /Chrome\/([0-9.]+)/],
+  },
+  {
+    name: "Firefox",
+    match: ["firefox/", "fxios/"],
+    version: [/Firefox\/([0-9.]+)/, /FxiOS\/([0-9.]+)/],
+  },
+  {
+    name: "Firefox Focus",
+    match: ["focus/"],
+    version: [/Focus\/([0-9.]+)/, /Firefox\/([0-9.]+)/],
+  },
+  {
+    name: "Safari",
+    match: ["safari/"],
+    exclude: ["chrome/", "chromium/", "edg/"],
+    version: [/Version\/([0-9.]+)/],
+  },
+  {
+    name: "Chrome",
+    match: ["chrome/"],
+    exclude: ["chromium/", "edg/"],
+    version: [/Chrome\/([0-9.]+)/],
+  },
+  { name: "Chromium", match: ["chromium/"], version: [/Chromium\/([0-9.]+)/] },
+  {
+    name: "Internet Explorer",
+    match: ["trident/", "msie"],
+    version: [/MSIE ([0-9.]+)/, /rv:([0-9.]+)/],
+  },
+];
+
+const findBrowserRule = (userAgent: string) => {
   const ua = userAgent.toLowerCase();
-  if (ua.includes("edg/")) return "Microsoft Edge";
-  if (ua.includes("edga/")) return "Microsoft Edge Android";
-  if (ua.includes("edgios/")) return "Microsoft Edge iOS";
-  if (ua.includes("opr/") || ua.includes("oprgx/")) return "Opera";
-  if (ua.includes("opera/")) return "Opera";
-  if (ua.includes("samsungbrowser/")) return "Samsung Internet";
-  if (ua.includes("ucbrowser/")) return "UC Browser";
-  if (ua.includes("brave/") || ua.includes("brave chrome/")) return "Brave";
-  if (ua.includes("vivaldi/")) return "Vivaldi";
-  if (ua.includes("yabrowser/")) return "Yandex Browser";
-  if (ua.includes("whale/")) return "Naver Whale";
-  if (ua.includes("arc/")) return "Arc";
-  if (ua.includes("firefox/") || ua.includes("fxios/")) return "Firefox";
-  if (ua.includes("focus/")) return "Firefox Focus";
-  if (
-    ua.includes("safari/") &&
-    !ua.includes("chrome/") &&
-    !ua.includes("chromium/") &&
-    !ua.includes("edg/")
-  )
-    return "Safari";
-  if (
-    ua.includes("chrome/") &&
-    !ua.includes("chromium/") &&
-    !ua.includes("edg/")
-  )
-    return "Chrome";
-  if (ua.includes("chromium/")) return "Chromium";
-  if (ua.includes("trident/") || ua.includes("msie"))
-    return "Internet Explorer";
-  return "Unknown";
+  return BROWSER_RULES.find(
+    (rule) =>
+      rule.match.some((token) => ua.includes(token)) &&
+      !(rule.exclude ?? []).some((token) => ua.includes(token))
+  );
+};
+
+function getBrowserName(userAgent: string): string {
+  return findBrowserRule(userAgent)?.name ?? "Unknown";
 }
 
 function getBrowserVersion(userAgent: string): string {
-  const ua = userAgent;
-  const edgeMatch = ua.match(/Edg[A]?\/([0-9.]+)/i);
-  if (edgeMatch) return edgeMatch[1];
-  const edgeIOSMatch = ua.match(/EdgiOS\/([0-9.]+)/i);
-  if (edgeIOSMatch) return edgeIOSMatch[1];
-  const edgeLegacyMatch = ua.match(/Edge\/([0-9.]+)/);
-  if (edgeLegacyMatch) return edgeLegacyMatch[1];
-  const oprMatch = ua.match(/OPR\/([0-9.]+)/);
-  if (oprMatch) return oprMatch[1];
-  const operaMatch = ua.match(/Opera\/([0-9.]+)|Opera ([0-9.]+)/);
-  if (operaMatch) return operaMatch[1] || operaMatch[2] || "Unknown";
-  const samsungMatch = ua.match(/SamsungBrowser\/([0-9.]+)/);
-  if (samsungMatch) return samsungMatch[1];
-  const ucMatch = ua.match(/UCBrowser\/([0-9.]+)/);
-  if (ucMatch) return ucMatch[1];
-  const braveMatch = ua.match(/Brave\/([0-9.]+)/);
-  if (braveMatch) return braveMatch[1];
-  const vivaldiMatch = ua.match(/Vivaldi\/([0-9.]+)/);
-  if (vivaldiMatch) return vivaldiMatch[1];
-  const yandexMatch = ua.match(/YaBrowser\/([0-9.]+)/);
-  if (yandexMatch) return yandexMatch[1];
-  const arcMatch = ua.match(/Arc\/([0-9.]+)/);
-  if (arcMatch) return arcMatch[1];
-  const firefoxMatch = ua.match(/Firefox\/([0-9.]+)/);
-  if (firefoxMatch) return firefoxMatch[1];
-  const fxiosMatch = ua.match(/FxiOS\/([0-9.]+)/);
-  if (fxiosMatch) return fxiosMatch[1];
-  const chromeMatch = ua.match(/Chrome\/([0-9.]+)/);
-  if (chromeMatch && !ua.includes("Edg/")) return chromeMatch[1];
-  const chromiumMatch = ua.match(/Chromium\/([0-9.]+)/);
-  if (chromiumMatch) return chromiumMatch[1];
-  if (
-    ua.includes("Safari") &&
-    !ua.includes("Chrome") &&
-    !ua.includes("Chromium")
-  ) {
-    const safariMatch = ua.match(/Version\/([0-9.]+)/);
-    if (safariMatch) return safariMatch[1];
+  const rule = findBrowserRule(userAgent);
+  for (const regex of rule?.version ?? []) {
+    const match = userAgent.match(regex);
+    if (match) return match[1];
   }
-  const ieMatch = ua.match(/(MSIE |rv:)([0-9.]+)/);
-  if (ieMatch) return ieMatch[2];
   return "Unknown";
 }
 

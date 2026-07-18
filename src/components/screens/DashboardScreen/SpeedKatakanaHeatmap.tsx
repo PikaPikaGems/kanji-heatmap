@@ -1,23 +1,15 @@
-import { useEffect, useState } from "react";
 import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
 import { STATS_KEY_PREFIX } from "@/components/screens/SpeedKatakanaScreen/storage";
+import { useStorageRevision } from "@/hooks/use-storage-value";
 import { FreqGradient } from "@/components/common/freq/FreqGradient";
 import { SectionHeading } from "./SectionHeading";
 import { DashboardPanel } from "./DashboardPanel";
 import { SpeedKatakanaHeatmapGrid } from "./SpeedKatakanaHeatmapGrid";
 
 export const SpeedKatakanaHeatmap = () => {
-  const [revision, setRevision] = useState(0);
-
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key == null || e.key.startsWith(STATS_KEY_PREFIX)) {
-        setRevision((n) => n + 1);
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  const revision = useStorageRevision(
+    (key) => key == null || key.startsWith(STATS_KEY_PREFIX)
+  );
 
   return (
     <DashboardPanel>

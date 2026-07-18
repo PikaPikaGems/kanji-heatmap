@@ -4,6 +4,7 @@ import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
 import { percent } from "@/lib/utils";
 import { Stat } from "./CountUpStat";
+import { EndScreenLayout } from "./EndScreenLayout";
 import { PracticeSessionResult } from "./types";
 import { RecapTile } from "./RecapTile";
 
@@ -33,28 +34,20 @@ export const EndSession = ({
 
   if (!hasMore) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full gap-10 px-4 animate-fade-in">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
-            🎉 {cheer}
-          </h2>
-          <p className="mt-1 text-xs font-bold tracking-wide uppercase text-muted-foreground">
-            All words complete
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16 gap-y-8">
-          <Stat value={accuracy} unit="%" label="Accuracy" />
-          <Stat value={wordsCleared} unit="" label="Words cleared" />
-          <Stat value={results.length} unit="" label="Attempts" />
-        </div>
-
-        <div className="flex flex-col w-full max-w-xs gap-3">
-          <PracticeButton size="lg" onClick={onEnd}>
-            Done
-          </PracticeButton>
-        </div>
-      </div>
+      <EndScreenLayout
+        className="px-4"
+        heading={`🎉 ${cheer}`}
+        subtitle="All words complete"
+        stats={
+          <>
+            <Stat value={accuracy} unit="%" label="Accuracy" />
+            <Stat value={wordsCleared} unit="" label="Words cleared" />
+            <Stat value={results.length} unit="" label="Attempts" />
+          </>
+        }
+        primaryLabel="Done"
+        onPrimary={onEnd}
+      />
     );
   }
 

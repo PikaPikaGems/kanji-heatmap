@@ -2,6 +2,7 @@ import {
   ExtendedKanjiInfoResponseType,
   KanjiExtendedInfo,
   KanjiMainInfo,
+  KanjiWorkerRequestName,
   MainKanjiInfoResponseType,
   OnMessageRequestType,
   PostMessageResponseType,
@@ -92,12 +93,21 @@ const retrieveVocabInfo = (word?: string) => {
   };
 };
 
-self.onmessage = function (event: { data: OnMessageRequestType }) {
-  const eventType = event.data.data.type;
-  const payload = event.data.data.payload;
-  const id = event.data.id;
+// ---------------------------------------------------------------------------
+// Request dispatch. Each request type gets one named handler in HANDLERS;
+// onmessage itself only routes. Handlers reply via the `Reply` pair built
+// once per message from the request id + type.
+// ---------------------------------------------------------------------------
 
-  const sendResponse = (data?: unknown) => {
+type Reply = {
+  ok: (data?: unknown) => void;
+  err: (error: { message: string }) => void;
+};
+
+type Handler = (payload: unknown, reply: Reply) => void;
+
+const makeReply = (id: number, eventType: KanjiWorkerRequestName): Reply => ({
+  ok: (data?: unknown) => {
     const response: PostMessageResponseType = {
       id,
       response: {
@@ -107,9 +117,8 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
       },
     };
     self.postMessage(response);
-  };
-
-  const sendError = (error: { message: string }) => {
+  },
+  err: (error: { message: string }) => {
     const response: PostMessageResponseType = {
       id,
       response: {
@@ -122,185 +131,178 @@ self.onmessage = function (event: { data: OnMessageRequestType }) {
     };
     console.error(response, error);
     self.postMessage(response);
+  },
+});
+
+const MISSING_PAYLOAD_MESSAGE =
+  "Please provide both an eventType and payload. One of them is missing";
+
+const requirePayload =
+  <T>(run: (payload: T, reply: Reply) => void): Handler =>
+  (payload, reply) => {
+    if (payload == null) {
+      reply.err({ message: MISSING_PAYLOAD_MESSAGE });
+      return;
+    }
+    run(payload as T, reply);
   };
 
-  if (eventType === "initialize-extended-kanji-map") {
+const getSearchPool = () => ({
+  main: KANJI_INFO_MAIN_CACHE,
+  extended: KANJI_INFO_EXTENDED_CACHE,
+  similar: KANJI_SIMILAR_CACHE,
+});
+
+// "similar" searches need the lazily-fetched similar map before they can run;
+// every other search runs synchronously against the in-memory caches.
+const withSimilarCacheIfNeeded = (
+  settings: SearchSettings,
+  reply: Reply,
+  run: () => void
+) => {
+  const needsSimilarCache =
+    settings.textSearch.type === "similar" && settings.textSearch.text !== "";
+
+  if (!needsSimilarCache) {
+    run();
+    return;
+  }
+
+  ensureSimilarCache().then(run).catch(reply.err);
+};
+
+const handleSearch = requirePayload<SearchSettings>((settings, reply) => {
+  // Side effect, the first time we search
+  // we need to store this in cache which will be useful
+  // when searching by radical
+  if (KANJI_BY_STROKE_ORDER_CACHE.length === 0) {
+    KANJI_BY_STROKE_ORDER_CACHE = getSortedByStrokeCount(getSearchPool());
+  }
+
+  if (
+    settings.textSearch.type === "radicals" &&
+    settings.textSearch.text !== ""
+  ) {
+    const { kanjis, possibleRadicals } = searchByRadical(
+      KANJI_BY_STROKE_ORDER_CACHE,
+      settings,
+      getSearchPool(),
+      KANJI_DECOMPOSITION_CACHE
+    );
+
+    reply.ok({ kanjis, possibleRadicals });
+    return;
+  }
+
+  withSimilarCacheIfNeeded(settings, reply, () => {
+    const kanjis: string[] = searchKanji(settings, getSearchPool());
+    reply.ok({ kanjis });
+  });
+});
+
+const handleSearchResultCount = requirePayload<SearchSettings>(
+  (settings, reply) => {
+    withSimilarCacheIfNeeded(settings, reply, () => {
+      const pool = getSearchPool();
+      const allKanji = Object.keys(pool.main);
+      reply.ok(filterKanji(allKanji, settings, pool).length);
+    });
+  }
+);
+
+const handleKanjiExtended = requirePayload<string>((kanji, reply) => {
+  const extendedInfo = KANJI_INFO_EXTENDED_CACHE[kanji];
+
+  if (extendedInfo == null) {
+    reply.err({ message: "No Kanji Info On Extended Cache" });
+    return;
+  }
+
+  reply.ok({
+    ...extendedInfo,
+    vocabInfo: {
+      first: retrieveVocabInfo(extendedInfo.mainVocab?.[0]),
+      second: retrieveVocabInfo(extendedInfo.mainVocab?.[1]),
+    },
+  });
+});
+
+const handleKanjiSimilar = requirePayload<string>((kanji, reply) => {
+  ensureSimilarCache()
+    .then(() => {
+      const similars = (KANJI_SIMILAR_CACHE[kanji] ?? []).filter(
+        (similar) => KANJI_INFO_MAIN_CACHE[similar] != null
+      );
+      reply.ok(similars);
+    })
+    .catch(reply.err);
+});
+
+const HANDLERS: Record<KanjiWorkerRequestName, Handler> = {
+  "initialize-extended-kanji-map": (_payload, reply) => {
     fetchExtendedKanjiInfo()
       .then(loadExtendedKanjiInfo)
-      .then(sendResponse)
-      .catch(sendError);
-
-    return;
-  }
-
-  if (eventType === "initialize-decomposition-map") {
+      .then(() => reply.ok())
+      .catch(reply.err);
+  },
+  "initialize-decomposition-map": (_payload, reply) => {
     fetchKanjiDecomposition()
       .then(loadKanjiDecomposition)
-      .then(sendResponse)
-      .catch(sendError);
-
-    return;
-  }
-
-  if (eventType === "initalize-segmented-vocab-map") {
+      .then(() => reply.ok())
+      .catch(reply.err);
+  },
+  "initalize-segmented-vocab-map": (_payload, reply) => {
     fetchSegmentedVocab()
       .then(loadSegmentedVocabInfo)
-      .then(sendResponse)
-      .catch(sendError);
-
-    return;
-  }
-
-  if (eventType === "kanji-main-map") {
+      .then(() => reply.ok())
+      .catch(reply.err);
+  },
+  "kanji-main-map": (_payload, reply) => {
     fetchMainManjiInfo()
       .then(loadMainKanjiInfo)
-      .then(() => sendResponse(KANJI_INFO_MAIN_CACHE))
-      .catch(sendError);
-
-    return;
-  }
-
-  if (eventType === "part-keyword-map") {
+      .then(() => reply.ok(KANJI_INFO_MAIN_CACHE))
+      .catch(reply.err);
+  },
+  "part-keyword-map": (_payload, reply) => {
     fetchPartKeywordInfo()
       .then((r) => {
         KANJI_PART_KEYWORD_MAP_CACHE = r;
       })
-      .then(() => sendResponse(KANJI_PART_KEYWORD_MAP_CACHE))
-      .catch(sendError);
-
-    return;
-  }
-
-  if (eventType === "phonetic-map") {
+      .then(() => reply.ok(KANJI_PART_KEYWORD_MAP_CACHE))
+      .catch(reply.err);
+  },
+  "phonetic-map": (_payload, reply) => {
     fetchPhoneticInfo()
       .then((r) => {
         KANJI_PHONETIC_MAP_CACHE = r;
       })
-      .then(() => sendResponse(KANJI_PHONETIC_MAP_CACHE))
-      .catch(sendError);
+      .then(() => reply.ok(KANJI_PHONETIC_MAP_CACHE))
+      .catch(reply.err);
+  },
+  "retrieve-vocab-info": (payload, reply) => {
+    reply.ok(retrieveVocabInfo(payload as string));
+  },
+  search: handleSearch,
+  "search-result-count": handleSearchResultCount,
+  "kanji-extended": handleKanjiExtended,
+  "kanji-similar": handleKanjiSimilar,
+};
 
-    return;
-  }
+self.onmessage = function (event: { data: OnMessageRequestType }) {
+  const eventType = event.data.data.type;
+  const payload = event.data.data.payload;
+  const reply = makeReply(event.data.id, eventType);
 
-  if (eventType === "retrieve-vocab-info") {
-    const vocabInfo = retrieveVocabInfo(payload as string);
-    sendResponse(vocabInfo);
-    return;
-  }
-
-  if (eventType == null || payload == null) {
-    sendError({
+  const handler = (HANDLERS as Record<string, Handler | undefined>)[eventType];
+  if (handler == null) {
+    reply.err({
       message:
-        "Please provide both an eventType and payload. One of them is missing",
+        eventType == null || payload == null
+          ? MISSING_PAYLOAD_MESSAGE
+          : "Not implemented",
     });
     return;
   }
 
-  const settings = payload as SearchSettings;
-  const kanjiPool = {
-    main: KANJI_INFO_MAIN_CACHE,
-    extended: KANJI_INFO_EXTENDED_CACHE,
-    similar: KANJI_SIMILAR_CACHE,
-  };
-
-  if (eventType === "search") {
-    // Side effect, the first time we search
-    // we need to store this in cache which will be useful
-    // when searching by radical
-    if (KANJI_BY_STROKE_ORDER_CACHE.length === 0) {
-      KANJI_BY_STROKE_ORDER_CACHE = getSortedByStrokeCount(kanjiPool);
-    }
-
-    if (
-      settings.textSearch.type === "radicals" &&
-      settings.textSearch.text !== ""
-    ) {
-      const { kanjis, possibleRadicals } = searchByRadical(
-        KANJI_BY_STROKE_ORDER_CACHE,
-        settings,
-        kanjiPool,
-        KANJI_DECOMPOSITION_CACHE
-      );
-
-      sendResponse({ kanjis, possibleRadicals });
-      return;
-    }
-
-    if (
-      settings.textSearch.type === "similar" &&
-      settings.textSearch.text !== ""
-    ) {
-      ensureSimilarCache()
-        .then(() => {
-          const pool = {
-            ...kanjiPool,
-            similar: KANJI_SIMILAR_CACHE,
-          };
-          const kanjis: string[] = searchKanji(settings, pool);
-          sendResponse({ kanjis });
-        })
-        .catch(sendError);
-      return;
-    }
-
-    const kanjis: string[] = searchKanji(settings, kanjiPool);
-    sendResponse({ kanjis });
-    return;
-  }
-
-  if (eventType === "search-result-count") {
-    const runCount = () => {
-      const pool = {
-        ...kanjiPool,
-        similar: KANJI_SIMILAR_CACHE,
-      };
-      const allKanji = Object.keys(pool.main);
-      const filterCount = filterKanji(allKanji, settings, pool).length;
-      sendResponse(filterCount);
-    };
-
-    if (
-      settings.textSearch.type === "similar" &&
-      settings.textSearch.text !== ""
-    ) {
-      ensureSimilarCache().then(runCount).catch(sendError);
-      return;
-    }
-
-    runCount();
-    return;
-  }
-
-  if (eventType === "kanji-extended") {
-    const extendedInfo = KANJI_INFO_EXTENDED_CACHE[payload as string];
-
-    if (extendedInfo == null) {
-      sendError({ message: "No Kanji Info On Extended Cache" });
-      return;
-    }
-
-    sendResponse({
-      ...extendedInfo,
-      vocabInfo: {
-        first: retrieveVocabInfo(extendedInfo.mainVocab?.[0]),
-        second: retrieveVocabInfo(extendedInfo.mainVocab?.[1]),
-      },
-    });
-    return;
-  }
-
-  if (eventType === "kanji-similar") {
-    ensureSimilarCache()
-      .then(() => {
-        const kanji = payload as string;
-        const similars = (KANJI_SIMILAR_CACHE[kanji] ?? []).filter(
-          (similar) => KANJI_INFO_MAIN_CACHE[similar] != null
-        );
-        sendResponse(similars);
-      })
-      .catch(sendError);
-    return;
-  }
-
-  sendError({ message: "Not implemented" });
+  handler(payload, reply);
 };

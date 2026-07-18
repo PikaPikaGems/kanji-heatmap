@@ -49,6 +49,9 @@ export const useKeyboardPagination = (
   page: number,
   totalPages: number
 ) => {
+  // Effect needed: window keydown subscription. Not built on the shared
+  // useKeyboardListener because it matches on e.code + shiftKey combos,
+  // which that hook's event.key map can't express.
   useEffect(() => {
     if (!shortcuts) return;
     const handler = (e: KeyboardEvent) => {

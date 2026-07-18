@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -22,9 +22,14 @@ export const BlurredGloss = ({
 }) => {
   const [blurred, setBlurred] = useState(blurrable);
 
-  useEffect(() => {
+  // Re-apply the initial blur when the card (resetKey) or blurrable changes —
+  // done during render (React's previous-state pattern) instead of an effect,
+  // so there is no one-frame flash of the previous card's revealed state.
+  const [prevReset, setPrevReset] = useState({ resetKey, blurrable });
+  if (prevReset.resetKey !== resetKey || prevReset.blurrable !== blurrable) {
+    setPrevReset({ resetKey, blurrable });
     setBlurred(blurrable);
-  }, [resetKey, blurrable]);
+  }
 
   const gloss = text || "—";
   const base = "max-w-sm px-2 text-xs font-bold tracking-wide";

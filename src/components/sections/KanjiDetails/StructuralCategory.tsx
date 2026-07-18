@@ -51,16 +51,30 @@ const formatStructuralTypeName = (type: StructuralType): string => {
   return `${info.name ?? "unknown"}`;
 };
 
-const Wrapper = ({ children }: { children: ReactNode }) => {
+const NoInfo = () => {
+  return <span className="text-[10px] uppercase">Not available</span>;
+};
+
+// Shared status handling for the four structural-data sources: ellipsis while
+// the provider loads, NoInfo when the source has nothing for this kanji, and
+// the horizontal scroller layout otherwise.
+const StructuralSection = ({
+  status,
+  hasData,
+  children,
+}: {
+  status: string;
+  hasData: boolean;
+  children: ReactNode;
+}) => {
+  if (status === "pending" || status === "idle") return "...";
+  if (!hasData) return <NoInfo />;
+
   return (
     <div className="flex items-center gap-4 overflow-x-auto justify-left w-fit">
       {children}
     </div>
   );
-};
-
-const NoInfo = () => {
-  return <span className="text-[10px] uppercase">Not available</span>;
 };
 
 // --- TASK 2A: Lorenzi (same pattern as KanjiStructuralData, uses multi provider) ---
@@ -70,14 +84,11 @@ const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {
   const semanticResolved = useResolvedComponent(hlorenzi?.semantic);
   const phoneticResolved = useResolvedComponent(hlorenzi?.phonetic);
 
-  if (status === "pending" || status === "idle") return "...";
-
-  if (hlorenzi?.phonetic == null && hlorenzi?.semantic == null) {
-    return <span className="text-[10px] uppercase">Not available</span>;
-  }
-
   return (
-    <Wrapper>
+    <StructuralSection
+      status={status}
+      hasData={hlorenzi?.phonetic != null || hlorenzi?.semantic != null}
+    >
       {semanticResolved && (
         <ComponentLink {...semanticResolved} title="Semantic" />
       )}
@@ -91,7 +102,7 @@ const KanjiStructuralDataLorenzi = ({ kanji }: { kanji: string }) => {
           icon={structuralTypeIcons[hlorenzi.type]}
         />
       )}
-    </Wrapper>
+    </StructuralSection>
   );
 };
 
@@ -110,15 +121,12 @@ const KanjiStructuralDataKanjium = ({ kanji }: { kanji: string }) => {
   const variantResolved = useResolvedComponent(radicalVariant);
   const phoneticResolved = useResolvedComponent(phonetic);
 
-  if (status === "pending" || status === "idle") return "...";
-  if (!kanjium) return <NoInfo />;
-
   const typeInfo = structureType
     ? structuralTypeInfoB[structureType as keyof typeof structuralTypeInfoB]
     : null;
 
   return (
-    <Wrapper>
+    <StructuralSection status={status} hasData={kanjium != null}>
       {semanticResolved && (
         <ComponentLink {...semanticResolved} title="Radical" />
       )}
@@ -147,7 +155,7 @@ const KanjiStructuralDataKanjium = ({ kanji }: { kanji: string }) => {
           }
         />
       )}
-    </Wrapper>
+    </StructuralSection>
   );
 };
 
@@ -155,15 +163,12 @@ const KanjiStructuralDataYagays = ({ kanji }: { kanji: string }) => {
   const { kanjiStructureData, status } = useMultiKanjiStructure(kanji);
   const yagays = kanjiStructureData?.yagays;
 
-  if (status === "pending" || status === "idle") return "...";
-  if (!yagays || yagays.length === 0) return <NoInfo />;
-
   return (
-    <Wrapper>
-      {[...new Set(yagays)].map((part) => {
+    <StructuralSection status={status} hasData={!!yagays && yagays.length > 0}>
+      {[...new Set(yagays ?? [])].map((part) => {
         return <PartComponentLink part={part} key={part} />;
       })}
-    </Wrapper>
+    </StructuralSection>
   );
 };
 
@@ -171,15 +176,12 @@ const KanjiStructuralDataScott = ({ kanji }: { kanji: string }) => {
   const { kanjiStructureData, status } = useMultiKanjiStructure(kanji);
   const scott = kanjiStructureData?.scott;
 
-  if (status === "pending" || status === "idle") return "...";
-  if (!scott || scott.length === 0) return <NoInfo />;
-
   return (
-    <Wrapper>
-      {[...new Set(scott)].map((part) => {
+    <StructuralSection status={status} hasData={!!scott && scott.length > 0}>
+      {[...new Set(scott ?? [])].map((part) => {
         return <PartComponentLink part={part} key={part} />;
       })}
-    </Wrapper>
+    </StructuralSection>
   );
 };
 

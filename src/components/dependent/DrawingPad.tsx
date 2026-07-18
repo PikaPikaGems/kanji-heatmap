@@ -3,14 +3,15 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
-  useEffect,
   useId,
   useRef,
   useState,
 } from "react";
+import { useGetStrokeFn } from "@/hooks/use-get-stroke-fn";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Undo2, Trash2, Search } from "@/components/icons";
 import { SquareX } from "lucide-react";
+import { getSvgPathFromStroke } from "@/lib/svg-path";
 
 export type Stroke = [number, number][];
 
@@ -19,18 +20,6 @@ export type DrawingSubmitPayload = {
   width: number;
   height: number;
 };
-
-function getSvgPathFromStroke(stroke: number[][]): string {
-  if (!stroke.length) return "";
-  const d: (string | number)[] = ["M", ...stroke[0], "Q"];
-  for (let i = 0; i < stroke.length; i++) {
-    const [x0, y0] = stroke[i];
-    const [x1, y1] = stroke[(i + 1) % stroke.length];
-    d.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
-  }
-  d.push("Z");
-  return d.join(" ");
-}
 
 export const DrawingPad = ({
   svgSize,
@@ -69,7 +58,7 @@ export const DrawingPad = ({
   const [currentPoints, setCurrentPoints] = useState<[number, number][] | null>(
     null
   );
-  const [getStrokeFn, setGetStrokeFn] = useState<any>(null);
+  const getStrokeFn = useGetStrokeFn();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
@@ -78,12 +67,6 @@ export const DrawingPad = ({
   // a parent component during render and trigger a React warning).
   const currentPointsRef = useRef<[number, number][] | null>(null);
   const patternId = useId();
-
-  useEffect(() => {
-    import("perfect-freehand").then((m) => {
-      setGetStrokeFn(() => m.getStroke);
-    });
-  }, []);
 
   const toSvgPoint = (
     e: React.PointerEvent<HTMLDivElement>

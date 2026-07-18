@@ -3,6 +3,7 @@ import React from "react";
 export const useIsTouchDevice = () => {
   const [isTouchDevice, setIsTouchDevice] = React.useState(false);
 
+  // Effect needed: one-shot touchstart listener flags a touch device.
   React.useEffect(() => {
     const touchDetect = () => {
       setIsTouchDevice(true);

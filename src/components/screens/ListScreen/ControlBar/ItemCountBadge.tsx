@@ -2,37 +2,27 @@ import { BOOKMARK_KEY_PREFIX } from "@/lib/bookmarks";
 import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { isKanji } from "@/lib/utils";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { useState, useEffect } from "react";
+import { useStorageValue } from "@/hooks/use-storage-value";
 import { KANJI_COUNT } from "@/lib/options/constants";
 
-const useKnownCount = () => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const compute = () => {
-      let n = 0;
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (
-          key?.startsWith(BOOKMARK_KEY_PREFIX) &&
-          localStorage.getItem(key) === "true"
-        )
-          n++;
-      }
-      setCount(n);
-    };
-
-    compute();
-
-    const onStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith(BOOKMARK_KEY_PREFIX)) compute();
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  return count;
+const countBookmarked = () => {
+  let n = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (
+      key?.startsWith(BOOKMARK_KEY_PREFIX) &&
+      localStorage.getItem(key) === "true"
+    )
+      n++;
+  }
+  return n;
 };
+
+const useKnownCount = () =>
+  useStorageValue(
+    countBookmarked,
+    (key) => key?.startsWith(BOOKMARK_KEY_PREFIX) ?? false
+  );
 
 const KnownBadge = () => {
   const knownCount = useKnownCount();

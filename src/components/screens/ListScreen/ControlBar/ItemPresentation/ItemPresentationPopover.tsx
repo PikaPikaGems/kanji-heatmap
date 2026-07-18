@@ -1,11 +1,7 @@
 import { useState, ReactNode } from "react";
 import { Flower } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { GenericPopover } from "@/components/common/GenericPopover";
 
 const ItemPresentationSettingsPopover = ({
   children,
@@ -14,27 +10,27 @@ const ItemPresentationSettingsPopover = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <Popover
+    <GenericPopover
       open={isOpen}
-      onOpenChange={(newState) => {
-        setIsOpen(newState);
-      }}
-    >
-      <PopoverTrigger
-        onMouseEnter={() => {
-          setIsOpen(true);
-        }}
-        asChild
-      >
-        <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
+      onOpenChange={setIsOpen}
+      showArrow={false}
+      contentClassName="mx-4 max-h-[80svh] overflow-y-auto overflow-x-hidden z-40"
+      trigger={
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-9 w-9 shrink-0"
+          onMouseEnter={() => {
+            setIsOpen(true);
+          }}
+        >
           <Flower />
           <span className="sr-only">Card Presentation Settings</span>
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="mx-4 max-h-[80svh] overflow-y-auto overflow-x-hidden z-40">
-        {isOpen ? children : null}
-      </PopoverContent>
-    </Popover>
+      }
+      // Mount the settings form only while open.
+      content={isOpen ? children : null}
+    />
   );
 };
 

@@ -127,6 +127,7 @@ export function useNetworkState(): IUseNetworkState {
     });
   }, []);
 
+  // Effect needed: subscribes to online/offline + connection change events.
   useEffect(() => {
     if (typeof window === "undefined") return;
 

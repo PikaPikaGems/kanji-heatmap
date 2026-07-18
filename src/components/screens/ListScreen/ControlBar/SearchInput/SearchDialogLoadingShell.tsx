@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { CircleX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { SHEET_CLOSE_BTN_CN } from "@/components/common/BottomSheet";
 
 export const SearchDialogLoadingShell = ({
   title,
@@ -30,7 +31,7 @@ export const SearchDialogLoadingShell = ({
           type="button"
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 z-[51] p-4 border-2 border-dashed rounded-xl bg-background"
+          className={`absolute top-2 right-2 z-[51] ${SHEET_CLOSE_BTN_CN}`}
           onClick={onClose}
           aria-label={`Close ${title}`}
         >
