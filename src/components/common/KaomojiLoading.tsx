@@ -1,6 +1,6 @@
 import { selectRandom } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const kaomojiFrames = {
   wFace: [
@@ -66,13 +66,7 @@ const kaomojiFrames = {
 ロード中 (Rōdochū)
 - A hybrid of English ("load") and Japanese (中 for "in progress"). Seen in contexts like game loading screens or media buffering.
 */
-const loadingTexts = [
-  "ローディング",
-  "読み込み中",
-  "通信中",
-  "処理中",
-  "ロード中",
-];
+const LOADING_TEXT = "読み込み中";
 
 const KaomojiAnimation = ({
   delay = 200,
@@ -82,25 +76,22 @@ const KaomojiAnimation = ({
   cn?: string;
 }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
-  const framesRef = useRef<readonly string[]>([]);
-  const loadingTextRef = useRef(loadingTexts[0]);
-
-  useLayoutEffect(() => {
-    loadingTextRef.current = selectRandom(loadingTexts);
-  }, []);
-  useEffect(() => {
+  // Pick the kaomoji set once per mount, in a lazy initializer (no effect).
+  const [frames] = useState<readonly string[]>(() => {
     const frameName = selectRandom(
       Object.keys(kaomojiFrames)
     ) as keyof typeof kaomojiFrames;
-    const frames = kaomojiFrames[frameName] ?? kaomojiFrames.wFace;
-    framesRef.current = frames;
+    return kaomojiFrames[frameName] ?? kaomojiFrames.wFace;
+  });
 
+  // Effect needed: interval driving the frame animation, cleared on unmount.
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFrame((prev) => (prev + 1) % frames.length);
     }, delay);
 
     return () => clearInterval(interval);
-  }, [delay]);
+  }, [delay, frames.length]);
 
   return (
     <>
@@ -111,10 +102,10 @@ const KaomojiAnimation = ({
           whiteSpace: "pre",
         }}
       >
-        {framesRef.current?.[currentFrame] ?? kaomojiFrames.wFace[0]}
+        {frames[currentFrame] ?? kaomojiFrames.wFace[0]}
       </div>
       <span className="text-2xl sm:text-3xl my-1 kanji-font">
-        {loadingTextRef.current}
+        {LOADING_TEXT}
       </span>
       <div className="font-extrabold text-xs">Loading...</div>
     </>

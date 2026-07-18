@@ -89,17 +89,18 @@ export const Game = ({
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
-  useEffect(() => {
+  // Reset per-card state when the card (index) or pad size changes — done
+  // during render (previous-state pattern), not in a sync effect.
+  const [prevCard, setPrevCard] = useState({ index, padSize });
+  if (prevCard.index !== index || prevCard.padSize !== padSize) {
+    setPrevCard({ index, padSize });
     setStrokes([]);
     setDrawing(null);
-    setStep({ type: "draw" });
-    setSelected(null);
-  }, [index]);
-
-  useEffect(() => {
-    setStrokes([]);
-    setDrawing(null);
-  }, [padSize]);
+    if (prevCard.index !== index) {
+      setStep({ type: "draw" });
+      setSelected(null);
+    }
+  }
 
   useEffect(() => {
     if (!current || !settings.hearPronunciationOnLoad) return;

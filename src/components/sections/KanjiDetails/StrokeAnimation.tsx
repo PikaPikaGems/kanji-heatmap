@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { KanjiDMAK, StrokeOrderReplay } from "@/components/common/KanjiDmak";
 import {
@@ -63,11 +63,15 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   const [result, setResult] = useState<GradeResult | null>(null);
   const padSize = useFitPadSize(SVG_SIZE);
 
-  useEffect(() => {
+  // Reset the drawing when the pad is resized — in-render previous-state
+  // pattern instead of a sync effect.
+  const [prevPadSize, setPrevPadSize] = useState(padSize);
+  if (prevPadSize !== padSize) {
+    setPrevPadSize(padSize);
     setStrokes([]);
     setStatus("idle");
     setResult(null);
-  }, [padSize]);
+  }
 
   const onGrade = async (payload: DrawingSubmitPayload) => {
     if (payload.strokes.length === 0) {
