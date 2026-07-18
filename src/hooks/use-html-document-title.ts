@@ -8,6 +8,8 @@ import { useEffect, useRef } from "react";
 function useHtmlDocumentTitle(title?: string): void {
   const previousTitle = useRef(document.title);
 
+  // Effect needed: mutates document.title (external DOM) and restores the
+  // previous title on unmount.
   useEffect(() => {
     document.title = title ? `${title} • Kanji Heatmap` : "Kanji Heatmap";
 

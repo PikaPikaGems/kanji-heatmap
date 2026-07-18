@@ -114,6 +114,8 @@ const KaomojiAnimation = ({
 
 export const DelayedLoadingKaomoji = () => {
   const [showLoading, setShowLoading] = useState(false);
+  // Effect needed: timer delaying the loading UI (avoids a flash on fast
+  // loads), cleared on unmount.
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowLoading(true);

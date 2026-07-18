@@ -58,6 +58,8 @@ export const Game = ({
     onCommit: handleChange,
   });
 
+  // Effect needed: imperative focus after render, when returning from
+  // feedback to the answer input.
   useEffect(() => {
     if (feedback == null) {
       inputRef.current?.focus();

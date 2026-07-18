@@ -87,6 +87,8 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
     );
   }, [setSearchParams, location]);
 
+  // Effect needed: persists the home search string to an external memory
+  // store whenever the router-owned params change.
   useLayoutEffect(() => {
     if (ALLOWED_LOCATIONS.includes(location)) {
       rememberHomeSearch(searchParams.toString());

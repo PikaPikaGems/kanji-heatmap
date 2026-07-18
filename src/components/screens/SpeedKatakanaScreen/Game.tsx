@@ -85,6 +85,7 @@ export const Game = ({
     inputRef.current?.focus();
   }, [index, words.length]);
 
+  // Effect needed: clears any pending flash timeout on unmount.
   useEffect(() => {
     const timer = flashTimerRef;
     return () => {

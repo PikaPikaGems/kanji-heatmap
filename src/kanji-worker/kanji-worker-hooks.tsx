@@ -61,6 +61,8 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
 
   const lastRequestedSettings = useRef<null | SearchSettings>(null);
 
+  // Effect needed: sends a search request to the web worker (external async
+  // system) whenever the settings change; the ref dedupes double-fires.
   useEffect(() => {
     const doubleRequest = lastRequestedSettings.current === searchSettings;
 
@@ -104,6 +106,8 @@ export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
 
   const lastRequestedSettings = useRef<null | SearchSettings>(null);
 
+  // Effect needed: worker request keyed to the settings (external async
+  // system); the ref dedupes double-fires.
   useEffect(() => {
     const doubleRequest = lastRequestedSettings.current === searchSettings;
 
@@ -147,6 +151,8 @@ export const useKanjiInfo = (
   });
   const requestFn = useKanjiWorkerRequest();
 
+  // Effect needed: fetches kanji info from the web worker whenever the
+  // kanji/request type changes.
   useEffect(() => {
     if (requestFn == null) {
       setState({
@@ -219,6 +225,8 @@ export const useVocabDetails = (word: string) => {
 
   const lastRequestedWord = useRef<string | null>(null);
 
+  // Effect needed: fetches vocab details from the web worker when the word
+  // changes; the ref dedupes repeat requests.
   useEffect(() => {
     if (!word) {
       setState({ status: "idle", error: null, vocabInfo: null });
@@ -297,6 +305,8 @@ export const useSimilarKanjis = (kanji: string) => {
     error?: string | null;
   }>({ status: "idle" });
 
+  // Effect needed: fetches similar kanji from the web worker; the cancelled
+  // flag guards against stale responses after kanji changes/unmount.
   useEffect(() => {
     if (!kanji) {
       setState({ status: "idle", data: [], error: null });

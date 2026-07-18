@@ -52,6 +52,8 @@ export const useStorageRevision = (
 
   const [revision, setRevision] = useState(0);
 
+  // Effect needed: subscribes to the window storage event (cross-tab
+  // natively, same-tab via notifyStorage).
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (matchesKeyRef.current(e.key)) {

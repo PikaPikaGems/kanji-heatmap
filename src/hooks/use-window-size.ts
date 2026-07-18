@@ -13,6 +13,8 @@ export function useWindowSize(debounceTime = 300) {
     return [0, 0];
   });
 
+  // Effect needed: subscribes to window resize (debounced), cleaned up on
+  // unmount.
   useEffect(() => {
     if (typeof window === "undefined") {
       return;

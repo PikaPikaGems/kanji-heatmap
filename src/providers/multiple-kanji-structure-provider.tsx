@@ -48,6 +48,7 @@ export const MultiKanjiStructureProvider = ({
   const [error, setError] = useState<Error | null>(null);
   const [rawData, setRawData] = useState<RawData | null>(null);
 
+  // Effect needed: fetches the structure datasets once on mount.
   useEffect(() => {
     setStatus("pending");
     Promise.all([

@@ -270,6 +270,8 @@ function MultiLineChart({
   const verticalLineRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Effect needed: chart.js instance lifecycle (create on the canvas,
+  // destroy the previous instance and on unmount).
   useEffect(() => {
     if (!canvasRef.current || Object.keys(data).length === 0) return;
 

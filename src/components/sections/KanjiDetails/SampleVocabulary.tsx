@@ -295,6 +295,8 @@ const PaginatedVocabulary = ({
 
 const TableSkeleton = () => {
   const [show, setShow] = useState(false);
+  // Effect needed: timer delaying the skeleton reveal (avoids a flash on
+  // fast loads), cleared on unmount.
   useEffect(() => {
     const timeout = setTimeout(() => setShow(true), 200);
     return () => clearTimeout(timeout);

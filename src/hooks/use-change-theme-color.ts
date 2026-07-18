@@ -41,6 +41,8 @@ export const useChangeThemeColor = () => {
     setThemeColor(colorIdRef.current);
   }, [setThemeColor]);
 
+  // Layout effect needed: applies the persisted theme color to a CSS var on
+  // the root element before paint (avoids a color flash).
   useLayoutEffect(() => {
     const themeColor = Number(
       localStorage.getItem(LOCAL_STORAGE_THEME_COLOR_KEY)

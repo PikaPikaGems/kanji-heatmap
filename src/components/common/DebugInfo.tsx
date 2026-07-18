@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Wifi, WifiOff, Info } from "lucide-react";
+import { useWindowSize } from "@/hooks/use-window-size";
 import { getUserAgentData } from "@/lib/ua-utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ const useNetworkState = (): NetworkInfo => {
     effectiveType: conn()?.effectiveType,
   }));
 
+  // Effect needed: subscribes to the Network Information API's change event.
   useEffect(() => {
     const c = conn();
     if (!c?.addEventListener) return;
@@ -41,6 +43,7 @@ const NetworkStatus = () => {
   const [online, setOnline] = useState(navigator.onLine);
   const network = useNetworkState();
 
+  // Effect needed: subscribes to the browser's online/offline events.
   useEffect(() => {
     const on = () => setOnline(true);
     const off = () => setOnline(false);
@@ -74,21 +77,10 @@ const NetworkStatus = () => {
 const SwVersion = () => <span>v{__BUILD_TIMESTAMP__}</span>;
 
 const WindowDims = () => {
-  const [dims, setDims] = useState({
-    w: window.innerWidth,
-    h: window.innerHeight,
-  });
-
-  useEffect(() => {
-    const handler = () =>
-      setDims({ w: window.innerWidth, h: window.innerHeight });
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-
+  const [w, h] = useWindowSize(0);
   return (
     <span>
-      {dims.w}×{dims.h}
+      {w}×{h}
     </span>
   );
 };
