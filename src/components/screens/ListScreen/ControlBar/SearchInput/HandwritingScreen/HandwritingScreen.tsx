@@ -1,9 +1,8 @@
 import { ReactNode, useState } from "react";
 import {
   DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
 } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
 import {

@@ -2,9 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
 import {
   DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
 } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";

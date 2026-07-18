@@ -1,4 +1,4 @@
-import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
+import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { STATS_KEY_PREFIX } from "@/components/screens/SpeedKatakanaScreen/storage";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { FreqGradient } from "@/components/common/freq/FreqGradient";

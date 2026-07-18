@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-utils";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "./routing-hooks";
+import { useSearchParams } from "@/hooks/routing-hooks";
 import { Link } from "./router-adapter";
 import { useNextPrevKanji } from "@/hooks/use-next-prev-kanji";
 

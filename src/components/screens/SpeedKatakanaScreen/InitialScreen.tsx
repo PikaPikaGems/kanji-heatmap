@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { useEnterAction } from "@/hooks/use-enter-action";
-import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
+import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
+import { useSetOpenedParam } from "@/hooks/routing-hooks";
 import { ActivityKind, recordActivity } from "@/lib/activity";
 import { PracticeItem } from "./types";
 

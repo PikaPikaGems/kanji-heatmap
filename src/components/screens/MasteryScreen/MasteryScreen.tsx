@@ -1,7 +1,7 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { ScreenShell } from "@/components/common/ScreenShell";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
-import { practiceNavLinks } from "@/components/items/nav-links";
+import { practiceNavLinks } from "@/lib/pages/nav-links";
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
 

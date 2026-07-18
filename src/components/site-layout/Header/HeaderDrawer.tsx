@@ -4,7 +4,7 @@ import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
-import { headerNavLinks } from "@/components/items/nav-links";
+import { headerNavLinks } from "@/lib/pages/nav-links";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
 import { cnTextLink } from "@/lib/generic-cn";

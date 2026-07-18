@@ -6,7 +6,7 @@ import {
   ToggleRow,
   usePracticeDeck,
 } from "@/components/shared-practice";
-import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
+import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { PracticeItem, RecognitionPracticeSettings, SoundMode } from "./types";
 

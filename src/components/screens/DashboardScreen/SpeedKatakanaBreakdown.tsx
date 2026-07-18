@@ -1,4 +1,4 @@
-import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
+import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,

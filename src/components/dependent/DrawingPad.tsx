@@ -12,14 +12,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { Undo2, Trash2, Search } from "@/components/icons";
 import { SquareX } from "lucide-react";
 import { getSvgPathFromStroke } from "@/lib/svg-path";
-
-export type Stroke = [number, number][];
-
-export type DrawingSubmitPayload = {
-  strokes: Stroke[];
-  width: number;
-  height: number;
-};
+import type { Stroke, DrawingSubmitPayload } from "@/lib/stroke-types";
 
 export const DrawingPad = ({
   svgSize,

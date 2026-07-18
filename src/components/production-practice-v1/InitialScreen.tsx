@@ -5,7 +5,7 @@ import {
   ToggleRow,
   usePracticeDeck,
 } from "@/components/shared-practice";
-import { productionPracticePageMeta } from "@/components/items/practice-pages";
+import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { PracticeItem, ProductionPracticeSettings } from "./types";
 

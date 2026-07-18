@@ -6,7 +6,7 @@ import {
   useItemType,
 } from "./kanji-item-button-hooks";
 import { ExpandedBtnContent } from "./ExpandedBtnContent";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
+import { useSetOpenedParam } from "@/hooks/routing-hooks";
 
 export const KanjiBtnErrorFallback = () => {
   return (

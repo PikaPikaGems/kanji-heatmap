@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Stroke } from "@/components/dependent/DrawingPad";
+import { Stroke } from "@/lib/stroke-types";
 import { ErrorBoundary } from "@/components/error";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 import { HandWritingDrawingPad } from "./HandwritingScreen";

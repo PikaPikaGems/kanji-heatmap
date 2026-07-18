@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --port 5174",
     "dev:cf": "vite --port 5173",
-    "build": "eslint . && node scripts/generate-more-info.mjs && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
+    "build": "eslint . && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b && tsc -p e2e/tsconfig.json",
     "test": "vitest run",
