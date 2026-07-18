@@ -71,9 +71,10 @@ export const useKanjiFromUrl = (kanji: string) => {
   const [params] = useSearchParams();
 
   const urlState = useMemo(() => {
-    params.delete(URL_PARAMS.openKanji);
-    params.set(URL_PARAMS.openKanji, kanji);
-    return params.toString();
+    // Clone before editing — the params object is shared router state.
+    const next = new URLSearchParams(params);
+    next.set(URL_PARAMS.openKanji, kanji);
+    return next.toString();
   }, [kanji, params]);
 
   return urlState;

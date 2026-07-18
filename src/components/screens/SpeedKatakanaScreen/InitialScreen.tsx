@@ -67,10 +67,7 @@ const RadioRow = ({
 );
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const currentStats = useMemo(
-    () => readSetStats(challengeSet),
-    [challengeSet]
-  );
+  const currentStats = readSetStats(challengeSet);
   const level = levelOf(challengeSet);
   const pos = positionInLevel(challengeSet);
   const stats = currentStats
