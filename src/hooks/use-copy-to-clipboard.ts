@@ -52,6 +52,8 @@ export function useCopyToClipboard(resetInterval = 500) {
     }
   }, []);
 
+  // Effect needed: timer auto-resetting the copied status, cleared on
+  // unmount/re-copy.
   useEffect(() => {
     if (status === "inactive") return;
 

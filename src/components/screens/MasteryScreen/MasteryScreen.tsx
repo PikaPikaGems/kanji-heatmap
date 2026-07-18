@@ -1,12 +1,12 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { BottomBar } from "@/components/common/BottomBar";
+import { ScreenShell } from "@/components/common/ScreenShell";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
-import { practiceNavLinks } from "@/components/items/nav-links";
+import { practiceNavLinks } from "@/lib/pages/nav-links";
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
 
   return (
-    <div className="flex flex-col w-full max-w-4xl gap-6 px-1 py-5 mx-auto sm:gap-8 sm:px-3 sm:py-8">
+    <ScreenShell>
       <div className="flex flex-col items-center justify-center flex-1 gap-5  text-center min-h-[50vh]">
         <div className="text-3xl">{"🙇🏽‍♀️ 🙇"}</div>
 
@@ -24,11 +24,7 @@ const MasteryScreen = () => {
           className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-3"
         />
       </div>
-
-      <div className="pt-4 mt-4 border-t-2 border-dotted">
-        <BottomBar justify="center" />
-      </div>
-    </div>
+    </ScreenShell>
   );
 };
 

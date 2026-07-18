@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
-import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
+import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";

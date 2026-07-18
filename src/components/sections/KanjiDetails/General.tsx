@@ -91,116 +91,103 @@ export const General = ({ kanji }: { kanji: string }) => {
 
   const data = info.data as GeneralKanjiItem;
 
+  const indexBadges: {
+    label: string;
+    value?: number;
+    description: string;
+  }[] = [
+    {
+      label: "Grade",
+      value: data.jouyouGrade,
+      description:
+        "The Japanese school grade level where this kanji is officially introduced in the jōyō curriculum.",
+    },
+    {
+      label: "Strokes",
+      value: data.strokes,
+      description:
+        "The total number of pen strokes used to write the kanji correctly.",
+    },
+    { label: "WK", value: data.wk, description: orderDisclaimer },
+    { label: "KKLC", value: data.kklcIndex, description: orderDisclaimer },
+    { label: "RTKA", value: data.rtk, description: orderDisclaimer },
+    { label: "RTKB", value: data.rtkb, description: orderDisclaimer },
+  ];
+
+  const readingRows: {
+    label: string;
+    description: ReactNode;
+    items: ReactNode[];
+  }[] = [
+    {
+      label: "Meanings",
+      description: (
+        <>
+          Words in english associated with this kanji. e.g., 山 →
+          &ldquo;mountain&rdquo;, 水 → &ldquo;water&rdquo;
+        </>
+      ),
+      // FIXME: I don't know why 回 has a meaning "#name?"
+      items: data.meanings
+        .filter((meaning) => meaning !== "#name?")
+        .map((meaning) => (
+          <Badge key={meaning} variant={"outline"} className="m-1">
+            {meaning}
+          </Badge>
+        )),
+    },
+    {
+      label: "Kunyomi",
+      description: (
+        <>
+          Native Japanese readings used in Japanese-origin words. e.g., 山 →{" "}
+          <strong>やま</strong> (yama), 水 → <strong>みず</strong> (mizu)
+        </>
+      ),
+      items: data.allKun.map((kun) => (
+        <RomajiBadge key={kun} kana={kun} className="text-lg" />
+      )),
+    },
+    {
+      label: "Onyomi",
+      description: (
+        <>
+          Sino-Japanese readings used in compound words. e.g., 山 →{" "}
+          <strong>サン</strong> (san) as in 富士山, 水 → <strong>スイ</strong>{" "}
+          (sui) as in 水泳
+        </>
+      ),
+      items: data.allOn.map((on) => <RomajiBadge key={on} kana={on} />),
+    },
+  ];
+
   return (
     <>
       <div className="mt-6 text-left">
         <JLPTBadge jlpt={data.jlpt} />
-        {hasData(data.jouyouGrade) && (
-          <PrimaryBadgeWithPopover
-            label="Grade"
-            value={data.jouyouGrade!}
-            description="The Japanese school grade level where this kanji is officially introduced in the jōyō curriculum."
-          />
-        )}
-        {hasData(data.strokes) && (
-          <PrimaryBadgeWithPopover
-            label="Strokes"
-            value={data.strokes!}
-            description="The total number of pen strokes used to write the kanji correctly."
-          />
-        )}
-        {hasData(data.wk) && (
-          <PrimaryBadgeWithPopover
-            label="WK"
-            value={data.wk!}
-            description={orderDisclaimer}
-          />
-        )}
-        {hasData(data.kklcIndex) && (
-          <PrimaryBadgeWithPopover
-            label="KKLC"
-            value={data.kklcIndex!}
-            description={orderDisclaimer}
-          />
-        )}
-        {hasData(data.rtk) && (
-          <PrimaryBadgeWithPopover
-            label="RTKA"
-            value={data.rtk!}
-            description={orderDisclaimer}
-          />
-        )}
-        {hasData(data.rtkb) && (
-          <PrimaryBadgeWithPopover
-            label="RTKB"
-            value={data.rtkb!}
-            description={orderDisclaimer}
-          />
+        {indexBadges.map(({ label, value, description }) =>
+          hasData(value) ? (
+            <PrimaryBadgeWithPopover
+              key={label}
+              label={label}
+              value={value!}
+              description={description}
+            />
+          ) : null
         )}
       </div>
       <DottedSeparator className="my-4 border-b-2" />
       <Table>
         <TableBody>
-          <TableRow className="text-left">
-            <LabelCell
-              label="Meanings"
-              description={
-                <>
-                  Words in english associated with this kanji. e.g., 山 →
-                  &ldquo;mountain&rdquo;, 水 → &ldquo;water&rdquo;
-                </>
-              }
-            />
-            <TableCellGrow>
-              {/** FIXME: I don't know why 回  has a meaning "#name?" */}
-              {data.meanings
-                .filter((meaning) => meaning !== "#name?")
-                .map((meaning) => {
-                  return (
-                    <Badge key={meaning} variant={"outline"} className="m-1">
-                      {meaning}
-                    </Badge>
-                  );
-                })}
-              {data.meanings.length === 0 && <div> - </div>}
-            </TableCellGrow>
-          </TableRow>
-          <TableRow className="text-left">
-            <LabelCell
-              label="Kunyomi"
-              description={
-                <>
-                  Native Japanese readings used in Japanese-origin words. e.g.,
-                  山 → <strong>やま</strong> (yama), 水 → <strong>みず</strong>{" "}
-                  (mizu)
-                </>
-              }
-            />
-            <TableCellGrow>
-              {data.allKun.map((kun) => (
-                <RomajiBadge key={kun} kana={kun} className="text-lg" />
-              ))}
-              {data.allKun.length === 0 && <div> - </div>}
-            </TableCellGrow>
-          </TableRow>
-          <TableRow className="text-left">
-            <LabelCell
-              label="Onyomi"
-              description={
-                <>
-                  Sino-Japanese readings used in compound words. e.g., 山 →{" "}
-                  <strong>サン</strong> (san) as in 富士山, 水 →{" "}
-                  <strong>スイ</strong> (sui) as in 水泳
-                </>
-              }
-            />
-            <TableCellGrow>
-              {data.allOn.map((on) => (
-                <RomajiBadge key={on} kana={on} />
-              ))}
-              {data.allOn.length === 0 && <div> - </div>}
-            </TableCellGrow>
-          </TableRow>
+          {readingRows.map(({ label, description, items }) => (
+            <TableRow key={label} className="text-left">
+              <LabelCell label={label} description={description} />
+              <TableCellGrow>
+                {items}
+                {items.length === 0 && <div> - </div>}
+              </TableCellGrow>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </>

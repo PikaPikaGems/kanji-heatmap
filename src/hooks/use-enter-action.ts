@@ -10,6 +10,8 @@ export const useEnterAction = (
   enabled = true,
   keys: readonly string[] = ["Enter"]
 ) => {
+  // Effect needed: subscribes to window keydown and must unsubscribe on
+  // unmount/disable.
   useEffect(() => {
     if (!enabled || !action) return;
 

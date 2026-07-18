@@ -1,7 +1,7 @@
 import type {
   DrawingSubmitPayload,
   Stroke,
-} from "@/components/dependent/DrawingPad";
+} from "@/lib/stroke-types";
 
 // On-device single-character recognition via Dariyooo's DaKanji ONNX model.
 // Everything (ORT JS, wasm, model, labels) loads only on the first recognize call.

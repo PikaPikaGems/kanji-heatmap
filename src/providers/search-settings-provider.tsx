@@ -14,7 +14,7 @@ import {
 import {
   useSearchParams,
   useUrlLocation,
-} from "@/components/dependent/routing/routing-hooks";
+} from "@/hooks/routing-hooks";
 import { searchSettings } from "./search-settings-hooks";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { rememberHomeSearch } from "@/lib/home-search-memory";
@@ -87,6 +87,8 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
     );
   }, [setSearchParams, location]);
 
+  // Effect needed: persists the home search string to an external memory
+  // store whenever the router-owned params change.
   useLayoutEffect(() => {
     if (ALLOWED_LOCATIONS.includes(location)) {
       rememberHomeSearch(searchParams.toString());

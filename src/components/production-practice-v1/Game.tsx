@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
 import {
   DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
 } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useJsonFetch } from "@/hooks/use-json";
@@ -31,6 +31,8 @@ import {
   ProductionPracticeSettings,
   SessionResult,
 } from "./types";
+
+const ENTER_OR_SPACE = ["Enter", " "] as const;
 
 type CardStep =
   | { type: "draw" }
@@ -86,23 +88,18 @@ export const Game = ({
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
-  useEffect(() => {
+  // Reset per-card state when the card (index) or pad size changes — done
+  // during render (previous-state pattern), not in a sync effect.
+  const [prevCard, setPrevCard] = useState({ index, padSize });
+  if (prevCard.index !== index || prevCard.padSize !== padSize) {
+    setPrevCard({ index, padSize });
     setStrokes([]);
     setDrawing(null);
-    setStep({ type: "draw" });
-    setSelected(null);
-  }, [index]);
-
-  useEffect(() => {
-    setStrokes([]);
-    setDrawing(null);
-  }, [padSize]);
-
-  useEffect(() => {
-    onProgress(
-      sessionItems.length === 0 ? 0 : (index / sessionItems.length) * 100
-    );
-  }, [index, onProgress, sessionItems.length]);
+    if (prevCard.index !== index) {
+      setStep({ type: "draw" });
+      setSelected(null);
+    }
+  }
 
   useEffect(() => {
     if (!current || !settings.hearPronunciationOnLoad) return;
@@ -112,27 +109,15 @@ export const Game = ({
   }, [index, settings.hearPronunciationOnLoad]);
 
   // Enter/Space grades when there are strokes. Never Forgot via keyboard.
-  useEffect(() => {
-    if (step.type !== "draw" || strokes.length === 0) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if ((e.key !== "Enter" && e.key !== " ") || e.isComposing) return;
-      const el = e.target as HTMLElement | null;
-      if (!el) return;
-      const tag = el.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (el.isContentEditable) return;
-      e.preventDefault();
-      drawSubmitRef.current({
-        strokes,
-        width: padSize,
-        height: padSize,
-      });
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [step.type, strokes, padSize]);
+  const submitViaKeyboard = useMemo(
+    () =>
+      step.type === "draw" && strokes.length > 0
+        ? () =>
+            drawSubmitRef.current({ strokes, width: padSize, height: padSize })
+        : null,
+    [step.type, strokes, padSize]
+  );
+  useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
 
   if (!current) {
     return null;
@@ -151,6 +136,9 @@ export const Game = ({
       onComplete(allResults);
       return;
     }
+    // Progress is reported here (the only place index advances) rather than
+    // via an effect; the parent resets it to 0 when a session starts.
+    onProgress((nextIndex / sessionItems.length) * 100);
     setIndex(nextIndex);
   };
 
@@ -177,7 +165,6 @@ export const Game = ({
         topGuess: candidates[0] ?? null,
         inTop10,
       };
-      const similarList = similarState.data ?? similars;
       // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
       // part-keywords (e.g. 囗 → "closed box"), which must not count.
       const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
@@ -185,7 +172,7 @@ export const Game = ({
         target: current.kanji,
         inTop10,
         modelGuesses: candidates,
-        similars: similarList,
+        similars,
         randomPool: randomKanjiPool,
         getSimilars,
         isRealKanji,

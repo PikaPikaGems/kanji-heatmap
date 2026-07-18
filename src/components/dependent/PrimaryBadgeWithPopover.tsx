@@ -1,10 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverCardArrow,
-} from "@/components/ui/popover";
+import { GenericPopover } from "@/components/common/GenericPopover";
 
 export const PrimaryBadgeWithPopover = ({
   label,
@@ -15,17 +10,19 @@ export const PrimaryBadgeWithPopover = ({
   value: number;
   description: string;
 }) => (
-  <Popover>
-    <PopoverTrigger>
-      <Badge className="m-1 cursor-pointer">
-        {label} {value}
-      </Badge>
-    </PopoverTrigger>
-    <PopoverContent className="text-sm">
-      <PopoverCardArrow />
+  <GenericPopover
+    contentClassName="text-sm"
+    trigger={
+      <button>
+        <Badge className="m-1 cursor-pointer">
+          {label} {value}
+        </Badge>
+      </button>
+    }
+    content={
       <p>
         <span className="font-semibold">{label}:</span> {description}
       </p>
-    </PopoverContent>
-  </Popover>
+    }
+  />
 );

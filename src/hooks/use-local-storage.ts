@@ -21,9 +21,13 @@ export function useLocalStorage2(storageKey: string) {
     () => localStorage.getItem(storageKey) === "true"
   );
 
-  useEffect(() => {
+  // Re-read when the key changes, during render (React's previous-state
+  // pattern) instead of a sync effect.
+  const [prevKey, setPrevKey] = useState(storageKey);
+  if (prevKey !== storageKey) {
+    setPrevKey(storageKey);
     setValue(localStorage.getItem(storageKey) === "true");
-  }, [storageKey]);
+  }
 
   const set = useCallback(
     (next: boolean) => {

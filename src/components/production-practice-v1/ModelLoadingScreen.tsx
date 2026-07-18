@@ -1,11 +1,14 @@
 import { PracticeButton } from "@/components/ui/practice-button";
+import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 
 export const ModelLoadingScreen = ({
   status,
+  errorReport,
   onRetry,
   onCancel,
 }: {
   status: "loading" | "error";
+  errorReport?: string | null;
   onRetry: () => void;
   onCancel: () => void;
 }) => {
@@ -28,9 +31,16 @@ export const ModelLoadingScreen = ({
           <div>
             <h2 className="text-xl font-bold">Could not load the model</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Check your connection and try again.
+              Check your connection and try again. If it keeps failing, copy the
+              log below and send it to the developers.
             </p>
           </div>
+          {errorReport ? (
+            <ErrorTerminal
+              content={errorReport}
+              filename="dakanji-warmup.log"
+            />
+          ) : null}
           <div className="flex flex-col w-full max-w-xs gap-2">
             <PracticeButton size="lg" onClick={onRetry}>
               Retry

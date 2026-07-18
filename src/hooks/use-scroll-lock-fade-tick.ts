@@ -17,6 +17,8 @@ const isBodyScrollLocked = () => {
 export const useScrollLockFadeTick = () => {
   const [tick, setTick] = useState(0);
 
+  // Effect needed: MutationObserver watching scroll-lock attribute changes
+  // on <body>/<html>, disconnected on unmount.
   useEffect(() => {
     let prev = isBodyScrollLocked();
 
@@ -50,6 +52,8 @@ export const useScrollLockSettleRef = <T extends HTMLElement>() => {
   const ref = useRef<T>(null);
   const fadeTick = useScrollLockFadeTick();
 
+  // Effect needed: imperatively restarts the CSS settle animation
+  // (class remove → reflow → re-add) after each lock toggle.
   useEffect(() => {
     if (fadeTick === 0) return;
     const el = ref.current;

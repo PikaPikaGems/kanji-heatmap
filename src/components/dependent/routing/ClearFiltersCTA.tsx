@@ -1,4 +1,4 @@
-import { useSearchParams } from "./routing-hooks";
+import { useSearchParams } from "@/hooks/routing-hooks";
 import { cnTextLink } from "@/lib/generic-cn";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { hasNoFilters } from "@/lib/results-utils";

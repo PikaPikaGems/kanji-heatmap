@@ -9,8 +9,12 @@
   "scripts": {
     "dev": "vite --port 5174",
     "dev:cf": "vite --port 5173",
-    "build": "eslint . && node scripts/generate-more-info.mjs && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
+    "build": "eslint . && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
     "lint": "eslint .",
+    "typecheck": "tsc -b && tsc -p e2e/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "preview": "vite preview",
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
     "format": "prettier --write .",
@@ -72,6 +76,11 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.41.0",
+    "@playwright/test": "~1.56.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@eslint/js": "^9.21.0",
     "@types/fuzzysearch": "^1.0.2",
     "@types/node": "^22.13.5",
@@ -84,6 +93,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.2",
     "rollup-plugin-visualizer": "^5.14.0",
@@ -91,6 +101,7 @@
     "typescript": "~5.6.3",
     "typescript-eslint": "^8.25.0",
     "vite": "^6.2.0",
+    "vitest": "^3.2.4",
     "wrangler": "^4.101.0"
   }
 }

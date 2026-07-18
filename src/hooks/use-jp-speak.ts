@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef } from "react";
 export const useSpeak = (word: string) => {
   const japaneseVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
+  // Effect needed: subscribes to speechSynthesis voiceschanged (voices load
+  // async in some browsers).
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();

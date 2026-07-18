@@ -39,13 +39,10 @@ function useKeyboardListener(
     stopPropagation = false,
   } = options;
 
-  // Use a ref to avoid recreating the event handler on every render
+  // Ref keeps the listener stable while always reading the latest handlers;
+  // assigned during render (no effect needed for a plain ref sync).
   const keyMapRef = useRef<KeyEventMap>(keyEventMap);
-
-  // Update the ref when keyEventMap changes
-  useEffect(() => {
-    keyMapRef.current = keyEventMap;
-  }, [keyEventMap]);
+  keyMapRef.current = keyEventMap;
 
   // Event handler
   const handleKeyEvent = useCallback(
@@ -62,7 +59,8 @@ function useKeyboardListener(
     [preventDefault, stopPropagation]
   );
 
-  // Set up and clean up the event listener
+  // Effect needed: subscribes to an external event target (window/element)
+  // and must remove the listener on unmount/option change.
   useEffect(() => {
     const currentTarget = target;
 

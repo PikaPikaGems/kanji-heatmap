@@ -14,5 +14,3 @@ export type PracticeItem = SharedPracticeItem;
 export type SessionResult = PracticeItem & {
   correct: boolean;
 };
-
-export type Phase = "initial" | "playing" | "ended";

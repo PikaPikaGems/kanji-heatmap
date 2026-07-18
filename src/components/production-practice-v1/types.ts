@@ -1,4 +1,4 @@
-import type { Stroke } from "@/components/dependent/DrawingPad";
+import type { Stroke } from "@/lib/stroke-types";
 import type {
   DeckFilterSettings,
   PracticeItem as SharedPracticeItem,
@@ -16,8 +16,6 @@ export type SessionResult = PracticeItem & {
   correct: boolean;
   gradeRank: number;
 };
-
-export type Phase = "initial" | "loading" | "playing" | "ended";
 
 export type GradeRankInfo = {
   rank: number;

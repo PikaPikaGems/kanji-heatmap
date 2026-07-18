@@ -121,73 +121,30 @@ export function KanjiWorkerProvider({
 
     hasMounted.current = true;
 
-    let mainReady = false;
-    let partReady = false;
-    let phoneticReady = false;
-    let othersReady = false;
-
-    const checkIfDone = () => {
-      if (mainReady && partReady && phoneticReady && othersReady) {
-        setIsReady(true);
-        return;
-      }
-    };
-
-    requestWorker({ type: "kanji-main-map" })
-      .then((r) => {
-        const res = r as Record<string, KanjiMainInfo>;
-        kanjiCacheRef.current = {};
-        Object.keys(res ?? {}).map((item) => {
-          const info = res[item];
-          // I don't know why typescript cannot detect this
-          if (kanjiCacheRef.current == null) {
-            console.error(
-              "Please check your logic. kanjiCacheRef.current shouldn't be null at this point"
-            );
-            return;
-          }
-
-          kanjiCacheRef.current[item] = { main: info };
-        });
-        mainReady = true;
-        checkIfDone();
-      })
-      .catch(() => {
-        setWorkerError(true);
-      });
-
-    requestWorker({
-      type: "part-keyword-map",
-    })
-      .then((r) => {
-        partKeywordCacheRef.current = r as KanjiPartKeywordCacheType;
-        partReady = true;
-        checkIfDone();
-      })
-      .catch(() => {
-        setWorkerError(true);
-      });
-
-    requestWorker({ type: "phonetic-map" })
-      .then((r) => {
-        phoneticCacheRef.current = r as KanjiPhoneticCacheType;
-        phoneticReady = true;
-        checkIfDone();
-      })
-      .catch(() => {
-        setWorkerError(true);
-      });
-
+    // Ready means: every cache request resolved. The ref-fill requests run in
+    // parallel with the worker-side initializations; one Promise.all replaces
+    // the previous per-request done flags.
     Promise.all([
-      requestWorker({
-        type: "initialize-extended-kanji-map",
+      requestWorker({ type: "kanji-main-map" }).then((r) => {
+        const res = r as Record<string, KanjiMainInfo>;
+        const cache: KanjiCacheType = {};
+        Object.keys(res ?? {}).forEach((item) => {
+          cache[item] = { main: res[item] };
+        });
+        kanjiCacheRef.current = cache;
       }),
+      requestWorker({ type: "part-keyword-map" }).then((r) => {
+        partKeywordCacheRef.current = r as KanjiPartKeywordCacheType;
+      }),
+      requestWorker({ type: "phonetic-map" }).then((r) => {
+        phoneticCacheRef.current = r as KanjiPhoneticCacheType;
+      }),
+      requestWorker({ type: "initialize-extended-kanji-map" }),
       requestWorker({ type: "initalize-segmented-vocab-map" }),
       requestWorker({ type: "initialize-decomposition-map" }),
     ])
       .then(() => {
-        othersReady = true;
-        checkIfDone();
+        setIsReady(true);
       })
       .catch(() => {
         setWorkerError(true);

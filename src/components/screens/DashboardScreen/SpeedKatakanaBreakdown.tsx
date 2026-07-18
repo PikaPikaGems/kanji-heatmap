@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { speedKatakanaPageMeta } from "@/components/items/practice-pages";
+import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,
@@ -10,6 +9,7 @@ import {
   STATS_KEY_PREFIX,
 } from "@/components/screens/SpeedKatakanaScreen/storage";
 import { countBands, cpmToBand } from "@/lib/activity";
+import { useStorageRevision } from "@/hooks/use-storage-value";
 import { SectionHeading } from "./SectionHeading";
 import { SegmentedBandBar } from "./SegmentedBandBar";
 import { DashboardPanel } from "./DashboardPanel";
@@ -44,17 +44,7 @@ const LevelCell = ({ level }: { level: number }) => {
 };
 
 export const SpeedKatakanaBreakdown = () => {
-  const [, bumpRevision] = useState(0);
-
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key == null || e.key.startsWith(STATS_KEY_PREFIX)) {
-        bumpRevision((n) => n + 1);
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  useStorageRevision((key) => key == null || key.startsWith(STATS_KEY_PREFIX));
 
   return (
     <DashboardPanel>

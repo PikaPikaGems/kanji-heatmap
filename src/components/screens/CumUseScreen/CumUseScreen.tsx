@@ -7,11 +7,11 @@ import { KanjiCumUseChart } from "@/components/sections/KanjiCumUseChart";
 import { PageLoadingFallback } from "@/components/dependent/site-wide/PageWrapper";
 import assetsPaths from "@/lib/assets-paths";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import pageItems from "@/components/items/page-items";
+import { cumUseGraphPageMeta } from "@/lib/pages/nav-links";
 
 const CumUseScreen = () => {
   const { data, status } = useJsonFetch(assetsPaths.CUM_USE);
-  useHtmlDocumentTitle(pageItems.cumUseGraphPage.title);
+  useHtmlDocumentTitle(cumUseGraphPageMeta.title);
 
   if (status == "pending") {
     return <PageLoadingFallback />;

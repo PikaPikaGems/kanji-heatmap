@@ -23,6 +23,8 @@ export const useChangeFont = () => {
     setFont(fontIdRef.current);
   }, [setFont]);
 
+  // Layout effect needed: applies the persisted kanji font to a CSS var on
+  // the root element before paint (avoids a font flash).
   useLayoutEffect(() => {
     const kanjiFont = Number(
       localStorage.getItem(LOCAL_STORAGE_KANJI_FONT_KEY)

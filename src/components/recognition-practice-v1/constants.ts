@@ -1,13 +1,13 @@
-import { JLPT_TYPE_ARR, JLTPTtypes } from "@/lib/jlpt";
+import {
+  DEFAULT_DECK_FILTER_SETTINGS,
+  PRACTICE_SESSION_SIZE,
+} from "@/components/shared-practice/constants";
 import { RecognitionPracticeSettings } from "./types";
 
-export const SESSION_SIZE = 10;
+export const SESSION_SIZE = PRACTICE_SESSION_SIZE;
 export const SETTINGS_KEY = "recognition-practice-v1-settings";
 
 export const DEFAULT_SETTINGS: RecognitionPracticeSettings = {
-  jlpt: [...JLPT_TYPE_ARR] as JLTPTtypes[],
-  bookmarkedOnly: false,
-  randomizeOrder: true,
-  randomizeFont: false,
+  ...DEFAULT_DECK_FILTER_SETTINGS,
   sound: { enabled: true, type: "correct" },
 };

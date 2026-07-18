@@ -8,22 +8,12 @@ import {
   getDayCounts,
   toLocalDateKey,
 } from "@/lib/activity";
-import { freqCategoryCn } from "@/lib/freq/freq-category";
-import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { HeatmapCell, HeatmapGrid, heatmapFillCn } from "./HeatmapGrid";
 
 /** Sun→Sat; only Mon / Wed / Fri labeled (Cursor/GitHub-style). */
 const DAY_LABELS = ["", "月", "", "水", "", "金", ""] as const;
 
 const CELL_PX = 12;
-const GAP_PX = 3;
-
-const TODAY_BORDER =
-  "border border-solid border-foreground dark:border-foreground";
 
 type CellProps = {
   dateKey: string | null;
@@ -82,47 +72,25 @@ const CalendarDayCell = ({
   const isToday = dateKey === todayKey;
   const n = dayTotalForFilters(getDayCounts(byDay, dateKey), filters);
   const level = getActivityLevel(n, maxN);
-  const fillCn =
-    level === 0
-      ? cn(
-          "bg-muted/50 dark:bg-muted/30",
-          isToday ? TODAY_BORDER : "border border-border dark:border-border"
-        )
-      : cn(
-          freqCategoryCn[level],
-          isToday ? TODAY_BORDER : "border border-black/10 dark:border-white/10"
-        );
 
   const label = isToday
     ? `Today, ${formatActivityDay(dateKey)}: ${n} events`
     : `${formatActivityDay(dateKey)}: ${n} events`;
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          aria-label={label}
-          title={label}
-          style={{ width: CELL_PX, height: CELL_PX }}
-          className={cn(
-            "cursor-pointer rounded-[2px] outline-none transition-colors",
-            "hover:bg-cyan-400 hover:border-foreground",
-            "hover:ring-2 hover:ring-foreground/30 hover:ring-offset-1 hover:ring-offset-background",
-            "focus-visible:ring-2 focus-visible:ring-ring",
-            fillCn
-          )}
-        />
-      </PopoverTrigger>
-      <PopoverContent className="p-3 w-52" side="top">
+    <HeatmapCell
+      cellPx={CELL_PX}
+      fillCn={heatmapFillCn(level, isToday)}
+      label={label}
+      detail={
         <DayDetail
           dateKey={dateKey}
           byDay={byDay}
           filters={filters}
           isToday={isToday}
         />
-      </PopoverContent>
-    </Popover>
+      }
+    />
   );
 };
 
@@ -144,79 +112,27 @@ export const CalendarGrid = ({
   maxN: number;
 }) => {
   const labelByWeek = new Map(monthLabels.map((m) => [m.weekIndex, m.label]));
-  const weekCount = weeks.length;
   const todayKey = toLocalDateKey();
 
   return (
-    <div className="overflow-x-auto pb-2 mb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
-      <div
-        className="inline-grid"
-        style={{
-          gridTemplateAreas: `"empty months" "days squares"`,
-          gridTemplateColumns: "auto 1fr",
-          columnGap: 6,
-          rowGap: GAP_PX,
-        }}
-      >
-        {/* Month letters — one column per week, same width as cells */}
-        <div
-          className="text-[10px] leading-none text-muted-foreground"
-          style={{
-            gridArea: "months",
-            display: "grid",
-            gridTemplateColumns: `repeat(${weekCount}, ${CELL_PX}px)`,
-            columnGap: GAP_PX,
-          }}
-        >
-          {weeks.map((_, weekIndex) => (
-            <div key={weekIndex} className="h-3">
-              {labelByWeek.get(weekIndex) ?? ""}
-            </div>
-          ))}
-        </div>
-
-        {/* Weekday letters — same row height as cells so M/W/F align */}
-        <div
-          className="text-[10px] leading-none text-muted-foreground"
-          style={{
-            gridArea: "days",
-            display: "grid",
-            gridTemplateRows: `repeat(7, ${CELL_PX}px)`,
-            rowGap: GAP_PX,
-          }}
-        >
-          {DAY_LABELS.map((label, i) => (
-            <div key={i} className="flex items-center justify-end pr-0.5">
-              {label}
-            </div>
-          ))}
-        </div>
-
-        {/* Squares — column flow: Sun→Sat down, then next week */}
-        <div
-          style={{
-            gridArea: "squares",
-            display: "grid",
-            gridAutoFlow: "column",
-            gridAutoColumns: CELL_PX,
-            gridTemplateRows: `repeat(7, ${CELL_PX}px)`,
-            gap: GAP_PX,
-          }}
-        >
-          {weeks.map((week, weekIndex) =>
-            week.map((dateKey, dayIndex) => (
-              <CalendarDayCell
-                key={`${weekIndex}-${dayIndex}`}
-                dateKey={dateKey}
-                byDay={byDay}
-                filters={filters}
-                maxN={maxN}
-                todayKey={todayKey}
-              />
-            ))
-          )}
-        </div>
-      </div>
-    </div>
+    <HeatmapGrid
+      cellPx={CELL_PX}
+      rowCount={7}
+      topLabels={weeks.map((_, weekIndex) => labelByWeek.get(weekIndex) ?? "")}
+      leftLabels={[...DAY_LABELS]}
+    >
+      {weeks.map((week, weekIndex) =>
+        week.map((dateKey, dayIndex) => (
+          <CalendarDayCell
+            key={`${weekIndex}-${dayIndex}`}
+            dateKey={dateKey}
+            byDay={byDay}
+            filters={filters}
+            maxN={maxN}
+            todayKey={todayKey}
+          />
+        ))
+      )}
+    </HeatmapGrid>
   );
 };

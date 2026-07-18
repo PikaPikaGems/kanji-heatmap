@@ -17,7 +17,7 @@ import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoI
 import {
   useBgSrc,
   useBgSrcDispatch,
-} from "@/components/dependent/routing/routing-hooks";
+} from "@/hooks/routing-hooks";
 import BasicSelect from "@/components/common/BasicSelect";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 
