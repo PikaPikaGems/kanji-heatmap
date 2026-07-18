@@ -1,10 +1,6 @@
-import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
 import { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
+import { GenericPopover } from "./GenericPopover";
 
 export const BadgeWithPopover = ({
   name,
@@ -15,22 +11,23 @@ export const BadgeWithPopover = ({
   desc?: string;
   icon?: ReactNode;
 }) => {
-  const content = (
-    <Badge
-      variant="outline"
-      className="px-4 m-1 cursor-not-allowed whitespace-nowrap"
-    >
-      {icon && <span className="mr-1 opacity-70">{icon}</span>}
-      {name}
-    </Badge>
-  );
-
   if (desc == null) {
-    return content;
+    return (
+      <Badge
+        variant="outline"
+        className="px-4 m-1 cursor-not-allowed whitespace-nowrap"
+      >
+        {icon && <span className="mr-1 opacity-70">{icon}</span>}
+        {name}
+      </Badge>
+    );
   }
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <GenericPopover
+      showArrow={false}
+      contentClassName="w-64 text-xs"
+      trigger={
         <button>
           <Badge
             variant="outline"
@@ -40,8 +37,8 @@ export const BadgeWithPopover = ({
             {name}
           </Badge>
         </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64 text-xs">{desc}</PopoverContent>
-    </Popover>
+      }
+      content={desc}
+    />
   );
 };

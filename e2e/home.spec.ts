@@ -27,6 +27,18 @@ test.describe("explore screen", () => {
     });
   });
 
+  test("card presentation settings popover opens", async ({ page }) => {
+    await page.goto("/");
+
+    await page
+      .getByRole("button", { name: "Card Presentation Settings" })
+      .click();
+
+    await expect(
+      page.getByRole("heading", { name: "Border Color Meaning" })
+    ).toBeVisible();
+  });
+
   test("clicking a kanji opens and closes the detail drawer", async ({
     page,
   }) => {
