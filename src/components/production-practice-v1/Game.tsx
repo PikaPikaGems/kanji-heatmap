@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
-import {
-  DrawingPad,
-} from "@/components/dependent/DrawingPad";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
 import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
@@ -17,6 +15,7 @@ import {
   useGetKanjiInfoFn,
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { recognizeDaKanji } from "@/lib/dakanji-adapter";
 import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
@@ -257,7 +256,7 @@ export const Game = ({
           {recognizing && (
             <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-background/70">
               <p className="text-sm font-bold sm:text-base animate-pulse">
-                Recognizing…
+                <RecognizingStatus label="Recognizing…" />
               </p>
             </div>
           )}
