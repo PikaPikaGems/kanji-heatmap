@@ -38,6 +38,30 @@ Note
 If you ever see a port bump to 5175, it means a stale vite is still holding 5174 — clear it with lsof -ti:5174,5173 | xargs kill and restart both.
 ```
 
+## Testing
+
+### Unit / component tests
+
+```
+pnpm test
+```
+
+### End-to-end tests (Playwright)
+
+`pnpm install` installs the Playwright npm package, but **not** the browser binaries. Download Chromium once (and again after Playwright upgrades):
+
+```
+pnpm exec playwright install chromium
+pnpm test:e2e
+
+# Watching the test
+pnpm exec playwright test --headed
+pnpm exec playwright test --debug
+pnpm exec playwright test --ui
+```
+
+If e2e fails with `browserType.launch: Executable doesn't exist` (often pointing at `~/Library/Caches/ms-playwright/chromium_headless_shell-…`), re-run `pnpm exec playwright install chromium`. That usually means Playwright was updated and the matching browser build is missing locally.
+
 ## Updating Data
 
 If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same directory, you can directly copy its output files
