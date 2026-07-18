@@ -17,8 +17,6 @@ export type SessionResult = PracticeItem & {
   gradeRank: number;
 };
 
-export type Phase = "initial" | "loading" | "playing" | "ended";
-
 export type GradeRankInfo = {
   rank: number;
   topGuess: string | null;

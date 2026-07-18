@@ -1,22 +1,16 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
+import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
 import { productionPracticePageMeta } from "@/components/items/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
-import { recordActivity } from "@/lib/activity";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
-import {
-  Phase,
-  PracticeItem,
-  ProductionPracticeSettings,
-  SessionResult,
-} from "./types";
+import { ProductionPracticeSettings, SessionResult } from "./types";
 
 const ProductionPracticeV1 = () => {
   useHtmlDocumentTitle(productionPracticePageMeta.heading);
@@ -25,134 +19,57 @@ const ProductionPracticeV1 = () => {
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const [phase, setPhase] = useState<Phase>("initial");
   const [loadStatus, setLoadStatus] = useState<"loading" | "error">("loading");
-  const [progress, setProgress] = useState(0);
-  const [deck, setDeck] = useState<PracticeItem[]>([]);
-  const [randomKanjiPool, setRandomKanjiPool] = useState<string[]>([]);
-  const [cursor, setCursor] = useState(0);
-  const [sessionItems, setSessionItems] = useState<PracticeItem[]>([]);
-  const [sessionKey, setSessionKey] = useState(0);
-  const [results, setResults] = useState<SessionResult[] | null>(null);
-  const [runResults, setRunResults] = useState<SessionResult[]>([]);
-  const [hasMore, setHasMore] = useState(true);
   const [modelReady, setModelReady] = useState(false);
-  const setOpenedKanji = useSetOpenedParam();
 
-  useEffect(() => {
-    if (phase !== "ended") {
-      setOpenedKanji(null);
-    }
-  }, [phase, setOpenedKanji]);
+  const session = usePracticeSession<SessionResult>({
+    activityKind: "production",
+    sessionSize: SESSION_SIZE,
+    onGoToInitial: () => setLoadStatus("loading"),
+    // Warm the handwriting model before entering "playing"; park on the
+    // "loading" phase (with retry) while the model spins up.
+    onPlay: (commitPlaying) => {
+      void warmThenCommit(commitPlaying);
+    },
+  });
+  const { phase, results, hasMore } = session;
 
-  const goToInitial = () => {
-    setProgress(0);
-    setResults(null);
-    setRunResults([]);
-    setHasMore(true);
-    setDeck([]);
-    setRandomKanjiPool([]);
-    setCursor(0);
-    setSessionItems([]);
-    setLoadStatus("loading");
-    setPhase("initial");
-  };
-
-  const warmAndPlay = async (
-    items: PracticeItem[],
-    nextCursor: number,
-    builtDeck?: PracticeItem[]
-  ) => {
-    if (builtDeck) {
-      setDeck(builtDeck);
-      setRandomKanjiPool(builtDeck.map((item) => item.kanji));
-    }
-    setSessionItems(items);
-    setCursor(nextCursor);
-    setSessionKey((k) => k + 1);
-    setProgress(0);
-    setResults(null);
-
+  const warmThenCommit = async (commitPlaying: () => void) => {
     if (modelReady) {
-      setPhase("playing");
+      commitPlaying();
       return;
     }
-
     setLoadStatus("loading");
-    setPhase("loading");
+    session.setPhase("loading");
     try {
       await warmupDaKanji();
       setModelReady(true);
-      setPhase("playing");
+      commitPlaying();
     } catch {
       setLoadStatus("error");
     }
   };
 
-  const startGame = (builtDeck: PracticeItem[]) => {
-    setRunResults([]);
-    setHasMore(true);
-    const chunk = builtDeck.slice(0, SESSION_SIZE);
-    void warmAndPlay(chunk, chunk.length, builtDeck);
-  };
-
   const retryWarmup = () => {
-    const items = sessionItems;
-    if (items.length === 0) {
-      goToInitial();
+    if (session.sessionItems.length === 0) {
+      session.goToInitial();
       return;
     }
-    void warmAndPlay(items, cursor);
+    session.play(session.sessionItems, session.cursor);
   };
 
-  const finishSession = (sessionResults: SessionResult[]) => {
-    const forgottens = sessionResults.filter((r) => !r.correct);
-    const moreLeft = forgottens.length > 0 || cursor < deck.length;
-
-    recordActivity("production");
-    setRunResults((prev) => [...prev, ...sessionResults]);
-    setResults(sessionResults);
-    setHasMore(moreLeft);
-    if (!moreLeft) setProgress(100);
-    setPhase("ended");
-  };
-
-  const startNextSession = () => {
-    if (!hasMore) return;
-
-    const forgottens = (results ?? [])
-      .filter((r) => !r.correct)
-      .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
-          ({
-            kanji,
-            word,
-            reading,
-            englishGloss,
-            keyword,
-            fontIndex,
-          }) satisfies PracticeItem
-      );
-
-    const remaining = deck.slice(cursor);
-    const pool = [...forgottens, ...remaining];
-    if (pool.length === 0) {
-      setHasMore(false);
-      setPhase("ended");
-      return;
-    }
-
-    const chunk = pool.slice(0, SESSION_SIZE);
-    const fromRemaining = Math.max(0, chunk.length - forgottens.length);
-    void warmAndPlay(chunk, cursor + fromRemaining);
-  };
+  // Derived from the deck (the pool is always the deck's kanji).
+  const randomKanjiPool = useMemo(
+    () => session.deck.map((item) => item.kanji),
+    [session.deck]
+  );
 
   return (
     <>
-      <PracticeShell progress={progress} playing={phase === "playing"}>
+      <PracticeShell progress={session.progress} playing={phase === "playing"}>
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
-            <InitialScreen onStart={startGame} />
+            <InitialScreen onStart={session.startGame} />
           </div>
         )}
 
@@ -161,20 +78,23 @@ const ProductionPracticeV1 = () => {
             <ModelLoadingScreen
               status={loadStatus}
               onRetry={retryWarmup}
-              onCancel={goToInitial}
+              onCancel={session.goToInitial}
             />
           </div>
         )}
 
-        {phase === "playing" && sessionItems.length > 0 && (
-          <div key={`playing-${sessionKey}`} className="h-full animate-fade-in">
+        {phase === "playing" && session.sessionItems.length > 0 && (
+          <div
+            key={`playing-${session.sessionKey}`}
+            className="h-full animate-fade-in"
+          >
             <Game
-              sessionItems={sessionItems}
+              sessionItems={session.sessionItems}
               settings={settings}
               randomKanjiPool={randomKanjiPool}
-              onProgress={setProgress}
-              onComplete={finishSession}
-              onEnd={goToInitial}
+              onProgress={session.setProgress}
+              onComplete={session.finishSession}
+              onEnd={session.goToInitial}
             />
           </div>
         )}
@@ -185,11 +105,11 @@ const ProductionPracticeV1 = () => {
             className="h-full animate-fade-in"
           >
             <EndSession
-              results={hasMore ? results : runResults}
+              results={hasMore ? results : session.runResults}
               hasMore={hasMore}
-              wordsCleared={deck.length}
-              onNext={startNextSession}
-              onEnd={goToInitial}
+              wordsCleared={session.deck.length}
+              onNext={session.startNextSession}
+              onEnd={session.goToInitial}
             />
           </div>
         )}
