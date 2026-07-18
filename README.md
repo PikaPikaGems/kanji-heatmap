@@ -144,12 +144,36 @@ pnpm run deps:cruise
 
 `deps:cruise` uses `.dependency-cruiser.mjs` (warns on cycles, notes orphans). Config lives there if you want stricter folder boundary rules later.
 
+### Unused code with Knip
+
+[Knip](https://knip.dev) finds unused files, exports, and `package.json` dependencies. Use it with the graphs: the graph shows **structure**, Knip shows **what is safe to delete or trim**.
+
+```
+pnpm run deps:knip              # full report (exits non-zero if issues exist)
+pnpm run deps:knip:files        # unused files only — best pair with archi/skott
+pnpm run deps:knip:exports      # unused exports / types
+pnpm run deps:knip:production   # production code only (skips tests / most devDeps)
+pnpm run deps:knip:report       # Markdown report → dependency-graphs/knip-report.md
+```
+
+Config: `knip.json` (Cloudflare `functions/**` and `scripts/**` are entry points; Graphviz `dot` is ignored as a system binary).
+
+Suggested workflow:
+
+1. Open `archi.svg` or `pnpm run deps:skott` and note a leaf / odd cluster.
+2. Run `pnpm run deps:knip:files` — if Knip also flags the file, it is unused from every entrypoint and is a delete/move candidate.
+3. For a still-used file with a fat API surface, run `pnpm run deps:knip:exports` and prune or split unused exports before relocating the module.
+4. Re-run `pnpm run deps:graph` (or skott) after the change to confirm the new edges look right.
+
+Knip often reports unused exports in UI barrels (`src/components/ui/*`) and similar shared modules — treat those as cleanup opportunities, not graph bugs.
+
 ### How to read the graphs for refactors
 
 - **Dense hubs** — many files import one module → candidate to split or keep as a shared primitive.
 - **One-way leaves** — a util only used by one feature folder → move it next to that feature.
 - **Cycles** — extract a shared type/helper or invert the dependency before moving files.
 - **Wrong cluster** — a file sitting in `common/` but only linked from one screen → relocate with the feature.
+- **Unused leaves** — confirmed with Knip (`deps:knip:files`) → delete or fold into the only consumer.
 
 For “should this _function_ be its own file?”, use the graph for context, then IDE Find References / extract helpers.
 

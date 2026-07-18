@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "functions/**/*.ts",
+    "scripts/**/*.{js,mjs,cjs,ts}"
+  ],
+  "ignoreBinaries": ["dot"]
+}

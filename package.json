@@ -27,7 +27,12 @@
     "deps:cruise:svg": "mkdir -p dependency-graphs && depcruise src --include-only \"^src\" --exclude \"\\\\.(test|spec)\\\\.(ts|tsx)$\" -T dot --collapse 3 | dot -T svg > dependency-graphs/cruise.svg",
     "deps:cruise:folders": "mkdir -p dependency-graphs && depcruise src --include-only \"^src\" --exclude \"\\\\.(test|spec)\\\\.(ts|tsx)$\" -T ddot | dot -T svg > dependency-graphs/folders.svg",
     "deps:cruise:archi": "mkdir -p dependency-graphs && depcruise src --include-only \"^src\" --exclude \"\\\\.(test|spec)\\\\.(ts|tsx)$\" -T archi | dot -T svg > dependency-graphs/archi.svg",
-    "deps:skott": "skott --tsconfig tsconfig.app.json --displayMode=webapp --ignorePattern=\".*\\\\.(test|spec)\\\\.(ts|tsx)$\" --ignorePattern=\"src/test/.*\" src/main.tsx"
+    "deps:skott": "skott --tsconfig tsconfig.app.json --displayMode=webapp --ignorePattern=\".*\\\\.(test|spec)\\\\.(ts|tsx)$\" --ignorePattern=\"src/test/.*\" src/main.tsx",
+    "deps:knip": "knip",
+    "deps:knip:production": "knip --production",
+    "deps:knip:files": "knip --files",
+    "deps:knip:exports": "knip --exports",
+    "deps:knip:report": "mkdir -p dependency-graphs && knip --reporter markdown --no-exit-code > dependency-graphs/knip-report.md"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",
@@ -103,6 +108,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "jsdom": "^26.1.0",
+    "knip": "^6.27.0",
     "madge": "^8.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.2",
