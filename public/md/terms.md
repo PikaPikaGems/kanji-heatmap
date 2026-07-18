@@ -2,7 +2,7 @@
 
 _Last Updated: December 12, 2025_
 
-By using kanjiheatmap.com (the “Site”), you agree to these Terms of Use and our [Privacy Policy](#).
+By using kanjiheatmap.com (the “Site”), you agree to these Terms of Use and our [Privacy Policy](/privacy).
 
 ## Acceptable Use
 
@@ -28,6 +28,6 @@ We may update these Terms of Use at any time. Changes will be posted here with a
 
 Questions? Reach out at:
 
-- admin@pikapikagems.com
+- [admin@pikapikagems.com](mailto:admin@pikapikagems.com)
 - [Discord](https://discord.gg/Ash8ZrGb4s)
 - [GitHub](https://github.com/PikaPikaGems/kanji-heatmap/issues)
