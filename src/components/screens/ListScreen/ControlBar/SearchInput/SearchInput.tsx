@@ -6,14 +6,22 @@ import {
   lazy,
   Suspense,
 } from "react";
-import { cn, isKanji } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { SearchType } from "@/lib/settings/settings";
 import {
   placeholderMap,
   SEARCH_TYPE_OPTIONS,
   translateMap,
 } from "@/lib/search-input-maps";
-import wanakana, { translateValue, hasKanji } from "@/lib/wanakana-adapter";
+import { translateValue } from "@/lib/wanakana-adapter";
+import {
+  DialogType,
+  inferSearchTypeFromText,
+  isDialogType,
+  resolvePaste,
+  searchTypeLabel,
+  stripToKanji,
+} from "@/lib/search-input-logic";
 import { CircleX, Search } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
@@ -33,26 +41,6 @@ const HandwritingControl = lazy(() =>
 );
 
 const INPUT_DEBOUNCE_TIME = 400;
-
-// Search types that open a drawer instead of accepting typed input.
-type DialogType =
-  | "radicals"
-  | "handwriting"
-  | "handwriting-alt"
-  | "handwriting-alt-2";
-const DIALOG_TYPES: DialogType[] = [
-  "radicals",
-  "handwriting",
-  "handwriting-alt",
-  "handwriting-alt-2",
-];
-const isDialogType = (type: SearchType): type is DialogType =>
-  (DIALOG_TYPES as SearchType[]).includes(type);
-
-const stripToKanji = (text: string) => text.split("").filter(isKanji).join("");
-
-const searchTypeLabel = (type: SearchType) =>
-  SEARCH_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
 
 export const SearchInput = ({
   initialSearchType = defaultSearchType,
@@ -130,25 +118,6 @@ export const SearchInput = ({
       setTypeHintKey((key) => key + 1);
     }
     onSyncAll(text, nextType);
-  };
-
-  // Infer a search type from Japanese IME / typed input. Returns null when
-  // the script is ambiguous or already matches the current type.
-  const inferSearchTypeFromText = (text: string): SearchType | null => {
-    if (text.length === 0) {
-      return null;
-    }
-    if (hasKanji(text)) {
-      return "multi-kanji";
-    }
-    if (wanakana.isKana(text)) {
-      return "readings";
-    }
-    // Multi-kanji expects Japanese characters — a roman word belongs in meanings.
-    if (searchType === "multi-kanji" && wanakana.isRomaji(text)) {
-      return "meanings";
-    }
-    return null;
   };
 
   // Immediately apply the current field value if a debounce is still waiting
@@ -245,7 +214,7 @@ export const SearchInput = ({
           // and we'd miss the readings switch.
           const raw = e.currentTarget.value;
           const text = raw.trim();
-          const inferred = inferSearchTypeFromText(text);
+          const inferred = inferSearchTypeFromText(text, searchType);
           if (inferred != null && inferred !== searchType) {
             syncAndAnnounceType(text, inferred);
             return;
@@ -282,7 +251,7 @@ export const SearchInput = ({
           // text entered without IME). Same script → type rules as paste.
           if (e.key === "Enter") {
             const text = (inputRef.current?.value ?? parsedValue).trim();
-            const inferred = inferSearchTypeFromText(text);
+            const inferred = inferSearchTypeFromText(text, searchType);
             if (inferred != null && inferred !== searchType) {
               syncAndAnnounceType(text, inferred);
               return;
@@ -299,72 +268,28 @@ export const SearchInput = ({
             return;
           }
 
-          const processedText = clipboardData.getData("text/plain").trim();
-
-          if (processedText.length === 0) {
-            // it's as if you didn't paste anything at all
-            return;
-          }
-
           // Insert at the caret (or replace the current selection) for every paste path.
           const start = inputRef.current?.selectionStart ?? parsedValue.length;
           const end = inputRef.current?.selectionEnd ?? start;
 
-          const commitPaste = (
-            insertion: string,
-            nextType: SearchType,
-            announceSwitch: boolean
-          ) => {
-            const newValue = `${parsedValue.slice(0, start)}${insertion}${parsedValue.slice(end)}`;
-            const caret = start + insertion.length;
-            if (announceSwitch) {
-              syncAndAnnounceType(newValue, nextType);
-            } else {
-              onSyncAll(newValue, nextType);
-            }
-            restoreCaret(caret);
-          };
+          const resolution = resolvePaste({
+            pasted: clipboardData.getData("text/plain"),
+            currentValue: parsedValue,
+            selectionStart: start,
+            selectionEnd: end,
+            searchType,
+          });
 
-          if (hasKanji(processedText)) {
-            if (searchType === "similar") {
-              const merged = `${parsedValue.slice(0, start)}${processedText}${parsedValue.slice(end)}`;
-              const kanjiOnly = stripToKanji(merged);
-              // hasKanji (wanakana) can disagree with isKanji — don't wipe the field.
-              if (kanjiOnly.length === 0) {
-                return;
-              }
-              onSyncAll(kanjiOnly, "similar");
-              restoreCaret(kanjiOnly.length);
-              return;
-            }
-
-            commitPaste(processedText, "multi-kanji", true);
+          if (resolution == null) {
             return;
           }
 
-          // No kanji: auto-pick a search type from the pasted script.
-          if (wanakana.isKana(processedText)) {
-            commitPaste(processedText, "readings", true);
-            return;
+          if (resolution.announce) {
+            syncAndAnnounceType(resolution.value, resolution.nextType);
+          } else {
+            onSyncAll(resolution.value, resolution.nextType);
           }
-
-          if (wanakana.isRomaji(processedText)) {
-            const nextType: SearchType =
-              searchType === "keyword" ? "keyword" : "meanings";
-            const insertion = translateValue(
-              processedText,
-              translateMap[nextType]
-            );
-            commitPaste(insertion, nextType, true);
-            return;
-          }
-
-          // Mixed / ambiguous: keep current search type.
-          const insertion = translateValue(
-            processedText,
-            translateMap[searchType]
-          );
-          commitPaste(insertion, searchType, false);
+          restoreCaret(resolution.caret);
         }}
         placeholder={placeholderMap[searchType]}
       />
