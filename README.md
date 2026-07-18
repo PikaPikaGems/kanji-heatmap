@@ -75,28 +75,7 @@ cp ../kanji-heatmap-data/output/*.json ./public/json
 `pnpm run build` regenerates derived JSON before compiling and bundling:
 
 ```
-node scripts/generate-more-info.mjs && node scripts/generate-speed-katakana.mjs && tsc -b && vite build
-```
-
-You can also run the generators on their own:
-
-```
-pnpm run generate-more-info
-pnpm run generate-speed-katakana
-```
-
-#### Structure and reading files
-
-These files in `public/json/` are generated from raw sources in `raw-data/` and filtered to the kanji in `public/json/filtered_kanji.json`:
-
-- `kanji-structure-hlorenzi.json`
-- `kanji-readings-details.json`
-- `kanji-structure-kanjium.json`
-- `kanji-structure-scott.json`
-- `kanji-structure-yagays.json`
-
-```
-pnpm run generate-more-info
+node scripts/generate-speed-katakana.mjs && tsc -b && vite build
 ```
 
 #### Speed Katakana challenge sets
@@ -166,6 +145,16 @@ Delete the `tar.gz` file since it's not needed anymore
 ```
 rm kanji-heatmap-data.tar.gz
 ```
+
+#### Structure and reading files
+
+These files in `public/json/` should have the following files:
+
+- `kanji-structure-hlorenzi.json`
+- `kanji-readings-details.json`
+- `kanji-structure-kanjium.json`
+- `kanji-structure-scott.json`
+- `kanji-structure-yagays.json`
 
 ## Talk to Us
 
