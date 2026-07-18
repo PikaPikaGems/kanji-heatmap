@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ALL_SORT_OPTIONS } from "@/lib/options/options-arr";
 import {
   FilterSettings,
@@ -120,101 +119,108 @@ const toSearchSettings = (sp: URLSearchParams): SearchSettings => {
   };
 };
 
+// Write `value` under `key`, or drop the param entirely when the value is the
+// default (`omitWhen`) — default-valued settings stay out of the URL.
+const setOrDelete = (
+  params: URLSearchParams,
+  key: string,
+  value: string,
+  omitWhen: boolean
+) => {
+  if (omitWhen) {
+    params.delete(key);
+  } else {
+    params.set(key, value);
+  }
+};
+
+const writeTextSearch = (prev: URLSearchParams, newVal: TextSearch) => {
+  const trimmedText = newVal.text.trim();
+  const text =
+    trimmedText === ""
+      ? ""
+      : translateValue(trimmedText, translateMap[newVal.type]);
+
+  setOrDelete(prev, URL_PARAMS.textSearch.text, text, text === "");
+  // if search type is the default one, don't show in url
+  setOrDelete(
+    prev,
+    URL_PARAMS.textSearch.type,
+    newVal.type,
+    newVal.type === defaultSearchType
+  );
+  return prev;
+};
+
+const writeFilterSettings = (prev: URLSearchParams, newVal: FilterSettings) => {
+  const p = URL_PARAMS.filterSettings;
+
+  setOrDelete(
+    prev,
+    p.strokeRange.min,
+    newVal.strokeRange.min.toString(),
+    newVal.strokeRange.min <= 1
+  );
+  setOrDelete(
+    prev,
+    p.strokeRange.max,
+    newVal.strokeRange.max.toString(),
+    newVal.strokeRange.max >= MAX_STROKE_COUNT
+  );
+  setOrDelete(
+    prev,
+    p.jlpt,
+    newVal.jlpt.join(","),
+    newVal.jlpt.length === 0 || newVal.jlpt.length === JLPTOptionsCount
+  );
+
+  // No frequency source means the rank range is meaningless — drop all three.
+  const noFreqSource = newVal.freq.source === "none";
+  setOrDelete(prev, p.freq.source, newVal.freq.source, noFreqSource);
+  setOrDelete(
+    prev,
+    p.freq.rankRange.min,
+    newVal.freq.rankRange.min.toString(),
+    noFreqSource || newVal.freq.rankRange.min <= 1
+  );
+  setOrDelete(
+    prev,
+    p.freq.rankRange.max,
+    newVal.freq.rankRange.max.toString(),
+    noFreqSource || newVal.freq.rankRange.max >= MAX_FREQ_RANK
+  );
+  return prev;
+};
+
+const writeSortSettings = (prev: URLSearchParams, newVal: SortSettings) => {
+  const p = URL_PARAMS.sortSettings;
+
+  // No primary sort means the secondary is meaningless — drop both.
+  const noPrimary = newVal.primary === "none";
+  setOrDelete(prev, p.primary, newVal.primary, noPrimary);
+  setOrDelete(
+    prev,
+    p.secondary,
+    newVal.secondary,
+    noPrimary || newVal.secondary === "none"
+  );
+  return prev;
+};
+
 const toSearchParams = (
   prev: URLSearchParams,
   key: keyof SearchSettings,
   value: TextSearch | FilterSettings | SortSettings
 ) => {
   if (key === "textSearch") {
-    const newVal = value as TextSearch;
-    const trimmedText = newVal.text.trim();
-
-    if (trimmedText === "") {
-      // if search type is the default one , don't show in url
-      newVal.type === defaultSearchType
-        ? prev.delete(URL_PARAMS.textSearch.type)
-        : prev.set(URL_PARAMS.textSearch.type, newVal.type);
-      prev.delete(URL_PARAMS.textSearch.text);
-      return prev;
-    }
-
-    const text = translateValue(trimmedText, translateMap[newVal.type]);
-    prev.set(URL_PARAMS.textSearch.text, text);
-
-    if (newVal.type !== defaultSearchType) {
-      prev.set(URL_PARAMS.textSearch.type, newVal.type);
-      return prev;
-    }
-
-    // if search type is the default one , don't show in url
-    prev.delete(URL_PARAMS.textSearch.type);
-    return prev;
+    return writeTextSearch(prev, value as TextSearch);
   }
-
   if (key === "filterSettings") {
-    const newVal = value as FilterSettings;
-
-    newVal.strokeRange.min <= 1
-      ? prev.delete(URL_PARAMS.filterSettings.strokeRange.min)
-      : prev.set(
-          URL_PARAMS.filterSettings.strokeRange.min,
-          newVal.strokeRange.min.toString()
-        );
-
-    newVal.strokeRange.max >= MAX_STROKE_COUNT
-      ? prev.delete(URL_PARAMS.filterSettings.strokeRange.max)
-      : prev.set(
-          URL_PARAMS.filterSettings.strokeRange.max,
-          newVal.strokeRange.max.toString()
-        );
-
-    newVal.jlpt.length === 0 || newVal.jlpt.length === JLPTOptionsCount
-      ? prev.delete(URL_PARAMS.filterSettings.jlpt)
-      : prev.set(URL_PARAMS.filterSettings.jlpt, newVal.jlpt.join(","));
-
-    if (newVal.freq.source === "none") {
-      prev.delete(URL_PARAMS.filterSettings.freq.source);
-      prev.delete(URL_PARAMS.filterSettings.freq.rankRange.min);
-      prev.delete(URL_PARAMS.filterSettings.freq.rankRange.max);
-    } else {
-      prev.set(URL_PARAMS.filterSettings.freq.source, newVal.freq.source);
-
-      newVal.freq.rankRange.min <= 1
-        ? prev.delete(URL_PARAMS.filterSettings.freq.rankRange.min)
-        : prev.set(
-            URL_PARAMS.filterSettings.freq.rankRange.min,
-            newVal.freq.rankRange.min.toString()
-          );
-
-      newVal.freq.rankRange.max >= MAX_FREQ_RANK
-        ? prev.delete(URL_PARAMS.filterSettings.freq.rankRange.max)
-        : prev.set(
-            URL_PARAMS.filterSettings.freq.rankRange.max,
-            newVal.freq.rankRange.max.toString()
-          );
-    }
-    return prev;
+    return writeFilterSettings(prev, value as FilterSettings);
   }
-
   if (key === "sortSettings") {
-    const newVal = value as SortSettings;
-
-    if (newVal.primary === "none") {
-      prev.delete(URL_PARAMS.sortSettings.primary);
-      prev.delete(URL_PARAMS.sortSettings.secondary);
-
-      return prev;
-    }
-
-    prev.set(URL_PARAMS.sortSettings.primary, newVal.primary);
-
-    newVal.secondary === "none"
-      ? prev.delete(URL_PARAMS.sortSettings.secondary)
-      : prev.set(URL_PARAMS.sortSettings.secondary, newVal.secondary);
-
-    return prev;
+    return writeSortSettings(prev, value as SortSettings);
   }
-
   return prev;
 };
 
