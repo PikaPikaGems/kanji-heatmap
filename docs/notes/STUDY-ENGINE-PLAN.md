@@ -135,6 +135,11 @@ export interface StudyEngineOptions {
   apiBaseUrl: string;
   clock?: () => Date;
 }
+
+export interface StudyUser {
+  id: string;
+  email: string;
+}
 ```
 
 The optional clock is for deterministic tests. Production uses the current
@@ -201,6 +206,13 @@ export type StudyEngineSnapshot =
       sync: SyncSnapshot;
       revision: number;
     };
+
+export interface SyncSnapshot {
+  status: "idle" | "syncing" | "offline" | "error";
+  pendingOperationCount: number;
+  lastSyncedAt: string | null;
+  errorMessage: string | null;
+}
 ```
 
 - The no-op engine reports `unavailable`.
@@ -227,6 +239,28 @@ export interface AuthService {
 
   logout(): Promise<AuthResult<void>>;
 }
+
+export interface PinChallenge {
+  id: string;
+  expiresAt: string;
+}
+
+export type AuthResult<T> =
+  | {
+      ok: true;
+      value: T;
+    }
+  | {
+      ok: false;
+      code:
+        | "invalid-email"
+        | "invalid-pin"
+        | "expired-pin"
+        | "rate-limited"
+        | "network-error"
+        | "server-error";
+      message?: string;
+    };
 ```
 
 The browser calls same-origin endpoints:
@@ -259,6 +293,38 @@ export interface StudyItem {
 
 export type CardType = "recognition" | "production";
 
+/**
+ * One user-facing entry in the review pile.
+ *
+ * Internally, one entry owns two FSRS cards: recognition and production.
+ */
+export interface ReviewPileItem {
+  item: StudyItem;
+  addedAt: string;
+}
+
+export interface ReviewOverview {
+  itemCount: number;
+  recognition: ReviewQueueCounts;
+  production: ReviewQueueCounts;
+}
+
+export interface ReviewQueueCounts {
+  due: number;
+  new: number;
+  learning: number;
+  review: number;
+}
+
+export interface ReviewSettings {
+  desiredRetention: number;
+  maximumIntervalDays: number;
+  newCardsPerDay: number;
+  maximumReviewsPerDay: number;
+  learningStepsMinutes: number[];
+  relearningStepsMinutes: number[];
+}
+
 export interface ReviewService {
   addToPile(item: StudyItem): Promise<ReviewPileItem | null>;
 
@@ -287,6 +353,11 @@ export interface ReviewService {
 ```
 
 ### Adding to the review pile
+
+`ReviewPileItem` is the user-facing record that says a `StudyItem` belongs to
+the review pile. It is not an FSRS card. It contains the item and pile-level
+metadata such as when it was added. Returning this record leaves room for
+future pile-level metadata without exposing the two internal cards.
 
 Adding one item always creates two internal FSRS cards:
 
@@ -321,6 +392,13 @@ export interface ReviewSession {
   end(): Promise<ReviewSessionSummary | null>;
 
   subscribe(listener: () => void): () => void;
+}
+
+export interface ReviewSessionSummary {
+  startedAt: string;
+  endedAt: string;
+  reviewedCount: number;
+  ratingCounts: Record<ReviewRating, number>;
 }
 ```
 
@@ -357,6 +435,8 @@ The UI will show the next interval for each rating:
 
 ```ts
 export type ReviewRating = "again" | "hard" | "good" | "easy";
+
+export type ReviewState = "new" | "learning" | "review" | "relearning";
 
 export interface ReviewPreview {
   calculatedAt: string;
@@ -448,6 +528,11 @@ export interface BookmarkService {
   has(item: StudyItem): Promise<boolean | null>;
   list(): Promise<Bookmark[] | null>;
 }
+
+export interface Bookmark {
+  item: StudyItem;
+  createdAt: string;
+}
 ```
 
 When logged out, bookmark controls show a login prompt.
@@ -459,6 +544,25 @@ recorded.
 
 ```ts
 export type PracticeGameId = string;
+
+export interface PracticeActivity {
+  id: string;
+  gameId: PracticeGameId;
+  schemaVersion: number;
+  completedAt: string;
+  metrics: Record<string, number>;
+}
+
+export interface DailyActivityCount {
+  date: string;
+  gameId: PracticeGameId;
+  count: number;
+}
+
+export interface ActivityTotal {
+  gameId: PracticeGameId;
+  count: number;
+}
 
 export interface ActivityService {
   record(input: {
@@ -519,6 +623,35 @@ export interface NotesService {
 
   list(filter?: NoteFilter): Promise<StudyNote[] | null>;
 }
+
+export interface CreateNoteInput {
+  title: string;
+  markdown: string;
+}
+
+export interface StudyNote {
+  id: string;
+  title: string;
+  markdown: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NoteFilter {
+  query?: string;
+}
+
+export type NoteUpdateResult =
+  | {
+      status: "updated";
+      note: StudyNote;
+    }
+  | {
+      status: "conflict";
+      note: StudyNote;
+      conflictCopy: StudyNote;
+    };
 ```
 
 The engine stores raw Markdown. Kanji Heatmap owns editing, previews, and
@@ -577,6 +710,44 @@ Every mutation:
 ### Sync request
 
 ```ts
+export interface SyncService {
+  syncNow(): Promise<SyncResult | null>;
+  getSnapshot(): SyncSnapshot;
+}
+
+export interface SyncResult {
+  pushedOperationCount: number;
+  pulledChangeCount: number;
+  completedAt: string;
+}
+
+export type SyncEntityType =
+  | "bookmark"
+  | "activity"
+  | "review-pile-item"
+  | "review"
+  | "review-settings"
+  | "note";
+
+export interface SyncOperation {
+  id: string;
+  deviceId: string;
+  entityType: SyncEntityType;
+  entityId: string;
+  action: "create" | "update" | "delete";
+  payload: unknown;
+  occurredAt: string;
+}
+
+export interface ServerChange {
+  sequence: number;
+  entityType: SyncEntityType;
+  entityId: string;
+  action: "create" | "update" | "delete";
+  payload: unknown;
+  occurredAt: string;
+}
+
 export interface SyncRequest {
   deviceId: string;
   cursor: number | null;
