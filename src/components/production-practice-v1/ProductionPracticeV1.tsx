@@ -8,6 +8,7 @@ import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
+import { formatModelLoadErrorReport } from "./format-model-load-error";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import { ProductionPracticeSettings, SessionResult } from "./types";
@@ -20,12 +21,16 @@ const ProductionPracticeV1 = () => {
     DEFAULT_SETTINGS
   );
   const [loadStatus, setLoadStatus] = useState<"loading" | "error">("loading");
+  const [loadErrorReport, setLoadErrorReport] = useState<string | null>(null);
   const [modelReady, setModelReady] = useState(false);
 
   const session = usePracticeSession<SessionResult>({
     activityKind: "production",
     sessionSize: SESSION_SIZE,
-    onGoToInitial: () => setLoadStatus("loading"),
+    onGoToInitial: () => {
+      setLoadStatus("loading");
+      setLoadErrorReport(null);
+    },
     // Warm the handwriting model before entering "playing"; park on the
     // "loading" phase (with retry) while the model spins up.
     onPlay: (commitPlaying) => {
@@ -40,12 +45,15 @@ const ProductionPracticeV1 = () => {
       return;
     }
     setLoadStatus("loading");
+    setLoadErrorReport(null);
     session.setPhase("loading");
     try {
       await warmupDaKanji();
       setModelReady(true);
       commitPlaying();
-    } catch {
+    } catch (error) {
+      console.error("DaKanji warmup failed", error);
+      setLoadErrorReport(formatModelLoadErrorReport(error));
       setLoadStatus("error");
     }
   };
@@ -77,6 +85,7 @@ const ProductionPracticeV1 = () => {
           <div key="loading" className="h-full animate-fade-in">
             <ModelLoadingScreen
               status={loadStatus}
+              errorReport={loadErrorReport}
               onRetry={retryWarmup}
               onCancel={session.goToInitial}
             />
