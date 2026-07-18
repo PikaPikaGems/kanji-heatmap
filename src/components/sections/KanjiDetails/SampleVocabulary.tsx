@@ -27,27 +27,13 @@ import { JishoBtn } from "@/components/common/JishoBtn";
 import { JotobaBtn } from "@/components/common/JotobaBtn";
 import { BugIconErrorBoundary } from "@/components/error";
 import { Keyboard } from "@/components/icons";
-
-// {w: '犬小屋', r: 'いぬごや', t: '🦉', e: 'doghouse', j: 5, k: 1}
-// word, reading, frequencyTier, translation, jlpt, kaishi
-type CommonWordEntry = {
-  w: string;
-  r?: string;
-  t?: string;
-  e?: string;
-  k?: number | boolean;
-  j?: number;
-  uncommon_form?: boolean;
-};
-
-const FreqCategoryMap: Record<string, string> = {
-  "🌱": "basic",
-  "☘️": "common",
-  "🌷": "fluent",
-  //   "📚": "advanced",
-  //   "🦉": "unranked",
-  //   "🌶️": "niche"
-};
+import {
+  CommonWordEntry,
+  FreqCategoryMap,
+  sortWordData,
+  TextbookWordEntry,
+  toCommonWordEntries,
+} from "@/lib/sample-vocabulary";
 
 const WordTagBadges = ({
   jlpt,
@@ -168,40 +154,6 @@ const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
       </TableRow>
     </>
   );
-};
-
-const sortWordData = (data: CommonWordEntry[]) => {
-  const score = (entry: CommonWordEntry) => {
-    let s = 0;
-
-    // Kaishi 1.5k: explicitly curated beginner vocab — strong signal
-    if (entry.k != null && entry.k) s += 500;
-
-    // JLPT level: N5 (easiest) → N1 (hardest); no JLPT = 0
-    const jlptScore: Record<number, number> = {
-      5: 250,
-      4: 200,
-      3: 100,
-      2: 40,
-      1: 20,
-    };
-    s += jlptScore[entry.j ?? -1] ?? 0;
-
-    // Frequency tier: basic > common > fluent > advanced/uncommon
-    const freqScore: Record<string, number> = {
-      "🌱": 250,
-      "☘️": 200,
-      "🌷": 100,
-      "📚": 10,
-      "🌶️": 0,
-      "🦉": 0,
-    };
-    s += freqScore[entry.t ?? "🦉"] ?? 0;
-
-    return s;
-  };
-
-  return [...data].sort((a, b) => score(b) - score(a));
 };
 
 const ShortcutKey = ({ label }: { label: string }) => (
@@ -389,15 +341,11 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
   );
 };
 
-type Reading = string;
-type Translation = string;
-type WordString = string;
-
-type TextbookWordEntry = Record<WordString, [Reading, Translation]>;
-
 export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
   const url = `${TEXT_BOOK_VOCAB_PATH}/${kanji}.json`;
-  const { data, status, error } = useJsonFetch<TextbookWordEntry>(url);
+  const { data, status, error } = useJsonFetch<Record<string, TextbookWordEntry>>(
+    url
+  );
 
   if (status === "pending" || status === "idle") {
     return <TableSkeleton />;
@@ -414,22 +362,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
     );
   }
 
-  // convert data to CommonWordEntry[]
-  const commonWordData = Object.entries(data[kanji]).map(
-    ([word, [reading, translation, jlpt, tags]]) => {
-      const tagsArray = (tags ?? "").split(",").map((tag) => tag.trim());
-      const isKaishi = tagsArray.includes("kaishi");
-      const isUncommonForm = tagsArray.includes("alt");
-      return {
-        w: word,
-        r: reading,
-        e: translation,
-        j: Number(jlpt),
-        k: isKaishi,
-        uncommon_form: isUncommonForm,
-      } as CommonWordEntry;
-    }
-  );
+  const commonWordData = toCommonWordEntries(data[kanji]);
 
   return (
     <div>
