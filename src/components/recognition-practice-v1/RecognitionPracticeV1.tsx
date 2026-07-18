@@ -5,7 +5,7 @@ import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
-import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
+import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";

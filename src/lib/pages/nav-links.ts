@@ -12,7 +12,7 @@ import {
   productionPracticePageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
-} from "@/components/items/practice-pages";
+} from "@/lib/pages/practice-pages";
 
 export type NavLinkIcon = ComponentType<
   SVGProps<SVGSVGElement> & { className?: string }

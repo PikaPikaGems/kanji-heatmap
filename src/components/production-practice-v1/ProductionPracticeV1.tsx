@@ -4,7 +4,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
-import { productionPracticePageMeta } from "@/components/items/practice-pages";
+import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";

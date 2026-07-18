@@ -14,13 +14,13 @@ import {
   recognitionPracticePageMeta,
   productionPracticePageMeta,
   speedKatakanaPageMeta,
-} from "@/components/items/practice-pages";
+} from "@/lib/pages/practice-pages";
 import {
   cumUseGraphPageMeta,
   dashboardPageMeta,
   exploreKanjiPageMeta,
   masteryPageMeta,
-} from "@/components/items/nav-links";
+} from "@/lib/pages/nav-links";
 
 const kanjiPage = {
   ...exploreKanjiPageMeta,

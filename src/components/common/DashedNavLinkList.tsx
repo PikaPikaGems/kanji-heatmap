@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { DashedNavLink } from "@/components/common/DashedNavLink";
-import type { NavLinkItem } from "@/components/items/nav-links";
+import type { NavLinkItem } from "@/lib/pages/nav-links";
 import { cn } from "@/lib/utils";
 
 type DashedNavLinkListProps = {
