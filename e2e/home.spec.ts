@@ -39,6 +39,16 @@ test.describe("explore screen", () => {
     ).toBeVisible();
   });
 
+  test("radical search opens its drawer", async ({ page }) => {
+    await page.goto("/?search-type=radicals");
+
+    await page.getByPlaceholder("Click to select one or more radicals").click();
+
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 30_000 });
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toBeHidden();
+  });
+
   test("clicking a kanji opens and closes the detail drawer", async ({
     page,
   }) => {
