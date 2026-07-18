@@ -37,3 +37,6 @@ dist-ssr
 test-results/
 playwright-report/
 coverage/
+
+# Generated dependency graphs (see README / pnpm run deps:graph)
+dependency-graphs/
