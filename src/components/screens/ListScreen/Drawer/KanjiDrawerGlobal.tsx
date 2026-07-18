@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useKanjiUrlState } from "@/components/dependent/routing/routing-hooks";
+import { useKanjiUrlState } from "@/hooks/routing-hooks";
 import { KanjiDrawer } from "../Drawer";
 
 const KanjiDrawerGlobal = () => {

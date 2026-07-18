@@ -1,4 +1,4 @@
-import { useLocation, useSearchParams } from "./router-adapter";
+import { useLocation, useSearchParams } from "wouter";
 import { useCallback, useMemo } from "react";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { FrequencyType } from "@/lib/options/options-types";

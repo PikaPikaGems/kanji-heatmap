@@ -11,7 +11,7 @@ import {
   floatingIslandNavLinks,
   practiceNavLinks,
 } from "@/lib/pages/nav-links";
-import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
+import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-adapter";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";

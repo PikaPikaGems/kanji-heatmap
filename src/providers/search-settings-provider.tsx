@@ -14,7 +14,7 @@ import {
 import {
   useSearchParams,
   useUrlLocation,
-} from "@/components/dependent/routing/routing-hooks";
+} from "@/hooks/routing-hooks";
 import { searchSettings } from "./search-settings-hooks";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { rememberHomeSearch } from "@/lib/home-search-memory";

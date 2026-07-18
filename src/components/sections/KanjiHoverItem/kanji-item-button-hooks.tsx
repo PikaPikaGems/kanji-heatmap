@@ -3,7 +3,7 @@ import { freqCategoryCn, getFreqCategory } from "@/lib/freq/freq-category";
 import { freqMap } from "@/lib/options/options-label-maps";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
-import { useBgSrc } from "@/components/dependent/routing/routing-hooks";
+import { useBgSrc } from "@/hooks/routing-hooks";
 import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-provider";
 import { isBookmarked } from "@/lib/bookmarks";
 import { BorderColorMeaning } from "@/lib/settings/settings";
