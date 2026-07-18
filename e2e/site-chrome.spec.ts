@@ -19,7 +19,7 @@ test.describe("site chrome", () => {
     });
 
     await island.getByRole("link", { name: "Explore Kanji" }).click();
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/(\?.*)?$/);
     await expect(page.getByText(/\d+ Items/)).toBeVisible({ timeout: 30_000 });
   });
 
@@ -56,10 +56,14 @@ test.describe("site chrome", () => {
   test("theme toggle flips dark/light and persists", async ({ page }) => {
     await page.goto("/");
 
-    // App default theme is dark.
+    // App default theme is dark; the toggle lives in the header drawer.
     await expect(page.locator("html")).toHaveClass(/dark/);
 
-    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("dialog", { name: "Navigation menu" });
+    await expect(menu).toBeVisible();
+
+    await menu.getByRole("button", { name: "Toggle theme" }).click();
     await expect(page.locator("html")).not.toHaveClass(/dark/);
     await expect
       .poll(async () =>

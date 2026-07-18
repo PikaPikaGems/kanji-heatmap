@@ -15,8 +15,14 @@ test.describe("dashboard", () => {
     await expect(page.getByLabel("Previous period")).toBeVisible();
     await expect(page.getByLabel("Next period")).toBeVisible();
 
-    await expect(page.getByLabel("Kanji Writing")).toBeVisible();
-    await expect(page.getByLabel("Kanji Reading")).toBeVisible();
-    await expect(page.getByLabel("Speed Katakana")).toBeVisible();
+    await expect(
+      page.getByRole("checkbox", { name: "Kanji Writing" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("checkbox", { name: "Kanji Reading" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("checkbox", { name: "Speed Katakana" })
+    ).toBeVisible();
   });
 });
