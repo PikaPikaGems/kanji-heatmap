@@ -29,7 +29,7 @@ const SetDetail = ({
   return (
     <div className="space-y-1.5 text-xs">
       <div className="font-extrabold">
-        Set {setNumber} · Level {level}, #{position}
+        Challenge {level}-{position} (#{setNumber})
       </div>
       {stats ? (
         <>
@@ -75,10 +75,13 @@ const SetDetail = ({
 const ChallengeSetCell = ({ setNumber }: { setNumber: number }) => {
   const stats = readSetStats(setNumber);
   const band = cpmToBand(stats?.bestCpmWithAccuracyOver70);
+  const level = levelOf(setNumber);
+  const pos = positionInLevel(setNumber);
+  const challengeLabel = `Challenge ${level}-${pos} (#${setNumber})`;
 
   const label = stats?.bestCpmWithAccuracyOver70
-    ? `Set ${setNumber}: ${stats.bestCpmWithAccuracyOver70} CPM`
-    : `Set ${setNumber}: not attempted`;
+    ? `${challengeLabel}: ${stats.bestCpmWithAccuracyOver70} CPM`
+    : `${challengeLabel}: not attempted`;
 
   return (
     <HeatmapCell
