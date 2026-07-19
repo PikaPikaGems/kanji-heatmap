@@ -115,7 +115,11 @@ describe("filterKanji", () => {
 
   it("meanings: matches keyword or any meaning", () => {
     expect(
-      filterKanji(allKanji, settings({ type: "meanings", text: "liquid" }), pool)
+      filterKanji(
+        allKanji,
+        settings({ type: "meanings", text: "liquid" }),
+        pool
+      )
     ).toEqual(["水"]);
   });
 

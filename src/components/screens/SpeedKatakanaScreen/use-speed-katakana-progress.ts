@@ -1,9 +1,5 @@
 import { useMemo } from "react";
-import {
-  computeAverageCpm,
-  countCompletedSets,
-  readSetStats,
-} from "./storage";
+import { computeAverageCpm, countCompletedSets, readSetStats } from "./storage";
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,

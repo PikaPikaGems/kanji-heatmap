@@ -18,6 +18,7 @@
     "preview": "vite preview",
     "peek": "prettier --write . && eslint . && tsc -b && vite build && vite preview --host",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "generate-more-info": "node scripts/generate-more-info.mjs",
     "generate-speed-katakana": "node scripts/generate-speed-katakana.mjs"
   },

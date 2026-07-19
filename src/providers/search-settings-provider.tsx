@@ -11,10 +11,7 @@ import {
   toSearchParams,
   toSearchSettings,
 } from "@/lib/settings/search-settings-adapter";
-import {
-  useSearchParams,
-  useUrlLocation,
-} from "@/hooks/routing-hooks";
+import { useSearchParams, useUrlLocation } from "@/hooks/routing-hooks";
 import { searchSettings } from "./search-settings-hooks";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { rememberHomeSearch } from "@/lib/home-search-memory";

@@ -18,7 +18,9 @@ export const heatmapFillCn = (level: FreqCategory, emphasizeBorder = false) =>
   level === 0
     ? cn(
         "bg-muted/50 dark:bg-muted/30",
-        emphasizeBorder ? EMPHASIS_BORDER : "border border-border dark:border-border"
+        emphasizeBorder
+          ? EMPHASIS_BORDER
+          : "border border-border dark:border-border"
       )
     : cn(
         freqCategoryCn[level],

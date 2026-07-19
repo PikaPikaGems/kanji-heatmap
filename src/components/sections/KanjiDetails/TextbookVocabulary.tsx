@@ -1,15 +1,17 @@
 import { useJsonFetch } from "@/hooks/use-json";
 import { TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
-import { TextbookWordEntry, toCommonWordEntries } from "@/lib/sample-vocabulary";
+import {
+  TextbookWordEntry,
+  toCommonWordEntries,
+} from "@/lib/sample-vocabulary";
 import { PaginatedVocabulary } from "./PaginatedVocabulary";
 import { TableSkeleton } from "./TableSkeleton";
 
 export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
   const url = `${TEXT_BOOK_VOCAB_PATH}/${kanji}.json`;
-  const { data, status, error } = useJsonFetch<Record<string, TextbookWordEntry>>(
-    url
-  );
+  const { data, status, error } =
+    useJsonFetch<Record<string, TextbookWordEntry>>(url);
 
   if (status === "pending" || status === "idle") {
     return <TableSkeleton />;
