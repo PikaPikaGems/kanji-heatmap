@@ -80,9 +80,9 @@ export const OverviewStat = ({
   return (
     <div
       className={cn(
-        "flex h-full w-full max-w-[12rem] min-w-0 items-start gap-2 rounded-xl border border-foreground/5 bg-muted/10 px-2 py-2 text-left sm:gap-2.5 sm:px-3 sm:py-2.5",
+        "flex h-full w-full min-w-0 items-start gap-2 rounded-xl border border-foreground/5 bg-muted/10 px-2 py-2 text-left sm:gap-2.5 sm:px-3 sm:py-2.5",
         compact &&
-          "max-w-none flex-col items-center justify-center gap-1 px-1.5 py-3 text-center sm:max-w-[12rem] sm:flex-row sm:items-start sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-left",
+          "max-w-none flex-col items-center justify-center gap-1 px-1.5 py-3 text-center sm:max-w-[10rem] sm:flex-row sm:items-start sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-left",
         className
       )}
     >
