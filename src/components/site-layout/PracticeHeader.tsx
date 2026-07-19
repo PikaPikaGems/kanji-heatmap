@@ -1,13 +1,6 @@
-import { Suspense } from "react";
 import { Link } from "@/components/dependent/routing";
-import { ErrorBoundary } from "@/components/error";
 import { Progress } from "@/components/ui/progress";
-import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
-import ChangeFontButton from "@/components/dependent/site-wide/ChangeFontButton";
-import { ChangeThemeColorBtn } from "@/components/dependent/site-wide/ChangeThemeColorBtn";
-import LazyHeaderDrawer, {
-  HeaderDrawerLoadingFallback,
-} from "@/components/site-layout/Header/LazyHeaderDrawer";
+import { HeaderBar } from "@/components/site-layout/Header/HeaderBar";
 import assetsPaths from "@/lib/assets-paths";
 
 /**
@@ -15,7 +8,10 @@ import assetsPaths from "@/lib/assets-paths";
  */
 export const PracticeHeader = ({ progress }: { progress: number }) => {
   return (
-    <header className="flex items-center justify-between w-full gap-3 px-2 border-b-4 border-dashed shrink-0 fix-scroll-layout-shift-right bg-background">
+    <HeaderBar
+      className="gap-3 shrink-0"
+      drawerErrorDetails="LazyHeaderDrawer in PracticeHeader"
+    >
       <Link
         to="/"
         className="flex items-center py-1.5 shrink-0 hover:opacity-80 transition-opacity"
@@ -33,21 +29,6 @@ export const PracticeHeader = ({ progress }: { progress: number }) => {
         className="flex-1 h-2"
         primitiveCn="background-theme-color-with-opacity-100"
       />
-
-      <section className="flex items-center pr-1 space-x-1 shrink-0">
-        <ErrorBoundary fallback={null}>
-          <ChangeFontButton />
-          <ChangeThemeColorBtn />
-          <ErrorBoundary
-            details="LazyHeaderDrawer in PracticeHeader"
-            fallback={<RefreshPageBtn />}
-          >
-            <Suspense fallback={<HeaderDrawerLoadingFallback />}>
-              <LazyHeaderDrawer />
-            </Suspense>
-          </ErrorBoundary>
-        </ErrorBoundary>
-      </section>
-    </header>
+    </HeaderBar>
   );
 };
