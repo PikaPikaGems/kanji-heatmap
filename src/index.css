@@ -171,6 +171,19 @@ button {
   padding-left: var(--removed-body-scroll-bar-size);
 }
 
+/*
+ * iOS browsers (Safari and Chrome, including iPad) can paint position:fixed
+ * elements at stale scroll coordinates. A dedicated compositor layer keeps
+ * persistent viewport UI visually pinned without changing document scrolling.
+ *
+ * Gated to iOS-like WebKit via -webkit-touch-callout (Chrome iOS is WebKit too).
+ */
+@supports (-webkit-touch-callout: none) {
+  .fixed-viewport-layer {
+    transform: translateZ(0);
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.5s ease-out;
 }
