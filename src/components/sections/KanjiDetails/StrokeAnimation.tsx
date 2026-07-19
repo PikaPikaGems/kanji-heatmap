@@ -116,8 +116,8 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
           </div>
         )}
         {status === "error" && (
-          <div className="animate-fade-in text-destructive">
-            The DaKanji recognizer couldn&apos;t be loaded right now.
+          <div className="animate-fade-in">
+            すみません 🙇🏽‍♀️ 🙇. The grader {`couldn't`} be loaded right now.
           </div>
         )}
         {status === "success" && result != null && (
