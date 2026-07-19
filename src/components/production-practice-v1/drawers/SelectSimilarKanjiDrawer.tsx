@@ -12,6 +12,7 @@ export const SelectSimilarKanjiDrawer = ({
   grade,
   candidates,
   selected,
+  gradingEnabled = true,
   onSelect,
   onForgot,
   onNext,
@@ -20,6 +21,7 @@ export const SelectSimilarKanjiDrawer = ({
   grade: GradeRankInfo;
   candidates: string[];
   selected: string | null;
+  gradingEnabled?: boolean;
   onSelect: (k: string | null) => void;
   onForgot: () => void;
   onNext: () => void;
@@ -28,14 +30,19 @@ export const SelectSimilarKanjiDrawer = ({
 
   useEnterAction(onNext, open && hasSelection, CONFIRM_KEYS);
 
+  const title = gradingEnabled ? gradeHeadline(grade.rank) : "Pick the kanji";
+  const description = gradingEnabled
+    ? grade.inTop10
+      ? "Which kanji did you draw?"
+      : "Which kanji is correct?"
+    : "Stroke grading isn't available — choose the character that fits.";
+
   return (
     <PracticeDrawerShell
       open={open}
       autoFocus
-      title={gradeHeadline(grade.rank)}
-      description={
-        grade.inTop10 ? "Which kanji did you draw?" : "Which kanji is correct?"
-      }
+      title={title}
+      description={description}
       footer={
         <div className="grid grid-cols-2 gap-2 px-3 sm:px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-md mx-auto w-full">
           <PracticeButton

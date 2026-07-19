@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
@@ -23,6 +23,8 @@ const ProductionPracticeV1 = () => {
   const [loadStatus, setLoadStatus] = useState<"loading" | "error">("loading");
   const [loadErrorReport, setLoadErrorReport] = useState<string | null>(null);
   const [modelReady, setModelReady] = useState(false);
+  const [playWithoutGrading, setPlayWithoutGrading] = useState(false);
+  const pendingCommitRef = useRef<(() => void) | null>(null);
 
   const session = usePracticeSession<SessionResult>({
     activityKind: "production",
@@ -30,9 +32,10 @@ const ProductionPracticeV1 = () => {
     onGoToInitial: () => {
       setLoadStatus("loading");
       setLoadErrorReport(null);
+      pendingCommitRef.current = null;
     },
     // Warm the handwriting model before entering "playing"; park on the
-    // "loading" phase (with retry) while the model spins up.
+    // "loading" phase (with retry / continue-without-grading) while it spins up.
     onPlay: (commitPlaying) => {
       void warmThenCommit(commitPlaying);
     },
@@ -44,12 +47,19 @@ const ProductionPracticeV1 = () => {
       commitPlaying();
       return;
     }
+    // User already chose to play without grading this visit — don't re-block.
+    if (playWithoutGrading) {
+      commitPlaying();
+      return;
+    }
+    pendingCommitRef.current = commitPlaying;
     setLoadStatus("loading");
     setLoadErrorReport(null);
     session.setPhase("loading");
     try {
       await warmupDaKanji();
       setModelReady(true);
+      pendingCommitRef.current = null;
       commitPlaying();
     } catch (error) {
       console.error("DaKanji warmup failed", error);
@@ -64,6 +74,21 @@ const ProductionPracticeV1 = () => {
       return;
     }
     session.play(session.sessionItems, session.cursor);
+  };
+
+  const continueWithoutGrading = () => {
+    setPlayWithoutGrading(true);
+    const commit = pendingCommitRef.current;
+    pendingCommitRef.current = null;
+    if (commit) {
+      commit();
+      return;
+    }
+    if (session.sessionItems.length > 0) {
+      session.setPhase("playing");
+      return;
+    }
+    session.goToInitial();
   };
 
   // Derived from the deck (the pool is always the deck's kanji).
@@ -87,6 +112,7 @@ const ProductionPracticeV1 = () => {
               status={loadStatus}
               errorReport={loadErrorReport}
               onRetry={retryWarmup}
+              onContinueWithoutGrading={continueWithoutGrading}
               onCancel={session.goToInitial}
             />
           </div>
@@ -101,6 +127,7 @@ const ProductionPracticeV1 = () => {
               sessionItems={session.sessionItems}
               settings={settings}
               randomKanjiPool={randomKanjiPool}
+              gradingEnabled={modelReady}
               onProgress={session.setProgress}
               onComplete={session.finishSession}
               onEnd={session.goToInitial}

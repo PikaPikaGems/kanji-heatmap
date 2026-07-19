@@ -20,6 +20,7 @@ export const FeedbackDrawer = ({
   item,
   grade,
   drawing,
+  gradingEnabled = true,
   onNext,
 }: {
   open: boolean;
@@ -27,6 +28,7 @@ export const FeedbackDrawer = ({
   item: PracticeItem;
   grade: GradeRankInfo;
   drawing: DrawingSnapshot | null;
+  gradingEnabled?: boolean;
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
@@ -42,9 +44,15 @@ export const FeedbackDrawer = ({
   const title =
     kind === "noKanji"
       ? "No worries — here it is"
-      : feedbackTitle(kind === "correct" ? "correct" : "incorrect", grade.rank);
+      : !gradingEnabled && kind === "correct"
+        ? "🎉 That's the one!"
+        : feedbackTitle(
+            kind === "correct" ? "correct" : "incorrect",
+            grade.rank
+          );
 
-  const bounce = kind === "correct" && grade.rank === 0;
+  // Celebrate any correct pick when stroke grading is off.
+  const bounce = kind === "correct" && (!gradingEnabled || grade.rank === 0);
 
   return (
     <>
