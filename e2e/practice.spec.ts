@@ -103,20 +103,18 @@ test.describe("practice modes", () => {
     await expect(startButton).toBeEnabled({ timeout: 30_000 });
     await startButton.click();
 
-    // Fixtures abort /onnx/**, so warmup fails and the error screen appears.
+    // Fixtures abort /onnx/** and /js/ref-patterns.js, so both recognizers
+    // fail warmup and the no-recognition error screen appears.
     await expect(
-      page.getByRole("heading", { name: "Could not load the model" })
+      page.getByRole("heading", { name: "Recognition unavailable" })
     ).toBeVisible({ timeout: 30_000 });
     await expect(
-      page.getByRole("button", { name: "Continue without grading" })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Retry loading model" })
+      page.getByRole("button", { name: "Continue without recognition" })
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
 
     await page
-      .getByRole("button", { name: "Continue without grading" })
+      .getByRole("button", { name: "Continue without recognition" })
       .click();
 
     await expect(
