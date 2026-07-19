@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  ReactNode,
-  useCallback,
-} from "react";
-import { useJsonFetch } from "@/hooks/use-json";
+import { createKanjiLookupProvider } from "./create-kanji-lookup-provider";
 import assetsPaths from "@/lib/assets-paths";
 
 import type {
@@ -13,88 +6,30 @@ import type {
   KanjiReadingEntrySmall,
 } from "@/lib/kanji-section-constants";
 
-interface KanjiReadingCategoryContextValue {
-  data: Record<string, KanjiReadingEntrySmall[]> | null;
-  status: "idle" | "pending" | "success" | "error";
-  error: Error | null;
-  getReadingsForKanji: (kanji: string) => KanjiReadingEntry[] | null;
-}
+const readingCategory = createKanjiLookupProvider<
+  [Record<string, KanjiReadingEntrySmall[]>],
+  KanjiReadingEntry[]
+>({
+  name: "KanjiReadingCategory",
+  assetPaths: [assetsPaths.KANJI_READING_DETAILS],
+  select: ([data], kanji) => {
+    const kanjiData = data[kanji];
+    if (!kanjiData || kanjiData.length <= 0) {
+      return null;
+    }
+    return kanjiData.map((entry) => ({
+      reading: entry.r,
+      type: entry.t,
+      frequency: entry.f,
+      example_word: entry.w,
+    }));
+  },
+});
 
-const KanjiReadingCategoryContext =
-  createContext<KanjiReadingCategoryContextValue | null>(null);
-
-export const KanjiReadingCategoryProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
-  const { data, status, error } = useJsonFetch<
-    Record<string, KanjiReadingEntrySmall[]>
-  >(assetsPaths.KANJI_READING_DETAILS);
-
-  const getReadingsForKanji = useCallback(
-    (kanji: string): KanjiReadingEntry[] | null => {
-      if (!data || !kanji) {
-        return null;
-      }
-
-      const kanjiData = data[kanji];
-
-      if (!kanjiData || kanjiData.length <= 0) {
-        return null;
-      }
-      return kanjiData.map((data) => {
-        return {
-          reading: data.r,
-          type: data.t,
-          frequency: data.f,
-          example_word: data.w,
-        };
-      });
-    },
-    [data]
-  );
-
-  const value = useMemo(
-    () => ({
-      data,
-      status,
-      error,
-      getReadingsForKanji,
-    }),
-    [data, status, error, getReadingsForKanji]
-  );
-
-  return (
-    <KanjiReadingCategoryContext.Provider value={value}>
-      {children}
-    </KanjiReadingCategoryContext.Provider>
-  );
-};
-
-// Hook to access the context
-export const useKanjiReadingCategoryContext = () => {
-  const context = useContext(KanjiReadingCategoryContext);
-  if (!context) {
-    throw new Error(
-      "useKanjiReadingCategoryContext must be used within a KanjiReadingCategoryProvider"
-    );
-  }
-  return context;
-};
+export const KanjiReadingCategoryProvider = readingCategory.Provider;
 
 // Hook to get reading data for a specific kanji
 export const useKanjiReadingDetails = (kanji: string) => {
-  const { status, error, getReadingsForKanji } =
-    useKanjiReadingCategoryContext();
-
-  const kanjiReadingData = useMemo(() => {
-    return getReadingsForKanji(kanji);
-  }, [getReadingsForKanji, kanji]);
-
-  return {
-    status,
-    error,
-    kanjiReadingData,
-  };
+  const { status, error, data } = readingCategory.useLookupState(kanji);
+  return { status, error, kanjiReadingData: data };
 };

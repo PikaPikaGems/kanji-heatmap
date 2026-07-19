@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { DependencyList, useEffect, useMemo, useState } from "react";
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import { useContextWithCatch } from "../providers/helpers";
 
@@ -24,11 +24,79 @@ const requestWorker = KANJI_WORKER_SINGLETON.request;
 
 type Status = "idle" | "loading" | "error" | "success";
 
+interface QueryState<T> {
+  status: Status;
+  data?: T;
+  error?: unknown;
+}
+
+/**
+ * Shared machinery for every worker-backed hook below. Runs `run()` whenever
+ * `deps` change and tracks {status, data, error}.
+ *
+ * The web worker does not guarantee that responses arrive in request order
+ * (see kanji-worker-promise-wrapper). A per-effect `cancelled` flag drops any
+ * response whose inputs are already stale, so a slow reply for an earlier
+ * `deps` value can never clobber a fresher result. Effect deps double as the
+ * request key, so an unchanged input never re-fires.
+ *
+ * Pass `run = null` to disable the query (empty / "none" inputs); the hook
+ * resets to idle. `keepPreviousData` keeps the last data visible during the
+ * next load (default true — avoids a flash of empty state between requests).
+ */
+const useWorkerQuery = <T,>(
+  run: (() => Promise<T>) | null,
+  deps: DependencyList,
+  keepPreviousData = true
+): QueryState<T> => {
+  const [state, setState] = useState<QueryState<T>>({ status: "idle" });
+
+  // Effect needed: dispatches a request to the web worker (external async
+  // system) keyed to `deps`; the cancelled flag drops stale responses.
+  useEffect(() => {
+    if (run == null) {
+      setState({ status: "idle", error: null });
+      return;
+    }
+
+    let cancelled = false;
+    setState((prev) => ({
+      status: "loading",
+      data: keepPreviousData ? prev.data : undefined,
+    }));
+
+    run()
+      .then((data) => {
+        if (!cancelled) {
+          setState({ status: "success", data, error: null });
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setState((prev) => ({
+            status: "error",
+            data: keepPreviousData ? prev.data : undefined,
+            error,
+          }));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // `run` is recreated each render but is keyed by `deps`, which encode every
+    // input it closes over; listing it would re-fire on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+
+  return state;
+};
+
 export const useKanjiWorkerRequest = () => {
   const fn = useContextWithCatch(
     ActionContext,
     "KanjiWorker",
-    "KanjirWorkerRequest"
+    "KanjiWorkerRequest"
   );
   return fn;
 };
@@ -51,142 +119,67 @@ export const useGetKanjiInfoFn = () => {
   return fn;
 };
 
+type SearchResult = { kanjis: string[]; possibleRadicals?: Set<string> };
+
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
-  const [state, setState] = useState<{
-    status: Status;
-    data?: string[];
-    additionalData?: unknown;
-    error?: string | null;
-  }>({ status: "idle" });
+  const state = useWorkerQuery<SearchResult>(
+    () =>
+      requestWorker({
+        type: "search",
+        payload: searchSettings,
+      }) as Promise<SearchResult>,
+    [searchSettings]
+  );
 
-  const lastRequestedSettings = useRef<null | SearchSettings>(null);
-
-  // Effect needed: sends a search request to the web worker (external async
-  // system) whenever the settings change; the ref dedupes double-fires.
-  useEffect(() => {
-    const doubleRequest = lastRequestedSettings.current === searchSettings;
-
-    if (doubleRequest) {
-      return;
-    }
-
-    lastRequestedSettings.current = searchSettings;
-
-    setState((prev) => {
-      return { status: "loading", data: prev.data };
-    });
-
-    requestWorker({ type: "search", payload: searchSettings })
-      .then((result: unknown) => {
-        const newData = result as {
-          kanjis: string[];
-          possibleRadicals: Set<string> | undefined;
-        };
-        setState({
-          status: "success",
-          error: null,
-          data: newData.kanjis as string[],
-          additionalData: newData.possibleRadicals,
-        });
-      })
-      .catch((error) => {
-        setState({ status: "error", error });
-      });
-  }, [searchSettings]);
-
-  return state;
+  return {
+    status: state.status,
+    data: state.data?.kanjis,
+    additionalData: state.data?.possibleRadicals,
+    error: (state.error as string | undefined) ?? null,
+  };
 };
 
 export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
-  const [state, setState] = useState<{
-    status: Status;
-    data?: number;
-    error?: string | null;
-  }>({ status: "idle" });
+  const state = useWorkerQuery<number>(
+    () =>
+      requestWorker({
+        type: "search-result-count",
+        payload: searchSettings,
+      }) as Promise<number>,
+    [searchSettings]
+  );
 
-  const lastRequestedSettings = useRef<null | SearchSettings>(null);
-
-  // Effect needed: worker request keyed to the settings (external async
-  // system); the ref dedupes double-fires.
-  useEffect(() => {
-    const doubleRequest = lastRequestedSettings.current === searchSettings;
-
-    if (doubleRequest) {
-      return;
-    }
-
-    lastRequestedSettings.current = searchSettings;
-
-    setState((prev) => {
-      return { status: "loading", data: prev.data };
-    });
-
-    requestWorker({ type: "search-result-count", payload: searchSettings })
-      .then((result: unknown) => {
-        setState({
-          status: "success",
-          error: null,
-          data: result as number,
-        });
-      })
-      .catch((error) => {
-        setState({ status: "error", error });
-      });
-  }, [searchSettings]);
-
-  return state;
+  return {
+    status: state.status,
+    data: state.data,
+    error: (state.error as string | undefined) ?? null,
+  };
 };
 
 export const useKanjiInfo = (
   kanji: string,
   requestType: KanjiInfoRequestType | "none"
 ) => {
-  const [state, setState] = useState<{
-    status: Status;
-    data?: unknown;
-    error?: { message: string } | null;
-  }>({
-    status: "idle",
-    data: null,
-  });
   const requestFn = useKanjiWorkerRequest();
 
-  // Effect needed: fetches kanji info from the web worker whenever the
-  // kanji/request type changes.
-  useEffect(() => {
-    if (requestFn == null) {
-      setState({
-        status: "error",
-        error: {
-          message: "requestFn does not exist. Please check KanjiWorkerProvider",
-        },
-      });
+  const state = useWorkerQuery<unknown>(
+    requestType === "none"
+      ? null
+      : () =>
+          requestFn == null
+            ? Promise.reject({
+                message:
+                  "requestFn does not exist. Please check KanjiWorkerProvider",
+              })
+            : requestFn(kanji, requestType),
+    [kanji, requestType, requestFn]
+  );
 
-      return;
-    }
-
-    if (requestType === "none") {
-      return;
-    }
-
-    setState((prev) => {
-      return { status: "loading", data: prev.data };
-    });
-    requestFn(kanji, requestType)
-      .then((result: unknown) => {
-        setState({
-          status: "success",
-          error: null,
-          data: result,
-        });
-      })
-      .catch((error) => {
-        setState({ status: "error", error });
-      });
-
-    return;
-  }, [kanji, requestType, requestFn]);
-  return state;
+  return {
+    status: state.status,
+    data: state.data ?? null,
+    error: (state.error as { message: string } | undefined) ?? null,
+  };
 };
 
 export const useKanjiSearchResult = () => {
@@ -203,8 +196,6 @@ export interface VocabInfo {
   parts: WordPartDetail[];
 }
 
-type VocabStatus = "idle" | "pending" | "success" | "error";
-
 type VocabWorkerResponse = {
   word: string;
   meaning: string;
@@ -213,131 +204,70 @@ type VocabWorkerResponse = {
 
 // Hook to get vocab info for a specific word
 export const useVocabDetails = (word: string) => {
-  const [state, setState] = useState<{
-    status: VocabStatus;
-    error: Error | null;
-    vocabInfo: VocabInfo | null;
-  }>({
-    status: "idle",
-    error: null,
-    vocabInfo: null,
-  });
+  const state = useWorkerQuery<VocabInfo | null>(
+    word
+      ? () =>
+          requestWorker({ type: "retrieve-vocab-info", payload: word }).then(
+            (result) => {
+              const response = result as VocabWorkerResponse;
+              if (response == null) {
+                return null;
+              }
+              return {
+                meaning: response.meaning || "",
+                parts: response.wordPartDetails,
+              };
+            }
+          )
+      : null,
+    [word]
+  );
 
-  const lastRequestedWord = useRef<string | null>(null);
-
-  // Effect needed: fetches vocab details from the web worker when the word
-  // changes; the ref dedupes repeat requests.
-  useEffect(() => {
-    if (!word) {
-      setState({ status: "idle", error: null, vocabInfo: null });
-      return;
-    }
-
-    // Avoid duplicate requests for the same word
-    if (lastRequestedWord.current === word) {
-      return;
-    }
-
-    lastRequestedWord.current = word;
-
-    setState((prev) => ({ ...prev, status: "pending" }));
-
-    requestWorker({ type: "retrieve-vocab-info", payload: word })
-      .then((result) => {
-        const response = result as VocabWorkerResponse;
-
-        if (response == null) {
-          setState({
-            status: "success",
-            error: null,
-            vocabInfo: null,
-          });
-          return;
-        }
-
-        setState({
-          status: "success",
-          error: null,
-          vocabInfo: {
-            meaning: response.meaning || "",
-            parts: response.wordPartDetails,
-          },
-        });
-      })
-      .catch((err) => {
-        setState({
-          status: "error",
-          error: err instanceof Error ? err : new Error(String(err)),
-          vocabInfo: null,
-        });
-      });
-  }, [word]);
-
-  return state;
+  return {
+    status: state.status,
+    error:
+      state.error == null
+        ? null
+        : state.error instanceof Error
+          ? state.error
+          : new Error(String(state.error)),
+    vocabInfo: state.data ?? null,
+  };
 };
 
 export const useWordKanjis = (word: string) => {
   const getKanjiInfo = useGetKanjiInfoFn();
 
-  const kanjis = (word || "").split("").filter(isKanji);
-  const uniqueKanjis = [...new Set(kanjis)];
-
-  if (!getKanjiInfo) {
-    return [];
-  }
-
-  return uniqueKanjis
-    .map((kanji) => {
-      const info = getKanjiInfo(kanji);
-      return {
-        kanji,
-        keyword: info?.keyword || "Unknown",
-        isKanji: true,
-      };
-    })
-    .filter((item) => item.keyword !== "Unknown" || item.isKanji);
+  return useMemo(() => {
+    if (!getKanjiInfo) {
+      return [];
+    }
+    const uniqueKanjis = [...new Set((word || "").split("").filter(isKanji))];
+    return uniqueKanjis.map((kanji) => ({
+      kanji,
+      keyword: getKanjiInfo(kanji)?.keyword || "Unknown",
+    }));
+  }, [word, getKanjiInfo]);
 };
 
 export const useSimilarKanjis = (kanji: string) => {
-  const [state, setState] = useState<{
-    status: Status;
-    data?: string[];
-    error?: string | null;
-  }>({ status: "idle" });
+  const state = useWorkerQuery<string[]>(
+    kanji
+      ? () =>
+          requestWorker({
+            type: "kanji-similar",
+            payload: kanji,
+          }) as Promise<string[]>
+      : null,
+    [kanji],
+    // Reset to empty between kanji so the previous kanji's matches never show
+    // for the next one.
+    false
+  );
 
-  // Effect needed: fetches similar kanji from the web worker; the cancelled
-  // flag guards against stale responses after kanji changes/unmount.
-  useEffect(() => {
-    if (!kanji) {
-      setState({ status: "idle", data: [], error: null });
-      return;
-    }
-
-    let cancelled = false;
-    setState({ status: "loading", data: undefined });
-
-    requestWorker({ type: "kanji-similar", payload: kanji })
-      .then((result) => {
-        if (cancelled) return;
-        setState({
-          status: "success",
-          error: null,
-          data: result as string[],
-        });
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        setState({
-          status: "error",
-          error: typeof error === "string" ? error : String(error),
-          data: [],
-        });
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [kanji]);
-
-  return state;
+  return {
+    status: state.status,
+    data: kanji ? state.data : [],
+    error: state.error == null ? null : String(state.error),
+  };
 };
