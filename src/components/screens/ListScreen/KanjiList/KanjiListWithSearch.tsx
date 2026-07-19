@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
 import {
   useGetKanjiInfoFn,
@@ -16,6 +17,17 @@ const KanjiListWithSearch = () => {
   const searchSettings = useSearchSettings();
   const getBasicInfo = useGetKanjiInfoFn();
 
+  // Memoized: VirtualKanjiList is React.memo'd, and the sort/filter paths of
+  // getFinalResults build a fresh array — a stable identity keeps the memo
+  // effective.
+  const kanjiKeys = useMemo(
+    () =>
+      result.data == null
+        ? []
+        : getFinalResults(searchSettings, result.data, getBasicInfo),
+    [searchSettings, result.data, getBasicInfo]
+  );
+
   if (result.error != null) {
     return <DefaultErrorFallback message="Failed to load data." />;
   }
@@ -23,8 +35,6 @@ const KanjiListWithSearch = () => {
   if (result.data == null) {
     return <LoadingKanjis />;
   }
-
-  const kanjiKeys = getFinalResults(searchSettings, result.data, getBasicInfo);
 
   if (kanjiKeys.length === 0) {
     return <NoSearchResults />;

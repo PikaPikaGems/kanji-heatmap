@@ -1,6 +1,6 @@
 import { Link } from "@/components/dependent/routing";
 import { useLocation } from "@/components/dependent/routing/router-adapter";
-import { floatingIslandNavLinks } from "@/components/items/nav-links";
+import { floatingIslandNavLinks } from "@/lib/pages/nav-links";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
 

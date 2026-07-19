@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { BOOKMARK_KEY_PREFIX } from "@/lib/bookmarks";
+import { useStorageValue } from "./use-storage-value";
 
 /** Parse `b:{kanji}:{word}` → kanji character, or null if malformed. */
 export const kanjiFromBookmarkKey = (key: string): string | null => {
@@ -23,21 +23,8 @@ const readBookmarkedKanji = (): string[] => {
 };
 
 /** Reactive list of bookmarked kanji (1:1 with representative words). */
-export const useBookmarkedKanji = () => {
-  const [kanji, setKanji] = useState<string[]>(() => readBookmarkedKanji());
-
-  useEffect(() => {
-    const refresh = () => setKanji(readBookmarkedKanji());
-    refresh();
-
-    const onStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith(BOOKMARK_KEY_PREFIX) || e.key == null) {
-        refresh();
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  return kanji;
-};
+export const useBookmarkedKanji = () =>
+  useStorageValue(
+    readBookmarkedKanji,
+    (key) => key == null || key.startsWith(BOOKMARK_KEY_PREFIX)
+  );

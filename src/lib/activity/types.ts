@@ -2,7 +2,7 @@ import {
   productionPracticePageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
-} from "@/components/items/practice-pages";
+} from "@/lib/pages/practice-pages";
 
 export type ActivityKind = "speedKatakana" | "production" | "recognition";
 
@@ -36,6 +36,9 @@ export type ActivityKindFilters = Record<ActivityKind, boolean>;
 
 export type WindowedActivityStats = {
   daysActive: number;
+  speedKatakanaDays: number;
+  productionDays: number;
+  recognitionDays: number;
   speedKatakanaSessions: number;
   productionRounds: number;
   recognitionRounds: number;
@@ -67,7 +70,7 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
 };
 
 export const ALL_ACTIVITY_KINDS: ActivityKind[] = [
-  "speedKatakana",
   "production",
   "recognition",
+  "speedKatakana",
 ];

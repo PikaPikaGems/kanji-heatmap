@@ -6,6 +6,8 @@ const COUNT_UP_MS = 900;
 const useCountUp = (target: number) => {
   const [value, setValue] = useState(0);
 
+  // Effect needed: requestAnimationFrame loop driving the count-up,
+  // cancelled on unmount/target change.
   useEffect(() => {
     let frame = 0;
     const start = performance.now();

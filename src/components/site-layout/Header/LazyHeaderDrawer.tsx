@@ -1,17 +1,17 @@
-import { lazy, Suspense, useState } from "react";
-import { Menu } from "lucide-react";
+import { lazy, useState } from "react";
+import { Loader2, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const HeaderDrawer = lazy(() => import("./HeaderDrawer"));
 
-const MenuTriggerFallback = ({ disabled = false }: { disabled?: boolean }) => (
+export const HeaderDrawerLoadingFallback = () => (
   <Button
     variant="outline"
     size="iconXl"
-    aria-label="Open menu"
-    disabled={disabled}
+    aria-label="Loading navigation menu"
+    disabled
   >
-    <Menu className="w-7 h-7" />
+    <Loader2 className="w-7 h-7 animate-spin" />
   </Button>
 );
 
@@ -34,11 +34,7 @@ const LazyHeaderDrawer = () => {
     );
   }
 
-  return (
-    <Suspense fallback={<MenuTriggerFallback disabled />}>
-      <HeaderDrawer initiallyOpen />
-    </Suspense>
-  );
+  return <HeaderDrawer initiallyOpen />;
 };
 
 export default LazyHeaderDrawer;

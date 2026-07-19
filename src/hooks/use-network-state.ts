@@ -1,156 +1,56 @@
-"use client";
+import { useEffect, useState } from "react";
 
-import { useState, useEffect, useCallback } from "react";
-
-export interface INetworkInformation extends EventTarget {
-  readonly downlink: number;
-  readonly downlinkMax: number;
-  readonly effectiveType: "slow-2g" | "2g" | "3g" | "4g";
-  readonly rtt: number;
-  readonly saveData: boolean;
-  readonly type:
-    | "bluetooth"
-    | "cellular"
-    | "ethernet"
-    | "none"
-    | "wifi"
-    | "wimax"
-    | "other"
-    | "unknown";
-
-  onChange: (event: Event) => void;
+export interface NetworkState {
+  /** Whether the browser is currently online (navigator.onLine). */
+  online: boolean;
+  /** Effective connection type, when the Network Information API is available. */
+  effectiveType?: "slow-2g" | "2g" | "3g" | "4g";
+  /** True when the user has requested reduced data usage. */
+  saveData?: boolean;
 }
 
-export interface IUseNetworkState {
-  /**
-   * @desc Whether browser connected to the network or not.
-   */
-  online: boolean | undefined;
-  /**
-   * @desc Previous value of `online` property. Helps to identify if browser
-   * just connected or lost connection.
-   */
-  previous: boolean | undefined;
-  /**
-   * @desc The {Date} object pointing to the moment when state change occurred.
-   */
-  since: Date | undefined;
-  /**
-   * @desc Effective bandwidth estimate in megabits per second, rounded to the
-   * nearest multiple of 25 kilobits per seconds.
-   */
-  downlink: INetworkInformation["downlink"] | undefined;
-  /**
-   * @desc Maximum downlink speed, in megabits per second (Mbps), for the
-   * underlying connection technology
-   */
-  downlinkMax: INetworkInformation["downlinkMax"] | undefined;
-  /**
-   * @desc Effective type of the connection meaning one of 'slow-2g', '2g', '3g', or '4g'.
-   * This value is determined using a combination of recently observed round-trip time
-   * and downlink values.
-   */
-  effectiveType: INetworkInformation["effectiveType"] | undefined;
-  /**
-   * @desc Estimated effective round-trip time of the current connection, rounded
-   * to the nearest multiple of 25 milliseconds
-   */
-  rtt: INetworkInformation["rtt"] | undefined;
-  /**
-   * @desc {true} if the user has set a reduced data usage option on the user agent.
-   */
-  saveData: INetworkInformation["saveData"] | undefined;
-  /**
-   * @desc The type of connection a device is using to communicate with the network.
-   * It will be one of the following values:
-   *  - bluetooth
-   *  - cellular
-   *  - ethernet
-   *  - none
-   *  - wifi
-   *  - wimax
-   *  - other
-   *  - unknown
-   */
-  type: INetworkInformation["type"] | undefined;
+interface NetworkInformation extends EventTarget {
+  readonly effectiveType?: NetworkState["effectiveType"];
+  readonly saveData?: boolean;
 }
 
 interface NavigatorWithConnection extends Navigator {
-  connection?: INetworkInformation;
+  connection?: NetworkInformation;
 }
 
-export function useNetworkState(): IUseNetworkState {
-  const [state, setState] = useState<IUseNetworkState>({
-    online: undefined,
-    previous: undefined,
-    since: undefined,
-    downlink: undefined,
-    downlinkMax: undefined,
-    effectiveType: undefined,
-    rtt: undefined,
-    saveData: undefined,
-    type: undefined,
-  });
+const readNetworkState = (): NetworkState => {
+  const connection = (navigator as NavigatorWithConnection).connection;
+  return {
+    online: navigator.onLine,
+    effectiveType: connection?.effectiveType,
+    saveData: connection?.saveData,
+  };
+};
 
-  const updateNetworkInfo = useCallback(() => {
-    if (typeof navigator === "undefined") return;
+/**
+ * Current online status plus the two Network Information API fields the app
+ * actually reads (effectiveType, saveData). Re-reads on online/offline and on
+ * connection change.
+ */
+export function useNetworkState(): NetworkState {
+  const [state, setState] = useState<NetworkState>(readNetworkState);
 
-    const online = navigator.onLine;
-    const now = new Date();
-
-    setState((prevState) => {
-      const nextState: IUseNetworkState = {
-        online,
-        previous: prevState.online,
-        since: prevState.online !== online ? now : prevState.since,
-        downlink: undefined,
-        downlinkMax: undefined,
-        effectiveType: undefined,
-        rtt: undefined,
-        saveData: undefined,
-        type: undefined,
-      };
-
-      const connection = (navigator as NavigatorWithConnection).connection as
-        | INetworkInformation
-        | undefined;
-      if (connection) {
-        nextState.downlink = connection.downlink;
-        nextState.downlinkMax = connection.downlinkMax;
-        nextState.effectiveType = connection.effectiveType;
-        nextState.rtt = connection.rtt;
-        nextState.saveData = connection.saveData;
-        nextState.type = connection.type;
-      }
-
-      return nextState;
-    });
-  }, []);
-
+  // Effect needed: subscribes to online/offline and connection-change events.
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const update = () => setState(readNetworkState());
+    update();
 
-    updateNetworkInfo();
-
-    window.addEventListener("online", updateNetworkInfo);
-    window.addEventListener("offline", updateNetworkInfo);
-
-    const connection = (navigator as NavigatorWithConnection).connection as
-      | INetworkInformation
-      | undefined;
-    if (connection) {
-      connection.addEventListener("change", updateNetworkInfo);
-    }
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    const connection = (navigator as NavigatorWithConnection).connection;
+    connection?.addEventListener?.("change", update);
 
     return () => {
-      window.removeEventListener("online", updateNetworkInfo);
-      window.removeEventListener("offline", updateNetworkInfo);
-
-      if (connection) {
-        connection.removeEventListener("change", updateNetworkInfo);
-      }
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+      connection?.removeEventListener?.("change", update);
     };
-  }, [updateNetworkInfo]);
+  }, []);
 
   return state;
 }

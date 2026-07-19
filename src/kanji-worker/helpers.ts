@@ -23,7 +23,7 @@ const createFetch = <T>(path: string) => {
     });
 };
 
-export const fetchMainManjiInfo = createFetch<MainKanjiInfoResponseType>(
+export const fetchMainKanjiInfo = createFetch<MainKanjiInfoResponseType>(
   assetsPaths.MAIN_KANJI_INFO_FILE_PATH
 );
 
@@ -80,18 +80,14 @@ export const transformToMainKanjiInfo = (
 ): KanjiMainInfo => {
   const [keyword, on, kun, jlptRaw, freq] = raw;
 
-  const jlpt: JLTPTtypes =
-    jlptRaw === 5
-      ? "n5"
-      : jlptRaw === 4
-        ? "n4"
-        : jlptRaw === 3
-          ? "n3"
-          : jlptRaw === 2
-            ? "n2"
-            : jlptRaw === 1
-              ? "n1"
-              : "none";
+  const jlptByRawLevel: Record<number, JLTPTtypes> = {
+    5: "n5",
+    4: "n4",
+    3: "n3",
+    2: "n2",
+    1: "n1",
+  };
+  const jlpt: JLTPTtypes = jlptByRawLevel[jlptRaw] ?? "none";
 
   // TODO: This assumes that the "raw" which is the data from JSON
   // has no issues. (IE. No missing values, numbers are not string, undefined or NaN)

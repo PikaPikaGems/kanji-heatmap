@@ -1,16 +1,13 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/error";
+import { PageLoadingFallback } from "@/components/dependent/site-wide/PageLoadingFallback";
 
 const LazySpeedKatakanaScreen = lazy(() => import("./SpeedKatakanaScreen"));
-
-const PracticeRouteFallback = () => (
-  <div className="fixed inset-0 bg-background animate-fade-in" aria-hidden />
-);
 
 const SpeedKatakanaScreen = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<PracticeRouteFallback />}>
+      <Suspense fallback={<PageLoadingFallback />}>
         <LazySpeedKatakanaScreen />
       </Suspense>
     </ErrorBoundary>

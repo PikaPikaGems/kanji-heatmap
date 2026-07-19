@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
 import { StrokePreview } from "../StrokePreview";
@@ -11,12 +12,15 @@ import { NextKanjiFooter, PracticeDrawerShell } from "./PracticeDrawerShell";
 /** Side-by-side preview size; stays under ~42vw so 320px phones don't overflow. */
 const PREVIEW_SIZE = 130;
 
+const ENTER_OR_SPACE = ["Enter", " "] as const;
+
 export const FeedbackDrawer = ({
   open,
   kind,
   item,
   grade,
   drawing,
+  gradingEnabled = true,
   onNext,
 }: {
   open: boolean;
@@ -24,51 +28,31 @@ export const FeedbackDrawer = ({
   item: PracticeItem;
   grade: GradeRankInfo;
   drawing: DrawingSnapshot | null;
+  gradingEnabled?: boolean;
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
 
   // Enter/Space → Next Kanji. Arm after a beat so the key that opened
   // feedback (e.g. Enter on Select → Next) doesn't also advance.
-  useEffect(() => {
-    if (!open || practiceOpen) return;
-
-    let armed = false;
-    const arm = () => {
-      armed = true;
-    };
-    const armTimeout = window.setTimeout(arm, 300);
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") arm();
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!armed || (e.key !== "Enter" && e.key !== " ") || e.isComposing) {
-        return;
-      }
-      const el = e.target as HTMLElement | null;
-      if (!el) return;
-      const tag = el.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (el.isContentEditable) return;
-      e.preventDefault();
-      onNext();
-    };
-
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.clearTimeout(armTimeout);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, practiceOpen, onNext]);
+  useArmedConfirmKey({
+    onConfirm: onNext,
+    enabled: open && !practiceOpen,
+    keys: ENTER_OR_SPACE,
+  });
 
   const title =
     kind === "noKanji"
       ? "No worries — here it is"
-      : feedbackTitle(kind === "correct" ? "correct" : "incorrect", grade.rank);
+      : !gradingEnabled && kind === "correct"
+        ? "🎉 That's the one!"
+        : feedbackTitle(
+            kind === "correct" ? "correct" : "incorrect",
+            grade.rank
+          );
 
-  const bounce = kind === "correct" && grade.rank === 0;
+  // Celebrate any correct pick when stroke grading is off.
+  const bounce = kind === "correct" && (!gradingEnabled || grade.rank === 0);
 
   return (
     <>

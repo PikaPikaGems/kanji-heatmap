@@ -155,9 +155,34 @@ export const buildCalendarWeeks = (range: DateRange): (string | null)[][] => {
   return weeks;
 };
 
-/** Month label positions for calendar header (week index → single letter). */
+export type MonthLabelType = "short" | "japanese-numbers";
+
+const JAPANESE_MONTH_LABELS = [
+  "一",
+  "二",
+  "三",
+  "四",
+  "五",
+  "六",
+  "七",
+  "八",
+  "九",
+  "十",
+  "霜", // 霜月 (November)
+  "師", // 師走 (December)
+] as const;
+
+const monthLabelFor = (month: number, labelType: MonthLabelType): string => {
+  if (labelType === "japanese-numbers") return JAPANESE_MONTH_LABELS[month];
+  return new Date(2000, month, 1).toLocaleDateString("en-US", {
+    month: "short",
+  })[0];
+};
+
+/** Month label positions for calendar header (week index → label). */
 export const monthLabelsForWeeks = (
-  weeks: (string | null)[][]
+  weeks: (string | null)[][],
+  labelType: MonthLabelType = "short"
 ): { weekIndex: number; label: string }[] => {
   const labels: { weekIndex: number; label: string }[] = [];
   let lastMonth = -1;
@@ -168,9 +193,7 @@ export const monthLabelsForWeeks = (
     const date = parseLocalDateKey(firstInRange);
     const month = date.getMonth();
     if (month !== lastMonth) {
-      // Cursor/GitHub-compact: single letter (J F M A M J J A S O N D)
-      const letter = date.toLocaleDateString("en-US", { month: "short" })[0];
-      labels.push({ weekIndex, label: letter });
+      labels.push({ weekIndex, label: monthLabelFor(month, labelType) });
       lastMonth = month;
     }
   });

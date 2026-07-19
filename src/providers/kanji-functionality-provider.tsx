@@ -6,7 +6,6 @@ import { DefaultErrorFallback } from "@/components/error";
 import { SearchSettingsProvider } from "./search-settings-provider";
 import { ItemSettingsProvider } from "./item-settings-provider";
 import { KanjiReadingCategoryProvider } from "./kanji-reading-category-provider";
-import { KanjiStructureProvider } from "./kanji-structure-provider";
 import { MultiKanjiStructureProvider } from "./multiple-kanji-structure-provider";
 import { KanjiRepresentativeWordProvider } from "./kanji-representative-word-provider";
 
@@ -20,17 +19,15 @@ export const KanjiFunctionalityProvider = ({
       <KanjiWorkerProvider
         fallback={
           <div className="py-20">
-            <DefaultErrorFallback message="Well, this is embarrasing. Something went wrong." />
+            <DefaultErrorFallback message="Well, this is embarrassing. Something went wrong." />
           </div>
         }
       >
         <KanjiRepresentativeWordProvider>
           <KanjiReadingCategoryProvider>
-            <KanjiStructureProvider>
-              <MultiKanjiStructureProvider>
-                <ItemSettingsProvider>{children}</ItemSettingsProvider>
-              </MultiKanjiStructureProvider>
-            </KanjiStructureProvider>
+            <MultiKanjiStructureProvider>
+              <ItemSettingsProvider>{children}</ItemSettingsProvider>
+            </MultiKanjiStructureProvider>
           </KanjiReadingCategoryProvider>
         </KanjiRepresentativeWordProvider>
       </KanjiWorkerProvider>

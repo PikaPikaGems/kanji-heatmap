@@ -195,6 +195,20 @@ const pwaConfig = {
         },
       },
       // **********************
+      // DOCS MARKDOWN from public folder (same caching trade-off as JSON)
+      // **********************
+      {
+        urlPattern: /\/md\/.*\.md$/i,
+        handler: "StaleWhileRevalidate" as const,
+        options: {
+          cacheName: "kanji-heatmap-md-cache",
+          expiration: {
+            maxEntries: 10,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      // **********************
       // Cache KANJI SAMPLE VOCABULARY from external source
       // **********************
       {

@@ -1,15 +1,16 @@
 import React from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { CircleX } from "@/components/icons";
 import { ErrorBoundary } from "@/components/error";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+import {
+  BOTTOM_SHEET_CHROME_CN,
+  DrawerCloseButton,
+} from "@/components/common/BottomSheet";
 
 import { KanjiInfoContent } from "./KanjiInfoContent";
 
@@ -28,7 +29,9 @@ export function KanjiDrawerRaw({
   // Also: autoFocus=true prevents the issue of search input from unnecessarily retaining focus
   return (
     <Drawer open={isOpen} onClose={onClose} autoFocus={true}>
-      <DrawerContent className="!select-text h-[calc(100dvh_-_40px)] !duration-200 border-2 border-t-4 [border-top-style:dashed]">
+      <DrawerContent
+        className={`${BOTTOM_SHEET_CHROME_CN} h-[calc(100dvh_-_40px)]`}
+      >
         <DrawerTitle className="sr-only">Information for Kanji</DrawerTitle>
         <DrawerDescription className="sr-only">
           Includes Sample Usage, Semantic Phonetic Compositions etc.
@@ -36,15 +39,7 @@ export function KanjiDrawerRaw({
         <ErrorBoundary>
           <KanjiInfoContent kanji={kanji} />
         </ErrorBoundary>
-        <DrawerClose asChild className="absolute top-2 right-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-4 border-2 border-dashed rounded-xl bg-background z-1000!"
-          >
-            <CircleX className="size-8" />
-          </Button>
-        </DrawerClose>
+        <DrawerCloseButton />
       </DrawerContent>
     </Drawer>
   );

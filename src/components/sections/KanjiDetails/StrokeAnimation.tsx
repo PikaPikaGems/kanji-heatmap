@@ -1,138 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import Raphael from "raphael";
-import "dmak";
-import { useEffect, useId, useState } from "react";
-import { PracticeButton } from "@/components/ui/practice-button";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import assetsPaths from "@/lib/assets-paths";
-import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
-import { PlayCircle, Snail } from "@/components/icons";
-import {
-  DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
-} from "@/components/dependent/DrawingPad";
+import { KanjiDMAK, StrokeOrderReplay } from "@/components/common/KanjiDmak";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
 import { Rocket } from "lucide-react";
 
-// Stock dmak crashes on null kvg: root — install our guarded loader once.
-installSafeDmakLoader();
-
-type AnimationSpeed = "fast" | "slow";
-
-const SPEEDS: Record<AnimationSpeed, { rate: number }> = {
-  fast: { rate: 0.0095 },
-  slow: { rate: 0.022 },
-};
-
-const KanjiDMAK = ({
-  kanji,
-  step = SPEEDS.slow.rate,
-  size = SVG_SIZE,
-  staticMode = false,
-  gridShow = true,
-}: {
-  kanji: string;
-  step?: number;
-  size?: number;
-  // when true: draws all strokes instantly with stroke-order numbers visible
-  staticMode?: boolean;
-  gridShow?: boolean;
-}) => {
-  const id = useId();
-  const kanjiId = `${id}-${kanji}-draw`;
-
-  useEffect(() => {
-    (window as any).Raphael = Raphael;
-
-    const dmak = new (window as any).Dmak(kanji, {
-      element: kanjiId,
-      uri:
-        import.meta.env.MODE === "development" ||
-        window.location.protocol === "http:"
-          ? assetsPaths.dev.KANJI_SVGS
-          : assetsPaths.KANJI_SVGS,
-      height: size,
-      width: size,
-      step: step,
-      // NOTE: dmak's stroke.animated is an object { drawing, erasing }, not a boolean.
-      // Passing a plain boolean breaks stroke.animated.drawing access — do not change.
-      stroke: staticMode
-        ? {
-            animated: { drawing: false, erasing: false },
-            order: { visible: true },
-            attr: { stroke: "random" },
-          }
-        : { attr: { stroke: "random" } },
-
-      grid: { show: gridShow },
-    });
-
-    return () => {
-      abandonDmak(dmak);
-      // Strict Mode re-runs this effect on the same host — clear leftover SVG.
-      document.getElementById(kanjiId)?.replaceChildren();
-      // Keep window.Raphael set; other KanjiDMAK instances may still need it.
-    };
-  }, [kanji, kanjiId, step, size, staticMode, gridShow]);
-
-  return <div id={kanjiId} />;
-};
-
-export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
-  const [key, setKey] = useState(1);
-  const [speed, setSpeed] = useState<AnimationSpeed>("fast");
-  const replay = () => setKey((x) => x + 1);
-
-  return (
-    <div className="p-4">
-      {/** key needed to redraw on change  */}
-      <div
-        role="button"
-        tabIndex={0}
-        title="Replay stroke order"
-        className={`${CONTAINER_CN} cursor-pointer`}
-        style={{ height: SVG_SIZE }}
-        onClick={replay}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            replay();
-          }
-        }}
-      >
-        <div key={`${kanji}-${speed}-${key}`}>
-          <KanjiDMAK kanji={kanji} step={SPEEDS[speed].rate} />
-        </div>
-      </div>
-      <div className="flex justify-center space-x-2">
-        <PracticeButton
-          size="icon"
-          onClick={() => {
-            setSpeed("fast");
-            replay();
-          }}
-        >
-          <PlayCircle />
-          <span className="sr-only">Animate</span>
-        </PracticeButton>
-        <PracticeButton
-          size="icon"
-          variant="secondary"
-          onClick={() => {
-            setSpeed("slow");
-            replay();
-          }}
-        >
-          <Snail /> <span className="sr-only">Animate Slowly</span>
-        </PracticeButton>
-      </div>
-    </div>
-  );
-};
+export const StrokeAnimation = ({ kanji }: { kanji: string }) => (
+  <div className="p-4">
+    <StrokeOrderReplay
+      kanji={kanji}
+      size={SVG_SIZE}
+      replayClassName={CONTAINER_CN}
+    />
+  </div>
+);
 
 const HINT_SVG_SIZE = 85;
 
@@ -175,11 +61,15 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   const [result, setResult] = useState<GradeResult | null>(null);
   const padSize = useFitPadSize(SVG_SIZE);
 
-  useEffect(() => {
+  // Reset the drawing when the pad is resized — in-render previous-state
+  // pattern instead of a sync effect.
+  const [prevPadSize, setPrevPadSize] = useState(padSize);
+  if (prevPadSize !== padSize) {
+    setPrevPadSize(padSize);
     setStrokes([]);
     setStatus("idle");
     setResult(null);
-  }, [padSize]);
+  }
 
   const onGrade = async (payload: DrawingSubmitPayload) => {
     if (payload.strokes.length === 0) {
@@ -221,11 +111,13 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
 
       <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
         {status === "loading" && (
-          <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
+          <div className="animate-fade-in opacity-80">
+            <RecognizingStatus label="採点中 · Grading…" />
+          </div>
         )}
         {status === "error" && (
-          <div className="animate-fade-in text-destructive">
-            The DaKanji recognizer couldn&apos;t be loaded right now.
+          <div className="animate-fade-in">
+            すみません 🙇🏽‍♀️ 🙇. The grader {`couldn't`} be loaded right now.
           </div>
         )}
         {status === "success" && result != null && (

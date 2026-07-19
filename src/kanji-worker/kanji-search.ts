@@ -4,7 +4,7 @@ import {
   KanjiExtendedInfo,
   KanjiMainInfo,
 } from "@/lib/kanji/kanji-worker-types";
-import { SearchSettings } from "@/lib/settings/settings";
+import { SearchSettings, SearchType } from "@/lib/settings/settings";
 import {
   K_JLPT,
   K_JOUYOU_KEY,
@@ -94,39 +94,94 @@ export const filterByKanjiSimple = (
     });
 };
 
+// How each search type interprets the query text: how the text is normalized
+// before matching, and what makes a kanji a hit. Adding a search type means
+// adding one entry here (the SearchType record makes forgetting one a type
+// error) instead of editing scattered branches inside filterKanji.
+type MatchContext = {
+  pool: DataPool;
+  /** The normalized search text. */
+  text: string;
+  /** Kanji characters extracted from the text (for kanji-list searches). */
+  kanjiSet: Set<string>;
+};
+
+type SearchDescriptor = {
+  normalize: (trimmedText: string) => string;
+  match: (kanji: string, ctx: MatchContext) => boolean;
+};
+
+const toHiraganaText = (text: string) => wanakana.toHiragana(text);
+const toRomajiText = (text: string) => wanakana.toRomaji(text.toLowerCase());
+const keepRawText = (text: string) => text;
+
+// multi-kanji and the handwriting variants all match against the kanji
+// characters found in the query text.
+const kanjiListSearch: SearchDescriptor = {
+  normalize: keepRawText,
+  match: (kanji, { kanjiSet }) => kanjiSet.has(kanji),
+};
+
+// similar has its own expansion path in filterKanji, and radicals is handled
+// by searchByRadical — inside plain text filtering both match everything.
+const matchEverything: SearchDescriptor = {
+  normalize: keepRawText,
+  match: () => true,
+};
+
+const SEARCH_DESCRIPTORS: Record<SearchType, SearchDescriptor> = {
+  keyword: {
+    normalize: toRomajiText,
+    match: (kanji, { pool, text }) => pool.main[kanji].keyword.includes(text),
+  },
+  meanings: {
+    normalize: toRomajiText,
+    match: (kanji, { pool, text }) =>
+      pool.main[kanji].keyword.includes(text) ||
+      pool.extended[kanji].meanings.find((meaning) => meaning.includes(text)) !=
+        null,
+  },
+  onyomi: {
+    normalize: toHiraganaText,
+    match: (kanji, { pool, text }) => pool.extended[kanji].allOn.has(text),
+  },
+  kunyomi: {
+    normalize: toHiraganaText,
+    match: (kanji, { pool, text }) =>
+      pool.extended[kanji].allKunStripped.has(text),
+  },
+  readings: {
+    normalize: toHiraganaText,
+    match: (kanji, { pool, text }) =>
+      pool.extended[kanji].allOn.has(text) ||
+      pool.extended[kanji].allKunStripped.has(text),
+  },
+  "multi-kanji": kanjiListSearch,
+  handwriting: kanjiListSearch,
+  "handwriting-alt": kanjiListSearch,
+  "handwriting-alt-2": kanjiListSearch,
+  similar: matchEverything,
+  radicals: matchEverything,
+};
+
+const extractKanjiCharacters = (text: string) =>
+  text.split("").filter((character) => {
+    return (
+      wanakana.isHiragana(character) === false &&
+      wanakana.isKatakana(character) === false &&
+      wanakana.isRomaji(character) === false &&
+      wanakana.isJapanese(character)
+    );
+  });
+
 export const filterKanji = (
   allKanji: string[],
   settings: SearchSettings,
   kanjiPool: DataPool
 ) => {
   const textSearch = settings.textSearch;
-
-  const trimmedSearchText = textSearch.text.trim();
-  const textToSearch =
-    textSearch.type === "onyomi" ||
-    textSearch.type === "kunyomi" ||
-    textSearch.type === "readings"
-      ? wanakana.toHiragana(trimmedSearchText)
-      : textSearch.type == "meanings" || textSearch.type === "keyword"
-        ? wanakana.toRomaji(trimmedSearchText.toLowerCase())
-        : trimmedSearchText;
-
-  const kanjisToSearchList =
-    textSearch.type === "multi-kanji" ||
-    textSearch.type === "handwriting" ||
-    textSearch.type === "handwriting-alt" ||
-    textSearch.type === "handwriting-alt-2"
-      ? textToSearch.split("").filter((character) => {
-          return (
-            wanakana.isHiragana(character) === false &&
-            wanakana.isKatakana(character) === false &&
-            wanakana.isRomaji(character) === false &&
-            wanakana.isJapanese(character)
-          );
-        })
-      : [];
-
-  const kanjiToSearchSet = new Set(kanjisToSearchList);
+  const descriptor = SEARCH_DESCRIPTORS[textSearch.type];
+  const textToSearch = descriptor.normalize(textSearch.text.trim());
 
   if (textSearch.type === "similar" && textToSearch !== "") {
     const queryKanjis = textToSearch.split("").filter(isKanji);
@@ -159,57 +214,53 @@ export const filterKanji = (
   // - freq filter source = none
   // - all-jlpt selected
   // Also add a LRU cache of recently computed results
+  const ctx: MatchContext = {
+    pool: kanjiPool,
+    text: textToSearch,
+    kanjiSet: new Set(extractKanjiCharacters(textToSearch)),
+  };
   const filteredBySearchText =
     textToSearch === ""
       ? allKanji
-      : allKanji.filter((kanji) => {
-          if (textSearch.type === "keyword") {
-            const info = kanjiPool.main[kanji];
-
-            // return fuzzysearch(textToSearch, info.keyword);
-            return info.keyword.includes(textToSearch);
-          }
-
-          if (textSearch.type === "meanings") {
-            const info = kanjiPool.main[kanji];
-            const meanings = kanjiPool.extended[kanji].meanings;
-            return (
-              info.keyword.includes(textToSearch) ||
-              meanings.find((meaning) => meaning.includes(textToSearch))
-            );
-          }
-
-          const exInfo = kanjiPool.extended[kanji];
-          if (textSearch.type === "kunyomi") {
-            const hit = exInfo.allKunStripped.has(textToSearch);
-            return hit;
-          }
-
-          if (textSearch.type === "onyomi") {
-            return exInfo.allOn.has(textToSearch);
-          }
-
-          if (textSearch.type === "readings") {
-            return (
-              exInfo.allOn.has(textToSearch) ||
-              exInfo.allKunStripped.has(textToSearch)
-            );
-          }
-
-          if (
-            textSearch.type === "multi-kanji" ||
-            textSearch.type === "handwriting" ||
-            textSearch.type === "handwriting-alt" ||
-            textSearch.type === "handwriting-alt-2"
-          ) {
-            return kanjiToSearchSet.has(kanji);
-          }
-
-          return true;
-        });
+      : allKanji.filter((kanji) => descriptor.match(kanji, ctx));
 
   return filterByKanjiSimple(filteredBySearchText, settings, kanjiPool);
 };
+
+type KanjiEntry = {
+  main: KanjiMainInfo;
+  extended: KanjiExtendedInfo;
+};
+
+type SortComparator = (a: KanjiEntry, b: KanjiEntry) => number;
+
+// One comparator per sort key; unknown keys (e.g. "none" as a secondary)
+// simply don't compare.
+const SORT_COMPARATORS: Record<string, SortComparator> = {
+  [K_JLPT]: (a, b) => jlptSort(a.main.jlpt, b.main.jlpt),
+  [K_JOUYOU_KEY]: (a, b) =>
+    numericSort(a.extended.jouyouGrade, b.extended.jouyouGrade),
+  [K_STROKES]: (a, b) => numericSort(a.extended.strokes, b.extended.strokes),
+  [K_WK_LVL]: (a, b) => numericSort(a.extended.wk, b.extended.wk),
+  [K_RTK_INDEX]: (a, b) => numericSort(a.extended.rtk, b.extended.rtk),
+  [K_RTKB_INDEX]: (a, b) => numericSort(a.extended.rtkb, b.extended.rtkb),
+  [K_KKLC_INDEX]: (a, b) =>
+    numericSort(a.extended.kklcIndex, b.extended.kklcIndex),
+  [K_MEANING_KEY]: (a, b) => alphaSort(a.main.keyword, b.main.keyword),
+  ...Object.fromEntries(
+    FREQ_RANK_OPTIONS_NONE_REMOVED.map((freqKey) => [
+      freqKey,
+      ((a, b) =>
+        freqSort(
+          getFrequency(freqKey, a.main),
+          getFrequency(freqKey, b.main)
+        )) satisfies SortComparator,
+    ])
+  ),
+};
+
+const compareBy = (sortKey: SortKey, a: KanjiEntry, b: KanjiEntry) =>
+  SORT_COMPARATORS[sortKey]?.(a, b) ?? 0;
 
 export const sortKanji = (
   kanjiList: string[],
@@ -223,61 +274,17 @@ export const sortKanji = (
     return kanjiList;
   }
 
+  // TODO: Also add a LRU cache of recently computed results
   return kanjiList.sort((a, b) => {
-    const infoA = kanjiPool.main[a];
-    const infoB = kanjiPool.main[b];
-    const exInfoA = kanjiPool.extended[a];
-    const exInfoB = kanjiPool.extended[b];
-    // TODO: Also add a LRU cache of recently computed results
-    const sortBy = (sortKey: SortKey) => {
-      if (sortKey === K_JLPT) {
-        return jlptSort(infoA.jlpt, infoB.jlpt);
-      }
+    const entryA = { main: kanjiPool.main[a], extended: kanjiPool.extended[a] };
+    const entryB = { main: kanjiPool.main[b], extended: kanjiPool.extended[b] };
 
-      if (sortKey === K_JOUYOU_KEY) {
-        return numericSort(exInfoA.jouyouGrade, exInfoB.jouyouGrade);
-      }
-
-      if (sortKey === K_STROKES) {
-        return numericSort(exInfoA.strokes, exInfoB.strokes);
-      }
-
-      if (sortKey === K_WK_LVL) {
-        return numericSort(exInfoA.wk, exInfoB.wk);
-      }
-
-      if (sortKey === K_RTK_INDEX) {
-        return numericSort(exInfoA.rtk, exInfoB.rtk);
-      }
-
-      if (sortKey === K_RTKB_INDEX) {
-        return numericSort(exInfoA.rtkb, exInfoB.rtkb);
-      }
-
-      if (sortKey === K_KKLC_INDEX) {
-        return numericSort(exInfoA.kklcIndex, exInfoB.kklcIndex);
-      }
-
-      if (sortKey === K_MEANING_KEY) {
-        return alphaSort(infoA.keyword, infoB.keyword);
-      }
-
-      if ((FREQ_RANK_OPTIONS_NONE_REMOVED as string[]).includes(sortKey)) {
-        return freqSort(
-          getFrequency(sortKey, infoA),
-          getFrequency(sortKey, infoB)
-        );
-      }
-
-      return 0;
-    };
-
-    const compareVal = sortBy(primarySort);
+    const compareVal = compareBy(primarySort, entryA, entryB);
     if (compareVal != 0) {
       return compareVal;
     }
 
-    return sortBy(secondarySort);
+    return compareBy(secondarySort, entryA, entryB);
   });
 };
 

@@ -1,22 +1,51 @@
-import { useEffect, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
-import { productionPracticePageMeta } from "@/components/items/practice-pages";
-import { warmupDaKanji } from "@/lib/dakanji-adapter";
-import { recordActivity } from "@/lib/activity";
+import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
+import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
+import { recognizeDaKanji, warmupDaKanji } from "@/lib/dakanji-adapter";
+import { recognizeKanji, warmupKanjiCanvas } from "@/lib/kanjicanvas-adapter";
+import type { DrawingSubmitPayload } from "@/lib/stroke-types";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
+import { ModelErrorLighterRecognizer } from "./ModelErrorLighterRecognizer";
+import { ModelErrorNoRecognizer } from "./ModelErrorNoRecognizer";
+import { formatModelLoadErrorReport } from "./format-model-load-error";
 import { Game } from "./Game";
-import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import {
-  Phase,
-  PracticeItem,
-  ProductionPracticeSettings,
-  SessionResult,
-} from "./types";
+  DEFAULT_SETTINGS,
+  RECOGNIZE_TOP_K,
+  SESSION_SIZE,
+  SETTINGS_KEY,
+} from "./constants";
+import { ProductionPracticeSettings, SessionResult } from "./types";
+
+type RecognitionBackend = "dakanji" | "kanjicanvas" | "none";
+
+type LoadPhase =
+  | { status: "loading-dakanji" }
+  | { status: "loading-backup" }
+  | { status: "error-lighter"; errorReport: string | null }
+  | { status: "error-none"; errorReport: string | null };
+
+const recognizeWithBackend = (
+  backend: RecognitionBackend,
+  payload: DrawingSubmitPayload
+): Promise<string[]> => {
+  if (backend === "dakanji") {
+    return recognizeDaKanji(payload, RECOGNIZE_TOP_K);
+  }
+  if (backend === "kanjicanvas") {
+    return recognizeKanji(payload.strokes);
+  }
+  return Promise.resolve([]);
+};
+
+const FadeIn = ({ children }: { children: ReactNode }) => (
+  <div className="h-full animate-fade-in">{children}</div>
+);
 
 const ProductionPracticeV1 = () => {
   useHtmlDocumentTitle(productionPracticePageMeta.heading);
@@ -25,175 +54,171 @@ const ProductionPracticeV1 = () => {
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const [phase, setPhase] = useState<Phase>("initial");
-  const [loadStatus, setLoadStatus] = useState<"loading" | "error">("loading");
-  const [progress, setProgress] = useState(0);
-  const [deck, setDeck] = useState<PracticeItem[]>([]);
-  const [randomKanjiPool, setRandomKanjiPool] = useState<string[]>([]);
-  const [cursor, setCursor] = useState(0);
-  const [sessionItems, setSessionItems] = useState<PracticeItem[]>([]);
-  const [sessionKey, setSessionKey] = useState(0);
-  const [results, setResults] = useState<SessionResult[] | null>(null);
-  const [runResults, setRunResults] = useState<SessionResult[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [modelReady, setModelReady] = useState(false);
-  const setOpenedKanji = useSetOpenedParam();
+  const [loadPhase, setLoadPhase] = useState<LoadPhase>({
+    status: "loading-dakanji",
+  });
+  // Sticky for the visit once the user commits to a backend (or none).
+  const [backend, setBackend] = useState<RecognitionBackend | null>(null);
+  const pendingCommitRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
-    if (phase !== "ended") {
-      setOpenedKanji(null);
-    }
-  }, [phase, setOpenedKanji]);
+  const session = usePracticeSession<SessionResult>({
+    activityKind: "production",
+    sessionSize: SESSION_SIZE,
+    onGoToInitial: () => {
+      setLoadPhase({ status: "loading-dakanji" });
+      pendingCommitRef.current = null;
+    },
+    // Warm recognition before "playing"; park on loading / confirm-fallback
+    // while backends spin up.
+    onPlay: (commitPlaying) => {
+      void warmThenCommit(commitPlaying);
+    },
+  });
+  const { phase, results, hasMore } = session;
 
-  const goToInitial = () => {
-    setProgress(0);
-    setResults(null);
-    setRunResults([]);
-    setHasMore(true);
-    setDeck([]);
-    setRandomKanjiPool([]);
-    setCursor(0);
-    setSessionItems([]);
-    setLoadStatus("loading");
-    setPhase("initial");
-  };
-
-  const warmAndPlay = async (
-    items: PracticeItem[],
-    nextCursor: number,
-    builtDeck?: PracticeItem[]
-  ) => {
-    if (builtDeck) {
-      setDeck(builtDeck);
-      setRandomKanjiPool(builtDeck.map((item) => item.kanji));
-    }
-    setSessionItems(items);
-    setCursor(nextCursor);
-    setSessionKey((k) => k + 1);
-    setProgress(0);
-    setResults(null);
-
-    if (modelReady) {
-      setPhase("playing");
+  const warmThenCommit = async (commitPlaying: () => void) => {
+    if (backend != null) {
+      commitPlaying();
       return;
     }
 
-    setLoadStatus("loading");
-    setPhase("loading");
+    pendingCommitRef.current = commitPlaying;
+    setLoadPhase({ status: "loading-dakanji" });
+    session.setPhase("loading");
+
     try {
       await warmupDaKanji();
-      setModelReady(true);
-      setPhase("playing");
-    } catch {
-      setLoadStatus("error");
+      setBackend("dakanji");
+      pendingCommitRef.current = null;
+      commitPlaying();
+      return;
+    } catch (daKanjiError) {
+      console.error("DaKanji warmup failed", daKanjiError);
+      const errorReport = formatModelLoadErrorReport(daKanjiError);
+
+      setLoadPhase({ status: "loading-backup" });
+      try {
+        await warmupKanjiCanvas();
+        setLoadPhase({ status: "error-lighter", errorReport });
+      } catch (canvasError) {
+        console.error("KanjiCanvas warmup failed", canvasError);
+        setLoadPhase({ status: "error-none", errorReport });
+      }
     }
   };
 
-  const startGame = (builtDeck: PracticeItem[]) => {
-    setRunResults([]);
-    setHasMore(true);
-    const chunk = builtDeck.slice(0, SESSION_SIZE);
-    void warmAndPlay(chunk, chunk.length, builtDeck);
-  };
-
-  const retryWarmup = () => {
-    const items = sessionItems;
-    if (items.length === 0) {
-      goToInitial();
+  const continueWithChosenBackend = (chosen: RecognitionBackend) => {
+    setBackend(chosen);
+    const commit = pendingCommitRef.current;
+    pendingCommitRef.current = null;
+    if (commit) {
+      commit();
       return;
     }
-    void warmAndPlay(items, cursor);
+    if (session.sessionItems.length > 0) {
+      session.setPhase("playing");
+      return;
+    }
+    session.goToInitial();
   };
 
-  const finishSession = (sessionResults: SessionResult[]) => {
-    const forgottens = sessionResults.filter((r) => !r.correct);
-    const moreLeft = forgottens.length > 0 || cursor < deck.length;
+  // Derived from the deck (the pool is always the deck's kanji).
+  const randomKanjiPool = useMemo(
+    () => session.deck.map((item) => item.kanji),
+    [session.deck]
+  );
 
-    recordActivity("production");
-    setRunResults((prev) => [...prev, ...sessionResults]);
-    setResults(sessionResults);
-    setHasMore(moreLeft);
-    if (!moreLeft) setProgress(100);
-    setPhase("ended");
-  };
+  const activeBackend = backend ?? "none";
+  const gradingEnabled = activeBackend !== "none";
 
-  const startNextSession = () => {
-    if (!hasMore) return;
-
-    const forgottens = (results ?? [])
-      .filter((r) => !r.correct)
-      .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
-          ({
-            kanji,
-            word,
-            reading,
-            englishGloss,
-            keyword,
-            fontIndex,
-          }) satisfies PracticeItem
+  const renderPhase = (): ReactNode => {
+    if (phase === "initial") {
+      return (
+        <FadeIn key="initial">
+          <InitialScreen onStart={session.startGame} />
+        </FadeIn>
       );
-
-    const remaining = deck.slice(cursor);
-    const pool = [...forgottens, ...remaining];
-    if (pool.length === 0) {
-      setHasMore(false);
-      setPhase("ended");
-      return;
     }
 
-    const chunk = pool.slice(0, SESSION_SIZE);
-    const fromRemaining = Math.max(0, chunk.length - forgottens.length);
-    void warmAndPlay(chunk, cursor + fromRemaining);
+    if (phase === "loading" && loadPhase.status === "loading-dakanji") {
+      return (
+        <FadeIn key="loading-dakanji">
+          <ModelLoadingScreen message="Loading handwriting model…" />
+        </FadeIn>
+      );
+    }
+
+    if (phase === "loading" && loadPhase.status === "loading-backup") {
+      return (
+        <FadeIn key="loading-backup">
+          <ModelLoadingScreen message="Trying a lighter recognizer…" />
+        </FadeIn>
+      );
+    }
+
+    if (phase === "loading" && loadPhase.status === "error-lighter") {
+      return (
+        <FadeIn key="error-lighter">
+          <ModelErrorLighterRecognizer
+            errorReport={loadPhase.errorReport}
+            onContinue={() => continueWithChosenBackend("kanjicanvas")}
+            onCancel={session.goToInitial}
+          />
+        </FadeIn>
+      );
+    }
+
+    if (phase === "loading" && loadPhase.status === "error-none") {
+      return (
+        <FadeIn key="error-none">
+          <ModelErrorNoRecognizer
+            errorReport={loadPhase.errorReport}
+            onContinue={() => continueWithChosenBackend("none")}
+            onCancel={session.goToInitial}
+          />
+        </FadeIn>
+      );
+    }
+
+    if (phase === "playing" && session.sessionItems.length > 0) {
+      return (
+        <FadeIn key={`playing-${session.sessionKey}`}>
+          <Game
+            sessionItems={session.sessionItems}
+            settings={settings}
+            randomKanjiPool={randomKanjiPool}
+            gradingEnabled={gradingEnabled}
+            recognize={(payload) =>
+              recognizeWithBackend(activeBackend, payload)
+            }
+            onProgress={session.setProgress}
+            onComplete={session.finishSession}
+            onEnd={session.goToInitial}
+          />
+        </FadeIn>
+      );
+    }
+
+    if (phase === "ended" && results) {
+      return (
+        <FadeIn key={hasMore ? "ended" : "complete"}>
+          <EndSession
+            results={hasMore ? results : session.runResults}
+            hasMore={hasMore}
+            wordsCleared={session.deck.length}
+            onNext={session.startNextSession}
+            onEnd={session.goToInitial}
+          />
+        </FadeIn>
+      );
+    }
+
+    return null;
   };
 
   return (
     <>
-      <PracticeShell progress={progress} playing={phase === "playing"}>
-        {phase === "initial" && (
-          <div key="initial" className="h-full animate-fade-in">
-            <InitialScreen onStart={startGame} />
-          </div>
-        )}
-
-        {phase === "loading" && (
-          <div key="loading" className="h-full animate-fade-in">
-            <ModelLoadingScreen
-              status={loadStatus}
-              onRetry={retryWarmup}
-              onCancel={goToInitial}
-            />
-          </div>
-        )}
-
-        {phase === "playing" && sessionItems.length > 0 && (
-          <div key={`playing-${sessionKey}`} className="h-full animate-fade-in">
-            <Game
-              sessionItems={sessionItems}
-              settings={settings}
-              randomKanjiPool={randomKanjiPool}
-              onProgress={setProgress}
-              onComplete={finishSession}
-              onEnd={goToInitial}
-            />
-          </div>
-        )}
-
-        {phase === "ended" && results && (
-          <div
-            key={hasMore ? "ended" : "complete"}
-            className="h-full animate-fade-in"
-          >
-            <EndSession
-              results={hasMore ? results : runResults}
-              hasMore={hasMore}
-              wordsCleared={deck.length}
-              onNext={startNextSession}
-              onEnd={goToInitial}
-            />
-          </div>
-        )}
-      </PracticeShell>
+      <PracticeShell progress={session.progress}>{renderPhase()}</PracticeShell>
 
       {phase === "ended" && <KanjiDrawerGlobal />}
     </>

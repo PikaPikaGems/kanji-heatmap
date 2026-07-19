@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
-import {
-  DrawingPad,
-  DrawingSubmitPayload,
-  Stroke,
-} from "@/components/dependent/DrawingPad";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useJsonFetch } from "@/hooks/use-json";
@@ -17,11 +15,11 @@ import {
   useGetKanjiInfoFn,
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { recognizeDaKanji } from "@/lib/dakanji-adapter";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
-import { DRAW_SVG_SIZE, GRADE_TOP_K, RECOGNIZE_TOP_K } from "./constants";
+import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
 import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
 import {
@@ -32,6 +30,8 @@ import {
   SessionResult,
 } from "./types";
 
+const ENTER_OR_SPACE = ["Enter", " "] as const;
+
 type CardStep =
   | { type: "draw" }
   | { type: "recognizing" }
@@ -39,17 +39,22 @@ type CardStep =
       type: "select";
       grade: GradeRankInfo;
       candidates: string[];
+      /** True when recognize threw; pick-only for this card. */
+      recognitionSkipped?: boolean;
     }
   | {
       type: "feedback";
       kind: "noKanji" | "correct" | "incorrect";
       grade: GradeRankInfo;
+      recognitionSkipped?: boolean;
     };
 
 export const Game = ({
   sessionItems,
   settings,
   randomKanjiPool,
+  gradingEnabled = true,
+  recognize,
   onProgress,
   onComplete,
   onEnd,
@@ -57,6 +62,9 @@ export const Game = ({
   sessionItems: PracticeItem[];
   settings: ProductionPracticeSettings;
   randomKanjiPool: string[];
+  /** When false, skip recognition and score by pick only. */
+  gradingEnabled?: boolean;
+  recognize: (payload: DrawingSubmitPayload) => Promise<string[]>;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
@@ -86,23 +94,18 @@ export const Game = ({
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
-  useEffect(() => {
+  // Reset per-card state when the card (index) or pad size changes — done
+  // during render (previous-state pattern), not in a sync effect.
+  const [prevCard, setPrevCard] = useState({ index, padSize });
+  if (prevCard.index !== index || prevCard.padSize !== padSize) {
+    setPrevCard({ index, padSize });
     setStrokes([]);
     setDrawing(null);
-    setStep({ type: "draw" });
-    setSelected(null);
-  }, [index]);
-
-  useEffect(() => {
-    setStrokes([]);
-    setDrawing(null);
-  }, [padSize]);
-
-  useEffect(() => {
-    onProgress(
-      sessionItems.length === 0 ? 0 : (index / sessionItems.length) * 100
-    );
-  }, [index, onProgress, sessionItems.length]);
+    if (prevCard.index !== index) {
+      setStep({ type: "draw" });
+      setSelected(null);
+    }
+  }
 
   useEffect(() => {
     if (!current || !settings.hearPronunciationOnLoad) return;
@@ -112,27 +115,15 @@ export const Game = ({
   }, [index, settings.hearPronunciationOnLoad]);
 
   // Enter/Space grades when there are strokes. Never Forgot via keyboard.
-  useEffect(() => {
-    if (step.type !== "draw" || strokes.length === 0) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if ((e.key !== "Enter" && e.key !== " ") || e.isComposing) return;
-      const el = e.target as HTMLElement | null;
-      if (!el) return;
-      const tag = el.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (el.isContentEditable) return;
-      e.preventDefault();
-      drawSubmitRef.current({
-        strokes,
-        width: padSize,
-        height: padSize,
-      });
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [step.type, strokes, padSize]);
+  const submitViaKeyboard = useMemo(
+    () =>
+      step.type === "draw" && strokes.length > 0
+        ? () =>
+            drawSubmitRef.current({ strokes, width: padSize, height: padSize })
+        : null,
+    [step.type, strokes, padSize]
+  );
+  useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
 
   if (!current) {
     return null;
@@ -151,6 +142,9 @@ export const Game = ({
       onComplete(allResults);
       return;
     }
+    // Progress is reported here (the only place index advances) rather than
+    // via an effect; the parent resets it to 0 when a session starts.
+    onProgress((nextIndex / sessionItems.length) * 100);
     setIndex(nextIndex);
   };
 
@@ -164,36 +158,58 @@ export const Game = ({
     });
   };
 
+  const openSelectStep = (
+    grade: GradeRankInfo,
+    modelGuesses: string[],
+    recognitionSkipped = false
+  ) => {
+    // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
+    // part-keywords (e.g. 囗 → "closed box"), which must not count.
+    const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
+    const grid = buildCandidateGrid({
+      target: current.kanji,
+      inTop10: grade.inTop10,
+      modelGuesses,
+      similars,
+      randomPool: randomKanjiPool,
+      getSimilars,
+      isRealKanji,
+    });
+    setSelected(null);
+    setStep({
+      type: "select",
+      grade,
+      candidates: grid,
+      recognitionSkipped,
+    });
+  };
+
   const onSubmit = async (payload: DrawingSubmitPayload) => {
     if (step.type !== "draw" || payload.strokes.length === 0) return;
     setDrawing(payload);
+
+    // No handwriting model — skip recognition and go straight to lookalike pick.
+    if (!gradingEnabled) {
+      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, []);
+      return;
+    }
+
     setStep({ type: "recognizing" });
     try {
-      const candidates = await recognizeDaKanji(payload, RECOGNIZE_TOP_K);
+      const candidates = await recognize(payload);
       const rank = candidates.indexOf(current.kanji);
       const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
-      const grade: GradeRankInfo = {
-        rank,
-        topGuess: candidates[0] ?? null,
-        inTop10,
-      };
-      const similarList = similarState.data ?? similars;
-      // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
-      // part-keywords (e.g. 囗 → "closed box"), which must not count.
-      const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
-      const grid = buildCandidateGrid({
-        target: current.kanji,
-        inTop10,
-        modelGuesses: candidates,
-        similars: similarList,
-        randomPool: randomKanjiPool,
-        getSimilars,
-        isRealKanji,
-      });
-      setSelected(null);
-      setStep({ type: "select", grade, candidates: grid });
+      openSelectStep(
+        {
+          rank,
+          topGuess: candidates[0] ?? null,
+          inTop10,
+        },
+        candidates
+      );
     } catch {
-      setStep({ type: "draw" });
+      // Keep the session moving — pick-only for this card, with a quiet notice.
+      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, [], true);
     }
   };
 
@@ -202,13 +218,23 @@ export const Game = ({
   const onSelectForgot = () => {
     if (step.type !== "select") return;
     pushResult(false, step.grade.rank);
-    setStep({ type: "feedback", kind: "incorrect", grade: step.grade });
+    setStep({
+      type: "feedback",
+      kind: "incorrect",
+      grade: step.grade,
+      recognitionSkipped: step.recognitionSkipped,
+    });
   };
 
   const onSelectNext = () => {
     if (step.type !== "select" || selected == null) return;
     const pickedCorrect = selected === current.kanji;
-    const sessionCorrect = pickedCorrect && step.grade.inTop10;
+    // With grading: drawing must also land in the model top-10.
+    // Without (session-wide or this card's recognize failure): pick is enough.
+    const gradeThisCard = gradingEnabled && !step.recognitionSkipped;
+    const sessionCorrect = gradeThisCard
+      ? pickedCorrect && step.grade.inTop10
+      : pickedCorrect;
     if (sessionCorrect) {
       playCorrect({ enabled: settings.celebratorySoundOnCorrect });
     }
@@ -217,18 +243,34 @@ export const Game = ({
       type: "feedback",
       kind: pickedCorrect ? "correct" : "incorrect",
       grade: step.grade,
+      recognitionSkipped: step.recognitionSkipped,
     });
   };
 
   const recognizing = step.type === "recognizing";
   const selectOpen = step.type === "select";
   const feedback = step.type === "feedback" ? step : null;
+  const recognitionSkippedOnSelect =
+    step.type === "select" && step.recognitionSkipped === true;
+  // Pick-only UX for this card when recognize failed mid-session.
+  const selectGradingEnabled = gradingEnabled && !recognitionSkippedOnSelect;
+  const feedbackGradingEnabled =
+    gradingEnabled && !(feedback?.recognitionSkipped === true);
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <EndSession onClick={onEnd} />
 
       <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
+        {!gradingEnabled && (
+          <p
+            className="mb-3 max-w-sm px-3 py-1.5 text-xs text-center rounded-lg bg-muted text-muted-foreground animate-fade-in"
+            role="status"
+          >
+            Playing without stroke grading — draw, then pick the kanji.
+          </p>
+        )}
+
         <ClozeWord
           word={current.word}
           kanji={current.kanji}
@@ -270,7 +312,7 @@ export const Game = ({
           {recognizing && (
             <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-background/70">
               <p className="text-sm font-bold sm:text-base animate-pulse">
-                Recognizing…
+                <RecognizingStatus label="Recognizing…" />
               </p>
             </div>
           )}
@@ -286,6 +328,8 @@ export const Game = ({
         }
         candidates={step.type === "select" ? step.candidates : []}
         selected={selected}
+        gradingEnabled={selectGradingEnabled}
+        recognitionSkipped={recognitionSkippedOnSelect}
         onSelect={setSelected}
         onForgot={onSelectForgot}
         onNext={onSelectNext}
@@ -297,6 +341,7 @@ export const Game = ({
         item={current}
         grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
         drawing={drawing}
+        gradingEnabled={feedbackGradingEnabled}
         onNext={advance}
       />
     </div>

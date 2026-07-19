@@ -15,6 +15,8 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
+  // Effect needed: mutates the <html> element's class list (external DOM,
+  // outside this component's render tree).
   useEffect(() => {
     const root = window.document.documentElement;
 

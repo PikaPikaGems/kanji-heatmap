@@ -6,7 +6,7 @@ import type { PracticeItem } from "../types";
 export const ItemReveal = ({ item }: { item: PracticeItem }) => (
   <div className="flex flex-col items-center gap-1 text-foreground">
     <div className="flex flex-wrap items-center justify-center gap-1">
-      <span className="text-2xl kanji-font">{item.kanji}</span>
+      <span className="text-4xl kanji-font">{item.kanji}</span>
       <span className="mx-1 text-base font-normal">·</span>
       {item.reading.split("・").map((r) => (
         <RomajiBadge key={r} kana={r} />

@@ -1,21 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
-import { recognitionPracticePageMeta } from "@/components/items/practice-pages";
-import { recordActivity } from "@/lib/activity";
+import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
+import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
-import {
-  Phase,
-  PracticeItem,
-  RecognitionPracticeSettings,
-  SessionResult,
-} from "./types";
+import { RecognitionPracticeSettings, SessionResult } from "./types";
 
 /** Toggle off to size the shell with `bottom-0` instead of visualViewport height. */
 const visualPortOn = true;
@@ -27,30 +21,21 @@ const RecognitionPracticeV1 = () => {
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const [phase, setPhase] = useState<Phase>("initial");
-  const [progress, setProgress] = useState(0);
-  const [deck, setDeck] = useState<PracticeItem[]>([]);
-  const [cursor, setCursor] = useState(0);
-  const [sessionItems, setSessionItems] = useState<PracticeItem[]>([]);
-  const [sessionKey, setSessionKey] = useState(0);
-  const [results, setResults] = useState<SessionResult[] | null>(null);
-  const [runResults, setRunResults] = useState<SessionResult[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const setOpenedKanji = useSetOpenedParam();
-
   const viewport = useVisualViewport();
   const primerRef = useRef<HTMLInputElement | null>(null);
 
-  // Kanji details drawer only on end screen; clear open param when leaving ended
-  useEffect(() => {
-    if (phase !== "ended") {
-      setOpenedKanji(null);
-    }
-  }, [phase, setOpenedKanji]);
+  const session = usePracticeSession<SessionResult>({
+    activityKind: "recognition",
+    sessionSize: SESSION_SIZE,
+    // Focus the sr-only primer so the soft keyboard opens with the session.
+    onSessionStart: () => primerRef.current?.focus(),
+  });
+  const { phase, results, hasMore } = session;
 
-  // Keep the play shell pinned to the layout top. Chasing visualViewport.offsetTop
-  // while iOS animates the keyboard makes the whole UI bob; "/" doesn't do that
-  // because ListScreen isn't viewport-pinned at all.
+  // Effect needed (external DOM): keeps the play shell pinned to the layout
+  // top. Chasing visualViewport.offsetTop while iOS animates the keyboard
+  // makes the whole UI bob; "/" doesn't do that because ListScreen isn't
+  // viewport-pinned at all.
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -68,79 +53,6 @@ const RecognitionPracticeV1 = () => {
     };
   }, []);
 
-  const beginPlaying = (items: PracticeItem[], nextCursor: number) => {
-    setSessionItems(items);
-    setCursor(nextCursor);
-    setSessionKey((k) => k + 1);
-    setProgress(0);
-    setResults(null);
-    setPhase("playing");
-  };
-
-  const goToInitial = () => {
-    setProgress(0);
-    setResults(null);
-    setRunResults([]);
-    setHasMore(true);
-    setDeck([]);
-    setCursor(0);
-    setSessionItems([]);
-    setPhase("initial");
-  };
-
-  const startGame = (builtDeck: PracticeItem[]) => {
-    primerRef.current?.focus();
-    setDeck(builtDeck);
-    setRunResults([]);
-    setHasMore(true);
-    const chunk = builtDeck.slice(0, SESSION_SIZE);
-    beginPlaying(chunk, chunk.length);
-  };
-
-  const finishSession = (sessionResults: SessionResult[]) => {
-    const forgottens = sessionResults.filter((r) => !r.correct);
-    const moreLeft = forgottens.length > 0 || cursor < deck.length;
-
-    recordActivity("recognition");
-    setRunResults((prev) => [...prev, ...sessionResults]);
-    setResults(sessionResults);
-    setHasMore(moreLeft);
-    if (!moreLeft) setProgress(100);
-    setPhase("ended");
-  };
-
-  const startNextSession = () => {
-    if (!hasMore) return;
-    primerRef.current?.focus();
-
-    const forgottens = (results ?? [])
-      .filter((r) => !r.correct)
-      .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
-          ({
-            kanji,
-            word,
-            reading,
-            englishGloss,
-            keyword,
-            fontIndex,
-          }) satisfies PracticeItem
-      );
-
-    const remaining = deck.slice(cursor);
-    const pool = [...forgottens, ...remaining];
-    if (pool.length === 0) {
-      // Nothing left — treat as complete rather than looping forever.
-      setHasMore(false);
-      setPhase("ended");
-      return;
-    }
-
-    const chunk = pool.slice(0, SESSION_SIZE);
-    const fromRemaining = Math.max(0, chunk.length - forgottens.length);
-    beginPlaying(chunk, cursor + fromRemaining);
-  };
-
   return (
     <>
       <input
@@ -151,24 +63,26 @@ const RecognitionPracticeV1 = () => {
         autoComplete="off"
       />
       <PracticeShell
-        progress={progress}
-        playing={phase === "playing"}
+        progress={session.progress}
         height={visualPortOn ? viewport.height : undefined}
       >
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
-            <InitialScreen onStart={startGame} />
+            <InitialScreen onStart={session.startGame} />
           </div>
         )}
 
-        {phase === "playing" && sessionItems.length > 0 && (
-          <div key={`playing-${sessionKey}`} className="h-full animate-fade-in">
+        {phase === "playing" && session.sessionItems.length > 0 && (
+          <div
+            key={`playing-${session.sessionKey}`}
+            className="h-full animate-fade-in"
+          >
             <Game
-              sessionItems={sessionItems}
+              sessionItems={session.sessionItems}
               sound={settings.sound ?? { enabled: true, type: "correct" }}
-              onProgress={setProgress}
-              onComplete={finishSession}
-              onEnd={goToInitial}
+              onProgress={session.setProgress}
+              onComplete={session.finishSession}
+              onEnd={session.goToInitial}
             />
           </div>
         )}
@@ -179,11 +93,11 @@ const RecognitionPracticeV1 = () => {
             className="h-full animate-fade-in"
           >
             <EndSession
-              results={hasMore ? results : runResults}
+              results={hasMore ? results : session.runResults}
               hasMore={hasMore}
-              wordsCleared={deck.length}
-              onNext={startNextSession}
-              onEnd={goToInitial}
+              wordsCleared={session.deck.length}
+              onNext={session.startNextSession}
+              onEnd={session.goToInitial}
             />
           </div>
         )}

@@ -4,17 +4,17 @@ import { DefaultErrorFallback } from "@/components/error";
 
 import { ChartData } from "@/components/sections/KanjiCumUseChart/helpers";
 import { KanjiCumUseChart } from "@/components/sections/KanjiCumUseChart";
-import KaomojiAnimation from "@/components/common/KaomojiLoading";
+import { PageLoadingFallback } from "@/components/dependent/site-wide/PageLoadingFallback";
 import assetsPaths from "@/lib/assets-paths";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import pageItems from "@/components/items/page-items";
+import { cumUseGraphPageMeta } from "@/lib/pages/nav-links";
 
 const CumUseScreen = () => {
   const { data, status } = useJsonFetch(assetsPaths.CUM_USE);
-  useHtmlDocumentTitle(pageItems.cumUseGraphPage.title);
+  useHtmlDocumentTitle(cumUseGraphPageMeta.title);
 
   if (status == "pending") {
-    return <KaomojiAnimation />;
+    return <PageLoadingFallback />;
   }
 
   if (status === "error" || data == null) {

@@ -14,10 +14,7 @@ import { ItemTypeSwitch } from "@/components/common/ItemTypeSwitch";
 import { JLPTBordersMeanings } from "@/components/common/jlpt/JLPTBorderMeanings";
 import { StudyStatusBorderMeanings } from "@/components/common/StudyStatusBorderMeanings";
 import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoIcon";
-import {
-  useBgSrc,
-  useBgSrcDispatch,
-} from "@/components/dependent/routing/routing-hooks";
+import { useBgSrc, useBgSrcDispatch } from "@/hooks/routing-hooks";
 import BasicSelect from "@/components/common/BasicSelect";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 

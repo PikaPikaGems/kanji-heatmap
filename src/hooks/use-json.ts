@@ -42,6 +42,8 @@ export const useAsync = <T>(
     }
   }, [asyncFunction]);
 
+  // Effect needed: kicks off the async fetch on mount / when the fetcher
+  // changes (data loading is an external side effect, not render logic).
   useEffect(() => {
     if (immediate) {
       execute();
@@ -83,4 +85,29 @@ export const useJsonFetch = <T>(
   const value = useAsync<T>(fetchJson, immediate);
 
   return value;
+};
+
+/**
+ * Fetch a text file from the public folder (e.g. markdown docs).
+ */
+export const useTextFetch = (
+  path: string,
+  immediate: boolean = true
+): {
+  execute: () => Promise<string>;
+  status: Status;
+  data: string | null;
+  error: Error | null;
+} => {
+  const fetchText = useCallback(async (): Promise<string> => {
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch text: ${response.status} ${response.statusText}`
+      );
+    }
+    return response.text();
+  }, [path]);
+
+  return useAsync<string>(fetchText, immediate);
 };

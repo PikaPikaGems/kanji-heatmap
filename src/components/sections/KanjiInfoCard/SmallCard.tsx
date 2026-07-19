@@ -12,11 +12,11 @@ import { ReactNode } from "react";
 
 const Wrapper = ({ kanji, badges }: { kanji: string; badges: ReactNode }) => {
   return (
-    <div className="m-1 border border-dashed p-2">
+    <div className="p-2 m-1 border border-dashed rounded-xl">
       <div className="flex flex-wrap items-center justify-center mx-1">
         {badges}
       </div>
-      <div className="kanji-font text-8xl mb-2">{kanji}</div>
+      <div className="mb-2 kanji-font text-8xl">{kanji}</div>
     </div>
   );
 };
@@ -34,8 +34,8 @@ export const SmallKanjiCard = ({ kanji }: { kanji: string }) => {
         kanji={kanji}
         badges={
           <>
-            <Badge className="animate-pulse m-1">......</Badge>
-            <Badge className="animate-pulse m-1" variant={"outline"}>
+            <Badge className="m-1 animate-pulse">......</Badge>
+            <Badge className="m-1 animate-pulse" variant={"outline"}>
               ......
             </Badge>
           </>
@@ -51,7 +51,7 @@ export const SmallKanjiCard = ({ kanji }: { kanji: string }) => {
       kanji={kanji}
       badges={
         <>
-          <Badge className="text-nowrap m-1">
+          <Badge className="m-1 text-nowrap">
             {info.keyword.toUpperCase()}
           </Badge>
           <JLPTBadge jlpt={info.jlpt} />

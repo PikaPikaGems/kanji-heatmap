@@ -1,6 +1,6 @@
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
-import { useKanjiFromUrl, useUrlLocation } from "./routing-hooks";
+import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import { Link } from "./router-adapter";
 import { radicalFalseFriends } from "@/lib/radicals";
 

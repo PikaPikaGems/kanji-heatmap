@@ -1,16 +1,13 @@
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/error";
+import { PageLoadingFallback } from "@/components/dependent/site-wide/PageLoadingFallback";
 
 const LazyProductionPracticeV1 = lazy(() => import("./ProductionPracticeV1"));
-
-const PracticeRouteFallback = () => (
-  <div className="fixed inset-0 bg-background animate-fade-in" aria-hidden />
-);
 
 const ProductionPracticeV1Screen = () => {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<PracticeRouteFallback />}>
+      <Suspense fallback={<PageLoadingFallback />}>
         <LazyProductionPracticeV1 />
       </Suspense>
     </ErrorBoundary>

@@ -3,7 +3,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import useKeyboardListener from "@/hooks/use-keyboard-listener";
 import { useNextPrevKanji } from "@/hooks/use-next-prev-kanji";
-import { useSetOpenedParam } from "@/components/dependent/routing/routing-hooks";
+import { useSetOpenedParam } from "@/hooks/routing-hooks";
 import { GLOBAL_KEYBOARD_SHORTCUTS } from "@/lib/options/constants";
 import { useChangeFont } from "@/hooks/use-change-font";
 import { Keyboard } from "@/components/icons";

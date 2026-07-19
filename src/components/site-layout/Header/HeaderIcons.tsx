@@ -20,6 +20,8 @@ const MenuItems = () => {
 
 export function Menu({ cn }: { cn: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  // Effect needed: subscribes to window resize to close the menu (the event
+  // itself is the trigger, not a derived value).
   useEffect(() => {
     const handleResize = () => {
       setIsOpen(false);
