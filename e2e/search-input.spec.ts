@@ -1,22 +1,28 @@
 import { expect, test } from "./fixtures";
 
 // Guards SearchInput's paste script-inference behavior (onPaste + the
-// "Switched to …" hint chip) ahead of the controller-hook refactor. Real
-// clipboard + Ctrl+V so the actual paste event path runs, not a synthetic one.
-test.use({ permissions: ["clipboard-read", "clipboard-write"] });
-
+// "Switched to …" hint chip) ahead of the controller-hook refactor.
+// Dispatches a real ClipboardEvent with DataTransfer (not fill/type) so the
+// onPaste path runs without touching the OS clipboard — headed parallel
+// workers share one system clipboard and race if they use Ctrl/Cmd+V.
 const pasteInto = async (
   page: import("@playwright/test").Page,
   text: string
 ) => {
   const searchBox = page.getByLabel("Search kanji");
   await expect(searchBox).toBeVisible();
-  await page.evaluate(
-    (clip) => navigator.clipboard.writeText(clip),
-    text
-  );
   await searchBox.click();
-  await page.keyboard.press("ControlOrMeta+v");
+  await searchBox.evaluate((el, value) => {
+    const dt = new DataTransfer();
+    dt.setData("text/plain", value);
+    el.dispatchEvent(
+      new ClipboardEvent("paste", {
+        clipboardData: dt,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+  }, text);
   return searchBox;
 };
 

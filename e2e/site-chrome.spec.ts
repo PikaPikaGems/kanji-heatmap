@@ -33,7 +33,8 @@ test.describe("site chrome", () => {
     await expect(page.getByText("Select a mode")).toBeVisible();
 
     await page.getByRole("link", { name: /Kanji Reading Practice/ }).click();
-    await expect(page).toHaveURL(/\/reading-practice$/);
+    // Trailing "?" is fine — wouter can leave an empty query string.
+    await expect(page).toHaveURL(/\/reading-practice\/?(\?.*)?$/);
     await expect(
       page.getByRole("button", { name: "Start Practicing" })
     ).toBeVisible({ timeout: 30_000 });
