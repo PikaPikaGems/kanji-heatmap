@@ -35,6 +35,24 @@ describe("createKanjiLookupProvider", () => {
     expect(result.current.error).toBeNull();
   });
 
+  it("does not fetch until a consumer hook mounts", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ 火: "fire" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const provider = makeProvider();
+
+    // Provider alone (no consumer) must not fetch.
+    render(<provider.Provider>hi</provider.Provider>);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    // Mounting a consumer triggers the fetch.
+    renderHook(() => provider.useLookup("火"), { wrapper: provider.Provider });
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+  });
+
   it("returns null for a kanji that is absent from the data", async () => {
     vi.stubGlobal(
       "fetch",
