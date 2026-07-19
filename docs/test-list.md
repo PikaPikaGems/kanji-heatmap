@@ -79,4 +79,4 @@ Playwright specs under `e2e/`. Run with `pnpm test:e2e`.
 - Speed katakana: typing the correct romaji advances the word
 - Speed katakana: typing skip advances without matching
 - Reading practice: forgot path returns to the start screen
-- Writing practice: model load failure surfaces retry UI
+- Writing practice: model load failure allows play without grading
