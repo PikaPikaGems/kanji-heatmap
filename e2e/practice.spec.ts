@@ -94,7 +94,7 @@ test.describe("practice modes", () => {
     ).toBeVisible({ timeout: 30_000 });
   });
 
-  test("writing practice: model load failure surfaces retry UI", async ({
+  test("writing practice: model load failure allows play without grading", async ({
     page,
   }) => {
     await page.goto("/writing-practice");
@@ -107,10 +107,21 @@ test.describe("practice modes", () => {
     await expect(
       page.getByRole("heading", { name: "Could not load the model" })
     ).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole("button", { name: "Retry" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Continue without grading" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Retry loading model" })
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
 
-    await page.getByRole("button", { name: "Back" }).click();
-    await expect(startButton).toBeVisible({ timeout: 30_000 });
+    await page
+      .getByRole("button", { name: "Continue without grading" })
+      .click();
+
+    await expect(
+      page.getByText("Playing without stroke grading", { exact: false })
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
   });
 });

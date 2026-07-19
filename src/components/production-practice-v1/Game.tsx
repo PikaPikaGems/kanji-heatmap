@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
-import {
-  DrawingPad,
-} from "@/components/dependent/DrawingPad";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
 import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
@@ -17,6 +15,7 @@ import {
   useGetKanjiInfoFn,
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { recognizeDaKanji } from "@/lib/dakanji-adapter";
 import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
@@ -52,6 +51,7 @@ export const Game = ({
   sessionItems,
   settings,
   randomKanjiPool,
+  gradingEnabled = true,
   onProgress,
   onComplete,
   onEnd,
@@ -59,6 +59,8 @@ export const Game = ({
   sessionItems: PracticeItem[];
   settings: ProductionPracticeSettings;
   randomKanjiPool: string[];
+  /** When false, skip ONNX recognition and score by pick only. */
+  gradingEnabled?: boolean;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
@@ -152,33 +154,46 @@ export const Game = ({
     });
   };
 
+  const openSelectStep = (grade: GradeRankInfo, modelGuesses: string[]) => {
+    // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
+    // part-keywords (e.g. 囗 → "closed box"), which must not count.
+    const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
+    const grid = buildCandidateGrid({
+      target: current.kanji,
+      inTop10: grade.inTop10,
+      modelGuesses,
+      similars,
+      randomPool: randomKanjiPool,
+      getSimilars,
+      isRealKanji,
+    });
+    setSelected(null);
+    setStep({ type: "select", grade, candidates: grid });
+  };
+
   const onSubmit = async (payload: DrawingSubmitPayload) => {
     if (step.type !== "draw" || payload.strokes.length === 0) return;
     setDrawing(payload);
+
+    // No handwriting model — skip recognition and go straight to lookalike pick.
+    if (!gradingEnabled) {
+      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, []);
+      return;
+    }
+
     setStep({ type: "recognizing" });
     try {
       const candidates = await recognizeDaKanji(payload, RECOGNIZE_TOP_K);
       const rank = candidates.indexOf(current.kanji);
       const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
-      const grade: GradeRankInfo = {
-        rank,
-        topGuess: candidates[0] ?? null,
-        inTop10,
-      };
-      // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
-      // part-keywords (e.g. 囗 → "closed box"), which must not count.
-      const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
-      const grid = buildCandidateGrid({
-        target: current.kanji,
-        inTop10,
-        modelGuesses: candidates,
-        similars,
-        randomPool: randomKanjiPool,
-        getSimilars,
-        isRealKanji,
-      });
-      setSelected(null);
-      setStep({ type: "select", grade, candidates: grid });
+      openSelectStep(
+        {
+          rank,
+          topGuess: candidates[0] ?? null,
+          inTop10,
+        },
+        candidates
+      );
     } catch {
       setStep({ type: "draw" });
     }
@@ -195,7 +210,11 @@ export const Game = ({
   const onSelectNext = () => {
     if (step.type !== "select" || selected == null) return;
     const pickedCorrect = selected === current.kanji;
-    const sessionCorrect = pickedCorrect && step.grade.inTop10;
+    // With grading: drawing must also land in the model top-10.
+    // Without: picking the right kanji is enough.
+    const sessionCorrect = gradingEnabled
+      ? pickedCorrect && step.grade.inTop10
+      : pickedCorrect;
     if (sessionCorrect) {
       playCorrect({ enabled: settings.celebratorySoundOnCorrect });
     }
@@ -216,6 +235,15 @@ export const Game = ({
       <EndSession onClick={onEnd} />
 
       <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
+        {!gradingEnabled && (
+          <p
+            className="mb-3 max-w-sm px-3 py-1.5 text-xs text-center rounded-lg bg-muted text-muted-foreground animate-fade-in"
+            role="status"
+          >
+            Playing without stroke grading — draw, then pick the kanji.
+          </p>
+        )}
+
         <ClozeWord
           word={current.word}
           kanji={current.kanji}
@@ -257,7 +285,7 @@ export const Game = ({
           {recognizing && (
             <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-background/70">
               <p className="text-sm font-bold sm:text-base animate-pulse">
-                Recognizing…
+                <RecognizingStatus label="Recognizing…" />
               </p>
             </div>
           )}
@@ -273,6 +301,7 @@ export const Game = ({
         }
         candidates={step.type === "select" ? step.candidates : []}
         selected={selected}
+        gradingEnabled={gradingEnabled}
         onSelect={setSelected}
         onForgot={onSelectForgot}
         onNext={onSelectNext}
@@ -284,6 +313,7 @@ export const Game = ({
         item={current}
         grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
         drawing={drawing}
+        gradingEnabled={gradingEnabled}
         onNext={advance}
       />
     </div>

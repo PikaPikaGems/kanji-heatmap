@@ -1,7 +1,5 @@
 import { ReactNode, useState } from "react";
-import {
-  DrawingPad,
-} from "@/components/dependent/DrawingPad";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
 import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
@@ -10,6 +8,7 @@ import {
   SmallUnexpectedErrorFallbackTxt,
 } from "@/components/error/SmallUnexpectedErrorFallback";
 import { ErrorBoundary } from "@/components/error";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { Recognizer } from "./recognizers";
 
 type RecognitionStatus = "idle" | "loading" | "success" | "error";
@@ -77,7 +76,7 @@ const HandwritingResultsPreview = ({
   if (status === "loading") {
     return (
       <div className={messageBoxCN}>
-        <div>認識中 · {`Recognizing...`}</div>
+        <RecognizingStatus label="認識中 · Recognizing…" />
       </div>
     );
   }

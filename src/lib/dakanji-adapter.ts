@@ -1,7 +1,4 @@
-import type {
-  DrawingSubmitPayload,
-  Stroke,
-} from "@/lib/stroke-types";
+import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 
 // On-device single-character recognition via Dariyooo's DaKanji ONNX model.
 // Everything (ORT JS, wasm, model, labels) loads only on the first recognize call.

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { KanjiDMAK, StrokeOrderReplay } from "@/components/common/KanjiDmak";
-import {
-  DrawingPad,
-} from "@/components/dependent/DrawingPad";
+import { DrawingPad } from "@/components/dependent/DrawingPad";
 import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
+import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
@@ -112,11 +111,13 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
 
       <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
         {status === "loading" && (
-          <div className="animate-fade-in opacity-80">採点中 · Grading…</div>
+          <div className="animate-fade-in opacity-80">
+            <RecognizingStatus label="採点中 · Grading…" />
+          </div>
         )}
         {status === "error" && (
-          <div className="animate-fade-in text-destructive">
-            The DaKanji recognizer couldn&apos;t be loaded right now.
+          <div className="animate-fade-in">
+            すみません 🙇🏽‍♀️ 🙇. The grader {`couldn't`} be loaded right now.
           </div>
         )}
         {status === "success" && result != null && (
