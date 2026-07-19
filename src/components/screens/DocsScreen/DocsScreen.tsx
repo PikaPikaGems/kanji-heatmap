@@ -1,7 +1,5 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { PrivacyPolicySection } from "./PrivacySection";
-import { TermsOfUseSection } from "./TermsOfUseSection";
-import { AboutSection } from "./AboutSection";
+import { MarkdownDoc } from "@/components/common/docs/MarkdownDoc";
 import type { ReactNode } from "react";
 
 const Wrapper = ({ children }: { children: ReactNode }) => {
@@ -16,7 +14,7 @@ export const AboutPage = () => {
   useHtmlDocumentTitle("About");
   return (
     <Wrapper>
-      <AboutSection />
+      <MarkdownDoc path="/md/about.md" />
     </Wrapper>
   );
 };
@@ -25,7 +23,7 @@ export const TermsPage = () => {
   useHtmlDocumentTitle("Terms of Use");
   return (
     <Wrapper>
-      <TermsOfUseSection />
+      <MarkdownDoc path="/md/terms.md" />
     </Wrapper>
   );
 };
@@ -34,7 +32,7 @@ export const PrivacyPage = () => {
   useHtmlDocumentTitle("Privacy Policy");
   return (
     <Wrapper>
-      <PrivacyPolicySection />
+      <MarkdownDoc path="/md/privacy.md" />
     </Wrapper>
   );
 };

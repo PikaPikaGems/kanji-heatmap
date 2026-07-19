@@ -91,3 +91,4 @@ Jonathan Waller's JLPT resources are licensed under [CC BY 4.0][cc-by-4].
 [cc-by-sa-3]: https://creativecommons.org/licenses/by-sa/3.0
 [cc-by-sa-4]: https://creativecommons.org/licenses/by-sa/4.0
 [wanikani-terms]: https://www.wanikani.com/terms
+[mit-license]: https://opensource.org/licenses/MIT

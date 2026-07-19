@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useJsonFetch } from "./use-json";
+import { useJsonFetch, useTextFetch } from "./use-json";
 
 describe("useJsonFetch", () => {
   afterEach(() => {
@@ -65,5 +65,44 @@ describe("useJsonFetch", () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(result.current.status).toBe("idle");
+  });
+});
+
+describe("useTextFetch", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("resolves to success with response text", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve("# About"),
+      })
+    );
+
+    const { result } = renderHook(() => useTextFetch("/md/about.md"));
+
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(result.current.data).toBe("# About");
+    expect(result.current.error).toBeNull();
+  });
+
+  it("sets error status for a non-ok HTTP response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+      })
+    );
+
+    const { result } = renderHook(() => useTextFetch("/md/missing.md", false));
+    await expect(result.current.execute()).rejects.toThrow("404");
+
+    await waitFor(() => expect(result.current.status).toBe("error"));
+    expect(result.current.error?.message).toContain("404");
   });
 });

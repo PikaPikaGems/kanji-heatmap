@@ -16,9 +16,9 @@ $ pnpm install
 $ pnpm run dev
 ```
 
-> **Note:** When using `pnpm run dev`, clicking the book icon (Jisho lookup) in the vocabulary table will not load data — it requires a Cloudflare Worker running locally. All other features work normally.
+> **Note:** When using `pnpm run dev`, those features requiring cloudflare functions such as Jisho, Jotoba and Google Handwriting API clicking will not work. All other features work normally.
 
-### Full functionality (with Jisho lookup)
+### Running With Cloudlare Functions Related Features Locally
 
 The Jisho lookup feature and Google handwriting API proxies requests through a [Cloudflare Pages Function](./functions/api/) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
 
@@ -78,13 +78,7 @@ cp ../kanji-heatmap-data/output/*.json ./public/json
 node scripts/generate-speed-katakana.mjs && tsc -b && vite build
 ```
 
-#### Speed Katakana challenge sets
-
 The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
-
-```
-pnpm run generate-speed-katakana
-```
 
 ## Build Analysis
 
@@ -146,15 +140,17 @@ Delete the `tar.gz` file since it's not needed anymore
 rm kanji-heatmap-data.tar.gz
 ```
 
-#### Structure and reading files
+#### Other Required Data
 
-These files in `public/json/` should have the following files:
+These files in `public/` should exists: (see also "./src/lib/assets-paths.ts)
 
-- `kanji-structure-hlorenzi.json`
-- `kanji-readings-details.json`
-- `kanji-structure-kanjium.json`
-- `kanji-structure-scott.json`
-- `kanji-structure-yagays.json`
+- `/json/kanji-structure-hlorenzi.json`
+- `/json/kanji-readings-details.json`
+- `/json/kanji-structure-kanjium.json`
+- `/json/kanji-structure-scott.json`
+- `/json/kanji-structure-yagays.json`
+- `/kanji-textbook-words-min/<KANJI>.json`
+- `/kanji-words/v4/<KANJI>.json`
 
 ## Talk to Us
 
