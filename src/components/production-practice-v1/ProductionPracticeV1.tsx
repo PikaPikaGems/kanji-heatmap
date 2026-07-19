@@ -8,6 +8,7 @@ import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { warmupDaKanji } from "@/lib/dakanji-adapter";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
+import { ModelErrorScreen } from "./ModelErrorScreen";
 import { formatModelLoadErrorReport } from "./format-model-load-error";
 import { Game } from "./Game";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
@@ -106,10 +107,15 @@ const ProductionPracticeV1 = () => {
           </div>
         )}
 
-        {phase === "loading" && (
+        {phase === "loading" && loadStatus === "loading" && (
           <div key="loading" className="h-full animate-fade-in">
-            <ModelLoadingScreen
-              status={loadStatus}
+            <ModelLoadingScreen />
+          </div>
+        )}
+
+        {phase === "loading" && loadStatus === "error" && (
+          <div key="error" className="h-full animate-fade-in">
+            <ModelErrorScreen
               errorReport={loadErrorReport}
               onRetry={retryWarmup}
               onContinueWithoutGrading={continueWithoutGrading}
