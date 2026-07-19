@@ -99,7 +99,7 @@ const ProductionPracticeV1 = () => {
 
   return (
     <>
-      <PracticeShell progress={session.progress} playing={phase === "playing"}>
+      <PracticeShell progress={session.progress}>
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
             <InitialScreen onStart={session.startGame} />

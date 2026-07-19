@@ -3,7 +3,11 @@ import "./theme.css";
 
 import { ThemeProvider } from "@/providers/theme-provider";
 import { KanjiFunctionalityProvider } from "./providers/kanji-functionality-provider";
-import { Route, Switch } from "./components/dependent/routing";
+import {
+  PracticeReturnPathMemory,
+  Route,
+  Switch,
+} from "./components/dependent/routing";
 import { Redirect } from "wouter";
 
 import {
@@ -44,6 +48,7 @@ const App = () => {
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <GlobalKeyboardShortcutProvider>
+          <PracticeReturnPathMemory />
           <Switch>
             {/* Speed Katakana renders its own slim header and doesn't need the
                 kanji data providers, so it lives outside the layout below. */}

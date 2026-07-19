@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { JLPTSelector } from "@/components/common/jlpt/JLPTSelector";
 import { JLTPTtypes } from "@/lib/jlpt";
+import { LeavePractice } from "./EndSessionButton";
 import { ToggleRow } from "./ToggleRow";
 import { DeckFilterSettings } from "./types";
 
@@ -35,7 +36,8 @@ export const PracticeInitialScreen = ({
   canStart: boolean;
   onStart: () => void;
 }) => (
-  <div className="flex flex-col h-full">
+  <div className="relative flex flex-col h-full">
+    <LeavePractice />
     <div className="flex-1 min-h-0 overflow-auto">
       <div className="flex flex-col max-w-md gap-6 px-4 py-6 mx-auto">
         <div className="text-left">

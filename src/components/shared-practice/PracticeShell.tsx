@@ -8,7 +8,6 @@ import { PracticeHeader } from "@/components/site-layout/PracticeHeader";
  */
 export const PracticeShell = ({
   progress,
-  playing,
   children,
   height,
 }: {
@@ -27,12 +26,6 @@ export const PracticeShell = ({
     style={height != null ? { height } : undefined}
   >
     <PracticeHeader progress={progress} />
-    <main
-      className={`flex-1 min-h-0 overflow-hidden ${
-        playing ? "pt-0 pb-2" : "py-2"
-      }`}
-    >
-      {children}
-    </main>
+    <main className={`flex-1 min-h-0 overflow-hidden`}>{children}</main>
   </div>
 );
