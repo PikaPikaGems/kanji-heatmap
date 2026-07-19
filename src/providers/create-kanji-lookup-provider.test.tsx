@@ -68,7 +68,7 @@ describe("createKanjiLookupProvider", () => {
     });
 
     await waitFor(() =>
-      expect((globalThis.fetch as ReturnType<typeof vi.fn>)).toHaveBeenCalled()
+      expect(globalThis.fetch as ReturnType<typeof vi.fn>).toHaveBeenCalled()
     );
     expect(result.current).toBeNull();
   });

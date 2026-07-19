@@ -95,7 +95,12 @@ describe("resolvePaste", () => {
         selectionEnd: 2,
         searchType: "multi-kanji",
       })
-    ).toEqual({ value: "水火", caret: 2, nextType: "multi-kanji", announce: true });
+    ).toEqual({
+      value: "水火",
+      caret: 2,
+      nextType: "multi-kanji",
+      announce: true,
+    });
   });
 
   it("keeps similar-type pastes kanji-only without announcing", () => {
@@ -108,7 +113,12 @@ describe("resolvePaste", () => {
         selectionEnd: 1,
         searchType: "similar",
       })
-    ).toEqual({ value: "火水", caret: 2, nextType: "similar", announce: false });
+    ).toEqual({
+      value: "火水",
+      caret: 2,
+      nextType: "similar",
+      announce: false,
+    });
   });
 
   it("ignores a similar-type paste that leaves no kanji", () => {
@@ -116,19 +126,20 @@ describe("resolvePaste", () => {
     // pasting a kanji into an empty field then stripping — the everyday case
     // is a paste whose only kanji fails isKanji. 々 is kana-adjacent: wanakana
     // counts it as kanji but isKanji (CJK unified block) does not.
-    expect(
-      resolvePaste({ ...base, pasted: "々", searchType: "similar" })
-    ).toBe(null);
+    expect(resolvePaste({ ...base, pasted: "々", searchType: "similar" })).toBe(
+      null
+    );
   });
 
   it("switches to readings for kana paste and announces", () => {
-    expect(resolvePaste({ ...base, pasted: "みず", searchType: "meanings" }))
-      .toEqual({
-        value: "みず",
-        caret: 2,
-        nextType: "readings",
-        announce: true,
-      });
+    expect(
+      resolvePaste({ ...base, pasted: "みず", searchType: "meanings" })
+    ).toEqual({
+      value: "みず",
+      caret: 2,
+      nextType: "readings",
+      announce: true,
+    });
   });
 
   it("sends roman words to meanings (or keeps keyword)", () => {
@@ -140,7 +151,12 @@ describe("resolvePaste", () => {
     });
     expect(
       resolvePaste({ ...base, pasted: "water", searchType: "keyword" })
-    ).toEqual({ value: "water", caret: 5, nextType: "keyword", announce: true });
+    ).toEqual({
+      value: "water",
+      caret: 5,
+      nextType: "keyword",
+      announce: true,
+    });
   });
 
   it("keeps the current type for mixed/ambiguous pastes", () => {

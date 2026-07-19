@@ -160,7 +160,10 @@ export const useSearchInputController = ({
     // Translate first (e.g. romaji → hiragana) so the field and the
     // settled search query stay in sync. Settling the raw keystrokes
     // would search a different string than what the user sees.
-    const updatedValue = translateValue(e.target.value, translateMap[searchType]);
+    const updatedValue = translateValue(
+      e.target.value,
+      translateMap[searchType]
+    );
 
     setValue(updatedValue);
     // NOTE: this is based on https://react.dev/learn/referencing-values-with-refs

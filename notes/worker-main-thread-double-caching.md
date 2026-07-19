@@ -3,7 +3,7 @@
 **Status:** deferred — to be done in its own PR at a later date.
 
 **Risk:** high. This is the one simplification from the codebase-cleanup pass
-that was *not* done, because it changes the worker protocol, turns a synchronous
+that was _not_ done, because it changes the worker protocol, turns a synchronous
 main-thread API into an async one, and can't be fully verified without a real
 app run (`vite build` + Playwright e2e are blocked in the cleanup environment by
 the egress policy on the `kanjicanvas` dependency).
@@ -40,7 +40,7 @@ side.
 
 - The worker loads the whole extended map via `initialize-extended-kanji-map`
   into `KANJI_INFO_EXTENDED_CACHE`.
-- The main thread *also* lazily fills `kanjiInfo.extended` per-kanji as each
+- The main thread _also_ lazily fills `kanjiInfo.extended` per-kanji as each
   kanji is requested
   (`kanji-worker-provider.tsx`, in `kanjiInfoRequest`, ~line 224:
   `kanjiCacheRef.current[kanji].extended = res;`).

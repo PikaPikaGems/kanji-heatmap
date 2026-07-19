@@ -138,9 +138,8 @@ const SEARCH_DESCRIPTORS: Record<SearchType, SearchDescriptor> = {
     normalize: toRomajiText,
     match: (kanji, { pool, text }) =>
       pool.main[kanji].keyword.includes(text) ||
-      pool.extended[kanji].meanings.find((meaning) =>
-        meaning.includes(text)
-      ) != null,
+      pool.extended[kanji].meanings.find((meaning) => meaning.includes(text)) !=
+        null,
   },
   onyomi: {
     normalize: toHiraganaText,

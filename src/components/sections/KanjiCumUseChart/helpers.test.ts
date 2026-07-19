@@ -5,7 +5,12 @@ import { buildTooltipInnerHtml, TooltipContext } from "./chart-tooltip";
 describe("getDataset", () => {
   it("maps series points and applies config label/color", () => {
     const [dataset] = getDataset(
-      { netflix: [[0, 10], [50, 42]] },
+      {
+        netflix: [
+          [0, 10],
+          [50, 42],
+        ],
+      },
       { netflix: { label: "Netflix", color: "#e50914" } }
     );
 
