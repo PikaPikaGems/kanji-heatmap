@@ -1,0 +1,54 @@
+---
+description: Separate screen components; route phases with early returns
+globs: "**/*.{tsx,jsx}"
+alwaysApply: false
+---
+
+# Screen components & phase routing
+
+## 1. One screen → one component
+
+When two UI states are clearly different screens (copy, CTAs, meaning), make **separate components**. Do not stuff them into one component with `if (variant === …)`.
+
+- One component per screen (e.g. `ModelErrorLighterRecognizer`, `ModelErrorNoRecognizer`)
+- Shared chrome only via a dumb layout shell, not a “god” screen with variants
+- Small conditionals for *content within one screen* (e.g. OOM vs generic sentence) are fine
+
+```tsx
+// ❌ BAD — variant enum inside the screen component
+export const ModelErrorScreen = ({ variant, ... }) => {
+  if (variant === "lighter-recognizer") return /* … */;
+  return /* no-recognition … */;
+};
+```
+
+## 2. Parent phase routing → early returns
+
+In the parent that chooses which screen to show, prefer a **linear early-return chain** (or `renderPhase()` that returns once). Do not stack `{phase === … && …}` blocks in one JSX tree.
+
+```tsx
+// ❌ BAD
+return (
+  <Shell>
+    {phase === "initial" && <InitialScreen />}
+    {phase === "loading" && <ModelLoadingScreen />}
+    {phase === "error" && <ModelError… />}
+  </Shell>
+);
+
+// ✅ GOOD
+const renderPhase = () => {
+  if (phase === "initial") return <InitialScreen … />;
+  if (phase === "loading-dakanji") return <ModelLoadingScreen message="…" />;
+  if (phase === "loading-backup") return <ModelLoadingScreen message="…" />;
+  if (phase === "error-lighter") return <ModelErrorLighterRecognizer … />;
+  if (phase === "error-none") return <ModelErrorNoRecognizer … />;
+  if (phase === "playing") return <Game … />;
+  if (phase === "ended") return <EndSession … />;
+  return null;
+};
+
+return <Shell>{renderPhase()}</Shell>;
+```
+
+Prefer flat phase/status values that map 1:1 to screens (`loading-dakanji`, `error-lighter`) over nested `{ status, variant, tryingBackup }` when it keeps the if-chain readable.
