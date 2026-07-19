@@ -18,7 +18,7 @@ $ pnpm run dev
 
 > **Note:** When using `pnpm run dev`, those features requiring cloudflare functions such as Jisho, Jotoba and Google Handwriting API clicking will not work. All other features work normally.
 
-### Running With Cloudlare Functions Related Features Locally
+### Locally Running With Cloudlare Functions Related Features
 
 The Jisho lookup feature and Google handwriting API proxies requests through a [Cloudflare Pages Function](./functions/api/) to work around CORS restrictions. To run it locally you need [wrangler](https://developers.cloudflare.com/workers/wrangler/):
 
@@ -62,24 +62,6 @@ pnpm exec playwright test --ui
 
 If e2e fails with `browserType.launch: Executable doesn't exist` (often pointing at `~/Library/Caches/ms-playwright/chromium_headless_shell-…`), re-run `pnpm exec playwright install chromium`. That usually means Playwright was updated and the matching browser build is missing locally.
 
-## Updating Data
-
-If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same directory, you can directly copy its output files
-
-```
-cp ../kanji-heatmap-data/output/*.json ./public/json
-```
-
-### Regenerating derived JSON
-
-`pnpm run build` regenerates derived JSON before compiling and bundling:
-
-```
-node scripts/generate-speed-katakana.mjs && tsc -b && vite build
-```
-
-The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
-
 ## Build Analysis
 
 Analyze the build with
@@ -91,32 +73,38 @@ ANALYZE=true ANALYZE_TEMPLATE=flamegraph pnpm run build
 
 Configure the visualizer settings in vite.config.ts if you want
 
-## Preview
+##
 
 ```
-$ pnpm run peek
-  ➜  Local:   http://localhost:4173/
-  ➜  Network: http://192.168.254.107:4173/
-  ➜  press h + enter to show help
+If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same directory, you can directly copy its output files
+
 ```
 
-## Updating the Data (Production)
+cp ../kanji-heatmap-data/output/\*.json ./public/json
+
+```
+
 
 Get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) repository
 
 ```
+
 curl -OL https://github.com/PikaPikaGems/kanji-heatmap-data/releases/latest/download/kanji-heatmap-data.tar.gz
+
 ```
 
 Uncompress and store the json files in `./public/json`
 
 ```
+
 tar -xzf ./kanji-heatmap-data.tar.gz -C ./public/json/
+
 ```
 
 You should have the following files updated (among others from the release)
 
 ```
+
 ls -la public/json
 
     component_keyword.json
@@ -130,19 +118,32 @@ ls -la public/json
     similar-kanjis.json
     vocab_furigana.json
     vocab_meaning.json
-```
 
-Derived files (`kanji-structure-*.json`, `kanji-readings-details.json`, `katakana/`) are produced by the generators above, not by this tarball.
+```
 
 Delete the `tar.gz` file since it's not needed anymore
 
 ```
+
 rm kanji-heatmap-data.tar.gz
+
 ```
+
+### Regenerating derived JSON
+
+`pnpm run build` regenerates derived JSON before compiling and bundling:
+
+```
+
+node scripts/generate-speed-katakana.mjs && tsc -b && vite build
+
+```
+
+The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
 
 #### Other Required Data
 
-These files in `public/` should exists: (see also "./src/lib/assets-paths.ts)
+These files in `public/` should exists: (see also `./src/lib/assets-paths.ts`)
 
 - `/json/kanji-structure-hlorenzi.json`
 - `/json/kanji-readings-details.json`
@@ -157,3 +158,4 @@ These files in `public/` should exists: (see also "./src/lib/assets-paths.ts)
 - [Discord](https://discord.gg/Ash8ZrGb4s)
 - [X/Twitter](https://x.com/pikapikagemsjp)
 - [Instagram](https://www.instagram.com/pikapikagems)
+```
