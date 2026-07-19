@@ -120,7 +120,7 @@ export type KanjiWorkerRequestName =
   | KanjiWorkerInfoRequestType
   | KanjiSearchRequestType
   | "initialize-extended-kanji-map"
-  | "initalize-segmented-vocab-map"
+  | "initialize-segmented-vocab-map"
   | "initialize-decomposition-map"
   | "kanji-main-map"
   | "phonetic-map"

@@ -140,7 +140,7 @@ export function KanjiWorkerProvider({
         phoneticCacheRef.current = r as KanjiPhoneticCacheType;
       }),
       requestWorker({ type: "initialize-extended-kanji-map" }),
-      requestWorker({ type: "initalize-segmented-vocab-map" }),
+      requestWorker({ type: "initialize-segmented-vocab-map" }),
       requestWorker({ type: "initialize-decomposition-map" }),
     ])
       .then(() => {

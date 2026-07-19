@@ -23,7 +23,7 @@ const createFetch = <T>(path: string) => {
     });
 };
 
-export const fetchMainManjiInfo = createFetch<MainKanjiInfoResponseType>(
+export const fetchMainKanjiInfo = createFetch<MainKanjiInfoResponseType>(
   assetsPaths.MAIN_KANJI_INFO_FILE_PATH
 );
 

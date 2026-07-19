@@ -12,7 +12,7 @@ import {
 import {
   fetchExtendedKanjiInfo,
   fetchKanjiDecomposition,
-  fetchMainManjiInfo,
+  fetchMainKanjiInfo,
   fetchPartKeywordInfo,
   fetchPhoneticInfo,
   fetchSegmentedVocab,
@@ -251,14 +251,14 @@ const HANDLERS: Record<KanjiWorkerRequestName, Handler> = {
       .then(() => reply.ok())
       .catch(reply.err);
   },
-  "initalize-segmented-vocab-map": (_payload, reply) => {
+  "initialize-segmented-vocab-map": (_payload, reply) => {
     fetchSegmentedVocab()
       .then(loadSegmentedVocabInfo)
       .then(() => reply.ok())
       .catch(reply.err);
   },
   "kanji-main-map": (_payload, reply) => {
-    fetchMainManjiInfo()
+    fetchMainKanjiInfo()
       .then(loadMainKanjiInfo)
       .then(() => reply.ok(KANJI_INFO_MAIN_CACHE))
       .catch(reply.err);

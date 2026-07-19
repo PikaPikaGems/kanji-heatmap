@@ -19,7 +19,7 @@ export const KanjiFunctionalityProvider = ({
       <KanjiWorkerProvider
         fallback={
           <div className="py-20">
-            <DefaultErrorFallback message="Well, this is embarrasing. Something went wrong." />
+            <DefaultErrorFallback message="Well, this is embarrassing. Something went wrong." />
           </div>
         }
       >

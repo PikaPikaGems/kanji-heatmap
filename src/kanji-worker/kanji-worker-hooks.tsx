@@ -1,4 +1,4 @@
-import { DependencyList, useEffect, useState } from "react";
+import { DependencyList, useEffect, useMemo, useState } from "react";
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import { useContextWithCatch } from "../providers/helpers";
 
@@ -96,7 +96,7 @@ export const useKanjiWorkerRequest = () => {
   const fn = useContextWithCatch(
     ActionContext,
     "KanjiWorker",
-    "KanjirWorkerRequest"
+    "KanjiWorkerRequest"
   );
   return fn;
 };
@@ -238,23 +238,16 @@ export const useVocabDetails = (word: string) => {
 export const useWordKanjis = (word: string) => {
   const getKanjiInfo = useGetKanjiInfoFn();
 
-  const kanjis = (word || "").split("").filter(isKanji);
-  const uniqueKanjis = [...new Set(kanjis)];
-
-  if (!getKanjiInfo) {
-    return [];
-  }
-
-  return uniqueKanjis
-    .map((kanji) => {
-      const info = getKanjiInfo(kanji);
-      return {
-        kanji,
-        keyword: info?.keyword || "Unknown",
-        isKanji: true,
-      };
-    })
-    .filter((item) => item.keyword !== "Unknown" || item.isKanji);
+  return useMemo(() => {
+    if (!getKanjiInfo) {
+      return [];
+    }
+    const uniqueKanjis = [...new Set((word || "").split("").filter(isKanji))];
+    return uniqueKanjis.map((kanji) => ({
+      kanji,
+      keyword: getKanjiInfo(kanji)?.keyword || "Unknown",
+    }));
+  }, [word, getKanjiInfo]);
 };
 
 export const useSimilarKanjis = (kanji: string) => {
