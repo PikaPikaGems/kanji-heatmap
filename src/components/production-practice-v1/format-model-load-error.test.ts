@@ -36,12 +36,16 @@ describe("isOrtWasmOutOfMemoryError", () => {
 });
 
 describe("formatModelLoadErrorReport", () => {
-  it("includes the pinned ORT runtime note", () => {
+  it("includes the ORT runtime note", () => {
     const report = formatModelLoadErrorReport(new Error("boom"));
     expect(report).toContain("DaKanji model warmup failed");
     expect(report).toContain("message: boom");
-    expect(report).toContain(
-      "ort: onnxruntime-web@1.17.3 (wasm numThreads=1 simd=false)"
-    );
+    expect(report).toContain("ort: onnxruntime-web@^1.27 (wasm numThreads=1)");
+  });
+
+  it("formats numeric ORT/Emscripten abort codes", () => {
+    const report = formatModelLoadErrorReport(13154144);
+    expect(report).toContain("numeric abort 13154144");
+    expect(report).toContain("0xc8b760");
   });
 });

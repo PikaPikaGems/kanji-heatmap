@@ -2,16 +2,9 @@ import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 
 // On-device single-character recognition via Dariyooo's DaKanji ONNX model.
 // Everything (ORT JS, wasm, model, labels) loads only on the first recognize call.
-//
-// Pin onnxruntime-web@1.17.3 and force the non-SIMD / single-thread wasm build.
-// Newer ORT only ships ort-wasm-simd-threaded, whose SharedArrayBuffer reservation
-// OOMs on many iOS Safari versions (esp. iOS 17): "RangeError: Out of memory".
-// See https://github.com/microsoft/onnxruntime/issues/22086
 
 const MODEL_URL = "/onnx/char_classifier.onnx";
 const LABELS_URL = "/onnx/char_classifier_labels.txt";
-// Copied from node_modules by the vite `ort-wasm-copy` plugin.
-const ORT_WASM_URL = "/onnx/ort-wasm.wasm";
 const DEFAULT_TOP_K = 10;
 // Match DrawingPad's perfect-freehand `size` so the raster looks like what the user drew.
 const STROKE_WIDTH = 16;
@@ -36,9 +29,12 @@ let runtimePromise: Promise<DaKanjiRuntime> | null = null;
 const loadRuntime = (): Promise<DaKanjiRuntime> => {
   if (runtimePromise == null) {
     runtimePromise = (async () => {
-      // Parallel: ORT JS + model labels (wasm is fetched by ORT after env setup).
-      const [ort, labelsText] = await Promise.all([
+      // Parallel: ORT JS + Vite-emitted wasm URL + model labels.
+      // `?url` puts the wasm on the asset pipeline (hashed /assets/… path) so we
+      // never fight Vite's interceptor for the stock ort-wasm-simd-threaded name.
+      const [ort, { default: wasmUrl }, labelsText] = await Promise.all([
         import("onnxruntime-web/wasm"),
+        import("onnxruntime-web/ort-wasm-simd-threaded.wasm?url"),
         fetch(LABELS_URL).then((response) => {
           if (!response.ok) {
             throw new Error(
@@ -49,10 +45,9 @@ const loadRuntime = (): Promise<DaKanjiRuntime> => {
         }),
       ]);
 
-      // Low-memory wasm: no worker threads, no SIMD → ort-wasm.wasm.
+      // Avoid needing cross-origin isolation headers for multi-threaded wasm.
       ort.env.wasm.numThreads = 1;
-      ort.env.wasm.simd = false;
-      ort.env.wasm.wasmPaths = { "ort-wasm.wasm": ORT_WASM_URL };
+      ort.env.wasm.wasmPaths = { wasm: wasmUrl };
 
       const labels = labelsText.trim();
       if (labels.length === 0) {

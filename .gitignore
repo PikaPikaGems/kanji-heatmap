@@ -17,8 +17,6 @@ public/kanji-textbook-words/*
 public/kanji-textbook-words-min/*
 public/json/katakana/*
 public/js/*
-# Copied from node_modules by vite ort-wasm-copy plugin (see vite.config.ts).
-public/onnx/ort-wasm.wasm
 
 dist-ssr
 *.local

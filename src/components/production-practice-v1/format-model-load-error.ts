@@ -23,7 +23,7 @@ export const formatModelLoadErrorReport = (error: unknown): string => {
       `name: ${error.name}`,
       `message: ${error.message}`,
       `ua: ${ua}`,
-      "ort: onnxruntime-web@1.17.3 (wasm numThreads=1 simd=false)",
+      "ort: onnxruntime-web@^1.27 (wasm numThreads=1)",
     ];
     if (error.stack) {
       lines.push("", "stack:", error.stack);
@@ -31,13 +31,19 @@ export const formatModelLoadErrorReport = (error: unknown): string => {
     return lines.join("\n");
   }
 
+  // ORT/Emscripten sometimes rejects with a bare number (wasm abort code).
+  const detail =
+    typeof error === "number"
+      ? `numeric abort ${error} (0x${error.toString(16)})`
+      : String(error);
+
   return [
     "DaKanji model warmup failed",
     "───────────────────────────",
     `time: ${now}`,
     `url: ${href}`,
-    `error: ${String(error)}`,
+    `error: ${detail}`,
     `ua: ${ua}`,
-    "ort: onnxruntime-web@1.17.3 (wasm numThreads=1 simd=false)",
+    "ort: onnxruntime-web@^1.27 (wasm numThreads=1)",
   ].join("\n");
 };

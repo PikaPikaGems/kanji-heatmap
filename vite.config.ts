@@ -29,31 +29,6 @@ const kanjiCanvasRefPatternsPlugin: Plugin = {
   buildStart: copyRefPatterns,
 };
 
-// onnxruntime-web@1.17.3 does not export individual .wasm paths, so copy the
-// low-memory ort-wasm.wasm next to the DaKanji model under public/onnx/.
-const ORT_WASM_SRC = path.resolve(
-  __dirname,
-  "node_modules/onnxruntime-web/dist/ort-wasm.wasm"
-);
-const ORT_WASM_DEST_DIR = path.resolve(__dirname, "public/onnx");
-const ORT_WASM_DEST = path.join(ORT_WASM_DEST_DIR, "ort-wasm.wasm");
-
-const copyOrtWasm = (): void => {
-  if (!fs.existsSync(ORT_WASM_SRC)) {
-    throw new Error(`Missing ORT wasm at ${ORT_WASM_SRC}`);
-  }
-  if (!fs.existsSync(ORT_WASM_DEST_DIR)) {
-    fs.mkdirSync(ORT_WASM_DEST_DIR, { recursive: true });
-  }
-  fs.copyFileSync(ORT_WASM_SRC, ORT_WASM_DEST);
-};
-
-const ortWasmPlugin: Plugin = {
-  name: "ort-wasm-copy",
-  configureServer: copyOrtWasm,
-  buildStart: copyOrtWasm,
-};
-
 const pwaConfig = {
   // registerType: 'prompt' <-- if we want to ensure user updates
   registerType: "autoUpdate" as const,
@@ -140,8 +115,7 @@ const pwaConfig = {
         },
       },
       // **********************
-      // Any remaining hashed /assets/*.wasm chunks (ORT wasm itself lives under
-      // /onnx/ort-wasm.wasm and is covered by the dakanji-onnx-cache rule above)
+      // ORT wasm emitted by Vite as a hashed /assets/*.wasm chunk
       // **********************
       {
         urlPattern: /\/assets\/.*\.wasm$/i,
@@ -277,7 +251,6 @@ const visualizer_templates: TemplateType[] = [
 export default defineConfig(() => ({
   plugins: [
     kanjiCanvasRefPatternsPlugin,
-    ortWasmPlugin,
     process.env.CF_PAGES ? null : cloudflare(),
     react(),
     VitePWA(pwaConfig),
@@ -300,7 +273,7 @@ export default defineConfig(() => ({
   },
   build: {
     target: "esnext", // Needed for module workers
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 0, // keep the ~13MB ORT wasm as a separate file
     rollupOptions: {
       output: {
         // Keep the app entry lean by isolating large, cache-friendly vendor groups.
