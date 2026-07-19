@@ -1,11 +1,11 @@
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PlusCircle } from "lucide-react";
-import { useLocalStorage2 } from "@/hooks/use-local-storage";
+import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { bookmarkStorageKey } from "@/lib/bookmarks";
 
 const MarkAsKnownBadge = ({ kanji, word }: { kanji: string; word: string }) => {
-  const [isKnown, setIsKnown] = useLocalStorage2(
+  const [isKnown, setIsKnown] = useLocalStorageFlag(
     bookmarkStorageKey(kanji, word)
   );
   const toggle = () => setIsKnown(!isKnown);

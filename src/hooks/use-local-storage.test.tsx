@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useLocalStorage, useLocalStorage2 } from "./use-local-storage";
+import { useLocalStorage, useLocalStorageFlag } from "./use-local-storage";
 
 type Settings = { a: number; b?: string };
 
@@ -72,14 +72,14 @@ describe("useLocalStorage", () => {
   });
 });
 
-describe("useLocalStorage2", () => {
+describe("useLocalStorageFlag", () => {
   it("defaults to false when unset", () => {
-    const { result } = renderHook(() => useLocalStorage2("flag"));
+    const { result } = renderHook(() => useLocalStorageFlag("flag"));
     expect(result.current[0]).toBe(false);
   });
 
   it("stores 'true' when set and removes the key when unset", () => {
-    const { result } = renderHook(() => useLocalStorage2("flag"));
+    const { result } = renderHook(() => useLocalStorageFlag("flag"));
 
     act(() => {
       result.current[1](true);
@@ -92,5 +92,18 @@ describe("useLocalStorage2", () => {
     });
     expect(result.current[0]).toBe(false);
     expect(localStorage.getItem("flag")).toBeNull();
+  });
+
+  it("re-reads when the storage key changes", () => {
+    localStorage.setItem("flag-a", "true");
+
+    const { result, rerender } = renderHook(
+      ({ key }: { key: string }) => useLocalStorageFlag(key),
+      { initialProps: { key: "flag-a" } }
+    );
+    expect(result.current[0]).toBe(true);
+
+    rerender({ key: "flag-b" });
+    expect(result.current[0]).toBe(false);
   });
 });

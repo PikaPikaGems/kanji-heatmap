@@ -9,11 +9,15 @@ import { useEffect, useRef, useState } from "react";
  * writes arrive from the browser automatically.
  *
  * Both callbacks are kept in refs, so callers may pass inline functions
- * without re-subscribing on every render.
+ * without re-subscribing on every render. When `resubscribeKey` changes, the
+ * value is re-read synchronously during render (previous-state pattern) — used
+ * when the storage key the caller reads depends on a prop, so a key change is
+ * reflected without a stale frame.
  */
 export const useStorageValue = <T>(
   read: () => T,
-  matchesKey: (key: string | null) => boolean
+  matchesKey: (key: string | null) => boolean,
+  resubscribeKey?: string
 ): T => {
   const readRef = useRef(read);
   const matchesKeyRef = useRef(matchesKey);
@@ -21,6 +25,12 @@ export const useStorageValue = <T>(
   matchesKeyRef.current = matchesKey;
 
   const [value, setValue] = useState<T>(() => readRef.current());
+
+  const [prevKey, setPrevKey] = useState(resubscribeKey);
+  if (prevKey !== resubscribeKey) {
+    setPrevKey(resubscribeKey);
+    setValue(readRef.current());
+  }
 
   useEffect(() => {
     // Re-read on mount so a write between initial render and subscription
