@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchType } from "@/lib/settings/settings";
 import { placeholderMap, SEARCH_TYPE_OPTIONS } from "@/lib/search-input-maps";
@@ -24,6 +26,9 @@ export const SearchInput = ({
     onSettle,
   });
   const { parsedValue, searchType, isDrawerType } = controller;
+  const [isDrawerChunkLoading, setIsDrawerChunkLoading] = useState(false);
+  const showDrawerLoading =
+    isDrawerChunkLoading && controller.openDialogType !== "none";
 
   const fontCN =
     parsedValue === "" || searchType === "meanings" || searchType === "keyword"
@@ -40,7 +45,8 @@ export const SearchInput = ({
         spellCheck={false}
         aria-label="Search kanji"
         className={cn(
-          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-7 pr-[105px] h-9",
+          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-7 h-9",
+          showDrawerLoading ? "pr-[130px]" : "pr-[105px]",
           fontCN,
           isDrawerType && "cursor-pointer"
         )}
@@ -67,6 +73,12 @@ export const SearchInput = ({
             <span className="sr-only"> Clear search text</span>
           </Button>
         )}
+        {showDrawerLoading && (
+          <Loader2
+            className="size-4 shrink-0 animate-spin text-muted-foreground"
+            aria-label="Loading search drawer"
+          />
+        )}
         <BasicSelect
           value={searchType}
           onChange={controller.onSelectType}
@@ -90,6 +102,7 @@ export const SearchInput = ({
         value={parsedValue}
         onChange={controller.onSyncAll}
         handwritingResetKey={controller.handwritingResetKey}
+        onChunkLoadingChange={setIsDrawerChunkLoading}
       />
     </section>
   );

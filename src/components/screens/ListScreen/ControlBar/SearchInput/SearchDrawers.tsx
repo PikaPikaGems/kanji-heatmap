@@ -1,8 +1,6 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { SearchType } from "@/lib/settings/settings";
 import { DialogType } from "@/lib/search-input-logic";
-import { RadicalsLoadingFallback } from "./RadicalScreen/RadicalsLoadingFallback";
-import { HandwritingLoadingFallback } from "./HandwritingScreen/HandwritingLoadingFallback";
 
 const RadicalsControl = lazy(() =>
   import("./RadicalScreen/RadicalsControl").then((m) => ({
@@ -14,6 +12,19 @@ const HandwritingControl = lazy(() =>
     default: m.HandwritingControl,
   }))
 );
+
+/** Reports Suspense fallback lifetime so the search bar can show a spinner. */
+const DrawerChunkLoadingFallback = ({
+  onLoadingChange,
+}: {
+  onLoadingChange: (loading: boolean) => void;
+}) => {
+  useEffect(() => {
+    onLoadingChange(true);
+    return () => onLoadingChange(false);
+  }, [onLoadingChange]);
+  return null;
+};
 
 /**
  * The lazily-loaded radical and handwriting drawers attached to the search
@@ -27,6 +38,7 @@ export const SearchDrawers = ({
   value,
   onChange,
   handwritingResetKey,
+  onChunkLoadingChange,
 }: {
   searchType: SearchType;
   openDialogType: DialogType | "none";
@@ -34,15 +46,15 @@ export const SearchDrawers = ({
   value: string;
   onChange: (newStr: string, type: SearchType) => void;
   handwritingResetKey: number;
+  onChunkLoadingChange: (loading: boolean) => void;
 }) => {
   return (
     <>
       {(openDialogType === "radicals" || searchType === "radicals") && (
         <Suspense
           fallback={
-            <RadicalsLoadingFallback
-              isOpen={openDialogType === "radicals"}
-              onClose={onClose}
+            <DrawerChunkLoadingFallback
+              onLoadingChange={onChunkLoadingChange}
             />
           }
         >
@@ -63,9 +75,8 @@ export const SearchDrawers = ({
         // drawer's open state so the drawing survives closing/reopening it.
         <Suspense
           fallback={
-            <HandwritingLoadingFallback
-              isOpen={openDialogType === searchType}
-              onClose={onClose}
+            <DrawerChunkLoadingFallback
+              onLoadingChange={onChunkLoadingChange}
             />
           }
         >
