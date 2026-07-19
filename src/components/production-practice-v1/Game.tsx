@@ -16,11 +16,10 @@ import {
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
-import { recognizeDaKanji } from "@/lib/dakanji-adapter";
 import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
-import { DRAW_SVG_SIZE, GRADE_TOP_K, RECOGNIZE_TOP_K } from "./constants";
+import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
 import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
 import {
@@ -40,11 +39,14 @@ type CardStep =
       type: "select";
       grade: GradeRankInfo;
       candidates: string[];
+      /** True when recognize threw; pick-only for this card. */
+      recognitionSkipped?: boolean;
     }
   | {
       type: "feedback";
       kind: "noKanji" | "correct" | "incorrect";
       grade: GradeRankInfo;
+      recognitionSkipped?: boolean;
     };
 
 export const Game = ({
@@ -52,6 +54,7 @@ export const Game = ({
   settings,
   randomKanjiPool,
   gradingEnabled = true,
+  recognize,
   onProgress,
   onComplete,
   onEnd,
@@ -59,8 +62,9 @@ export const Game = ({
   sessionItems: PracticeItem[];
   settings: ProductionPracticeSettings;
   randomKanjiPool: string[];
-  /** When false, skip ONNX recognition and score by pick only. */
+  /** When false, skip recognition and score by pick only. */
   gradingEnabled?: boolean;
+  recognize: (payload: DrawingSubmitPayload) => Promise<string[]>;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
@@ -154,7 +158,11 @@ export const Game = ({
     });
   };
 
-  const openSelectStep = (grade: GradeRankInfo, modelGuesses: string[]) => {
+  const openSelectStep = (
+    grade: GradeRankInfo,
+    modelGuesses: string[],
+    recognitionSkipped = false
+  ) => {
     // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
     // part-keywords (e.g. 囗 → "closed box"), which must not count.
     const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
@@ -168,7 +176,12 @@ export const Game = ({
       isRealKanji,
     });
     setSelected(null);
-    setStep({ type: "select", grade, candidates: grid });
+    setStep({
+      type: "select",
+      grade,
+      candidates: grid,
+      recognitionSkipped,
+    });
   };
 
   const onSubmit = async (payload: DrawingSubmitPayload) => {
@@ -183,7 +196,7 @@ export const Game = ({
 
     setStep({ type: "recognizing" });
     try {
-      const candidates = await recognizeDaKanji(payload, RECOGNIZE_TOP_K);
+      const candidates = await recognize(payload);
       const rank = candidates.indexOf(current.kanji);
       const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
       openSelectStep(
@@ -195,7 +208,8 @@ export const Game = ({
         candidates
       );
     } catch {
-      setStep({ type: "draw" });
+      // Keep the session moving — pick-only for this card, with a quiet notice.
+      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, [], true);
     }
   };
 
@@ -204,15 +218,21 @@ export const Game = ({
   const onSelectForgot = () => {
     if (step.type !== "select") return;
     pushResult(false, step.grade.rank);
-    setStep({ type: "feedback", kind: "incorrect", grade: step.grade });
+    setStep({
+      type: "feedback",
+      kind: "incorrect",
+      grade: step.grade,
+      recognitionSkipped: step.recognitionSkipped,
+    });
   };
 
   const onSelectNext = () => {
     if (step.type !== "select" || selected == null) return;
     const pickedCorrect = selected === current.kanji;
     // With grading: drawing must also land in the model top-10.
-    // Without: picking the right kanji is enough.
-    const sessionCorrect = gradingEnabled
+    // Without (session-wide or this card's recognize failure): pick is enough.
+    const gradeThisCard = gradingEnabled && !step.recognitionSkipped;
+    const sessionCorrect = gradeThisCard
       ? pickedCorrect && step.grade.inTop10
       : pickedCorrect;
     if (sessionCorrect) {
@@ -223,12 +243,19 @@ export const Game = ({
       type: "feedback",
       kind: pickedCorrect ? "correct" : "incorrect",
       grade: step.grade,
+      recognitionSkipped: step.recognitionSkipped,
     });
   };
 
   const recognizing = step.type === "recognizing";
   const selectOpen = step.type === "select";
   const feedback = step.type === "feedback" ? step : null;
+  const recognitionSkippedOnSelect =
+    step.type === "select" && step.recognitionSkipped === true;
+  // Pick-only UX for this card when recognize failed mid-session.
+  const selectGradingEnabled = gradingEnabled && !recognitionSkippedOnSelect;
+  const feedbackGradingEnabled =
+    gradingEnabled && !(feedback?.recognitionSkipped === true);
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
@@ -301,7 +328,8 @@ export const Game = ({
         }
         candidates={step.type === "select" ? step.candidates : []}
         selected={selected}
-        gradingEnabled={gradingEnabled}
+        gradingEnabled={selectGradingEnabled}
+        recognitionSkipped={recognitionSkippedOnSelect}
         onSelect={setSelected}
         onForgot={onSelectForgot}
         onNext={onSelectNext}
@@ -313,7 +341,7 @@ export const Game = ({
         item={current}
         grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
         drawing={drawing}
-        gradingEnabled={gradingEnabled}
+        gradingEnabled={feedbackGradingEnabled}
         onNext={advance}
       />
     </div>

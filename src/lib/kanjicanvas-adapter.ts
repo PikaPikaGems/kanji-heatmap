@@ -45,11 +45,19 @@ const loadKanjiCanvas = (): Promise<KanjiCanvasGlobal> => {
       }
 
       return kanjiCanvas;
-    })();
+    })().catch((error) => {
+      // Allow a later warmup/recognize attempt to retry after a failed load.
+      kanjiCanvasPromise = null;
+      throw error;
+    });
   }
 
   return kanjiCanvasPromise;
 };
+
+/** Preload the engine + reference patterns so the first recognize call is fast. */
+export const warmupKanjiCanvas = (): Promise<void> =>
+  loadKanjiCanvas().then(() => undefined);
 
 // Recognize a kanji from drawn strokes entirely on-device (no API call).
 // Returns the best candidate kanji, most likely first.
