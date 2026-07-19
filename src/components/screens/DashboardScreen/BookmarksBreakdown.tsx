@@ -85,7 +85,7 @@ export const BookmarksBreakdown = () => {
                     />
                   </TableCell>
                   <TableCell className="p-0 text-[10px]">
-                    <span className="inline-block w-12 -mb-0_5 grow text-end">
+                    <span className="inline-block min-w-14 -mb-0_5 grow text-end">
                       {n} / {total}
                     </span>
                   </TableCell>
