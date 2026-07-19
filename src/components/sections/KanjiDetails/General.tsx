@@ -157,7 +157,9 @@ export const General = ({ kanji }: { kanji: string }) => {
           (sui) as in 水泳
         </>
       ),
-      items: data.allOn.map((on) => <RomajiBadge key={on} kana={on} />),
+      items: data.allOn.map((on) => (
+        <RomajiBadge key={on} className="text-lg" kana={on} />
+      )),
     },
   ];
 
