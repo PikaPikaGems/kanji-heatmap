@@ -23,7 +23,7 @@ export const EndSession = ({
   return (
     <EndScreenLayout
       heading={cheer}
-      subtitle="Challenge complete"
+      subtitle=""
       headingExtra={
         <div className="mt-2">
           <SpeedKatakanaStatsSummary completed={completedSets} />

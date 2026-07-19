@@ -14,14 +14,13 @@ export const ClozeWord = ({
   const idx = word.indexOf(kanji);
   const before = idx === -1 ? "" : word.slice(0, idx);
   const after = idx === -1 ? word : word.slice(idx + kanji.length);
+
   const displayLen = before.length + after.length + 1;
 
   const sizeClass =
-    displayLen > 6
-      ? "text-4xl sm:text-5xl md:text-6xl"
-      : displayLen < 3
-        ? "text-6xl sm:text-7xl md:text-8xl"
-        : "text-5xl sm:text-6xl md:text-7xl";
+    displayLen > 4
+      ? "text-3xl sm:text-4xl md:text-7xl"
+      : "text-4xl sm:text-5xl md:text-7xl";
 
   return (
     <p
@@ -41,7 +40,7 @@ export const ClozeWord = ({
         <span className="mx-0.5">{kanji}</span>
       ) : (
         <span
-          className="inline-flex items-center justify-center mx-1 min-w-[1.25em] px-2 pt-1 pb-4 border-2 border-dotted rounded-xl border-foreground/70 align-middle"
+          className="inline-flex items-center romaji-font justify-center mx-1 min-w-[1.25em] px-2  border-2 border-dotted rounded-xl border-foreground/70 align-middle"
           aria-label="missing kanji"
         >
           ?

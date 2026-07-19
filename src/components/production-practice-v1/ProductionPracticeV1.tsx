@@ -218,9 +218,7 @@ const ProductionPracticeV1 = () => {
 
   return (
     <>
-      <PracticeShell progress={session.progress} playing={phase === "playing"}>
-        {renderPhase()}
-      </PracticeShell>
+      <PracticeShell progress={session.progress}>{renderPhase()}</PracticeShell>
 
       {phase === "ended" && <KanjiDrawerGlobal />}
     </>

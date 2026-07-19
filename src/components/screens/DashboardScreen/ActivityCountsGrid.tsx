@@ -23,18 +23,12 @@ export const ActivityCountsGrid = ({
   stats: ActivityCountsDisplay;
 }) => (
   <div className="flex flex-col gap-2 sm:gap-3">
-    <div className="grid grid-cols-2 justify-items-start gap-2 sm:grid-cols-4 sm:gap-3">
+    <div className="grid grid-cols-2 gap-2 justify-items-start sm:grid-cols-4 sm:gap-3">
       <OverviewStat
         value={stats.daysActive}
         title="Total"
         unit="Days"
         Icon={CalendarDays}
-      />
-      <OverviewStat
-        value={stats.speedKatakanaDays}
-        title={speedKatakanaPageMeta.shortLabel}
-        unit="Days"
-        Icon={Keyboard}
       />
       <OverviewStat
         value={stats.productionDays}
@@ -48,15 +42,14 @@ export const ActivityCountsGrid = ({
         unit="Days"
         Icon={Eye}
       />
+      <OverviewStat
+        value={stats.speedKatakanaDays}
+        title={speedKatakanaPageMeta.shortLabel}
+        unit="Days"
+        Icon={Keyboard}
+      />
     </div>
     <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
-      <OverviewStat
-        value={stats.speedKatakanaSessions}
-        title={speedKatakanaPageMeta.shortLabel}
-        unit="Sessions"
-        Icon={Keyboard}
-        compact
-      />
       <OverviewStat
         value={stats.productionRounds}
         title={productionPracticePageMeta.shortLabel}
@@ -69,6 +62,13 @@ export const ActivityCountsGrid = ({
         title={recognitionPracticePageMeta.shortLabel}
         unit="Rounds"
         Icon={Eye}
+        compact
+      />
+      <OverviewStat
+        value={stats.speedKatakanaSessions}
+        title={speedKatakanaPageMeta.shortLabel}
+        unit="Sessions"
+        Icon={Keyboard}
         compact
       />
     </div>

@@ -3,12 +3,18 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { RadioRow, ToggleRow } from "@/components/shared-practice";
+import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
-import { DEFAULT_SETTINGS, levelOf, positionInLevel, SETTINGS_KEY } from "./constants";
+import {
+  DEFAULT_SETTINGS,
+  levelOf,
+  positionInLevel,
+  SETTINGS_KEY,
+} from "./constants";
 import { useSpeedKatakanaProgress } from "./use-speed-katakana-progress";
 import { ChallengeSetSelector } from "./ChallengeSetSelector";
 
@@ -74,7 +80,8 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   useEnterAction(onStart);
 
   return (
-    <div className="flex flex-col w-full h-full animate-fade-in">
+    <div className="relative flex flex-col w-full h-full animate-fade-in">
+      <LeavePractice />
       <div className="flex-1 min-h-0 pl-4 pr-2 overflow-auto">
         <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
           <div className="flex flex-col items-center gap-1 px-6">

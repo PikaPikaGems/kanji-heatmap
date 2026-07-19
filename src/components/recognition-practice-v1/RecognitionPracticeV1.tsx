@@ -64,7 +64,6 @@ const RecognitionPracticeV1 = () => {
       />
       <PracticeShell
         progress={session.progress}
-        playing={phase === "playing"}
         height={visualPortOn ? viewport.height : undefined}
       >
         {phase === "initial" && (
