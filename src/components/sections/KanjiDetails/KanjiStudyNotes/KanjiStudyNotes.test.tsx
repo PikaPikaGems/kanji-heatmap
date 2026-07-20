@@ -1,14 +1,34 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-import KanjiStudyNotes, {
-  getKanjiStudyNotesStorageKey,
-  MAX_STUDY_NOTE_LENGTH,
-} from ".";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import KanjiStudyNotes from ".";
+import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
 vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
   useWordKanjis: () => [],
 }));
+
+beforeAll(() => {
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+  );
+  vi.stubGlobal("speechSynthesis", {
+    getVoices: () => [],
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    cancel: vi.fn(),
+    speak: vi.fn(),
+  });
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("KanjiStudyNotes", () => {
   it("limits and stores notes separately for each kanji", () => {

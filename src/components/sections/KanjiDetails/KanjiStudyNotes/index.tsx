@@ -3,11 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
-
-export const MAX_STUDY_NOTE_LENGTH = 1000;
-
-export const getKanjiStudyNotesStorageKey = (kanji: string) =>
-  `kanji-study-notes:v1:${encodeURIComponent(kanji)}`;
+import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
 interface StoredStudyNotes {
   notes: string;
