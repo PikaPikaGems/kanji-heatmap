@@ -44,7 +44,9 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
           <MarkdownEditor
             value={notes}
             maxLength={MAX_STUDY_NOTE_LENGTH}
-            onChange={(value) => setStoredNotes("notes", value)}
+            onChange={(value) =>
+              setStoredNotes("notes", value.slice(0, MAX_STUDY_NOTE_LENGTH))
+            }
           />
           <p className="mt-2 text-xs text-muted-foreground">
             Japanese words become clickable in Preview. Optional details:{" "}
