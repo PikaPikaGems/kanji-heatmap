@@ -61,6 +61,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
+const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   const info = useKanjiRepresentativeWord(kanji);
@@ -111,6 +112,13 @@ export const KanjiDetails = ({
         </ErrorBoundary>
       </SimpleAccordion>
       <RepresentativeStudyWordAccordion kanji={kanji} />
+      <SimpleAccordion trigger="Kanji Study Notes">
+        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
+          <Suspense fallback={<BasicLoading />}>
+            <KanjiStudyNotes key={kanji} kanji={kanji} />
+          </Suspense>
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
