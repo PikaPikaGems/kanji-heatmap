@@ -48,38 +48,36 @@ const App = () => {
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <GlobalKeyboardShortcutProvider>
-          <PracticeReturnPathMemory />
-          <Switch>
-            {/* Speed Katakana renders its own slim header and doesn't need the
-                kanji data providers, so it lives outside the layout below. */}
-            <Route
-              path={speedKatakanaPage.href}
-              component={speedKatakanaPage.Component}
-            />
-            {/* Recognition practice has its own header but needs kanji data + drawer. */}
-            <Route path={recognitionPracticeV1Page.href}>
-              <KanjiFunctionalityProvider>
-                <RecognitionPracticeV1 />
-              </KanjiFunctionalityProvider>
-            </Route>
-            {/* Production (writing) practice needs kanji data, drawer, and ONNX. */}
-            <Route path={productionPracticeV1Page.href}>
-              <KanjiFunctionalityProvider>
-                <ProductionPracticeV1 />
-              </KanjiFunctionalityProvider>
-            </Route>
-            <Route>
-              <Header />
-              <main className="min-h-dvh bg-background">
-                <ErrorBoundary
-                  details="App"
-                  fallback={
-                    <div className="w-full pr-4 mt-14">
-                      <DefaultErrorFallback />
-                    </div>
-                  }
-                >
-                  <KanjiFunctionalityProvider>
+          <KanjiFunctionalityProvider>
+            <PracticeReturnPathMemory />
+            <Switch>
+              {/* Speed Katakana renders its own slim header, so it lives
+                  outside the shared layout below. */}
+              <Route
+                path={speedKatakanaPage.href}
+                component={speedKatakanaPage.Component}
+              />
+              {/* Recognition practice has its own header. */}
+              <Route
+                path={recognitionPracticeV1Page.href}
+                component={RecognitionPracticeV1}
+              />
+              {/* Production (writing) practice has its own header + ONNX. */}
+              <Route
+                path={productionPracticeV1Page.href}
+                component={ProductionPracticeV1}
+              />
+              <Route>
+                <Header />
+                <main className="min-h-dvh bg-background">
+                  <ErrorBoundary
+                    details="App"
+                    fallback={
+                      <div className="w-full pr-4 mt-14">
+                        <DefaultErrorFallback />
+                      </div>
+                    }
+                  >
                     <PageFadeIn>
                       <Switch>
                         <Route
@@ -120,13 +118,13 @@ const App = () => {
                         </Route>
                       </Switch>
                     </PageFadeIn>
-                  </KanjiFunctionalityProvider>
-                </ErrorBoundary>
-              </main>
-              <FloatingIsland />
-              <PracticeFab />
-            </Route>
-          </Switch>
+                  </ErrorBoundary>
+                </main>
+                <FloatingIsland />
+                <PracticeFab />
+              </Route>
+            </Switch>
+          </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
     </ErrorBoundary>
