@@ -196,9 +196,9 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
 // https: //www.verbix.com/webverbix/japanese/miru
 
 export const outLinks = {
-  githubIssue: "https://github.com/PikaPikaGems/kanji-heatmap/issues/63",
+  githubIssue: "https://github.com/PikaPikaGems/kanji-heatmap/issues/241",
   githubContentIssue:
-    "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/5",
+    "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/27",
   discord: "https://discord.gg/Ash8ZrGb4s",
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
   twitter: "https://x.com/pikapikagemsJP",

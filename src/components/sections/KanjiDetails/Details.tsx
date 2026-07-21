@@ -49,15 +49,20 @@ export const ImprovementCTA = () => {
 
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return (
-    <>
-      <p className="my-4 text-xs text-left">
-        <strong>⚠ Note:</strong> The speak buttons 🔊 🎧 rely on your{" "}
-        {"browser's"} built-in text-to-speech, which may not work in some
-        devices.
+    <div className="my-4">
+      <p className="text-xs text-left">
+        {"⚠️"} The speak buttons 🔊 🎧 rely on your {"browser's"} built-in
+        text-to-speech, which may not work in some devices.
+      </p>
+      <p className="text-xs text-left">
+        {"⚠️"} We strive for accuracy, but mistakes can happen. If you find an
+        content issue, please report it{" "}
+        <ExternalTextLink href={outLinks.githubContentIssue} text="here" /> 🐞🐛
+        . Always verify important information with official sources.
       </p>
 
       <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
-    </>
+    </div>
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
