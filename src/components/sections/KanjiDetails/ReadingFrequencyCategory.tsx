@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { BasicLoading } from "@/components/common/BasicLoading";
 import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import {
@@ -26,6 +25,7 @@ import {
   readingTypeLabels,
 } from "@/lib/kanji-section-constants";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { TableSkeleton } from "./TableSkeleton";
 
 const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
   const label = frequencyLabels[frequency];
@@ -74,7 +74,7 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
   const { status, error, kanjiReadingData } = useKanjiReadingDetails(kanji);
 
   if (status === "pending" || status === "idle") {
-    return <BasicLoading />;
+    return <TableSkeleton />;
   }
 
   if (status === "error" || error) {
