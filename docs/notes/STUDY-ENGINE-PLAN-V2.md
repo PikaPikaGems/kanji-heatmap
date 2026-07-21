@@ -22,8 +22,10 @@ The first release deliberately favors simple, explicit rules:
 - One Markdown note exists per kanji.
 - Practice history stores device-scoped summaries, not session histories.
 - Review events are immutable and remain the scheduling source of truth.
-- The backend runs the shared deterministic FSRS core and stores rebuildable
-  canonical card projections.
+- Postgres keeps a rolling 90-day review-event tail; older events move to
+  private R2 Standard account-month chunks and remain there indefinitely.
+- The backend runs the canonical, version-pinned Python FSRS adapter and stores
+  rebuildable canonical card projections.
 - New devices bootstrap from projections and compact history summaries instead
   of downloading every historical review event.
 - The backend uses typed sync and bootstrap endpoints.
@@ -50,13 +52,18 @@ flowchart LR
     App --> Contract["Study Engine Contract"]
     Contract --> Noop["Built-in No-op Engine"]
     Contract --> Engine["kh-study-engine"]
+    Engine --> BrowserScheduler["Pinned ts-fsrs adapter"]
     Engine --> DeviceDB[(Device Metadata DB)]
     Engine --> AccountDB[(Account Dexie DB)]
     Engine --> API[Private Sync API]
     API --> Auth[Auth and Entitlements]
-    API --> Scheduler["Shared deterministic FSRS core"]
-    Scheduler --> Projections[(Card Projections)]
+    API --> BackendScheduler["Pinned py-fsrs adapter"]
+    BrowserScheduler -.-> FsrsContract["Versioned FSRS contract and golden vectors"]
+    BackendScheduler -.-> FsrsContract
+    BackendScheduler --> Projections[(Card Projections)]
     API --> BackendDB[(Backend Relational DB)]
+    BackendDB --> Archiver["Validated 90-day archiver"]
+    Archiver --> R2[(Private R2 Standard)]
 ```
 
 ### Kanji Heatmap owns
@@ -75,9 +82,8 @@ Application components never import `kh-study-engine` directly.
 
 ### `kh-study-engine` owns
 
-- `ts-fsrs` integration
-- A framework-independent deterministic scheduler-core package consumed by
-  both the browser engine and backend
+- A version-pinned `ts-fsrs` adapter
+- A language-neutral, versioned FSRS contract and JSON conformance fixtures
 - Dexie and IndexedDB schemas
 - Review-pile membership and review sessions
 - Card scheduling, previews, and statistics
@@ -92,9 +98,10 @@ Application components never import `kh-study-engine` directly.
 The engine is framework-independent. It does not depend on React, Wouter,
 Tailwind, or Kanji Heatmap components.
 
-The shared scheduler core contains only versioned settings validation, event
-ordering, deterministic PRNG/fuzz behavior, and FSRS replay. It contains no
-Dexie, HTTP, authentication, or UI code.
+The scheduler contract defines settings validation, event ordering, time and
+rating normalization, state mapping, interval rounding, and serialized
+conformance fixtures. It contains no executable TypeScript- or Python-specific
+persistence, HTTP, authentication, or UI code.
 
 ### Private backend owns
 
@@ -104,8 +111,11 @@ Dexie, HTTP, authentication, or UI code.
 - Canonical cloud data
 - Idempotent sync processing
 - Ordered account change delivery
-- The same version-pinned deterministic FSRS core used by the browser
+- A version-pinned `py-fsrs` adapter implementing the same scheduler contract
+- Canonical scheduler output and cross-runtime conformance verification
 - Canonical, rebuildable card projections and compact review summaries
+- Validated review-event archival to private R2 Standard
+- Per-card archive-boundary checkpoints for hot-tail replay
 - Fast new-device bootstrap snapshots
 - Note conflict preservation
 - Billing, rate limits, secrets, and abuse prevention
@@ -392,22 +402,39 @@ export interface ReviewSettings {
 }
 ```
 
-The settings map to these `ts-fsrs` parameters:
+The browser adapter maps the settings to `ts-fsrs`; the backend adapter maps
+the same contract to `py-fsrs`:
 
 ```text
-requestRetention       -> request_retention
-maximumIntervalDays    -> maximum_interval
-enableFuzz             -> enable_fuzz
-enableShortTerm        -> enable_short_term
-learningStepsMinutes   -> learning_steps
-relearningStepsMinutes -> relearning_steps
-modelWeights           -> w
+Contract               ts-fsrs             py-fsrs
+requestRetention       request_retention    desired_retention
+maximumIntervalDays    maximum_interval     maximum_interval
+enableFuzz             portable adapter     portable adapter
+enableShortTerm        enable_short_term    adapter controls empty/nonempty steps
+learningStepsMinutes   learning_steps       learning_steps as timedeltas
+relearningStepsMinutes relearning_steps     relearning_steps as timedeltas
+modelWeights           w                    parameters
 ```
 
 When short-term scheduling is disabled, learning and relearning steps remain
 stored but are ignored. The UI hides those controls. Model weights are an
 advanced option and are validated against the engine's pinned FSRS version.
 FSRS 6 currently uses 21 weights.
+
+The Fuzz policy remains open. The current Python implementation uses unseeded
+randomness for built-in fuzzing, so the two libraries' native fuzz flags must
+never be enabled independently for synchronized accounts. Before the V1
+contract freezes, choose one:
+
+1. **Portable deterministic fuzz (better behavior):** keep `enableFuzz`; run
+   both libraries with native fuzz disabled; apply one contract-defined,
+   event-ID-seeded integer algorithm in TypeScript and Python; require exact
+   golden-vector parity.
+2. **No fuzz (simpler):** remove or permanently disable `enableFuzz`, hide the
+   control, and keep both native fuzz flags false.
+
+Until that decision is made, `enableFuzz` is provisional and no synchronized
+implementation may turn on native library fuzz.
 
 There are no `newCardsPerDay` or `maximumReviewsPerDay` settings.
 
@@ -473,20 +500,31 @@ queued offline, but existing schedules remain in place until the backend
 accepts it and publishes the rebuilt projection generation. The UI shows that
 recalculation is pending.
 
-### Deterministic scheduling
+### Cross-runtime scheduling contract
 
-The browser and backend use the same version-pinned scheduler package. Every
-review event supplies the seed for interval fuzz:
+The browser and backend pin package versions independently:
 
-```text
-fuzzSeed = reviewEvent.id
-```
+- The browser uses `ts-fsrs` through a TypeScript adapter.
+- The FastAPI backend uses `py-fsrs` through a Python adapter.
+- The Python result is canonical. Browser scheduling is an immediate,
+  offline-capable projection that the next successful sync may correct.
 
-The scheduler obtains all randomness from a deterministic PRNG initialized
-with that seed. Replaying the same ordered events, FSRS version, and settings
-must produce byte-equivalent scheduling state on every platform. If the
-selected `ts-fsrs` integration cannot inject deterministic randomness, fuzz
-must remain disabled for synchronized accounts until that capability exists.
+Both adapters consume the same normalized settings and ordered review events.
+They must pass shared JSON golden vectors covering new, learning, review, and
+relearning cards; all ratings; short-term steps; maximum intervals; timestamp
+boundaries; and long replay sequences.
+
+Golden-vector assertions are exact for discrete outputs such as state,
+scheduled interval, due timestamp, repetitions, and lapses. Floating-point
+stability, difficulty, and retrievability use an explicitly versioned
+tolerance because JavaScript and Python calculations are not promised to be
+byte-identical. Canonical backend values are stored and synced without being
+recomputed by the client.
+
+An upgrade to either FSRS package requires a scheduler-contract version
+change, regenerated fixtures, a reviewed output diff, and passing tests in
+both runtimes. If portable fuzz is selected, its algorithm and vectors are
+versioned independently from both FSRS packages.
 
 ## Review sessions
 
@@ -556,8 +594,10 @@ time, then New cards by pile addition time.
 
 ### Rating behavior
 
-- Incorrect answer maps to `again`.
-- Correct answer reveals Hard, Normal, and Easy.
+- Forgot and an incorrect selected answer map to `again`.
+- Reading Review reveals Hard, Normal, and Easy after a correct reading.
+- Writing Review normally derives the rating from handwriting-recognizer rank
+  after the user selects the correct kanji.
 - Normal maps to FSRS `good`.
 - The engine records review time using its clock.
 - The UI does not provide a timestamp.
@@ -581,6 +621,117 @@ export interface ReviewOutcome {
 
 Previewing does not mutate data. Rating recalculates from the actual current
 time before saving.
+
+### Round and run structure
+
+One review round calls `startSession({ cardType, limit: 10 })`. The resulting
+`ReviewSession` owns at most 10 cards and has the same initial, playing, and
+ended presentation rhythm as the existing Reading and Writing Practice
+screens. A review run may contain multiple rounds. Continue starts another
+session from cards eligible at that time; End returns to the review start
+screen.
+
+The engine queue, not React, decides eligibility and order. An `again` rating
+does not use the practice game's immediate “forgotten items first” list.
+Short-term learning or relearning cards become eligible according to their
+calculated due times and may appear in a later round.
+
+Each rating must finish its atomic local transaction before feedback advances
+to the next card. Network sync remains non-blocking. Round completion requests
+an immediate sync, while the outbox remains durable if that request fails.
+
+### Kanji Reading Review flow
+
+Reading Review reuses the Reading Practice prompt, kana input, answer matching,
+feedback, and keyboard behavior. The answer screen shows Forgot instead of
+allowing an incorrect answer to advance. After a correct reading, the feedback
+screen replaces Practice's single Next action with Hard, Normal, and Easy.
+
+```mermaid
+flowchart TD
+    ReadingStart["Start Reading Review round (limit 10)"] --> ReadingPrompt["Show word and reading input"]
+    ReadingPrompt --> ReadingAction{User action}
+    ReadingAction -->|Forgot| ReadingAgain["Rating = Again"]
+    ReadingAction -->|Incorrect text| ReadingPrompt
+    ReadingAction -->|Correct reading| ReadingFeedback["Reveal answer and Hard / Normal / Easy"]
+    ReadingFeedback -->|Hard| ReadingHard["Rating = Hard"]
+    ReadingFeedback -->|Normal| ReadingGood["Rating = Good"]
+    ReadingFeedback -->|Easy| ReadingEasy["Rating = Easy"]
+    ReadingAgain --> ReadingSave["Atomically save card, event, and outbox"]
+    ReadingHard --> ReadingSave
+    ReadingGood --> ReadingSave
+    ReadingEasy --> ReadingSave
+    ReadingSave --> ReadingSync["Schedule non-blocking sync"]
+    ReadingSync --> ReadingRemaining{Cards remain in round?}
+    ReadingRemaining -->|Yes| ReadingPrompt
+    ReadingRemaining -->|No| ReadingEnd["Show round summary and request sync"]
+    ReadingEnd --> ReadingContinue{Continue run?}
+    ReadingContinue -->|Yes| ReadingStart
+    ReadingContinue -->|No| ReadingDone["End run"]
+```
+
+### Kanji Writing Review flow
+
+Writing Review reuses the Writing Practice drawing pad, handwriting-recognizer
+warmup and fallback, candidate construction, `SelectSimilarKanjiDrawer`, and
+feedback drawer. The normal candidate drawer shows Forgot and Grade instead of
+Forgot and Next.
+
+When recognition succeeds, Grade is deterministic:
+
+- If the selected kanji is incorrect, the chosen or derived rating is invalid
+  and the engine records `again` (the user-facing result is Forgot).
+- Correct selection with recognizer rank 1 through 3 records `easy`.
+- Correct selection with recognizer rank 4 through 10 records `good`
+  (user-facing Normal).
+- Correct selection outside the top 10 records `hard`.
+
+These are one-based user-facing ranks. For a zero-based recognizer candidate
+array, indexes 0–2 are Easy, indexes 3–9 are Normal, and `-1` is Hard when the
+user still selects the correct target from the constructed grid.
+
+When the recognizer is unavailable for the run or fails for one card, no rank
+exists. `SelectSimilarKanjiDrawer` shows the candidate grid plus Forgot, Hard,
+Normal, and Easy in that same drawer; it does not add a later rating screen.
+The rating buttons may be visible before selection but remain disabled until a
+candidate is selected. A correct candidate preserves the chosen rating. An
+incorrect candidate invalidates Hard, Normal, or Easy and records `again`.
+
+```mermaid
+flowchart TD
+    WritingStart["Start Writing Review round (limit 10)"] --> WritingWarm["Warm handwriting recognizer"]
+    WritingWarm --> WritingPrompt["Show writing prompt and drawing pad"]
+    WritingPrompt --> WritingAction{User action}
+    WritingAction -->|Forgot| WritingAgain["Rating = Again"]
+    WritingAction -->|Submit drawing| WritingAvailable{Recognizer result available?}
+    WritingAvailable -->|Yes| WritingRecognize["Rank target and build candidate grid"]
+    WritingAvailable -->|No| WritingFallback["Build fallback candidate grid"]
+    WritingRecognize --> WritingAutoDrawer["Drawer: select candidate, Forgot, Grade"]
+    WritingAutoDrawer -->|Forgot| WritingAgain
+    WritingAutoDrawer -->|Grade| WritingCorrect{Selected target kanji?}
+    WritingCorrect -->|No| WritingAgain
+    WritingCorrect -->|Yes| WritingRank{Recognizer rank}
+    WritingRank -->|1 through 3| WritingEasy["Rating = Easy"]
+    WritingRank -->|4 through 10| WritingGood["Rating = Good"]
+    WritingRank -->|Outside top 10| WritingHard["Rating = Hard"]
+    WritingFallback --> WritingManualDrawer["Drawer: select candidate, Forgot, Hard / Normal / Easy"]
+    WritingManualDrawer -->|Forgot| WritingAgain
+    WritingManualDrawer -->|"Hard / Normal / Easy"| WritingManualCorrect{Selected target kanji?}
+    WritingManualCorrect -->|No| WritingAgain
+    WritingManualCorrect -->|Yes| WritingManualRating["Use selected rating"]
+    WritingAgain --> WritingSave["Atomically save card, event, and outbox"]
+    WritingEasy --> WritingSave
+    WritingGood --> WritingSave
+    WritingHard --> WritingSave
+    WritingManualRating --> WritingSave
+    WritingSave --> WritingFeedback["Show feedback and schedule non-blocking sync"]
+    WritingFeedback --> WritingRemaining{Cards remain in round?}
+    WritingRemaining -->|Yes| WritingPrompt
+    WritingRemaining -->|No| WritingEnd["Show round summary and request sync"]
+    WritingEnd --> WritingContinue{Continue run?}
+    WritingContinue -->|Yes| WritingStart
+    WritingContinue -->|No| WritingDone["End run"]
+```
 
 ### Review state lifecycle
 
@@ -610,7 +761,7 @@ flowchart TD
     AuthCheck -->|Yes| Tx[Begin Dexie transaction]
     Tx --> ReadCard[Read current card]
     ReadCard --> EventIdentity["Create event ID and reserve device sequence"]
-    EventIdentity --> Calculate["Calculate FSRS result with event ID fuzz seed"]
+    EventIdentity --> Calculate["Calculate FSRS result with TypeScript adapter"]
     Calculate --> SaveCard[Update derived card]
     SaveCard --> AddEvent["Append event with device sequence and local date"]
     AddEvent --> AddOutbox[Add typed outbox operation]
@@ -844,8 +995,8 @@ device.
 ### Sentence shadowing history
 
 ```ts
-export interface SentenceShadowingSessionProgress {
-  sessionId: string;
+export interface SentenceShadowingChallengeProgress {
+  challengeId: string;
   attemptCount: number;
   lastAttemptAt: string;
   updatedAt: string;
@@ -853,12 +1004,12 @@ export interface SentenceShadowingSessionProgress {
 
 export interface SentenceShadowingHistoryService {
   /**
-   * Atomically increments today's session count and the selected session's
+   * Atomically increments today's attempt count and the selected challenge's
    * attempt count.
    */
-  recordAttempt(
-    sessionId: string
-  ): Promise<SentenceShadowingSessionProgress | null>;
+  recordAttempt(input: {
+    challengeId: string;
+  }): Promise<SentenceShadowingChallengeProgress | null>;
 
   getDailyCounts(input: {
     from: string;
@@ -867,12 +1018,12 @@ export interface SentenceShadowingHistoryService {
 
   getTotal(): Promise<number | null>;
 
-  listSessions(): Promise<SentenceShadowingSessionProgress[] | null>;
+  listChallenges(): Promise<SentenceShadowingChallengeProgress[] | null>;
 }
 ```
 
-Sentence-session IDs are stable content identifiers. Device rows merge into
-account totals, so its heatmap shows attempts across all devices.
+Sentence Shadowing challenge IDs are stable content identifiers. Device rows
+merge into account totals, so its heatmap shows attempts across all devices.
 
 ### Review history
 
@@ -945,7 +1096,7 @@ The dashboard includes:
 - Total Speed Katakana sessions
 - Total Kanji Reading Practice rounds
 - Total Kanji Writing Practice rounds
-- Total Sentence Shadowing sessions
+- Total Sentence Shadowing attempts
 - Total Kanji Reading Reviews
 - Total Kanji Writing Reviews
 - Total New Kanji Added
@@ -965,7 +1116,7 @@ Activity heatmap filters include:
 ### Specialized heatmaps
 
 - Speed Katakana keeps its per-device challenge heatmap.
-- Sentence Shadowing shows one cell per stable session ID, colored by total
+- Sentence Shadowing shows one cell per stable challenge ID, colored by total
   attempt count across devices.
 
 ### Kanji Mastery and Kanji Difficulty
@@ -1200,19 +1351,19 @@ id, [kanji+cardType+reviewedAt], reviewedAt, [deviceId+deviceSequence], localDat
 
 #### `reviewSettings`
 
-| Column                   | Type        | Purpose                   |
-| ------------------------ | ----------- | ------------------------- |
-| `id`                     | `"current"` | Singleton primary key     |
-| `fsrsVersion`            | string      | Parameter compatibility   |
-| `version`                | number      | Optimistic sync version   |
-| `requestRetention`       | number      | Target recall probability |
-| `maximumIntervalDays`    | number      | Interval cap              |
-| `enableFuzz`             | boolean     | Interval fuzz             |
-| `enableShortTerm`        | boolean     | Short-term scheduling     |
-| `learningStepsMinutes`   | number[]    | Learning steps            |
-| `relearningStepsMinutes` | number[]    | Relearning steps          |
-| `modelWeights`           | number[]    | FSRS model weights        |
-| `updatedAt`              | string      | Last update               |
+| Column                   | Type        | Purpose                       |
+| ------------------------ | ----------- | ----------------------------- |
+| `id`                     | `"current"` | Singleton primary key         |
+| `fsrsVersion`            | string      | Parameter compatibility       |
+| `version`                | number      | Optimistic sync version       |
+| `requestRetention`       | number      | Target recall probability     |
+| `maximumIntervalDays`    | number      | Interval cap                  |
+| `enableFuzz`             | boolean     | Provisional; open V1 decision |
+| `enableShortTerm`        | boolean     | Short-term scheduling         |
+| `learningStepsMinutes`   | number[]    | Learning steps                |
+| `relearningStepsMinutes` | number[]    | Relearning steps              |
+| `modelWeights`           | number[]    | FSRS model weights            |
+| `updatedAt`              | string      | Last update                   |
 
 Dexie indexes:
 
@@ -1276,21 +1427,21 @@ Dexie indexes:
 id, &[deviceId+challengeId], deviceId, challengeId
 ```
 
-#### `deviceSentenceShadowingSessions`
+#### `deviceSentenceShadowingChallenges`
 
-| Column          | Type   | Purpose                            |
-| --------------- | ------ | ---------------------------------- |
-| `id`            | string | `deviceId + sessionId` primary key |
-| `deviceId`      | string | Owning device                      |
-| `sessionId`     | string | Stable content identity            |
-| `attemptCount`  | number | Monotonic attempt count            |
-| `lastAttemptAt` | string | Latest completion                  |
-| `updatedAt`     | string | Last update                        |
+| Column          | Type   | Purpose                              |
+| --------------- | ------ | ------------------------------------ |
+| `id`            | string | `deviceId + challengeId` primary key |
+| `deviceId`      | string | Owning device                        |
+| `challengeId`   | string | Stable content identity              |
+| `attemptCount`  | number | Monotonic attempt count              |
+| `lastAttemptAt` | string | Latest completion                    |
+| `updatedAt`     | string | Last update                          |
 
 Dexie indexes:
 
 ```text
-id, &[deviceId+sessionId], deviceId, sessionId
+id, &[deviceId+challengeId], deviceId, challengeId
 ```
 
 #### `reviewDailySummaries`
@@ -1405,7 +1556,7 @@ erDiagram
     DEVICE ||--o{ DEVICE_SEQUENCE_COUNTER : reserves
     DEVICE ||--o{ DEVICE_DAILY_HISTORY : owns
     DEVICE ||--o{ DEVICE_SPEED_CHALLENGE : owns
-    DEVICE ||--o{ DEVICE_SHADOWING_SESSION : owns
+    DEVICE ||--o{ DEVICE_SHADOWING_CHALLENGE : owns
     DEVICE_SEQUENCE_COUNTER ||--o{ REVIEW_EVENT : orders
     REVIEW_PILE_ITEM ||--o{ CARD_PROJECTION : owns
     REVIEW_PILE_ITEM ||--o{ REVIEW_EVENT : records
@@ -1451,10 +1602,10 @@ erDiagram
         string challengeId
         number attemptCount
     }
-    DEVICE_SHADOWING_SESSION {
+    DEVICE_SHADOWING_CHALLENGE {
         string id PK
         string deviceId
-        string sessionId
+        string challengeId
         number attemptCount
     }
     REVIEW_DAILY_SUMMARY {
@@ -1506,6 +1657,9 @@ Every local mutation:
 
 ```ts
 export interface ReviewEventPush {
+  /**
+   * Must equal event.id. The event row is also the idempotency record.
+   */
   operationId: string;
   event: {
     id: string;
@@ -1554,9 +1708,9 @@ export type SyncUpsert =
       value: DeviceSpeedChallengeSyncRecord;
     }
   | {
-      kind: "device-sentence-shadowing-session";
+      kind: "device-sentence-shadowing-challenge";
       operationId: string;
-      value: DeviceSentenceShadowingSyncRecord;
+      value: DeviceShadowingChallengeSyncRecord;
     };
 
 export interface SyncRequest {
@@ -1575,7 +1729,7 @@ export type AccountChange =
   | NoteConflictChange
   | DeviceDailyHistoryChange
   | DeviceSpeedChallengeChange
-  | DeviceSentenceShadowingChange
+  | DeviceShadowingChallengeChange
   | ReviewCardProjectionChange
   | ReviewDailySummaryChange
   | ReviewProjectionMetadataChange;
@@ -1594,6 +1748,15 @@ Each `AccountChange` is a discriminated union member with a sequence, a
 literal kind, and a fully typed domain value. The protocol has no
 `payload: unknown` and does not allow update/delete actions on immutable
 review events.
+
+For `ReviewEventPush`, `operationId` must equal `event.id`. The backend
+deduplicates with the `review_events` primary key and the unique
+`(account_id, device_id, device_sequence)` constraint. Review pushes do not
+create a second permanent row in `processed_operations`; otherwise cold
+archival would not bound SQL growth. That table remains the idempotency store
+for non-review typed upserts. A duplicate event ID or device sequence is
+acknowledged only when the immutable fields match the accepted row; conflicting
+payloads are rejected and logged.
 
 `affectedReviewCardProjections` contains the canonical projection for every
 card changed by review events accepted in this request, independent of change
@@ -1618,9 +1781,9 @@ sequenceDiagram
     App->>Dexie: Read bounded outbox batch and cursor
     App->>API: POST typed pushes and cursor
     API->>DB: Begin account transaction
-    DB->>DB: Dedupe operation IDs
+    DB->>DB: Dedupe event identities and upsert operation IDs
     DB->>DB: Apply domain-specific merges
-    DB->>DB: Replay affected cards with shared FSRS core
+    DB->>DB: Advance or checkpoint-replay affected cards
     DB->>DB: Update affected daily review summaries
     DB->>DB: Append ordered account changes
     DB-->>API: Commit
@@ -1637,20 +1800,24 @@ For each `POST /api/sync`, the backend:
 1. Verifies the HttpOnly session and premium entitlement.
 2. Validates the full typed batch before applying it.
 3. Begins one database transaction.
-4. Skips operations already present in `processed_operations`.
+4. Deduplicates review pushes by event ID/device sequence and skips non-review
+   upserts already present in `processed_operations`.
 5. Applies new operations with entity-specific rules.
-6. Replays each card affected by accepted review events, using the canonical
-   settings and deterministic event order.
+6. Advances a current projection for a newest in-order review; for a late
+   review, replays its affected card from the archive-boundary checkpoint plus
+   the ordered hot tail.
 7. Updates review daily summaries for affected local dates.
 8. Appends domain rows and changed projections to `account_changes`.
-9. Records accepted operation IDs.
+9. Records accepted non-review operation IDs.
 10. Selects the next bounded page after the supplied cursor.
 11. Commits and returns acknowledgements and changes.
 
 A late offline review may invalidate every later projection for that card.
-The backend replays that card's full event stream, not the entire account.
-Concurrent offline reviews can therefore adjust a due date that another device
-previously displayed.
+Because accepted review timestamps are limited by the 14-day offline window
+and Postgres retains 90 days, the backend replays that card's checkpoint + hot
+tail without fetching R2. Concurrent offline reviews can therefore adjust a
+due date that another device previously displayed. A missing or invalid
+checkpoint falls back to cold + hot replay rather than guessing.
 
 A settings, model-weight, or FSRS-version change enqueues one idempotent
 account-wide projection rebuild. The current projection generation remains
@@ -1722,8 +1889,8 @@ sequenceDiagram
   maximum.
 - **Speed challenge:** for one device/challenge, merge attempt count and best
   values by maximum and latest attempt by newest timestamp.
-- **Shadowing session:** for one device/session, merge attempt count by maximum
-  and latest attempt by newest timestamp.
+- **Shadowing challenge:** for one device/challenge, merge attempt count by
+  maximum and latest attempt by newest timestamp.
 - **Card projections:** server-authoritative but rebuildable; accept only from
   the backend and replace older generations locally.
 - **Review daily summaries:** server-authoritative, rebuildable aggregates of
@@ -1731,20 +1898,50 @@ sequenceDiagram
 
 ### Sync triggers
 
-Sync runs:
+Every mutation is durable locally before sync is scheduled. Rating a review
+atomically commits the card projection, immutable event, and outbox operation;
+the review UI waits for that local transaction but never waits for the network.
 
-- At engine startup after session verification
-- Shortly after a local mutation, with debounce
-- When connectivity returns
-- When the tab becomes focused
-- Periodically while an authenticated tab remains active
-- When the user requests Sync Now
+The engine does not poll every 30 seconds. When the outbox changes from empty
+to nonempty, it schedules one one-shot deadline for 30 seconds after the oldest
+pending operation. It starts sync earlier when any of these occurs:
 
-Use the Web Locks API so one tab owns sync work for an account at a time.
-Use exponential backoff with jitter after transient errors.
+- The outbox reaches 10 pending operations.
+- A 10-item review or practice round finishes.
+- The user ends the current review or practice run.
+- Connectivity returns.
+- The tab becomes focused.
+- The user requests Sync Now.
 
-Do not add WebSockets, CRDTs, background service-worker sync, or aggressive
-real-time polling in the first release.
+The engine also syncs at startup after session verification. While an
+authenticated tab remains visible, it performs a remote-change pull at most
+once every five minutes even when its local outbox is empty. This keeps
+multiple devices reasonably current without aggressive polling.
+
+Only one sync may be in flight for an account. Use the Web Locks API so one tab
+owns that work across the browser profile. Mutations committed during an
+in-flight request remain in the outbox; after the request completes, the owner
+starts another request immediately if the 10-operation threshold or oldest
+operation deadline has already been reached.
+
+When the document becomes hidden or receives `pagehide`, the engine may send
+one bounded best-effort request using keepalive transport. It must not block
+navigation or rely on `beforeunload`. The outbox remains the source of
+durability: entries are removed only after an acknowledgement is applied
+locally. If the server accepts a keepalive request but the page closes before
+applying its response, the next startup safely retries the same operation IDs.
+
+Transient failures retain every pending operation and use exponential backoff
+with jitter, capped at five minutes. Startup, explicit Sync Now, reconnect, or
+focus may retry sooner. Successful responses apply acknowledgements, pulled
+changes, canonical projections, and the new cursor in one Dexie transaction.
+
+A review round keeps its current in-memory queue stable while sync applies
+canonical projections. Reconciled due dates and remote changes affect the next
+round; sync does not remove or replace the card currently shown to the user.
+
+Do not add WebSockets, CRDTs, background service-worker sync, empty 30-second
+polling, or more than one concurrent account sync in the first release.
 
 ### Fast bootstrap
 
@@ -1763,7 +1960,7 @@ export interface BootstrapResponse {
   noteConflicts: NoteConflictSyncRecord[];
   deviceDailyHistory: DeviceDailyHistorySyncRecord[];
   speedKatakanaChallenges: DeviceSpeedChallengeSyncRecord[];
-  sentenceShadowingSessions: DeviceSentenceShadowingSyncRecord[];
+  sentenceShadowingChallenges: DeviceShadowingChallengeSyncRecord[];
   reviewCardProjections: ReviewCardProjectionSyncRecord[];
   reviewDailySummaries: ReviewDailySummarySyncRecord[];
   reviewProjectionMetadata: ReviewProjectionMetadataSyncRecord;
@@ -1798,18 +1995,19 @@ sequenceDiagram
     API-->>App: Changes committed after snapshot
 ```
 
-The backend retains all immutable review events for audit, projection rebuild,
-and disaster recovery. Full-log replay is a backend recovery and verification
-tool, not the normal new-device path.
+The backend retains all immutable review events across the 90-day Postgres tail
+and indefinite private R2 archive. Full-log replay is a backend recovery and
+verification tool, not the normal new-device path.
 
 ### Projection invalidation and recovery
 
-- A new review replays only its affected card.
-- A late event replays its affected card from the beginning because it may
-  change every later interval.
+- A newest in-order review advances only its current affected-card projection.
+- A late event replays its affected card from the archive-boundary checkpoint
+  plus ordered hot events because it may change every later hot interval.
 - A pile membership change updates the projection's active/removed status.
 - A settings or engine-version change rebuilds every card asynchronously and
-  publishes a new projection generation atomically.
+  publishes a new projection generation and new boundary checkpoints
+  atomically after cold + hot replay.
 - Daily review summaries are rebuilt for dates affected by late events or
   corrected pile-addition metadata.
 - A corrupted local account database is deleted and restored through
@@ -1824,7 +2022,14 @@ tool, not the normal new-device path.
 
 The backend may compact old `account_changes` after all supported clients can
 bootstrap beyond the compaction frontier. Event retention is independent:
-immutable review events remain available for canonical rebuilds.
+immutable review events remain available in Postgres or R2 for canonical
+rebuilds.
+
+Detailed archival invariants, account-month object layout, rollout, and cost
+assumptions are specified in
+[`STUDY-ENGINE-EVENT-COLD-ARCHIVAL-PLAN.md`](./STUDY-ENGINE-EVENT-COLD-ARCHIVAL-PLAN.md)
+and
+[`STUDY-ENGINE-STORAGE-AND-ACCESS-DISCUSSION.md`](./STUDY-ENGINE-STORAGE-AND-ACCESS-DISCUSSION.md).
 
 ## Backend relational schema
 
@@ -1841,6 +2046,9 @@ operation_id
 processed_at
 PRIMARY KEY (account_id, operation_id)
 ```
+
+This table stores non-review typed-upsert idempotency records. A review event's
+own primary key is its idempotency record.
 
 #### `account_changes`
 
@@ -1890,6 +2098,9 @@ PRIMARY KEY (account_id, kanji)
 
 #### `review_events`
 
+This table contains the rolling 90-day hot tail. Older rows remain
+authoritative in R2 account-month chunks.
+
 ```text
 account_id
 event_id
@@ -1905,6 +2116,52 @@ PRIMARY KEY (account_id, event_id)
 INDEX (account_id, kanji, card_type, reviewed_at)
 UNIQUE (account_id, device_id, device_sequence)
 ```
+
+#### `review_event_archives`
+
+```text
+account_id
+archive_id
+year_month
+part_number
+from_order_key
+to_order_key
+object_uri
+content_sha256
+event_count
+byte_size
+schema_version
+archived_at
+status
+PRIMARY KEY (account_id, archive_id)
+UNIQUE (account_id, year_month, part_number)
+INDEX (account_id, year_month, status)
+```
+
+`status` is `writing`, `validating`, `ready`, `failed`, or `purged`. SQL event
+rows may be deleted only after the covering manifest is `ready` and affected
+boundary checkpoints have advanced. `purged` means the SQL rows were removed;
+the R2 object remains authoritative and available to rebuilds.
+
+#### `review_card_archive_checkpoints`
+
+```text
+account_id
+kanji
+card_type
+through_order_key
+card_state
+settings_version
+fsrs_version
+source_archive_generation
+updated_at
+PRIMARY KEY (account_id, kanji, card_type)
+```
+
+These rows are rebuildable base states immediately before each card's hot
+event tail. They make accepted late-event replay independent of R2 on the
+ordinary sync path. Full settings/FSRS-version rebuilds regenerate them from
+cold + hot events.
 
 #### `review_settings`
 
@@ -2005,16 +2262,16 @@ updated_at
 PRIMARY KEY (account_id, device_id, challenge_id)
 ```
 
-#### `device_sentence_shadowing_sessions`
+#### `device_sentence_shadowing_challenges`
 
 ```text
 account_id
 device_id
-session_id
+challenge_id
 attempt_count
 last_attempt_at
 updated_at
-PRIMARY KEY (account_id, device_id, session_id)
+PRIMARY KEY (account_id, device_id, challenge_id)
 ```
 
 #### `notes`
@@ -2056,13 +2313,15 @@ erDiagram
     ACCOUNT ||--o{ BOOKMARK : owns
     ACCOUNT ||--o{ REVIEW_PILE_ITEM : owns
     ACCOUNT ||--o{ REVIEW_EVENT : records
+    ACCOUNT ||--o{ REVIEW_EVENT_ARCHIVE : archives
+    ACCOUNT ||--o{ REVIEW_ARCHIVE_CHECKPOINT : checkpoints
     ACCOUNT ||--|| REVIEW_SETTINGS : configures
     ACCOUNT ||--o{ REVIEW_CARD_PROJECTION : materializes
     ACCOUNT ||--o{ REVIEW_DAILY_SUMMARY : aggregates
     ACCOUNT ||--|| REVIEW_PROJECTION_METADATA : versions
     ACCOUNT ||--o{ DEVICE_DAILY_HISTORY : aggregates
     ACCOUNT ||--o{ DEVICE_SPEED_CHALLENGE : tracks
-    ACCOUNT ||--o{ DEVICE_SHADOWING_SESSION : tracks
+    ACCOUNT ||--o{ DEVICE_SHADOWING_CHALLENGE : tracks
     ACCOUNT ||--o{ NOTE : owns
     NOTE ||--o{ NOTE_CONFLICT : preserves
 
@@ -2087,6 +2346,23 @@ erDiagram
         string reviewedAt
         string deviceId
         number deviceSequence
+    }
+    REVIEW_EVENT_ARCHIVE {
+        string archiveId PK
+        string accountId
+        string yearMonth
+        number partNumber
+        string objectUri
+        string contentSha256
+        string status
+    }
+    REVIEW_ARCHIVE_CHECKPOINT {
+        string accountId PK
+        string kanji PK
+        string cardType PK
+        string throughOrderKey
+        object cardState
+        string fsrsVersion
     }
     REVIEW_PILE_ITEM {
         string accountId PK
@@ -2128,10 +2404,10 @@ erDiagram
         string challengeId PK
         number attemptCount
     }
-    DEVICE_SHADOWING_SESSION {
+    DEVICE_SHADOWING_CHALLENGE {
         string accountId PK
         string deviceId PK
-        string sessionId PK
+        string challengeId PK
         number attemptCount
     }
     NOTE {
@@ -2156,7 +2432,8 @@ ReviewService facade
 ├── CardProjectionRepository
 ├── ReviewEventRepository
 ├── ReviewSessionManager
-├── SharedDeterministicFsrsCore
+├── TypeScriptFsrsAdapter
+├── SchedulerContractValidator
 ├── ReviewSettingsRepository
 ├── ReviewDailySummaryRepository
 ├── EngineClock
@@ -2164,8 +2441,8 @@ ReviewService facade
 ```
 
 These parts are implementation details and can be unit-tested independently.
-The backend imports the same `SharedDeterministicFsrsCore`; it does not import
-browser persistence or session-management code.
+The backend implements the same contract with its own `PythonFsrsAdapter`; it
+does not import TypeScript, browser persistence, or session-management code.
 
 ## Selecting an engine
 
@@ -2244,9 +2521,10 @@ monitoring alerts when the deployed engine reports `unavailable`.
 
 - Kanji Heatmap remains GPLv3.
 - `kh-study-engine` is public and GPL-compatible.
-- The shared scheduler-core package uses a permissive GPL-compatible license
-  so the private backend can consume it without coupling to browser code.
+- The language-neutral scheduler contract and golden-vector fixtures use a
+  permissive GPL-compatible license so both repositories can consume them.
 - `ts-fsrs` is MIT.
+- `py-fsrs` is MIT.
 - Dexie is Apache-2.0.
 - Required notices are retained.
 - The private backend remains separate and proprietary.
@@ -2263,8 +2541,8 @@ terms.
 1. Publish and test the versioned engine contract.
 2. Add the no-op engine and React provider.
 3. Add Vite virtual-module selection.
-4. Publish the version-pinned deterministic FSRS core shared by browser and
-   backend.
+4. Resolve the V1 fuzz policy, publish the versioned FSRS contract and golden
+   vectors, and implement pinned TypeScript and Python adapters that pass them.
 5. Add device metadata and account-scoped Dexie databases.
 6. Implement review pile, projections, events, settings, and migrations.
 7. Add review facade and repository unit tests.
@@ -2277,9 +2555,11 @@ terms.
 14. Implement typed sync, canonical backend projections, and relational
     schema.
 15. Implement fast bootstrap and projection rebuild jobs.
-16. Add multi-device, retry, conflict, bootstrap, and rebuild tests.
-17. Add the pinned production build.
-18. Add monitoring for accidental no-op production deployments.
+16. Implement private R2 account-month archival, archive-boundary checkpoints,
+    validation, and feature-flagged SQL purge.
+17. Add multi-device, retry, conflict, bootstrap, archival, and rebuild tests.
+18. Add the pinned production build.
+19. Add monitoring for accidental no-op production deployments.
 
 ## Required tests
 
@@ -2288,12 +2568,31 @@ terms.
 - Pile removal tombstones both cards.
 - No daily card/review limits are applied.
 - Rating atomically updates card, event, and outbox.
+- Reading Forgot records Again; a correct reading exposes Hard, Normal, and
+  Easy in the feedback UI.
+- Writing correct-selection ranks 1–3, 4–10, and outside top 10 record Easy,
+  Good, and Hard respectively.
+- Any incorrect writing candidate invalidates another rating and records Again.
+- Writing recognition failure exposes manual Hard, Normal, and Easy in the
+  candidate drawer without adding a later rating screen.
 - Settings are shared by reading and writing.
 - Settings changes deterministically rebuild cards.
-- Deterministic fuzz produces the same intervals from the same event IDs in
-  browser and backend runtimes.
+- TypeScript and Python adapters pass the same base FSRS golden vectors with
+  both libraries' native fuzz disabled.
+- If portable fuzz is selected, both adapters produce exact event-ID-seeded
+  fuzz vectors.
+- If no fuzz is selected, the contract and UI omit or reject the setting.
+- Replaying the same inputs in the canonical Python adapter is deterministic.
 - Duplicate sync operation IDs do not duplicate data.
+- A duplicate review identity with different immutable fields is rejected.
 - Lost sync responses are safe to retry.
+- The oldest pending outbox operation triggers sync within 30 seconds without
+  empty periodic requests.
+- Ten pending operations and round/run completion trigger immediate,
+  non-blocking sync attempts.
+- Concurrent tabs and mutations during an in-flight request never create
+  overlapping account syncs or lose outbox entries.
+- A keepalive response lost during `pagehide` is safely retried on startup.
 - Review events from two offline devices are both retained.
 - Clock ties order by device ID, device sequence, and event ID.
 - `deviceSequence` preserves same-device order and never acts as a
@@ -2306,7 +2605,7 @@ terms.
 - Daily practice history from two devices sums without lost increments.
 - Same-device daily rows merge counters by maximum.
 - Speed challenge rows merge best and latest values correctly.
-- Shadowing session rows merge attempt counts and latest times correctly.
+- Shadowing challenge rows merge attempt counts and latest times correctly.
 - Review totals count immutable rating events.
 - First-time new-kanji totals count one pile item, not its two cards.
 - Stale note updates preserve conflict copies.
@@ -2317,6 +2616,17 @@ terms.
   replay.
 - Changes committed after the bootstrap cursor are pulled normally.
 - Rebuilt daily summaries match a full immutable-event aggregation.
+- Review pushes deduplicate by event identity without permanent duplicate
+  `processed_operations` rows.
+- Archive validation failure never deletes hot review events.
+- Ready account-month objects pass checksum, count, boundary, ordering, and
+  replay-parity validation before SQL purge.
+- A late event inside the offline window replays checkpoint + hot tail without
+  fetching R2.
+- Settings/FSRS-version rebuilds from cold + hot facts reproduce canonical
+  projections and regenerate archive checkpoints.
+- Account deletion removes its hot events, manifests, checkpoints, and R2
+  objects.
 
 ### Review-history stress test
 
@@ -2327,7 +2637,12 @@ Measure and publish:
 
 - Batched event-ingestion throughput and database growth
 - Full backend projection-rebuild wall time, CPU, and peak memory
-- Single-card replay latency for a late event near the beginning of history
+- Single-card checkpoint + hot-tail replay latency for an accepted event near
+  the 14-day lateness limit
+- Diagnostic cold + hot single-card rebuild latency from earliest history
+- Ninety-day hot-table/index size and steady-state bloat
+- Archive compression, object-operation count, validation time, and purge lag
+- Cold + hot rebuild time, R2 bytes read, and regenerated-checkpoint parity
 - Bootstrap payload compressed/uncompressed size and server response time
 - IndexedDB bootstrap-apply time and storage size
 - Time until `/mastery` and `/dashboard` are interactive
@@ -2343,7 +2658,8 @@ required new-device workflow.
 
 - Offline access window: 14 days.
 - FSRS settings: shared by reading and writing.
-- FSRS execution: one version-pinned deterministic core in browser and backend.
+- FSRS execution: pinned TypeScript and Python adapters implement one
+  versioned contract; backend output is canonical.
 - Notes: one per kanji.
 - Review pile: one item per kanji.
 - Pile list order: newest first.
@@ -2357,3 +2673,22 @@ required new-device workflow.
 - Backend cards: canonical, rebuildable projections.
 - New-device recovery: consistent bootstrap snapshot plus later cursor pulls.
 - Sync transport: typed push, ordered cursor pull, and fast bootstrap.
+- Review rounds: at most 10 cards; a run may contain multiple rounds.
+- Reading ratings: Forgot is Again; correct answers expose Hard/Normal/Easy.
+- Writing ratings: correct rank 1–3 is Easy, 4–10 is Normal, outside top 10 is
+  Hard; an incorrect candidate is Again.
+- Writing recognizer fallback: manual Hard/Normal/Easy remains inside the
+  candidate drawer.
+- Review-event hot retention: rolling 90 days in Postgres.
+- Review-event cold storage: private R2 Standard account-month chunks retained
+  indefinitely.
+- Archive rollout: copy, read back, checksum, and replay-validate before SQL
+  purge; retain SQL on any failure.
+
+## Open product decisions
+
+- FSRS interval fuzz:
+  - **Portable deterministic fuzz:** keep the setting and implement one
+    event-ID-seeded, integer-only algorithm in both adapters.
+  - **No fuzz:** remove or permanently disable the setting for the simpler V1.
+  - Never enable the two libraries' native fuzz independently.
