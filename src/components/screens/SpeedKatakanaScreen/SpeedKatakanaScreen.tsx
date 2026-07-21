@@ -1,21 +1,17 @@
 import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { EndSession } from "./EndSession";
-import { SessionStats, SpeedKatakanaSettings } from "./types";
+import { SessionStats } from "./types";
 import { recordActivity } from "@/lib/activity";
 import { recordSetResult } from "./storage";
 import { useCompletedSetsCount } from "./use-completed-sets-count";
-import {
-  DEFAULT_SETTINGS,
-  SETTINGS_KEY,
-  SPEED_KATAKANA_TOTAL_CHALLENGES,
-} from "./constants";
+import { SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
+import { useChallengeSearchParam } from "./use-challenge-search-param";
 
 type Phase = "initial" | "playing" | "ended";
 
@@ -26,10 +22,7 @@ const SpeedKatakanaScreen = () => {
   useHtmlDocumentTitle(speedKatakanaPageMeta.heading);
 
   const [phase, setPhase] = useState<Phase>("initial");
-  const [settings, setSetting] = useLocalStorage<SpeedKatakanaSettings>(
-    SETTINGS_KEY,
-    DEFAULT_SETTINGS
-  );
+  const { settings, selectChallengeSet } = useChallengeSearchParam();
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState<SessionStats | null>(null);
   const completedSetsCount = useCompletedSetsCount();
@@ -72,7 +65,7 @@ const SpeedKatakanaScreen = () => {
 
   const startNextChallenge = () => {
     primerRef.current?.focus();
-    setSetting("challengeSet", nextChallengeSet(settings.challengeSet));
+    selectChallengeSet(nextChallengeSet(settings.challengeSet));
     setProgress(0);
     setPhase("playing");
   };

@@ -57,7 +57,7 @@ export const HeatmapCell = ({
         )}
       />
     </PopoverTrigger>
-    <PopoverContent className="p-3 w-52" side="top">
+    <PopoverContent className="w-56 p-3" side="top">
       {detail}
     </PopoverContent>
   </Popover>

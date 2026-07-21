@@ -67,6 +67,21 @@ test.describe("practice modes", () => {
     await expect(page.getByText("アメリカ")).toBeVisible();
   });
 
+  test("speed katakana: ?challenge= selects the set and syncs on click", async ({
+    page,
+  }) => {
+    await page.goto("/speed-katakana?challenge=200");
+
+    await expect(page.getByText("Challenge 20-10 (#200):")).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // Challenge position 1 within the selected level updates the URL.
+    await page.getByRole("button", { name: "1", exact: true }).last().click();
+    await expect(page).toHaveURL(/challenge=191/);
+    await expect(page.getByText("Challenge 20-1 (#191):")).toBeVisible();
+  });
+
   test("reading practice: forgot path returns to the start screen", async ({
     page,
   }) => {

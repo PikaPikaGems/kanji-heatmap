@@ -1,4 +1,3 @@
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -6,17 +5,13 @@ import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
-import { SoundMode, SpeedKatakanaSettings, WordCount } from "./types";
+import { SoundMode, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
-import {
-  DEFAULT_SETTINGS,
-  levelOf,
-  positionInLevel,
-  SETTINGS_KEY,
-} from "./constants";
+import { levelOf, positionInLevel } from "./constants";
 import { useSpeedKatakanaProgress } from "./use-speed-katakana-progress";
 import { ChallengeSetSelector } from "./ChallengeSetSelector";
+import { useChallengeSearchParam } from "./use-challenge-search-param";
 
 const SetStats = ({ challengeSet }: { challengeSet: number }) => {
   const currentStats = readSetStats(challengeSet);
@@ -65,10 +60,8 @@ const SetStats = ({ challengeSet }: { challengeSet: number }) => {
 };
 
 export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
-  const [settings, setSetting] = useLocalStorage<SpeedKatakanaSettings>(
-    SETTINGS_KEY,
-    DEFAULT_SETTINGS
-  );
+  const { settings, setSetting, selectChallengeSet } =
+    useChallengeSearchParam();
 
   const { summary, levelCompletion } = useSpeedKatakanaProgress();
 
@@ -176,7 +169,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <ChallengeSetSelector
               challengeSet={settings.challengeSet}
               levelCompletion={levelCompletion}
-              onSelect={(setNumber) => setSetting("challengeSet", setNumber)}
+              onSelect={selectChallengeSet}
             />
           </div>
 

@@ -5,10 +5,14 @@ import {
   positionInLevel,
   setFromLevelAndPos,
 } from "@/components/screens/SpeedKatakanaScreen/constants";
+import { speedKatakanaChallengeHref } from "@/components/screens/SpeedKatakanaScreen/challenge-search-param";
 import {
   ChallengeSetStats,
   readSetStats,
 } from "@/components/screens/SpeedKatakanaScreen/storage";
+import { Link } from "@/components/dependent/routing";
+import { ArrowRight } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { CPM_BAND_LABELS, cpmToBand } from "@/lib/activity";
 import { HeatmapCell, HeatmapGrid, heatmapFillCn } from "./HeatmapGrid";
 
@@ -68,6 +72,19 @@ const SetDetail = ({
       ) : (
         <div className="text-muted-foreground">Not attempted yet</div>
       )}
+      <div className="pt-2 mt-1 border-t border-border">
+        <Button
+          asChild
+          size="sm"
+          variant="secondary"
+          className="w-full h-8 font-semibold"
+        >
+          <Link to={speedKatakanaChallengeHref(setNumber)}>
+            Practice
+            <ArrowRight className="size-3.5 opacity-70" aria-hidden />
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 };
