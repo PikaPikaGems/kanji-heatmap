@@ -12,6 +12,7 @@ import {
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 
 interface StudyNotesFullscreenEditorProps {
   open: boolean;
@@ -67,8 +68,8 @@ export const StudyNotesFullscreenEditor = ({
               <span className="text-2xl leading-none kanji-font">{kanji}</span>
               <span>Study Notes</span>
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Markdown supported. Japanese text is clickable in View Mode.
+            <DialogDescription asChild>
+              <StudyNotesEditorTips />
             </DialogDescription>
             <DialogPrimitive.Close asChild className="absolute top-2 right-2">
               <Button
@@ -89,12 +90,6 @@ export const StudyNotesFullscreenEditor = ({
               fill
               autoFocus
             />
-            <p className="mt-2 shrink-0 text-xs leading-snug text-muted-foreground">
-              Optional:{" "}
-              <code className="break-all text-[0.7rem]">
-                {`:vocab[日本語]{kana="にほんご" definition="…"}`}
-              </code>
-            </p>
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>
