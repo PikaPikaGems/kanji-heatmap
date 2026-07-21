@@ -1,15 +1,14 @@
-import { ReachOutToUs, RefreshOrGoBackHome, Wrapper } from "./common";
+import { ErrorSocialIcons, RefreshOrGoBackHome, Wrapper } from "./common";
 import { Sumimasen } from "./Sumimasen";
 
 export const PageNotFound = () => {
   return (
     <Wrapper>
-      <Sumimasen />
-      <div className="my-2 font-bold">Page Not Found</div>
-      <div className="text-xs">
-        <div className="m-1 text-xs">
-          <ReachOutToUs prefix="If you think this is a mistake, you can report on " />
-          <br />
+      <div className="flex w-full max-w-sm flex-col items-center gap-5 animate-fade-in">
+        <Sumimasen />
+        <p className="text-base font-semibold tracking-tight">Page Not Found</p>
+        <div className="flex w-full flex-col items-center gap-4">
+          <ErrorSocialIcons />
           <RefreshOrGoBackHome />
         </div>
       </div>

@@ -1,49 +1,55 @@
 import { ReactNode } from "react";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-
+import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { cnTextLink } from "@/lib/generic-cn";
-import { outLinks } from "@/lib/external-links";
+import { cn } from "@/lib/utils";
 
 export const RefreshOrGoBackHome = () => {
   return (
-    <>
+    <p className="text-xs text-muted-foreground">
       Meanwhile, you can try{" "}
       <button
+        type="button"
         className={cnTextLink}
         onClick={() => {
           window?.location.reload();
         }}
       >
         refreshing the page
-      </button>
+      </button>{" "}
       or try again later.
-    </>
+    </p>
   );
 };
 
-export const Wrapper = ({ children }: { children: ReactNode }) => {
+export const Wrapper = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center pt-4">
+    <div
+      className={cn(
+        "flex h-full w-full flex-col items-center justify-center px-4 py-8 text-center",
+        className
+      )}
+    >
       {children}
     </div>
   );
 };
 
-const SHOW_TWITTER = true;
-export const ReachOutToUs = ({
-  prefix = " Let us know on ",
-}: {
-  prefix?: string;
-}) => {
+/** Same social/out-link icons used in the header and bottom bar. */
+export const ErrorSocialIcons = ({ className }: { className?: string }) => {
   return (
-    <>
-      {prefix}
-      <ExternalTextLink href={outLinks.discord} text="Discord," />
-      {SHOW_TWITTER && (
-        <ExternalTextLink href={outLinks.twitter} text="Twitter," />
+    <div
+      className={cn(
+        "flex flex-wrap items-center justify-center gap-1",
+        className
       )}
-      or
-      <ExternalTextLink href={outLinks.githubIssue} text="GitHub." />
-    </>
+    >
+      <LinksOutItems />
+    </div>
   );
 };

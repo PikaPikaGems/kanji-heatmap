@@ -7,6 +7,7 @@ import {
   SpeedKatakanaScreen,
   DashboardScreen,
   MasteryScreen,
+  ErrorFallbackPreviewScreen,
 } from "@/components/screens";
 import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
 import { ProductionPracticeV1Screen } from "@/components/production-practice-v1";
@@ -60,6 +61,12 @@ const privacyPage = {
   Component: PrivacyScreen,
 };
 
+const errorFallbackPreviewPage = {
+  href: "/error-fallback-preview",
+  title: "Error Fallback Preview",
+  Component: ErrorFallbackPreviewScreen,
+};
+
 const speedKatakanaPage = {
   ...speedKatakanaPageMeta,
   Component: SpeedKatakanaScreen,
@@ -83,6 +90,7 @@ const pageItems = {
   aboutPage,
   termsPage,
   privacyPage,
+  errorFallbackPreviewPage,
   speedKatakanaPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,

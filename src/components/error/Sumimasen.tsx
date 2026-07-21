@@ -22,15 +22,28 @@ export const APOLOGIZING_SYMBOL = [
   "( •́ ‿ •̀ )ゞ",
 ];
 
-export const Sumimasen = () => {
-  return (
-    <>
-      <span className="my-1 text-3xl sm:text-3xl kanji-font">
-        {"すみません"}
-      </span>
-      <div className="flex items-center justify-center my-4 space-x-2">
-        <div className="text-3xl">{"🙇🏽‍♀️ 🙇"}</div>
+export const Sumimasen = ({
+  layout = "stacked",
+}: {
+  layout?: "stacked" | "inline";
+}) => {
+  if (layout === "inline") {
+    return (
+      <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1">
+        <span className="text-3xl leading-none kanji-font">すみません</span>
+        <span className="text-2xl leading-none" aria-hidden="true">
+          {"🙏🏽 🙇"}
+        </span>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <span className="text-3xl leading-none kanji-font">すみません</span>
+      <span className="text-3xl leading-none" aria-hidden="true">
+        {"🙏🏽 🙇"}
+      </span>
+    </div>
   );
 };

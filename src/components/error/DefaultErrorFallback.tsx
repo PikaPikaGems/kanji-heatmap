@@ -1,6 +1,10 @@
-import { ReachOutToUs, RefreshOrGoBackHome, Wrapper } from "./common";
-import { Sumimasen } from "./Sumimasen";
+import { ErrorFallbackSoft } from "./ErrorFallbackAlternatives";
 
+/**
+ * Default full-page unexpected-error fallback.
+ * Sibling alternatives live in `ErrorFallbackAlternatives.tsx`
+ * (preview at `/error-fallback-preview`).
+ */
 export const DefaultErrorFallback = ({
   message = "Welp... this isn’t supposed to happen! 🫣🫣",
   showDefaultCta = true,
@@ -9,19 +13,6 @@ export const DefaultErrorFallback = ({
   showDefaultCta?: boolean;
 }) => {
   return (
-    <Wrapper>
-      <Sumimasen />
-      <div className="my-1 font-bold text-xs max-w-96">{message}</div>
-      {showDefaultCta && (
-        <div className="mx-2 text-xs">
-          <div>
-            <ReachOutToUs />
-          </div>
-          <div className="mt-1">
-            <RefreshOrGoBackHome />
-          </div>
-        </div>
-      )}
-    </Wrapper>
+    <ErrorFallbackSoft message={message} showDefaultCta={showDefaultCta} />
   );
 };

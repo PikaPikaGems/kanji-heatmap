@@ -28,6 +28,7 @@ const {
   aboutPage,
   termsPage,
   privacyPage,
+  errorFallbackPreviewPage,
   speedKatakanaPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
@@ -107,6 +108,10 @@ const App = () => {
                         <Route
                           path={privacyPage.href}
                           component={privacyPage.Component}
+                        />
+                        <Route
+                          path={errorFallbackPreviewPage.href}
+                          component={errorFallbackPreviewPage.Component}
                         />
                         <Route path="/docs">
                           <Redirect to="/about" />
