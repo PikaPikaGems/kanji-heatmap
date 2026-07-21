@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
+import { StudyNotesFullscreenEditor } from "./StudyNotesFullscreenEditor";
 import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
 interface StoredStudyNotes {
@@ -20,16 +23,44 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
     typeof storedNotes.notes === "string"
       ? storedNotes.notes.slice(0, MAX_STUDY_NOTE_LENGTH)
       : "";
+  const isCoarsePointer = useCoarsePointer();
   const [mode, setMode] = useState<NotesMode>(
     notes.length > 0 ? "view" : "edit"
   );
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+
+  const persistNotes = (value: string) => {
+    setStoredNotes("notes", value.slice(0, MAX_STUDY_NOTE_LENGTH));
+  };
+
+  const openEditor = () => {
+    setMode("edit");
+    if (isCoarsePointer) {
+      setFullscreenOpen(true);
+    }
+  };
+
+  const handleModeChange = (value: string) => {
+    const next = value as NotesMode;
+    setMode(next);
+    if (next === "edit" && isCoarsePointer) {
+      setFullscreenOpen(true);
+    }
+  };
+
+  const handleFullscreenOpenChange = (open: boolean) => {
+    setFullscreenOpen(open);
+    if (!open && notes.trim().length > 0) {
+      setMode("view");
+    }
+  };
 
   return (
     <div
       className="px-1 pt-2 pb-3"
       onKeyDown={(event) => event.stopPropagation()}
     >
-      <Tabs value={mode} onValueChange={(value) => setMode(value as NotesMode)}>
+      <Tabs value={mode} onValueChange={handleModeChange}>
         <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5">
           <TabsList
             aria-label="Kanji study notes mode"
@@ -61,30 +92,49 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
           value="edit"
           className="mt-1.5 motion-safe:data-[state=active]:animate-in motion-safe:data-[state=active]:fade-in-0 motion-safe:data-[state=active]:slide-in-from-bottom-1 motion-safe:data-[state=active]:duration-200"
         >
-          <MarkdownEditor
-            value={notes}
-            maxLength={MAX_STUDY_NOTE_LENGTH}
-            onChange={(value) =>
-              setStoredNotes("notes", value.slice(0, MAX_STUDY_NOTE_LENGTH))
-            }
-          />
-          <p className="mt-3 text-xs leading-snug text-muted-foreground">
-            Fun fact! Japanese texts are clickable in View Mode. <br />
-            Optional special syntax:{" "}
-            <code className="text-[0.7rem] break-all">
-              {`:vocab[日本語]{kana="にほんご" definition="Japanese language (my own definition)"}`}
-            </code>
-          </p>
+          {isCoarsePointer ? (
+            <div className="flex flex-col items-stretch gap-3 rounded-xl border-[3px] border-dashed border-border bg-background px-4 py-8 text-center">
+              <Button type="button" onClick={() => setFullscreenOpen(true)}>
+                {notes.trim().length > 0 ? "Continue writing" : "Start writing"}
+              </Button>
+            </div>
+          ) : (
+            <>
+              <MarkdownEditor
+                value={notes}
+                maxLength={MAX_STUDY_NOTE_LENGTH}
+                onChange={persistNotes}
+              />
+              <p className="mt-3 text-xs leading-snug text-muted-foreground">
+                Fun fact! Japanese texts are clickable in View Mode. <br />
+                Optional special syntax:{" "}
+                <code className="text-[0.7rem] break-all">
+                  {`:vocab[日本語]{kana="にほんご" definition="Japanese language (my own definition)"}`}
+                </code>
+              </p>
+            </>
+          )}
         </TabsContent>
         <TabsContent
           value="view"
           className="mt-1.5 motion-safe:data-[state=active]:animate-in motion-safe:data-[state=active]:fade-in-0 motion-safe:data-[state=active]:slide-in-from-bottom-1 motion-safe:data-[state=active]:duration-200"
         >
           <div className="overflow-hidden bg-background rounded-xl border-[3px] border-dashed pb-4 border-border">
-            <MarkdownPreview source={notes} />
+            <MarkdownPreview source={notes} onEmptyClick={openEditor} />
           </div>
         </TabsContent>
       </Tabs>
+
+      {isCoarsePointer ? (
+        <StudyNotesFullscreenEditor
+          open={fullscreenOpen}
+          onOpenChange={handleFullscreenOpenChange}
+          kanji={kanji}
+          value={notes}
+          maxLength={MAX_STUDY_NOTE_LENGTH}
+          onChange={persistNotes}
+        />
+      ) : null}
     </div>
   );
 };

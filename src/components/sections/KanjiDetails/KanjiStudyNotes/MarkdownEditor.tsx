@@ -18,12 +18,17 @@ interface MarkdownEditorProps {
   value: string;
   maxLength: number;
   onChange: (value: string) => void;
+  /** Grow to fill the parent instead of a fixed h-64. */
+  fill?: boolean;
+  autoFocus?: boolean;
 }
 
 export const MarkdownEditor = ({
   value,
   maxLength,
   onChange,
+  fill = false,
+  autoFocus = false,
 }: MarkdownEditorProps) => {
   const backdropRef = useRef<HTMLPreElement>(null);
   const segments = useMemo(() => getMarkdownHighlightSegments(value), [value]);
@@ -37,9 +42,14 @@ export const MarkdownEditor = ({
   };
 
   return (
-    <div>
+    <div className={cn(fill && "flex h-full min-h-0 flex-col")}>
       {/* No padding here — absolute backdrop + flowing textarea must share the same origin. */}
-      <div className="relative overflow-hidden bg-background rounded-xl border-[3px] border-dotted border-border focus-within:border-ring focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
+      <div
+        className={cn(
+          "relative overflow-hidden bg-background rounded-xl border-[3px] border-dotted border-border focus-within:border-ring focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring",
+          fill && "min-h-0 flex-1"
+        )}
+      >
         <pre
           ref={backdropRef}
           aria-hidden="true"
@@ -64,10 +74,12 @@ export const MarkdownEditor = ({
           maxLength={maxLength}
           rows={8}
           spellCheck={false}
+          autoFocus={autoFocus}
           placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable in View Mode."
           className={cn(
             sharedEditorTextClass,
-            "relative block w-full h-64 resize-none bg-transparent outline-none",
+            "relative block w-full resize-none bg-transparent outline-none",
+            fill ? "h-full min-h-0" : "h-64",
             // Glyphs stay invisible so only the backdrop colors show; caret stays visible.
             "text-transparent caret-foreground [-webkit-text-fill-color:transparent]",
             // Translucent wash (not opaque lime) so backdrop text stays readable.
@@ -82,7 +94,7 @@ export const MarkdownEditor = ({
         />
       </div>
       <p
-        className={`mt-1.5 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
+        className={`mt-1.5 shrink-0 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
         aria-live="polite"
       >
         {value.length} / {maxLength}

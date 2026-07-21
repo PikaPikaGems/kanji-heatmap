@@ -1,0 +1,27 @@
+---
+description: Do not write or update tests unless the user explicitly asks
+alwaysApply: true
+---
+
+# Tests only when asked
+
+Do **not** create, update, or expand automated tests unless the user explicitly asks for tests in the current request.
+
+## Do not (unless asked)
+
+- Add new `*.test.ts` / `*.test.tsx` / `*.spec.*` files
+- Extend existing test files while implementing a feature or bugfix
+- “Be thorough” by adding coverage for code you just wrote
+- Update snapshots or e2e specs as a drive-by
+
+## Do
+
+- Implement the requested product/code change
+- Only touch tests when the user says to (e.g. “add tests”, “update the tests”, “fix the failing test”)
+- If an existing test fails because of your change and the user did **not** ask for test work: mention the failure briefly; do not rewrite tests unless they ask
+
+## Examples
+
+- User: “Add fullscreen notes editor” → change app code only; no new/updated unit tests
+- User: “Add fullscreen notes editor and cover it with tests” → app code + tests
+- User: “Fix the failing KanjiStudyNotes test” → only the test (and minimal code if required)
