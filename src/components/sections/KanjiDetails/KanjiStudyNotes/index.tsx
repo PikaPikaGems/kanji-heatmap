@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -94,9 +94,9 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
         >
           {isCoarsePointer ? (
             <div className="flex flex-col items-stretch gap-3 rounded-xl border-[3px] border-dashed border-border bg-background px-4 py-8 text-center">
-              <Button type="button" onClick={() => setFullscreenOpen(true)}>
+              <PracticeButton size="lg" onClick={() => setFullscreenOpen(true)}>
                 {notes.trim().length > 0 ? "Continue writing" : "Start writing"}
-              </Button>
+              </PracticeButton>
             </div>
           ) : (
             <>
