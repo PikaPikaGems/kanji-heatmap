@@ -9,7 +9,7 @@ import { getMarkdownHighlightSegments } from "./markdown";
  */
 const sharedEditorTextClass = cn(
   "m-0 box-border p-3.5",
-  "font-mono text-sm font-normal not-italic leading-[1.55rem] tracking-normal",
+  "font-mono text-base font-normal not-italic leading-[1.55rem] tracking-normal",
   "text-left whitespace-pre-wrap break-words [overflow-wrap:anywhere]",
   "border-0"
 );

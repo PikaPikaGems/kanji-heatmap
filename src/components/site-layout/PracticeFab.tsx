@@ -29,6 +29,11 @@ export const PracticeFab = () => {
   const [open, setOpen] = useState(false);
   const bgSrc = useBgSrc();
   const hasBgMeaning = bgSrc !== "none";
+  // Secondary (contrast) only when the page heatmap bg is meaningful.
+  // Today that applies on `/` only. Once `/mastery` ships a heatmap, include
+  // it here too. `/dashboard` (and other FAB routes) always stay primary.
+  const useSecondaryVariant = location === "/" && hasBgMeaning;
+
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
 
   if (!fabHrefs.has(location)) {
@@ -48,10 +53,10 @@ export const PracticeFab = () => {
         <PracticeButton
           ref={buttonRef}
           size="icon"
-          variant={hasBgMeaning ? "secondary" : "primary"}
+          variant={useSecondaryVariant ? "secondary" : "primary"}
           className={cn(
             "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom))]",
-            hasBgMeaning && "border-foreground/40"
+            useSecondaryVariant && "border-foreground/40"
           )}
           aria-label="Open practice menu"
           aria-expanded={open}

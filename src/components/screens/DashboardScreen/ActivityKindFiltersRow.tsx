@@ -24,7 +24,7 @@ export const ActivityKindFiltersRow = ({
             checked={filters[kind]}
             onCheckedChange={(v) => onChange(kind, v === true)}
           />
-          <Label htmlFor={id} className="cursor-pointer text-sm font-semibold">
+          <Label htmlFor={id} className="text-xs font-semibold cursor-pointer">
             {ACTIVITY_KIND_LABELS[kind]}
           </Label>
         </div>

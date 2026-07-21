@@ -80,7 +80,7 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
           value="view"
           className="mt-1.5 motion-safe:data-[state=active]:animate-in motion-safe:data-[state=active]:fade-in-0 motion-safe:data-[state=active]:slide-in-from-bottom-1 motion-safe:data-[state=active]:duration-200"
         >
-          <div className="overflow-hidden bg-background rounded-xl border-[3px] border-dashed border-border">
+          <div className="overflow-hidden bg-background rounded-xl border-[3px] border-dashed pb-4 border-border">
             <MarkdownPreview source={notes} />
           </div>
         </TabsContent>
