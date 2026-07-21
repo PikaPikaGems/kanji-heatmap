@@ -42,7 +42,7 @@ test.describe("practice modes", () => {
         .getByRole("option", { name: "(Select All)", exact: true })
         .click();
       await page.getByRole("option", { name: "Grade 1", exact: true }).click();
-      await page.keyboard.press("Escape");
+      await page.getByRole("option", { name: "Close", exact: true }).click();
 
       await expect(count).not.toHaveText(initialCount ?? "", {
         timeout: 30_000,
