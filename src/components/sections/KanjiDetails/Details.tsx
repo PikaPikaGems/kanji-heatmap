@@ -112,13 +112,6 @@ export const KanjiDetails = ({
         </ErrorBoundary>
       </SimpleAccordion>
       <RepresentativeStudyWordAccordion kanji={kanji} />
-      <SimpleAccordion trigger="Kanji Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<BasicLoading />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
@@ -132,6 +125,13 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger="Personal Study Notes">
+        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
+          <Suspense fallback={<BasicLoading />}>
+            <KanjiStudyNotes key={kanji} kanji={kanji} />
+          </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>

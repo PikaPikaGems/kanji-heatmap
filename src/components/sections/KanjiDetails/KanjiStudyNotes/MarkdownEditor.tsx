@@ -1,20 +1,18 @@
 import { useMemo, useRef, type UIEvent } from "react";
 import { cn } from "@/lib/utils";
-import {
-  getMarkdownHighlightSegments,
-  type MarkdownHighlightKind,
-} from "./markdown";
+import { EDITOR_HIGHLIGHT_CLASSES } from "./editorHighlightClasses";
+import { getMarkdownHighlightSegments } from "./markdown";
 
-const highlightClasses: Record<MarkdownHighlightKind, string> = {
-  plain: "text-foreground",
-  heading: "font-semibold text-primary",
-  emphasis: "text-fuchsia-600 dark:text-fuchsia-400",
-  link: "text-blue-600 underline dark:text-blue-400",
-  quote: "italic text-muted-foreground",
-  list: "text-amber-700 dark:text-amber-400",
-  code: "text-emerald-700 dark:text-emerald-400",
-  directive: "text-violet-700 dark:text-violet-400",
-};
+/**
+ * Typography must match exactly on the backdrop and textarea — any padding,
+ * weight, or italic mismatch shifts caret/selection relative to the highlights.
+ */
+const sharedEditorTextClass = cn(
+  "m-0 box-border p-3.5",
+  "font-mono text-sm font-normal not-italic leading-[1.55rem] tracking-normal",
+  "text-left whitespace-pre-wrap break-words [overflow-wrap:anywhere]",
+  "border-0"
+);
 
 interface MarkdownEditorProps {
   value: string;
@@ -40,16 +38,20 @@ export const MarkdownEditor = ({
 
   return (
     <div>
-      <div className="relative overflow-hidden border rounded-md bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      {/* No padding here — absolute backdrop + flowing textarea must share the same origin. */}
+      <div className="relative overflow-hidden bg-background rounded-xl border-[3px] border-dotted border-border focus-within:border-ring focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
         <pre
           ref={backdropRef}
           aria-hidden="true"
-          className="absolute inset-0 p-3 m-0 overflow-hidden font-mono text-sm leading-6 text-left break-words whitespace-pre-wrap pointer-events-none"
+          className={cn(
+            sharedEditorTextClass,
+            "absolute inset-0 overflow-hidden pointer-events-none"
+          )}
         >
           {segments.map((segment, index) => (
             <span
               key={`${segment.kind}-${index}`}
-              className={cn(highlightClasses[segment.kind])}
+              className={cn(EDITOR_HIGHLIGHT_CLASSES[segment.kind])}
             >
               {segment.text}
             </span>
@@ -62,18 +64,27 @@ export const MarkdownEditor = ({
           maxLength={maxLength}
           rows={8}
           spellCheck={false}
-          placeholder={`Write Markdown notes here. When you write Japanese words like 自転車 they become clickable on when displayed!`}
-          className="relative block w-full p-3 overflow-auto font-mono text-sm leading-6 text-left text-transparent bg-transparent border-0 resize-y min-h-48 caret-foreground placeholder:text-muted-foreground focus:outline-none"
-          style={{ caretColor: "hsl(var(--foreground))" }}
+          placeholder="Write Markdown notes here. Japanese texts are clickable in View Mode."
+          className={cn(
+            sharedEditorTextClass,
+            "relative block w-full h-64 resize-none bg-transparent outline-none",
+            // Glyphs stay invisible so only the backdrop colors show; caret stays visible.
+            "text-transparent caret-foreground [-webkit-text-fill-color:transparent]",
+            // Translucent wash (not opaque lime) so backdrop text stays readable.
+            // Also beat global `::selection { color: black !important }`.
+            "selection:!bg-[rgb(127_255_0_/_0.25)] selection:!text-transparent",
+            "selection:[-webkit-text-fill-color:transparent]"
+            // "placeholder:text-muted-foreground placeholder:[-webkit-text-fill-color:unset]"
+          )}
           onChange={(event) => onChange(event.target.value)}
           onScroll={syncScroll}
         />
       </div>
       <p
-        className="mt-1 text-xs text-right text-muted-foreground"
+        className={`mt-1.5 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
         aria-live="polite"
       >
-        {value.length}/{maxLength}
+        {value.length} / {maxLength}
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { unified } from "unified";
 import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
@@ -55,11 +55,52 @@ describe("remarkJapaneseVocab", () => {
     ).toEqual(["日本語"]);
   });
 
+  it("keeps kanji compounds as vocab nodes even when Segmenter sets isWordLike false", () => {
+    // Firefox reports isWordLike:false for compounds like 電車 / 自転車.
+    const OriginalSegmenter = (
+      Intl as typeof Intl & { Segmenter?: typeof Intl.Segmenter }
+    ).Segmenter;
+
+    class FirefoxLikeSegmenter {
+      segment(input: string) {
+        if (OriginalSegmenter == null) {
+          return [{ segment: input, isWordLike: false }];
+        }
+        return [
+          ...new OriginalSegmenter("ja", { granularity: "word" }).segment(
+            input
+          ),
+        ].map(({ segment }) => ({ segment, isWordLike: false }));
+      }
+    }
+
+    vi.stubGlobal("Intl", {
+      ...Intl,
+      Segmenter: FirefoxLikeSegmenter,
+    });
+
+    try {
+      expect(
+        getVocabNodes("車 (car), 電車 (train), 自転車 (bicycle).").map(
+          (node) => node.word
+        )
+      ).toEqual(["車", "電車", "自転車"]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("segments Japanese sentences without requiring spaces", () => {
     const words = getVocabNodes("日本語を勉強する").map((node) => node.word);
 
     expect(words.length).toBeGreaterThan(1);
     expect(words.join("")).toBe("日本語を勉強する");
+  });
+
+  it("keeps pure kana runs as a single vocab node", () => {
+    expect(getVocabNodes("にほんご").map((node) => node.word)).toEqual([
+      "にほんご",
+    ]);
   });
 
   it("preserves optional directive metadata", () => {
@@ -91,5 +132,35 @@ describe("getMarkdownHighlightSegments", () => {
     expect(kinds).toEqual(
       new Set(["heading", "plain", "emphasis", "link", "directive"])
     );
+  });
+
+  it("highlights Japanese words outside stronger Markdown syntax", () => {
+    const segments = getMarkdownHighlightSegments("Ride 電車 and にほんご");
+    const japanese = segments
+      .filter((segment) => segment.kind === "japanese")
+      .map((segment) => segment.text);
+
+    expect(japanese).toEqual(["電車", "にほんご"]);
+  });
+
+  it("highlights Japanese inside headings and list items", () => {
+    const source = `# My Notes about 車
+- 自転車 (bicycle)
+## Sidenote about Japanese にほんご`;
+    const segments = getMarkdownHighlightSegments(source);
+    const japanese = segments
+      .filter((segment) => segment.kind === "japanese")
+      .map((segment) => segment.text);
+
+    expect(japanese).toEqual(["車", "自転車", "にほんご"]);
+
+    const bicycleLine = segments
+      .filter(
+        (segment) =>
+          segment.text.includes("bicycle") || segment.text === " (bicycle)"
+      )
+      .map((segment) => segment.kind);
+
+    expect(bicycleLine.every((kind) => kind === "plain")).toBe(true);
   });
 });

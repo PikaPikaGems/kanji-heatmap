@@ -1,4 +1,4 @@
-import type { Root, RootContent, Text } from "mdast";
+import type { ListItem, Root, RootContent, Text } from "mdast";
 import type { Plugin } from "unified";
 import { unified } from "unified";
 import remarkDirective from "remark-directive";
@@ -24,7 +24,8 @@ export type MarkdownHighlightKind =
   | "quote"
   | "list"
   | "code"
-  | "directive";
+  | "directive"
+  | "japanese";
 
 export interface MarkdownHighlightSegment {
   kind: MarkdownHighlightKind;
@@ -33,6 +34,8 @@ export interface MarkdownHighlightSegment {
 
 const japaneseCharacterPattern =
   /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ヵヶー]/u;
+
+const kanjiCharacterPattern = /[\p{Script=Han}々〆]/u;
 
 const skippedParentTypes = new Set([
   "code",
@@ -58,7 +61,14 @@ interface SegmenterConstructor {
   };
 }
 
+const hasKanji = (value: string) => kanjiCharacterPattern.test(value);
+
 const getJapaneseSegments = (value: string): JapaneseSegment[] => {
+  // Pure kana runs stay intact so "にほんご" is one badge, not に/ほん/ご.
+  if (!hasKanji(value)) {
+    return [{ segment: value, isWordLike: true }];
+  }
+
   const Segmenter = (Intl as typeof Intl & { Segmenter?: SegmenterConstructor })
     .Segmenter;
 
@@ -74,9 +84,34 @@ const getJapaneseSegments = (value: string): JapaneseSegment[] => {
       }));
   }
 
+  // Firefox marks some CJK compounds (電車, 自転車, …) as isWordLike:false
+  // even though they are valid words. Ignore that flag for Japanese script
+  // segments — we only segment pure Japanese runs here.
   return Array.from(
     new Segmenter("ja", { granularity: "word" }).segment(value)
-  );
+  ).map(({ segment }) => ({
+    segment,
+    isWordLike: japaneseCharacterPattern.test(segment),
+  }));
+};
+
+/**
+ * Split text into Japanese runs vs everything else, then word-segment only
+ * runs that contain kanji. Pure-kana runs are kept as a single token.
+ */
+const getVocabReplacementSegments = (value: string): JapaneseSegment[] => {
+  const parts = value
+    .split(
+      /([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ヵヶー]+)/u
+    )
+    .filter(Boolean);
+
+  return parts.flatMap((part) => {
+    if (!japaneseCharacterPattern.test(part)) {
+      return [{ segment: part, isWordLike: false }];
+    }
+    return getJapaneseSegments(part);
+  });
 };
 
 const createVocabDirective = (
@@ -136,7 +171,7 @@ export const remarkJapaneseVocab: Plugin<[], Root> = () => (tree) => {
       return;
     }
 
-    const replacement = getJapaneseSegments(node.value).map(
+    const replacement = getVocabReplacementSegments(node.value).map(
       ({ segment, isWordLike }) =>
         isWordLike && japaneseCharacterPattern.test(segment)
           ? createVocabDirective(segment)
@@ -164,8 +199,6 @@ const highlightKinds: Partial<
 > = {
   heading: { kind: "heading", priority: 1 },
   blockquote: { kind: "quote", priority: 1 },
-  list: { kind: "list", priority: 1 },
-  listItem: { kind: "list", priority: 2 },
   emphasis: { kind: "emphasis", priority: 3 },
   strong: { kind: "emphasis", priority: 3 },
   link: { kind: "link", priority: 4 },
@@ -176,6 +209,9 @@ const highlightKinds: Partial<
   leafDirective: { kind: "directive", priority: 6 },
   containerDirective: { kind: "directive", priority: 6 },
 };
+
+/** Japanese may recolor text inside headings/quotes/list markers, but not stronger syntax. */
+const JAPANESE_MAX_OVERRIDE_PRIORITY = 2;
 
 export const getMarkdownHighlightSegments = (
   source: string
@@ -191,10 +227,26 @@ export const getMarkdownHighlightSegments = (
   const tree = highlightParser.parse(source);
 
   visit(tree, (node) => {
-    const highlight = highlightKinds[node.type];
     const start = node.position?.start.offset;
     const end = node.position?.end.offset;
-    if (highlight == null || start == null || end == null) {
+    if (start == null || end == null) {
+      return;
+    }
+
+    // Only tint the list marker (`- `, `1. `), not the bullet body text.
+    if (node.type === "listItem") {
+      const listItem = node as ListItem;
+      const markerEnd = listItem.children[0]?.position?.start.offset ?? end;
+      for (let index = start; index < markerEnd; index += 1) {
+        if (1 >= highlights[index].priority) {
+          highlights[index] = { kind: "list", priority: 1 };
+        }
+      }
+      return;
+    }
+
+    const highlight = highlightKinds[node.type];
+    if (highlight == null) {
       return;
     }
 
@@ -204,6 +256,31 @@ export const getMarkdownHighlightSegments = (
       }
     }
   });
+
+  // Highlight Japanese runs unless they're already part of stronger syntax
+  // (emphasis, links, code, :vocab directives).
+  for (let index = 0; index < source.length; ) {
+    const char = source[index];
+    if (
+      japaneseCharacterPattern.test(char) &&
+      highlights[index].priority <= JAPANESE_MAX_OVERRIDE_PRIORITY
+    ) {
+      let end = index + 1;
+      while (
+        end < source.length &&
+        japaneseCharacterPattern.test(source[end]) &&
+        highlights[end].priority <= JAPANESE_MAX_OVERRIDE_PRIORITY
+      ) {
+        end += 1;
+      }
+      for (let cursor = index; cursor < end; cursor += 1) {
+        highlights[cursor] = { kind: "japanese", priority: 2 };
+      }
+      index = end;
+    } else {
+      index += 1;
+    }
+  }
 
   const segments: MarkdownHighlightSegment[] = [];
   for (let index = 0; index < source.length; index += 1) {
