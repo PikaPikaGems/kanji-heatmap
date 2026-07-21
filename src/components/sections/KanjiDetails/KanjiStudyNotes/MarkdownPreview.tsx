@@ -84,7 +84,7 @@ const components: Components = {
     </pre>
   ),
   code: ({ children }) => (
-    <code className="m-0 p-0 leading-none tracking-tight !text-green-500 font-mono text-[0.875em] rounded bg-muted-foreground/10">
+    <code className="m-0 px-2 py-0.5 text-green-500 font-mono text-[0.875em] rounded-lg bg-muted-foreground/10">
       {children}
     </code>
   ),

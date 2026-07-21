@@ -14,5 +14,5 @@ export const EDITOR_HIGHLIGHT_CLASSES: Record<MarkdownHighlightKind, string> = {
   list: "text-violet-700 dark:text-violet-400",
   code: "text-emerald-700 dark:text-emerald-400",
   directive: "text-lime-700 dark:text-lime-400",
-  japanese: "text-cyan-500 dark:text-cyan-500 font-bold",
+  japanese: "text-theme-color-with-opacity-100 font-bold",
 };
