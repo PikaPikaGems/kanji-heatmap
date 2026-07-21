@@ -57,8 +57,17 @@ describe("remarkJapaneseVocab", () => {
 
   it("keeps kanji compounds as vocab nodes even when Segmenter sets isWordLike false", () => {
     // Firefox reports isWordLike:false for compounds like 電車 / 自転車.
+    // Intl.Segmenter types need ES2024.Intl; cast locally like markdown.ts.
+    type SegmenterCtor = new (
+      locales?: string | string[],
+      options?: { granularity: "word" }
+    ) => {
+      segment(
+        input: string
+      ): Iterable<{ segment: string; isWordLike?: boolean }>;
+    };
     const OriginalSegmenter = (
-      Intl as typeof Intl & { Segmenter?: typeof Intl.Segmenter }
+      Intl as typeof Intl & { Segmenter?: SegmenterCtor }
     ).Segmenter;
 
     class FirefoxLikeSegmenter {
@@ -85,6 +94,24 @@ describe("remarkJapaneseVocab", () => {
           (node) => node.word
         )
       ).toEqual(["車", "電車", "自転車"]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("falls back to Japanese-script runs when Intl.Segmenter is unavailable", () => {
+    const { Segmenter: _removed, ...intlWithoutSegmenter } =
+      Intl as typeof Intl & {
+        Segmenter?: unknown;
+      };
+    void _removed;
+
+    vi.stubGlobal("Intl", intlWithoutSegmenter);
+
+    try {
+      expect(
+        getVocabNodes("Learn 日本語 today").map((node) => node.word)
+      ).toEqual(["日本語"]);
     } finally {
       vi.unstubAllGlobals();
     }
