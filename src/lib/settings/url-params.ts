@@ -17,4 +17,6 @@ export const URL_PARAMS = {
     secondary: "sort-secondary",
   },
   bgSrc: "bg-src",
+  /** Speed Katakana challenge set id (`/speed-katakana?challenge=200`). */
+  challenge: "challenge",
 } as const;
