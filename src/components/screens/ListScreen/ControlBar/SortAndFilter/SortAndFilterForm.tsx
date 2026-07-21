@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FreqRankTypeInfo } from "@/components/common/freq/FreqRankTypeInfo";
 import { StrokeCountField } from "@/components/common/StrokeCountField";
 import { JLPTSelector } from "@/components/common/jlpt/JLPTSelector";
+import { JouyouGradeSelector } from "@/components/common/JouyouGradeSelector";
 import { FrequencyRankDataSource } from "@/components/common/freq/FrequencyRankDataSource";
 import { FrequencyRankingRangeField } from "@/components/common/freq/FrequencyRankingRangeField";
 
@@ -118,6 +119,12 @@ export const SortAndFilterSettingsForm = ({
             <JLPTSelector
               selectedJLPT={filterValues.jlpt}
               setSelectedJLPT={form.setJlpt}
+            />
+          }
+          jouyouGradeField={
+            <JouyouGradeSelector
+              selectedGrades={filterValues.jouyouGrade}
+              setSelectedGrades={form.setJouyouGrade}
             />
           }
           freqRankSourceField={

@@ -23,6 +23,15 @@ describe("useSortAndFilterForm", () => {
     expect(result.current.isDisabled).toBe(false);
   });
 
+  it("tracks Jōyō-grade edits in the filter values", () => {
+    const { result } = renderHook(() => useSortAndFilterForm(initial));
+
+    act(() => result.current.setJouyouGrade(["1", "none"]));
+
+    expect(result.current.filterValues.jouyouGrade).toEqual(["1", "none"]);
+    expect(result.current.isDisabled).toBe(false);
+  });
+
   it("keeps the secondary sort when the new primary is a grouping sort", () => {
     const { result } = renderHook(() => useSortAndFilterForm(initial));
 

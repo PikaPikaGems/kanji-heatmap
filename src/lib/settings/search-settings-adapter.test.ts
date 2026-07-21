@@ -35,6 +35,7 @@ describe("search settings ↔ URL params round-trip", () => {
       filterSettings: {
         strokeRange: { min: 3, max: 10 },
         jlpt: ["n5", "n4"],
+        jouyouGrade: ["1", "6", "none"],
         freq: { source: "rank-netflix", rankRange: { min: 5, max: 100 } },
       },
       sortSettings: { primary: "strokes", secondary: "keyword" },
@@ -83,5 +84,13 @@ describe("search settings ↔ URL params round-trip", () => {
     });
     toSearchParams(params, "sortSettings", defaultSortSettings);
     expect(params.toString()).toBe("");
+  });
+
+  it("ignores invalid Jōyō-grade values from the URL", () => {
+    const params = new URLSearchParams("filter-jouyou-grade=1,invalid,none");
+    expect(toSearchSettings(params).filterSettings.jouyouGrade).toEqual([
+      "1",
+      "none",
+    ]);
   });
 });

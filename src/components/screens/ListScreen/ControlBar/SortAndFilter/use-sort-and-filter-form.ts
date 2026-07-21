@@ -9,6 +9,7 @@ import {
 } from "@/lib/settings/search-settings-adapter";
 import { SearchSettings } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
+import { JouyouGradeType } from "@/lib/jouyou-grade";
 
 const isGroupSort = (sortKey: string) =>
   (GROUP_OPTIONS as readonly string[]).includes(sortKey);
@@ -53,6 +54,10 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
 
   const setJlpt = (val: JLTPTtypes[]) => {
     setFilterValues((prev) => ({ ...prev, jlpt: val }));
+  };
+
+  const setJouyouGrade = (val: JouyouGradeType[]) => {
+    setFilterValues((prev) => ({ ...prev, jouyouGrade: val }));
   };
 
   const setFreqSource = (val: string) => {
@@ -110,6 +115,7 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
     setSecondarySort,
     setStrokeRange,
     setJlpt,
+    setJouyouGrade,
     setFreqSource,
     setFreqRankRange,
     resetToDefaults,
