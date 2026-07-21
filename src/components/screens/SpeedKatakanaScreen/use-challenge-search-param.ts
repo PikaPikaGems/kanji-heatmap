@@ -9,6 +9,7 @@ import { parseChallengeParam } from "./challenge-search-param";
 /**
  * Keeps Speed Katakana `challengeSet` in sync with `?challenge=` on the URL:
  * - Valid URL param → settings (so InitialScreen selection + stats match)
+ * - Invalid / empty URL param → removed from the URL (replace)
  * - Selecting a challenge → URL (replace, so browsing sets doesn't spam history)
  */
 export const useChallengeSearchParam = () => {
@@ -18,18 +19,37 @@ export const useChallengeSearchParam = () => {
     DEFAULT_SETTINGS
   );
 
-  const challengeFromUrl = parseChallengeParam(
-    searchParams.get(URL_PARAMS.challenge)
-  );
+  const rawChallenge = searchParams.get(URL_PARAMS.challenge);
+  const challengeFromUrl = parseChallengeParam(rawChallenge);
 
   useLayoutEffect(() => {
+    // Present but invalid (e.g. ?challenge=999 or ?challenge=abc) → strip it.
+    if (rawChallenge != null && challengeFromUrl == null) {
+      setSearchParams(
+        (prev) => {
+          if (!prev.has(URL_PARAMS.challenge)) return prev;
+          const next = new URLSearchParams(prev);
+          next.delete(URL_PARAMS.challenge);
+          return next;
+        },
+        { replace: true }
+      );
+      return;
+    }
+
     if (
       challengeFromUrl != null &&
       challengeFromUrl !== settings.challengeSet
     ) {
       setSetting("challengeSet", challengeFromUrl);
     }
-  }, [challengeFromUrl, settings.challengeSet, setSetting]);
+  }, [
+    rawChallenge,
+    challengeFromUrl,
+    settings.challengeSet,
+    setSetting,
+    setSearchParams,
+  ]);
 
   const syncChallengeToUrl = useCallback(
     (challengeSet: number) => {
