@@ -122,13 +122,20 @@ export const useGetKanjiInfoFn = () => {
 type SearchResult = { kanjis: string[]; possibleRadicals?: Set<string> };
 
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
+  // ItemCountBadge (and similar) can mount before the worker finishes loading
+  // main + extended maps. Searching with only main populated crashes the
+  // worker on `exInfo.strokes` and rejects every pending request via onerror.
+  const ready = useIsKanjiWorkerReady();
+
   const state = useWorkerQuery<SearchResult>(
-    () =>
-      requestWorker({
-        type: "search",
-        payload: searchSettings,
-      }) as Promise<SearchResult>,
-    [searchSettings]
+    ready
+      ? () =>
+          requestWorker({
+            type: "search",
+            payload: searchSettings,
+          }) as Promise<SearchResult>
+      : null,
+    [searchSettings, ready]
   );
 
   return {
@@ -140,13 +147,17 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
 };
 
 export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
+  const ready = useIsKanjiWorkerReady();
+
   const state = useWorkerQuery<number>(
-    () =>
-      requestWorker({
-        type: "search-result-count",
-        payload: searchSettings,
-      }) as Promise<number>,
-    [searchSettings]
+    ready
+      ? () =>
+          requestWorker({
+            type: "search-result-count",
+            payload: searchSettings,
+          }) as Promise<number>
+      : null,
+    [searchSettings, ready]
   );
 
   return {

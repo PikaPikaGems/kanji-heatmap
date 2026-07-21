@@ -209,4 +209,28 @@ describe("searchKanji", () => {
     );
     expect(result).toEqual(["山", "水", "火"]);
   });
+
+  it("skips kanji that exist in main but lack extended info", () => {
+    const mismatchedPool = {
+      main: {
+        ...pool.main,
+        氷: mainInfo("ice", "n2", 20),
+      },
+      extended: pool.extended,
+    };
+
+    expect(() =>
+      searchKanji(
+        settings({ type: "readings", text: "", primary: "strokes" }),
+        mismatchedPool
+      )
+    ).not.toThrow();
+
+    expect(
+      searchKanji(
+        settings({ type: "readings", text: "", primary: "strokes" }),
+        mismatchedPool
+      )
+    ).toEqual(["山", "水", "火"]);
+  });
 });

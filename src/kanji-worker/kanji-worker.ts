@@ -153,6 +153,10 @@ const getSearchPool = () => ({
   similar: KANJI_SIMILAR_CACHE,
 });
 
+const areKanjiCachesReady = () =>
+  Object.keys(KANJI_INFO_MAIN_CACHE).length > 0 &&
+  Object.keys(KANJI_INFO_EXTENDED_CACHE).length > 0;
+
 // "similar" searches need the lazily-fetched similar map before they can run;
 // every other search runs synchronously against the in-memory caches.
 const withSimilarCacheIfNeeded = (
@@ -172,6 +176,13 @@ const withSimilarCacheIfNeeded = (
 };
 
 const handleSearch = requirePayload<SearchSettings>((settings, reply) => {
+  // Main and extended load in parallel. A search that lands between those
+  // completions used to throw on undefined.strokes and kill the worker.
+  if (!areKanjiCachesReady()) {
+    reply.err({ message: "Kanji caches not initialized" });
+    return;
+  }
+
   // Side effect, the first time we search
   // we need to store this in cache which will be useful
   // when searching by radical
@@ -202,6 +213,11 @@ const handleSearch = requirePayload<SearchSettings>((settings, reply) => {
 
 const handleSearchResultCount = requirePayload<SearchSettings>(
   (settings, reply) => {
+    if (!areKanjiCachesReady()) {
+      reply.err({ message: "Kanji caches not initialized" });
+      return;
+    }
+
     withSimilarCacheIfNeeded(settings, reply, () => {
       const pool = getSearchPool();
       const allKanji = Object.keys(pool.main);
