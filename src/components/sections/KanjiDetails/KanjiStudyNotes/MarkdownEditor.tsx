@@ -44,7 +44,7 @@ export const MarkdownEditor = ({
         <pre
           ref={backdropRef}
           aria-hidden="true"
-          className="absolute inset-0 p-3 m-0 overflow-hidden font-mono text-sm leading-6 text-left whitespace-pre-wrap break-words pointer-events-none"
+          className="absolute inset-0 p-3 m-0 overflow-hidden font-mono text-sm leading-6 text-left break-words whitespace-pre-wrap pointer-events-none"
         >
           {segments.map((segment, index) => (
             <span
@@ -62,8 +62,8 @@ export const MarkdownEditor = ({
           maxLength={maxLength}
           rows={8}
           spellCheck={false}
-          placeholder="Write Markdown notes here…"
-          className="relative block w-full min-h-48 p-3 overflow-auto font-mono text-sm leading-6 text-left text-transparent bg-transparent border-0 resize-y caret-foreground placeholder:text-muted-foreground focus:outline-none"
+          placeholder={`Write Markdown notes here. When you write Japanese words like 自転車 they become clickable on when displayed!`}
+          className="relative block w-full p-3 overflow-auto font-mono text-sm leading-6 text-left text-transparent bg-transparent border-0 resize-y min-h-48 caret-foreground placeholder:text-muted-foreground focus:outline-none"
           style={{ caretColor: "hsl(var(--foreground))" }}
           onChange={(event) => onChange(event.target.value)}
           onScroll={syncScroll}

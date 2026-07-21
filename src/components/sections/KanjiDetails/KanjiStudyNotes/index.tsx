@@ -25,7 +25,10 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
   );
 
   return (
-    <div className="px-1 pt-2 pb-3">
+    <div
+      className="px-1 pt-2 pb-3"
+      onKeyDown={(event) => event.stopPropagation()}
+    >
       <Tabs value={mode} onValueChange={(value) => setMode(value as NotesMode)}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList aria-label="Kanji study notes mode">
@@ -45,7 +48,8 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
             }
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Japanese words become clickable in Preview. Optional details:{" "}
+            Japanese words become clickable in Preview. Special syntax you can
+            use:{" "}
             <code className="break-all">
               {`:vocab[日本語]{kana="にほんご" definition="Japanese language"}`}
             </code>
