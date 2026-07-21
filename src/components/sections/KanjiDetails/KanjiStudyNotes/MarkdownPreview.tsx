@@ -113,7 +113,7 @@ export const MarkdownPreview = ({ source }: { source: string }) => {
   if (source.trim().length === 0) {
     return (
       <p className="px-4 py-8 text-sm text-center text-muted-foreground">
-        Nothing to view yet.
+        Your notes are empty. Start writing to see them here.
       </p>
     );
   }
