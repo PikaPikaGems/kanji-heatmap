@@ -71,13 +71,21 @@ export const filterByKanjiSimple = (
   return allKanji
     .filter((kanji) => {
       const info = kanjiPool.main[kanji];
+      if (info == null) {
+        return false;
+      }
       if ([0, JLPTOptionsCount].includes(jlptFilters.size)) {
         return true;
       }
       return jlptFilters.has(info.jlpt);
     })
     .filter((kanji) => {
+      // Main/extended can briefly diverge (load race) or permanently diverge
+      // (stale SW caches of the two JSON files). Skip rather than crash.
       const exInfo = kanjiPool.extended[kanji];
+      if (exInfo == null) {
+        return false;
+      }
       const withinRange =
         maxStrokes >= exInfo.strokes && exInfo.strokes >= minStrokes;
       return withinRange;
@@ -87,6 +95,9 @@ export const filterByKanjiSimple = (
         return true;
       }
       const info = kanjiPool.main[kanji];
+      if (info == null) {
+        return false;
+      }
       const freq = getFrequency(freqFilter.source, info) ?? Number.MAX_VALUE;
       const withinRange =
         freq >= freqFilter.rankRange.min && freq <= freqFilter.rankRange.max;
@@ -132,29 +143,36 @@ const matchEverything: SearchDescriptor = {
 const SEARCH_DESCRIPTORS: Record<SearchType, SearchDescriptor> = {
   keyword: {
     normalize: toRomajiText,
-    match: (kanji, { pool, text }) => pool.main[kanji].keyword.includes(text),
+    match: (kanji, { pool, text }) =>
+      pool.main[kanji]?.keyword.includes(text) ?? false,
   },
   meanings: {
     normalize: toRomajiText,
     match: (kanji, { pool, text }) =>
-      pool.main[kanji].keyword.includes(text) ||
-      pool.extended[kanji].meanings.find((meaning) => meaning.includes(text)) !=
-        null,
+      (pool.main[kanji]?.keyword.includes(text) ?? false) ||
+      pool.extended[kanji]?.meanings.find((meaning) =>
+        meaning.includes(text)
+      ) != null,
   },
   onyomi: {
     normalize: toHiraganaText,
-    match: (kanji, { pool, text }) => pool.extended[kanji].allOn.has(text),
+    match: (kanji, { pool, text }) =>
+      pool.extended[kanji]?.allOn.has(text) ?? false,
   },
   kunyomi: {
     normalize: toHiraganaText,
     match: (kanji, { pool, text }) =>
-      pool.extended[kanji].allKunStripped.has(text),
+      pool.extended[kanji]?.allKunStripped.has(text) ?? false,
   },
   readings: {
     normalize: toHiraganaText,
-    match: (kanji, { pool, text }) =>
-      pool.extended[kanji].allOn.has(text) ||
-      pool.extended[kanji].allKunStripped.has(text),
+    match: (kanji, { pool, text }) => {
+      const extended = pool.extended[kanji];
+      if (extended == null) {
+        return false;
+      }
+      return extended.allOn.has(text) || extended.allKunStripped.has(text);
+    },
   },
   "multi-kanji": kanjiListSearch,
   handwriting: kanjiListSearch,
@@ -276,8 +294,21 @@ export const sortKanji = (
 
   // TODO: Also add a LRU cache of recently computed results
   return kanjiList.sort((a, b) => {
-    const entryA = { main: kanjiPool.main[a], extended: kanjiPool.extended[a] };
-    const entryB = { main: kanjiPool.main[b], extended: kanjiPool.extended[b] };
+    const mainA = kanjiPool.main[a];
+    const mainB = kanjiPool.main[b];
+    const extendedA = kanjiPool.extended[a];
+    const extendedB = kanjiPool.extended[b];
+    if (
+      mainA == null ||
+      mainB == null ||
+      extendedA == null ||
+      extendedB == null
+    ) {
+      return 0;
+    }
+
+    const entryA = { main: mainA, extended: extendedA };
+    const entryB = { main: mainB, extended: extendedB };
 
     const compareVal = compareBy(primarySort, entryA, entryB);
     if (compareVal != 0) {
@@ -297,9 +328,9 @@ export const searchKanji = (settings: SearchSettings, kanjiPool: DataPool) => {
 export const getSortedByStrokeCount = (kanjiPool: DataPool) => {
   const allKanji = Object.keys(kanjiPool.main);
   return allKanji.sort((a, b) => {
-    const exInfoA = kanjiPool.extended[a];
-    const exInfoB = kanjiPool.extended[b];
-    return numericSort(exInfoA.strokes, exInfoB.strokes);
+    const strokesA = kanjiPool.extended[a]?.strokes ?? -1;
+    const strokesB = kanjiPool.extended[b]?.strokes ?? -1;
+    return numericSort(strokesA, strokesB);
   });
 };
 
@@ -330,6 +361,9 @@ export const searchByRadical = (
   // if kanji has all the radicals in the set then include this in the search result
   const filteredKanjis = filteredKanjisSimple.filter((kanji) => {
     const kanjiRadicalSet = kanjiDecompositionCache[kanji];
+    if (kanjiRadicalSet == null) {
+      return false;
+    }
     return radicalPayload.every((radical) => {
       return kanjiRadicalSet.has(radical);
     });
@@ -340,7 +374,7 @@ export const searchByRadical = (
   // get all radicals in all the remaining kanjis
   const possibleRadicals = kanjis.reduce((acc, kanji) => {
     const kanjiRadicalSet = kanjiDecompositionCache[kanji];
-    kanjiRadicalSet.forEach((item) => acc.add(item));
+    kanjiRadicalSet?.forEach((item) => acc.add(item));
     return acc;
   }, new Set<string>([]));
 
