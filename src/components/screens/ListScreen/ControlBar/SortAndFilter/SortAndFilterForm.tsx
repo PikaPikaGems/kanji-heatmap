@@ -1,7 +1,7 @@
 import { SORT_ORDER_SELECT } from "@/lib/options/options-arr";
 import { SearchSettings } from "@/lib/settings/settings";
 
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 
 import { FreqRankTypeInfo } from "@/components/common/freq/FreqRankTypeInfo";
 import { StrokeCountField } from "@/components/common/StrokeCountField";
@@ -160,8 +160,8 @@ export const SortAndFilterSettingsForm = ({
           </div>
         )}
         <div className="flex justify-end px-0 pt-2 space-x-1">
-          <Button
-            variant="outline"
+          <PracticeButton
+            variant="secondary"
             onClick={(e) => {
               e.preventDefault();
               form.resetToDefaults();
@@ -169,10 +169,10 @@ export const SortAndFilterSettingsForm = ({
             }}
           >
             Clear all
-          </Button>
-          <Button disabled={isDisabled} type="submit">
+          </PracticeButton>
+          <PracticeButton disabled={isDisabled} type="submit">
             Apply
-          </Button>
+          </PracticeButton>
         </div>
       </div>
     </form>
