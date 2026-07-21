@@ -1,4 +1,5 @@
 import { lazy, ReactNode, Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -19,6 +20,16 @@ import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
+
+const StudyNotesLoadingFallback = () => (
+  <div
+    className="flex w-full h-48 items-center justify-center"
+    role="status"
+    aria-label="Loading"
+  >
+    <Loader2 className="size-7 animate-spin" />
+  </div>
+);
 
 export const RirikkuCTABadge = () => {
   return (
@@ -134,7 +145,7 @@ export const KanjiDetails = ({
       </SimpleAccordion>
       <SimpleAccordion trigger="⭐️ Personal Study Notes">
         <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<BasicLoading />}>
+          <Suspense fallback={<StudyNotesLoadingFallback />}>
             <KanjiStudyNotes key={kanji} kanji={kanji} />
           </Suspense>
         </ErrorBoundary>
