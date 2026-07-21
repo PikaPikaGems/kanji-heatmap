@@ -5,6 +5,7 @@ import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
+import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 import { StudyNotesFullscreenEditor } from "./StudyNotesFullscreenEditor";
 import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
@@ -100,18 +101,12 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
             </div>
           ) : (
             <>
+              <StudyNotesEditorTips className="mb-3" />
               <MarkdownEditor
                 value={notes}
                 maxLength={MAX_STUDY_NOTE_LENGTH}
                 onChange={persistNotes}
               />
-              <p className="mt-3 text-xs leading-snug text-muted-foreground">
-                Fun fact! Japanese texts are clickable in View Mode. <br />
-                Optional special syntax:{" "}
-                <code className="text-[0.7rem] break-all">
-                  {`:vocab[日本語]{kana="にほんご" definition="Japanese language (my own definition)"}`}
-                </code>
-              </p>
             </>
           )}
         </TabsContent>
