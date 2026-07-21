@@ -51,6 +51,19 @@ beforeAll(() => {
     cancel: vi.fn(),
     speak: vi.fn(),
   });
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      onchange: null,
+    }))
+  );
 });
 
 afterAll(() => {
@@ -171,6 +184,69 @@ describe("KanjiStudyNotes", () => {
     expect(
       screen.getByRole("textbox", { name: "Kanji study notes Markdown" })
     ).toHaveValue("**学ぶ**");
+  });
+
+  it("opens edit mode when the empty preview is clicked", async () => {
+    const user = userEvent.setup();
+    render(<KanjiStudyNotes kanji="空" />);
+
+    await user.click(screen.getByRole("tab", { name: "View Mode" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: /Your notes are empty\. Start writing to see them here\./,
+      })
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: "Kanji study notes Markdown" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Edit Mode" })).toHaveAttribute(
+      "data-state",
+      "active"
+    );
+  });
+
+  it("opens a fullscreen editor for coarse pointers", async () => {
+    const user = userEvent.setup();
+    const matchMedia = vi.mocked(window.matchMedia);
+    matchMedia.mockImplementation((query) => ({
+      matches: query === "(pointer: coarse)",
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      onchange: null,
+    }));
+
+    try {
+      render(<KanjiStudyNotes kanji="手" />);
+
+      expect(
+        screen.getByRole("button", { name: "Start writing" })
+      ).toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Start writing" }));
+
+      expect(
+        screen.getByRole("heading", { name: /Study Notes/ })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("textbox", { name: "Kanji study notes Markdown" })
+      ).toBeInTheDocument();
+    } finally {
+      matchMedia.mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onchange: null,
+      }));
+    }
   });
 
   it("does not render raw HTML or javascript: links in preview", () => {

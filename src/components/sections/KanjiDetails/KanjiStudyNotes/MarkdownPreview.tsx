@@ -109,8 +109,27 @@ const components: Components = {
   span: MarkdownSpan,
 };
 
-export const MarkdownPreview = ({ source }: { source: string }) => {
+export const MarkdownPreview = ({
+  source,
+  onEmptyClick,
+}: {
+  source: string;
+  /** When set, the empty state becomes a control that starts editing. */
+  onEmptyClick?: () => void;
+}) => {
   if (source.trim().length === 0) {
+    if (onEmptyClick != null) {
+      return (
+        <button
+          type="button"
+          onClick={onEmptyClick}
+          className="block w-full px-4 pb-8 text-base text-center pt-11 text-muted-foreground hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Your notes are empty. Start writing to see them here.
+        </button>
+      );
+    }
+
     return (
       <p className="px-4 pb-8 text-base text-center pt-11 text-muted-foreground">
         Your notes are empty. Start writing to see them here.
