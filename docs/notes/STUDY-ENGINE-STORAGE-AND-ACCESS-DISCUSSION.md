@@ -27,18 +27,18 @@ their data is not lost.
 - V2 already has a checkpoint-style path for **devices**: bootstrap from card
   projections and compact daily summaries, not the full event log.
 - Compacting `account_changes` (the sync delivery log) is the first safe
-  cleanup lever in the written plan.
-- Under the current plan, compacting `account_changes` does **not** delete
-  `review_events`. Immutable review events remain in Postgres.
+  cleanup lever and remains independent of event archival.
+- V2 keeps 90 days of `review_events` in Postgres and retains older events in
+  private R2 Standard account-month chunks.
 - Weekly/biweekly **deletion** of review events is risky because late offline
-  reviews need the full event stream for that card to rebuild correctly.
+  reviews require ordered replay. The adopted design instead uses verified cold
+  facts plus a per-card archive-boundary checkpoint and hot tail.
 - The existing **14-day offline access window** is already the user-facing
   “come online periodically” rule. Framing it as “open the app online at least
   every couple of weeks” matches the plan; weekly is stricter than necessary
   unless the grant window is shortened.
-- If Postgres cannot hold unbounded event history, prefer **cold archival**
-  (events leave SQL but remain reloadable) over checkpoint deletion. That
-  option is sketched later in this note; it is not spelled out in V2 yet.
+- Cold archival is part of V2: events leave SQL only after object readback,
+  checksum verification, and replay parity, and remain reloadable indefinitely.
 
 ---
 
@@ -147,10 +147,12 @@ online again.
 
 ## Where backend event logs are stored
 
-In V2, backend review history lives in the relational database (Postgres, or
-equivalent) as the `review_events` table.
+V2 keeps a rolling 90-day event tail in Postgres and archives older immutable
+events to a private Cloudflare R2 Standard bucket. R2 events are retained
+indefinitely so they remain available for projection rebuild, audit, and
+disaster recovery.
 
-Logical columns:
+The hot `review_events` table and each serialized cold event contain:
 
 - `account_id`
 - `event_id`
@@ -163,7 +165,7 @@ Logical columns:
 - `local_date`
 - `utc_offset_minutes`
 
-The plan keeps these rows as the scheduling source of truth for:
+Hot and cold events together remain the scheduling source of truth for:
 
 - Audit
 - Projection rebuild
@@ -180,171 +182,181 @@ bootstrap from:
 Bootstrap is described in V2 as the V1 checkpoint format for devices. Full-log
 replay is a backend recovery/verification tool, not the normal new-device path.
 
-### Compacting `account_changes` vs keeping events
+### Review-volume-safe sync infrastructure
 
-Even after `account_changes` is compacted:
+Archiving `review_events` would not bound SQL growth if each review also left
+another permanent row in `processed_operations` or `account_changes`.
 
-- **Yes, all `review_events` are still kept** under the current written plan.
-- Change-log compaction only shrinks the sync delivery queue once clients can
-  catch up via bootstrap.
-- Event retention is explicitly independent of that cleanup.
+V2 therefore uses three separate rules:
 
-Rough capacity intuition (order of magnitude only):
+- Review-event `operationId` equals `event.id`. The backend deduplicates review
+  pushes with the `review_events` primary key and unique device sequence; it
+  does not create a second permanent `processed_operations` row per review.
+- Non-review typed upserts continue to use `processed_operations`.
+- `account_changes` is compacted after supported clients can bootstrap beyond
+  its compaction frontier.
 
-- Each event row is small (hundreds of bytes with indexes).
-- The plan’s stress test (about 2.19M events: 2,000/day for three years) is an
-  abuse/benchmark bound, not a typical user.
-- Postgres is likely fine early; pressure appears at many accounts × long
-  unbounded retention.
-
----
-
-## Cold archival option (if SQL cannot hold unbounded events)
-
-This section entertains the constraint: **we may not have bandwidth/capacity
-to keep every review event in Postgres forever.**
-
-Cold archival is a coherent extension of V2. It is **not** yet specified in
-the plan document.
-
-### Goal
-
-Bound Postgres event storage while preserving rebuildability, instead of
-weekly checkpoint deletion.
-
-### Hot vs cold
-
-**Keep hot in Postgres:**
-
-- Card projections (current scheduling state)
-- Review daily summaries (dashboard)
-- Pile, notes, bookmarks, settings
-- A recent tail of `review_events` for late offline sync and cheap single-card
-  replay
-- Sync infra (`account_changes` window, `processed_operations`)
-
-**Move cold (object storage such as S3/R2/GCS, or another cheap append-only
-store):**
-
-- Older immutable `review_events` past the chosen hot retention window
-
-### Suggested policy
-
-1. **Hot retention window** — e.g. 30–90 days of events in Postgres.
-   Must be ≥ the offline access window (14 days is the product floor, not
-   necessarily the archive floor).
-2. **Archive frontier** — events older than the hot window are written to cold
-   storage, then deleted or marked archived in Postgres.
-3. Per card, archive only events that are strictly before that card’s current
-   projection frontier. Do not drop events still required to explain the live
-   projection unless cold metadata can reload them.
-
-### Rebuild behavior after archival
-
-| Operation                             | Behavior                                                 |
-| ------------------------------------- | -------------------------------------------------------- |
-| Normal sync / new review              | Hot events + current projection only                     |
-| Late offline review inside hot window | Replay from hot Postgres events                          |
-| Full card rebuild / disaster recovery | Load that card’s cold segment(s) + hot tail, then replay |
-| New device bootstrap                  | Still projections + summaries; no full event download    |
-
-Devices stay cheap. Only the backend pays cold-fetch cost, and mainly on rare
-rebuild paths.
-
-### Example cold layout
-
-```text
-events/{account_id}/{kanji}/{card_type}/{chunk_id}.jsonl.gz
-```
-
-or by time:
-
-```text
-events/{account_id}/{yyyy}/{mm}/part-000.jsonl.gz
-```
-
-Chunks should be append-only and immutable. Postgres can keep a small index,
-for example:
-
-```text
-review_event_archives
-  account_id
-  kanji / card_type (or null for account-wide chunks)
-  from_order_key
-  to_order_key
-  object_uri
-  event_count
-  archived_at
-```
-
-### Soft archival vs hard deletion
-
-**A. Soft archival (recommended under the capacity constraint):**
-
-- Events leave Postgres but remain reloadable from cold storage.
-- Extremely late rebuilds are slower (cold fetch + replay) but still correct.
-- Matches “events remain authoritative.”
-
-**B. Hard deletion after some cold TTL:**
-
-- Eventually drop cold events too.
-- Ancient late offline histories can no longer be perfectly replayed.
-- Projections become the practical source of truth past that point.
-- Real correctness/product tradeoff; not free.
-
-For “SQL is too expensive, but we still care about recoverability,” choose
-**A**.
-
-### Interaction with the 14-day offline rule
-
-- Archive only after a window larger than 14 days (e.g. ≥ 30–90 days hot).
-- Normal offline users should not hit cold storage on sync.
-- Extremely stale devices may need a cold fetch for affected cards, or reviews
-  older than the offline window are rejected (V2 already validates timestamps
-  against the 14-day window).
-- User-facing guidance can remain: be online within the offline access window
-  so sync and offline access stay valid. Archival is an ops concern behind
-  that.
-
-### Relationship to earlier checkpoint idea
-
-| Approach                            | What happens to events              | Risk                                      |
-| ----------------------------------- | ----------------------------------- | ----------------------------------------- |
-| Weekly/biweekly checkpoint deletion | Delete history; keep snapshot only  | Breaks late offline replay / rebuild      |
-| Compact `account_changes` only      | Events stay in Postgres             | Does not solve unbounded event SQL growth |
-| Soft cold archival                  | Events leave SQL, remain reloadable | Extra infra; rare rebuilds slower         |
-| Hard delete after cold TTL          | Events eventually gone              | Lose perfect ancient replay               |
-
-Cold archival is the option that addresses SQL capacity without treating the
-checkpoint as “delete the source of truth every two weeks.”
-
-### Cost shape under cold archival
-
-- SQL holds a **bounded** event tail per account, not unbounded history.
-- Object storage holds the long tail cheaply.
-- Rebuild jobs become “fetch cold chunks for N cards” rather than unbounded
-  hot-table growth.
-- `account_changes` compaction remains independent and should still happen.
+The non-review receipt table is low-volume rather than strictly bounded. Its
+retention can be revisited from measured usage; it is not multiplied by the
+146-million-review planning bound. These cleanup paths are independent of cold
+archival.
 
 ---
 
-## Practical stance distilled from the discussion
+## Back-of-the-envelope capacity and cost
 
-1. **Devices:** already checkpoint-like via bootstrap projections + summaries.
-2. **Sync delivery log:** compact `account_changes` when safe.
-3. **Review events (current V2 text):** stay in Postgres `review_events`.
-4. **If Postgres cannot afford that:** add soft cold archival (hot tail in SQL,
-   long tail in object storage, reload on rebuild).
-5. **User messaging:** align with the 14-day offline access window rather than
-   inventing a separate weekly deletion policy.
-6. **Entitlement:** premium check gates cloud/sync; offline grant separately
-   gates cached local access for 14 days.
+Estimate dated **July 21, 2026**. It is a planning bound, not a vendor quote.
+All figures are in USD.
 
-## Open follow-ups
+### Workload assumption
 
-- Whether to add an explicit “Event cold archival” section to
-  `STUDY-ENGINE-PLAN-V2.md`.
-- Concrete hot retention length (30 vs 90 days, etc.).
-- Whether hard deletion after a cold TTL is ever acceptable for this product.
-- Storage/cost budgets from the plan’s review-history stress test once
-  measured.
+- 2,000 daily active users
+- 200 review ratings per user per day
+- 400,000 review events per day
+- 146,000,000 review events per year
+- 4.63 ratings per second on average
+
+Two hundred ratings means 20 ten-item rounds. That is plausible for a heavy
+learner. Assuming every one of 2,000 registered users does this every day is
+deliberately generous. For comparison, 25% daily activity at 100 ratings per
+active user produces 18.25 million events per year, one eighth of the planning
+bound.
+
+### SQL storage assumption
+
+Budget **1 to 1.5 KB of attributable hot SQL storage per accepted rating**.
+This is intentionally conservative and includes the event heap row, primary
+key and replay indexes, page overhead/bloat allowance, and bounded sync
+infrastructure attributable to reviews. It assumes review pushes do not create
+a second permanent idempotency row.
+
+Without archival:
+
+- End-of-year event-attributable SQL: **146 to 219 GB**
+- Average first-year stored amount while growing linearly: **73 to 109.5 GB**
+
+With a rolling 90-day hot tail:
+
+- Steady hot event footprint: **36 to 54 GB**
+- Average first-year hot amount during the initial ramp and steady tail:
+  approximately **31.6 to 47.3 GB**
+
+Actual size must be measured from representative data before selecting the
+production plan:
+
+```sql
+SELECT count(*) FROM review_events;
+SELECT pg_total_relation_size('review_events');
+SELECT pg_indexes_size('review_events');
+```
+
+The benchmark should also measure bounded `account_changes`, non-review
+`processed_operations`, autovacuum behavior, write-ahead log volume, backups,
+and projection-rebuild compute.
+
+### Render estimate
+
+Current references:
+
+- [Render pricing](https://render.com/pricing)
+- [Render Postgres flexible plans](https://render.com/docs/postgresql-refresh)
+
+Render bills Postgres storage at **$0.30 per GB-month** independently of
+compute.
+
+- No archival, Basic-1GB compute at $19/month: approximately **$491 to
+  $622/year**. This is a price floor, not a recommendation; 1 GB RAM is risky
+  for this row count and rebuild workload.
+- No archival, Pro-4GB compute at $55/month: approximately **$923 to
+  $1,054/year**.
+- Ninety-day hot retention, Pro-4GB compute: approximately **$774 to
+  $830/year**, plus negligible R2 cost.
+
+These figures exclude the FastAPI web service/worker, observability, taxes,
+unusual bandwidth, and backup charges not included by the selected plan.
+Render storage cannot be reduced after provisioning, so archival must start
+before autoscaling permanently raises allocated capacity. Deleted pages should
+be reused through normal autovacuum; routine `VACUUM FULL` is not part of the
+plan.
+
+### Heroku estimate
+
+Current references:
+
+- [Heroku pricing](https://www.heroku.com/pricing/)
+- [Heroku Postgres plans](https://elements.heroku.com/addons/heroku-postgresql)
+
+Heroku plans have fixed storage tiers:
+
+- Essential-2 provides 32 GB at $20/month and does not fit the generous
+  90-day estimate.
+- Standard-0 provides 64 GB at $50/month, or **$600/year**. A 36 to 54 GB hot
+  tail can fit, but the upper bound leaves little room for projections,
+  sync tables, bloat, and operational headroom.
+- Without archival, the first-year 146 to 219 GB endpoint requires at least
+  Standard-2 with 256 GB at $200/month, or **$2,400/year**. The upper estimate
+  is still close enough to the tier limit to require measurement.
+
+Heroku's tier jump makes archival financially more significant than on Render.
+Render's independently scalable storage is the safer initial choice while
+actual row size and active-user behavior are unknown.
+
+### Cloudflare R2 estimate
+
+Current reference:
+[Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/).
+
+R2 Standard includes 10 GB-month of storage, 1 million Class A operations, and
+10 million Class B operations per month. Additional storage is $0.015 per
+GB-month with no internet-egress charge.
+
+Assume compressed canonical JSON Lines consumes 100 to 300 bytes per event:
+
+- At the end of year one, approximately 110 million events are older than 90
+  days: **11 to 33 GB** compressed.
+- First-year R2 Standard storage and operation cost should be approximately
+  **$0 to $2** after the monthly free tier.
+- Each later full year adds roughly **15 to 44 GB**, approximately $0.23 to
+  $0.66 per month at current storage rates.
+
+Account-month chunks create about 24,000 objects per year for 2,000 accounts,
+far below the monthly Class A free allowance. R2 Infrequent Access has no
+Standard free tier and adds retrieval charges, so Standard is simpler and
+likely cheaper at this scale.
+
+---
+
+## Adopted cold-archival policy
+
+The detailed design lives in
+[`STUDY-ENGINE-EVENT-COLD-ARCHIVAL-PLAN.md`](./STUDY-ENGINE-EVENT-COLD-ARCHIVAL-PLAN.md).
+
+The resolved policy is:
+
+- Keep 90 rolling days of events in Postgres.
+- Run the archiver daily or weekly; do not perform one large migration every
+  90 days.
+- Store one or more immutable `jsonl.gz` chunks per account/month in a private
+  R2 Standard bucket.
+- Keep verified R2 events indefinitely.
+- Maintain a rebuildable per-card archive-boundary checkpoint so a late event
+  inside the 14-day offline window replays from checkpoint + hot tail without
+  fetching cold history.
+- Do not purge SQL until object readback, checksum verification, and replay
+  parity all pass.
+- If verification fails, retain SQL rows and alert.
+- New-device bootstrap remains projections + summaries; it never downloads
+  cold events.
+- Full settings/FSRS-version rebuilds and disaster recovery read cold + hot
+  facts through the canonical Python adapter.
+- Account deletion removes the account's hot rows, archive manifests,
+  checkpoints, and R2 objects.
+
+No event becomes eligible before day 91. The archive writer and validation path
+can therefore ship behind feature flags before the first purge. Correctness
+wins over the retention target: if purge readiness is late, Postgres grows
+temporarily rather than deleting an unverified source of truth.
+
+The user-facing offline guidance remains tied to the 14-day access grant, not
+to archival. Premium entitlement still gates cloud sync; the offline grant
+separately gates cached local access.
