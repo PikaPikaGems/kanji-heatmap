@@ -112,7 +112,7 @@ const components: Components = {
 export const MarkdownPreview = ({ source }: { source: string }) => {
   if (source.trim().length === 0) {
     return (
-      <p className="px-4 py-8 text-sm text-center text-muted-foreground">
+      <p className="px-4 pb-8 text-base text-center pt-11 text-muted-foreground">
         Your notes are empty. Start writing to see them here.
       </p>
     );
