@@ -146,6 +146,27 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
   };
 };
 
+/** Kanji → jōyō school grade from the extended cache (ready once worker is). */
+export const useJouyouGradeMap = () => {
+  const ready = useIsKanjiWorkerReady();
+
+  const state = useWorkerQuery<Record<string, number>>(
+    ready
+      ? () =>
+          requestWorker({
+            type: "jouyou-grade-map",
+          }) as Promise<Record<string, number>>
+      : null,
+    [ready]
+  );
+
+  return {
+    status: state.status,
+    data: state.data,
+    error: (state.error as string | undefined) ?? null,
+  };
+};
+
 export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
   const ready = useIsKanjiWorkerReady();
 

@@ -123,6 +123,7 @@ export type KanjiWorkerRequestName =
   | "initialize-segmented-vocab-map"
   | "initialize-decomposition-map"
   | "kanji-main-map"
+  | "jouyou-grade-map"
   | "phonetic-map"
   | "part-keyword-map"
   | "retrieve-vocab-info";
