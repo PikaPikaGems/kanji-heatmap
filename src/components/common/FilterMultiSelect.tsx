@@ -22,7 +22,7 @@ export const FilterMultiSelect = <T extends string>({
   placeholder: string;
 }) => {
   const id = useId();
-  const fieldId = `${label.toLowerCase().replaceAll(" ", "-")}-${id}`;
+  const fieldId = `${label.toLowerCase().replace(/\s+/g, "-")}-${id}`;
 
   return (
     <div>
