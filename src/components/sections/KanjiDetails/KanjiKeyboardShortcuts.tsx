@@ -7,6 +7,7 @@ import { useSetOpenedParam } from "@/hooks/routing-hooks";
 import { GLOBAL_KEYBOARD_SHORTCUTS } from "@/lib/options/constants";
 import { useChangeFont } from "@/hooks/use-change-font";
 import { Keyboard } from "@/components/icons";
+import { checkIfInputField } from "@/lib/utils";
 
 const kbdClass =
   "h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[12px] font-medium opacity-100 sm:flex";
@@ -51,9 +52,18 @@ export const KanjiKeyboardShortcuts = ({ kanji }: { kanji: string }) => {
   };
 
   useKeyboardListener({
-    ArrowLeft: prevKanji,
-    ArrowRight: nextKanji,
-    "!": speakKanji,
+    ArrowLeft: (event) => {
+      if (checkIfInputField(event.target as HTMLElement)) return;
+      prevKanji();
+    },
+    ArrowRight: (event) => {
+      if (checkIfInputField(event.target as HTMLElement)) return;
+      nextKanji();
+    },
+    "!": (event) => {
+      if (checkIfInputField(event.target as HTMLElement)) return;
+      speakKanji();
+    },
   });
 
   if (kanjis == null) {

@@ -8,7 +8,7 @@ import { vocabExternalLinks } from "@/lib/external-links";
 
 interface VocabPopoverContentProps {
   word: string;
-  kana: string;
+  kana?: string;
   wordKanjis: { kanji: string; keyword: string }[];
   definition?: string;
   optionalSection?: ReactNode;
@@ -42,14 +42,17 @@ export const VocabPopoverContent = ({
             {optionalSection}
             {definition && (
               <>
-                <SeeMore definition={definition} maxLen={150} />
+                <SeeMore
+                  definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
+                  maxLen={150}
+                />
               </>
             )}
           </div>
         </>
       )}
       <DottedSeparator />
-      <VocabActions kana={kana} word={word} />
+      <VocabActions kana={kana ?? ""} word={word} />
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore this word further →

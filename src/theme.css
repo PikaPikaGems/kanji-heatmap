@@ -19,6 +19,14 @@
   color: rgba(var(--theme-color-selected), 1);
 }
 
+.hover-text-theme-color-with-opacity-100:hover {
+  color: rgba(var(--theme-color-selected), 1);
+}
+
+.hover-background-theme-color-with-opacity-100:hover {
+  background-color: rgba(var(--theme-color-selected), 1);
+}
+
 .background-theme-color-with-opacity-0 {
   background-color: rgba(var(--theme-color-selected), 0);
 }

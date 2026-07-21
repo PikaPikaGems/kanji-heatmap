@@ -61,6 +61,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
+const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   const info = useKanjiRepresentativeWord(kanji);
@@ -124,6 +125,13 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Character Structure"}>
         <ErrorBoundary details="StructuralComposition in KanjiDetails">
           <StructureInfo kanji={kanji} />
+        </ErrorBoundary>
+      </SimpleAccordion>
+      <SimpleAccordion trigger="⭐️ Personal Study Notes">
+        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
+          <Suspense fallback={<BasicLoading />}>
+            <KanjiStudyNotes key={kanji} kanji={kanji} />
+          </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
       <SimpleAccordion trigger={"Frequency Ranks"}>
