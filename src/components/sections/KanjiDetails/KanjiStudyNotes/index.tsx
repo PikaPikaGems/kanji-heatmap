@@ -56,9 +56,6 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
               View Mode
             </TabsTrigger>
           </TabsList>
-          <p className="text-xs text-muted-foreground">
-            Saved automatically on this device
-          </p>
         </div>
         <TabsContent
           value="edit"

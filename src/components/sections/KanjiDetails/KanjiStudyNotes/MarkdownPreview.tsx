@@ -77,8 +77,14 @@ const components: Components = {
       {children}
     </blockquote>
   ),
+  // Fenced blocks are <pre><code>; keep line boxes tight (parent uses leading-7).
+  pre: ({ children }) => (
+    <pre className="my-2.5 overflow-x-auto rounded bg-muted-foreground/10 p-3 font-mono text-sm leading-none whitespace-pre [&_code]:m-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:leading-none">
+      {children}
+    </pre>
+  ),
   code: ({ children }) => (
-    <code className="px-1.5 py-0.5 font-mono text-[0.875em] rounded bg-muted">
+    <code className="m-0 p-0 leading-none tracking-tight !text-green-500 font-mono text-[0.875em] rounded bg-muted-foreground/10">
       {children}
     </code>
   ),

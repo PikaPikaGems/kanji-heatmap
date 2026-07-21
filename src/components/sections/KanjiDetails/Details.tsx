@@ -127,7 +127,7 @@ export const KanjiDetails = ({
           <StructureInfo kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger="Personal Study Notes">
+      <SimpleAccordion trigger="⭐️ Personal Study Notes">
         <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
           <Suspense fallback={<BasicLoading />}>
             <KanjiStudyNotes key={kanji} kanji={kanji} />

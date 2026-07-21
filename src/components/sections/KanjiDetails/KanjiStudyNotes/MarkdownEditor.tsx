@@ -64,7 +64,7 @@ export const MarkdownEditor = ({
           maxLength={maxLength}
           rows={8}
           spellCheck={false}
-          placeholder="Write Markdown notes here. Japanese texts are clickable in View Mode."
+          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable in View Mode."
           className={cn(
             sharedEditorTextClass,
             "relative block w-full h-64 resize-none bg-transparent outline-none",
@@ -73,8 +73,9 @@ export const MarkdownEditor = ({
             // Translucent wash (not opaque lime) so backdrop text stays readable.
             // Also beat global `::selection { color: black !important }`.
             "selection:!bg-[rgb(127_255_0_/_0.25)] selection:!text-transparent",
-            "selection:[-webkit-text-fill-color:transparent]"
-            // "placeholder:text-muted-foreground placeholder:[-webkit-text-fill-color:unset]"
+            "selection:[-webkit-text-fill-color:transparent]",
+            // Explicit fill (not unset) — unset inherits the parent's transparent fill.
+            "placeholder:text-muted-foreground placeholder:[-webkit-text-fill-color:hsl(var(--muted-foreground))]"
           )}
           onChange={(event) => onChange(event.target.value)}
           onScroll={syncScroll}
