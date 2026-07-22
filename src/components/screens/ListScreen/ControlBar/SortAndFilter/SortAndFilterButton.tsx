@@ -17,6 +17,9 @@ const ChangedIndicator = () => {
   );
 };
 
+// forwardRef required: rendered as the child of `<DialogTrigger asChild>` /
+// `<HoverCardTrigger asChild>` (SortAndFilterDialog, LazySortAndFilter) —
+// Radix injects a ref for focus-return and hover-card positioning.
 export const SortAndFilterButton = forwardRef<
   HTMLButtonElement,
   { onClick: () => void }
