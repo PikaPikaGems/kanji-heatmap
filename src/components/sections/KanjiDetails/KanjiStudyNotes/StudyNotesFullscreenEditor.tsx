@@ -1,5 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { CircleX } from "@/components/icons";
+import { CircleX, InfoIcon } from "@/components/icons";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { cn } from "@/lib/utils";
-import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 
@@ -69,9 +70,27 @@ export const StudyNotesFullscreenEditor = ({
               <span className="text-2xl leading-none kanji-font">{kanji}</span>
               <span>Study Notes</span>
             </DialogTitle>
-            <DialogDescription asChild>
-              <StudyNotesEditorTips />
+            <DialogDescription className="sr-only">
+              Write personal study notes for {kanji}.
             </DialogDescription>
+            <GenericPopover
+              trigger={
+                <button
+                  type="button"
+                  className="inline-flex items-center self-start gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8"
+                >
+                  <strong>Tips and optional syntax</strong>
+                  <InfoIcon size={14} />
+                </button>
+              }
+              content={
+                <div className="p-3 space-y-3 text-left">
+                  <StudyNotesEditorTips />
+                  <LocalStorageWarning className="pt-3 text-left border-t border-border" />
+                </div>
+              }
+              contentClassName="z-[70] m-0 w-[calc(100vw-2rem)] max-w-sm p-0"
+            />
             <DialogPrimitive.Close asChild className="absolute top-2 right-2">
               <Button
                 variant="ghost"
@@ -83,7 +102,7 @@ export const StudyNotesFullscreenEditor = ({
               </Button>
             </DialogPrimitive.Close>
           </DialogHeader>
-          <div className="flex flex-col flex-1 min-h-0 px-3 pt-3">
+          <div className="flex flex-col flex-1 min-h-0 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <MarkdownEditor
               value={value}
               maxLength={maxLength}
@@ -91,9 +110,6 @@ export const StudyNotesFullscreenEditor = ({
               fill
               autoFocus
             />
-          </div>
-          <div className="pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <LocalStorageWarning className="pb-2" />
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>
