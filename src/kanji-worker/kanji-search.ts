@@ -13,7 +13,6 @@ import {
   K_KKLC_INDEX,
   K_MEANING_KEY,
   K_RTK_INDEX,
-  K_RTKB_INDEX,
   K_STROKES,
   K_WK_LVL,
 } from "@/lib/options/options-constants";
@@ -265,7 +264,6 @@ const SORT_COMPARATORS: Record<string, SortComparator> = {
   [K_STROKES]: (a, b) => numericSort(a.extended.strokes, b.extended.strokes),
   [K_WK_LVL]: (a, b) => numericSort(a.extended.wk, b.extended.wk),
   [K_RTK_INDEX]: (a, b) => numericSort(a.extended.rtk, b.extended.rtk),
-  [K_RTKB_INDEX]: (a, b) => numericSort(a.extended.rtkb, b.extended.rtkb),
   [K_KKLC_INDEX]: (a, b) =>
     numericSort(a.extended.kklcIndex, b.extended.kklcIndex),
   [K_MEANING_KEY]: (a, b) => alphaSort(a.main.keyword, b.main.keyword),

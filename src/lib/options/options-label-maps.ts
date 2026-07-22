@@ -25,7 +25,6 @@ import {
   K_RANK_WIKIPEDIA_DOC,
   K_RANK_WKFR,
   K_RTK_INDEX,
-  K_RTKB_INDEX,
   K_STROKES,
   K_WK_LVL,
 } from "./options-constants";
@@ -42,20 +41,18 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_JOUYOU_KEY]: "Jouyou Grade",
   [K_STROKES]: "Stroke Count",
   [K_WK_LVL]: "WK",
-  [K_RTK_INDEX]: "RTKA",
-  [K_RTKB_INDEX]: "RTKB",
+  [K_RTK_INDEX]: "RTK",
   [K_MEANING_KEY]: "English Keyword",
   [K_KKLC_INDEX]: "KKLC",
 };
 
 export const orderDisclaimer =
-  "⚠️ Community-based orders (WK, KKLC, RTKA, RTKB) are provided may differ from official editions. For accuracy, please refer to the original books or apps.";
+  "⚠️ Community-based orders (WK, KKLC, RTK) are provided may differ from official editions. For accuracy, please refer to the original books or apps.";
 
 export const COMMUNITY_ORDER_KEYS = [
   K_WK_LVL,
   K_KKLC_INDEX,
   K_RTK_INDEX,
-  K_RTKB_INDEX,
 ] as const;
 
 export const isCommunityOrder = (key: string) =>
