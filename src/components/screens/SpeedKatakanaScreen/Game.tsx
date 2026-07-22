@@ -69,10 +69,10 @@ export const Game = ({
   const current = game.current;
 
   return (
-    <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
+    <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:700px)]:justify-center animate-fade-in-fast">
       <EndSession onClick={onEnd} />
 
-      <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
+      <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:700px)]:flex-none gap-3 text-center">
         <div className="flex items-center justify-center gap-1 pt-4">
           <span className="px-2 text-xs font-bold tabular-nums">
             {game.index + 1} / {game.wordCount}
