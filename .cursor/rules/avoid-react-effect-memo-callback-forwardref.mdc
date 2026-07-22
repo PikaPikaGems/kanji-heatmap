@@ -1,0 +1,47 @@
+---
+description: Avoid useEffect, useMemo, useCallback, and forwardRef unless truly necessary
+globs: **/*.{ts,tsx}
+alwaysApply: true
+---
+
+# Avoid unnecessary React hooks and forwardRef
+
+Prefer deriving values during render and using simpler React patterns. Do **not** reach for `useEffect`, `useMemo`, `useCallback`, or `forwardRef` by default.
+
+## useEffect — especially avoid
+
+Do **not** use `useEffect` unless you truly need it (syncing with an external system, subscriptions, timers, imperative DOM APIs, etc.).
+
+If there is no simpler alternative and you must use it, add a short comment at the effect explaining:
+
+1. Why the effect is required
+2. That there is no simpler way (e.g. not just “derive during render” or event handlers)
+
+```tsx
+// ❌ BAD — derived state / mirroring props
+useEffect(() => {
+  setFiltered(items.filter(fn));
+}, [items]);
+
+// ✅ GOOD — compute during render
+const filtered = items.filter(fn);
+
+// ✅ OK only when syncing with an external system, with a justifying comment
+// Needed: subscribe to the kanji worker; no render-time API for this.
+useEffect(() => {
+  const unsub = worker.subscribe(handler);
+  return unsub;
+}, [worker]);
+```
+
+## useMemo / useCallback
+
+Do **not** add `useMemo` or `useCallback` unless profiling or an existing repo pattern clearly requires them (e.g. a stable identity that a memoized child depends on). Prefer plain values and inline functions.
+
+If you must use them, add a brief comment why the memoization is necessary and why a simpler approach is insufficient.
+
+## forwardRef
+
+Do **not** use `forwardRef` unless a parent truly must get a DOM/component ref and there is no simpler alternative (e.g. lifting the node, composing without a ref).
+
+If you must use it, add a brief comment why the ref is required and why there is no simpler way.
