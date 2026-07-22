@@ -1,5 +1,9 @@
-import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
-import { ErrorSocialIcons, RefreshOrGoBackHome, Wrapper } from "./common";
+import {
+  ErrorSocialIcons,
+  ErrorToolbarCta,
+  RefreshOrGoBackHome,
+  Wrapper,
+} from "./common";
 import { Sumimasen } from "./Sumimasen";
 
 const DEFAULT_MESSAGE = "Welp... this isn’t supposed to happen! 🫣🫣";
@@ -10,8 +14,8 @@ type FallbackProps = {
 };
 
 /**
- * Alternative A — soft copy + icon row (current default direction).
- * Apology first, muted supporting line, then the usual social icons.
+ * Alternative A — soft copy + icon row.
+ * Apology first, then icons, then refresh copy underneath.
  */
 export const ErrorFallbackSoft = ({
   message = DEFAULT_MESSAGE,
@@ -36,8 +40,8 @@ export const ErrorFallbackSoft = ({
 };
 
 /**
- * Alternative B — toolbar row.
- * Puts social icons beside the refresh control, like the bottom bar.
+ * Alternative B — toolbar (current default).
+ * Linked “Say hi, report a bug, or refresh.” above the social icon row.
  */
 export const ErrorFallbackToolbar = ({
   message = DEFAULT_MESSAGE,
@@ -50,17 +54,7 @@ export const ErrorFallbackToolbar = ({
         <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
           {message}
         </p>
-        {showDefaultCta && (
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex items-center justify-center gap-1">
-              <ErrorSocialIcons />
-              <RefreshPageBtn />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Say hi, report a bug, or refresh.
-            </p>
-          </div>
-        )}
+        {showDefaultCta && <ErrorToolbarCta />}
       </div>
     </Wrapper>
   );
@@ -79,12 +73,7 @@ export const ErrorFallbackCompact = ({
       <div className="flex w-full max-w-xs flex-col items-center gap-4 animate-fade-in">
         <Sumimasen layout="inline" />
         <p className="text-xs font-semibold leading-relaxed">{message}</p>
-        {showDefaultCta && (
-          <div className="flex w-full flex-col items-center gap-3">
-            <ErrorSocialIcons />
-            <RefreshOrGoBackHome />
-          </div>
-        )}
+        {showDefaultCta && <ErrorToolbarCta />}
       </div>
     </Wrapper>
   );
@@ -92,7 +81,7 @@ export const ErrorFallbackCompact = ({
 
 /**
  * Alternative D — quiet / minimal.
- * Less emoji energy in the body copy; social icons carry the CTA.
+ * Less emoji energy in the body copy; icons carry the CTA.
  */
 export const ErrorFallbackQuiet = ({
   message = "Something went wrong on our side.",
@@ -116,17 +105,17 @@ export const ErrorFallbackQuiet = ({
 
 export const errorFallbackAlternatives = [
   {
+    id: "toolbar",
+    label: "Toolbar (default)",
+    description: "Say hi / report a bug / refresh above the social icon row.",
+    Component: ErrorFallbackToolbar,
+  },
+  {
     id: "soft",
-    label: "Soft (default)",
+    label: "Soft",
     description:
       "Stacked apology, medium message, icon row, then refresh copy.",
     Component: ErrorFallbackSoft,
-  },
-  {
-    id: "toolbar",
-    label: "Toolbar",
-    description: "Social icons + refresh button in one control row.",
-    Component: ErrorFallbackToolbar,
   },
   {
     id: "compact",

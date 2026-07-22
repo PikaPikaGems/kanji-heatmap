@@ -1,4 +1,4 @@
-import { ErrorSocialIcons, Wrapper } from "./common";
+import { ErrorToolbarCta, Wrapper } from "./common";
 import { Sumimasen } from "./Sumimasen";
 import { ClearFiltersCTA } from "../dependent/routing/ClearFiltersCTA";
 
@@ -10,7 +10,7 @@ export const NonIdealResultText = () => {
         those primarily used in proper nouns. As a result, some characters will
         be missing.
       </p>
-      <ErrorSocialIcons />
+      <ErrorToolbarCta />
     </div>
   );
 };

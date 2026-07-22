@@ -1,7 +1,7 @@
-import { ErrorFallbackSoft } from "./ErrorFallbackAlternatives";
+import { ErrorFallbackToolbar } from "./ErrorFallbackAlternatives";
 
 /**
- * Default full-page unexpected-error fallback.
+ * Default full-page unexpected-error fallback (Toolbar layout).
  * Sibling alternatives live in `ErrorFallbackAlternatives.tsx`
  * (preview at `/error-fallback-preview`).
  */
@@ -13,6 +13,6 @@ export const DefaultErrorFallback = ({
   showDefaultCta?: boolean;
 }) => {
   return (
-    <ErrorFallbackSoft message={message} showDefaultCta={showDefaultCta} />
+    <ErrorFallbackToolbar message={message} showDefaultCta={showDefaultCta} />
   );
 };

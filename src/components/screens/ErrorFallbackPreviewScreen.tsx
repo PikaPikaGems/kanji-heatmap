@@ -1,5 +1,29 @@
 import { errorFallbackAlternatives } from "@/components/error/ErrorFallbackAlternatives";
+import { KanjiNotFound } from "@/components/error/KanjiNotFound";
+import { NoSearchResults } from "@/components/error/NoSearchResults";
+import { PageNotFound } from "@/components/error/PageNotFound";
 import { BottomBar } from "@/components/common/BottomBar";
+
+const relatedStates = [
+  {
+    id: "page-not-found",
+    label: "PageNotFound",
+    description: "Unknown route / 404.",
+    node: <PageNotFound />,
+  },
+  {
+    id: "no-search-results",
+    label: "NoSearchResults",
+    description: "Empty kanji search / filters.",
+    node: <NoSearchResults />,
+  },
+  {
+    id: "kanji-not-found",
+    label: "KanjiNotFound",
+    description: "Character outside the heatmap corpus.",
+    node: <KanjiNotFound kanji="龍" />,
+  },
+] as const;
 
 /**
  * Temporary gallery for picking a default error-boundary fallback.
@@ -13,8 +37,8 @@ export const ErrorFallbackPreviewScreen = () => {
           Error fallback alternatives
         </h1>
         <p className="text-sm text-muted-foreground">
-          Soft is wired as the current default. Compare spacing and icon CTAs
-          below, then we can lock one in.
+          Toolbar is the current default. Linked hi / bug / refresh sit above
+          the icon row.
         </p>
       </header>
 
@@ -35,6 +59,31 @@ export const ErrorFallbackPreviewScreen = () => {
             </section>
           )
         )}
+      </div>
+
+      <header className="mb-6 mt-12 space-y-2 text-center">
+        <h2 className="text-lg font-semibold tracking-tight">
+          Related empty / not-found states
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Same toolbar CTA treatment for consistency.
+        </p>
+      </header>
+
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+        {relatedStates.map(({ id, label, description, node }) => (
+          <section
+            key={id}
+            id={id}
+            className="overflow-hidden rounded-2xl border border-border/60"
+          >
+            <div className="space-y-1 border-b border-border/60 px-4 py-3 text-left">
+              <h3 className="text-sm font-semibold">{label}</h3>
+              <p className="text-xs text-muted-foreground">{description}</p>
+            </div>
+            <div className="min-h-80 bg-background">{node}</div>
+          </section>
+        ))}
       </div>
 
       <BottomBar justify="center" />

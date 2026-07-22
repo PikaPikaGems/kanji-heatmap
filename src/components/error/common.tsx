@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { cnTextLink } from "@/lib/generic-cn";
+import { outLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
 
 export const RefreshOrGoBackHome = () => {
@@ -17,6 +19,26 @@ export const RefreshOrGoBackHome = () => {
         refreshing the page
       </button>{" "}
       or try again later.
+    </p>
+  );
+};
+
+/** Linked CTA: Discord / GitHub issue / reload — shown above the icon row. */
+export const SayHiReportOrRefresh = () => {
+  return (
+    <p className="text-xs text-muted-foreground">
+      Say <ExternalTextLink href={outLinks.discord} text="hi" />, report a{" "}
+      <ExternalTextLink href={outLinks.githubIssue} text="bug" />, or{" "}
+      <button
+        type="button"
+        className={cnTextLink}
+        onClick={() => {
+          window?.location.reload();
+        }}
+      >
+        refresh
+      </button>
+      .
     </p>
   );
 };
@@ -50,6 +72,16 @@ export const ErrorSocialIcons = ({ className }: { className?: string }) => {
       )}
     >
       <LinksOutItems />
+    </div>
+  );
+};
+
+/** Text CTA above icons (toolbar layout). */
+export const ErrorToolbarCta = ({ className }: { className?: string }) => {
+  return (
+    <div className={cn("flex w-full flex-col items-center gap-3", className)}>
+      <SayHiReportOrRefresh />
+      <ErrorSocialIcons />
     </div>
   );
 };
