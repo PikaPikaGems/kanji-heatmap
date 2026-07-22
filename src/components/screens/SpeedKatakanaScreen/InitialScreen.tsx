@@ -76,7 +76,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     <div className="relative flex flex-col w-full h-full animate-fade-in">
       <LeavePractice />
       <div className="flex-1 min-h-0 pl-4 pr-2 overflow-auto">
-        <div className="flex flex-col justify-center w-full max-w-lg min-h-full gap-6 px-1 mx-auto">
+        <div className="flex flex-col w-full max-w-lg gap-6 px-1 py-6 mx-auto">
           <div className="flex flex-col items-center gap-1 px-6">
             <h1 className="pt-4 text-lg font-bold text-center">
               {speedKatakanaPageMeta.heading}
