@@ -12,18 +12,18 @@ export const FilterToggleRow = ({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) => (
-  <div className="flex items-center justify-between gap-3 rounded-md border border-border/60 bg-muted/30 px-3 py-2.5 sm:gap-4">
-    <Label
-      htmlFor={id}
-      className="min-w-0 flex-1 text-sm leading-snug cursor-pointer"
-    >
-      {label}
-    </Label>
+  <div className="flex items-center gap-3 rounded-md py-2.5 ">
     <Switch
       id={id}
       checked={checked}
       onCheckedChange={onChange}
       className="shrink-0"
     />
+    <Label
+      htmlFor={id}
+      className="flex-1 min-w-0 text-sm leading-snug cursor-pointer"
+    >
+      {label}
+    </Label>
   </div>
 );

@@ -15,7 +15,7 @@ export const StrokeCountField = ({
 
   return (
     <div className="w-full">
-      <Label className="text-xs font-thin" htmlFor={fieldId}>
+      <Label className="text-xs" htmlFor={fieldId}>
         Stroke Count
       </Label>
       <DualRangeSlider
