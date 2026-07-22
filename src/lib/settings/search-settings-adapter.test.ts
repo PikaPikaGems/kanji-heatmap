@@ -88,7 +88,7 @@ describe("search settings ↔ URL params round-trip", () => {
     expect(params.toString()).toBe("");
   });
 
-  it("ignores invalid Jōyō-grade values from the URL", () => {
+  it("ignores invalid Jouyou-grade values from the URL", () => {
     const params = new URLSearchParams("filter-jouyou-grade=1,invalid,none");
     expect(toSearchSettings(params).filterSettings.jouyouGrade).toEqual([
       "1",

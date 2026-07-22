@@ -42,7 +42,7 @@ test.describe("sort and filter", () => {
     await expect(page.getByText(/\d+ Items/)).toBeVisible({ timeout: 30_000 });
   });
 
-  test("Jōyō-grade filter from the dialog updates the URL", async ({
+  test("Jouyou-grade filter from the dialog updates the URL", async ({
     page,
   }) => {
     await page.goto("/");

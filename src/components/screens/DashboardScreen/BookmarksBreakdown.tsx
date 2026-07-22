@@ -132,7 +132,7 @@ export const BookmarksBreakdown = () => {
       const meta = JouyouGradeListItems[grade];
       return {
         key: String(grade),
-        label: meta.label !== "Not in Jōyō" ? meta.label : "~",
+        label: meta.label !== "Not in Jouyou" ? meta.label : "~",
         cn: meta.cn,
         bookmarked: next[grade].bookmarked,
         total: next[grade].total,
@@ -149,7 +149,7 @@ export const BookmarksBreakdown = () => {
 
   const bands = showGrade ? gradeBands : jlptBands;
   const description = showGrade
-    ? "How much of each jōyō grade you've bookmarked. Bookmark a word from a kanji’s detail drawer to start filling these bars."
+    ? "How much of each jouyou grade you've bookmarked. Bookmark a word from a kanji’s detail drawer to start filling these bars."
     : "How much of each JLPT band you've bookmarked. Bookmark a word from a kanji’s detail drawer to start filling these bars.";
 
   return (

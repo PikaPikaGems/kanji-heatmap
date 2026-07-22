@@ -23,7 +23,7 @@ describe("useSortAndFilterForm", () => {
     expect(result.current.isDisabled).toBe(false);
   });
 
-  it("tracks Jōyō-grade edits in the filter values", () => {
+  it("tracks Jouyou-grade edits in the filter values", () => {
     const { result } = renderHook(() => useSortAndFilterForm(initial));
 
     act(() => result.current.setJouyouGrade(["1", "none"]));

@@ -172,7 +172,7 @@ describe("filterKanji", () => {
     expect(result).toEqual(["水"]);
   });
 
-  it("filters by one or more Jōyō grades", () => {
+  it("filters by one or more Jouyou grades", () => {
     expect(
       filterKanji(allKanji, settings({ jouyouGrade: ["1"] }), pool)
     ).toEqual(["水"]);
@@ -181,7 +181,7 @@ describe("filterKanji", () => {
     ).toEqual(["水", "山"]);
   });
 
-  it("filters for kanji without an assigned Jōyō grade", () => {
+  it("filters for kanji without an assigned Jouyou grade", () => {
     expect(
       filterKanji(allKanji, settings({ jouyouGrade: ["none"] }), pool)
     ).toEqual(["火"]);
@@ -200,7 +200,7 @@ describe("filterKanji", () => {
     ).toEqual(allKanji);
   });
 
-  it("combines JLPT and Jōyō-grade filters", () => {
+  it("combines JLPT and Jouyou-grade filters", () => {
     expect(
       filterKanji(
         allKanji,

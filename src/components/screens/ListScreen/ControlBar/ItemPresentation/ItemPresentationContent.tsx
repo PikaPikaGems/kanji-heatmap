@@ -85,7 +85,7 @@ const CardStateSettings = () => {
         options={[
           { value: "jlpt", label: "JLPT Level" },
           { value: "study-status", label: "Study Status" },
-          { value: "grade", label: "Jōyō Grade" },
+          { value: "grade", label: "Jouyou Grade" },
           { value: "none", label: "None" },
         ]}
       />

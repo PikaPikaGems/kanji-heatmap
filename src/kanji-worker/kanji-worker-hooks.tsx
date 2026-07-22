@@ -166,7 +166,7 @@ const fetchJouyouGradeMap = () => {
   return jouyouGradeMapPromise;
 };
 
-/** Kanji → jōyō school grade from the extended cache (ready once worker is). */
+/** Kanji → jouyou school grade from the extended cache (ready once worker is). */
 export const useJouyouGradeMap = (enabled = true) => {
   const ready = useIsKanjiWorkerReady();
 
