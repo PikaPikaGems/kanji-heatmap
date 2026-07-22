@@ -17,6 +17,9 @@ type DashedNavLinkProps = {
   iconClassName?: string;
 };
 
+// forwardRef required: HeaderDrawer wraps this in `<DrawerClose asChild>` via
+// DashedNavLinkList's `wrapItem`, which injects a ref (vaul needs the anchor
+// node to close the drawer / restore focus).
 export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
   (
     {

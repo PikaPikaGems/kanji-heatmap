@@ -5,6 +5,10 @@ import {
   subscribeToRememberedHomeSearch,
 } from "@/lib/home-search-memory";
 
+// forwardRef required: DashedNavLink passes an explicit ref, and this link is
+// rendered as the direct child of `asChild` elements (DrawerClose in
+// HeaderDrawer, NavigationMenuLink in Nav, Button in SpeedKatakanaHeatmapGrid)
+// whose Slot injects a ref into it for focus/positioning.
 export const RememberedHomeLink = forwardRef<HTMLAnchorElement, LinkProps>(
   (props, ref) => {
     const rememberedHomeHref = useSyncExternalStore(

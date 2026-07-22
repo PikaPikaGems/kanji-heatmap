@@ -25,6 +25,8 @@ interface TriggerProps {
   onBlur?: () => void;
 }
 
+// forwardRef required: rendered as the child of `<HoverCardTrigger asChild>`
+// in HoverKanji — Radix injects a ref to anchor the hover card to this button.
 const KanjiItemButton = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
     const { kanji, onClick, ...rest } = props;
