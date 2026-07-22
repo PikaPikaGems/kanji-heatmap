@@ -1,4 +1,5 @@
 import { JLTPTtypes } from "../jlpt";
+import { JouyouGradeType } from "../jouyou-grade";
 import { FrequencyType, SortKey } from "../options/options-types";
 
 export const SEARCH_TYPE_ARR = [
@@ -25,6 +26,7 @@ export type TextSearch = {
 export type FilterSettings = {
   strokeRange: { min: number; max: number };
   jlpt: JLTPTtypes[];
+  jouyouGrade: JouyouGradeType[];
   freq: {
     source: FrequencyType;
     rankRange: { min: number; max: number };

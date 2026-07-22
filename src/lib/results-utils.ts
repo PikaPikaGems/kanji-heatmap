@@ -1,18 +1,24 @@
 import { MAX_STROKE_COUNT } from "@/lib/options/constants";
 import { JLPTOptions } from "@/lib/jlpt";
+import { JouyouGradeOptions } from "@/lib/jouyou-grade";
+import { isSelectionFilterActive } from "@/lib/selection-filter";
 import { FilterSettings, SearchSettings } from "@/lib/settings/settings";
 import { dedupe, isKanji } from "@/lib/utils";
 import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { K_MEANING_KEY } from "@/lib/options/options-constants";
 
 export const hasNoFilters = (settings: SearchSettings) => {
-  const { strokeRange, freq, jlpt } = settings.filterSettings;
+  const { strokeRange, freq, jlpt, jouyouGrade } = settings.filterSettings;
   const fullRangeStrokes =
     strokeRange.min <= 1 && strokeRange.max >= MAX_STROKE_COUNT;
   const fullRangeFreq = freq.source === "none";
-  const allJLPT = jlpt.length === 0 || jlpt.length === JLPTOptions.length;
+  const allJLPT = !isSelectionFilterActive(jlpt.length, JLPTOptions.length);
+  const allGrades = !isSelectionFilterActive(
+    jouyouGrade.length,
+    JouyouGradeOptions.length
+  );
 
-  return fullRangeStrokes && fullRangeFreq && allJLPT;
+  return fullRangeStrokes && fullRangeFreq && allJLPT && allGrades;
 };
 
 const alphaSort = (a: string, b: string) => {
@@ -94,6 +100,11 @@ export const isEqualFilters = (
   if (a.jlpt.length !== b.jlpt.length) return false;
   for (let i = 0; i < a.jlpt.length; i++) {
     if (a.jlpt[i] !== b.jlpt[i]) return false;
+  }
+
+  if (a.jouyouGrade.length !== b.jouyouGrade.length) return false;
+  for (let i = 0; i < a.jouyouGrade.length; i++) {
+    if (a.jouyouGrade[i] !== b.jouyouGrade[i]) return false;
   }
 
   if (a.freq.source !== b.freq.source) return false;

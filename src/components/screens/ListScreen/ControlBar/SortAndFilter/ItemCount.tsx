@@ -9,6 +9,15 @@ import { SEARCH_TYPE_OPTIONS } from "@/lib/search-input-maps";
 const disclaimer =
   "Some kanji characters may be excluded based on your selected frequency source filter.";
 
+const SEARCH_TEXT_DISPLAY_MAX = 200;
+
+const formatSearchTextForDisplay = (text: string) => {
+  if (text.length <= SEARCH_TEXT_DISPLAY_MAX) {
+    return text;
+  }
+  return `${text.slice(0, SEARCH_TEXT_DISPLAY_MAX)}...`;
+};
+
 const AllMatchMsg = () => {
   return (
     <div className="block w-full text-right text-xs">
@@ -31,7 +40,7 @@ const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
       <>
         Your Search Text is{" "}
         <span className="mx-1 font-extrabold">
-          {`"${settings.textSearch.text}"`}
+          {`"${formatSearchTextForDisplay(settings.textSearch.text)}"`}
         </span>
         <span>{`(Search Type: ${SEARCH_TYPE_OPTIONS.find((item) => item.value === settings.textSearch.type)?.label} )`}</span>
         .

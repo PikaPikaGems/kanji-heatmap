@@ -1,4 +1,5 @@
 import { JLTPTtypes } from "@/lib/jlpt";
+import { JouyouGradeType } from "@/lib/jouyou-grade";
 
 /** Shared deck item used by recognition + production practice. */
 export type PracticeItem = {
@@ -21,6 +22,7 @@ export type PracticeSessionResult = {
 /** Settings fields needed to build a representative-word deck. */
 export type DeckFilterSettings = {
   jlpt: JLTPTtypes[];
+  jouyouGrade: JouyouGradeType[];
   bookmarkedOnly: boolean;
   randomizeOrder: boolean;
   randomizeFont: boolean;

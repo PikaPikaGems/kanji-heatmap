@@ -3,7 +3,7 @@ import { expect, test } from "./fixtures";
 test.describe("navigation", () => {
   test("dashboard renders", async ({ page }) => {
     await page.goto("/dashboard");
-    await expect(page.getByText(/Saved only on this device/)).toBeVisible({
+    await expect(page.getByText(/Local storage only/)).toBeVisible({
       timeout: 30_000,
     });
   });
