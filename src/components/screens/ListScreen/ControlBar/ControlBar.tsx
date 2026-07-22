@@ -1,17 +1,12 @@
-import { lazy, Suspense } from "react";
-import KaoMojiLoadingSpinner from "@/components/common/KaomojiLoading";
+import { Suspense } from "react";
 import { ReportBugIconBtn } from "@/components/common/ReportBugIconBtn";
 
-import ItemPresentationSettingsPopover from "./ItemPresentation/ItemPresentationPopover";
 import { SettledSearchInput } from "./SearchInput/SettledSearchInput";
 import { SettledSortAndFilter } from "./SortAndFilter/SettledSortAndFilter";
+import LazyItemPresentation, {
+  ItemPresentationLoadingFallback,
+} from "./ItemPresentation/LazyItemPresentation";
 import { ErrorBoundary } from "@/components/error";
-
-const ItemPresentationSettingsContent = lazy(() =>
-  import("./ItemPresentation/ItemPresentationContent").then((m) => ({
-    default: m.ItemPresentationSettingsContent,
-  }))
-);
 
 export const ControlBar = () => {
   return (
@@ -44,23 +39,9 @@ export const ControlBar = () => {
           </div>
         }
       >
-        <ItemPresentationSettingsPopover>
-          <ErrorBoundary details="ItemPresentationSettingsContent in ControlBar">
-            <Suspense
-              fallback={
-                <div
-                  className="py-8 text-sm text-center text-muted-foreground"
-                  role="status"
-                >
-                  <KaoMojiLoadingSpinner />
-                  Loading...
-                </div>
-              }
-            >
-              <ItemPresentationSettingsContent />
-            </Suspense>
-          </ErrorBoundary>
-        </ItemPresentationSettingsPopover>
+        <Suspense fallback={<ItemPresentationLoadingFallback />}>
+          <LazyItemPresentation />
+        </Suspense>
       </ErrorBoundary>
     </>
   );
