@@ -11,6 +11,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { ReactNode } from "react";
 import { JLPTBadge } from "@/components/common/jlpt/JLPTBadge";
+import { JouyouGradeBadge } from "@/components/common/JouyouGradeBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
@@ -97,12 +98,6 @@ export const General = ({ kanji }: { kanji: string }) => {
     description: string;
   }[] = [
     {
-      label: "Grade",
-      value: data.jouyouGrade,
-      description:
-        "The Japanese school grade level where this kanji is officially introduced in the jōyō curriculum.",
-    },
-    {
       label: "Strokes",
       value: data.strokes,
       description:
@@ -167,6 +162,9 @@ export const General = ({ kanji }: { kanji: string }) => {
     <>
       <div className="mt-6 text-left">
         <JLPTBadge jlpt={data.jlpt} />
+        {hasData(data.jouyouGrade) && (
+          <JouyouGradeBadge jouyouGrade={data.jouyouGrade!} />
+        )}
         {indexBadges.map(({ label, value, description }) =>
           hasData(value) ? (
             <PrimaryBadgeWithPopover
