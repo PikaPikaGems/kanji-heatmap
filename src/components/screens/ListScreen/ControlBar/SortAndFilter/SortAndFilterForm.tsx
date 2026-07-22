@@ -31,7 +31,8 @@ export const SortAndFilterSettingsForm = ({
   initialValue: SearchSettings;
 }) => {
   const form = useSortAndFilterForm(initialValue);
-  const { sortValues, filterValues, isDisabled, isGroup } = form;
+  const { sortValues, filterValues, isDisabled, isClearDisabled, isGroup } =
+    form;
 
   return (
     <form
@@ -162,6 +163,7 @@ export const SortAndFilterSettingsForm = ({
         <div className="flex justify-end px-0 pt-2 space-x-1">
           <PracticeButton
             variant="secondary"
+            disabled={isClearDisabled}
             onClick={(e) => {
               e.preventDefault();
               form.resetToDefaults();

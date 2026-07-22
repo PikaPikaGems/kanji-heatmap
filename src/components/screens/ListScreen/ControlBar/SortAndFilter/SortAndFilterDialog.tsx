@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { SearchSettings } from "@/lib/settings/settings";
 import { ErrorBoundary } from "@/components/error";
 import {
@@ -15,22 +15,18 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { SortAndFilterButton } from "./SortAndFilterButton";
-import KaoMojiLoadingSpinner from "@/components/common/KaomojiLoading";
-
-const SortAndFilterSettingsForm = lazy(() =>
-  import("./SortAndFilterForm").then((m) => ({
-    default: m.SortAndFilterSettingsForm,
-  }))
-);
+import { SortAndFilterSettingsForm } from "./SortAndFilterForm";
 
 export const SortAndFilterSettingsDialog = ({
   initialValue,
   onSettle,
+  initiallyOpen = false,
 }: {
   onSettle: (x: SearchSettings) => void;
   initialValue: SearchSettings;
+  initiallyOpen?: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -61,22 +57,13 @@ export const SortAndFilterSettingsDialog = ({
         </DialogHeader>
         {isOpen && (
           <ErrorBoundary>
-            <Suspense
-              fallback={
-                <div className="py-8 text-sm text-center text-muted-foreground">
-                  <KaoMojiLoadingSpinner />
-                  Loading...
-                </div>
-              }
-            >
-              <SortAndFilterSettingsForm
-                initialValue={initialValue}
-                onSettle={(val) => {
-                  onSettle(val);
-                  setIsOpen(false);
-                }}
-              />
-            </Suspense>
+            <SortAndFilterSettingsForm
+              initialValue={initialValue}
+              onSettle={(val) => {
+                onSettle(val);
+                setIsOpen(false);
+              }}
+            />
           </ErrorBoundary>
         )}
       </DialogContent>

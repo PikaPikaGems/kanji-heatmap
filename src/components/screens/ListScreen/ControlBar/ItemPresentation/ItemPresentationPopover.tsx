@@ -1,14 +1,16 @@
-import { useState, ReactNode } from "react";
+import { useState } from "react";
 import { Flower } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { GenericPopover } from "@/components/common/GenericPopover";
+import { ErrorBoundary } from "@/components/error";
+import { ItemPresentationSettingsContent } from "./ItemPresentationContent";
 
 const ItemPresentationSettingsPopover = ({
-  children,
+  initiallyOpen = false,
 }: {
-  children: ReactNode;
+  initiallyOpen?: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   return (
     <GenericPopover
       open={isOpen}
@@ -29,7 +31,13 @@ const ItemPresentationSettingsPopover = ({
         </Button>
       }
       // Mount the settings form only while open.
-      content={isOpen ? children : null}
+      content={
+        isOpen ? (
+          <ErrorBoundary details="ItemPresentationSettingsContent in ItemPresentationPopover">
+            <ItemPresentationSettingsContent />
+          </ErrorBoundary>
+        ) : null
+      }
     />
   );
 };

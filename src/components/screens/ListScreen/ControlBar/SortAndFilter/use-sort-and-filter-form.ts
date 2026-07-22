@@ -98,6 +98,10 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
   );
 
   const isDisabled = noChangeInFilterValues && noChangeInSortValues;
+  const isClearDisabled =
+    sortValues.primary === defaultSortSettings.primary &&
+    sortValues.secondary === defaultSortSettings.secondary &&
+    isEqualFilters(filterValues, defaultFilterSettings);
   const isGroup = isGroupSort(sortValues.primary);
 
   const buildSettings = (): SearchSettings => ({
@@ -110,6 +114,7 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
     sortValues,
     filterValues,
     isDisabled,
+    isClearDisabled,
     isGroup,
     setPrimarySort,
     setSecondarySort,

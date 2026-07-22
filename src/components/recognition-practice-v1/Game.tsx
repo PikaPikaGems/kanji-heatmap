@@ -125,14 +125,15 @@ export const Game = ({
   };
 
   return (
-    <div className="relative flex flex-col w-full h-full gap-5 [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8 md:justify-center md:gap-8 [@media(min-height:900px)]:justify-center [@media(min-height:900px)]:gap-8">
+    <div className="relative flex flex-col w-full h-full gap-5 [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8">
       <EndSession onClick={onEnd} />
       {/*
-        Touch layout: keep the prompt + input as a top-anchored cluster with a
-        fixed gap. A bottom spacer absorbs visual-viewport height changes so
-        the keyboard opening/closing does not shove content around.
+        Coarse-pointer (touch) layout: keep the prompt + input as a
+        top-anchored cluster with a fixed gap. A bottom spacer absorbs
+        visual-viewport height changes so the keyboard opening/closing does
+        not shove content around. Fine-pointer devices center instead.
       */}
-      <div className="flex flex-col items-center shrink-0 px-4 pt-8 text-center [@media(pointer:fine)]:pt-8 md:pt-8 [@media(min-height:900px)]:pt-8">
+      <div className="flex flex-col items-center shrink-0 px-4 pt-8 text-center">
         <div
           className={current.fontIndex === null ? "kanji-font" : ""}
           style={
@@ -158,7 +159,7 @@ export const Game = ({
         />
       </div>
 
-      <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0 md:pb-0">
+      <div className="flex flex-col gap-3 shrink-0 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] [@media(pointer:fine)]:pb-0">
         {feedback == null ? (
           <>
             <Input
@@ -208,12 +209,12 @@ export const Game = ({
       </div>
 
       {/*
-        Bottom spacer on coarse-pointer / short screens only. Height changes
-        from the on-screen keyboard are absorbed here instead of stretching
-        the gap between the gloss and the input.
+        Bottom spacer on coarse-pointer devices only. Height changes from the
+        on-screen keyboard are absorbed here instead of stretching the gap
+        between the gloss and the input.
       */}
       <div
-        className="flex-1 min-h-0 [@media(pointer:fine)]:hidden md:hidden [@media(min-height:900px)]:hidden"
+        className="flex-1 min-h-0 [@media(pointer:fine)]:hidden"
         aria-hidden="true"
       />
     </div>
