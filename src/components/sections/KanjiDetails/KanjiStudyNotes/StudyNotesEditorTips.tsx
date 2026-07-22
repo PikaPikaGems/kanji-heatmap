@@ -1,10 +1,9 @@
-import { forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clipboard } from "@/components/icons";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 
-export const OPTIONAL_VOCAB_SYNTAX = `:vocab[日本語]{kana="にほんご" definition="Japanese language (my own definition)"}`;
+export const OPTIONAL_VOCAB_SYNTAX = `:vocab[日本]{kana="にほん" definition="Japan"}`;
 
 const VocabSyntaxCopyButton = () => {
   const { copy, status } = useCopyToClipboard(1200);
@@ -15,7 +14,7 @@ const VocabSyntaxCopyButton = () => {
       type="button"
       variant="outline"
       size="iconXl"
-      className="h-7 w-7 shrink-0 rounded-md"
+      className="rounded-md h-7 w-7 shrink-0"
       aria-label={copied ? "Copied vocab syntax" : "Copy vocab syntax"}
       title={copied ? "Copied" : "Copy"}
       onClick={(event) => {
@@ -34,27 +33,17 @@ const VocabSyntaxCopyButton = () => {
 };
 
 /** Shared edit-mode tips shown above the study notes textarea. */
-export const StudyNotesEditorTips = forwardRef<
-  HTMLDivElement,
-  { className?: string }
->(function StudyNotesEditorTips({ className }, ref) {
+export const StudyNotesEditorTips = ({ className }: { className?: string }) => {
   return (
-    <div
-      ref={ref}
-      className={cn(
-        "space-y-2.5 text-xs leading-snug text-muted-foreground",
-        className
-      )}
-    >
+    <div className={cn("space-y-2.5 text-sm font-bold text-left", className)}>
       <p>
         Fun fact! Japanese text is clickable when your notes are finally
-        displayed.
+        displayed. Try the optional syntax! 👇
       </p>
 
       <div className="space-y-1.5">
-        <p className="font-medium text-foreground/80">Optional syntax</p>
         <div className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/50 p-1.5 pl-2.5">
-          <code className="min-w-0 flex-1 break-all font-mono text-[0.7rem] leading-relaxed text-foreground/90">
+          <code className="flex-1 min-w-0 font-mono text-sm leading-relaxed text-left break-all text-foreground/80">
             {OPTIONAL_VOCAB_SYNTAX}
           </code>
           <VocabSyntaxCopyButton />
@@ -62,4 +51,4 @@ export const StudyNotesEditorTips = forwardRef<
       </div>
     </div>
   );
-});
+};

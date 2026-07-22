@@ -1,4 +1,5 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
+import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { ScreenShell } from "@/components/common/ScreenShell";
 import { StatsOverview } from "./StatsOverview";
 import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
@@ -17,10 +18,7 @@ const DashboardScreen = () => {
             Your Progress
           </h1>
         )}
-        <p className="mx-auto mt-2 text-sm text-muted-foreground">
-          ⚠️ Saved only on this device. No backup. Your data may be lost at any
-          time.
-        </p>
+        <LocalStorageWarning className="mt-2 text-sm" />
       </header>
 
       <StatsOverview />

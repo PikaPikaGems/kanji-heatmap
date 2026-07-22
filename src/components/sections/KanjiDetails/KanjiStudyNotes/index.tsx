@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
@@ -107,6 +108,7 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
                 maxLength={MAX_STUDY_NOTE_LENGTH}
                 onChange={persistNotes}
               />
+              <LocalStorageWarning className="pb-2" />
             </>
           )}
         </TabsContent>
