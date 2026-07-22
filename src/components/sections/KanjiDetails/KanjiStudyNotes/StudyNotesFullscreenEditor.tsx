@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { cn } from "@/lib/utils";
+import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 
 interface StudyNotesFullscreenEditorProps {
   open: boolean;
@@ -62,13 +64,13 @@ export const StudyNotesFullscreenEditor = ({
           }}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <DialogHeader className="relative shrink-0 gap-1 border-b border-border px-4 py-3 pr-16 text-left">
+          <DialogHeader className="relative gap-1 px-4 py-3 pr-16 text-left border-b shrink-0 border-border">
             <DialogTitle className="flex items-center gap-2 text-base">
               <span className="text-2xl leading-none kanji-font">{kanji}</span>
               <span>Study Notes</span>
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Markdown supported. Japanese text is clickable in View Mode.
+            <DialogDescription asChild>
+              <StudyNotesEditorTips />
             </DialogDescription>
             <DialogPrimitive.Close asChild className="absolute top-2 right-2">
               <Button
@@ -81,7 +83,7 @@ export const StudyNotesFullscreenEditor = ({
               </Button>
             </DialogPrimitive.Close>
           </DialogHeader>
-          <div className="flex min-h-0 flex-1 flex-col px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+          <div className="flex flex-col flex-1 min-h-0 px-3 pt-3">
             <MarkdownEditor
               value={value}
               maxLength={maxLength}
@@ -89,12 +91,9 @@ export const StudyNotesFullscreenEditor = ({
               fill
               autoFocus
             />
-            <p className="mt-2 shrink-0 text-xs leading-snug text-muted-foreground">
-              Optional:{" "}
-              <code className="break-all text-[0.7rem]">
-                {`:vocab[日本語]{kana="にほんご" definition="…"}`}
-              </code>
-            </p>
+          </div>
+          <div className="pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <LocalStorageWarning className="pb-2" />
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>

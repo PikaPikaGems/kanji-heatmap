@@ -7,6 +7,7 @@ export const URL_PARAMS = {
   filterSettings: {
     strokeRange: { min: "filter-stroke-min", max: "filter-stroke-max" },
     jlpt: "filter-jlpt",
+    jouyouGrade: "filter-jouyou-grade",
     freq: {
       source: "filter-freq-source",
       rankRange: { min: "filter-freq-rank-min", max: "filter-freq-rank-max" },

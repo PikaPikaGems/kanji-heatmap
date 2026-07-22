@@ -1,7 +1,9 @@
 import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { JLPTSelector } from "@/components/common/jlpt/JLPTSelector";
+import { JouyouGradeSelector } from "@/components/common/JouyouGradeSelector";
 import { JLTPTtypes } from "@/lib/jlpt";
+import { JOUYOU_GRADE_TYPE_ARR, JouyouGradeType } from "@/lib/jouyou-grade";
 import { LeavePractice } from "./EndSessionButton";
 import { ToggleRow } from "./ToggleRow";
 import { DeckFilterSettings } from "./types";
@@ -52,10 +54,19 @@ export const PracticeInitialScreen = ({
             Kanji to include
           </h2>
           <div className="pt-2 pb-6">
-            <JLPTSelector
-              selectedJLPT={filters.jlpt}
-              setSelectedJLPT={(v: JLTPTtypes[]) => onFilterChange("jlpt", v)}
-            />
+            <div className="flex flex-col gap-3">
+              <JLPTSelector
+                selectedJLPT={filters.jlpt}
+                setSelectedJLPT={(v: JLTPTtypes[]) => onFilterChange("jlpt", v)}
+              />
+              <JouyouGradeSelector
+                selectedGrades={
+                  filters.jouyouGrade ??
+                  ([...JOUYOU_GRADE_TYPE_ARR] as JouyouGradeType[])
+                }
+                setSelectedGrades={(v) => onFilterChange("jouyouGrade", v)}
+              />
+            </div>
           </div>
           <ToggleRow
             id="bookmarked-only"

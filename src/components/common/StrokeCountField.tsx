@@ -22,7 +22,7 @@ export const StrokeCountField = ({
         id={fieldId}
         label={(value) => value}
         labelPosition="bottom"
-        className="text-xs pt-2"
+        className="pt-2 pb-4 text-xs"
         value={values}
         onValueChange={setValues}
         min={1}
