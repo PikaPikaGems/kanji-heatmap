@@ -12,7 +12,7 @@ import {
   practiceNavLinks,
 } from "@/lib/pages/nav-links";
 import { useBgSrc } from "@/hooks/routing-hooks";
-import { useLocation } from "@/components/dependent/routing/router-adapter";
+import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
 

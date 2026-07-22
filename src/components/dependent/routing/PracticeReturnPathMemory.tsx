@@ -2,7 +2,7 @@ import { useLayoutEffect } from "react";
 import {
   useLocation,
   useSearch,
-} from "@/components/dependent/routing/router-adapter";
+} from "@/components/dependent/routing/router-hooks";
 import { rememberPracticeReturnHref } from "@/lib/practice-return-path";
 
 /** Keeps the last non-practice route so practice screens can leave via wouter. */

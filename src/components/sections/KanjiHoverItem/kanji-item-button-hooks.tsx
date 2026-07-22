@@ -8,7 +8,7 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
 import { useBgSrc } from "@/hooks/routing-hooks";
-import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-provider";
+import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-hooks";
 import { isBookmarked } from "@/lib/bookmarks";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";

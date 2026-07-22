@@ -6,7 +6,7 @@ import {
   useVocabDetails,
   useWordKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { isJapanese } from "wanakana";
 
 interface StudyNoteVocabButtonProps {

@@ -23,7 +23,7 @@ vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
   }),
 }));
 
-vi.mock("@/providers/kanji-representative-word-provider", () => ({
+vi.mock("@/providers/kanji-representative-word-hooks", () => ({
   useKanjiRepresentativeWord: (kanji: string) =>
     kanji === "車"
       ? {

@@ -1,4 +1,4 @@
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PlusCircle } from "lucide-react";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";

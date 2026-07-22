@@ -1,4 +1,4 @@
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";

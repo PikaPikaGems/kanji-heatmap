@@ -1,6 +1,6 @@
 import { CircleArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "@/components/dependent/routing/router-adapter";
+import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { getPracticeReturnHref } from "@/lib/practice-return-path";
 

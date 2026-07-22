@@ -13,7 +13,8 @@ import {
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { CPM_BAND_LABELS, cpmToBand } from "@/lib/activity";
-import { HeatmapCell, HeatmapGrid, heatmapFillCn } from "./HeatmapGrid";
+import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
+import { heatmapFillCn } from "./heatmap-fill";
 
 const CELL_PX = 20;
 
