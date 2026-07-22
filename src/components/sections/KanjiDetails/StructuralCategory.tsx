@@ -1,4 +1,4 @@
-import { useMultiKanjiStructure } from "@/providers/multiple-kanji-structure-provider";
+import { useMultiKanjiStructure } from "@/providers/multiple-kanji-structure-hooks";
 import {
   StructuralType,
   structuralTypeInfo,
@@ -20,7 +20,8 @@ import {
   Minimize2,
   Lightbulb,
 } from "lucide-react";
-import { PartComponentLink, useResolvedComponent } from "./PartComponentLink";
+import { PartComponentLink } from "./PartComponentLink";
+import { useResolvedComponent } from "./use-resolved-component";
 
 const ICON_SIZE = 15;
 

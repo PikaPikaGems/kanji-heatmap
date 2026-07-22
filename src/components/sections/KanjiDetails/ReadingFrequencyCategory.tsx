@@ -1,4 +1,4 @@
-import { useKanjiReadingDetails } from "@/providers/kanji-reading-category-provider";
+import { useKanjiReadingDetails } from "@/providers/kanji-reading-category-hooks";
 
 import {
   Table,

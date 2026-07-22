@@ -8,7 +8,8 @@ import {
   getDayCounts,
   toLocalDateKey,
 } from "@/lib/activity";
-import { HeatmapCell, HeatmapGrid, heatmapFillCn } from "./HeatmapGrid";
+import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
+import { heatmapFillCn } from "./heatmap-fill";
 
 /** Sun→Sat; only Mon / Wed / Fri labeled (Cursor/GitHub-style). */
 const DAY_LABELS = ["", "月", "", "水", "", "金", ""] as const;

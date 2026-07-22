@@ -1,6 +1,6 @@
 import wanakana from "@/lib/wanakana-adapter";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { ellipsisCn, loadingCn } from "./kanji-item-button-hooks";
 import { isKanji } from "@/lib/utils";
 const RepWordKanji = ({ kanji }: { kanji: string }) => {

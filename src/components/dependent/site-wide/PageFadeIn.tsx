@@ -1,5 +1,5 @@
 import { ReactNode, useLayoutEffect } from "react";
-import { useLocation } from "@/components/dependent/routing/router-adapter";
+import { useLocation } from "@/components/dependent/routing/router-hooks";
 
 /** Remounts children on route change so `animate-fade-in` plays. */
 export const PageFadeIn = ({ children }: { children: ReactNode }) => {

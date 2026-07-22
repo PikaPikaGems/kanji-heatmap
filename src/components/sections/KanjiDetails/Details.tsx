@@ -17,7 +17,7 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { StructureInfo } from "./StructureInfo";
 import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { BottomBar } from "@/components/common/BottomBar";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-provider";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 

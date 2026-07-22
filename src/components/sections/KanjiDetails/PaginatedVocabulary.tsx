@@ -8,12 +8,12 @@ import {
 } from "@/components/ui/table";
 import { Keyboard } from "@/components/icons";
 import { CommonWordEntry, sortWordData } from "@/lib/sample-vocabulary";
+import { Pagination } from "./Pagination";
 import {
-  Pagination,
   usePagination,
   useKeyboardPagination,
   PaginationShortcuts,
-} from "./Pagination";
+} from "./pagination-hooks";
 import { WordRow } from "./WordRow";
 
 const ShortcutKey = ({ label }: { label: string }) => (

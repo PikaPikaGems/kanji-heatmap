@@ -6,16 +6,10 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { PlayCircle, Snail } from "@/components/icons";
 import assetsPaths from "@/lib/assets-paths";
 import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
+import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
-
-export type AnimationSpeed = "fast" | "slow";
-
-export const SPEEDS: Record<AnimationSpeed, { rate: number }> = {
-  fast: { rate: 0.0095 },
-  slow: { rate: 0.022 },
-};
 
 export const KanjiDMAK = ({
   kanji,
