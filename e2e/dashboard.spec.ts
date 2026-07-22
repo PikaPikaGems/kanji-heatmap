@@ -4,7 +4,7 @@ test.describe("dashboard", () => {
   test("renders overview sections and activity filters", async ({ page }) => {
     await page.goto("/dashboard");
 
-    await expect(page.getByText(/Saved only on this device/)).toBeVisible({
+    await expect(page.getByText(/Local storage only/)).toBeVisible({
       timeout: 30_000,
     });
     await expect(page.getByText("All-time Overview")).toBeVisible();

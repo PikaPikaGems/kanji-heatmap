@@ -1,5 +1,7 @@
 import wanakana from "@/lib/wanakana-adapter";
 import { JLPTOptionsCount, JLPTRank, JLTPTtypes } from "@/lib/jlpt";
+import { JouyouGradeOptionsCount, toJouyouGradeType } from "@/lib/jouyou-grade";
+import { matchesSelectionFilter } from "@/lib/selection-filter";
 import {
   KanjiExtendedInfo,
   KanjiMainInfo,
@@ -64,6 +66,7 @@ export const filterByKanjiSimple = (
   kanjiPool: DataPool
 ) => {
   const jlptFilters = new Set(settings.filterSettings.jlpt);
+  const gradeFilters = new Set(settings.filterSettings.jouyouGrade);
   const minStrokes = settings.filterSettings.strokeRange.min;
   const maxStrokes = settings.filterSettings.strokeRange.max;
   const freqFilter = settings.filterSettings.freq;
@@ -74,10 +77,7 @@ export const filterByKanjiSimple = (
       if (info == null) {
         return false;
       }
-      if ([0, JLPTOptionsCount].includes(jlptFilters.size)) {
-        return true;
-      }
-      return jlptFilters.has(info.jlpt);
+      return matchesSelectionFilter(jlptFilters, JLPTOptionsCount, info.jlpt);
     })
     .filter((kanji) => {
       // Main/extended can briefly diverge (load race) or permanently diverge
@@ -88,7 +88,11 @@ export const filterByKanjiSimple = (
       }
       const withinRange =
         maxStrokes >= exInfo.strokes && exInfo.strokes >= minStrokes;
-      return withinRange;
+      const grade = toJouyouGradeType(exInfo.jouyouGrade);
+      const matchesGrade =
+        grade != null &&
+        matchesSelectionFilter(gradeFilters, JouyouGradeOptionsCount, grade);
+      return withinRange && matchesGrade;
     })
     .filter((kanji) => {
       if (freqFilter.source === "none") {

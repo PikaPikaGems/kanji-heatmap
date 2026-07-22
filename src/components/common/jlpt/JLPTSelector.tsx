@@ -1,7 +1,5 @@
-import { useId } from "react";
 import { JLPTOptions, JLTPTtypes } from "@/lib/jlpt";
-import { Label } from "@/components/ui/label";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { FilterMultiSelect } from "@/components/common/FilterMultiSelect";
 
 const JLPTOptionsWithIcon = JLPTOptions.map((entry) => {
   return {
@@ -22,23 +20,13 @@ export function JLPTSelector({
   selectedJLPT: JLTPTtypes[];
   setSelectedJLPT: (v: JLTPTtypes[]) => void;
 }) {
-  const id = useId();
-  const fieldId = `jlpt-multiselect-${id}`;
   return (
-    <div>
-      <Label className="text-xs font-thin" htmlFor={fieldId}>
-        JLPT
-      </Label>
-      <MultiSelect
-        name={fieldId}
-        options={JLPTOptionsWithIcon}
-        onValueChange={setSelectedJLPT as (v: string[]) => void}
-        value={selectedJLPT}
-        placeholder="All levels selected"
-        variant="inverted"
-        maxCount={JLPTOptionsWithIcon.length}
-        hasSearchInput={false}
-      />
-    </div>
+    <FilterMultiSelect
+      label="JLPT"
+      options={JLPTOptionsWithIcon}
+      selectedValues={selectedJLPT}
+      onValueChange={setSelectedJLPT}
+      placeholder="All levels selected"
+    />
   );
 }

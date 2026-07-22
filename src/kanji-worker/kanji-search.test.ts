@@ -7,6 +7,7 @@ import {
 import { SearchSettings, SearchType } from "@/lib/settings/settings";
 import { SortKey } from "@/lib/options/options-types";
 import { JLTPTtypes } from "@/lib/jlpt";
+import { JOUYOU_GRADE_TYPE_ARR, JouyouGradeType } from "@/lib/jouyou-grade";
 import { filterKanji, searchKanji, sortKanji } from "./kanji-search";
 
 const mainInfo = (
@@ -67,7 +68,7 @@ const pool = {
       meanings: ["fire", "flame"],
       allOn: ["か"],
       allKunStripped: ["ひ"],
-      jouyouGrade: 1,
+      jouyouGrade: -1,
     }),
     山: extendedInfo({
       strokes: 3,
@@ -87,16 +88,21 @@ const settings = ({
   text = "",
   primary = "none",
   secondary = "none",
+  jlpt = [],
+  jouyouGrade = [],
 }: {
   type?: SearchType;
   text?: string;
   primary?: SortKey;
   secondary?: SortKey;
+  jlpt?: JLTPTtypes[];
+  jouyouGrade?: JouyouGradeType[];
 }): SearchSettings => ({
   textSearch: { type, text },
   filterSettings: {
     strokeRange: { min: 1, max: 99 },
-    jlpt: [],
+    jlpt,
+    jouyouGrade,
     freq: { source: "none", rankRange: { min: 1, max: 99999 } },
   },
   sortSettings: { primary, secondary },
@@ -163,6 +169,51 @@ describe("filterKanji", () => {
     );
     // 氷 is similar but not in the pool, so only 水 survives.
     expect(result).toEqual(["水"]);
+  });
+
+  it("filters by one or more Jōyō grades", () => {
+    expect(
+      filterKanji(allKanji, settings({ jouyouGrade: ["1"] }), pool)
+    ).toEqual(["水"]);
+    expect(
+      filterKanji(allKanji, settings({ jouyouGrade: ["1", "2"] }), pool)
+    ).toEqual(["水", "山"]);
+  });
+
+  it("filters for kanji without an assigned Jōyō grade", () => {
+    expect(
+      filterKanji(allKanji, settings({ jouyouGrade: ["none"] }), pool)
+    ).toEqual(["火"]);
+  });
+
+  it("treats empty and all-grade selections as unrestricted", () => {
+    expect(filterKanji(allKanji, settings({ jouyouGrade: [] }), pool)).toEqual(
+      allKanji
+    );
+    expect(
+      filterKanji(
+        allKanji,
+        settings({ jouyouGrade: [...JOUYOU_GRADE_TYPE_ARR] }),
+        pool
+      )
+    ).toEqual(allKanji);
+  });
+
+  it("combines JLPT and Jōyō-grade filters", () => {
+    expect(
+      filterKanji(
+        allKanji,
+        settings({ jlpt: ["n5"], jouyouGrade: ["1"] }),
+        pool
+      )
+    ).toEqual(["水"]);
+    expect(
+      filterKanji(
+        allKanji,
+        settings({ jlpt: ["n4"], jouyouGrade: ["1"] }),
+        pool
+      )
+    ).toEqual([]);
   });
 });
 

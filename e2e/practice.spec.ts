@@ -24,6 +24,33 @@ test.describe("practice modes", () => {
     ).toBeVisible({ timeout: 30_000 });
   });
 
+  for (const { name, route } of [
+    { name: "reading", route: "/reading-practice" },
+    { name: "writing", route: "/writing-practice" },
+  ]) {
+    test(`${name} practice: Jōyō-grade filter narrows the deck`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+
+      const count = page.getByText(/\d+ kanji match your filters/);
+      await expect(count).toBeVisible({ timeout: 30_000 });
+      const initialCount = await count.textContent();
+
+      await page.getByLabel("Jōyō grade").click();
+      await page
+        .getByRole("option", { name: "(Select All)", exact: true })
+        .click();
+      await page.getByRole("option", { name: "Grade 1", exact: true }).click();
+      await page.getByRole("option", { name: "Close", exact: true }).click();
+
+      await expect(count).not.toHaveText(initialCount ?? "", {
+        timeout: 30_000,
+      });
+      await expect(page.getByLabel("Jōyō grade")).toContainText("Grade 1");
+    });
+  }
+
   // Guards the Speed Katakana matching engine before its extraction into
   // lib/speed-katakana-match. Default settings keep word order fixed, so
   // challenge set 1 always starts with パーセント ("paasento" — also covers

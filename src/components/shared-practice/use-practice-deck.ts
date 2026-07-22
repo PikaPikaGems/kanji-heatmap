@@ -2,9 +2,15 @@ import { useMemo } from "react";
 import { useJsonFetch } from "@/hooks/use-json";
 import {
   useGetKanjiInfoFn,
-  useIsKanjiWorkerReady,
+  useKanjiSearch,
 } from "@/kanji-worker/kanji-worker-hooks";
 import assetsPaths from "@/lib/assets-paths";
+import {
+  defaultFilterSettings,
+  defaultSearchTextSettings,
+  defaultSortSettings,
+} from "@/lib/settings/search-settings-adapter";
+import { SearchSettings } from "@/lib/settings/settings";
 import { buildPracticeDeck } from "./build-deck";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
@@ -15,24 +21,40 @@ type RepEntry = [string, string, string, string];
  * the identical data flow both practice InitialScreens used to duplicate.
  */
 export const usePracticeDeck = (settings: DeckFilterSettings) => {
-  const workerReady = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const { data: repWords, status: repStatus } = useJsonFetch<
     Record<string, RepEntry>
   >(assetsPaths.KANJI_REPRESENTATIVE_WORDS);
 
+  const searchSettings = useMemo<SearchSettings>(
+    () => ({
+      textSearch: defaultSearchTextSettings,
+      filterSettings: {
+        ...defaultFilterSettings,
+        jlpt: settings.jlpt ?? [],
+        jouyouGrade: settings.jouyouGrade ?? [],
+      },
+      sortSettings: defaultSortSettings,
+    }),
+    [settings.jlpt, settings.jouyouGrade]
+  );
+  const filteredKanji = useKanjiSearch(searchSettings);
+
   const deck: PracticeItem[] = useMemo(() => {
-    if (!workerReady || !getInfo || !repWords) return [];
+    if (!getInfo || !repWords || filteredKanji.status !== "success") return [];
     return buildPracticeDeck({
       repWords,
-      getJlpt: (kanji) => getInfo(kanji)?.jlpt ?? null,
+      includedKanji: new Set(filteredKanji.data),
       getKeyword: (kanji) => getInfo(kanji)?.keyword ?? "...",
       settings,
     });
-  }, [workerReady, getInfo, repWords, settings]);
+  }, [filteredKanji.data, filteredKanji.status, getInfo, repWords, settings]);
 
   const loading =
-    !workerReady || repStatus === "pending" || repStatus === "idle";
+    filteredKanji.status === "loading" ||
+    filteredKanji.status === "idle" ||
+    repStatus === "pending" ||
+    repStatus === "idle";
   const canStart = !loading && deck.length > 0;
 
   return { deck, loading, canStart };

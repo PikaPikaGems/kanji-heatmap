@@ -1,4 +1,3 @@
-import { JLPTOptionsCount, JLTPTtypes } from "@/lib/jlpt";
 import { isBookmarked } from "@/lib/bookmarks";
 import { shuffle } from "@/lib/utils";
 import { randomFontIndex } from "@/hooks/use-change-font";
@@ -8,18 +7,15 @@ type RepEntry = [string, string, string, string];
 
 export const buildPracticeDeck = ({
   repWords,
-  getJlpt,
+  includedKanji,
   getKeyword,
   settings,
 }: {
   repWords: Record<string, RepEntry>;
-  getJlpt: (kanji: string) => JLTPTtypes | null;
+  includedKanji: ReadonlySet<string>;
   getKeyword: (kanji: string) => string;
   settings: DeckFilterSettings;
 }): PracticeItem[] => {
-  const jlptSet = new Set(settings.jlpt);
-  const applyJlpt = jlptSet.size > 0 && jlptSet.size < JLPTOptionsCount;
-
   const items: PracticeItem[] = [];
 
   for (const [kanji, entry] of Object.entries(repWords)) {
@@ -28,9 +24,7 @@ export const buildPracticeDeck = ({
     const [word, reading, englishGloss] = entry;
     if (!word || !reading) continue;
 
-    const jlpt = getJlpt(kanji);
-    if (jlpt == null) continue;
-    if (applyJlpt && !jlptSet.has(jlpt)) continue;
+    if (!includedKanji.has(kanji)) continue;
     if (settings.bookmarkedOnly && !isBookmarked(kanji, word)) continue;
 
     items.push({

@@ -9,6 +9,12 @@ import {
 } from "@/lib/settings/settings";
 import { MAX_FREQ_RANK, MAX_STROKE_COUNT } from "@/lib/options/constants";
 import { JLPT_TYPE_ARR, JLPTOptionsCount, JLTPTtypes } from "@/lib/jlpt";
+import {
+  JOUYOU_GRADE_TYPE_ARR,
+  JouyouGradeOptionsCount,
+  JouyouGradeType,
+} from "@/lib/jouyou-grade";
+import { isSelectionFilterActive } from "@/lib/selection-filter";
 import { FrequencyType, SortKey } from "../options/options-types";
 import { translateMap } from "../search-input-maps";
 import { FREQ_RANK_OPTIONS } from "../options/options-constants";
@@ -19,6 +25,7 @@ import { translateValue } from "../wanakana-adapter";
 const defaultFilterSettings: FilterSettings = {
   strokeRange: { min: 1, max: MAX_STROKE_COUNT },
   jlpt: [],
+  jouyouGrade: [],
   freq: {
     source: "none",
     rankRange: { min: 1, max: MAX_FREQ_RANK },
@@ -45,11 +52,19 @@ const toSearchType = (val?: string | null): SearchType => {
   return defaultSearchType;
 };
 
-const toJLPT = (jlptString?: string | null) => {
-  return (jlptString ?? "").split(",").filter((item) => {
-    return JLPT_TYPE_ARR.includes(item as JLTPTtypes);
-  }) as JLTPTtypes[];
-};
+const toSelection = <T extends string>(
+  rawValue: string | null,
+  allowedValues: readonly T[]
+) =>
+  (rawValue ?? "")
+    .split(",")
+    .filter((item): item is T => allowedValues.includes(item as T));
+
+const toJLPT = (jlptString: string | null) =>
+  toSelection<JLTPTtypes>(jlptString, JLPT_TYPE_ARR);
+
+const toJouyouGrade = (gradeString: string | null) =>
+  toSelection<JouyouGradeType>(gradeString, JOUYOU_GRADE_TYPE_ARR);
 
 const toSortKey = (sortKeyStr?: string | null) => {
   if (sortKeyStr != null && ALL_SORT_OPTIONS.includes(sortKeyStr as SortKey)) {
@@ -96,6 +111,7 @@ const toSearchSettings = (sp: URLSearchParams): SearchSettings => {
         ),
       },
       jlpt: toJLPT(sp.get(p.filterSettings.jlpt)),
+      jouyouGrade: toJouyouGrade(sp.get(p.filterSettings.jouyouGrade)),
       freq: {
         source: toFrequencySrc(sp.get(p.filterSettings.freq.source)),
         rankRange: {
@@ -171,7 +187,13 @@ const writeFilterSettings = (prev: URLSearchParams, newVal: FilterSettings) => {
     prev,
     p.jlpt,
     newVal.jlpt.join(","),
-    newVal.jlpt.length === 0 || newVal.jlpt.length === JLPTOptionsCount
+    !isSelectionFilterActive(newVal.jlpt.length, JLPTOptionsCount)
+  );
+  setOrDelete(
+    prev,
+    p.jouyouGrade,
+    newVal.jouyouGrade.join(","),
+    !isSelectionFilterActive(newVal.jouyouGrade.length, JouyouGradeOptionsCount)
   );
 
   // No frequency source means the rank range is meaningless — drop all three.
