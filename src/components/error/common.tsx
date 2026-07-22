@@ -4,6 +4,7 @@ import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { cnTextLink } from "@/lib/generic-cn";
 import { outLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
+import { RefreshPageBtn } from "../common/RefreshPageBtn";
 
 /** Linked CTA: Discord / GitHub issue / reload — shown above the icon row. */
 export const SayHiReportOrRefresh = () => {
@@ -60,11 +61,11 @@ export const ErrorSocialIcons = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-1",
+        "flex flex-wrap items-center justify-center gap-1 pt-4",
         className
       )}
     >
-      <LinksOutItems />
+      <LinksOutItems /> {"·"} <RefreshPageBtn />
     </div>
   );
 };
@@ -72,7 +73,7 @@ export const ErrorSocialIcons = ({ className }: { className?: string }) => {
 /** Text CTA above icons (toolbar layout). */
 export const ErrorToolbarCta = ({ className }: { className?: string }) => {
   return (
-    <div className={cn("flex w-full flex-col items-center gap-3", className)}>
+    <div className={cn("flex w-full flex-col items-center", className)}>
       <SayHiReportOrRefresh />
       <ErrorSocialIcons />
     </div>
