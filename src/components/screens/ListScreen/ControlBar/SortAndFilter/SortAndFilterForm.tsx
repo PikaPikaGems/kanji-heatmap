@@ -62,7 +62,7 @@ export const SortAndFilterSettingsForm = ({
               {isCommunityOrder(sortValues.primary) && (
                 <div
                   key={`disclaimer-${sortValues.primary}`}
-                  className="text-xs mt-1 text-left px-3 animate-fade-in"
+                  className="px-3 mt-1 text-xs text-left animate-fade-in"
                 >
                   {orderDisclaimer}
                 </div>
@@ -90,7 +90,7 @@ export const SortAndFilterSettingsForm = ({
                 {isCommunityOrder(sortValues.secondary) && (
                   <div
                     key={`disclaimer-${sortValues.secondary}`}
-                    className="text-xs mt-1 text-left px-3 animate-fade-in"
+                    className="px-3 mt-1 text-xs text-left animate-fade-in"
                   >
                     {orderDisclaimer}
                   </div>
@@ -152,7 +152,7 @@ export const SortAndFilterSettingsForm = ({
             <>
               <FilterToggleRow
                 id="filter-bookmarked-only"
-                label="Bookmarks only"
+                label="Bookmarked only"
                 checked={filterValues.bookmarkedOnly}
                 onChange={form.setBookmarkedOnly}
               />
@@ -167,16 +167,22 @@ export const SortAndFilterSettingsForm = ({
         />
       </div>
       <div className="px-2 pt-4 mt-4 border-t">
-        {!isDisabled && (
-          <ItemCount
-            settings={{ ...initialValue, filterSettings: filterValues }}
-          />
-        )}
-        {isDisabled && (
-          <div className="flex items-center justify-end w-full text-xs">
-            There are no changes to apply yet.
-          </div>
-        )}
+        <div className="flex min-h-12 items-center justify-end">
+          {!isDisabled ? (
+            <div key="item-count" className="w-full animate-fade-in-slow">
+              <ItemCount
+                settings={{ ...initialValue, filterSettings: filterValues }}
+              />
+            </div>
+          ) : (
+            <div
+              key="no-changes"
+              className="flex w-full items-center justify-end text-xs animate-fade-in-slow"
+            >
+              There are no changes to apply yet.
+            </div>
+          )}
+        </div>
         <div className="flex justify-end px-0 pt-2 space-x-1">
           <PracticeButton
             variant="secondary"

@@ -192,6 +192,10 @@ button {
   animation: fade-in 0.2s ease-out;
 }
 
+.animate-fade-in-slow {
+  animation: fade-in 0.8s ease-out;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

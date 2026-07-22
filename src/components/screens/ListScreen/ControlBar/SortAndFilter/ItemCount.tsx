@@ -88,9 +88,16 @@ const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
   const { data: clientFiltered, isLoading: clientLoading } =
     useClientFilteredKanjis(workerSearch.data, settings.filterSettings);
 
+  // Keep layout height stable while counts load so the dialog doesn't bounce.
   if (needsClient) {
     if (clientLoading || clientFiltered == null || workerSearch.error) {
-      return null;
+      return (
+        <span className="invisible" aria-hidden>
+          A total of 0 of {KANJI_COUNT} Kanji characters match your applied
+          filters.
+          <br />
+        </span>
+      );
     }
     return (
       <MatchCountMessage settings={settings} count={clientFiltered.length} />
@@ -98,7 +105,13 @@ const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
   }
 
   if (workerCount.data == null || workerCount.error) {
-    return null;
+    return (
+      <span className="invisible" aria-hidden>
+        A total of 0 of {KANJI_COUNT} Kanji characters match your applied
+        filters.
+        <br />
+      </span>
+    );
   }
 
   return <MatchCountMessage settings={settings} count={workerCount.data} />;
