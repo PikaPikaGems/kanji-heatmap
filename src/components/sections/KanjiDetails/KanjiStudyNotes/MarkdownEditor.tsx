@@ -11,7 +11,7 @@ const sharedEditorTextClass = cn(
   "m-0 box-border appearance-none rounded-none p-3.5",
   "font-mono text-base font-normal not-italic leading-[1.55rem] tracking-normal",
   "[font-kerning:none] [font-variant-ligatures:none]",
-  "text-left whitespace-pre-wrap break-words [overflow-wrap:break-word]",
+  "text-left whitespace-pre-wrap break-words",
   "[-webkit-text-size-adjust:100%] [text-size-adjust:100%]",
   "border-0"
 );
