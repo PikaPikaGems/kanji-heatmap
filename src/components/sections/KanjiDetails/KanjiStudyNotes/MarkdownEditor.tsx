@@ -8,9 +8,11 @@ import { getMarkdownHighlightSegments } from "./markdown";
  * weight, or italic mismatch shifts caret/selection relative to the highlights.
  */
 const sharedEditorTextClass = cn(
-  "m-0 box-border p-3.5",
+  "m-0 box-border appearance-none rounded-none p-3.5",
   "font-mono text-base font-normal not-italic leading-[1.55rem] tracking-normal",
-  "text-left whitespace-pre-wrap break-words [overflow-wrap:anywhere]",
+  "[font-kerning:none] [font-variant-ligatures:none]",
+  "text-left whitespace-pre-wrap break-words [overflow-wrap:break-word]",
+  "[-webkit-text-size-adjust:100%] [text-size-adjust:100%]",
   "border-0"
 );
 
@@ -55,7 +57,7 @@ export const MarkdownEditor = ({
           aria-hidden="true"
           className={cn(
             sharedEditorTextClass,
-            "markdown-editor-backdrop absolute inset-0 overflow-hidden pointer-events-none"
+            "absolute inset-0 overflow-hidden pointer-events-none"
           )}
         >
           {segments.map((segment, index) => (
@@ -78,7 +80,7 @@ export const MarkdownEditor = ({
           placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable when your notes are finally displayed."
           className={cn(
             sharedEditorTextClass,
-            "markdown-editor-input relative block w-full resize-none bg-transparent outline-none",
+            "relative block w-full resize-none bg-transparent outline-none",
             fill ? "h-full min-h-0" : "h-64",
             // Glyphs stay invisible so only the backdrop colors show; caret stays visible.
             "text-transparent caret-foreground [-webkit-text-fill-color:transparent]",
