@@ -34,6 +34,11 @@ export const inferSearchTypeFromText = (
     return null;
   }
   if (hasKanji(text)) {
+    // Similar is intentionally kanji-based — keep it instead of jumping
+    // to multi-kanji when IME confirms a kanji candidate.
+    if (currentType === "similar") {
+      return null;
+    }
     return "multi-kanji";
   }
   if (wanakana.isKana(text)) {

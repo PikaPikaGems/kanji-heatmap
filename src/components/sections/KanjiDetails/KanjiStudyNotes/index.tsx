@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
+import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 import { StudyNotesFullscreenEditor } from "./StudyNotesFullscreenEditor";
 import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
@@ -94,24 +96,19 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
         >
           {isCoarsePointer ? (
             <div className="flex flex-col items-stretch gap-3 rounded-xl border-[3px] border-dashed border-border bg-background px-4 py-8 text-center">
-              <Button type="button" onClick={() => setFullscreenOpen(true)}>
+              <PracticeButton size="lg" onClick={() => setFullscreenOpen(true)}>
                 {notes.trim().length > 0 ? "Continue writing" : "Start writing"}
-              </Button>
+              </PracticeButton>
             </div>
           ) : (
             <>
+              <StudyNotesEditorTips className="mb-3" />
               <MarkdownEditor
                 value={notes}
                 maxLength={MAX_STUDY_NOTE_LENGTH}
                 onChange={persistNotes}
               />
-              <p className="mt-3 text-xs leading-snug text-muted-foreground">
-                Fun fact! Japanese texts are clickable in View Mode. <br />
-                Optional special syntax:{" "}
-                <code className="text-[0.7rem] break-all">
-                  {`:vocab[日本語]{kana="にほんご" definition="Japanese language (my own definition)"}`}
-                </code>
-              </p>
+              <LocalStorageWarning className="pb-2" />
             </>
           )}
         </TabsContent>
