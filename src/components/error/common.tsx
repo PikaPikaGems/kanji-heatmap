@@ -27,11 +27,22 @@ export const RefreshOrGoBackHome = () => {
 export const SayHiReportOrRefresh = () => {
   return (
     <p className="text-xs text-muted-foreground">
-      Say <ExternalTextLink href={outLinks.discord} text="hi" />, report a{" "}
-      <ExternalTextLink href={outLinks.githubIssue} text="bug" />, or{" "}
+      Say{" "}
+      <ExternalTextLink
+        href={outLinks.discord}
+        text="hi"
+        className="px-0.5 py-0"
+      />
+      , report a{" "}
+      <ExternalTextLink
+        href={outLinks.githubIssue}
+        text="bug"
+        className="px-0.5 py-0"
+      />
+      , or{" "}
       <button
         type="button"
-        className={cnTextLink}
+        className={`${cnTextLink} px-0.5 py-0`}
         onClick={() => {
           window?.location.reload();
         }}
