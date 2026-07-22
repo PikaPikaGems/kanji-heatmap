@@ -44,7 +44,6 @@ export const GROUP_OPTIONS = [
 export const NONGROUP_OPTIONS = [
   K_KKLC_INDEX,
   K_RTK_INDEX,
-  K_RTKB_INDEX,
   K_MEANING_KEY,
 ] as const;
 

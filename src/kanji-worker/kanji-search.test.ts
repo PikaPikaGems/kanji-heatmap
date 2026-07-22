@@ -38,7 +38,6 @@ const extendedInfo = ({
   parts: new Set(),
   strokes,
   rtk: -1,
-  rtkb: -1,
   wk: -1,
   jouyouGrade,
   meanings,

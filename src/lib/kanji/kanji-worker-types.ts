@@ -49,7 +49,6 @@ export type KanjiExtendedInfo = {
   parts: Set<string>;
   strokes: number;
   rtk: number;
-  rtkb: number;
   wk: number;
   jouyouGrade: number;
   meanings: string[];

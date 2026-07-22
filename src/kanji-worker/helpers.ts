@@ -127,7 +127,8 @@ export const transformToExtendedKanjiInfo = (
   const [
     parts,
     strokes,
-    rtk,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _rtk_old,
     wk,
     jouyouGrade,
     meanings,
@@ -136,7 +137,7 @@ export const transformToExtendedKanjiInfo = (
     phonetic,
     mainVocab,
     kklcIndex,
-    rtkb,
+    rtk,
   ] = item;
 
   const hiraganaAllKun = (allKun ?? []).map((val) => wanakana.toHiragana(val));
@@ -148,7 +149,6 @@ export const transformToExtendedKanjiInfo = (
     parts: new Set(parts),
     strokes,
     rtk,
-    rtkb: rtkb ?? -1,
     wk,
     jouyouGrade,
     meanings: Array.from(new Set(meanings)),

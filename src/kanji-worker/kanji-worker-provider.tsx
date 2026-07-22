@@ -188,7 +188,6 @@ export function KanjiWorkerProvider({
             jouyouGrade,
             wk,
             rtk,
-            rtkb,
             strokes,
             kklcIndex,
           } = kanjiInfo.extended;
@@ -200,7 +199,6 @@ export function KanjiWorkerProvider({
             jouyouGrade,
             wk,
             rtk,
-            rtkb,
             strokes,
             kklcIndex,
             jlpt: kanjiInfo.main.jlpt,
