@@ -65,7 +65,7 @@ export const StudyNotesFullscreenEditor = ({
           }}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <DialogHeader className="relative gap-1 px-4 py-3 pr-16 text-left border-b shrink-0 border-border">
+          <DialogHeader className="relative gap-1 px-4 py-3 pr-16 text-left shrink-0">
             <DialogTitle className="flex items-center gap-2 text-base">
               <span className="text-2xl leading-none kanji-font">{kanji}</span>
               <span>Study Notes</span>
@@ -77,16 +77,16 @@ export const StudyNotesFullscreenEditor = ({
               trigger={
                 <button
                   type="button"
-                  className="inline-flex items-center self-start gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8"
+                  className="inline-flex items-center self-start gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8"
                 >
                   <strong>Tips and optional syntax</strong>
                   <InfoIcon size={14} />
                 </button>
               }
               content={
-                <div className="p-3 space-y-3 text-left">
+                <div className="p-5 space-y-3 text-left">
                   <StudyNotesEditorTips />
-                  <LocalStorageWarning className="pt-3 text-left border-t border-border" />
+                  <LocalStorageWarning className="p-2 text-center" />
                 </div>
               }
               contentClassName="z-[70] m-0 w-[calc(100vw-2rem)] max-w-sm p-0"
