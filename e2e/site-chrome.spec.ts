@@ -8,7 +8,7 @@ test.describe("site chrome", () => {
     const island = page.getByRole("navigation", { name: "Primary" });
     await island.getByRole("link", { name: "Dashboard" }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByText(/Saved only on this device/)).toBeVisible({
+    await expect(page.getByText(/Local storage only/)).toBeVisible({
       timeout: 30_000,
     });
 
