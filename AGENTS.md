@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Coding conventions
+
+The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow them even if you are a tool that does not load those files:
+
+- Tests: do NOT add or change automated tests unless the user explicitly asks. See `tests-only-when-asked.mdc`.
+- React hooks: avoid `useEffect`, `useMemo`, `useCallback`, and `forwardRef` unless truly necessary and there is no simpler way; if you must use one, add a short comment explaining why. Prefer deriving values during render. See `avoid-react-effect-memo-callback-forwardref.mdc`.
+- Single responsibility: one screen → one component (no `variant` enums stuffed into a "god" screen); route phases with a linear early-return chain rather than stacked `{phase === … && …}` blocks. Prefer early exits in conditionals generally. See `react-single-responsibility-screens.mdc`.
+- Formatting: run Prettier on the exact files you edit (`pnpm exec prettier --write <paths>`); do not run a full-repo format unless asked. Match `.prettierrc.json`. See `prettier-format.mdc`.
+
 ## Cursor Cloud specific instructions
 
 Kanji Heatmap is a client-side React + Vite single-page app (no backend of its own). Kanji data is served as static JSON from `public/json`. Standard commands live in `package.json` and setup/data docs live in `README.md` — refer to those rather than duplicating them.
