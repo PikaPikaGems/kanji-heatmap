@@ -1,5 +1,4 @@
 import { errorFallbackAlternatives } from "@/components/error/ErrorFallbackAlternatives";
-import { KanjiNotFound } from "@/components/error/KanjiNotFound";
 import { NoSearchResults } from "@/components/error/NoSearchResults";
 import { PageNotFound } from "@/components/error/PageNotFound";
 import { BottomBar } from "@/components/common/BottomBar";
@@ -16,12 +15,6 @@ const relatedStates = [
     label: "NoSearchResults",
     description: "Empty kanji search / filters.",
     node: <NoSearchResults />,
-  },
-  {
-    id: "kanji-not-found",
-    label: "KanjiNotFound",
-    description: "Character outside the heatmap corpus.",
-    node: <KanjiNotFound kanji="龍" />,
   },
 ] as const;
 
@@ -70,7 +63,7 @@ export const ErrorFallbackPreviewScreen = () => {
         </p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2">
         {relatedStates.map(({ id, label, description, node }) => (
           <section
             key={id}
