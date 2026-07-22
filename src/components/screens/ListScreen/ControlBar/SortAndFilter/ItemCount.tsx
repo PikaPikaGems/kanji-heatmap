@@ -1,9 +1,14 @@
 import { useDeferredValue } from "react";
 import { KANJI_COUNT } from "@/lib/options/constants";
 import { SearchSettings } from "@/lib/settings/settings";
+import { needsClientListFilters } from "@/lib/client-list-filters";
 import { shouldShowAllKanji } from "@/lib/results-utils";
 
-import { useKanjiSearchCount } from "@/kanji-worker/kanji-worker-hooks";
+import {
+  useKanjiSearch,
+  useKanjiSearchCount,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 import { SEARCH_TYPE_OPTIONS } from "@/lib/search-input-maps";
 
 const disclaimer =
@@ -28,13 +33,13 @@ const AllMatchMsg = () => {
   );
 };
 
-const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
-  const data = useKanjiSearchCount(settings);
-
-  if (data.data == null || data.error) {
-    return null;
-  }
-
+const MatchCountMessage = ({
+  settings,
+  count,
+}: {
+  settings: SearchSettings;
+  count: number;
+}) => {
   const textPrefix =
     settings.textSearch.text.length > 0 ? (
       <>
@@ -49,14 +54,14 @@ const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
       ""
     );
 
-  if (data.data >= KANJI_COUNT) {
+  if (count >= KANJI_COUNT) {
     return <AllMatchMsg />;
   }
 
   const textSuffix =
     settings.filterSettings.freq.source !== "none" ? disclaimer : null;
 
-  if (data.data === 0) {
+  if (count === 0) {
     return (
       <>
         {textPrefix} No Kanji characters match your applied filters. <br />
@@ -68,12 +73,35 @@ const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
   return (
     <>
       {textPrefix} A total of{" "}
-      <span className="font-extrabold mx-1">{data.data}</span> of
+      <span className="font-extrabold mx-1">{count}</span> of
       <span className="font-extrabold mx-1"> {KANJI_COUNT}</span>
       Kanji characters match your applied filters. <br />
       {textSuffix}
     </>
   );
+};
+
+const ItemCountComputed = ({ settings }: { settings: SearchSettings }) => {
+  const needsClient = needsClientListFilters(settings.filterSettings);
+  const workerCount = useKanjiSearchCount(settings);
+  const workerSearch = useKanjiSearch(settings);
+  const { data: clientFiltered, isLoading: clientLoading } =
+    useClientFilteredKanjis(workerSearch.data, settings.filterSettings);
+
+  if (needsClient) {
+    if (clientLoading || clientFiltered == null || workerSearch.error) {
+      return null;
+    }
+    return (
+      <MatchCountMessage settings={settings} count={clientFiltered.length} />
+    );
+  }
+
+  if (workerCount.data == null || workerCount.error) {
+    return null;
+  }
+
+  return <MatchCountMessage settings={settings} count={workerCount.data} />;
 };
 
 export const ItemCount = ({ settings }: { settings: SearchSettings }) => {

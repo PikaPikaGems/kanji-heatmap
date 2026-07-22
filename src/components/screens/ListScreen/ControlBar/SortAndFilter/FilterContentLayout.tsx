@@ -8,21 +8,28 @@ export const FilterSectionLayout = ({
   strokeCountField,
   freqRankRangeField,
   freqRankSourceField,
+  toggleFiltersField,
 }: {
   jlptField: ReactNode;
   jouyouGradeField: ReactNode;
   strokeCountField: ReactNode;
   freqRankSourceField: ReactNode;
   freqRankRangeField?: ReactNode;
+  toggleFiltersField?: ReactNode;
 }) => {
   return (
     <section className="text-start">
       <UppercaseHeading title="Filters" icon={<FilterX size={15} />} />
-      <div className="grid w-full grid-cols-1 gap-4 pb-8 xl:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-4 pb-4 sm:pb-6 xl:grid-cols-3">
         <div>{strokeCountField}</div>
         <div>{jlptField}</div>
         <div>{jouyouGradeField}</div>
       </div>
+      {toggleFiltersField != null && (
+        <div className="grid w-full grid-cols-1 gap-3 pb-8 sm:grid-cols-2 sm:gap-4">
+          {toggleFiltersField}
+        </div>
+      )}
       <div className="py-2 mt-4 text-xs font-extrabold uppercase md:mt-0">
         Frequency Ranking
       </div>

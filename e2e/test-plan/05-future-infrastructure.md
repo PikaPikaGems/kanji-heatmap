@@ -31,6 +31,7 @@ Currently `fixtures.ts` aborts `/onnx/*` and `/js/ref-patterns.js`
 unexercised.
 
 Options, cheapest first:
+
 1. Stub the recognizer boundary: fulfill the asset routes with a tiny
    fake and mock the candidate-list producer so the UI flow (draw →
    candidates → select → search) is tested without real inference.
@@ -61,6 +62,7 @@ loading state. Cheap — promote to P2 if the worker layer gets refactored.
 ## Browser & viewport matrix
 
 Currently chromium-only, desktop viewport. Considerations:
+
 - **Mobile viewport project** (`devices["Pixel 7"]`): the layout has
   mobile-specific surfaces (drawers, floating island); cheap to add —
   run the existing suite, fix selectors that assume hover.

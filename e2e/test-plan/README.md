@@ -40,13 +40,13 @@ Infrastructure (already bootstrapped — extend it, don't replace it):
 
 Existing specs and what they already guard (don't duplicate):
 
-| Spec | Coverage |
-| --- | --- |
-| `home.spec.ts` | Grid renders with item count; search narrows results; card-presentation popover; radical-search drawer opens/closes; kanji cell click opens/closes detail drawer |
-| `kanji-details.spec.ts` | `?open=` deep link; stroke-order accordion, replay controls, dmak-drawn SVG |
-| `navigation.spec.ts` | Dashboard empty state; About page; 404 screen |
-| `practice.spec.ts` | Reading practice start → game screen; writing practice initial screen; speed-katakana correct answer advances |
-| `search-input.spec.ts` | Paste-based search-type inference (kanji → Multi-Kanji, roman → Meanings, kana → Readings) |
+| Spec                    | Coverage                                                                                                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home.spec.ts`          | Grid renders with item count; search narrows results; card-presentation popover; radical-search drawer opens/closes; kanji cell click opens/closes detail drawer |
+| `kanji-details.spec.ts` | `?open=` deep link; stroke-order accordion, replay controls, dmak-drawn SVG                                                                                      |
+| `navigation.spec.ts`    | Dashboard empty state; About page; 404 screen                                                                                                                    |
+| `practice.spec.ts`      | Reading practice start → game screen; writing practice initial screen; speed-katakana correct answer advances                                                    |
+| `search-input.spec.ts`  | Paste-based search-type inference (kanji → Multi-Kanji, roman → Meanings, kana → Readings)                                                                       |
 
 ## Conventions for new specs
 
@@ -58,7 +58,7 @@ Existing specs and what they already guard (don't duplicate):
    assertion after `goto` gets `{ timeout: 30_000 }`; subsequent
    assertions use defaults.
 4. Search input debounces 400ms before querying the worker — assert on
-   the *result* (e.g. `/\d+ Items? Matched/`), never on timing.
+   the _result_ (e.g. `/\d+ Items? Matched/`), never on timing.
 5. One spec file per feature area, `test.describe` per sub-area, and a
    top-of-file comment saying which refactor the spec guards (see
    existing specs for the pattern).
@@ -67,13 +67,13 @@ Existing specs and what they already guard (don't duplicate):
 
 ## Plan documents & priorities
 
-| Doc | Area | Priority |
-| --- | --- | --- |
-| `01-search-sort-filter.md` | Search types, sort & filter dialog, URL round-trip | **P1** |
-| `02-kanji-details-bookmarks-dashboard.md` | Detail drawer content, bookmarks/known status, dashboard | **P1/P2** |
-| `03-navigation-settings-misc.md` | Nav surfaces, home-search memory, theme/font, secondary pages | **P2** |
-| `04-practice-games.md` | Reading / writing / speed-katakana flows, activity recording | **P2** |
-| `05-future-infrastructure.md` | Offline/PWA, handwriting, real API proxies, browser matrix | **P3** |
+| Doc                                       | Area                                                          | Priority  |
+| ----------------------------------------- | ------------------------------------------------------------- | --------- |
+| `01-search-sort-filter.md`                | Search types, sort & filter dialog, URL round-trip            | **P1**    |
+| `02-kanji-details-bookmarks-dashboard.md` | Detail drawer content, bookmarks/known status, dashboard      | **P1/P2** |
+| `03-navigation-settings-misc.md`          | Nav surfaces, home-search memory, theme/font, secondary pages | **P2**    |
+| `04-practice-games.md`                    | Reading / writing / speed-katakana flows, activity recording  | **P2**    |
+| `05-future-infrastructure.md`             | Offline/PWA, handwriting, real API proxies, browser matrix    | **P3**    |
 
 - **P1** — gates any refactor of the list screen, worker, or URL state.
   Build these first.

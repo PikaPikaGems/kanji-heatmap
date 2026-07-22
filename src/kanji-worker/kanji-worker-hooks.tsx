@@ -8,6 +8,7 @@ import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { isKanji } from "@/lib/utils";
+import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
 export type KanjiRequestFn = (
   k: string,
@@ -231,7 +232,23 @@ export const useKanjiInfo = (
 export const useKanjiSearchResult = () => {
   const searchSettings = useSearchSettings();
   const results = useKanjiSearch(searchSettings);
-  return results;
+  const { data: clientFiltered, isLoading: clientFilterLoading } =
+    useClientFilteredKanjis(results.data, searchSettings.filterSettings);
+
+  // Bookmark / anchor-word filters run on the main thread after the worker
+  // search; keep the list in a loading state until those sets are ready.
+  if (clientFilterLoading) {
+    return {
+      ...results,
+      data: undefined,
+      status: "loading" as const,
+    };
+  }
+
+  return {
+    ...results,
+    data: clientFiltered,
+  };
 };
 
 // Vocab types

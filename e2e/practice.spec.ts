@@ -37,7 +37,7 @@ test.describe("practice modes", () => {
       await expect(count).toBeVisible({ timeout: 30_000 });
       const initialCount = await count.textContent();
 
-      await page.getByLabel("Jōyō grade").click();
+      await page.getByLabel("Jouyou Grade").click();
       await page
         .getByRole("option", { name: "(Select All)", exact: true })
         .click();
@@ -47,7 +47,7 @@ test.describe("practice modes", () => {
       await expect(count).not.toHaveText(initialCount ?? "", {
         timeout: 30_000,
       });
-      await expect(page.getByLabel("Jōyō grade")).toContainText("Grade 1");
+      await expect(page.getByLabel("Jouyou Grade")).toContainText("Grade 1");
     });
   }
 

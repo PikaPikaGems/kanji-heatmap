@@ -8,7 +8,14 @@ import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { K_MEANING_KEY } from "@/lib/options/options-constants";
 
 export const hasNoFilters = (settings: SearchSettings) => {
-  const { strokeRange, freq, jlpt, jouyouGrade } = settings.filterSettings;
+  const {
+    strokeRange,
+    freq,
+    jlpt,
+    jouyouGrade,
+    bookmarkedOnly,
+    withAnchorWordsOnly,
+  } = settings.filterSettings;
   const fullRangeStrokes =
     strokeRange.min <= 1 && strokeRange.max >= MAX_STROKE_COUNT;
   const fullRangeFreq = freq.source === "none";
@@ -18,7 +25,14 @@ export const hasNoFilters = (settings: SearchSettings) => {
     JouyouGradeOptions.length
   );
 
-  return fullRangeStrokes && fullRangeFreq && allJLPT && allGrades;
+  return (
+    fullRangeStrokes &&
+    fullRangeFreq &&
+    allJLPT &&
+    allGrades &&
+    !bookmarkedOnly &&
+    !withAnchorWordsOnly
+  );
 };
 
 const alphaSort = (a: string, b: string) => {
@@ -110,6 +124,9 @@ export const isEqualFilters = (
   if (a.freq.source !== b.freq.source) return false;
   if (a.freq.rankRange.min !== b.freq.rankRange.min) return false;
   if (a.freq.rankRange.max !== b.freq.rankRange.max) return false;
+
+  if (a.bookmarkedOnly !== b.bookmarkedOnly) return false;
+  if (a.withAnchorWordsOnly !== b.withAnchorWordsOnly) return false;
 
   return true;
 };

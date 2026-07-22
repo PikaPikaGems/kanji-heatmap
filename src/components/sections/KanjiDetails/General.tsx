@@ -110,7 +110,7 @@ export const General = ({ kanji }: { kanji: string }) => {
     },
     { label: "WK", value: data.wk, description: orderDisclaimer },
     { label: "KKLC", value: data.kklcIndex, description: orderDisclaimer },
-    { label: "RTKA", value: data.rtk, description: orderDisclaimer },
+    { label: "RTK", value: data.rtk, description: orderDisclaimer },
     { label: "RTKB", value: data.rtkb, description: orderDisclaimer },
   ];
 

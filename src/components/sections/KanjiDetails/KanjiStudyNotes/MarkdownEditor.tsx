@@ -1,18 +1,63 @@
-import { useMemo, useRef, type UIEvent } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { EDITOR_HIGHLIGHT_CLASSES } from "./editorHighlightClasses";
 import { getMarkdownHighlightSegments } from "./markdown";
 
+/*
+ * HOW THIS EDITOR WORKS — and why the iOS-specific code below exists.
+ *
+ * The editor is two stacked layers: a transparent <textarea> on top (owns the
+ * real text, caret, and selection) over a <pre> backdrop that renders the same
+ * text with syntax colors. The illusion only holds while both layers compute
+ * identical glyph positions, line breaks, and scroll offsets.
+ *
+ * Reported bug this file guards against: on iPhone, pasting text (e.g. the
+ * copied `:vocab[...]` snippet from the editor tips) left the visible text
+ * offset from the native caret. Two documented WebKit behaviors cause that:
+ *
+ *  1. iOS auto-scrolls a focused textarea (paste, typing near the bottom)
+ *     WITHOUT reliably firing `scroll` events, so the backdrop stays behind —
+ *     a vertical offset that looks like a padding bug. Fix: a focus-scoped
+ *     rAF loop (`startScrollSyncLoop`) mirrors the scroll position every
+ *     frame instead of trusting events.
+ *  2. WebKit's glyph-shaping cache can go stale after edits near a wrap
+ *     boundary, desyncing caret/wrapping from the overlay. Fix: a reflow
+ *     nudge after each input (`nudgeGlyphLayout`).
+ *
+ * Both fixes are gated behind `isIOSLikeWebKit`, so desktop and Android
+ * behavior is unchanged: there the backdrop syncs via the plain `onScroll`
+ * handler, exactly as before.
+ */
+
 /**
  * Typography must match exactly on the backdrop and textarea — any padding,
- * weight, or italic mismatch shifts caret/selection relative to the highlights.
+ * size, kerning, or wrapping mismatch shifts caret/selection relative to the
+ * highlights, so both layers share this class and pin every metric-affecting
+ * property (kerning/ligatures off, text-size-adjust fixed, identical
+ * wrapping). Bold/italic highlight spans are metric-safe: the mono stack is
+ * fixed-pitch across weights/slants, CJK fallback glyphs are full-width, and
+ * `font-synthesis: none` (set at :root) prevents synthetic faces from
+ * changing advance widths.
  */
 const sharedEditorTextClass = cn(
-  "m-0 box-border p-3.5",
+  "m-0 box-border appearance-none rounded-none p-3.5",
   "font-mono text-base font-normal not-italic leading-[1.55rem] tracking-normal",
-  "text-left whitespace-pre-wrap break-words [overflow-wrap:anywhere]",
+  "[font-kerning:none] [font-variant-ligatures:none]",
+  "text-left whitespace-pre-wrap break-words",
+  "[-webkit-text-size-adjust:100%] [text-size-adjust:100%]",
   "border-0"
 );
+
+/**
+ * True only on iOS-family WebKit (Safari plus every iOS browser shell, since
+ * they all embed WebKit). Desktop and Android evaluate to false, keeping the
+ * iOS workarounds below completely inert there — no rAF loop, no reflow
+ * nudge, no behavior change.
+ */
+const isIOSLikeWebKit =
+  typeof CSS !== "undefined" &&
+  typeof CSS.supports === "function" &&
+  CSS.supports("-webkit-touch-callout", "none");
 
 interface MarkdownEditorProps {
   value: string;
@@ -31,14 +76,70 @@ export const MarkdownEditor = ({
   autoFocus = false,
 }: MarkdownEditorProps) => {
   const backdropRef = useRef<HTMLPreElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const scrollSyncRafRef = useRef<number | null>(null);
   const segments = useMemo(() => getMarkdownHighlightSegments(value), [value]);
 
-  const syncScroll = (event: UIEvent<HTMLTextAreaElement>) => {
-    if (backdropRef.current == null) {
+  const syncScrollNow = () => {
+    const backdrop = backdropRef.current;
+    const textarea = textareaRef.current;
+    if (backdrop == null || textarea == null) {
       return;
     }
-    backdropRef.current.scrollTop = event.currentTarget.scrollTop;
-    backdropRef.current.scrollLeft = event.currentTarget.scrollLeft;
+    backdrop.scrollTop = textarea.scrollTop;
+    backdrop.scrollLeft = textarea.scrollLeft;
+  };
+
+  /**
+   * iOS fix #1 (see file header): iOS WebKit auto-scrolls a focused textarea
+   * (paste, typing near the bottom, caret moves) without reliably firing
+   * scroll events, which leaves the highlight backdrop vertically offset from
+   * the caret — the "text drifted away from the cursor after paste" bug.
+   * While the textarea is focused, mirror its scroll position every animation
+   * frame instead of trusting events. iOS-only; other platforms return
+   * immediately and keep using the `onScroll` handler.
+   */
+  const startScrollSyncLoop = () => {
+    if (!isIOSLikeWebKit || scrollSyncRafRef.current != null) {
+      return;
+    }
+    const tick = () => {
+      syncScrollNow();
+      scrollSyncRafRef.current = requestAnimationFrame(tick);
+    };
+    scrollSyncRafRef.current = requestAnimationFrame(tick);
+  };
+
+  const stopScrollSyncLoop = () => {
+    if (scrollSyncRafRef.current != null) {
+      cancelAnimationFrame(scrollSyncRafRef.current);
+      scrollSyncRafRef.current = null;
+    }
+  };
+
+  // Effect needed: the rAF loop is an imperative subscription that must be
+  // cancelled on unmount (blur never fires if the dialog unmounts while
+  // focused); there is no render-time way to express that cleanup.
+  useEffect(() => stopScrollSyncLoop, []);
+
+  /**
+   * iOS fix #2 (see file header): WebKit can leave the textarea's glyph
+   * layout stale after edits near a wrap boundary — the caret and wrapping
+   * visibly desync from the overlay even though both layers have identical
+   * styles (WebKit-only shaping-cache bug). Toggling letter-spacing and
+   * forcing a reflow invalidates the stale cache; the value is visually
+   * imperceptible and removed immediately. Documented in
+   * https://github.com/panphora/overtype/issues/116 (same overlay
+   * architecture as this editor).
+   */
+  const nudgeGlyphLayout = () => {
+    const textarea = textareaRef.current;
+    if (textarea == null) {
+      return;
+    }
+    textarea.style.setProperty("letter-spacing", "-0.001px", "important");
+    void textarea.offsetHeight;
+    textarea.style.removeProperty("letter-spacing");
   };
 
   return (
@@ -69,13 +170,14 @@ export const MarkdownEditor = ({
           {"\n"}
         </pre>
         <textarea
+          ref={textareaRef}
           aria-label="Kanji study notes Markdown"
           value={value}
           maxLength={maxLength}
           rows={8}
           spellCheck={false}
           autoFocus={autoFocus}
-          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable in View Mode."
+          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable when your notes are finally displayed."
           className={cn(
             sharedEditorTextClass,
             "relative block w-full resize-none bg-transparent outline-none",
@@ -89,8 +191,22 @@ export const MarkdownEditor = ({
             // Explicit fill (not unset) — unset inherits the parent's transparent fill.
             "placeholder:text-muted-foreground placeholder:[-webkit-text-fill-color:hsl(var(--muted-foreground))]"
           )}
-          onChange={(event) => onChange(event.target.value)}
-          onScroll={syncScroll}
+          onChange={(event) => {
+            onChange(event.target.value);
+            // iOS only (inert elsewhere): after the edit is painted, clear
+            // WebKit's stale glyph layout and re-sync the backdrop scroll —
+            // paste both scrolls the textarea silently (fix #1) and can
+            // leave stale shaping (fix #2).
+            if (isIOSLikeWebKit) {
+              requestAnimationFrame(() => {
+                nudgeGlyphLayout();
+                syncScrollNow();
+              });
+            }
+          }}
+          onScroll={syncScrollNow}
+          onFocus={startScrollSyncLoop}
+          onBlur={stopScrollSyncLoop}
         />
       </div>
       <p

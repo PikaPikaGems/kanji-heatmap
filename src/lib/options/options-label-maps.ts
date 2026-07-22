@@ -47,7 +47,7 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
 };
 
 export const orderDisclaimer =
-  "⚠️ Community-based orders (WK, KKLC, RTK) are provided may differ from official editions. For accuracy, please refer to the original books or apps.";
+  "⚠️ Community-based orders (WK, KKLC, RTK) may differ from official editions. For accuracy, please refer to the original books or apps.";
 
 export const COMMUNITY_ORDER_KEYS = [
   K_WK_LVL,
