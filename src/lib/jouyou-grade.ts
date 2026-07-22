@@ -1,4 +1,4 @@
-/** Jōyō school-grade bands used in kanji_extended.json. */
+/** Jouyou school-grade bands used in kanji_extended.json. */
 
 export const JOUYOU_GRADE_ARR = [1, 2, 3, 4, 5, 6, 9, -1] as const;
 export type JouyouGrade = (typeof JOUYOU_GRADE_ARR)[number];
@@ -53,7 +53,7 @@ export const JouyouGradeListItems: Record<
     cn: "bg-gray-400",
     cnBorder: "border-gray-400",
     color: "gray",
-    label: "Not in Jōyō",
+    label: "Not in Jouyou",
   },
 };
 

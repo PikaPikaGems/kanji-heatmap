@@ -28,7 +28,7 @@ test.describe("practice modes", () => {
     { name: "reading", route: "/reading-practice" },
     { name: "writing", route: "/writing-practice" },
   ]) {
-    test(`${name} practice: Jōyō-grade filter narrows the deck`, async ({
+    test(`${name} practice: Jouyou-grade filter narrows the deck`, async ({
       page,
     }) => {
       await page.goto(route);

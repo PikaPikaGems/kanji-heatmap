@@ -26,7 +26,7 @@ export const FilterMultiSelect = <T extends string>({
 
   return (
     <div>
-      <Label className="text-xs font-thin" htmlFor={fieldId}>
+      <Label className="text-xs" htmlFor={fieldId}>
         {label}
       </Label>
       <MultiSelect
