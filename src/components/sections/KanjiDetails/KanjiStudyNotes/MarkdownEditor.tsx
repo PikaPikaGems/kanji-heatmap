@@ -55,7 +55,7 @@ export const MarkdownEditor = ({
           aria-hidden="true"
           className={cn(
             sharedEditorTextClass,
-            "absolute inset-0 overflow-hidden pointer-events-none"
+            "markdown-editor-backdrop absolute inset-0 overflow-hidden pointer-events-none"
           )}
         >
           {segments.map((segment, index) => (
@@ -78,7 +78,7 @@ export const MarkdownEditor = ({
           placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable when your notes are finally displayed."
           className={cn(
             sharedEditorTextClass,
-            "relative block w-full resize-none bg-transparent outline-none",
+            "markdown-editor-input relative block w-full resize-none bg-transparent outline-none",
             fill ? "h-full min-h-0" : "h-64",
             // Glyphs stay invisible so only the backdrop colors show; caret stays visible.
             "text-transparent caret-foreground [-webkit-text-fill-color:transparent]",

@@ -182,6 +182,27 @@ button {
   .fixed-viewport-layer {
     transform: translateZ(0);
   }
+
+  /*
+   * iOS WebKit wraps textarea text differently from an identically styled
+   * <pre> after paste/composition. The notes editor normally overlays a
+   * transparent textarea on a highlighted backdrop; on iOS that can separate
+   * the native caret from the visible glyphs. Render the textarea's own text
+   * instead so text, selection, and caret always share one layout engine.
+   */
+  .markdown-editor-backdrop {
+    display: none;
+  }
+
+  .markdown-editor-input {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  }
+
+  .markdown-editor-input::selection {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  }
 }
 
 .animate-fade-in {
