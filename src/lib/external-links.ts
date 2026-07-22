@@ -203,6 +203,7 @@ export const outLinks = {
   ririkku: `https://ririkku.com/?utm_source=kanjiheatmap`,
   twitter: "https://x.com/pikapikagemsJP",
   instagram: "https://www.instagram.com/pikapikagems/",
+  email: "mailto:admin@pikapikagems.com",
   jpWordRanks:
     "https://pikapikagems.github.io/japanese-word-ranks/?utm_source=kanjiheatmap",
 };

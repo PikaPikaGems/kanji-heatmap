@@ -1,6 +1,6 @@
 import { outLinks } from "@/lib/external-links";
 import { BugIcon, DiscordIcon } from "../icons";
-import { BirdIcon, InstagramIcon } from "lucide-react";
+import { BirdIcon, InstagramIcon, Mail } from "lucide-react";
 
 const bugItem = {
   href: outLinks.githubIssue,
@@ -26,11 +26,18 @@ export const instagramItem = {
   icon: <InstagramIcon />,
 };
 
+const emailItem = {
+  href: outLinks.email,
+  text: "Email us",
+  icon: <Mail />,
+};
+
 const linksOutItems = {
   bugItem,
   discordItem,
   twitterItem,
   instagramItem,
+  emailItem,
 };
 
 export { linksOutItems };

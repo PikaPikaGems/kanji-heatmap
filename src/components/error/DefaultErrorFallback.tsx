@@ -1,6 +1,10 @@
-import { ReachOutToUs, RefreshOrGoBackHome, Wrapper } from "./common";
+import { ErrorToolbarCta, Wrapper } from "./common";
 import { Sumimasen } from "./Sumimasen";
 
+/**
+ * Default full-page unexpected-error fallback.
+ * Apology + message, then linked hi/bug/refresh above the social icon row.
+ */
 export const DefaultErrorFallback = ({
   message = "Welp... this isn’t supposed to happen! 🫣🫣",
   showDefaultCta = true,
@@ -10,18 +14,13 @@ export const DefaultErrorFallback = ({
 }) => {
   return (
     <Wrapper>
-      <Sumimasen />
-      <div className="my-1 font-bold text-xs max-w-96">{message}</div>
-      {showDefaultCta && (
-        <div className="mx-2 text-xs">
-          <div>
-            <ReachOutToUs />
-          </div>
-          <div className="mt-1">
-            <RefreshOrGoBackHome />
-          </div>
-        </div>
-      )}
+      <div className="flex w-full max-w-md flex-col items-center gap-6 animate-fade-in">
+        <Sumimasen />
+        <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+          {message}
+        </p>
+        {showDefaultCta && <ErrorToolbarCta />}
+      </div>
     </Wrapper>
   );
 };
