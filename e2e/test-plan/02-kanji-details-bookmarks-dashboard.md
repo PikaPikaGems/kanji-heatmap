@@ -12,6 +12,7 @@ link; stroke-order accordion + replay controls (`kanji-details.spec.ts`,
 `home.spec.ts`). Dashboard **empty** state (`navigation.spec.ts`).
 
 localStorage keys involved:
+
 - Bookmarks: `b:<kanji>:<word>` = `"true"` (prefix scan in `bookmarks.ts`)
 - Known status: boolean keys via `useLocalStorage2`
 - Activity: `activity-all-time`, `activity-by-day`
@@ -22,6 +23,7 @@ localStorage keys involved:
 ## Detail drawer content (P1)
 
 ### KD-1: Drawer sections render for a data-rich kanji
+
 - **Guards:** `KanjiInfoContent.tsx` accordion composition and the
   worker's `kanji-extended` request.
 - **Steps:** `goto /?open=%E6%B0%B4` (水); expand each accordion section
@@ -33,6 +35,7 @@ localStorage keys involved:
   (Jisho, Jotoba) present.
 
 ### KD-2: Similar-kanji click navigates the drawer to the new kanji
+
 - **Guards:** drawer-internal navigation via the `open` URL param
   (`useKanjiUrlState` in `src/hooks/routing-hooks.ts`).
 - **Steps:** open 水, expand similar-kanji section, click a suggestion.
@@ -40,6 +43,7 @@ localStorage keys involved:
   header shows it; browser Back returns to 水's drawer.
 
 ### KD-3: Document title reflects the open kanji
+
 - **Guards:** `use-html-document-title`.
 - **Steps:** `goto /?open=%E6%B0%B4`.
 - **Assertions:** `await expect(page).toHaveTitle(/水/)`; closing the
@@ -50,6 +54,7 @@ localStorage keys involved:
 ## Bookmarks & known status (P1)
 
 ### BM-1: Bookmarking persists across reload
+
 - **Guards:** `KanjiWordStatusActions.tsx` write path + `safeReadJson`
   storage helpers.
 - **Steps:** open a kanji drawer, toggle a bookmark action; assert its
@@ -58,6 +63,7 @@ localStorage keys involved:
   key (`page.evaluate` over `Object.keys(localStorage)`).
 
 ### BM-2: Known-status toggle persists and is reflected in card borders
+
 - **Guards:** study-status border coloring (`ItemSettings`
   `borderColorMeaning: "study-status"`).
 - **Steps:** seed `item-settings` for study-status borders (or set via
@@ -68,6 +74,7 @@ localStorage keys involved:
   class changes, note it and assert localStorage + drawer state instead.
 
 ### BM-3: Same-page storage sync (synthetic StorageEvent)
+
 - **Guards:** `notifyStorage` in `src/lib/storage.ts` — components on the
   same page sharing a key sync via a manually dispatched `StorageEvent`;
   the subtlest sync surface in the app.
@@ -82,6 +89,7 @@ localStorage keys involved:
 ## Dashboard with data (P2)
 
 ### DB-1: Seeded activity renders heatmap and stats
+
 - **Guards:** `ActivityCalendarHeatmap.tsx`, `CalendarGrid.tsx`,
   stats overview components.
 - **Steps:** before `goto`, seed localStorage via an init script
@@ -93,11 +101,13 @@ localStorage keys involved:
   **hidden**; heatmap grid renders cells; a non-zero stat is visible.
 
 ### DB-2: Bookmarks breakdown counts seeded bookmarks
+
 - **Steps:** seed several `b:<kanji>:<word>` keys via init script;
   `goto /dashboard`.
 - **Assertions:** breakdown section shows the expected count / kanji.
 
 ### DB-3: Duration navigation switches the visible period
+
 - **Steps:** with seeded multi-day activity, use the duration nav
   controls.
 - **Assertions:** the displayed period label changes; grid re-renders

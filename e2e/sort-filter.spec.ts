@@ -53,7 +53,7 @@ test.describe("sort and filter", () => {
       .click();
 
     const dialog = page.getByRole("dialog");
-    await dialog.getByLabel("Jōyō grade").click();
+    await dialog.getByLabel("Jouyou Grade").click();
     await page.getByRole("option", { name: "Grade 1", exact: true }).click();
     await page.keyboard.press("Escape");
     await dialog.getByRole("button", { name: "Apply" }).click();
