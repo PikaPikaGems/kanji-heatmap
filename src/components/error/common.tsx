@@ -5,24 +5,6 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { outLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
 
-export const RefreshOrGoBackHome = () => {
-  return (
-    <p className="text-xs text-muted-foreground">
-      Meanwhile, you can try{" "}
-      <button
-        type="button"
-        className={cnTextLink}
-        onClick={() => {
-          window?.location.reload();
-        }}
-      >
-        refreshing the page
-      </button>{" "}
-      or try again later.
-    </p>
-  );
-};
-
 /** Linked CTA: Discord / GitHub issue / reload — shown above the icon row. */
 export const SayHiReportOrRefresh = () => {
   return (
