@@ -18,7 +18,11 @@ export const InitialScreen = ({
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const { deck, loading, canStart } = usePracticeDeck(settings);
+  // Writing practice never randomizes fonts (unlike reading / speed katakana).
+  const { deck, loading, canStart } = usePracticeDeck({
+    ...settings,
+    randomizeFont: false,
+  });
 
   useEnterAction(canStart ? () => onStart(deck) : null, canStart);
 
@@ -28,6 +32,7 @@ export const InitialScreen = ({
       description={productionPracticePageMeta.description}
       filters={settings}
       onFilterChange={setSetting}
+      showRandomizeFont={false}
       deckSize={deck.length}
       loading={loading}
       canStart={canStart}

@@ -10,8 +10,8 @@ import { DeckFilterSettings } from "./types";
 
 /**
  * Shared scaffold for the practice-mode start screens: heading, the
- * "Kanji to include" filters, the two shared session toggles (with
- * mode-specific options injected below them), and the sticky start footer.
+ * "Kanji to include" filters, shared session toggles (with mode-specific
+ * options injected below them), and the sticky start footer.
  */
 export const PracticeInitialScreen = ({
   heading,
@@ -19,6 +19,7 @@ export const PracticeInitialScreen = ({
   filters,
   onFilterChange,
   sessionOptions,
+  showRandomizeFont = true,
   deckSize,
   loading,
   canStart,
@@ -33,6 +34,8 @@ export const PracticeInitialScreen = ({
   ) => void;
   /** Mode-specific controls rendered below the shared session toggles. */
   sessionOptions?: ReactNode;
+  /** Reading practice keeps this; writing practice hides it. */
+  showRandomizeFont?: boolean;
   deckSize: number;
   loading: boolean;
   canStart: boolean;
@@ -88,12 +91,14 @@ export const PracticeInitialScreen = ({
             checked={filters.randomizeOrder}
             onChange={(v) => onFilterChange("randomizeOrder", v)}
           />
-          <ToggleRow
-            id="randomize-font"
-            label="Randomize font"
-            checked={filters.randomizeFont}
-            onChange={(v) => onFilterChange("randomizeFont", v)}
-          />
+          {showRandomizeFont && (
+            <ToggleRow
+              id="randomize-font"
+              label="Randomize font"
+              checked={filters.randomizeFont}
+              onChange={(v) => onFilterChange("randomizeFont", v)}
+            />
+          )}
           {sessionOptions}
         </section>
       </div>
