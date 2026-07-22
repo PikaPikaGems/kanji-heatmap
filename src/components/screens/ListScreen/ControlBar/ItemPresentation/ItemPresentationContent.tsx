@@ -13,6 +13,7 @@ import { FreqGradient } from "@/components/common/freq/FreqGradient";
 import { ItemTypeSwitch } from "@/components/common/ItemTypeSwitch";
 import { JLPTBordersMeanings } from "@/components/common/jlpt/JLPTBorderMeanings";
 import { StudyStatusBorderMeanings } from "@/components/common/StudyStatusBorderMeanings";
+import { JouyouGradeBordersMeanings } from "@/components/common/JouyouGradeBorderMeanings";
 import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoIcon";
 import { useBgSrc, useBgSrcDispatch } from "@/hooks/routing-hooks";
 import BasicSelect from "@/components/common/BasicSelect";
@@ -84,6 +85,7 @@ const CardStateSettings = () => {
         options={[
           { value: "jlpt", label: "JLPT Level" },
           { value: "study-status", label: "Study Status" },
+          { value: "grade", label: "Jōyō Grade" },
           { value: "none", label: "None" },
         ]}
       />
@@ -95,6 +97,11 @@ const CardStateSettings = () => {
       {cardState.borderColorMeaning === "study-status" && (
         <div key="study-status" className="animate-fade-in">
           <StudyStatusBorderMeanings />
+        </div>
+      )}
+      {cardState.borderColorMeaning === "grade" && (
+        <div key="grade" className="animate-fade-in">
+          <JouyouGradeBordersMeanings />
         </div>
       )}
     </>

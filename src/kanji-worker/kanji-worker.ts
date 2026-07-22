@@ -279,6 +279,17 @@ const HANDLERS: Record<KanjiWorkerRequestName, Handler> = {
       .then(() => reply.ok(KANJI_INFO_MAIN_CACHE))
       .catch(reply.err);
   },
+  "jouyou-grade-map": (_payload, reply) => {
+    if (Object.keys(KANJI_INFO_EXTENDED_CACHE).length === 0) {
+      reply.err({ message: "Extended kanji cache not initialized" });
+      return;
+    }
+    const grades: Record<string, number> = {};
+    for (const kanji of Object.keys(KANJI_INFO_EXTENDED_CACHE)) {
+      grades[kanji] = KANJI_INFO_EXTENDED_CACHE[kanji].jouyouGrade;
+    }
+    reply.ok(grades);
+  },
   "part-keyword-map": (_payload, reply) => {
     fetchPartKeywordInfo()
       .then((r) => {
