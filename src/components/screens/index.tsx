@@ -4,7 +4,6 @@ import { AboutScreen, TermsScreen, PrivacyScreen } from "./DocsScreen";
 import { SpeedKatakanaScreen } from "./SpeedKatakanaScreen";
 import { DashboardScreen } from "./DashboardScreen";
 import { MasteryScreen } from "./MasteryScreen";
-import { ErrorFallbackPreviewScreen } from "./ErrorFallbackPreviewScreen";
 
 export {
   CumUseScreen,
@@ -15,5 +14,4 @@ export {
   SpeedKatakanaScreen,
   DashboardScreen,
   MasteryScreen,
-  ErrorFallbackPreviewScreen,
 };
