@@ -103,6 +103,8 @@ const settings = ({
     jlpt,
     jouyouGrade,
     freq: { source: "none", rankRange: { min: 1, max: 99999 } },
+    bookmarkedOnly: false,
+    withAnchorWordsOnly: false,
   },
   sortSettings: { primary, secondary },
 });

@@ -30,6 +30,8 @@ const defaultFilterSettings: FilterSettings = {
     source: "none",
     rankRange: { min: 1, max: MAX_FREQ_RANK },
   },
+  bookmarkedOnly: false,
+  withAnchorWordsOnly: false,
 };
 
 const defaultSortSettings: SortSettings = {
@@ -127,6 +129,8 @@ const toSearchSettings = (sp: URLSearchParams): SearchSettings => {
           ),
         },
       },
+      bookmarkedOnly: sp.get(p.filterSettings.bookmarkedOnly) === "1",
+      withAnchorWordsOnly: sp.get(p.filterSettings.withAnchorWordsOnly) === "1",
     },
     sortSettings: {
       primary: toSortKey(sp.get(p.sortSettings.primary)),
@@ -210,6 +214,13 @@ const writeFilterSettings = (prev: URLSearchParams, newVal: FilterSettings) => {
     p.freq.rankRange.max,
     newVal.freq.rankRange.max.toString(),
     noFreqSource || newVal.freq.rankRange.max >= MAX_FREQ_RANK
+  );
+  setOrDelete(prev, p.bookmarkedOnly, "1", newVal.bookmarkedOnly !== true);
+  setOrDelete(
+    prev,
+    p.withAnchorWordsOnly,
+    "1",
+    newVal.withAnchorWordsOnly !== true
   );
   return prev;
 };

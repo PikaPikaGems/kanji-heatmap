@@ -17,6 +17,8 @@ export const searchSettings = createContextComponents<SearchSettings>({
       source: "none" as const,
       rankRange: { min: 1, max: MAX_FREQ_RANK },
     },
+    bookmarkedOnly: false,
+    withAnchorWordsOnly: false,
   },
   sortSettings: {
     primary: "none",

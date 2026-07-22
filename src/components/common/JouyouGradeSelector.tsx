@@ -21,7 +21,7 @@ export const JouyouGradeSelector = ({
   setSelectedGrades: (values: JouyouGradeType[]) => void;
 }) => (
   <FilterMultiSelect
-    label="Jōyō grade"
+    label="Jouyou Grade"
     options={JouyouGradeOptionsWithIcon}
     selectedValues={selectedGrades}
     onValueChange={setSelectedGrades}

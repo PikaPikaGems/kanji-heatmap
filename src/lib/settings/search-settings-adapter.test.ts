@@ -37,6 +37,8 @@ describe("search settings ↔ URL params round-trip", () => {
         jlpt: ["n5", "n4"],
         jouyouGrade: ["1", "6", "none"],
         freq: { source: "rank-netflix", rankRange: { min: 5, max: 100 } },
+        bookmarkedOnly: true,
+        withAnchorWordsOnly: true,
       },
       sortSettings: { primary: "strokes", secondary: "keyword" },
     };

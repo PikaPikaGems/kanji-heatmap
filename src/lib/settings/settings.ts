@@ -31,6 +31,10 @@ export type FilterSettings = {
     source: FrequencyType;
     rankRange: { min: number; max: number };
   };
+  /** Keep only kanji with a bookmarked representative (anchor) word. */
+  bookmarkedOnly: boolean;
+  /** Keep only kanji that have an assigned anchor word. */
+  withAnchorWordsOnly: boolean;
 };
 
 export type SortSettings = {

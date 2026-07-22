@@ -75,7 +75,7 @@ export const MarkdownEditor = ({
           rows={8}
           spellCheck={false}
           autoFocus={autoFocus}
-          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable in View Mode."
+          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable when your notes are finally displayed."
           className={cn(
             sharedEditorTextClass,
             "relative block w-full resize-none bg-transparent outline-none",

@@ -12,6 +12,8 @@ export const URL_PARAMS = {
       source: "filter-freq-source",
       rankRange: { min: "filter-freq-rank-min", max: "filter-freq-rank-max" },
     },
+    bookmarkedOnly: "filter-bookmarked-only",
+    withAnchorWordsOnly: "filter-anchor-words-only",
   },
   sortSettings: {
     primary: "sort-primary",

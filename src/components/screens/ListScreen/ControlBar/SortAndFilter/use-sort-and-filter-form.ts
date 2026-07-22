@@ -83,6 +83,14 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
     }));
   };
 
+  const setBookmarkedOnly = (val: boolean) => {
+    setFilterValues((prev) => ({ ...prev, bookmarkedOnly: val }));
+  };
+
+  const setWithAnchorWordsOnly = (val: boolean) => {
+    setFilterValues((prev) => ({ ...prev, withAnchorWordsOnly: val }));
+  };
+
   const resetToDefaults = () => {
     setSortValues(defaultSortSettings);
     setFilterValues(defaultFilterSettings);
@@ -123,6 +131,8 @@ export const useSortAndFilterForm = (initialValue: SearchSettings) => {
     setJouyouGrade,
     setFreqSource,
     setFreqRankRange,
+    setBookmarkedOnly,
+    setWithAnchorWordsOnly,
     resetToDefaults,
     buildSettings,
   };
