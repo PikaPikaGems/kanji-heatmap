@@ -45,13 +45,20 @@ interface QueryState<T> {
  * Pass `run = null` to disable the query (empty / "none" inputs); the hook
  * resets to idle. `keepPreviousData` keeps the last data visible during the
  * next load (default true — avoids a flash of empty state between requests).
+ * `initialData` seeds the first render, so a remount with an answer already in
+ * hand renders it immediately instead of flashing a loading state.
  */
 const useWorkerQuery = <T,>(
   run: (() => Promise<T>) | null,
   deps: DependencyList,
-  keepPreviousData = true
+  keepPreviousData = true,
+  initialData?: T
 ): QueryState<T> => {
-  const [state, setState] = useState<QueryState<T>>({ status: "idle" });
+  const [state, setState] = useState<QueryState<T>>(
+    initialData === undefined
+      ? { status: "idle" }
+      : { status: "success", data: initialData }
+  );
 
   // Effect needed: dispatches a request to the web worker (external async
   // system) keyed to `deps`; the cancelled flag drops stale responses.
@@ -112,11 +119,23 @@ export const useGetKanjiInfoFn = () => {
   return fn;
 };
 
+/**
+ * Search results keyed by the settings that produced them.
+ *
+ * The list screen unmounts on every route change, so returning to it used to
+ * restart the query from scratch and show the loading skeleton again for a
+ * result the worker had already computed. The data is static, so a previous
+ * answer for identical settings is always still correct.
+ */
+const searchResultCache = new Map<string, SearchResponse>();
+
+const searchCacheKey = (settings: SearchSettings) => JSON.stringify(settings);
+
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
-  // ItemCountBadge (and similar) can mount before the worker finishes loading
-  // main + extended maps. Searching with only main populated crashes the
-  // worker on `exInfo.strokes` and rejects every pending request via onerror.
+  // ItemCountBadge (and similar) can mount before the worker is ready; the
+  // query stays idle until then rather than racing initialisation.
   const ready = useIsKanjiWorkerReady();
+  const cacheKey = searchCacheKey(searchSettings);
 
   const state = useWorkerQuery<SearchResponse>(
     ready
@@ -124,9 +143,14 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
           requestWorker({
             type: "search",
             payload: searchSettings,
+          }).then((response) => {
+            searchResultCache.set(cacheKey, response);
+            return response;
           })
       : null,
-    [searchSettings, ready]
+    [searchSettings, ready],
+    true,
+    searchResultCache.get(cacheKey)
   );
 
   return {
