@@ -6,7 +6,10 @@ import { SearchSettings } from "@/lib/settings/settings";
 import { KanjiInfoRequestType } from "@/lib/kanji/kanji-info-types";
 import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import {
+  GetBasicKanjiInfo,
+  SearchResponse,
+} from "@/lib/kanji/kanji-worker-types";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
@@ -120,21 +123,19 @@ export const useGetKanjiInfoFn = () => {
   return fn;
 };
 
-type SearchResult = { kanjis: string[]; possibleRadicals?: Set<string> };
-
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
   // ItemCountBadge (and similar) can mount before the worker finishes loading
   // main + extended maps. Searching with only main populated crashes the
   // worker on `exInfo.strokes` and rejects every pending request via onerror.
   const ready = useIsKanjiWorkerReady();
 
-  const state = useWorkerQuery<SearchResult>(
+  const state = useWorkerQuery<SearchResponse>(
     ready
       ? () =>
           requestWorker({
             type: "search",
             payload: searchSettings,
-          }) as Promise<SearchResult>
+          })
       : null,
     [searchSettings, ready]
   );
@@ -159,7 +160,7 @@ const fetchJouyouGradeMap = () => {
     jouyouGradeMapPromise = requestWorker({
       type: "jouyou-grade-map",
     }).then((data) => {
-      jouyouGradeMapCache = data as Record<string, number>;
+      jouyouGradeMapCache = data;
       return jouyouGradeMapCache;
     });
   }
@@ -191,7 +192,7 @@ export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
           requestWorker({
             type: "search-result-count",
             payload: searchSettings,
-          }) as Promise<number>
+          })
       : null,
     [searchSettings, ready]
   );
@@ -259,20 +260,13 @@ export interface VocabInfo {
   parts: WordPartDetail[];
 }
 
-type VocabWorkerResponse = {
-  word: string;
-  meaning: string;
-  wordPartDetails: WordPartDetail[];
-} | null;
-
 // Hook to get vocab info for a specific word
 export const useVocabDetails = (word: string) => {
   const state = useWorkerQuery<VocabInfo | null>(
     word
       ? () =>
           requestWorker({ type: "retrieve-vocab-info", payload: word }).then(
-            (result) => {
-              const response = result as VocabWorkerResponse;
+            (response) => {
               if (response == null) {
                 return null;
               }
@@ -320,7 +314,7 @@ export const useSimilarKanjis = (kanji: string) => {
           requestWorker({
             type: "kanji-similar",
             payload: kanji,
-          }) as Promise<string[]>
+          })
       : null,
     [kanji],
     // Reset to empty between kanji so the previous kanji's matches never show

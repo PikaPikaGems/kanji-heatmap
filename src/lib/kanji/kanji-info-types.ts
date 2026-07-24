@@ -3,22 +3,23 @@ import {
   KanjiExtendedInfo,
   KanjiInfoFrequency,
   KanjiMainInfo,
+  WordPartDetail,
 } from "./kanji-worker-types";
 
 export type KanjiInfoRequestType = "hover-card" | "general" | "radical-keyword";
 
+type VocabWord = {
+  word: string;
+  meaning: string;
+  wordPartDetails: WordPartDetail[];
+};
+
 export type VocabExtendedInfo = {
   vocabInfo?: {
-    first?: {
-      word: string;
-      meaning: string;
-      wordPartDetails: string[][];
-    };
-    second?: {
-      word: string;
-      meaning: string;
-      wordPartDetails: string[][];
-    };
+    // null (not undefined) when the kanji has no first/second sample word —
+    // that is what the worker's retrieveVocabInfo returns.
+    first?: VocabWord | null;
+    second?: VocabWord | null;
   };
 };
 export type KanjiCacheItem = {
@@ -31,7 +32,7 @@ export type KanjiWordDetails = {
   meaning: string;
   // word: part details
   // "行為": [["行", "こう"], ["為","い"]]
-  wordPartDetails: string[][];
+  wordPartDetails: WordPartDetail[];
   partsList: {
     kanji: string;
     keyword: string;

@@ -1,11 +1,6 @@
 import { JLTPTtypes } from "../jlpt";
-
-export type KanjiWorkerInfoRequestType = "kanji-extended" | "kanji-similar";
-// | "kanji-related-kanji"
-// | "kanji-notes"
-// | "kanji-other-vocab";
-
-export type KanjiSearchRequestType = "search-result-count" | "search";
+import type { SearchSettings } from "../settings/settings";
+import type { VocabExtendedInfo } from "./kanji-info-types";
 
 export type KanjiMainInfo = {
   keyword: string;
@@ -115,22 +110,58 @@ export type ExtendedKanjiInfoResponseType = Record<
   ExtendedKanjiInfoItemType
 >;
 
-export type KanjiWorkerRequestName =
-  | KanjiWorkerInfoRequestType
-  | KanjiSearchRequestType
-  | "initialize-extended-kanji-map"
-  | "initialize-segmented-vocab-map"
-  | "initialize-decomposition-map"
-  | "kanji-main-map"
-  | "jouyou-grade-map"
-  | "phonetic-map"
-  | "part-keyword-map"
-  | "retrieve-vocab-info";
+// ---------------------------------------------------------------------------
+// Worker protocol
+//
+// One entry per request: its payload and its response. The promise wrapper on
+// the main thread and the HANDLERS map inside the worker both derive their
+// types from this, so adding a request means one entry here plus one handler,
+// and a mismatch on either side is a compile error rather than a runtime cast.
+// ---------------------------------------------------------------------------
+
+export type SearchResponse = {
+  kanjis: string[];
+  possibleRadicals?: Set<string>;
+};
+
+export type VocabInfoResponse = {
+  word: string;
+  meaning: WordMeaning;
+  wordPartDetails: WordPartDetail[];
+} | null;
+
+export interface WorkerApi {
+  "initialize-extended-kanji-map": { payload: undefined; response: void };
+  "initialize-segmented-vocab-map": { payload: undefined; response: void };
+  "initialize-decomposition-map": { payload: undefined; response: void };
+  "kanji-main-map": {
+    payload: undefined;
+    response: Record<string, KanjiMainInfo>;
+  };
+  "jouyou-grade-map": { payload: undefined; response: Record<string, number> };
+  "phonetic-map": { payload: undefined; response: Record<string, string[]> };
+  "part-keyword-map": { payload: undefined; response: Record<string, string> };
+  "retrieve-vocab-info": { payload: string; response: VocabInfoResponse };
+  search: { payload: SearchSettings; response: SearchResponse };
+  "search-result-count": { payload: SearchSettings; response: number };
+  "kanji-extended": {
+    payload: string;
+    response: KanjiExtendedInfo & VocabExtendedInfo;
+  };
+  "kanji-similar": { payload: string; response: string[] };
+}
+
+export type KanjiWorkerRequestName = keyof WorkerApi;
+
+/** The `{type, payload}` envelope for one request name. */
+export type WorkerRequestOf<K extends KanjiWorkerRequestName> =
+  undefined extends WorkerApi[K]["payload"]
+    ? { type: K; payload?: WorkerApi[K]["payload"] }
+    : { type: K; payload: WorkerApi[K]["payload"] };
 
 export type KanjiWorkerRequest = {
-  type: KanjiWorkerRequestName;
-  payload?: unknown;
-};
+  [K in KanjiWorkerRequestName]: WorkerRequestOf<K>;
+}[KanjiWorkerRequestName];
 
 export type OnMessageRequestType = {
   id: number;

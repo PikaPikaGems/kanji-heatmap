@@ -32,7 +32,8 @@ export const fetchExtendedKanjiInfo =
     assetsPaths.EXTENDED_KANJI_INFO_FILE_PATH
   );
 
-export const fetchPhoneticInfo = createFetch<Record<string, string>>(
+// phonetic.json maps a component to the sounds it signals: 𠦝 -> ["ちょう","かん"]
+export const fetchPhoneticInfo = createFetch<Record<string, string[]>>(
   assetsPaths.PHONETIC_FILE
 );
 

@@ -8,6 +8,7 @@ import {
   PostMessageResponseType,
   SegmentedVocabInfo,
   SegmentedVocabResponseType,
+  WorkerApi,
 } from "@/lib/kanji/kanji-worker-types";
 import {
   fetchExtendedKanjiInfo,
@@ -33,7 +34,7 @@ const KANJI_INFO_EXTENDED_CACHE: Record<string, KanjiExtendedInfo> = {};
 const KANJI_DECOMPOSITION_CACHE: Record<string, Set<string>> = {};
 
 let KANJI_SEGMENTED_VOCAB_CACHE: Record<string, SegmentedVocabInfo> = {};
-let KANJI_PHONETIC_MAP_CACHE: Record<string, string> = {};
+let KANJI_PHONETIC_MAP_CACHE: Record<string, string[]> = {};
 let KANJI_PART_KEYWORD_MAP_CACHE: Record<string, string> = {};
 let KANJI_BY_STROKE_ORDER_CACHE: string[] = [];
 let KANJI_SIMILAR_CACHE: Record<string, string[]> = {};
@@ -94,57 +95,22 @@ const retrieveVocabInfo = (word?: string) => {
 };
 
 // ---------------------------------------------------------------------------
-// Request dispatch. Each request type gets one named handler in HANDLERS;
-// onmessage itself only routes. Handlers reply via the `Reply` pair built
-// once per message from the request id + type.
+// Request dispatch. Every handler returns its response (or a promise of one)
+// and throws to signal failure; onmessage owns the reply envelope. Payload and
+// response types come from WorkerApi, so both sides of the protocol are
+// checked by the compiler instead of cast.
 // ---------------------------------------------------------------------------
-
-type Reply = {
-  ok: (data?: unknown) => void;
-  err: (error: { message: string }) => void;
-};
-
-type Handler = (payload: unknown, reply: Reply) => void;
-
-const makeReply = (id: number, eventType: KanjiWorkerRequestName): Reply => ({
-  ok: (data?: unknown) => {
-    const response: PostMessageResponseType = {
-      id,
-      response: {
-        requestType: eventType,
-        status: "COMPLETED",
-        data,
-      },
-    };
-    self.postMessage(response);
-  },
-  err: (error: { message: string }) => {
-    const response: PostMessageResponseType = {
-      id,
-      response: {
-        requestType: eventType,
-        status: "ERRORED",
-        error: {
-          message: `Message:${error.message}, request:${eventType} failed`,
-        },
-      },
-    };
-    console.error(response, error);
-    self.postMessage(response);
-  },
-});
 
 const MISSING_PAYLOAD_MESSAGE =
   "Please provide both an eventType and payload. One of them is missing";
 
 const requirePayload =
-  <T>(run: (payload: T, reply: Reply) => void): Handler =>
-  (payload, reply) => {
+  <P, R>(run: (payload: P) => R) =>
+  (payload: P | undefined): R => {
     if (payload == null) {
-      reply.err({ message: MISSING_PAYLOAD_MESSAGE });
-      return;
+      throw new Error(MISSING_PAYLOAD_MESSAGE);
     }
-    run(payload as T, reply);
+    return run(payload);
   };
 
 const getSearchPool = () => ({
@@ -159,28 +125,25 @@ const areKanjiCachesReady = () =>
 
 // "similar" searches need the lazily-fetched similar map before they can run;
 // every other search runs synchronously against the in-memory caches.
-const withSimilarCacheIfNeeded = (
+const withSimilarCacheIfNeeded = <T>(
   settings: SearchSettings,
-  reply: Reply,
-  run: () => void
-) => {
+  run: () => T
+): T | Promise<T> => {
   const needsSimilarCache =
     settings.textSearch.type === "similar" && settings.textSearch.text !== "";
 
   if (!needsSimilarCache) {
-    run();
-    return;
+    return run();
   }
 
-  ensureSimilarCache().then(run).catch(reply.err);
+  return ensureSimilarCache().then(run);
 };
 
-const handleSearch = requirePayload<SearchSettings>((settings, reply) => {
+const handleSearch = requirePayload((settings: SearchSettings) => {
   // Main and extended load in parallel. A search that lands between those
   // completions used to throw on undefined.strokes and kill the worker.
   if (!areKanjiCachesReady()) {
-    reply.err({ message: "Kanji caches not initialized" });
-    return;
+    throw new Error("Kanji caches not initialized");
   }
 
   // Side effect, the first time we search
@@ -201,114 +164,87 @@ const handleSearch = requirePayload<SearchSettings>((settings, reply) => {
       KANJI_DECOMPOSITION_CACHE
     );
 
-    reply.ok({ kanjis, possibleRadicals });
-    return;
+    return { kanjis, possibleRadicals };
   }
 
-  withSimilarCacheIfNeeded(settings, reply, () => {
-    const kanjis: string[] = searchKanji(settings, getSearchPool());
-    reply.ok({ kanjis });
+  return withSimilarCacheIfNeeded(settings, () => ({
+    kanjis: searchKanji(settings, getSearchPool()),
+  }));
+});
+
+const handleSearchResultCount = requirePayload((settings: SearchSettings) => {
+  if (!areKanjiCachesReady()) {
+    throw new Error("Kanji caches not initialized");
+  }
+
+  return withSimilarCacheIfNeeded(settings, () => {
+    const pool = getSearchPool();
+    const allKanji = Object.keys(pool.main);
+    return filterKanji(allKanji, settings, pool).length;
   });
 });
 
-const handleSearchResultCount = requirePayload<SearchSettings>(
-  (settings, reply) => {
-    if (!areKanjiCachesReady()) {
-      reply.err({ message: "Kanji caches not initialized" });
-      return;
-    }
-
-    withSimilarCacheIfNeeded(settings, reply, () => {
-      const pool = getSearchPool();
-      const allKanji = Object.keys(pool.main);
-      reply.ok(filterKanji(allKanji, settings, pool).length);
-    });
-  }
-);
-
-const handleKanjiExtended = requirePayload<string>((kanji, reply) => {
+const handleKanjiExtended = requirePayload((kanji: string) => {
   const extendedInfo = KANJI_INFO_EXTENDED_CACHE[kanji];
 
   if (extendedInfo == null) {
-    reply.err({ message: "No Kanji Info On Extended Cache" });
-    return;
+    throw new Error("No Kanji Info On Extended Cache");
   }
 
-  reply.ok({
+  return {
     ...extendedInfo,
     vocabInfo: {
       first: retrieveVocabInfo(extendedInfo.mainVocab?.[0]),
       second: retrieveVocabInfo(extendedInfo.mainVocab?.[1]),
     },
-  });
+  };
 });
 
-const handleKanjiSimilar = requirePayload<string>((kanji, reply) => {
-  ensureSimilarCache()
-    .then(() => {
-      const similars = (KANJI_SIMILAR_CACHE[kanji] ?? []).filter(
-        (similar) => KANJI_INFO_MAIN_CACHE[similar] != null
-      );
-      reply.ok(similars);
-    })
-    .catch(reply.err);
-});
+const handleKanjiSimilar = requirePayload((kanji: string) =>
+  ensureSimilarCache().then(() =>
+    (KANJI_SIMILAR_CACHE[kanji] ?? []).filter(
+      (similar) => KANJI_INFO_MAIN_CACHE[similar] != null
+    )
+  )
+);
 
-const HANDLERS: Record<KanjiWorkerRequestName, Handler> = {
-  "initialize-extended-kanji-map": (_payload, reply) => {
-    fetchExtendedKanjiInfo()
-      .then(loadExtendedKanjiInfo)
-      .then(() => reply.ok())
-      .catch(reply.err);
-  },
-  "initialize-decomposition-map": (_payload, reply) => {
-    fetchKanjiDecomposition()
-      .then(loadKanjiDecomposition)
-      .then(() => reply.ok())
-      .catch(reply.err);
-  },
-  "initialize-segmented-vocab-map": (_payload, reply) => {
-    fetchSegmentedVocab()
-      .then(loadSegmentedVocabInfo)
-      .then(() => reply.ok())
-      .catch(reply.err);
-  },
-  "kanji-main-map": (_payload, reply) => {
-    fetchMainKanjiInfo()
-      .then(loadMainKanjiInfo)
-      .then(() => reply.ok(KANJI_INFO_MAIN_CACHE))
-      .catch(reply.err);
-  },
-  "jouyou-grade-map": (_payload, reply) => {
+const HANDLERS: {
+  [K in KanjiWorkerRequestName]: (
+    payload: WorkerApi[K]["payload"]
+  ) => WorkerApi[K]["response"] | Promise<WorkerApi[K]["response"]>;
+} = {
+  "initialize-extended-kanji-map": () =>
+    fetchExtendedKanjiInfo().then(loadExtendedKanjiInfo),
+  "initialize-decomposition-map": () =>
+    fetchKanjiDecomposition().then(loadKanjiDecomposition),
+  "initialize-segmented-vocab-map": () =>
+    fetchSegmentedVocab().then(loadSegmentedVocabInfo),
+  "kanji-main-map": () =>
+    fetchMainKanjiInfo().then((items) => {
+      loadMainKanjiInfo(items);
+      return KANJI_INFO_MAIN_CACHE;
+    }),
+  "jouyou-grade-map": () => {
     if (Object.keys(KANJI_INFO_EXTENDED_CACHE).length === 0) {
-      reply.err({ message: "Extended kanji cache not initialized" });
-      return;
+      throw new Error("Extended kanji cache not initialized");
     }
     const grades: Record<string, number> = {};
     for (const kanji of Object.keys(KANJI_INFO_EXTENDED_CACHE)) {
       grades[kanji] = KANJI_INFO_EXTENDED_CACHE[kanji].jouyouGrade;
     }
-    reply.ok(grades);
+    return grades;
   },
-  "part-keyword-map": (_payload, reply) => {
-    fetchPartKeywordInfo()
-      .then((r) => {
-        KANJI_PART_KEYWORD_MAP_CACHE = r;
-      })
-      .then(() => reply.ok(KANJI_PART_KEYWORD_MAP_CACHE))
-      .catch(reply.err);
-  },
-  "phonetic-map": (_payload, reply) => {
-    fetchPhoneticInfo()
-      .then((r) => {
-        KANJI_PHONETIC_MAP_CACHE = r;
-      })
-      .then(() => reply.ok(KANJI_PHONETIC_MAP_CACHE))
-      .catch(reply.err);
-  },
-  "retrieve-vocab-info": (payload, reply) => {
-    reply.ok(retrieveVocabInfo(payload as string));
-  },
+  "part-keyword-map": () =>
+    fetchPartKeywordInfo().then((map) => {
+      KANJI_PART_KEYWORD_MAP_CACHE = map;
+      return KANJI_PART_KEYWORD_MAP_CACHE;
+    }),
+  "phonetic-map": () =>
+    fetchPhoneticInfo().then((map) => {
+      KANJI_PHONETIC_MAP_CACHE = map;
+      return KANJI_PHONETIC_MAP_CACHE;
+    }),
+  "retrieve-vocab-info": (word) => retrieveVocabInfo(word),
   search: handleSearch,
   "search-result-count": handleSearchResultCount,
   "kanji-extended": handleKanjiExtended,
@@ -316,20 +252,49 @@ const HANDLERS: Record<KanjiWorkerRequestName, Handler> = {
 };
 
 self.onmessage = function (event: { data: OnMessageRequestType }) {
-  const eventType = event.data.data.type;
-  const payload = event.data.data.payload;
-  const reply = makeReply(event.data.id, eventType);
+  const { id, data } = event.data;
+  const eventType = data.type;
+  const payload = data.payload;
 
-  const handler = (HANDLERS as Record<string, Handler | undefined>)[eventType];
+  const postReply = (response: PostMessageResponseType["response"]) => {
+    self.postMessage({ id, response } satisfies PostMessageResponseType);
+  };
+
+  const postError = (message: string, cause?: unknown) => {
+    const response: PostMessageResponseType["response"] = {
+      requestType: eventType,
+      status: "ERRORED",
+      error: { message: `Message:${message}, request:${eventType} failed` },
+    };
+    console.error({ id, response }, cause);
+    postReply(response);
+  };
+
+  const handler = (
+    HANDLERS as Record<string, ((payload: unknown) => unknown) | undefined>
+  )[eventType];
+
   if (handler == null) {
-    reply.err({
-      message:
-        eventType == null || payload == null
-          ? MISSING_PAYLOAD_MESSAGE
-          : "Not implemented",
-    });
+    postError(
+      eventType == null || payload == null
+        ? MISSING_PAYLOAD_MESSAGE
+        : "Not implemented"
+    );
     return;
   }
 
-  handler(payload, reply);
+  // Wrapping in a resolved promise means a handler can throw or reject and
+  // only that request fails; the worker itself stays alive.
+  Promise.resolve()
+    .then(() => handler(payload))
+    .then((responseData) =>
+      postReply({
+        requestType: eventType,
+        status: "COMPLETED",
+        data: responseData,
+      })
+    )
+    .catch((error: unknown) =>
+      postError(error instanceof Error ? error.message : String(error), error)
+    );
 };

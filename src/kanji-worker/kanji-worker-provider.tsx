@@ -5,13 +5,8 @@ import {
   KanjiInfoRequestType,
   KanjiPartKeywordCacheType,
   KanjiPhoneticCacheType,
-  VocabExtendedInfo,
 } from "@/lib/kanji/kanji-info-types";
-import {
-  GetBasicKanjiInfo,
-  KanjiExtendedInfo,
-  KanjiMainInfo,
-} from "@/lib/kanji/kanji-worker-types";
+import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import {
   extractKanjiGeneralData,
   extractKanjiHoverData,
@@ -51,19 +46,18 @@ export function KanjiWorkerProvider({
     // parallel with the worker-side initializations; one Promise.all replaces
     // the previous per-request done flags.
     Promise.all([
-      requestWorker({ type: "kanji-main-map" }).then((r) => {
-        const res = r as Record<string, KanjiMainInfo>;
+      requestWorker({ type: "kanji-main-map" }).then((res) => {
         const cache: KanjiCacheType = {};
         Object.keys(res ?? {}).forEach((item) => {
           cache[item] = { main: res[item] };
         });
         kanjiCacheRef.current = cache;
       }),
-      requestWorker({ type: "part-keyword-map" }).then((r) => {
-        partKeywordCacheRef.current = r as KanjiPartKeywordCacheType;
+      requestWorker({ type: "part-keyword-map" }).then((map) => {
+        partKeywordCacheRef.current = map;
       }),
-      requestWorker({ type: "phonetic-map" }).then((r) => {
-        phoneticCacheRef.current = r as KanjiPhoneticCacheType;
+      requestWorker({ type: "phonetic-map" }).then((map) => {
+        phoneticCacheRef.current = map;
       }),
       requestWorker({ type: "initialize-extended-kanji-map" }),
       requestWorker({ type: "initialize-segmented-vocab-map" }),
@@ -117,9 +111,7 @@ export function KanjiWorkerProvider({
         const result = await requestWorker({
           type: "kanji-extended",
           payload: kanji,
-        }).then((r) => {
-          const res = r as KanjiExtendedInfo & VocabExtendedInfo;
-
+        }).then((res) => {
           if (kanjiCacheRef?.current?.[kanji] == null) {
             throw Error("No information about this Kanji");
           }
