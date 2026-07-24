@@ -1,6 +1,7 @@
 # Kanji worker + JSON data layout redesign
 
-**Status:** planned, not yet implemented (as of 2026-07-24).
+**Status:** implemented on `claude/kanji-worker-simplify-xgcr03`, except for
+the two items listed under "Still to do" at the end (as of 2026-07-24).
 **Supersedes:** the open question in `worker-main-thread-double-caching.md`.
 **Scope:** `src/kanji-worker/`, `public/json/`, `raw-data/`, the data
 generation pipeline, and the providers that feed kanji data to the UI.
@@ -269,3 +270,29 @@ Each is called out in the commit that introduces it:
   or the comments are wrong, then fix deliberately.
 - Deeper radical-search UX restructure (beyond the render-perf fixes).
 - PWA/service-worker precache list audit once the v2 files land.
+
+---
+
+## 9. Still to do
+
+Everything above shipped except these, which are independent of the rest:
+
+- **`kanji-readings-details.json` and the four `kanji-structure-*.json` files
+  still load on the main thread**, through `createKanjiLookupProvider`, and
+  are still fetched eagerly rather than when their drawer section opens. The
+  generator already emits the merged `kanji_structures.json` (53 KB gzipped
+  against 66 KB over four requests) and passes `kanji_reading_details.json`
+  through, so the remaining work is to add two lazy worker requests, point
+  `useMultiKanjiStructure` / the reading-category hook at them, and delete the
+  five v1 files.
+- **Radical drawer render cost.** The half-second freeze on selecting a
+  radical is unvirtualised rendering, not search: `RadicalsResultsPreview`
+  renders every match, ~200 `RadicalBtn`s re-render unmemoised, and the list
+  screen behind the dialog re-renders too. Fixes: memoise `RadicalBtn`,
+  cap or virtualise the preview, and `useDeferredValue` for the background
+  list.
+
+Also still open from section 8: filling the 391 component keyword gaps,
+wiring `extra_kanji_keyword` into the registry, confirming
+`filtered_kanji.json` can go, and deciding what to do about the crossed
+`kd`/`wkfr` frequency indices.
