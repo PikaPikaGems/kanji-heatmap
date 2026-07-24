@@ -224,16 +224,6 @@ const HANDLERS: {
       loadMainKanjiInfo(items);
       return KANJI_INFO_MAIN_CACHE;
     }),
-  "jouyou-grade-map": () => {
-    if (Object.keys(KANJI_INFO_EXTENDED_CACHE).length === 0) {
-      throw new Error("Extended kanji cache not initialized");
-    }
-    const grades: Record<string, number> = {};
-    for (const kanji of Object.keys(KANJI_INFO_EXTENDED_CACHE)) {
-      grades[kanji] = KANJI_INFO_EXTENDED_CACHE[kanji].jouyouGrade;
-    }
-    return grades;
-  },
   "part-keyword-map": () =>
     fetchPartKeywordInfo().then((map) => {
       KANJI_PART_KEYWORD_MAP_CACHE = map;

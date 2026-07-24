@@ -27,6 +27,9 @@ export type GetBasicKanjiInfo = (kanji: string) => {
   on?: string;
   kun?: string;
   frequency?: KanjiInfoFrequency;
+  jouyouGrade?: number;
+  repWord?: string | null;
+  repReading?: string | null;
 } | null;
 
 export type KanjiInfoFrequency = {
@@ -162,7 +165,6 @@ export interface WorkerApi {
     payload: undefined;
     response: Record<string, KanjiMainInfo>;
   };
-  "jouyou-grade-map": { payload: undefined; response: Record<string, number> };
   "phonetic-map": { payload: undefined; response: Record<string, string[]> };
   "part-keyword-map": { payload: undefined; response: Record<string, string> };
   "retrieve-vocab-info": { payload: string; response: VocabInfoResponse };

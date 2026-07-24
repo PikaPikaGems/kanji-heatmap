@@ -2,7 +2,6 @@ import { useId, useMemo, useState } from "react";
 import {
   useGetKanjiInfoFn,
   useIsKanjiWorkerReady,
-  useJouyouGradeMap,
   useKanjiSearch,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { toSearchSettings } from "@/lib/settings/search-settings-adapter";
@@ -83,7 +82,6 @@ export const BookmarksBreakdown = () => {
   const ready = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
-  const gradeMap = useJouyouGradeMap();
   const bookmarked = useBookmarkedKanji();
   const [showGrade, setShowGrade] = useState(false);
   const switchId = useId();
@@ -116,15 +114,15 @@ export const BookmarksBreakdown = () => {
 
   const gradeBands = useMemo((): BreakdownBand[] => {
     const next = emptyGradeCounts();
-    if (!ready || !gradeMap.data || !search.data) return [];
+    if (!ready || !getInfo || !search.data) return [];
 
     for (const kanji of search.data) {
-      const grade = toJouyouGrade(gradeMap.data[kanji]);
+      const grade = toJouyouGrade(getInfo(kanji)?.jouyouGrade);
       next[grade].total += 1;
     }
 
     for (const kanji of bookmarked) {
-      const grade = toJouyouGrade(gradeMap.data[kanji]);
+      const grade = toJouyouGrade(getInfo(kanji)?.jouyouGrade);
       next[grade].bookmarked += 1;
     }
 
@@ -138,14 +136,12 @@ export const BookmarksBreakdown = () => {
         total: next[grade].total,
       };
     });
-  }, [ready, gradeMap.data, search.data, bookmarked]);
+  }, [ready, getInfo, search.data, bookmarked]);
 
+  // Grade now comes from the same synchronous lookup as JLPT, so there is no
+  // separate grade-map request to wait on.
   const loading =
-    !ready ||
-    search.status === "loading" ||
-    search.status === "idle" ||
-    (showGrade &&
-      (gradeMap.status === "loading" || gradeMap.status === "idle"));
+    !ready || search.status === "loading" || search.status === "idle";
 
   const bands = showGrade ? gradeBands : jlptBands;
   const description = showGrade

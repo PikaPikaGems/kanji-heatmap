@@ -2,10 +2,7 @@ import { JLPTListItems } from "@/lib/jlpt";
 import { JouyouGradeListItems, toJouyouGrade } from "@/lib/jouyou-grade";
 import { freqCategoryCn, getFreqCategory } from "@/lib/freq/freq-category";
 import { freqMap } from "@/lib/options/options-label-maps";
-import {
-  useGetKanjiInfoFn,
-  useJouyouGradeMap,
-} from "@/kanji-worker/kanji-worker-hooks";
+import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-hooks";
@@ -61,7 +58,6 @@ export const useItemBtnCn = (kanji: string) => {
   const bgSrc = useBgSrc();
   const itemType = useItemType();
   const { borderColorMeaning } = useDeferredItemSettings();
-  const gradeMap = useJouyouGradeMap(borderColorMeaning === "grade");
 
   const kanjiInfo = getInfo?.(kanji);
 
@@ -92,7 +88,7 @@ export const useItemBtnCn = (kanji: string) => {
   const border = getBorderCn(
     borderColorMeaning,
     jlpt,
-    gradeMap.data?.[kanji],
+    kanjiInfo?.jouyouGrade,
     kanji,
     representativeWord,
     dontIncludeFreq,

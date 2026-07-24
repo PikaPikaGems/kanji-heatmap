@@ -148,41 +148,6 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
   };
 };
 
-/** Shared across hook instances so list cells don't each hit the worker. */
-let jouyouGradeMapCache: Record<string, number> | null = null;
-let jouyouGradeMapPromise: Promise<Record<string, number>> | null = null;
-
-const fetchJouyouGradeMap = () => {
-  if (jouyouGradeMapCache) {
-    return Promise.resolve(jouyouGradeMapCache);
-  }
-  if (!jouyouGradeMapPromise) {
-    jouyouGradeMapPromise = requestWorker({
-      type: "jouyou-grade-map",
-    }).then((data) => {
-      jouyouGradeMapCache = data;
-      return jouyouGradeMapCache;
-    });
-  }
-  return jouyouGradeMapPromise;
-};
-
-/** Kanji → jouyou school grade from the extended cache (ready once worker is). */
-export const useJouyouGradeMap = (enabled = true) => {
-  const ready = useIsKanjiWorkerReady();
-
-  const state = useWorkerQuery<Record<string, number>>(
-    ready && enabled ? fetchJouyouGradeMap : null,
-    [ready, enabled]
-  );
-
-  return {
-    status: state.status,
-    data: state.data ?? jouyouGradeMapCache ?? undefined,
-    error: (state.error as string | undefined) ?? null,
-  };
-};
-
 export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
   const ready = useIsKanjiWorkerReady();
 
