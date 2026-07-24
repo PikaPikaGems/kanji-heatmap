@@ -7,7 +7,6 @@ import { SearchSettingsProvider } from "./search-settings-provider";
 import { ItemSettingsProvider } from "./item-settings-provider";
 import { KanjiReadingCategoryProvider } from "./kanji-reading-category-provider";
 import { MultiKanjiStructureProvider } from "./multiple-kanji-structure-provider";
-import { KanjiRepresentativeWordProvider } from "./kanji-representative-word-provider";
 
 export const KanjiFunctionalityProvider = ({
   children,
@@ -23,13 +22,11 @@ export const KanjiFunctionalityProvider = ({
           </div>
         }
       >
-        <KanjiRepresentativeWordProvider>
-          <KanjiReadingCategoryProvider>
-            <MultiKanjiStructureProvider>
-              <ItemSettingsProvider>{children}</ItemSettingsProvider>
-            </MultiKanjiStructureProvider>
-          </KanjiReadingCategoryProvider>
-        </KanjiRepresentativeWordProvider>
+        <KanjiReadingCategoryProvider>
+          <MultiKanjiStructureProvider>
+            <ItemSettingsProvider>{children}</ItemSettingsProvider>
+          </MultiKanjiStructureProvider>
+        </KanjiReadingCategoryProvider>
       </KanjiWorkerProvider>
     </SearchSettingsProvider>
   );

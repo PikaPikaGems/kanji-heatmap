@@ -1,51 +1,40 @@
 import { useMemo } from "react";
 import { useBookmarkedKanji } from "@/hooks/use-bookmarked-kanji";
-import { useJsonFetch } from "@/hooks/use-json";
-import assetsPaths from "@/lib/assets-paths";
+import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import {
   applyClientListFilters,
   needsClientListFilters,
 } from "@/lib/client-list-filters";
 import { FilterSettings } from "@/lib/settings/settings";
 
-type RepEntry = [string, string, string, string];
-
-const isValidAnchorEntry = (entry: unknown): entry is RepEntry =>
-  Array.isArray(entry) &&
-  typeof entry[0] === "string" &&
-  entry[0].length > 0 &&
-  typeof entry[1] === "string" &&
-  entry[1].length > 0;
-
 /**
  * Loads the sets needed for list client-side filters (bookmarks always;
  * representative/anchor words only when that toggle is on).
+ *
+ * Anchor words used to mean fetching the 168 KB representative-word JSON on
+ * the main thread; the worker snapshot already carries the word per kanji.
  */
 export const useClientListFilterContext = (filters: FilterSettings) => {
   const bookmarked = useBookmarkedKanji();
+  const getInfo = useGetKanjiInfoFn();
   const needsAnchorData = filters.withAnchorWordsOnly;
-  const { data: repWords, status: repStatus } = useJsonFetch<
-    Record<string, RepEntry | null>
-  >(assetsPaths.KANJI_REPRESENTATIVE_WORDS, needsAnchorData);
 
   // Set identity must stay stable: filtered lists depend on reference equality.
   const bookmarkedKanji = useMemo(() => new Set(bookmarked), [bookmarked]);
 
-  // Building the ~2k-entry set every render is wasted work while JSON is cached.
+  // A membership predicate rather than a prebuilt set: the snapshot answers
+  // per kanji, so there is nothing to enumerate up front.
   const kanjiWithAnchorWords = useMemo(() => {
-    if (!needsAnchorData) return null;
-    if (!repWords) return null;
-    const set = new Set<string>();
-    for (const [kanji, entry] of Object.entries(repWords)) {
-      if (isValidAnchorEntry(entry)) {
-        set.add(kanji);
-      }
-    }
-    return set;
-  }, [needsAnchorData, repWords]);
+    if (!needsAnchorData || getInfo == null) return null;
+    return {
+      has: (kanji: string) => {
+        const word = getInfo(kanji)?.repWord;
+        return word != null && word.length > 0;
+      },
+    };
+  }, [needsAnchorData, getInfo]);
 
-  const isLoading =
-    needsAnchorData && (repStatus === "idle" || repStatus === "pending");
+  const isLoading = needsAnchorData && getInfo == null;
 
   return {
     isActive: needsClientListFilters(filters),

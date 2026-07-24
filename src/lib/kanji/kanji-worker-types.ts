@@ -211,6 +211,11 @@ export interface WorkerApi {
   "kanji-hover": { payload: string; response: HoverItemReturnData };
   "kanji-general": { payload: string; response: GeneralKanjiItem };
   "component-map": { payload: undefined; response: ComponentsMap };
+  /** Gloss and emoji tag, needed only by detail surfaces and practice decks. */
+  "rep-word-details": {
+    payload: undefined;
+    response: Record<string, [englishGloss: string, emojiTag: string]>;
+  };
   "kanji-similar": { payload: string; response: string[] };
 }
 

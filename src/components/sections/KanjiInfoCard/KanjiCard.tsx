@@ -14,7 +14,7 @@ import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 
 const transformKanjiWordDetails = (
   kanji: string,
@@ -58,7 +58,7 @@ export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
 };
 
 const RepWordKanji = ({ kanji }: { kanji: string }) => {
-  const repWord = useKanjiRepresentativeWord(kanji);
+  const repWord = useKanjiRepresentativeWordDetails(kanji);
 
   return (
     <>

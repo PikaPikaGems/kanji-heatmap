@@ -48,7 +48,7 @@ interface QueryState<T> {
  * `initialData` seeds the first render, so a remount with an answer already in
  * hand renders it immediately instead of flashing a loading state.
  */
-const useWorkerQuery = <T,>(
+export const useWorkerQuery = <T,>(
   run: (() => Promise<T>) | null,
   deps: DependencyList,
   keepPreviousData = true,

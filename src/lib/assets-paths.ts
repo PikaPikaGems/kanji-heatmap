@@ -14,7 +14,6 @@ const assetsPaths = {
     KANJI_VOCAB: "/kanji-words/v4", // Note: No slash at the end is intentional
     TEXT_BOOK_VOCAB: "/kanji-textbook-words-min", // Note: No slash at the end is intentional
   },
-  KANJI_REPRESENTATIVE_WORDS: "/json/kanji_representative_words.json",
   KANJI_DECOMPOSITION: "/json/v2/kanji_decomposition.json",
   SIMILAR_KANJIS: "/json/v2/similar_kanjis.json",
   KANJI_READING_DETAILS: "/json/kanji-readings-details.json",

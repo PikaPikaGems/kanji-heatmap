@@ -16,6 +16,7 @@ import {
   fetchHoverKanjiInfo,
   fetchKanjiDecomposition,
   fetchMainKanjiInfo,
+  fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
   transformToGeneralKanjiInfo,
@@ -105,6 +106,10 @@ const loadDecomposition = lazyDataset(
 
 const loadSimilar = lazyDataset(
   (): Promise<Record<string, string[]>> => fetchSimilarKanjis()
+);
+
+const loadRepWordDetails = lazyDataset(
+  (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
 );
 
 // Starts immediately: the worker exists to answer questions about this map.
@@ -257,6 +262,7 @@ const HANDLERS: {
     return { mainInfoMap, componentsMap };
   },
   "component-map": () => loadComponents(),
+  "rep-word-details": () => loadRepWordDetails(),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,
