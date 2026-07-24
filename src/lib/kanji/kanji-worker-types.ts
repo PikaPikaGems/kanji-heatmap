@@ -1,6 +1,7 @@
 import { JLTPTtypes } from "../jlpt";
+import type { WordPartDetail } from "../furigana";
 import type { SearchSettings } from "../settings/settings";
-import type { VocabExtendedInfo } from "./kanji-info-types";
+import type { GeneralKanjiItem, HoverItemReturnData } from "./kanji-info-types";
 
 export type KanjiMainInfo = {
   keyword: string;
@@ -54,23 +55,57 @@ export type KanjiInfoFrequency = {
   jpdb: number | null; // rank_jpdb,
 };
 
-export type KanjiExtendedInfo = {
-  parts: Set<string>;
-  strokes: number;
-  rtk: number;
-  wk: number;
-  jouyouGrade: number;
+/**
+ * Meanings and readings: what the details "General Information" section shows
+ * and what meaning/reading searches match against.
+ */
+export type KanjiGeneralInfo = {
   meanings: string[];
   allOn: Set<string>;
   allKun: Set<string>;
-  allKunStripped: Set<string>; // same as allKun except wanakana.toHiragana(item.replace(/[-.。ー]/g, ""))
-  phonetic?: string;
-  mainVocab?: string[];
-  kklcIndex: number;
+  // allKun with okurigana markers stripped, so a typed reading matches.
+  allKunStripped: Set<string>;
 };
 
+/** Everything the hover card is assembled from. */
+export type KanjiHoverInfo = {
+  parts: string[];
+  /** The component that signals this kanji's sound; undefined when none. */
+  phonetic?: string;
+  /** Up to two sample words, keyed into the vocab dataset. */
+  mainVocab: string[];
+};
+
+/** One entry of a component in components.json. */
+export type ComponentInfo = {
+  /** Keyword; absent when no source has one for this component. */
+  k?: string;
+  /** Sounds this component signals. */
+  s?: string[];
+  /** Stroke count, present for radicals shown in the drawer. */
+  n?: number;
+};
+
+export type ComponentsMap = Record<string, ComponentInfo>;
+
+export type GeneralInfoResponseType = Record<
+  string,
+  [meanings: string[], allOn: string[], allKun: string[]]
+>;
+
+export type HoverInfoResponseType = Record<
+  string,
+  [parts: string[], phonetic: string, mainVocab: string[]]
+>;
+
+export type VocabResponseType = Record<
+  string,
+  [furigana: string, meaning: string]
+>;
+
 export type WordMeaning = string;
-export type WordPartDetail = [string, string | undefined];
+// One furigana segment: text plus an optional reading.
+export type { WordPartDetail } from "../furigana";
 export type SegmentedVocabResponseType = Record<string, SegmentedVocabInfo>;
 
 export type SegmentedVocabInfo = {
@@ -146,6 +181,16 @@ export type ExtendedKanjiInfoResponseType = Record<
 // and a mismatch on either side is a compile error rather than a runtime cast.
 // ---------------------------------------------------------------------------
 
+/**
+ * The one copy of worker data that lives on the main thread. It exists because
+ * grid tiles read keyword, frequency, JLPT, grade and the representative word
+ * during render, where awaiting a promise is not an option.
+ */
+export type InitSnapshot = {
+  mainInfoMap: Record<string, KanjiMainInfo>;
+  componentsMap: ComponentsMap;
+};
+
 export type SearchResponse = {
   kanjis: string[];
   possibleRadicals?: Set<string>;
@@ -158,22 +203,14 @@ export type VocabInfoResponse = {
 } | null;
 
 export interface WorkerApi {
-  "initialize-extended-kanji-map": { payload: undefined; response: void };
-  "initialize-segmented-vocab-map": { payload: undefined; response: void };
-  "initialize-decomposition-map": { payload: undefined; response: void };
-  "kanji-main-map": {
-    payload: undefined;
-    response: Record<string, KanjiMainInfo>;
-  };
-  "phonetic-map": { payload: undefined; response: Record<string, string[]> };
-  "part-keyword-map": { payload: undefined; response: Record<string, string> };
+  /** One round trip that hands the main thread everything it reads during render. */
+  init: { payload: undefined; response: InitSnapshot };
   "retrieve-vocab-info": { payload: string; response: VocabInfoResponse };
   search: { payload: SearchSettings; response: SearchResponse };
   "search-result-count": { payload: SearchSettings; response: number };
-  "kanji-extended": {
-    payload: string;
-    response: KanjiExtendedInfo & VocabExtendedInfo;
-  };
+  "kanji-hover": { payload: string; response: HoverItemReturnData };
+  "kanji-general": { payload: string; response: GeneralKanjiItem };
+  "component-map": { payload: undefined; response: ComponentsMap };
   "kanji-similar": { payload: string; response: string[] };
 }
 

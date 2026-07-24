@@ -3,7 +3,11 @@ import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper"
 import { useContextWithCatch } from "../providers/helpers";
 
 import { SearchSettings } from "@/lib/settings/settings";
-import { KanjiInfoRequestType } from "@/lib/kanji/kanji-info-types";
+import {
+  GeneralKanjiItem,
+  HoverItemReturnData,
+  KanjiInfoRequestType,
+} from "@/lib/kanji/kanji-info-types";
 import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import {
@@ -13,12 +17,6 @@ import {
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
-export type KanjiRequestFn = (
-  k: string,
-  type: KanjiInfoRequestType
-) => Promise<unknown>;
-
-export const ActionContext = createContext<KanjiRequestFn | null>(null);
 export const IsReadyContext = createContext<boolean>(false);
 export const GetBasicKanjiInfoContext = createContext<GetBasicKanjiInfo | null>(
   null
@@ -96,15 +94,6 @@ const useWorkerQuery = <T,>(
   return state;
 };
 
-export const useKanjiWorkerRequest = () => {
-  const fn = useContextWithCatch(
-    ActionContext,
-    "KanjiWorker",
-    "KanjiWorkerRequest"
-  );
-  return fn;
-};
-
 export const useIsKanjiWorkerReady = () => {
   const ready = useContextWithCatch(
     IsReadyContext,
@@ -173,19 +162,14 @@ export const useKanjiInfo = (
   kanji: string,
   requestType: KanjiInfoRequestType | "none"
 ) => {
-  const requestFn = useKanjiWorkerRequest();
-
-  const state = useWorkerQuery<unknown>(
+  const state = useWorkerQuery<HoverItemReturnData | GeneralKanjiItem>(
     requestType === "none"
       ? null
       : () =>
-          requestFn == null
-            ? Promise.reject({
-                message:
-                  "requestFn does not exist. Please check KanjiWorkerProvider",
-              })
-            : requestFn(kanji, requestType),
-    [kanji, requestType, requestFn]
+          requestType === "hover-card"
+            ? requestWorker({ type: "kanji-hover", payload: kanji })
+            : requestWorker({ type: "kanji-general", payload: kanji }),
+    [kanji, requestType]
   );
 
   return {

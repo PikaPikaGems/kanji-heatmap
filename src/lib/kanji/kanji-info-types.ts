@@ -1,10 +1,5 @@
 import { JLTPTtypes } from "../jlpt";
-import {
-  KanjiExtendedInfo,
-  KanjiInfoFrequency,
-  KanjiMainInfo,
-  WordPartDetail,
-} from "./kanji-worker-types";
+import { KanjiInfoFrequency, WordPartDetail } from "./kanji-worker-types";
 
 export type KanjiInfoRequestType = "hover-card" | "general" | "radical-keyword";
 
@@ -22,11 +17,6 @@ export type VocabExtendedInfo = {
     second?: VocabWord | null;
   };
 };
-export type KanjiCacheItem = {
-  main: KanjiMainInfo;
-  extended?: KanjiExtendedInfo & VocabExtendedInfo;
-};
-
 export type KanjiWordDetails = {
   word: string;
   meaning: string;
@@ -71,9 +61,6 @@ export type HoverItemReturnData = {
   };
 };
 
-export type KanjiCacheType = Record<string, KanjiCacheItem>;
-export type KanjiPhoneticCacheType = Record<string, string[]>;
-export type KanjiPartKeywordCacheType = Record<string, string>;
 export type KanjiVocabCacheType = Record<
   string,
   { meaning: string; parts: string[][] }

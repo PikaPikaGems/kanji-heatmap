@@ -2,13 +2,14 @@ import wanakana from "@/lib/wanakana-adapter";
 import {
   GeneralKanjiItem,
   HoverItemReturnData,
-  KanjiCacheItem,
-  KanjiCacheType,
-  KanjiPartKeywordCacheType,
-  KanjiPhoneticCacheType,
   VocabExtendedInfo,
 } from "@/lib/kanji/kanji-info-types";
-import { KanjiExtendedInfo } from "@/lib/kanji/kanji-worker-types";
+import {
+  ComponentsMap,
+  KanjiGeneralInfo,
+  KanjiHoverInfo,
+  KanjiMainInfo,
+} from "@/lib/kanji/kanji-worker-types";
 
 // Pure assembly of the per-kanji payloads behind the hover card and the
 // details "general" section. All data comes in as plain caches, so these
@@ -16,55 +17,70 @@ import { KanjiExtendedInfo } from "@/lib/kanji/kanji-worker-types";
 // the characterization tests can pin their exact output against the real
 // JSON data.
 
+type MainInfoMap = Record<string, KanjiMainInfo>;
+
+/**
+ * Keyword for a single component: a kanji's own keyword wins, otherwise the
+ * component registry answers. `isKanji` drives whether the UI links to a kanji
+ * page or a component page.
+ */
+const lookupPart = (
+  part: string,
+  mainInfoMap: MainInfoMap,
+  components: ComponentsMap
+) => {
+  const kanjiKeyword = mainInfoMap[part]?.keyword;
+  return {
+    keyword: kanjiKeyword ?? components[part]?.k,
+    isKanji: kanjiKeyword != null,
+  };
+};
+
 export const extractKanjiHoverData = (
-  kanjiInfo: KanjiCacheItem,
-  kanjiInfoExtended: KanjiExtendedInfo & VocabExtendedInfo,
-  kanjiCache?: KanjiCacheType | null,
-  partKeywordCache?: KanjiPartKeywordCacheType | null,
-  phoneticCache?: KanjiPhoneticCacheType | null
+  main: KanjiMainInfo,
+  hoverInfo: KanjiHoverInfo & VocabExtendedInfo,
+  mainInfoMap: MainInfoMap,
+  components: ComponentsMap
 ) => {
   const getPhonetic = () => {
-    if (kanjiInfoExtended.phonetic == null) {
+    const phoneticPart = hoverInfo.phonetic;
+    if (phoneticPart == null) {
       return undefined;
     }
-    const kanjiKeyword = kanjiCache?.[kanjiInfoExtended.phonetic]?.main.keyword;
     return {
-      phonetic: kanjiInfoExtended.phonetic,
-      sound: phoneticCache?.[kanjiInfoExtended.phonetic],
-      keyword: kanjiKeyword ?? partKeywordCache?.[kanjiInfoExtended.phonetic],
-      isKanji: kanjiKeyword != null,
+      phonetic: phoneticPart,
+      sound: components[phoneticPart]?.s,
+      ...lookupPart(phoneticPart, mainInfoMap, components),
     };
   };
 
+  // Characters with no keyword (kana, punctuation) are dropped, and a
+  // character repeated in the word is listed once.
   const getPartsList = (word: string) => {
-    const parts = word.split("");
     const partCache: Record<string, string> = {};
     const isKanjiCache: Record<string, boolean> = {};
-    parts.forEach((part) => {
-      const kanjiKeyword = kanjiCache?.[part]?.main.keyword;
-      const keyword = kanjiKeyword ?? partKeywordCache?.[part];
 
+    word.split("").forEach((part) => {
+      const { keyword, isKanji } = lookupPart(part, mainInfoMap, components);
       if (keyword) {
         partCache[part] = keyword;
-        isKanjiCache[part] = kanjiKeyword != null;
+        isKanjiCache[part] = isKanji;
       }
     });
 
-    return Object.keys(partCache).map((part) => {
-      return {
-        kanji: part,
-        keyword: partCache[part],
-        isKanji: isKanjiCache[part],
-      };
-    });
+    return Object.keys(partCache).map((part) => ({
+      kanji: part,
+      keyword: partCache[part],
+      isKanji: isKanjiCache[part],
+    }));
   };
 
   const phonetic = getPhonetic();
 
-  const vocab = kanjiInfoExtended.vocabInfo;
+  const vocab = hoverInfo.vocabInfo;
 
   const result = {
-    ...kanjiInfo.main,
+    ...main,
     mainVocab: {
       first: vocab?.first
         ? { ...vocab.first, partsList: getPartsList(vocab.first.word) }
@@ -76,26 +92,22 @@ export const extractKanjiHoverData = (
           }
         : undefined,
     },
-    parts: Array.from(kanjiInfoExtended.parts).map((part) => {
-      const kanjiKeyword = kanjiCache?.[part]?.main.keyword;
-      return {
-        part,
-        keyword: kanjiKeyword ?? partKeywordCache?.[part],
-        isKanji: kanjiKeyword != null,
-      };
-    }),
-    frequency: kanjiInfo.main.frequency,
+    parts: hoverInfo.parts.map((part) => ({
+      part,
+      ...lookupPart(part, mainInfoMap, components),
+    })),
+    frequency: main.frequency,
     phonetic,
   } as HoverItemReturnData;
   return result;
 };
 
 export const extractKanjiGeneralData = (
-  kanjiInfo: KanjiCacheItem,
-  kanjiInfoExtended: KanjiExtendedInfo & VocabExtendedInfo
+  main: KanjiMainInfo,
+  generalInfo: KanjiGeneralInfo
 ) => {
-  const { allKun, allOn, meanings, jouyouGrade, wk, rtk, strokes, kklcIndex } =
-    kanjiInfoExtended;
+  const { allKun, allOn, meanings } = generalInfo;
+  const { jouyouGrade, wk, rtk, strokes, kklcIndex, jlpt } = main;
 
   return {
     allKun: Array.from(allKun),
@@ -106,6 +118,6 @@ export const extractKanjiGeneralData = (
     rtk,
     strokes,
     kklcIndex,
-    jlpt: kanjiInfo.main.jlpt,
+    jlpt,
   } as GeneralKanjiItem;
 };

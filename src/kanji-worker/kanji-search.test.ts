@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  KanjiExtendedInfo,
+  KanjiGeneralInfo,
   KanjiInfoFrequency,
   KanjiMainInfo,
 } from "@/lib/kanji/kanji-worker-types";
@@ -37,29 +37,20 @@ const mainInfo = (
   repReading: null,
 });
 
+// Meanings and readings only: strokes and grade now live on the main info.
 const extendedInfo = ({
-  strokes = 1,
   meanings = [],
   allOn = [],
   allKunStripped = [],
-  jouyouGrade = -1,
 }: {
-  strokes?: number;
   meanings?: string[];
   allOn?: string[];
   allKunStripped?: string[];
-  jouyouGrade?: number;
-}): KanjiExtendedInfo => ({
-  parts: new Set(),
-  strokes,
-  rtk: -1,
-  wk: -1,
-  jouyouGrade,
+}): KanjiGeneralInfo => ({
   meanings,
   allOn: new Set(allOn),
   allKun: new Set(allKunStripped),
   allKunStripped: new Set(allKunStripped),
-  kklcIndex: -1,
 });
 
 // 水 (water), 火 (fire), 山 (mountain) — enough to exercise every search type.
@@ -71,25 +62,19 @@ const pool = {
   },
   extended: {
     水: extendedInfo({
-      strokes: 4,
       meanings: ["water", "liquid"],
       allOn: ["すい"],
       allKunStripped: ["みず"],
-      jouyouGrade: 1,
     }),
     火: extendedInfo({
-      strokes: 4,
       meanings: ["fire", "flame"],
       allOn: ["か"],
       allKunStripped: ["ひ"],
-      jouyouGrade: -1,
     }),
     山: extendedInfo({
-      strokes: 3,
       meanings: ["mountain"],
       allOn: ["さん"],
       allKunStripped: ["やま"],
-      jouyouGrade: 2,
     }),
   },
   similar: { 水: ["氷"] },

@@ -1,19 +1,19 @@
 import wanakana from "@/lib/wanakana-adapter";
 import { JLTPTtypes } from "@/lib/jlpt";
 import {
-  ExtendedKanjiInfoItemType,
-  ExtendedKanjiInfoResponseType,
-  KanjiExtendedInfo,
+  ComponentsMap,
+  GeneralInfoResponseType,
+  HoverInfoResponseType,
+  KanjiGeneralInfo,
+  KanjiHoverInfo,
   KanjiMainInfo,
   MainKanjiInfoItemType,
   MainKanjiInfoResponseType,
   SegmentedVocabInfo,
-  WordPartDetail,
+  VocabResponseType,
 } from "@/lib/kanji/kanji-worker-types";
 import assetsPaths from "@/lib/assets-paths";
-
-export const kanjiMainInfoCache: Record<string, KanjiMainInfo> = {};
-export const kanjiOtherInfoCache: Record<string, KanjiExtendedInfo> = {};
+import { decodeFurigana } from "@/lib/furigana";
 
 const createFetch = <T>(path: string) => {
   return () =>
@@ -27,19 +27,21 @@ export const fetchMainKanjiInfo = createFetch<MainKanjiInfoResponseType>(
   assetsPaths.MAIN_KANJI_INFO_FILE_PATH
 );
 
-export const fetchExtendedKanjiInfo =
-  createFetch<ExtendedKanjiInfoResponseType>(
-    assetsPaths.EXTENDED_KANJI_INFO_FILE_PATH
-  );
-
-// phonetic.json maps a component to the sounds it signals: 𠦝 -> ["ちょう","かん"]
-export const fetchPhoneticInfo = createFetch<Record<string, string[]>>(
-  assetsPaths.PHONETIC_FILE
+export const fetchGeneralKanjiInfo = createFetch<GeneralInfoResponseType>(
+  assetsPaths.EXTENDED_GENERAL_FILE_PATH
 );
 
-export const fetchPartKeywordInfo = createFetch<Record<string, string>>(
-  assetsPaths.PART_KEYWORD_FILE
+export const fetchHoverKanjiInfo = createFetch<HoverInfoResponseType>(
+  assetsPaths.EXTENDED_HOVER_FILE_PATH
 );
+
+export const fetchComponents = createFetch<ComponentsMap>(
+  assetsPaths.COMPONENTS_FILE
+);
+
+export const fetchRepWordDetails = createFetch<
+  Record<string, [string, string]>
+>(assetsPaths.REP_WORD_DETAILS_FILE);
 
 export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
   assetsPaths.KANJI_DECOMPOSITION
@@ -49,32 +51,18 @@ export const fetchSimilarKanjis = createFetch<Record<string, string[]>>(
   assetsPaths.SIMILAR_KANJIS
 );
 
-export const fetchVocabFurigana = createFetch<Record<string, WordPartDetail[]>>(
-  assetsPaths.VOCAB_FURIGANA
-);
+const fetchVocabFile = createFetch<VocabResponseType>(assetsPaths.VOCAB_FILE);
 
-export const fetchVocabMeaning = createFetch<Record<string, string>>(
-  assetsPaths.VOCAB_MEANING
-);
-
-export const fetchSegmentedVocab = () => {
-  return Promise.all([fetchVocabFurigana(), fetchVocabMeaning()]).then(
-    async (result) => {
-      const [allFurigana, allMeanings] = result;
-
-      const allWords = Object.keys(allFurigana);
-      const cache: Record<string, SegmentedVocabInfo> = {};
-      allWords.forEach((word) => {
-        cache[word] = {
-          meaning: allMeanings[word],
-          parts: allFurigana[word],
-        };
-      });
-
-      return cache;
+/** Furigana is stored as one string per word; decode it back into segments. */
+export const fetchSegmentedVocab = () =>
+  fetchVocabFile().then((entries) => {
+    const cache: Record<string, SegmentedVocabInfo> = {};
+    for (const word of Object.keys(entries)) {
+      const [furigana, meaning] = entries[word];
+      cache[word] = { meaning, parts: decodeFurigana(furigana) };
     }
-  );
-};
+    return cache;
+  });
 
 export const transformToMainKanjiInfo = (
   raw: MainKanjiInfoItemType
@@ -142,42 +130,30 @@ export const transformToMainKanjiInfo = (
   };
 };
 
-export const transformToExtendedKanjiInfo = (
-  item: ExtendedKanjiInfoItemType
-): KanjiExtendedInfo => {
-  const [
-    parts,
-    strokes,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _rtk_old,
-    wk,
-    jouyouGrade,
-    meanings,
-    allOn,
-    allKun,
-    phonetic,
-    mainVocab,
-    kklcIndex,
-    rtk,
-  ] = item;
-
+export const transformToGeneralKanjiInfo = ([
+  meanings,
+  allOn,
+  allKun,
+]: GeneralInfoResponseType[string]): KanjiGeneralInfo => {
   const hiraganaAllKun = (allKun ?? []).map((val) => wanakana.toHiragana(val));
   const hiraganaAllKunStripped = (allKun ?? []).map((val) =>
     wanakana.toHiragana(val.replace(/[-.。ー]/g, ""))
   );
 
   return {
-    parts: new Set(parts),
-    strokes,
-    rtk,
-    wk,
-    jouyouGrade,
     meanings: Array.from(new Set(meanings)),
     allOn: new Set((allOn ?? []).map((val) => wanakana.toHiragana(val))),
     allKun: new Set(hiraganaAllKun),
     allKunStripped: new Set(hiraganaAllKunStripped),
-    phonetic: (phonetic ?? "").length > 0 ? phonetic : undefined,
-    mainVocab,
-    kklcIndex: kklcIndex ?? -1,
   };
 };
+
+export const transformToHoverKanjiInfo = ([
+  parts,
+  phonetic,
+  mainVocab,
+]: HoverInfoResponseType[string]): KanjiHoverInfo => ({
+  parts: parts ?? [],
+  phonetic: (phonetic ?? "").length > 0 ? phonetic : undefined,
+  mainVocab: mainVocab ?? [],
+});

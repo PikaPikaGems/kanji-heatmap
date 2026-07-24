@@ -17,19 +17,19 @@ const posted: PostMessageResponseType[] = [];
 const readFile = (...segments: string[]) =>
   fs.readFileSync(path.join(process.cwd(), ...segments), "utf8");
 
-const rawFile = (name: string) => readFile("raw-data", name);
+/** Records which datasets the worker actually fetched, in order. */
+const fetched: string[] = [];
 
-// Maps the paths in assets-paths.ts onto the files that back them. Main info
-// is served from the generated v2 file; the rest still come from raw-data.
-const FILE_BY_PATH: Record<string, string> = {
-  "/json/kanji_extended.json": "kanji_extended.json",
-  "/json/phonetic.json": "phonetic.json",
-  "/json/component_keyword.json": "component_keyword.json",
-  "/json/vocab_furigana.json": "vocab_furigana.json",
-  "/json/vocab_meaning.json": "vocab_meaning.json",
-  "/json/kanji_decomposition.json": "kanji_decomposition.json",
-  "/json/similar-kanjis.json": "similar-kanjis.json",
-};
+// Every dataset now comes from the generated v2 directory.
+const V2_FILES = [
+  "kanji_main.json",
+  "kanji_extended_general.json",
+  "kanji_extended_hover.json",
+  "components.json",
+  "vocab.json",
+  "kanji_decomposition.json",
+  "similar_kanjis.json",
+];
 
 const send = (id: number, type: string, payload?: unknown) => {
   (self.onmessage as (event: { data: unknown }) => void)({
@@ -48,18 +48,15 @@ const replyFor = (id: number) => posted.find((message) => message.id === id);
 
 beforeAll(async () => {
   vi.stubGlobal("fetch", (input: string) => {
-    if (input === "/json/v2/kanji_main.json") {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          JSON.parse(readFile("public", "json", "v2", "kanji_main.json")),
-      });
-    }
-    const file = FILE_BY_PATH[input];
+    const file = V2_FILES.find((name) => input === `/json/v2/${name}`);
     if (file == null) {
       return Promise.reject(new Error(`unexpected fetch: ${input}`));
     }
-    return Promise.resolve({ ok: true, json: () => JSON.parse(rawFile(file)) });
+    fetched.push(file);
+    return Promise.resolve({
+      ok: true,
+      json: () => JSON.parse(readFile("public", "json", "v2", file)),
+    });
   });
 
   vi.spyOn(self, "postMessage").mockImplementation(((
@@ -72,16 +69,70 @@ beforeAll(async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
 
   await import("./kanji-worker");
-
-  // Populate the caches the search/extended handlers need.
-  send(1, "kanji-main-map");
-  send(2, "initialize-extended-kanji-map");
-  send(3, "initialize-segmented-vocab-map");
   await settle();
 });
 
 afterEach(() => {
   posted.length = 0;
+});
+
+describe("lazy datasets", () => {
+  it("fetches nothing but the main info until a request needs more", () => {
+    // The worker starts loading kanji_main at module load; everything else
+    // waits for a request that actually reads it.
+    expect(fetched).toEqual(["kanji_main.json"]);
+  });
+
+  it("fetches the components file only when the snapshot is requested", async () => {
+    send(2, "init");
+    await settle();
+
+    expect(fetched).toContain("components.json");
+    expect(fetched).not.toContain("vocab.json");
+    expect(fetched).not.toContain("kanji_extended_hover.json");
+  });
+
+  it("fetches hover datasets only on the first hover request", async () => {
+    expect(fetched).not.toContain("kanji_extended_hover.json");
+
+    send(3, "kanji-hover", "五");
+    await settle();
+
+    expect(fetched).toContain("kanji_extended_hover.json");
+    expect(fetched).toContain("vocab.json");
+  });
+
+  it("does not refetch a dataset it already has", async () => {
+    const before = fetched.filter((f) => f === "kanji_extended_hover.json");
+
+    send(4, "kanji-hover", "六");
+    await settle();
+
+    expect(
+      fetched.filter((f) => f === "kanji_extended_hover.json")
+    ).toHaveLength(before.length);
+  });
+
+  it("does not need the meanings file for a non-text search", async () => {
+    expect(fetched).not.toContain("kanji_extended_general.json");
+
+    send(5, "search-result-count", {
+      textSearch: { type: "keyword", text: "" },
+      filterSettings: {
+        strokeRange: { min: 1, max: 99 },
+        jlpt: [],
+        jouyouGrade: [],
+        freq: { source: "none", rankRange: { min: 1, max: 99999 } },
+        bookmarkedOnly: false,
+        withAnchorWordsOnly: false,
+      },
+      sortSettings: { primary: "strokes", secondary: "none" },
+    });
+    await settle();
+
+    expect(replyFor(5)?.response.status).toBe("COMPLETED");
+    expect(fetched).not.toContain("kanji_extended_general.json");
+  });
 });
 
 describe("reply envelope", () => {
@@ -126,55 +177,71 @@ describe("reply envelope", () => {
 
 describe("handler errors", () => {
   it("fails only the offending request and keeps serving the next one", async () => {
-    send(50, "kanji-extended", "🐟"); // not a kanji in the cache
-    send(51, "kanji-extended", "一");
+    send(50, "kanji-hover", "🐟"); // not a kanji we have data for
+    send(51, "kanji-hover", "一");
     await settle();
 
     expect(replyFor(50)?.response.status).toBe("ERRORED");
     expect(replyFor(50)?.response.error?.message).toContain(
-      "No Kanji Info On Extended Cache"
+      "No information about this Kanji"
     );
     expect(replyFor(51)?.response.status).toBe("COMPLETED");
   });
 
   it("names the failing request in the error message", async () => {
-    send(60, "kanji-extended", "🐟");
+    send(60, "kanji-hover", "🐟");
     await settle();
 
     expect(replyFor(60)?.response.error?.message).toContain(
-      "request:kanji-extended failed"
+      "request:kanji-hover failed"
     );
   });
 });
 
 describe("data handlers", () => {
-  it("returns the main info map keyed by kanji", async () => {
-    send(70, "kanji-main-map");
+  it("hands the main thread the snapshot it renders from", async () => {
+    send(70, "init");
     await settle();
 
-    const data = replyFor(70)?.response.data as Record<string, unknown>;
-    expect(Object.keys(data)).toHaveLength(2426);
-    expect(data["一"]).toMatchObject({ keyword: "one", jlpt: "n5" });
+    const data = replyFor(70)?.response.data as {
+      mainInfoMap: Record<string, unknown>;
+      componentsMap: Record<string, { k?: string; s?: string[] }>;
+    };
+    expect(Object.keys(data.mainInfoMap)).toHaveLength(2426);
+    expect(data.mainInfoMap["一"]).toMatchObject({
+      keyword: "one",
+      jlpt: "n5",
+      strokes: 1,
+      repWord: "一",
+    });
+    expect(data.componentsMap["𠦝"].s).toEqual(["ちょう", "かん"]);
   });
 
-  it("returns phonetic sounds as arrays", async () => {
-    send(80, "phonetic-map");
-    await settle();
-
-    const data = replyFor(80)?.response.data as Record<string, string[]>;
-    expect(data["𠦝"]).toEqual(["ちょう", "かん"]);
-  });
-
-  it("assembles extended info with its sample vocabulary", async () => {
-    send(90, "kanji-extended", "一");
+  it("assembles a hover payload with its sample vocabulary", async () => {
+    send(90, "kanji-hover", "一");
     await settle();
 
     const data = replyFor(90)?.response.data as {
-      vocabInfo: { first: { word: string } | null };
-      meanings: string[];
+      keyword: string;
+      mainVocab: { first: { word: string; meaning: string } };
     };
-    expect(data.meanings).toContain("one");
-    expect(data.vocabInfo.first?.word).toBe("一つ");
+    expect(data.keyword).toBe("one");
+    expect(data.mainVocab.first.word).toBe("一つ");
+    expect(data.mainVocab.first.meaning).toContain("one");
+  });
+
+  it("assembles a general payload with katakana onyomi", async () => {
+    send(95, "kanji-general", "朝");
+    await settle();
+
+    const data = replyFor(95)?.response.data as {
+      allOn: string[];
+      meanings: string[];
+      jlpt: string;
+    };
+    expect(data.allOn).toEqual(["チョウ"]);
+    expect(data.meanings).toContain("morning");
+    expect(data.jlpt).toBe("n4");
   });
 
   it("returns null vocab info for an unknown word", async () => {

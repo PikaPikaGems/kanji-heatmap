@@ -3,7 +3,7 @@ import { JLPTOptionsCount, JLPTRank, JLTPTtypes } from "@/lib/jlpt";
 import { JouyouGradeOptionsCount, toJouyouGradeType } from "@/lib/jouyou-grade";
 import { matchesSelectionFilter } from "@/lib/selection-filter";
 import {
-  KanjiExtendedInfo,
+  KanjiGeneralInfo,
   KanjiMainInfo,
 } from "@/lib/kanji/kanji-worker-types";
 import { SearchSettings, SearchType } from "@/lib/settings/settings";
@@ -24,7 +24,8 @@ import { isKanji } from "@/lib/utils";
 
 type DataPool = {
   main: Record<string, KanjiMainInfo>;
-  extended: Record<string, KanjiExtendedInfo>;
+  /** Meanings and readings. Lazily loaded: absent until a text search needs it. */
+  extended: Record<string, KanjiGeneralInfo>;
   similar?: Record<string, string[]>;
 };
 
@@ -249,36 +250,33 @@ export const filterKanji = (
   return filterByKanjiSimple(filteredBySearchText, settings, kanjiPool);
 };
 
-type KanjiEntry = {
-  main: KanjiMainInfo;
-  extended: KanjiExtendedInfo;
-};
-
-type SortComparator = (a: KanjiEntry, b: KanjiEntry) => number;
+// Every sort key is answered by the main info, which is why sorting works
+// before the lazily-loaded datasets have arrived.
+type SortComparator = (a: KanjiMainInfo, b: KanjiMainInfo) => number;
 
 // One comparator per sort key; unknown keys (e.g. "none" as a secondary)
 // simply don't compare.
 const SORT_COMPARATORS: Record<string, SortComparator> = {
-  [K_JLPT]: (a, b) => jlptSort(a.main.jlpt, b.main.jlpt),
-  [K_JOUYOU_KEY]: (a, b) => numericSort(a.main.jouyouGrade, b.main.jouyouGrade),
-  [K_STROKES]: (a, b) => numericSort(a.main.strokes, b.main.strokes),
-  [K_WK_LVL]: (a, b) => numericSort(a.main.wk, b.main.wk),
-  [K_RTK_INDEX]: (a, b) => numericSort(a.main.rtk, b.main.rtk),
-  [K_KKLC_INDEX]: (a, b) => numericSort(a.main.kklcIndex, b.main.kklcIndex),
-  [K_MEANING_KEY]: (a, b) => alphaSort(a.main.keyword, b.main.keyword),
+  [K_JLPT]: (a, b) => jlptSort(a.jlpt, b.jlpt),
+  [K_JOUYOU_KEY]: (a, b) => numericSort(a.jouyouGrade, b.jouyouGrade),
+  [K_STROKES]: (a, b) => numericSort(a.strokes, b.strokes),
+  [K_WK_LVL]: (a, b) => numericSort(a.wk, b.wk),
+  [K_RTK_INDEX]: (a, b) => numericSort(a.rtk, b.rtk),
+  [K_KKLC_INDEX]: (a, b) => numericSort(a.kklcIndex, b.kklcIndex),
+  [K_MEANING_KEY]: (a, b) => alphaSort(a.keyword, b.keyword),
   ...Object.fromEntries(
     FREQ_RANK_OPTIONS_NONE_REMOVED.map((freqKey) => [
       freqKey,
       ((a, b) =>
         freqSort(
-          getFrequency(freqKey, a.main),
-          getFrequency(freqKey, b.main)
+          getFrequency(freqKey, a),
+          getFrequency(freqKey, b)
         )) satisfies SortComparator,
     ])
   ),
 };
 
-const compareBy = (sortKey: SortKey, a: KanjiEntry, b: KanjiEntry) =>
+const compareBy = (sortKey: SortKey, a: KanjiMainInfo, b: KanjiMainInfo) =>
   SORT_COMPARATORS[sortKey]?.(a, b) ?? 0;
 
 export const sortKanji = (
@@ -297,26 +295,16 @@ export const sortKanji = (
   return kanjiList.sort((a, b) => {
     const mainA = kanjiPool.main[a];
     const mainB = kanjiPool.main[b];
-    const extendedA = kanjiPool.extended[a];
-    const extendedB = kanjiPool.extended[b];
-    if (
-      mainA == null ||
-      mainB == null ||
-      extendedA == null ||
-      extendedB == null
-    ) {
+    if (mainA == null || mainB == null) {
       return 0;
     }
 
-    const entryA = { main: mainA, extended: extendedA };
-    const entryB = { main: mainB, extended: extendedB };
-
-    const compareVal = compareBy(primarySort, entryA, entryB);
+    const compareVal = compareBy(primarySort, mainA, mainB);
     if (compareVal != 0) {
       return compareVal;
     }
 
-    return compareBy(secondarySort, entryA, entryB);
+    return compareBy(secondarySort, mainA, mainB);
   });
 };
 
