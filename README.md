@@ -70,10 +70,14 @@ Configure the visualizer settings in `vite.config.ts` if you want.
 
 ## Updating kanji data
 
+Upstream data is an **input**, not something the app serves directly: it goes
+into `./raw-data`, and `scripts/generate-v2-json.mjs` turns it into the files
+the app fetches from `./public/json/v2`. See `raw-data/README.md`.
+
 If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same parent directory, you can copy its output files directly:
 
 ```bash
-cp ../kanji-heatmap-data/output/*.json ./public/json
+cp ../kanji-heatmap-data/output/*.json ./raw-data
 ```
 
 Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) repository:
@@ -82,16 +86,16 @@ Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/Pika
 curl -OL https://github.com/PikaPikaGems/kanji-heatmap-data/releases/latest/download/kanji-heatmap-data.tar.gz
 ```
 
-Uncompress and store the JSON files in `./public/json`:
+Uncompress and store the JSON files in `./raw-data`:
 
 ```bash
-tar -xzf ./kanji-heatmap-data.tar.gz -C ./public/json/
+tar -xzf ./kanji-heatmap-data.tar.gz -C ./raw-data/
 ```
 
 You should have the following files updated (among others from the release):
 
 ```bash
-ls -la public/json
+ls -la raw-data
 ```
 
 ```text
