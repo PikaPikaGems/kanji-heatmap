@@ -20,7 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate-more-info": "node scripts/generate-more-info.mjs",
-    "generate-speed-katakana": "node scripts/generate-speed-katakana.mjs"
+    "generate-speed-katakana": "node scripts/generate-speed-katakana.mjs",
+    "generate-json": "node scripts/generate-v2-json.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",

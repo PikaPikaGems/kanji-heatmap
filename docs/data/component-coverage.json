@@ -1,0 +1,3121 @@
+{
+  "summary": {
+    "referenced": 540,
+    "withKeyword": 149,
+    "missing": 391
+  },
+  "missing": [
+    {
+      "char": "辵",
+      "refs": 99,
+      "sources": [
+        "hl",
+        "ka"
+      ]
+    },
+    {
+      "char": "艸",
+      "refs": 69,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "釒",
+      "refs": 58,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "⺼",
+      "refs": 52,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "攴",
+      "refs": 51,
+      "sources": [
+        "hl",
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "⺮",
+      "refs": 49,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "⺍",
+      "refs": 30,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "尞",
+      "refs": 23,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "犭",
+      "refs": 23,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "圣",
+      "refs": 22,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "⺩",
+      "refs": 21,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "冓",
+      "refs": 20,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "咼",
+      "refs": 19,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "夋",
+      "refs": 19,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㐮",
+      "refs": 18,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
+      "char": "复",
+      "refs": 18,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "畐",
+      "refs": 18,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "禺",
+      "refs": 18,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "辟",
+      "refs": 18,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "曷",
+      "refs": 17,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "侖",
+      "refs": 16,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "兑",
+      "refs": 16,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "亢",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "兪",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𢦏",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "扁",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "敝",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "袁",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "賁",
+      "refs": 15,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𠂊",
+      "refs": 14,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "喿",
+      "refs": 14,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
+      "char": "夆",
+      "refs": 14,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
+      "char": "⺤",
+      "refs": 14,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "爰",
+      "refs": 14,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "龹",
+      "refs": 12,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
+      "char": "兹",
+      "refs": 12,
+      "sources": [
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "夹",
+      "refs": 12,
+      "sources": [
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "并",
+      "refs": 12,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戠",
+      "refs": 12,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "甬",
+      "refs": 12,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "网",
+      "refs": 12,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "𧾷",
+      "refs": 12,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "㐬",
+      "refs": 11,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㕣",
+      "refs": 11,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "丂",
+      "refs": 10,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "卆",
+      "refs": 10,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "尃",
+      "refs": 10,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "䍃",
+      "refs": 10,
+      "sources": [
+        "hl",
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "臤",
+      "refs": 10,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "丰",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "关",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㔾",
+      "refs": 9,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "夌",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "夭",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "奐",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㦮",
+      "refs": 9,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "攸",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𦍌",
+      "refs": 9,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "翟",
+      "refs": 9,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "乇",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "乚",
+      "refs": 8,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "俞",
+      "refs": 8,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "劦",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "孰",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "弗",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戔",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "曼",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "朮",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "朿",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "睘",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "荅",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "菐",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "蒦",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "竟",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "丩",
+      "refs": 7,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𠂇",
+      "refs": 7,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "⺈",
+      "refs": 7,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "卬",
+      "refs": 7,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "夗",
+      "refs": 7,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "夾",
+      "refs": 7,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "牜",
+      "refs": 7,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "离",
+      "refs": 7,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "䒑",
+      "refs": 7,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "覀",
+      "refs": 7,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "𠂤",
+      "refs": 6,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "亲",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "兌",
+      "refs": 6,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "叟",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "咸",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "坴",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "埶",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "堇",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "宓",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "帚",
+      "refs": 6,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "开",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "戊",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戍",
+      "refs": 6,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戶",
+      "refs": 6,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "溥",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "爫",
+      "refs": 6,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𦰩",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "蜀",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "迶",
+      "refs": 6,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "㐅",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亼",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "从",
+      "refs": 5,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "僉",
+      "refs": 5,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "冘",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "卂",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "厷",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "叚",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "龶",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "帛",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "幵",
+      "refs": 5,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "彔",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "ya"
+      ]
+    },
+    {
+      "char": "录",
+      "refs": 5,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "忩",
+      "refs": 5,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戋",
+      "refs": 5,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "枼",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "桼",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "丬",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "耑",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𧘇",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "襄",
+      "refs": 5,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "⻊",
+      "refs": 5,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "闌",
+      "refs": 5,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "陏",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "雚",
+      "refs": 5,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "𠂢",
+      "refs": 4,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㐱",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "㒸",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "冋",
+      "refs": 4,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "卉",
+      "refs": 4,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "厓",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𡈼",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "𡗗",
+      "refs": 4,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "奚",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "ya"
+      ]
+    },
+    {
+      "char": "奞",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "孚",
+      "refs": 4,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "它",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "尗",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "𡿺",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "ka"
+      ]
+    },
+    {
+      "char": "㣺",
+      "refs": 4,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "戌",
+      "refs": 4,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "⺦",
+      "refs": 4,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "罙",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "龷",
+      "refs": 4,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𦰌",
+      "refs": 4,
+      "sources": [
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "褱",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "ka"
+      ]
+    },
+    {
+      "char": "酋",
+      "refs": 4,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "黑",
+      "refs": 4,
+      "sources": [
+        "hl",
+        "ka"
+      ]
+    },
+    {
+      "char": "卄",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "丗",
+      "refs": 3,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "业",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠂎",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠃊",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠃌",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亶",
+      "refs": 3,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "冏",
+      "refs": 3,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "匊",
+      "refs": 3,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "⺊",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠫓",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠬝",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "𠬶",
+      "refs": 3,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "咢",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "壴",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "夅",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "夸",
+      "refs": 3,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "妟",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "妾",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "尓",
+      "refs": 3,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "屰",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "崔",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "彭",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "悤",
+      "refs": 3,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "敕",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "楚",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "龰",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "滕",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "潘",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "烝",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𤇾",
+      "refs": 3,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "𤣩",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "窄",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𥫗",
+      "refs": 3,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "筑",
+      "refs": 3,
+      "sources": [
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "絜",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "罔",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "羔",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "肙",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "胥",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𦥑",
+      "refs": 3,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "茲",
+      "refs": 3,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "襾",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "ya"
+      ]
+    },
+    {
+      "char": "豦",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "閏",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "隺",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "𮥶",
+      "refs": 3,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "齒",
+      "refs": 3,
+      "sources": [
+        "hl",
+        "ka"
+      ]
+    },
+    {
+      "char": "⺀",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "乎",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𠂔",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "乕",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "龴",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亟",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "产",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "佰",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "兴",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠔉",
+      "refs": 2,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "冉",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𠘨",
+      "refs": 2,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "剌",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "劵",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "匀",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "匈",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "匋",
+      "refs": 2,
+      "sources": [
+        "ka",
+        "sc"
+      ]
+    },
+    {
+      "char": "卌",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "卦",
+      "refs": 2,
+      "sources": [
+        "hl",
+        "ya"
+      ]
+    },
+    {
+      "char": "厉",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠩵",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "厤",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "叀",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠮷",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "咨",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "哥",
+      "refs": 2,
+      "sources": [
+        "hl",
+        "ya"
+      ]
+    },
+    {
+      "char": "囟",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "垔",
+      "refs": 2,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "壳",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "孛",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "宁",
+      "refs": 2,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "寉",
+      "refs": 2,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "寍",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㠯",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "弯",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "⺗",
+      "refs": 2,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "愈",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㥯",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "戉",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "戎",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "敖",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𰕎",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "敫",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "㫃",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "斿",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "旁",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "旉",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "显",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "杀",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "柬",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "桀",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "步",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "沓",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "澡",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𤋱",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "熏",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "爫",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "𤓻",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "⺧",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "牟",
+      "refs": 2,
+      "sources": [
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "犀",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "犮",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "玨",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "电",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "畀",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "畾",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "皃",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "盍",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "眞",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "睪",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "矣",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "禹",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "稟",
+      "refs": 2,
+      "sources": [
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "娄",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "糹",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "縣",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "羍",
+      "refs": 2,
+      "sources": [
+        "hl",
+        "sc"
+      ]
+    },
+    {
+      "char": "肀",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "肋",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "舄",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "苟",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "莧",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𧆨",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "䜌",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "豈",
+      "refs": 2,
+      "sources": [
+        "ka",
+        "ya"
+      ]
+    },
+    {
+      "char": "豤",
+      "refs": 2,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "貇",
+      "refs": 2,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "躬",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "隽",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "雍",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "𩙿",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "麥",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "鼡",
+      "refs": 2,
+      "sources": [
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "",
+      "refs": 2,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "コ",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "丅",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亐",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "丽",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "丵",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "乑",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "乛",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠃑",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "乜",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "习",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠄎",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亍",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亚",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "亩",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "侌",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𠈌",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "倝",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "兒",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "內",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "冎",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㒼",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "冝",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "冢",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "刍",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "刖",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㓞",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "务",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "厃",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "厈",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "叒",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "叧",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "吕",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "囷",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "坒",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㚘",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "婁",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "寽",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㝵",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "尌",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "尔",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "龸",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𡵉",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "巟",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "巿",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "庚",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "廌",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "弍",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "弚",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "彖",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "㣊",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "徵",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "忝",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㥑",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "敄",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "昷",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "朩",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "杂",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "柰",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "氿",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㳄",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𣴎",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "涂",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "淮",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "烕",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "爭",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "㸒",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "㸚",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "甶",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "畄",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𤴓",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "癸",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "睿",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "类",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "粲",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "𦈢",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "⺶",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "羕",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "羽",
+      "refs": 1,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "耤",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "聶",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "䏍",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "肰",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "臧",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "芻",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "䖝",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "蚤",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "䙴",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "䚯",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "誊",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "賈",
+      "refs": 1,
+      "sources": [
+        "hl"
+      ]
+    },
+    {
+      "char": "赫",
+      "refs": 1,
+      "sources": [
+        "ya"
+      ]
+    },
+    {
+      "char": "雁",
+      "refs": 1,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "䩗",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "駦",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "𩵋",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "龜",
+      "refs": 1,
+      "sources": [
+        "ka"
+      ]
+    },
+    {
+      "char": "龟",
+      "refs": 1,
+      "sources": [
+        "sc"
+      ]
+    },
+    {
+      "char": "",
+      "refs": 1,
+      "sources": [
+        "ka"
+      ]
+    }
+  ]
+}

@@ -112,11 +112,18 @@ vocab_furigana.json
 vocab_meaning.json
 ```
 
-Delete the `tar.gz` file since it is no longer needed:
+Regenerate the files the app actually serves, then delete the `tar.gz` since
+it is no longer needed:
 
 ```bash
+pnpm run generate-json
 rm kanji-heatmap-data.tar.gz
 ```
+
+`generate-json` reads `./raw-data` and writes `./public/json/v2` plus
+`docs/data/component-coverage.json`. It fails instead of writing if the data
+breaks an invariant (missing kanji, conflicting component keywords, furigana
+that does not round-trip, a sort field that is not a number).
 
 ### Regenerating derived JSON
 
