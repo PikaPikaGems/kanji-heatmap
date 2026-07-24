@@ -189,20 +189,21 @@ measured from current data.
   reading. Everything a tile paints synchronously, and every sort/filter
   field. Shipped once to the main thread as the sync snapshot.
 
-**Lazy — one dataset each, fetched on the gesture that needs it:**
+**Lazy — one dataset each, fetched on the gesture that needs it.** Sizes are
+gzipped, which is how they go over the wire:
 
-| File                          | Size (gz) | Needed by                                             |
-| ----------------------------- | --------- | ----------------------------------------------------- |
-| `kanji_extended_general.json` | 85 KB     | details "General Information", meaning/reading search |
-| `kanji_extended_hover.json`   | 43 KB     | hover card (parts, phonetic ref, vocab refs)          |
-| `rep_word_details.json`       | 60 KB     | hover tag, details study word, practice decks (gloss) |
-| `vocab.json`                  | 129 KB    | vocab popover / hover (furigana + meaning merged)     |
-| `components.json`             | ~15 KB    | component keywords/sounds/strokes (the registry)      |
-| `kanji_structures.json`       | 53 KB     | "Character Structure" section (4 files merged)        |
-| `kanji_decomposition.json`    | 26 KB     | radical / multi-kanji search                          |
-| `similar_kanjis.json`         | 82 KB     | similar search, practice game                         |
-| `kanji_reading_details.json`  | 176 KB    | "Reading Usefulness" section                          |
-| `cum_use.json`                | 2 KB      | dashboard                                             |
+| File                          | Size (gz) | Fetched when                                                                                                                                                  |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kanji_extended_general.json` | 85 KB     | a meaning/reading text search runs, or the details "General Information" section renders                                                                      |
+| `kanji_extended_hover.json`   | 43 KB     | the first hover card opens                                                                                                                                    |
+| `vocab.json`                  | 129 KB    | the first hover card or vocab popover opens                                                                                                                   |
+| `components.json`             | 3 KB      | the init snapshot is built (it answers component keywords for synchronous lookups)                                                                            |
+| `rep_word_details.json`       | 60 KB     | a gloss or emoji tag is displayed: hover card, details study word, practice deck                                                                              |
+| `kanji_structures.json`       | 53 KB     | the "Character Structure" section opens _(not wired up yet — see §9)_                                                                                         |
+| `kanji_reading_details.json`  | 42 KB     | the "Reading Usefulness" section opens _(not wired up yet — see §9)_                                                                                          |
+| `kanji_decomposition.json`    | 19 KB     | a **radical** search runs. Multi-kanji and handwriting searches do **not** use it — they match the kanji characters in the query directly (`kanjiListSearch`) |
+| `similar_kanjis.json`         | 43 KB     | a similar search runs, **or** the "Character Structure" section opens (it lists similar kanji via `useSimilarKanjis`), or the practice game starts            |
+| `cum_use.json`                | 1 KB      | the dashboard's cumulative-use chart mounts (main thread, never through the worker)                                                                           |
 
 Not served: `docs/data/component-coverage.json` — the generated coverage
 report (JSON, not markdown, so a test can assert the gap count never grows).

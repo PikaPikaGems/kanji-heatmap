@@ -97,6 +97,11 @@ const loadVocab = lazyDataset(
   (): Promise<Record<string, SegmentedVocabInfo>> => fetchSegmentedVocab()
 );
 
+/**
+ * The radical-search index: which drawer-selectable radicals each kanji
+ * contains. Only `searchByRadical` reads it — multi-kanji and handwriting
+ * searches match the kanji characters in the query directly.
+ */
 const loadDecomposition = lazyDataset(
   (): Promise<Record<string, Set<string>>> =>
     fetchKanjiDecomposition().then((raw) =>
@@ -104,6 +109,10 @@ const loadDecomposition = lazyDataset(
     )
 );
 
+/**
+ * Read by similar search, by the details "Character Structure" section (which
+ * lists similar kanji), and by the practice game.
+ */
 const loadSimilar = lazyDataset(
   (): Promise<Record<string, string[]>> => fetchSimilarKanjis()
 );
