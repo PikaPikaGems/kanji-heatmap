@@ -14,12 +14,14 @@ import type { PostMessageResponseType } from "@/lib/kanji/kanji-worker-types";
 
 const posted: PostMessageResponseType[] = [];
 
-const rawFile = (name: string) =>
-  fs.readFileSync(path.join(process.cwd(), "raw-data", name), "utf8");
+const readFile = (...segments: string[]) =>
+  fs.readFileSync(path.join(process.cwd(), ...segments), "utf8");
 
-// Maps the paths in assets-paths.ts onto the raw-data equivalents.
+const rawFile = (name: string) => readFile("raw-data", name);
+
+// Maps the paths in assets-paths.ts onto the files that back them. Main info
+// is served from the generated v2 file; the rest still come from raw-data.
 const FILE_BY_PATH: Record<string, string> = {
-  "/json/kanji_main.json": "kanji_main.json",
   "/json/kanji_extended.json": "kanji_extended.json",
   "/json/phonetic.json": "phonetic.json",
   "/json/component_keyword.json": "component_keyword.json",
@@ -46,6 +48,13 @@ const replyFor = (id: number) => posted.find((message) => message.id === id);
 
 beforeAll(async () => {
   vi.stubGlobal("fetch", (input: string) => {
+    if (input === "/json/v2/kanji_main.json") {
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          JSON.parse(readFile("public", "json", "v2", "kanji_main.json")),
+      });
+    }
     const file = FILE_BY_PATH[input];
     if (file == null) {
       return Promise.reject(new Error(`unexpected fetch: ${input}`));
@@ -203,6 +212,39 @@ describe("data handlers", () => {
 
     expect(replyFor(120)?.response.status).toBe("COMPLETED");
     expect(replyFor(120)?.response.data).toBe(2426);
+  });
+
+  it("sorts by every sort key using only the main info", async () => {
+    // The whole point of moving strokes/grade/wk/kklc/rtk into kanji_main is
+    // that a URL-driven sort works at first paint without the extended file.
+    for (const primary of ["strokes", "grade", "wk-level", "rtk-index"]) {
+      posted.length = 0;
+      send(200, "search", {
+        ...searchSettings(""),
+        sortSettings: { primary, secondary: "none" },
+      });
+      await settle();
+
+      expect(replyFor(200)?.response.status, primary).toBe("COMPLETED");
+      const { kanjis } = replyFor(200)?.response.data as { kanjis: string[] };
+      expect(kanjis, primary).toHaveLength(2426);
+    }
+  });
+
+  it("orders a stroke-count sort ascending", async () => {
+    send(210, "search", {
+      ...searchSettings(""),
+      sortSettings: { primary: "strokes", secondary: "none" },
+    });
+    await settle();
+
+    const { kanjis } = replyFor(210)?.response.data as { kanjis: string[] };
+    const main = JSON.parse(
+      readFile("public", "json", "v2", "kanji_main.json")
+    ) as Record<string, [string, string, string, number, number[], number]>;
+    const strokes = kanjis.slice(0, 50).map((kanji) => main[kanji][5]);
+
+    expect(strokes).toEqual([...strokes].sort((a, b) => a - b));
   });
 
   it("runs a keyword search and returns the matching kanji", async () => {

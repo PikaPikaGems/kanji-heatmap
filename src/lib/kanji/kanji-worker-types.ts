@@ -8,6 +8,17 @@ export type KanjiMainInfo = {
   on: string;
   kun: string;
   frequency: KanjiInfoFrequency;
+  // Sort and filter read these. They live here rather than in the extended
+  // info because sort settings are URL-reachable at first paint, so requiring
+  // the extended file would make it eager again.
+  strokes: number;
+  jouyouGrade: number;
+  wk: number;
+  kklcIndex: number;
+  rtk: number;
+  // Rendered by expanded tiles during render, so it cannot be async.
+  repWord: string | null;
+  repReading: string | null;
 };
 
 export type GetBasicKanjiInfo = (kanji: string) => {
@@ -86,10 +97,23 @@ export type FreqList = [
   number, // rank_jpdb
 ];
 
-export type MainKanjiInfoResponseType = Record<
-  string,
-  [string, string, string, number, FreqList]
->;
+/** One entry of public/json/v2/kanji_main.json. */
+export type MainKanjiInfoItemType = [
+  keyword: string,
+  on: string,
+  kun: string,
+  jlptRaw: number,
+  freq: FreqList,
+  strokes: number,
+  jouyouGrade: number,
+  wk: number,
+  kklcIndex: number,
+  rtk: number,
+  repWord: string | null,
+  repReading: string | null,
+];
+
+export type MainKanjiInfoResponseType = Record<string, MainKanjiInfoItemType>;
 
 export type ExtendedKanjiInfoItemType = [
   string[], // component parts

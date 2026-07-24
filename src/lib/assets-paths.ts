@@ -1,5 +1,5 @@
 const assetsPaths = {
-  MAIN_KANJI_INFO_FILE_PATH: "/json/kanji_main.json",
+  MAIN_KANJI_INFO_FILE_PATH: "/json/v2/kanji_main.json",
   EXTENDED_KANJI_INFO_FILE_PATH: "/json/kanji_extended.json",
   PHONETIC_FILE: "/json/phonetic.json",
   PART_KEYWORD_FILE: "/json/component_keyword.json",

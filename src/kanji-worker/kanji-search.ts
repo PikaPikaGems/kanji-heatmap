@@ -79,15 +79,16 @@ export const filterByKanjiSimple = (
       return matchesSelectionFilter(jlptFilters, JLPTOptionsCount, info.jlpt);
     })
     .filter((kanji) => {
-      // Main/extended can briefly diverge (load race) or permanently diverge
-      // (stale SW caches of the two JSON files). Skip rather than crash.
-      const exInfo = kanjiPool.extended[kanji];
-      if (exInfo == null) {
+      // Strokes and grade live on the main info, so this filter no longer
+      // needs the extended file to be loaded. A kanji missing from main is
+      // skipped rather than crashing the worker.
+      const info = kanjiPool.main[kanji];
+      if (info == null) {
         return false;
       }
       const withinRange =
-        maxStrokes >= exInfo.strokes && exInfo.strokes >= minStrokes;
-      const grade = toJouyouGradeType(exInfo.jouyouGrade);
+        maxStrokes >= info.strokes && info.strokes >= minStrokes;
+      const grade = toJouyouGradeType(info.jouyouGrade);
       const matchesGrade =
         grade != null &&
         matchesSelectionFilter(gradeFilters, JouyouGradeOptionsCount, grade);
@@ -259,13 +260,11 @@ type SortComparator = (a: KanjiEntry, b: KanjiEntry) => number;
 // simply don't compare.
 const SORT_COMPARATORS: Record<string, SortComparator> = {
   [K_JLPT]: (a, b) => jlptSort(a.main.jlpt, b.main.jlpt),
-  [K_JOUYOU_KEY]: (a, b) =>
-    numericSort(a.extended.jouyouGrade, b.extended.jouyouGrade),
-  [K_STROKES]: (a, b) => numericSort(a.extended.strokes, b.extended.strokes),
-  [K_WK_LVL]: (a, b) => numericSort(a.extended.wk, b.extended.wk),
-  [K_RTK_INDEX]: (a, b) => numericSort(a.extended.rtk, b.extended.rtk),
-  [K_KKLC_INDEX]: (a, b) =>
-    numericSort(a.extended.kklcIndex, b.extended.kklcIndex),
+  [K_JOUYOU_KEY]: (a, b) => numericSort(a.main.jouyouGrade, b.main.jouyouGrade),
+  [K_STROKES]: (a, b) => numericSort(a.main.strokes, b.main.strokes),
+  [K_WK_LVL]: (a, b) => numericSort(a.main.wk, b.main.wk),
+  [K_RTK_INDEX]: (a, b) => numericSort(a.main.rtk, b.main.rtk),
+  [K_KKLC_INDEX]: (a, b) => numericSort(a.main.kklcIndex, b.main.kklcIndex),
   [K_MEANING_KEY]: (a, b) => alphaSort(a.main.keyword, b.main.keyword),
   ...Object.fromEntries(
     FREQ_RANK_OPTIONS_NONE_REMOVED.map((freqKey) => [
@@ -330,8 +329,8 @@ export const searchKanji = (settings: SearchSettings, kanjiPool: DataPool) => {
 export const getSortedByStrokeCount = (kanjiPool: DataPool) => {
   const allKanji = Object.keys(kanjiPool.main);
   return allKanji.sort((a, b) => {
-    const strokesA = kanjiPool.extended[a]?.strokes ?? -1;
-    const strokesB = kanjiPool.extended[b]?.strokes ?? -1;
+    const strokesA = kanjiPool.main[a]?.strokes ?? -1;
+    const strokesB = kanjiPool.main[b]?.strokes ?? -1;
     return numericSort(strokesA, strokesB);
   });
 };

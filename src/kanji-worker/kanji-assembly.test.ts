@@ -30,23 +30,37 @@ import {
 // production pipeline: helpers.ts transforms + the worker's kanji-extended
 // response shape (extended info merged with vocabInfo).
 
-const readJson = <T>(name: string): T =>
+const readJson = <T>(...segments: string[]): T =>
   JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "public/json", name), "utf8")
+    fs.readFileSync(path.join(process.cwd(), ...segments), "utf8")
   ) as T;
 
-const rawMain = readJson<MainKanjiInfoResponseType>("kanji_main.json");
+// kanji_main comes from the generated v2 file (the one the app loads); the
+// rest still come from the v1 files until their consumers are migrated.
+const rawMain = readJson<MainKanjiInfoResponseType>(
+  "public/json/v2",
+  "kanji_main.json"
+);
 const rawExtended = readJson<ExtendedKanjiInfoResponseType>(
+  "public/json",
   "kanji_extended.json"
 );
 const partKeywordCache = readJson<KanjiPartKeywordCacheType>(
+  "public/json",
   "component_keyword.json"
 );
-const phoneticCache = readJson<KanjiPhoneticCacheType>("phonetic.json");
+const phoneticCache = readJson<KanjiPhoneticCacheType>(
+  "public/json",
+  "phonetic.json"
+);
 const vocabFurigana = readJson<Record<string, WordPartDetail[]>>(
+  "public/json",
   "vocab_furigana.json"
 );
-const vocabMeaning = readJson<Record<string, string>>("vocab_meaning.json");
+const vocabMeaning = readJson<Record<string, string>>(
+  "public/json",
+  "vocab_meaning.json"
+);
 
 const kanjiCache: KanjiCacheType = {};
 Object.keys(rawMain).forEach((k) => {

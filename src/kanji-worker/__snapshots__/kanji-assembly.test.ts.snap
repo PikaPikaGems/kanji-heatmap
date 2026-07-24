@@ -70,7 +70,9 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
     "wkfr": 12,
   },
   "jlpt": "n5",
+  "jouyouGrade": 1,
   "keyword": "one",
+  "kklcIndex": 2,
   "kun": "ひと-",
   "mainVocab": {
     "first": {
@@ -123,6 +125,11 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
   "on": "いち",
   "parts": [],
   "phonetic": undefined,
+  "repReading": "いち・ひと",
+  "repWord": "一",
+  "rtk": 1,
+  "strokes": 1,
+  "wk": 1,
 }
 `;
 
@@ -150,7 +157,9 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
     "wkfr": 291,
   },
   "jlpt": "n5",
+  "jouyouGrade": 1,
   "keyword": "five",
+  "kklcIndex": 7,
   "kun": "いつ",
   "mainVocab": {
     "first": {
@@ -227,6 +236,11 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
       "ご",
     ],
   },
+  "repReading": "ご",
+  "repWord": "五",
+  "rtk": 5,
+  "strokes": 4,
+  "wk": 2,
 }
 `;
 
@@ -254,7 +268,9 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
     "wkfr": 681,
   },
   "jlpt": "n5",
+  "jouyouGrade": 1,
   "keyword": "six",
+  "kklcIndex": 8,
   "kun": "む",
   "mainVocab": {
     "first": {
@@ -324,6 +340,11 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
     },
   ],
   "phonetic": undefined,
+  "repReading": "ろく",
+  "repWord": "六",
+  "rtk": 6,
+  "strokes": 4,
+  "wk": 2,
 }
 `;
 
@@ -351,7 +372,9 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
     "wkfr": 638,
   },
   "jlpt": "n4",
+  "jouyouGrade": 2,
   "keyword": "morning",
+  "kklcIndex": 145,
   "kun": "あさ",
   "mainVocab": {
     "first": {
@@ -433,5 +456,10 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
       "かん",
     ],
   },
+  "repReading": "あさ",
+  "repWord": "朝",
+  "rtk": 53,
+  "strokes": 12,
+  "wk": 8,
 }
 `;

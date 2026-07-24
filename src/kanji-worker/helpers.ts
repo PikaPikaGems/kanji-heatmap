@@ -3,9 +3,9 @@ import { JLTPTtypes } from "@/lib/jlpt";
 import {
   ExtendedKanjiInfoItemType,
   ExtendedKanjiInfoResponseType,
-  FreqList,
   KanjiExtendedInfo,
   KanjiMainInfo,
+  MainKanjiInfoItemType,
   MainKanjiInfoResponseType,
   SegmentedVocabInfo,
   WordPartDetail,
@@ -77,9 +77,22 @@ export const fetchSegmentedVocab = () => {
 };
 
 export const transformToMainKanjiInfo = (
-  raw: [string, string, string, number, FreqList]
+  raw: MainKanjiInfoItemType
 ): KanjiMainInfo => {
-  const [keyword, on, kun, jlptRaw, freq] = raw;
+  const [
+    keyword,
+    on,
+    kun,
+    jlptRaw,
+    freq,
+    strokes,
+    jouyouGrade,
+    wk,
+    kklcIndex,
+    rtk,
+    repWord,
+    repReading,
+  ] = raw;
 
   const jlptByRawLevel: Record<number, JLTPTtypes> = {
     5: "n5",
@@ -98,6 +111,13 @@ export const transformToMainKanjiInfo = (
     on,
     kun,
     jlpt,
+    strokes,
+    jouyouGrade,
+    wk,
+    kklcIndex,
+    rtk,
+    repWord,
+    repReading,
     frequency: {
       netflix: freq[0], //rank_netflix
       twitter: freq[1], //rank_twitter
