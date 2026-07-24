@@ -8,15 +8,14 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { useJsonFetch } from "@/hooks/use-json";
 import { BlurredGloss } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   useGetKanjiInfoFn,
+  useSimilarKanjiMap,
   useSimilarKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
-import assetsPaths from "@/lib/assets-paths";
 import { ClozeWord } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
 import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
@@ -84,13 +83,11 @@ export const Game = ({
   const similarState = useSimilarKanjis(current?.kanji ?? "");
   const similars = similarState.data ?? [];
   const getKanjiInfo = useGetKanjiInfoFn();
-  const { data: similarMap } = useJsonFetch<Record<string, string[]>>(
-    assetsPaths.SIMILAR_KANJIS
+  const similarMap = useSimilarKanjiMap();
+  const getSimilars = useMemo(
+    () => (k: string) => similarMap?.[k] ?? [],
+    [similarMap]
   );
-  const getSimilars = useMemo(() => {
-    const map = similarMap;
-    return (k: string) => map?.[k] ?? [];
-  }, [similarMap]);
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 

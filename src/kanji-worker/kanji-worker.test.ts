@@ -251,6 +251,27 @@ describe("data handlers", () => {
     expect(replyFor(100)?.response.data).toBeNull();
   });
 
+  it("serves the whole similar map from the same dataset as a single lookup", async () => {
+    send(105, "kanji-similar", "五");
+    await settle();
+    const single = replyFor(105)?.response.data as string[];
+
+    const fetchesBefore = fetched.filter(
+      (f) => f === "similar_kanjis.json"
+    ).length;
+
+    send(106, "similar-map");
+    await settle();
+
+    const map = replyFor(106)?.response.data as Record<string, string[]>;
+    // Game.tsx used to download this file itself alongside the worker copy.
+    expect(fetched.filter((f) => f === "similar_kanjis.json")).toHaveLength(
+      fetchesBefore
+    );
+    // The map is unfiltered; the per-kanji request drops unknown kanji.
+    expect(map["五"]).toEqual(expect.arrayContaining(single));
+  });
+
   it("filters similar kanji down to ones the app knows", async () => {
     send(110, "kanji-similar", "五");
     await settle();

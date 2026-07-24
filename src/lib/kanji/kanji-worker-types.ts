@@ -217,6 +217,8 @@ export interface WorkerApi {
     response: Record<string, [englishGloss: string, emojiTag: string]>;
   };
   "kanji-similar": { payload: string; response: string[] };
+  /** The whole similar map, for callers that look up many kanji at once. */
+  "similar-map": { payload: undefined; response: Record<string, string[]> };
 }
 
 export type KanjiWorkerRequestName = keyof WorkerApi;

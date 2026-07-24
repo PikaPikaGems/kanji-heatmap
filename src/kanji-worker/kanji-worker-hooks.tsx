@@ -280,6 +280,22 @@ export const useWordKanjis = (word: string) => {
   }, [word, getKanjiInfo]);
 };
 
+/**
+ * The whole similar-kanji map, for callers that need to look up many kanji at
+ * once. The worker already holds this dataset, so asking it avoids a second
+ * download of the same file on the main thread.
+ */
+export const useSimilarKanjiMap = () => {
+  const ready = useIsKanjiWorkerReady();
+
+  const state = useWorkerQuery<Record<string, string[]>>(
+    ready ? () => requestWorker({ type: "similar-map" }) : null,
+    [ready]
+  );
+
+  return state.data;
+};
+
 export const useSimilarKanjis = (kanji: string) => {
   const state = useWorkerQuery<string[]>(
     kanji

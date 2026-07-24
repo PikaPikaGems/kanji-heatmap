@@ -263,6 +263,7 @@ const HANDLERS: {
   },
   "component-map": () => loadComponents(),
   "rep-word-details": () => loadRepWordDetails(),
+  "similar-map": () => loadSimilar(),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,
