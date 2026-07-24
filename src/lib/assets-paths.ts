@@ -5,7 +5,7 @@ const assetsPaths = {
   COMPONENTS_FILE: "/json/v2/components.json",
   VOCAB_FILE: "/json/v2/vocab.json",
   REP_WORD_DETAILS_FILE: "/json/v2/rep_word_details.json",
-  CUM_USE: "/json/cum_use.json",
+  CUM_USE: "/json/v2/cum_use.json",
   KANJI_SVGS: "https://assets.pikapikagems.com/kanji/",
   KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v4", // Note: No slash at the end is intentional
   TEXT_BOOK_VOCAB: "https://assets.pikapikagems.com/kanji-textbook-words/v4", // Note: No slash at the end is intentional
