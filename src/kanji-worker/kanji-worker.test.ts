@@ -121,7 +121,7 @@ describe("lazy datasets", () => {
     expect(fetched).not.toContain("kanji_structures.json");
     expect(fetched).not.toContain("kanji_reading_details.json");
 
-    send(6, "structures-map");
+    send(6, "kanji-structure", "朝");
     await settle();
 
     expect(fetched).toContain("kanji_structures.json");
@@ -351,21 +351,11 @@ describe("data handlers", () => {
   });
 
   it("expands the merged structures file into named per-source fields", async () => {
-    send(140, "structures-map");
+    send(140, "kanji-structure", "朝");
     await settle();
 
-    const map = replyFor(140)?.response.data as Record<
-      string,
-      {
-        hlorenzi: { type: string } | null;
-        kanjium: (string | null)[] | null;
-        scott: string[] | null;
-        yagays: string[] | null;
-      }
-    >;
-
     // 朝 has all four sources; short keys hl/ka/sc/ya must arrive named.
-    expect(map["朝"]).toEqual({
+    expect(replyFor(140)?.response.data).toEqual({
       hlorenzi: { type: "kaii" },
       kanjium: ["月", null, "朝", "⿰", "Compound ideograph"],
       scott: ["龺", "月"],
@@ -374,20 +364,22 @@ describe("data handlers", () => {
   });
 
   it("reports a source absent from an entry as null, not undefined", async () => {
-    send(145, "structures-map");
-    await settle();
-
-    const map = replyFor(145)?.response.data as Record<
-      string,
-      Record<string, unknown>
-    >;
-
     // Coverage per source is 2,061–2,356 of 2,426, so gaps are the norm. The
     // section renders null as "no info"; undefined would survive the structured
     // clone as a missing key instead.
-    const withGap = Object.keys(map).find((kanji) => map[kanji].scott === null);
-    expect(withGap).toBeDefined();
-    expect(Object.keys(map[withGap!]).sort()).toEqual([
+    const structures = JSON.parse(
+      readFile("public", "json", "v2", "kanji_structures.json")
+    ) as Record<string, Record<string, unknown>>;
+    const withGap = Object.keys(structures).find(
+      (kanji) => structures[kanji].sc == null
+    )!;
+
+    send(145, "kanji-structure", withGap);
+    await settle();
+
+    const entry = replyFor(145)?.response.data as Record<string, unknown>;
+    expect(entry.scott).toBeNull();
+    expect(Object.keys(entry).sort()).toEqual([
       "hlorenzi",
       "kanjium",
       "scott",
@@ -395,24 +387,42 @@ describe("data handlers", () => {
     ]);
   });
 
-  it("expands reading details into named fields", async () => {
-    send(150, "reading-details-map");
+  it("answers null for a kanji the structures file does not cover", async () => {
+    send(146, "kanji-structure", "🐟");
     await settle();
 
-    const map = replyFor(150)?.response.data as Record<
-      string,
-      {
-        reading: string;
-        type: string;
-        frequency: string;
-        example_word: string;
-      }[]
-    >;
+    expect(replyFor(146)?.response.status).toBe("COMPLETED");
+    expect(replyFor(146)?.response.data).toBeNull();
+  });
 
-    expect(map["朝"]).toEqual([
+  it("expands reading details into named fields", async () => {
+    send(150, "kanji-reading-details", "朝");
+    await settle();
+
+    expect(replyFor(150)?.response.data).toEqual([
       { reading: "チョウ", type: "ON", frequency: "↔", example_word: "朝食" },
       { reading: "あさ", type: "KUN", frequency: "↑", example_word: "朝" },
     ]);
+  });
+
+  it("answers null rather than an empty list when a kanji has no readings", async () => {
+    // 292 kanji are absent from the dataset; the section shows "no info" for
+    // null but would render an empty table for [].
+    const readings = JSON.parse(
+      readFile("public", "json", "v2", "kanji_reading_details.json")
+    ) as Record<string, unknown[]>;
+    const uncovered = Object.keys(
+      JSON.parse(readFile("public", "json", "v2", "kanji_main.json")) as Record<
+        string,
+        unknown
+      >
+    ).find((kanji) => readings[kanji] == null)!;
+
+    send(151, "kanji-reading-details", uncovered);
+    await settle();
+
+    expect(replyFor(151)?.response.status).toBe("COMPLETED");
+    expect(replyFor(151)?.response.data).toBeNull();
   });
 
   it("runs a keyword search and returns the matching kanji", async () => {

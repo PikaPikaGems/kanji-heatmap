@@ -1,11 +1,11 @@
 import { JLTPTtypes } from "../jlpt";
 import type { WordPartDetail } from "../furigana";
 import type {
+  KanjiReadingEntry,
   KanjiReadingEntrySmall,
-  KanjiReadingsData,
   KanjiStructureEntry,
   KanjiumEntry,
-  MultiKanjiStructureData,
+  MultiKanjiStructureEntry,
 } from "../kanji-section-constants";
 import type { SearchSettings } from "../settings/settings";
 import type { GeneralKanjiItem, HoverItemReturnData } from "./kanji-info-types";
@@ -260,8 +260,20 @@ export interface WorkerApi {
    * beats a request per kanji, and it matches what the main-thread providers
    * these replaced already did.
    */
-  "structures-map": { payload: undefined; response: MultiKanjiStructureData };
-  "reading-details-map": { payload: undefined; response: KanjiReadingsData };
+  /**
+   * One kanji's structure entry, not the whole map. The drawer displays a
+   * single kanji, and the worker already holds the map in memory, so the reply
+   * is one small object rather than a 2,426-entry structured clone.
+   */
+  "kanji-structure": {
+    payload: string;
+    response: MultiKanjiStructureEntry | null;
+  };
+  /** One kanji's reading breakdown; empty and absent both answer null. */
+  "kanji-reading-details": {
+    payload: string;
+    response: KanjiReadingEntry[] | null;
+  };
 }
 
 export type KanjiWorkerRequestName = keyof WorkerApi;

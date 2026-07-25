@@ -274,6 +274,24 @@ const handleRetrieveVocabInfo = requirePayload(async (word: string) =>
   retrieveVocabInfo(await loadVocab(), word)
 );
 
+/**
+ * Both detail sections answer for one kanji. The whole map stays in the worker
+ * — sending it to the main thread would put a second copy of it there, which
+ * is the duplication this redesign set out to remove.
+ */
+const handleKanjiStructure = requirePayload(async (kanji: string) => {
+  const structures = await loadStructures();
+  return structures[kanji] ?? null;
+});
+
+const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
+  const readingDetails = await loadReadingDetails();
+  const entries = readingDetails[kanji];
+  // Kanji with no breakdown are absent; an empty array would render an empty
+  // table instead of the "no info" state, so both collapse to null here.
+  return entries == null || entries.length === 0 ? null : entries;
+});
+
 const HANDLERS: {
   [K in KanjiWorkerRequestName]: (
     payload: WorkerApi[K]["payload"]
@@ -289,8 +307,8 @@ const HANDLERS: {
   "component-map": () => loadComponents(),
   "rep-word-details": () => loadRepWordDetails(),
   "similar-map": () => loadSimilar(),
-  "structures-map": () => loadStructures(),
-  "reading-details-map": () => loadReadingDetails(),
+  "kanji-structure": handleKanjiStructure,
+  "kanji-reading-details": handleKanjiReadingDetails,
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,
