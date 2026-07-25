@@ -1,5 +1,12 @@
 import { JLTPTtypes } from "../jlpt";
 import type { WordPartDetail } from "../furigana";
+import type {
+  KanjiReadingEntrySmall,
+  KanjiReadingsData,
+  KanjiStructureEntry,
+  KanjiumEntry,
+  MultiKanjiStructureData,
+} from "../kanji-section-constants";
 import type { SearchSettings } from "../settings/settings";
 import type { GeneralKanjiItem, HoverItemReturnData } from "./kanji-info-types";
 
@@ -101,6 +108,34 @@ export type HoverInfoResponseType = Record<
 export type VocabResponseType = Record<
   string,
   [furigana: string, meaning: string]
+>;
+
+/**
+ * One entry of public/json/v2/kanji_structures.json.
+ *
+ * Short keys, and a source is omitted rather than nulled: coverage per source
+ * runs 2,061–2,426 of 2,426 kanji, so most entries are missing at least one.
+ * The worker expands these into `MultiKanjiStructureEntry` so the detail
+ * sections keep reading named fields.
+ */
+export type StructuresResponseType = Record<
+  string,
+  {
+    /** hlorenzi: `{type, semantic?, phonetic?}`. */
+    hl?: KanjiStructureEntry;
+    /** kanjium: `[semantic, radicalVariant, phonetic, ids, structureType]`. */
+    ka?: KanjiumEntry;
+    /** scott component list. */
+    sc?: string[];
+    /** yagays component list. */
+    ya?: string[];
+  }
+>;
+
+/** One entry of public/json/v2/kanji_reading_details.json. */
+export type ReadingDetailsResponseType = Record<
+  string,
+  KanjiReadingEntrySmall[]
 >;
 
 export type WordMeaning = string;
@@ -219,6 +254,14 @@ export interface WorkerApi {
   "kanji-similar": { payload: string; response: string[] };
   /** The whole similar map, for callers that look up many kanji at once. */
   "similar-map": { payload: undefined; response: Record<string, string[]> };
+  /**
+   * Whole-map responses rather than per-kanji: both back a detail section that
+   * the user arrows through kanji by kanji, so one round trip on first open
+   * beats a request per kanji, and it matches what the main-thread providers
+   * these replaced already did.
+   */
+  "structures-map": { payload: undefined; response: MultiKanjiStructureData };
+  "reading-details-map": { payload: undefined; response: KanjiReadingsData };
 }
 
 export type KanjiWorkerRequestName = keyof WorkerApi;

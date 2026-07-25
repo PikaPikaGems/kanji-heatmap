@@ -1,33 +1,34 @@
-import { createKanjiLookupProvider } from "./create-kanji-lookup-provider";
-import assetsPaths from "@/lib/assets-paths";
+import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
+import {
+  useIsKanjiWorkerReady,
+  useWorkerQuery,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { KanjiReadingsData } from "@/lib/kanji-section-constants";
 
-import type {
-  KanjiReadingEntry,
-  KanjiReadingEntrySmall,
-} from "@/lib/kanji-section-constants";
+const requestWorker = KANJI_WORKER_SINGLETON.request;
 
-export const readingCategory = createKanjiLookupProvider<
-  [Record<string, KanjiReadingEntrySmall[]>],
-  KanjiReadingEntry[]
->({
-  name: "KanjiReadingCategory",
-  assetPaths: [assetsPaths.KANJI_READING_DETAILS],
-  select: ([data], kanji) => {
-    const kanjiData = data[kanji];
-    if (!kanjiData || kanjiData.length <= 0) {
-      return null;
-    }
-    return kanjiData.map((entry) => ({
-      reading: entry.r,
-      type: entry.t,
-      frequency: entry.f,
-      example_word: entry.w,
-    }));
-  },
-});
-
-// Hook to get reading data for a specific kanji
+/**
+ * Per-reading usefulness data, served by the worker on first use.
+ *
+ * Only the detail drawer's "Reading Usefulness" section reads this, and a
+ * collapsed accordion does not mount its body, so nothing is fetched until
+ * that section is expanded.
+ */
 export const useKanjiReadingDetails = (kanji: string) => {
-  const { status, error, data } = readingCategory.useLookupState(kanji);
-  return { status, error, kanjiReadingData: data };
+  const ready = useIsKanjiWorkerReady();
+
+  const { status, error, data } = useWorkerQuery<KanjiReadingsData>(
+    ready ? () => requestWorker({ type: "reading-details-map" }) : null,
+    [ready]
+  );
+
+  const entries = data?.[kanji];
+
+  return {
+    status: status === "loading" ? "pending" : status,
+    error,
+    // Kanji with no reading breakdown are absent from the dataset; the section
+    // treats null as "no info" and an empty array would render an empty table.
+    kanjiReadingData: entries == null || entries.length === 0 ? null : entries,
+  };
 };

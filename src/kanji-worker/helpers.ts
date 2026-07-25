@@ -9,11 +9,17 @@ import {
   KanjiMainInfo,
   MainKanjiInfoItemType,
   MainKanjiInfoResponseType,
+  ReadingDetailsResponseType,
   SegmentedVocabInfo,
+  StructuresResponseType,
   VocabResponseType,
 } from "@/lib/kanji/kanji-worker-types";
 import assetsPaths from "@/lib/assets-paths";
 import { decodeFurigana } from "@/lib/furigana";
+import type {
+  KanjiReadingsData,
+  MultiKanjiStructureData,
+} from "@/lib/kanji-section-constants";
 
 const createFetch = <T>(path: string) => {
   return () =>
@@ -50,6 +56,49 @@ export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
 export const fetchSimilarKanjis = createFetch<Record<string, string[]>>(
   assetsPaths.SIMILAR_KANJIS
 );
+
+const fetchStructuresFile = createFetch<StructuresResponseType>(
+  assetsPaths.KANJI_STRUCTURES
+);
+
+/**
+ * Expand the stored short keys into the named fields the "Character Structure"
+ * section reads. A source absent from an entry becomes `null`, which is what
+ * the section already treats as "this source has nothing to say".
+ */
+export const fetchMultiKanjiStructures = () =>
+  fetchStructuresFile().then((entries) => {
+    const cache: MultiKanjiStructureData = {};
+    for (const kanji of Object.keys(entries)) {
+      const { hl, ka, sc, ya } = entries[kanji];
+      cache[kanji] = {
+        hlorenzi: hl ?? null,
+        kanjium: ka ?? null,
+        scott: sc ?? null,
+        yagays: ya ?? null,
+      };
+    }
+    return cache;
+  });
+
+const fetchReadingDetailsFile = createFetch<ReadingDetailsResponseType>(
+  assetsPaths.KANJI_READING_DETAILS
+);
+
+/** Expand the stored `{r,t,f,w}` entries into named reading fields. */
+export const fetchKanjiReadingDetails = () =>
+  fetchReadingDetailsFile().then((entries) => {
+    const cache: KanjiReadingsData = {};
+    for (const kanji of Object.keys(entries)) {
+      cache[kanji] = entries[kanji].map((entry) => ({
+        reading: entry.r,
+        type: entry.t,
+        frequency: entry.f,
+        example_word: entry.w,
+      }));
+    }
+    return cache;
+  });
 
 const fetchVocabFile = createFetch<VocabResponseType>(assetsPaths.VOCAB_FILE);
 

@@ -16,11 +16,10 @@ const assetsPaths = {
   },
   KANJI_DECOMPOSITION: "/json/v2/kanji_decomposition.json",
   SIMILAR_KANJIS: "/json/v2/similar_kanjis.json",
-  KANJI_READING_DETAILS: "/json/kanji-readings-details.json",
-  KANJI_STRUCTURE_DETAILS: "/json/kanji-structure-hlorenzi.json",
-  KANJI_STRUCTURE_KANJIUM: "/json/kanji-structure-kanjium.json",
-  KANJI_STRUCTURE_SCOTT: "/json/kanji-structure-scott.json",
-  KANJI_STRUCTURE_YAGAYS: "/json/kanji-structure-yagays.json",
+  KANJI_READING_DETAILS: "/json/v2/kanji_reading_details.json",
+  // One merged file in place of the four per-source structure files: 50 KB
+  // gzipped against 66 KB over four requests.
+  KANJI_STRUCTURES: "/json/v2/kanji_structures.json",
   ICON_SVG: "/img/app-icon.svg",
   SPEED_KATAKANA_CHALLENGE_SET: "/json/katakana/challenge-set-", // append `<setNumber>.json`
   SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",

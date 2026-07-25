@@ -1,36 +1,35 @@
-import { createKanjiLookupProvider } from "./create-kanji-lookup-provider";
-import assetsPaths from "@/lib/assets-paths";
+import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import {
-  KanjiStructureData,
-  KanjiumData,
-  ComponentListData,
-  MultiKanjiStructureEntry,
-} from "@/lib/kanji-section-constants";
+  useIsKanjiWorkerReady,
+  useWorkerQuery,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { MultiKanjiStructureData } from "@/lib/kanji-section-constants";
 
-export const multiStructure = createKanjiLookupProvider<
-  [KanjiStructureData, KanjiumData, ComponentListData, ComponentListData],
-  MultiKanjiStructureEntry
->({
-  name: "MultiKanjiStructure",
-  assetPaths: [
-    assetsPaths.KANJI_STRUCTURE_DETAILS,
-    assetsPaths.KANJI_STRUCTURE_KANJIUM,
-    assetsPaths.KANJI_STRUCTURE_SCOTT,
-    assetsPaths.KANJI_STRUCTURE_YAGAYS,
-  ],
-  select: ([hlorenzi, kanjium, scott, yagays], kanji) => {
-    const h = hlorenzi[kanji] ?? null;
-    const k = kanjium[kanji] ?? null;
-    const s = scott[kanji] ?? null;
-    const y = yagays[kanji] ?? null;
-    if (!h && !k && !s && !y) {
-      return null;
-    }
-    return { hlorenzi: h, kanjium: k, scott: s, yagays: y };
-  },
-});
+const requestWorker = KANJI_WORKER_SINGLETON.request;
 
+/**
+ * The four per-source structure datasets, merged into one file and served by
+ * the worker on first use.
+ *
+ * Only the detail drawer's "Character Structure" section reads this, and a
+ * collapsed accordion does not mount its body, so nothing is fetched until
+ * that section is expanded. The response is the whole map: the user arrows
+ * from kanji to kanji inside the drawer, so one round trip on first open beats
+ * a request per kanji.
+ */
 export const useMultiKanjiStructure = (kanji: string) => {
-  const { status, error, data } = multiStructure.useLookupState(kanji);
-  return { kanjiStructureData: data, status, error };
+  const ready = useIsKanjiWorkerReady();
+
+  const { status, error, data } = useWorkerQuery<MultiKanjiStructureData>(
+    ready ? () => requestWorker({ type: "structures-map" }) : null,
+    [ready]
+  );
+
+  return {
+    // The sections predate the worker's status vocabulary and render "..." for
+    // "pending"; useWorkerQuery calls that state "loading".
+    status: status === "loading" ? "pending" : status,
+    error,
+    kanjiStructureData: data?.[kanji] ?? null,
+  };
 };

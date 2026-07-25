@@ -29,6 +29,8 @@ const V2_FILES = [
   "vocab.json",
   "kanji_decomposition.json",
   "similar_kanjis.json",
+  "kanji_structures.json",
+  "kanji_reading_details.json",
 ];
 
 const send = (id: number, type: string, payload?: unknown) => {
@@ -111,6 +113,19 @@ describe("lazy datasets", () => {
     expect(
       fetched.filter((f) => f === "kanji_extended_hover.json")
     ).toHaveLength(before.length);
+  });
+
+  it("does not fetch the detail-section datasets until asked", async () => {
+    // Both back one collapsed accordion each. Opening a kanji drawer must not
+    // pull them; only expanding the section does.
+    expect(fetched).not.toContain("kanji_structures.json");
+    expect(fetched).not.toContain("kanji_reading_details.json");
+
+    send(6, "structures-map");
+    await settle();
+
+    expect(fetched).toContain("kanji_structures.json");
+    expect(fetched).not.toContain("kanji_reading_details.json");
   });
 
   it("does not need the meanings file for a non-text search", async () => {
@@ -333,6 +348,71 @@ describe("data handlers", () => {
     const strokes = kanjis.slice(0, 50).map((kanji) => main[kanji][5]);
 
     expect(strokes).toEqual([...strokes].sort((a, b) => a - b));
+  });
+
+  it("expands the merged structures file into named per-source fields", async () => {
+    send(140, "structures-map");
+    await settle();
+
+    const map = replyFor(140)?.response.data as Record<
+      string,
+      {
+        hlorenzi: { type: string } | null;
+        kanjium: (string | null)[] | null;
+        scott: string[] | null;
+        yagays: string[] | null;
+      }
+    >;
+
+    // 朝 has all four sources; short keys hl/ka/sc/ya must arrive named.
+    expect(map["朝"]).toEqual({
+      hlorenzi: { type: "kaii" },
+      kanjium: ["月", null, "朝", "⿰", "Compound ideograph"],
+      scott: ["龺", "月"],
+      yagays: ["十", "早", "月"],
+    });
+  });
+
+  it("reports a source absent from an entry as null, not undefined", async () => {
+    send(145, "structures-map");
+    await settle();
+
+    const map = replyFor(145)?.response.data as Record<
+      string,
+      Record<string, unknown>
+    >;
+
+    // Coverage per source is 2,061–2,356 of 2,426, so gaps are the norm. The
+    // section renders null as "no info"; undefined would survive the structured
+    // clone as a missing key instead.
+    const withGap = Object.keys(map).find((kanji) => map[kanji].scott === null);
+    expect(withGap).toBeDefined();
+    expect(Object.keys(map[withGap!]).sort()).toEqual([
+      "hlorenzi",
+      "kanjium",
+      "scott",
+      "yagays",
+    ]);
+  });
+
+  it("expands reading details into named fields", async () => {
+    send(150, "reading-details-map");
+    await settle();
+
+    const map = replyFor(150)?.response.data as Record<
+      string,
+      {
+        reading: string;
+        type: string;
+        frequency: string;
+        example_word: string;
+      }[]
+    >;
+
+    expect(map["朝"]).toEqual([
+      { reading: "チョウ", type: "ON", frequency: "↔", example_word: "朝食" },
+      { reading: "あさ", type: "KUN", frequency: "↑", example_word: "朝" },
+    ]);
   });
 
   it("runs a keyword search and returns the matching kanji", async () => {

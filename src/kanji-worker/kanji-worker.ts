@@ -15,7 +15,9 @@ import {
   fetchGeneralKanjiInfo,
   fetchHoverKanjiInfo,
   fetchKanjiDecomposition,
+  fetchKanjiReadingDetails,
   fetchMainKanjiInfo,
+  fetchMultiKanjiStructures,
   fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
@@ -23,6 +25,10 @@ import {
   transformToHoverKanjiInfo,
   transformToMainKanjiInfo,
 } from "./helpers";
+import type {
+  KanjiReadingsData,
+  MultiKanjiStructureData,
+} from "@/lib/kanji-section-constants";
 import {
   extractKanjiGeneralData,
   extractKanjiHoverData,
@@ -119,6 +125,16 @@ const loadSimilar = lazyDataset(
 
 const loadRepWordDetails = lazyDataset(
   (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
+);
+
+/** Read only by the details "Character Structure" section. */
+const loadStructures = lazyDataset(
+  (): Promise<MultiKanjiStructureData> => fetchMultiKanjiStructures()
+);
+
+/** Read only by the details "Reading Usefulness" section. */
+const loadReadingDetails = lazyDataset(
+  (): Promise<KanjiReadingsData> => fetchKanjiReadingDetails()
 );
 
 // Starts immediately: the worker exists to answer questions about this map.
@@ -273,6 +289,8 @@ const HANDLERS: {
   "component-map": () => loadComponents(),
   "rep-word-details": () => loadRepWordDetails(),
   "similar-map": () => loadSimilar(),
+  "structures-map": () => loadStructures(),
+  "reading-details-map": () => loadReadingDetails(),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,
