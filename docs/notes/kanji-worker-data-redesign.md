@@ -1,7 +1,7 @@
 # Kanji worker + JSON data layout redesign
 
 **Status:** implemented on `claude/kanji-worker-simplify-xgcr03`, except for
-the two items listed under "Still to do" at the end (as of 2026-07-24).
+the one item listed under "Still to do" at the end (as of 2026-07-25).
 **Supersedes:** the open question in `worker-main-thread-double-caching.md`.
 **Scope:** `src/kanji-worker/`, `public/json/`, `raw-data/`, the data
 generation pipeline, and the providers that feed kanji data to the UI.
@@ -199,8 +199,8 @@ gzipped, which is how they go over the wire:
 | `vocab.json`                  | 127 KB    | the first hover card or vocab popover opens                                                                                                                   |
 | `components.json`             | 3 KB      | the init snapshot is built (it answers component keywords for synchronous lookups)                                                                            |
 | `rep_word_details.json`       | 60 KB     | a gloss or emoji tag is displayed: hover card, details study word, practice deck                                                                              |
-| `kanji_structures.json`       | 50 KB     | the "Character Structure" section opens _(not wired up yet — see §10)_                                                                                        |
-| `kanji_reading_details.json`  | 41 KB     | the "Reading Usefulness" section opens _(not wired up yet — see §10)_                                                                                         |
+| `kanji_structures.json`       | 50 KB     | the "Character Structure" section is expanded                                                                                                                 |
+| `kanji_reading_details.json`  | 41 KB     | the "Reading Usefulness" section is expanded                                                                                                                  |
 | `kanji_decomposition.json`    | 19 KB     | a **radical** search runs. Multi-kanji and handwriting searches do **not** use it — they match the kanji characters in the query directly (`kanjiListSearch`) |
 | `similar_kanjis.json`         | 43 KB     | a similar search runs, **or** the "Character Structure" section opens (it lists similar kanji via `useSimilarKanjis`), or the practice game starts            |
 | `cum_use.json`                | <1 KB     | the dashboard's cumulative-use chart mounts (main thread, never through the worker)                                                                           |
@@ -221,25 +221,22 @@ from the data currently committed.
 
 ### Served from `public/json/v2/` — 11 files
 
-| File                          | Raw    | Gzip   | Entries | Loaded  |
-| ----------------------------- | ------ | ------ | ------- | ------- |
-| `kanji_main.json`             | 389 KB | 163 KB | 2,426   | eager   |
-| `vocab.json`                  | 308 KB | 127 KB | 4,408   | lazy    |
-| `kanji_structures.json`       | 322 KB | 50 KB  | 2,426   | lazy \* |
-| `kanji_extended_general.json` | 237 KB | 84 KB  | 2,426   | lazy    |
-| `kanji_reading_details.json`  | 229 KB | 41 KB  | 2,134   | lazy \* |
-| `rep_word_details.json`       | 154 KB | 60 KB  | 2,348   | lazy    |
-| `similar_kanjis.json`         | 120 KB | 43 KB  | 2,426   | lazy    |
-| `kanji_extended_hover.json`   | 115 KB | 41 KB  | 2,426   | lazy    |
-| `kanji_decomposition.json`    | 48 KB  | 19 KB  | 2,426   | lazy    |
-| `components.json`             | 9 KB   | 3 KB   | 390     | lazy    |
-| `cum_use.json`                | 2 KB   | <1 KB  | 7       | lazy    |
+| File                          | Raw    | Gzip   | Entries | Loaded |
+| ----------------------------- | ------ | ------ | ------- | ------ |
+| `kanji_main.json`             | 389 KB | 163 KB | 2,426   | eager  |
+| `vocab.json`                  | 308 KB | 127 KB | 4,408   | lazy   |
+| `kanji_structures.json`       | 322 KB | 50 KB  | 2,426   | lazy   |
+| `kanji_extended_general.json` | 237 KB | 84 KB  | 2,426   | lazy   |
+| `kanji_reading_details.json`  | 229 KB | 41 KB  | 2,134   | lazy   |
+| `rep_word_details.json`       | 154 KB | 60 KB  | 2,348   | lazy   |
+| `similar_kanjis.json`         | 120 KB | 43 KB  | 2,426   | lazy   |
+| `kanji_extended_hover.json`   | 115 KB | 41 KB  | 2,426   | lazy   |
+| `kanji_decomposition.json`    | 48 KB  | 19 KB  | 2,426   | lazy   |
+| `components.json`             | 9 KB   | 3 KB   | 390     | lazy   |
+| `cum_use.json`                | 2 KB   | <1 KB  | 7       | lazy   |
 
 The raw column is what `pnpm run generate-json` prints; the gzip column is
 `gzip -9`.
-
-\* Generated and committed, but not yet consumed — the app still fetches the
-v1 equivalents from `public/json/`. See §10.
 
 Entry counts are not all 2,426 on purpose: `kanji_reading_details` covers only
 kanji that have a reading breakdown (2,134), `rep_word_details` only kanji with
@@ -259,16 +256,9 @@ count never grows — filling a keyword gap shrinks `summary.missing`, and
 introducing a new uncovered component makes the test fail. Current state:
 540 components referenced, 149 with a keyword, 391 without.
 
-### Still read from `public/json/` (v1, pending §10)
-
-These five predate the pipeline and are committed directly rather than
-generated. They are what §10's remaining work deletes.
-
-- `kanji-readings-details.json`
-- `kanji-structure-hlorenzi.json`
-- `kanji-structure-kanjium.json`
-- `kanji-structure-scott.json`
-- `kanji-structure-yagays.json`
+`public/json/v2/` now holds every JSON the app fetches — the five v1
+`kanji-structure-*.json` / `kanji-readings-details.json` files that used to sit
+in `public/json/` are gone, and their inputs live only in `raw-data/`.
 
 `public/json/katakana/challenge-set-<N>.json` is also generated, but by a
 separate script (`generate-speed-katakana.mjs`, run as part of `pnpm build`)
@@ -319,10 +309,38 @@ Each is called out in the commit that introduces it:
   was halted; only the characterization-test commit was kept. The staged
   commit sequence exists so review can happen per concept rather than on one
   large diff.
-- **Environment caveat:** `pnpm install` cannot fetch `kanjicanvas` directly
-  (`codeload.github.com` is blocked by the sandbox egress policy). It can be
-  installed from a locally built tarball of the pinned commit; `package.json`
-  and the lockfile must be restored afterwards.
+- **Two claims in this note were wrong and were caught by reading the code
+  rather than by any test.** Both are recorded because the pattern matters
+  more than the individual errors:
+  - This note stated that the structure and reading-detail files "load
+    eagerly on the main thread". They never did — `createKanjiLookupProvider`
+    fetched from a `useEffect` in its first consumer hook, and both consumers
+    sit inside collapsed accordions. The justification for moving them into
+    the worker is the parse location and the four-requests-instead-of-one, not
+    eager bytes. Nothing guarded the accordion behaviour the laziness rests
+    on, so `SimpleAccordion.test.tsx` now pins it: `forceMount`, or any
+    accordion that hides its body with CSS instead of unmounting it, would
+    silently make every detail drawer fetch every dataset.
+  - The generator reported file sizes using `json.length` — UTF-16 code units,
+    not bytes — understating every file by ~25% on this mostly-Japanese data.
+    Sizes quoted in a design document need to say which tool produced them,
+    which the tables here now do.
+- **Environment caveat:** `pnpm install` cannot fetch `kanjicanvas` in a
+  sandboxed agent environment. `package.json` points at
+  `github:asdfjkl/kanjicanvas`, the package is not on npm, and GitHub source
+  archives are served from `codeload.github.com`, which returns 403 for
+  repositories not attached to the session — independently of the environment's
+  network-access level. Workaround used here: install from a locally built
+  tarball of the pinned commit, then restore `package.json` and the lockfile.
+
+  Measured, for whoever fixes this properly: the full test suite passes without
+  the package (it is dynamically imported behind one handwriting backend), and
+  only `vite.config.ts`'s `copyRefPatterns` needs it, via an unconditional
+  `copyFileSync`. So making it an `optionalDependency` and letting that plugin
+  skip-with-warning — while hard-failing when `CI` is set, so a fetch failure
+  cannot silently ship a build without handwriting recognition — removes the
+  problem for every environment. Vendoring is the alternative and is worse:
+  `ref-patterns.js` is 6.7 MB raw / 2.4 MB gzipped, permanently in git.
 
 ---
 
@@ -336,44 +354,25 @@ Each is called out in the commit that introduces it:
 - The crossed `kd` / `wkfr` frequency indices: decide whether the field names
   or the comments are wrong, then fix deliberately.
 - Deeper radical-search UX restructure (beyond the render-perf fixes).
-- PWA/service-worker precache list audit once the v2 files land.
+- **PWA cache audit — done, and it found a pre-existing problem.** The v2 files
+  needed no config change: `globPatterns` is `**/*.{js,css,html}` so no JSON is
+  precached, and the runtime rule `/\/json\/.*\.json$/i` already matches
+  `/json/v2/...` because `.*` spans the directory segment. But that rule's
+  cache is capped at `maxEntries: 50`, and the app can fetch **211** distinct
+  JSON URLs: 11 data files plus 200 `challenge-set-<N>.json` for speed-katakana.
+  They share one LRU, so playing enough katakana evicts `kanji_main.json`.
+  Under `StaleWhileRevalidate` that is not a correctness bug — the file is
+  refetched — but it quietly defeats the offline support the comment above the
+  rule claims to provide. This predates the redesign (17 v1 JSON files + 200
+  sets was the same situation), so it is not a regression, and fixing it means
+  deciding a caching policy: separate rules for data versus challenge sets, or
+  a cap above 211. Left as a deliberate decision rather than changed in passing.
 
 ---
 
 ## 10. Still to do
 
-Everything above shipped except these, which are independent of the rest:
-
-- **`kanji-readings-details.json` and the four `kanji-structure-*.json` files
-  still load on the main thread**, through `createKanjiLookupProvider`.
-
-  To be precise about what is and is not wrong here, because an earlier draft
-  of this note overstated it: that factory is **already lazy**. It fetches
-  nothing when the provider mounts; `ensureLoaded` fires from a `useEffect` in
-  the first consumer hook that mounts, and the only consumers are
-  `StructuralCategory` and `ReadingFrequencyCategory` inside the kanji detail
-  drawer. So these bytes already obey P1 — they are not on the first-paint
-  path, and moving them into the worker will not reduce eager load at all.
-
-  What is actually left is smaller than "make it lazy":
-
-  1. **Two mechanisms instead of one.** `createKanjiLookupProvider` and the
-     worker's `lazyDataset` solve the same problem in different places, which
-     is exactly the kind of duplication this work was meant to remove. One
-     surface, one way to reach data.
-  2. **Four requests instead of one**, and 66 KB gzipped instead of 50 KB,
-     because the merged `kanji_structures.json` is generated but unused.
-  3. **Parsing on the main thread.** `res.json()` for the 229 KB reading
-     details and 322 KB of structures runs on the UI thread, where the worker
-     exists precisely to avoid it. This is the one user-visible part, and it
-     is worth measuring before assuming it is perceptible — the parse is a
-     one-time cost behind a section that already shows a loading state.
-  4. **Generated-but-unconsumed files** sit committed in `public/json/v2/`
-     alongside the five v1 originals, so the two can drift.
-
-  The work itself: two lazy worker requests, re-point `useMultiKanjiStructure`
-  and `useKanjiReadingDetails`, delete `createKanjiLookupProvider` and the
-  five v1 files. Sequenced as two commits, structures first.
+Everything above shipped. What remains:
 
 - **Radical drawer render cost.** The half-second freeze on selecting a
   radical is unvirtualised rendering, not search: `RadicalsResultsPreview`
