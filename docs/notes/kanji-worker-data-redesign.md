@@ -345,13 +345,36 @@ Each is called out in the commit that introduces it:
 Everything above shipped except these, which are independent of the rest:
 
 - **`kanji-readings-details.json` and the four `kanji-structure-*.json` files
-  still load on the main thread**, through `createKanjiLookupProvider`, and
-  are still fetched eagerly rather than when their drawer section opens. The
-  generator already emits the merged `kanji_structures.json` (53 KB gzipped
-  against 66 KB over four requests) and passes `kanji_reading_details.json`
-  through, so the remaining work is to add two lazy worker requests, point
-  `useMultiKanjiStructure` / the reading-category hook at them, and delete the
-  five v1 files.
+  still load on the main thread**, through `createKanjiLookupProvider`.
+
+  To be precise about what is and is not wrong here, because an earlier draft
+  of this note overstated it: that factory is **already lazy**. It fetches
+  nothing when the provider mounts; `ensureLoaded` fires from a `useEffect` in
+  the first consumer hook that mounts, and the only consumers are
+  `StructuralCategory` and `ReadingFrequencyCategory` inside the kanji detail
+  drawer. So these bytes already obey P1 — they are not on the first-paint
+  path, and moving them into the worker will not reduce eager load at all.
+
+  What is actually left is smaller than "make it lazy":
+
+  1. **Two mechanisms instead of one.** `createKanjiLookupProvider` and the
+     worker's `lazyDataset` solve the same problem in different places, which
+     is exactly the kind of duplication this work was meant to remove. One
+     surface, one way to reach data.
+  2. **Four requests instead of one**, and 66 KB gzipped instead of 50 KB,
+     because the merged `kanji_structures.json` is generated but unused.
+  3. **Parsing on the main thread.** `res.json()` for the 229 KB reading
+     details and 322 KB of structures runs on the UI thread, where the worker
+     exists precisely to avoid it. This is the one user-visible part, and it
+     is worth measuring before assuming it is perceptible — the parse is a
+     one-time cost behind a section that already shows a loading state.
+  4. **Generated-but-unconsumed files** sit committed in `public/json/v2/`
+     alongside the five v1 originals, so the two can drift.
+
+  The work itself: two lazy worker requests, re-point `useMultiKanjiStructure`
+  and `useKanjiReadingDetails`, delete `createKanjiLookupProvider` and the
+  five v1 files. Sequenced as two commits, structures first.
+
 - **Radical drawer render cost.** The half-second freeze on selecting a
   radical is unvirtualised rendering, not search: `RadicalsResultsPreview`
   renders every match, ~200 `RadicalBtn`s re-render unmemoised, and the list
