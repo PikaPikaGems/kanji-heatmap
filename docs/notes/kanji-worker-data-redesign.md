@@ -294,6 +294,37 @@ Each is called out in the commit that introduces it:
 3. Returning to a route no longer flashes `LoadingKanjis`.
 4. The first-ever hover pays a one-time lazy fetch behind the existing hover
    loading state; subsequent hovers are one round trip.
+5. The radical drawer's results strip renders at most 120 matches and offers
+   "+N more" instead of rendering every match. Selecting a common radical used
+   to render over a thousand items, each running `useItemBtnCn` and
+   `ExpandedBtnContent`, into a 176px strip.
+6. Speed-katakana challenge sets and core kanji data now use separate service
+   worker caches, so heavy katakana play no longer evicts `kanji_main.json`.
+
+---
+
+### A design rule this produced
+
+**The worker owns its datasets; the main thread asks about one kanji.**
+
+The detail-section requests were first written to return the whole map, on the
+reasoning that the drawer moves between kanji so one round trip would beat many.
+That was wrong twice over. It put a second copy of a 2,426-entry map on the main
+thread — the duplication this whole note started from — and it was inconsistent
+with `kanji-hover`, `kanji-general` and `kanji-similar`, which the same drawer
+already asked per kanji.
+
+It also produced a symptom that was easy to misread as unrelated: because a
+collapsed accordion unmounts its body, every re-expand re-cloned the whole map
+across the boundary, which then needed a main-thread memo to paper over. The
+per-kanji version deleted that memo. **A fix that requires a cache to stay fast
+is worth re-examining** — the cache was evidence the payload was wrong, not that
+it needed caching.
+
+Whole-map replies are still right for `similar-map` (the practice game needs
+many kanji at once) and `component-map` (keywords are read synchronously during
+render). The test is whether a caller genuinely needs many entries at once, not
+whether it might need them eventually.
 
 ---
 
@@ -354,34 +385,32 @@ Each is called out in the commit that introduces it:
 - The crossed `kd` / `wkfr` frequency indices: decide whether the field names
   or the comments are wrong, then fix deliberately.
 - Deeper radical-search UX restructure (beyond the render-perf fixes).
-- **PWA cache audit — done, and it found a pre-existing problem.** The v2 files
-  needed no config change: `globPatterns` is `**/*.{js,css,html}` so no JSON is
-  precached, and the runtime rule `/\/json\/.*\.json$/i` already matches
-  `/json/v2/...` because `.*` spans the directory segment. But that rule's
-  cache is capped at `maxEntries: 50`, and the app can fetch **211** distinct
-  JSON URLs: 11 data files plus 200 `challenge-set-<N>.json` for speed-katakana.
-  They share one LRU, so playing enough katakana evicts `kanji_main.json`.
-  Under `StaleWhileRevalidate` that is not a correctness bug — the file is
-  refetched — but it quietly defeats the offline support the comment above the
-  rule claims to provide. This predates the redesign (17 v1 JSON files + 200
-  sets was the same situation), so it is not a regression, and fixing it means
-  deciding a caching policy: separate rules for data versus challenge sets, or
-  a cap above 211. Left as a deliberate decision rather than changed in passing.
+- **PWA cache audit — done, and it found a pre-existing problem, now fixed.**
+  The v2 files needed no config change: `globPatterns` is `**/*.{js,css,html}`
+  so no JSON is precached, and the runtime rule `/\/json\/.*\.json$/i` already
+  matched `/json/v2/...` because `.*` spans the directory segment. But that
+  rule's cache was capped at `maxEntries: 50` while the app can fetch **211**
+  distinct JSON URLs: 11 data files plus 200 `challenge-set-<N>.json` for
+  speed-katakana. Sharing one LRU meant playing enough katakana evicted
+  `kanji_main.json`. Under `StaleWhileRevalidate` that is not a correctness bug
+  — the file is refetched — but it quietly defeated the offline support the
+  comment above the rule claims to provide. It predated the redesign (17 v1
+  files + 200 sets was the same situation), so it was not a regression.
+  Resolved by splitting into two caches that cannot evict each other: core data
+  at 30 entries, challenge sets at 50.
 
 ---
 
 ## 10. Still to do
 
-Everything above shipped. What remains:
+Everything in this note shipped. What remains is owner decisions from §9, none
+of which are code-blocked: filling the 391 component keyword gaps, wiring
+`extra_kanji_keyword` into the registry, confirming `filtered_kanji.json` can
+go, deciding what to do about the crossed `kd` / `wkfr` frequency indices, and
+any deeper radical-search UX restructure.
 
-- **Radical drawer render cost.** The half-second freeze on selecting a
-  radical is unvirtualised rendering, not search: `RadicalsResultsPreview`
-  renders every match, ~200 `RadicalBtn`s re-render unmemoised, and the list
-  screen behind the dialog re-renders too. Fixes: memoise `RadicalBtn`,
-  cap or virtualise the preview, and `useDeferredValue` for the background
-  list.
-
-Also still open from section 8: filling the 391 component keyword gaps,
-wiring `extra_kanji_keyword` into the registry, confirming
-`filtered_kanji.json` can go, and deciding what to do about the crossed
-`kd`/`wkfr` frequency indices.
+One flake worth knowing about, unrelated to these changes: the e2e case
+"radical search opens its drawer" occasionally times out waiting for the dialog
+under parallel load. It passes in isolation and on re-run, and it only
+opens and closes the drawer, so it is a test-timing issue rather than a
+symptom — but it is the kind of thing that looks like a real failure in CI.
