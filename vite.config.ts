@@ -234,11 +234,34 @@ const pwaConfig = {
         the JSON files won't be available until they go online.
         After the initial fetch, offline access is supported.
       */
+      /*
+      Two rules, not one, because these are different populations sharing one
+      LRU otherwise: 11 core data files against 200 speed-katakana challenge
+      sets. A single cache capped at 50 entries meant playing a few rounds of
+      speed katakana could evict kanji_main.json — the file the whole app waits
+      on at startup — and a first-time offline visit would then have nothing.
+      Separate caches cannot evict each other.
+      */
       {
-        urlPattern: /\/json\/.*\.json$/i,
+        // Core kanji data. 11 files today, all of which a heavy session touches,
+        // so the cap only needs headroom for the layout changing.
+        urlPattern: /\/json\/(?!katakana\/).*\.json$/i,
         handler: "StaleWhileRevalidate" as const,
         options: {
           cacheName: "kanji-heatmap-json-cache",
+          expiration: {
+            maxEntries: 30,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      {
+        // Speed-katakana challenge sets: 200 small files, and a player only ever
+        // revisits a handful, so this is the one that should be evicting.
+        urlPattern: /\/json\/katakana\/.*\.json$/i,
+        handler: "StaleWhileRevalidate" as const,
+        options: {
+          cacheName: "kanji-heatmap-katakana-cache",
           expiration: {
             maxEntries: 50,
             maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
