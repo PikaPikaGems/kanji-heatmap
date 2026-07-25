@@ -125,6 +125,44 @@ rm kanji-heatmap-data.tar.gz
 breaks an invariant (missing kanji, conflicting component keywords, furigana
 that does not round-trip, a sort field that is not a number).
 
+#### Checking data sizes
+
+`generate-json` prints the size and entry count of everything it writes, so
+the quickest check is to run it and read the output.
+
+To measure the files independently — inputs and served output, raw and
+gzipped, which is what matters over the wire — paste this:
+
+```bash
+for f in raw-data/*.json public/json/*.json public/json/v2/*.json docs/data/*.json; do
+  printf "%7s %7s  %s\n" \
+    "$(( $(stat -c%s "$f") / 1024 ))K" \
+    "$(( $(gzip -9 -c "$f" | wc -c) / 1024 ))K" \
+    "$f"
+done | sort -k3
+```
+
+Columns are raw, gzipped, path. (On macOS, `stat -c%s` is `stat -f%z`.)
+
+Totals per directory, and the eager/lazy split that
+`docs/notes/kanji-worker-data-redesign.md` documents:
+
+```bash
+# gzipped total of everything served from public/json/v2, summed per file
+# (each is fetched separately, so the per-file sum is what goes over the wire —
+# don't `cat` them together first, that compresses across files and overstates)
+for f in public/json/v2/*.json; do gzip -9 -c "$f" | wc -c; done |
+  awk '{t+=$1} END {printf "%.0f KB gz total\n", t/1024}'
+
+# the one file loaded before first paint — everything else is lazy
+gzip -9 -c public/json/v2/kanji_main.json | wc -c |
+  awk '{printf "%.0f KB gz eager\n", $1/1024}'
+```
+
+§5 of `docs/notes/kanji-worker-data-redesign.md` lists the expected size and
+entry count of every generated file, so these commands verify the design note
+rather than trusting it.
+
 ### Regenerating derived JSON
 
 `pnpm run build` regenerates derived JSON before compiling and bundling:
