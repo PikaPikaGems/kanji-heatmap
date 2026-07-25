@@ -61,7 +61,6 @@
     "cmdk": "1.0.0",
     "dmak": "^0.3.1",
     "fuzzysearch": "^1.0.3",
-    "kanjicanvas": "github:asdfjkl/kanjicanvas",
     "lucide-react": "^0.474.0",
     "marked": "^18.0.6",
     "onnxruntime-web": "^1.27.0",
@@ -82,6 +81,9 @@
     "vite-plugin-pwa": "^0.21.1",
     "wanakana": "^5.3.1",
     "wouter": "^3.6.0"
+  },
+  "optionalDependencies": {
+    "kanjicanvas": "github:asdfjkl/kanjicanvas"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.41.0",

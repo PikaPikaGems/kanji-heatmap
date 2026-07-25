@@ -17,7 +17,36 @@ const REF_PATTERNS_SRC = path.resolve(
 const REF_PATTERNS_DEST_DIR = path.resolve(__dirname, "public/js");
 const REF_PATTERNS_DEST = path.join(REF_PATTERNS_DEST_DIR, "ref-patterns.js");
 
+// The engine itself is bundled rather than copied, so Rollup has to resolve it.
+const KANJI_CANVAS_ID = "kanjicanvas/docs/resources/javascript/kanji-canvas.js";
+const KANJI_CANVAS_SRC = path.resolve(
+  __dirname,
+  "node_modules",
+  KANJI_CANVAS_ID
+);
+const KANJI_CANVAS_STUB = "\0kanjicanvas-not-installed";
+const kanjiCanvasInstalled = () => fs.existsSync(KANJI_CANVAS_SRC);
+
+// kanjicanvas is an optional dependency: it has no npm release, so it installs
+// from a GitHub tarball, which some sandboxed environments cannot reach. Its
+// absence must not break `pnpm install`, `pnpm test` or a dev server — only the
+// on-device handwriting backend, which the UI already treats as one of several
+// choices. A deployable build is a different matter: shipping without it would
+// silently drop the feature, so CI fails loudly instead.
 const copyRefPatterns = (): void => {
+  if (!fs.existsSync(REF_PATTERNS_SRC)) {
+    const message =
+      "kanjicanvas is not installed, so public/js/ref-patterns.js cannot be " +
+      "written. The kanjicanvas handwriting backend will be unavailable.";
+    if (process.env.CI) {
+      throw new Error(
+        `${message} Refusing to produce a deployable build without it.`
+      );
+    }
+    console.warn(`\n[kanjicanvas-ref-patterns] ${message}\n`);
+    return;
+  }
+
   if (!fs.existsSync(REF_PATTERNS_DEST_DIR))
     fs.mkdirSync(REF_PATTERNS_DEST_DIR, { recursive: true });
   fs.copyFileSync(REF_PATTERNS_SRC, REF_PATTERNS_DEST);
@@ -25,8 +54,30 @@ const copyRefPatterns = (): void => {
 
 const kanjiCanvasRefPatternsPlugin: Plugin = {
   name: "kanjicanvas-ref-patterns",
+  // `pre`, so resolveId sees the bare specifier. Vite's own resolver would
+  // otherwise turn it into an absolute path first and then fail to read it.
+  enforce: "pre",
   configureServer: copyRefPatterns,
   buildStart: copyRefPatterns,
+
+  // With the package absent, stub the bundled import so the build still
+  // completes. The stub throws when the module is evaluated, which is on the
+  // dynamic import inside kanjicanvas-adapter — a path that already resets its
+  // memo and rethrows, so the handwriting UI falls back exactly as it does for
+  // any other engine load failure.
+  resolveId(id) {
+    // Matches the bare specifier and the absolute path, since dependency
+    // pre-bundling may have resolved it before this hook runs.
+    const isKanjiCanvas =
+      id === KANJI_CANVAS_ID ||
+      id.replace(/\\/g, "/").endsWith(KANJI_CANVAS_ID);
+    return isKanjiCanvas && !kanjiCanvasInstalled() ? KANJI_CANVAS_STUB : null;
+  },
+  load(id) {
+    return id === KANJI_CANVAS_STUB
+      ? 'throw new Error("kanjicanvas is not installed in this build");'
+      : null;
+  },
 };
 
 const pwaConfig = {
