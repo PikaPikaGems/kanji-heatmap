@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback, useRef } from "react";
 import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import {
   useGetKanjiInfoFn,
@@ -16,6 +15,12 @@ import { ClearFiltersCTA } from "@/components/dependent/routing/ClearFiltersCTA"
 import { externalLinks } from "@/lib/external-links";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
+
+/**
+ * How many matches the results strip renders. Enough to fill several screens of
+ * horizontal scrolling; past that it is cost with no benefit.
+ */
+const RESULTS_PREVIEW_LIMIT = 120;
 
 const StrokeDivider = ({ stroke }: { stroke: string }) => {
   return (
@@ -34,19 +39,28 @@ const StrokeDivider = ({ stroke }: { stroke: string }) => {
   );
 };
 
-const RadicalBtn = ({
+/**
+ * 253 of these render at once, so it is memoised and every prop is a primitive
+ * or a stable callback. `onToggle` takes the radical rather than closing over
+ * it, which is what lets one shared handler serve the whole grid — a per-button
+ * arrow function would make the memo useless.
+ */
+const RadicalBtn = React.memo(function RadicalBtn({
   isDisabled,
-  onClick,
+  onToggle,
   isTouchDevice,
   isSelected,
   radical,
 }: {
   isDisabled: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onToggle: (
+    radical: string,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void;
   isSelected: boolean;
   radical: string;
   isTouchDevice: boolean;
-}) => {
+}) {
   const cn1 = isDisabled
     ? "opacity-10"
     : isTouchDevice
@@ -59,18 +73,18 @@ const RadicalBtn = ({
   return (
     <button
       disabled={isDisabled}
-      onClick={onClick}
+      onClick={(e) => onToggle(radical, e)}
       className={`
         w-[47px] h-[45px] transition-all duration-500 ml-1 mb-1 kanji-font text-2xl
         disabled:cursor-not-allowed disabled:border-dotted
         ${cn1}
-        ${cn2} 
+        ${cn2}
       `}
     >
       {radical}
     </button>
   );
-};
+});
 
 const ExpandedRadicalBtn = ({
   onClick,
@@ -197,6 +211,33 @@ export const RadicalScreenContent = ({
 
   const getBasicInfo = useGetKanjiInfoFn();
 
+  // The handler must keep one identity across renders or RadicalBtn's memo
+  // never hits, but it needs the current selection. A ref gives it both:
+  // the callback stays stable while always reading the latest values.
+  const latest = useRef({ value, setValue });
+  latest.current = { value, setValue };
+
+  const handleToggle = useCallback(
+    (
+      radical: string,
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ): void => {
+      const { value: selected, setValue: commit } = latest.current;
+      const next = new Set(selected);
+
+      if (next.delete(radical)) {
+        // Deselecting leaves focus on a button that is about to look
+        // unselected; blurring keeps the hover styling from sticking.
+        e.currentTarget.blur();
+      } else {
+        next.add(radical);
+      }
+
+      commit(next);
+    },
+    []
+  );
+
   if (getBasicInfo == null) {
     return null;
   }
@@ -221,20 +262,7 @@ export const RadicalScreenContent = ({
                   {index === 0 && <StrokeDivider stroke={stroke} />}
                   <RadicalBtn
                     isDisabled={isDisabled}
-                    onClick={(e) => {
-                      const prev = value;
-                      const newSelected = new Set(prev);
-                      const prevHasRadical = newSelected.has(radical);
-                      prevHasRadical
-                        ? newSelected.delete(radical)
-                        : newSelected.add(radical);
-
-                      if (prevHasRadical) {
-                        e.currentTarget.blur();
-                      }
-
-                      setValue(newSelected);
-                    }}
+                    onToggle={handleToggle}
                     radical={radical}
                     isSelected={isSelected}
                     isTouchDevice={isTouchDevice}
@@ -336,13 +364,29 @@ export const RadicalsResultsPreview = ({
     return null;
   }
 
+  // Each item runs useItemBtnCn and renders ExpandedBtnContent, so this strip
+  // is the expensive part of the drawer, not the search. Selecting a common
+  // radical can match well over a thousand kanji, and rendering them all is
+  // what makes the drawer freeze — in a 176px-tall horizontal strip nobody
+  // scrolls that far anyway. Cap it and say how many are hidden; the full set
+  // is one tap away by closing the drawer.
+  const shown = data.slice(0, RESULTS_PREVIEW_LIMIT);
+  const hidden = data.length - shown.length;
+
   return (
     <>
-      {data.map((kanji) => {
-        return (
-          <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
-        );
-      })}
+      {shown.map((kanji) => (
+        <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
+      ))}
+      {hidden > 0 && (
+        <button
+          onClick={onClick}
+          className="flex flex-col items-center justify-center h-full px-3 text-xs font-bold shrink-0 text-foreground/70 hover:text-foreground"
+        >
+          <span className="text-lg">+{hidden}</span>
+          <span>more</span>
+        </button>
+      )}
     </>
   );
 };
