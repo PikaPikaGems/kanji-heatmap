@@ -294,10 +294,11 @@ Each is called out in the commit that introduces it:
 3. Returning to a route no longer flashes `LoadingKanjis`.
 4. The first-ever hover pays a one-time lazy fetch behind the existing hover
    loading state; subsequent hovers are one round trip.
-5. The radical drawer's results strip renders at most 120 matches and offers
-   "+N more" instead of rendering every match. Selecting a common radical used
-   to render over a thousand items, each running `useItemBtnCn` and
-   `ExpandedBtnContent`, into a 176px strip.
+5. The radical drawer's results strip is virtualised with `virtua`'s
+   `VList horizontal` — the same library the main kanji list already uses. Every
+   match stays scrollable; only the visible window is mounted. Verified against
+   the previous layout in a browser: item width (124px) and total scroll width
+   (3,712px for 29 matches) are identical, with 11 items mounted instead of 29.
 6. Speed-katakana challenge sets and core kanji data now use separate service
    worker caches, so heavy katakana play no longer evicts `kanji_main.json`.
 
@@ -404,10 +405,11 @@ whether it might need them eventually.
 ## 10. Still to do
 
 Everything in this note shipped. What remains is owner decisions from §9, none
-of which are code-blocked: filling the 391 component keyword gaps, wiring
-`extra_kanji_keyword` into the registry, confirming `filtered_kanji.json` can
-go, deciding what to do about the crossed `kd` / `wkfr` frequency indices, and
-any deeper radical-search UX restructure.
+of which are code-blocked and all of which the owner is handling separately:
+filling the 391 component keyword gaps, wiring `extra_kanji_keyword` into the
+registry, confirming `filtered_kanji.json` can go, deciding what to do about the
+crossed `kd` / `wkfr` frequency indices, and any deeper radical-search UX
+restructure.
 
 One flake worth knowing about, unrelated to these changes: the e2e case
 "radical search opens its drawer" occasionally times out waiting for the dialog

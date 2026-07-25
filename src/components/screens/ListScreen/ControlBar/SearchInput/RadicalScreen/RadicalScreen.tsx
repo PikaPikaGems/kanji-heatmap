@@ -1,4 +1,5 @@
 import React, { ReactNode, useCallback, useRef } from "react";
+import { VList } from "virtua";
 import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import {
   useGetKanjiInfoFn,
@@ -17,10 +18,12 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
 
 /**
- * How many matches the results strip renders. Enough to fill several screens of
- * horizontal scrolling; past that it is cost with no benefit.
+ * Width of one results-preview item, in px. Measured from the pre-virtualisation
+ * layout, where the flex row sized each tile at 124px plus its 4px `ml-1`.
+ * Virtualising needs a definite size, and keeping this number is what makes the
+ * strip look and scroll exactly as it did.
  */
-const RESULTS_PREVIEW_LIMIT = 120;
+const RESULT_ITEM_WIDTH = 128;
 
 const StrokeDivider = ({ stroke }: { stroke: string }) => {
   return (
@@ -189,7 +192,9 @@ export const RadicalScreenLayout = ({
         {middle}
       </div>
 
-      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 border-foreground/40 scrollbar-thin animate-fade-in">
+      {/* No overflow here: RadicalsResultsPreview renders a virtualised VList
+          which owns the horizontal scrolling. Two nested scrollers would fight. */}
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-hidden border-2 border-dotted rounded-md h-44 border-foreground/40 animate-fade-in">
         {bottom}
       </div>
       <div className="absolute bottom-[170px] w-full m-auto z-50">
@@ -364,29 +369,33 @@ export const RadicalsResultsPreview = ({
     return null;
   }
 
-  // Each item runs useItemBtnCn and renders ExpandedBtnContent, so this strip
-  // is the expensive part of the drawer, not the search. Selecting a common
-  // radical can match well over a thousand kanji, and rendering them all is
-  // what makes the drawer freeze — in a 176px-tall horizontal strip nobody
-  // scrolls that far anyway. Cap it and say how many are hidden; the full set
-  // is one tap away by closing the drawer.
-  const shown = data.slice(0, RESULTS_PREVIEW_LIMIT);
-  const hidden = data.length - shown.length;
-
+  // Every match stays scrollable; only the visible ones are mounted. Each item
+  // runs useItemBtnCn and renders ExpandedBtnContent, so rendering all of them
+  // is what froze the drawer — selecting a common radical matches well over a
+  // thousand kanji. VList owns the horizontal scrolling for this strip, which
+  // is why the container in RadicalScreenLayout does not set overflow itself.
   return (
-    <>
-      {shown.map((kanji) => (
-        <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
-      ))}
-      {hidden > 0 && (
-        <button
-          onClick={onClick}
-          className="flex flex-col items-center justify-center h-full px-3 text-xs font-bold shrink-0 text-foreground/70 hover:text-foreground"
+    <VList
+      horizontal
+      className="w-full h-full scrollbar-thin"
+      // Each item is a fixed RESULT_ITEM_WIDTH, so telling VList up front avoids
+      // a measure-then-reflow pass on open.
+      itemSize={RESULT_ITEM_WIDTH}
+      overscan={4}
+      data-testid="results-strip"
+    >
+      {data.map((kanji) => (
+        <div
+          key={kanji}
+          // pr-1 leaves room for the ml-1 that KanjiItemSimpleButton carries, so
+          // the item occupies exactly RESULT_ITEM_WIDTH and matches the spacing
+          // the flex row produced before this was virtualised.
+          className="h-full pr-1"
+          style={{ width: RESULT_ITEM_WIDTH }}
         >
-          <span className="text-lg">+{hidden}</span>
-          <span>more</span>
-        </button>
-      )}
-    </>
+          <KanjiItemSimpleButton kanji={kanji} onClick={onClick} />
+        </div>
+      ))}
+    </VList>
   );
 };

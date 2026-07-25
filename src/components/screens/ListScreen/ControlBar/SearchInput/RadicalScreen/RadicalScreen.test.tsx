@@ -12,8 +12,9 @@ import { RadicalScreenContent, RadicalsResultsPreview } from "./RadicalScreen";
  * 1. RadicalBtn is memoised, which only works while `onToggle` keeps one
  *    identity. Reintroducing a per-button arrow function would re-render all
  *    253 buttons on every selection.
- * 2. The results strip is capped. Selecting a common radical matches over a
- *    thousand kanji, and each item runs hooks and renders readings.
+ * 2. The results strip is virtualised. Selecting a common radical matches over
+ *    a thousand kanji, and each item runs hooks and renders readings, so all of
+ *    them must stay reachable while only the visible ones are mounted.
  */
 
 const searchResult = vi.hoisted(() => ({
@@ -108,7 +109,7 @@ describe("RadicalsResultsPreview", () => {
   const kanjiList = (n: number) =>
     Array.from({ length: n }, (_, i) => String.fromCodePoint(0x4e00 + i));
 
-  it("caps how many matches it renders and reports the remainder", () => {
+  it("mounts only a fraction of a large match set", () => {
     itemRenders.count = 0;
     searchResult.value = {
       data: kanjiList(1500),
@@ -118,13 +119,36 @@ describe("RadicalsResultsPreview", () => {
 
     render(<RadicalsResultsPreview onClick={() => {}} />);
 
-    // 120 items, not 1500 — the whole point of the cap.
-    expect(screen.getAllByTestId("preview-item")).toHaveLength(120);
-    expect(itemRenders.count).toBe(120);
-    expect(screen.getByText("+1380")).toBeVisible();
+    // The exact count depends on the measured viewport, so this asserts the
+    // property that matters — nowhere near 1,500 items are mounted — rather
+    // than a number that would make the test brittle.
+    expect(itemRenders.count).toBeGreaterThan(0);
+    expect(itemRenders.count).toBeLessThan(200);
+    expect(screen.getAllByTestId("preview-item").length).toBe(
+      itemRenders.count
+    );
   });
 
-  it("renders every match when they fit under the cap", () => {
+  it("does not drop matches — the full set stays in the list", () => {
+    // Virtualisation, not a cap: nothing is hidden behind a "+N more" button,
+    // and scrolling reaches every match.
+    searchResult.value = {
+      data: kanjiList(1500),
+      status: "success",
+      additionalData: null,
+    };
+
+    render(<RadicalsResultsPreview onClick={() => {}} />);
+
+    expect(screen.queryByText(/^\+\d+$/)).toBeNull();
+    expect(screen.queryByText("more")).toBeNull();
+  });
+
+  it("mounts matches from the start of the list, in order", () => {
+    // jsdom reports a zero-size viewport, so virtua mounts its minimum window
+    // rather than everything — which is why this asserts ordering and an upper
+    // bound instead of an exact count. That all matches remain reachable by
+    // scrolling is covered in e2e, where the viewport is real.
     searchResult.value = {
       data: kanjiList(7),
       status: "success",
@@ -133,8 +157,12 @@ describe("RadicalsResultsPreview", () => {
 
     render(<RadicalsResultsPreview onClick={() => {}} />);
 
-    expect(screen.getAllByTestId("preview-item")).toHaveLength(7);
-    expect(screen.queryByText(/^\+/)).toBeNull();
+    const mounted = screen
+      .getAllByTestId("preview-item")
+      .map((el) => el.textContent);
+    expect(mounted.length).toBeGreaterThan(0);
+    expect(mounted.length).toBeLessThanOrEqual(7);
+    expect(mounted).toEqual(kanjiList(7).slice(0, mounted.length));
   });
 
   it("shows nothing when nothing is filtered out yet", () => {
