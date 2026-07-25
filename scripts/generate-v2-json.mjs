@@ -441,7 +441,10 @@ const written = [];
 const write = (name, value) => {
   const json = JSON.stringify(value);
   fs.writeFileSync(path.join(OUT_DIR, name), json);
-  written.push([name, json.length, Object.keys(value).length]);
+  // Byte length, not string length: these files are mostly Japanese, where one
+  // UTF-16 code unit is three UTF-8 bytes, so `json.length` understates the
+  // file by ~25%. The whole eager/lazy split was argued from these numbers.
+  written.push([name, Buffer.byteLength(json), Object.keys(value).length]);
 };
 
 write("kanji_main.json", outMain);
