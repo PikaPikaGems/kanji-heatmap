@@ -3,9 +3,15 @@ import {
   useIsKanjiWorkerReady,
   useWorkerQuery,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { oncePerSession } from "@/kanji-worker/worker-dataset-cache";
 import { KanjiReadingsData } from "@/lib/kanji-section-constants";
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
+
+const loadReadingDetails = () =>
+  oncePerSession("reading-details-map", () =>
+    requestWorker({ type: "reading-details-map" })
+  );
 
 /**
  * Per-reading usefulness data, served by the worker on first use.
@@ -18,7 +24,7 @@ export const useKanjiReadingDetails = (kanji: string) => {
   const ready = useIsKanjiWorkerReady();
 
   const { status, error, data } = useWorkerQuery<KanjiReadingsData>(
-    ready ? () => requestWorker({ type: "reading-details-map" }) : null,
+    ready ? loadReadingDetails : null,
     [ready]
   );
 

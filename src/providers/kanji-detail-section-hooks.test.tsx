@@ -2,8 +2,12 @@ import { act, render, screen } from "@testing-library/react";
 import { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import userEvent from "@testing-library/user-event";
+
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import { IsReadyContext } from "@/kanji-worker/kanji-worker-hooks";
+import SimpleAccordion from "@/components/common/SimpleAccordion";
+import { clearWorkerDatasetCache } from "@/kanji-worker/worker-dataset-cache";
 import { useKanjiReadingDetails } from "./kanji-reading-category-hooks";
 import { useMultiKanjiStructure } from "./multiple-kanji-structure-hooks";
 
@@ -38,6 +42,9 @@ const flush = async () => {
 
 beforeEach(() => {
   request.mockReset();
+  // The memo is module-level and deliberately outlives components, so each
+  // test needs a clean one.
+  clearWorkerDatasetCache();
 });
 
 describe("useMultiKanjiStructure", () => {
@@ -117,6 +124,94 @@ describe("useMultiKanjiStructure", () => {
 
     expect(request).not.toHaveBeenCalled();
     expect(screen.getByTestId("status").textContent).toBe("idle");
+  });
+});
+
+/**
+ * The whole point of these two datasets living behind the accordion: opening a
+ * kanji drawer must cost nothing, and the first expand must pay for every
+ * kanji at once so later ones are free.
+ *
+ * The pieces are covered separately (SimpleAccordion.test.tsx proves a closed
+ * body is unmounted; kanji-worker.test.ts proves the worker does not fetch the
+ * file until the request arrives). This closes the chain in one place, because
+ * the guarantee is what the user experiences, not any single link in it.
+ */
+describe("neither dataset is requested until its section is expanded", () => {
+  const Section = ({ kanji }: { kanji: string }) => {
+    const { kanjiStructureData } = useMultiKanjiStructure(kanji);
+    return <span>{kanjiStructureData?.scott?.join("") ?? "no data"}</span>;
+  };
+
+  const Drawer = ({ kanji }: { kanji: string }) => (
+    <Wrapper>
+      <SimpleAccordion trigger="Character Structure">
+        <Section kanji={kanji} />
+      </SimpleAccordion>
+    </Wrapper>
+  );
+
+  beforeEach(() => {
+    request.mockResolvedValue({
+      朝: { hlorenzi: null, kanjium: null, scott: ["龺", "月"], yagays: null },
+      日: { hlorenzi: null, kanjium: null, scott: ["日"], yagays: null },
+    });
+  });
+
+  it("requests nothing while the drawer is open but the section is collapsed", async () => {
+    render(<Drawer kanji="朝" />);
+    await flush();
+
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it("requests once on the first expand", async () => {
+    render(<Drawer kanji="朝" />);
+    await flush();
+
+    await userEvent.click(screen.getByText("Character Structure"));
+    await flush();
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith({ type: "structures-map" });
+    expect(screen.getByText("龺月")).toBeVisible();
+  });
+
+  it("collapsing and re-expanding does not go back to the worker", async () => {
+    render(<Drawer kanji="朝" />);
+    await flush();
+
+    const trigger = screen.getByText("Character Structure");
+    await userEvent.click(trigger);
+    await flush();
+    await userEvent.click(trigger); // collapse — body unmounts
+    await userEvent.click(trigger); // expand — body mounts fresh
+    await flush();
+
+    // Without the main-thread memo this would be 2: the worker would not
+    // refetch the file, but it would still clone the whole map across the
+    // boundary again on every expand.
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("龺月")).toBeVisible();
+  });
+
+  it("opening a different kanji's section reuses the same map", async () => {
+    const first = render(<Drawer kanji="朝" />);
+    await flush();
+    await userEvent.click(screen.getByText("Character Structure"));
+    await flush();
+    expect(screen.getByText("龺月")).toBeVisible();
+
+    first.unmount();
+
+    render(<Drawer kanji="日" />);
+    await flush();
+    await userEvent.click(screen.getByText("Character Structure"));
+    await flush();
+
+    // One request total for both kanji: the whole map was already in hand.
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("日")).toBeVisible();
   });
 });
 

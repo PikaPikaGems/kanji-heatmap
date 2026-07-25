@@ -3,9 +3,15 @@ import {
   useIsKanjiWorkerReady,
   useWorkerQuery,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { oncePerSession } from "@/kanji-worker/worker-dataset-cache";
 import { MultiKanjiStructureData } from "@/lib/kanji-section-constants";
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
+
+const loadStructures = () =>
+  oncePerSession("structures-map", () =>
+    requestWorker({ type: "structures-map" })
+  );
 
 /**
  * The four per-source structure datasets, merged into one file and served by
@@ -21,7 +27,7 @@ export const useMultiKanjiStructure = (kanji: string) => {
   const ready = useIsKanjiWorkerReady();
 
   const { status, error, data } = useWorkerQuery<MultiKanjiStructureData>(
-    ready ? () => requestWorker({ type: "structures-map" }) : null,
+    ready ? loadStructures : null,
     [ready]
   );
 
