@@ -159,20 +159,20 @@ makes the data regeneration provably behavior-preserving.
 
 Measured, not assumed:
 
-| Finding                                   | Detail                                                                                                                                                                                                                                   |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Component keyword coverage                | 540 distinct non-kanji components are referenced across all datasets; **150 have a keyword, 390 do not**                                                                                                                                 |
-| Where the gaps are                        | All 390 are referenced only by the structure files / phonetic maps. Every surface that currently _displays_ keywords (hover parts, radical drawer, decomposition search) is 100% covered                                                 |
-| Keyword conflicts                         | **Zero** across `component_keyword.json`, `phonetic.json`, `moreRadicalKeywords`, `nonRadicalVariantKeywords` — consolidation is safe today                                                                                              |
-| `radicalFalseFriends` bugs                | `艹` maps to `" ⺾"` (leading space → that alias lookup can never match); `辶` is declared twice; 3 NFKC lookalike pairs exist beyond the manually tracked ones                                                                          |
-| Structure files are heterogeneous         | hlorenzi = objects `{type, semantic?, phonetic?}` (2,244); kanjium = 5-tuples (2,426); scott / yagays = component arrays (2,061 / 2,356). Their exact types already exist in `src/lib/kanji-section-constants.ts`                        |
-| Furigana compression is ambiguous         | The naive `会[かい]社[しゃ]` form cannot distinguish `あん                                                                                                                                                                               | 肝[きも]`from`あん肝[きも]`— **140 of 4,408 words fail** to round-trip. Anki-style (space before a bracketed segment following a plain one:`あん 肝[きも]`) round-trips **4,408/4,408** |
-| Frequency index oddity                    | In `transformToMainKanjiInfo`, freq index 3 populates field `kd` but is commented `rank_wkfr`, and index 15 populates `wkfr` commented `rank_kd` — crossed. **Preserved verbatim**; "fixing" it would silently change displayed rankings |
-| Dead data                                 | `rtkb` is declared on `GeneralKanjiItem` but never reaches any runtime payload (pinned by test); `_rtk_old` is already discarded by the v1 transform; `kanjiMainInfoCache` / `kanjiOtherInfoCache` in `helpers.ts` have zero references  |
-| Duplicate download                        | `similar-kanjis.json` is fetched by the worker _and_ independently by `production-practice-v1/Game.tsx`                                                                                                                                  |
-| Type bugs found while typing the protocol | `fetchPhoneticInfo` was typed `Record<string,string>` but the data is `Record<string,string[]>`; `wordPartDetails` was typed `string[][]` but is `[string, string?][]`                                                                   |
-| Navigation regression                     | `KanjiListWithSearch` unmounts on route change, so returning to `/` restarts `useWorkerQuery` from idle and re-shows `LoadingKanjis` although nothing changed                                                                            |
-| Radical drawer freeze                     | Not the search (already in the worker). It is main-thread render: `RadicalsResultsPreview` renders every match unvirtualized, ~200 `RadicalBtn`s re-render unmemoized, and the list screen behind the dialog re-renders too              |
+| Finding                                   | Detail                                                                                                                                                                                                                                                                      |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Component keyword coverage                | 540 distinct non-kanji components are referenced across all datasets; **149 have a keyword, 391 do not** (the generated `component-coverage.json` is the authority on this count)                                                                                           |
+| Where the gaps are                        | All 391 are referenced only by the structure files / phonetic maps. Every surface that currently _displays_ keywords (hover parts, radical drawer, decomposition search) is 100% covered                                                                                    |
+| Keyword conflicts                         | **Zero** across `component_keyword.json`, `phonetic.json`, `moreRadicalKeywords`, `nonRadicalVariantKeywords` — consolidation is safe today                                                                                                                                 |
+| `radicalFalseFriends` bugs                | `艹` maps to `" ⺾"` (leading space → that alias lookup can never match); `辶` is declared twice; 3 NFKC lookalike pairs exist beyond the manually tracked ones                                                                                                             |
+| Structure files are heterogeneous         | hlorenzi = objects `{type, semantic?, phonetic?}` (2,244); kanjium = 5-tuples (2,426); scott / yagays = component arrays (2,061 / 2,356). Their exact types already exist in `src/lib/kanji-section-constants.ts`                                                           |
+| Furigana compression is ambiguous         | The naive `会[かい]社[しゃ]` form cannot distinguish `あん` + `肝[きも]` from `あん肝[きも]` — **140 of 4,408 words fail** to round-trip. Anki-style, which puts a space before a bracketed segment that follows a plain one (`あん 肝[きも]`), round-trips **4,408/4,408** |
+| Frequency index oddity                    | In `transformToMainKanjiInfo`, freq index 3 populates field `kd` but is commented `rank_wkfr`, and index 15 populates `wkfr` commented `rank_kd` — crossed. **Preserved verbatim**; "fixing" it would silently change displayed rankings                                    |
+| Dead data                                 | `rtkb` is declared on `GeneralKanjiItem` but never reaches any runtime payload (pinned by test); `_rtk_old` is already discarded by the v1 transform; `kanjiMainInfoCache` / `kanjiOtherInfoCache` in `helpers.ts` have zero references                                     |
+| Duplicate download                        | `similar-kanjis.json` is fetched by the worker _and_ independently by `production-practice-v1/Game.tsx`                                                                                                                                                                     |
+| Type bugs found while typing the protocol | `fetchPhoneticInfo` was typed `Record<string,string>` but the data is `Record<string,string[]>`; `wordPartDetails` was typed `string[][]` but is `[string, string?][]`                                                                                                      |
+| Navigation regression                     | `KanjiListWithSearch` unmounts on route change, so returning to `/` restarts `useWorkerQuery` from idle and re-shows `LoadingKanjis` although nothing changed                                                                                                               |
+| Radical drawer freeze                     | Not the search (already in the worker). It is main-thread render: `RadicalsResultsPreview` renders every match unvirtualized, ~200 `RadicalBtn`s re-render unmemoized, and the list screen behind the dialog re-renders too                                                 |
 
 ---
 
@@ -181,8 +181,8 @@ Measured, not assumed:
 All served files live in `public/json/v2/`, snake_case. Sizes are raw / gzip,
 measured from current data.
 
-**Eager — 1 file, 341 KB / 163.5 KB gz** (down from an effective
-747 KB / 365 KB today):
+**Eager — 1 file, 389 KB / 163 KB gz** (down from an effective
+747 KB / 365 KB before this change):
 
 - `kanji_main.json` — keyword, on, kun, jlpt, 19 frequency ranks, strokes,
   jouyou grade, WK level, KKLC index, RTK index, representative word +
@@ -194,23 +194,89 @@ gzipped, which is how they go over the wire:
 
 | File                          | Size (gz) | Fetched when                                                                                                                                                  |
 | ----------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kanji_extended_general.json` | 85 KB     | a meaning/reading text search runs, or the details "General Information" section renders                                                                      |
-| `kanji_extended_hover.json`   | 43 KB     | the first hover card opens                                                                                                                                    |
-| `vocab.json`                  | 129 KB    | the first hover card or vocab popover opens                                                                                                                   |
+| `kanji_extended_general.json` | 84 KB     | a meaning/reading text search runs, or the details "General Information" section renders                                                                      |
+| `kanji_extended_hover.json`   | 41 KB     | the first hover card opens                                                                                                                                    |
+| `vocab.json`                  | 127 KB    | the first hover card or vocab popover opens                                                                                                                   |
 | `components.json`             | 3 KB      | the init snapshot is built (it answers component keywords for synchronous lookups)                                                                            |
 | `rep_word_details.json`       | 60 KB     | a gloss or emoji tag is displayed: hover card, details study word, practice deck                                                                              |
-| `kanji_structures.json`       | 53 KB     | the "Character Structure" section opens _(not wired up yet — see §9)_                                                                                         |
-| `kanji_reading_details.json`  | 42 KB     | the "Reading Usefulness" section opens _(not wired up yet — see §9)_                                                                                          |
+| `kanji_structures.json`       | 50 KB     | the "Character Structure" section opens _(not wired up yet — see §10)_                                                                                        |
+| `kanji_reading_details.json`  | 41 KB     | the "Reading Usefulness" section opens _(not wired up yet — see §10)_                                                                                         |
 | `kanji_decomposition.json`    | 19 KB     | a **radical** search runs. Multi-kanji and handwriting searches do **not** use it — they match the kanji characters in the query directly (`kanjiListSearch`) |
 | `similar_kanjis.json`         | 43 KB     | a similar search runs, **or** the "Character Structure" section opens (it lists similar kanji via `useSimilarKanjis`), or the practice game starts            |
-| `cum_use.json`                | 1 KB      | the dashboard's cumulative-use chart mounts (main thread, never through the worker)                                                                           |
-
-Not served: `docs/data/component-coverage.json` — the generated coverage
-report (JSON, not markdown, so a test can assert the gap count never grows).
+| `cum_use.json`                | <1 KB     | the dashboard's cumulative-use chart mounts (main thread, never through the worker)                                                                           |
 
 ---
 
-## 5. Decisions and rejected alternatives
+## 5. Generated file manifest
+
+`pnpm run generate-json` (`scripts/generate-v2-json.mjs`) reads **only**
+`raw-data/` and writes **only** the files below. Nothing else in the tree is
+touched, and the script fails without writing if the data breaks an invariant.
+Every one of these files is committed, so the manifest doubles as a checklist:
+after a regeneration, exactly these paths should appear in `git status` and no
+others.
+
+Sizes are raw / gzip (`gzip -9`, which is roughly what a CDN serves), measured
+from the data currently committed.
+
+### Served from `public/json/v2/` — 11 files
+
+| File                          | Raw    | Gzip   | Entries | Loaded  |
+| ----------------------------- | ------ | ------ | ------- | ------- |
+| `kanji_main.json`             | 389 KB | 163 KB | 2,426   | eager   |
+| `vocab.json`                  | 308 KB | 127 KB | 4,408   | lazy    |
+| `kanji_structures.json`       | 322 KB | 50 KB  | 2,426   | lazy \* |
+| `kanji_extended_general.json` | 237 KB | 84 KB  | 2,426   | lazy    |
+| `kanji_reading_details.json`  | 229 KB | 41 KB  | 2,134   | lazy \* |
+| `rep_word_details.json`       | 154 KB | 60 KB  | 2,348   | lazy    |
+| `similar_kanjis.json`         | 120 KB | 43 KB  | 2,426   | lazy    |
+| `kanji_extended_hover.json`   | 115 KB | 41 KB  | 2,426   | lazy    |
+| `kanji_decomposition.json`    | 48 KB  | 19 KB  | 2,426   | lazy    |
+| `components.json`             | 9 KB   | 3 KB   | 390     | lazy    |
+| `cum_use.json`                | 2 KB   | <1 KB  | 7       | lazy    |
+
+The raw column is what `pnpm run generate-json` prints; the gzip column is
+`gzip -9`.
+
+\* Generated and committed, but not yet consumed — the app still fetches the
+v1 equivalents from `public/json/`. See §10.
+
+Entry counts are not all 2,426 on purpose: `kanji_reading_details` covers only
+kanji that have a reading breakdown (2,134), `rep_word_details` only kanji with
+a representative word (2,348), `vocab` is keyed by word rather than kanji
+(4,408), `components` holds non-kanji components only (390), and `cum_use` is
+keyed by frequency source (7).
+
+### Not served — 1 file
+
+| File                                | Raw   | Gzip | Contents                                                                          |
+| ----------------------------------- | ----- | ---- | --------------------------------------------------------------------------------- |
+| `docs/data/component-coverage.json` | 40 KB | 2 KB | `{summary: {referenced, withKeyword, missing}, missing: [{char, refs, sources}]}` |
+
+The coverage report is committed but never fetched by the app. It is JSON
+rather than markdown so it is diffable and so a unit test can assert the gap
+count never grows — filling a keyword gap shrinks `summary.missing`, and
+introducing a new uncovered component makes the test fail. Current state:
+540 components referenced, 149 with a keyword, 391 without.
+
+### Still read from `public/json/` (v1, pending §10)
+
+These five predate the pipeline and are committed directly rather than
+generated. They are what §10's remaining work deletes.
+
+- `kanji-readings-details.json`
+- `kanji-structure-hlorenzi.json`
+- `kanji-structure-kanjium.json`
+- `kanji-structure-scott.json`
+- `kanji-structure-yagays.json`
+
+`public/json/katakana/challenge-set-<N>.json` is also generated, but by a
+separate script (`generate-speed-katakana.mjs`, run as part of `pnpm build`)
+and is gitignored rather than committed.
+
+---
+
+## 6. Decisions and rejected alternatives
 
 | Decision                                                                                    | Rejected alternative                                           | Why                                                                                                                                                                   |
 | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -228,7 +294,7 @@ report (JSON, not markdown, so a test can assert the gap count never grows).
 
 ---
 
-## 6. Deliberate behavior changes
+## 7. Deliberate behavior changes
 
 Each is called out in the commit that introduces it:
 
@@ -241,7 +307,7 @@ Each is called out in the commit that introduces it:
 
 ---
 
-## 7. Process notes
+## 8. Process notes
 
 - **Rebase first.** The branch was reset onto current `main` before any work,
   and the plan's file references re-verified afterwards.
@@ -260,7 +326,7 @@ Each is called out in the commit that introduces it:
 
 ---
 
-## 8. Out of scope / future work
+## 9. Out of scope / future work
 
 - Filling the 390 missing component keywords (tracked by the coverage report).
 - `extra_kanji_keyword.json` (44 entries): wire into the registry so
@@ -274,7 +340,7 @@ Each is called out in the commit that introduces it:
 
 ---
 
-## 9. Still to do
+## 10. Still to do
 
 Everything above shipped except these, which are independent of the rest:
 

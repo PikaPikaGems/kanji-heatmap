@@ -137,15 +137,18 @@ The `/speed-katakana` game loads word lists from `public/json/katakana/challenge
 
 #### Other required data
 
-These files in `public/` should exist (see also `./src/lib/assets-paths.ts`):
+Every JSON the app fetches from `public/` is committed, so a fresh clone plus
+`pnpm run generate-speed-katakana` is enough to run the site. The only data
+_not_ in the repo is the per-kanji vocabulary, which is gitignored because it
+is one file per kanji (see also `./src/lib/assets-paths.ts`):
 
-- `/json/kanji-structure-hlorenzi.json`
-- `/json/kanji-readings-details.json`
-- `/json/kanji-structure-kanjium.json`
-- `/json/kanji-structure-scott.json`
-- `/json/kanji-structure-yagays.json`
 - `/kanji-textbook-words-min/<KANJI>.json`
 - `/kanji-words/v4/<KANJI>.json`
+
+These paths are used in development only. In production the same data is
+served from `https://assets.pikapikagems.com`, so the site works without them;
+locally, the vocabulary sections of the kanji drawer stay empty until you
+populate the two directories.
 
 ## Talk to us
 
