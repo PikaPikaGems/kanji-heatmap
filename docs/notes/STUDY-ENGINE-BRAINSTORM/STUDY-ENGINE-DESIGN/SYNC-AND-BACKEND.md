@@ -152,7 +152,7 @@ Bootstrap is required when:
 
 Writes remain blocked until activation.
 
-### Start or resume
+### Start
 
 Proposed request:
 
@@ -162,8 +162,7 @@ Proposed request:
   "engineVersion": "1.0.0",
   "applicationId": "kanji-heatmap",
   "catalogVersion": "kanji-review-v1",
-  "catalogSha256": "...",
-  "resumeBootstrapId": null
+  "catalogSha256": "..."
 }
 ```
 
@@ -186,7 +185,10 @@ Proposed response:
 ```
 
 Each page contains whole typed entities and the next opaque cursor. A cursor is
-bound to account, bootstrap ID, snapshot revision, and expiry.
+bound to account, bootstrap ID, snapshot revision, and expiry. It is a
+within-run cursor: a client that is interrupted deletes its partial database
+and starts a new bootstrap rather than resuming an old one, so no bootstrap ID
+needs to outlive a browsing session.
 
 The cursor is keyset, not offset: a fixed domain order with primary key order
 inside each domain, encoded opaquely. Pages are bounded by
@@ -216,7 +218,7 @@ sequenceDiagram
     loop Until hasMore is false
         Engine->>API: Get page at cursor
         API-->>Engine: Entities and next cursor
-        Engine->>DB: One transaction: entities plus cursor
+        Engine->>DB: One transaction: entities
     end
     Engine->>DB: Set cursor to R, mark cache active
     Engine->>API: Pull deltas after R
@@ -491,17 +493,18 @@ thousand small rows. Deactivated card rows null their `state` and
   a rule and an HTML comment marker, ordered by the deterministic tuple
   `(clampedUpdatedAt, deviceId, deviceSequence)` so every runtime produces
   byte-identical output. Set `has_merged_edit`.
-- Validate a `note_put` against
-  `min(max(noteMaxUtf8Bytes, currentCanonicalBytes), noteMergedMaxUtf8Bytes)`,
-  so a user can always save a merged note that the system made oversized, but
-  can never grow it.
+- Validate every `note_put` against `noteMaxUtf8Bytes` with **no exception for
+  an already-merged note**. A merged note is readable at its merged size but
+  cannot be saved again until the user brings it under the limit. This is what
+  bounds merge growth: since every accepted edit is at most the limit, every
+  two-way merge is at most twice it, permanently.
 - Size `noteMergedMaxUtf8Bytes` at no less than
-  `2 * noteMaxUtf8Bytes + separator`, which makes a first merge provably
-  unable to overflow.
-- Only a chained merge can reach the ceiling. When it does, keep the winner in
-  full, append the loser truncated at a UTF-8 scalar boundary with a visible
-  marker, archive the loser's full text, and return a `note_merge_truncated`
-  warning.
+  `2 * noteMaxUtf8Bytes + separator`; `4 * noteMaxUtf8Bytes` is recommended so
+  that three or more concurrently divergent devices also fit.
+- At the ceiling, keep the deterministic winner in full and cut the remainder
+  at a UTF-8 scalar boundary ending in `⋯`. This is a bounds check with no
+  warning code and no host UI, because the note is already over the edit limit
+  and the user must resolve it before saving regardless.
 - An edit beats a concurrent delete. The note stays active with the edited
   content, because reviving text is recoverable and losing it is not.
 - The next accepted `note_put` for that kanji clears `has_merged_edit`.
@@ -754,7 +757,6 @@ Redis is not authoritative for:
 R2 stores:
 
 - account-associated operational event objects under retention policy;
-- note text truncated by a chained merge that reached the byte ceiling;
 - separately transformed research objects;
 - optional export bundles.
 
@@ -787,7 +789,7 @@ Record metrics without note content or direct event payloads:
 - duplicate retry and sequence-gap counts;
 - delta sizes and cursor lag;
 - review replay versus LWW fallback rates;
-- note merge rate and merge-truncation rate;
+- note merge rate;
 - pile add rejections by `pile_item_exists`;
 - delivery outbox oldest undelivered age and R2 write failures;
 - entitlement/read-only transitions;

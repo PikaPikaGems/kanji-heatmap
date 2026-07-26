@@ -96,12 +96,21 @@ interface ReviewCardRow {
   generation: number;
   cardRevision: number;
   state: FsrsCardStateV1 | null; // nulled when inactive
-  historyWindow: ReviewHistoryWindow | null; // nulled when inactive
   counters: ReviewCounters;
   serverRevision?: number;
   active: boolean;
 }
 ```
+
+The client does **not** store a review history ring. The bounded window and its
+`anchorState` are a backend replay structure; see
+[Bounded history window](#bounded-history-window). Nothing in the client reads
+them: a grade carries `priorState` taken from the handle's frozen snapshot, and
+several offline grades of one card form a contiguous branch identified by
+device sequence, not by a local ring. Keeping a copy on the client meant
+writing an eviction and anchor-advance algorithm, shipping the ring on every
+canonical card in every delta, and keeping two implementations of one structure
+agreeing about the same events.
 
 Rows are keyed by bounded natural keys, and `generation` is a column rather
 than part of the key. One kanji has one pile row and two card rows no matter
@@ -256,8 +265,7 @@ and that device reconciles its projection to the canonical word.
 
 `reviews.pile.remove(kanji)`:
 
-1. Deactivate the pile item and both cards locally, nulling card `state` and
-   `historyWindow`.
+1. Deactivate the pile item and both cards locally, nulling card `state`.
 2. Cancel any in-memory handle for those cards.
 3. Append one `review_pile_remove` operation.
 4. Preserve raw review history in the operational archive.
@@ -451,7 +459,6 @@ interface GradeOutcome {
   eventId: string;
   cardId: CardId;
   provisionalCard: DueCard;
-  sync: "pending";
 }
 ```
 
@@ -487,14 +494,13 @@ One grade transaction:
 5. Compute a provisional state with pinned `ts-fsrs` from the handle's frozen
    snapshot.
 6. Increment the card's local revision.
-7. Append the event to the bounded local history window.
-8. Increment the card's local counters.
-9. Increment the optimistic local daily summary and rating count.
-10. Append one `review_grade` operation to the outbox.
-11. Consume the handle and broadcast its release.
-12. Commit before returning success.
+7. Increment the card's local counters.
+8. Increment the optimistic local daily summary and rating count.
+9. Append one `review_grade` operation to the outbox.
+10. Consume the handle and broadcast its release.
+11. Commit before returning success.
 
-Steps 9 and 10 are optimistic projections and one fact. The device does not
+Steps 8 and 9 are optimistic projections and one fact. The device does not
 send a summary; the backend derives the canonical daily row from this fact and
 overwrites the projection on the next pull.
 
@@ -522,7 +528,6 @@ interface ReviewFactV1 {
   deviceSequence: number;
 
   baseServerRevision: number;
-  predecessorEventId?: string;
   settingsRevision: number;
   schedulerVersion: string;
 
@@ -553,7 +558,10 @@ server-adjusted and clamped `reviewedAt`.
 
 ## Bounded history window
 
-Each card stores a small complete segment:
+**This structure lives only in Postgres.** It is what makes exact replay
+possible; no client stores or receives it.
+
+Each canonical card keeps a small complete segment:
 
 ```ts
 interface ReviewHistoryWindow {
@@ -584,8 +592,8 @@ When an event is evicted:
 - advance `anchorServerRevision`;
 - keep exactly the configured number of newer events.
 
-The backend publishes ring capacity. Browser and backend must support that
-capacity before writable access.
+The backend publishes ring capacity so the browser can report an unsupported
+value before writable access, but the browser never materializes a ring.
 
 ## Exact replay
 
@@ -774,6 +782,7 @@ interface ReviewSettingsApi {
 interface ReviewPileApi {
   watch(kanji: Kanji): QueryStore<ReviewPileItemView | null>;
   watchMany(kanji: readonly Kanji[]): QueryStore<readonly ReviewPileItemView[]>;
+  watchAll(): QueryStore<readonly ReviewPileItemView[]>;
   add(input: {
     kanji: Kanji;
     word: string;
@@ -787,22 +796,65 @@ interface ReviewPileApi {
   }): Promise<Result<ReviewPileItemView>>;
 }
 
+/** Read-only progress for display. Not sufficient to compute a schedule. */
+interface CardProgress {
+  dueAt: UnixMs;
+  learningState: FsrsLearningState;
+  stability: number; // days; higher means better retained
+  difficulty: number; // 1..10; higher means harder for this user
+  reviews: number;
+  lapses: number;
+}
+
 interface ReviewPileItemView {
   kanji: Kanji;
   word: string;
   generation: number;
-  readingDueAt: UnixMs;
-  writingDueAt: UnixMs;
+  reading: CardProgress;
+  writing: CardProgress;
 }
 ```
 
 `watchMany` replaces a loosely typed `getCardInfo(kanjiArray, "both")`. It
-returns pile/card summaries suitable for list badges without exposing mutable
-FSRS internals.
+returns pile/card summaries suitable for list badges. `watchAll` serves a
+whole-collection visualization; it is bounded by the review catalog, so it needs
+no paging.
 
-`getDue`/`watchDue` require a single `CardType`. `beginReview` returns previews;
-there is no separate public `preview(kanji, cardType)` that can race with card
+### Why `CardProgress` exposes stability and difficulty
+
+The rule that due queries return no FSRS state exists so a host cannot compute
+its own schedule and disagree with the backend. `CardProgress` does not enable
+that: it omits `elapsedDays`, `scheduledDays`, `learningStep`, `lastReviewAt`,
+and the settings, so it cannot be fed to `ts-fsrs`. What it does enable is the
+`/mastery` visualization, whose entire purpose is to colour a tile by how well
+a kanji is known.
+
+Stability and difficulty are the only two numbers FSRS produces that mean
+something to a person — roughly "how long this will stay learned" and "how much
+work it is for you" — so a host that cannot read them cannot build a mastery
+view at all. Combined values are host arithmetic and are deliberately not
+engine surface: combined stability is `min(reading, writing)` and combined
+difficulty is `max(reading, writing)`, both because the weaker half is what
+governs whether the kanji is actually known.
+
+An item is included with `learningState: "new"` and `stability: 0` between
+`add` and its first grade, so a mastery view can distinguish "in the pile,
+never reviewed" from "not in the pile" without a second query.
+
+`getDue` requires a single `CardType`. `beginReview` returns previews; there is
+no separate public `preview(kanji, cardType)` that can race with card
 replacement.
+
+### There is no `watchDue()`
+
+An earlier draft exposed `watchDue()`, `watchDueCount()`, and `getDue()` — three
+ways to ask one question. A review session must not consume a live-updating
+list: a queue that reorders between the card being chosen and the card being
+opened is worse than a stale one, and the session already re-queries after each
+grade. The consumer that genuinely needs live data is the **badge**, which needs
+a number rather than a list, and `watchDueCount()` serves it. Removing
+`watchDue()` also removes a live query whose result set changes on a timer as
+cards come due, for no reader.
 
 ## Review session behavior
 

@@ -250,6 +250,11 @@ creates a fresh generation with no restored state.
   smaller UI limit.
 - Concurrent divergent note edits merge by concatenation. Both texts survive
   in the canonical note and the user resolves them in the editor.
+- The edit limit applies to every save with no exception, including when a
+  merge already made the note larger. A merged note is readable at its merged
+  size and must be trimmed before it can be saved again. This is what bounds
+  merge growth: every accepted edit is at most the limit, so every two-way
+  merge is at most twice it, permanently.
 - Daily and challenge summaries are backend-derived projections. Devices never
   send them.
 - Daily statistics persist for the account lifetime.
@@ -269,6 +274,8 @@ creates a fresh generation with no restored state.
 - New cards are due immediately.
 - A pile item carries the representative word its two cards test. The word is
   frozen at add time. Changing it discards the generation and its schedule.
+- The review history ring lives only in Postgres. The client stores current
+  card state and no ring.
 - Freeze an in-progress review with a one-use in-memory handle. There is no
   persistent cross-tab review lease; two tabs grading the same card produce
   two facts that replay correctly.
@@ -285,7 +292,8 @@ creates a fresh generation with no restored state.
 ### Synchronization and archives
 
 - Use a paged bootstrap at a fixed account revision, written directly into the
-  account database while access is `bootstrapping`.
+  account database while access is `bootstrapping`. An interrupted bootstrap
+  restarts from scratch; there is no durable resume.
 - Block reads and writes until bootstrap activation completes, which is what
   makes a partially written cache unobservable without a staging table.
 - Use one transactional sync envelope for every mutation: notes, bookmarks,
@@ -391,6 +399,11 @@ script.
 
 ## Documents
 
+Start with [SUMMARY.md](./SUMMARY.md) if you need the whole system in one
+sitting: the exposed API, how each route uses it, the algorithms behind it, and
+both schemas.
+
+- [Summary](./SUMMARY.md)
 - [Contract and lifecycle](./CONTRACT-AND-LIFECYCLE.md)
 - [Local data and domains](./LOCAL-DATA-AND-DOMAINS.md)
 - [Sync and backend](./SYNC-AND-BACKEND.md)
@@ -407,8 +420,9 @@ The architecture supports these decisions but does not invent their values:
 - Study Contract and StudyEngine licenses. The choice determines whether
   proprietary third-party UIs may bundle StudyEngine.
 - Entitlement lease durations and renewal policy.
-- Note edit byte limit, and the merged-note ceiling, which must be at least
-  twice the edit limit plus a separator allowance.
+- Note edit byte limit, and the merged-note storage ceiling, which must be at
+  least twice the edit limit plus a separator allowance and is recommended at
+  four times it.
 - Sync request limits, bootstrap page byte budget, review ring size, and the
   `beginReview` entitlement margin.
 - Operational archive retention periods for classes other than raw review

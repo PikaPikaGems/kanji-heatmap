@@ -268,7 +268,6 @@ export interface ReviewsApi {
   readonly settings: ReviewSettingsApi;
   readonly pile: ReviewPileApi;
 
-  watchDue(input: DueQuery): QueryStore<readonly DueCard[]>;
   watchDueCount(cardType: CardType): QueryStore<number>;
   getDue(input: DueQuery): Promise<Result<readonly DueCard[]>>;
   beginReview(input: BeginReviewInput): Promise<Result<ActiveReview>>;
@@ -289,7 +288,6 @@ export interface SyncApi {
 
 export interface StorageApi {
   requestPersistence(): Promise<Result<{ persisted: boolean }>>;
-  estimate(): Promise<Result<StorageEstimate>>;
 }
 ```
 
@@ -331,9 +329,11 @@ export interface KanjiNoteView {
   serverRevision?: number;
 
   /**
-   * True when the backend merged a divergent edit into `content`. The host
-   * should surface a dismissible hint so the user knows to clean up the
-   * merged text. Cleared by the next successful `put`.
+   * True when the backend merged a divergent edit into `content`, which can
+   * leave `content` larger than `noteMaxUtf8Bytes`. `put` still enforces that
+   * limit with no exception, so the host must render an over-limit editor with
+   * a disabled save and explain why rather than showing a bare length error.
+   * Cleared by the next successful `put`.
    */
   hasMergedEdit: boolean;
   mergedAt?: UnixMs;
@@ -358,7 +358,6 @@ export interface KanjiBookmark {
 
 export interface ActivityWrite {
   eventId: string;
-  sync: "pending";
 }
 
 export interface DailySummaryRange {
@@ -427,13 +426,13 @@ export interface SyncOutcome {
   cursor: ServerCursor;
   hasMoreChanges: boolean;
 }
-
-export interface StorageEstimate {
-  usageBytes: number;
-  quotaBytes: number;
-  persisted: boolean | "unknown";
-}
 ```
+
+`estimate()` was removed: `StudyEngineSnapshot.storage` already carries
+`persisted` and a `pressure` band, live, with no round trip, and raw
+`navigator.storage.estimate()` is not account-scoped so a host that wants exact
+byte numbers can call it directly. `requestPersistence()` stays because it must
+be invoked from a user gesture and the engine decides when it is worth asking.
 
 `PracticeActivityEventInput` is the versioned union in
 [Local data and domains](./LOCAL-DATA-AND-DOMAINS.md).

@@ -114,22 +114,22 @@ interface AccountLocalMeta {
   // Present only while access is "bootstrapping".
   activeBootstrapId?: string;
   bootstrapSnapshotRevision?: number;
-  bootstrapCursor?: string;
 }
 ```
 
 Eight tables, down from fifteen. The removed tables and why they are no longer
 required:
 
-| Removed                  | Reason                                                       |
-| ------------------------ | ------------------------------------------------------------ |
-| `noteConflicts`          | Concurrent note edits merge into the canonical note          |
-| `reviewSettingsVersions` | Replay applies the winning current settings                  |
-| `archiveOutbox`          | The backend fans events out to the archive                   |
-| `syncInbox`              | A pull response is applied in one transaction from memory    |
-| `bootstrapPages`         | Pages write into live tables under the bootstrap gate        |
-| `localLeases`            | The review handle is in-memory; there is no persistent lease |
-| `deviceSlot` columns     | Summaries and counters are derived by the backend            |
+| Removed                  | Reason                                                              |
+| ------------------------ | ------------------------------------------------------------------- |
+| `noteConflicts`          | Concurrent note edits merge into the canonical note                 |
+| `reviewSettingsVersions` | Replay applies the winning current settings                         |
+| `archiveOutbox`          | The backend fans events out to the archive                          |
+| `syncInbox`              | A pull response is applied in one transaction from memory           |
+| `bootstrapPages`         | Pages write into live tables under the bootstrap gate               |
+| `localLeases`            | The review handle is in-memory; there is no persistent lease        |
+| `deviceSlot` columns     | Summaries and counters are derived by the backend                   |
+| `historyWindow` column   | The review ring is a backend replay structure with no client reader |
 
 ### Why `syncInbox` is gone
 
@@ -211,8 +211,9 @@ problem entirely. Stale-write protection is unaffected because it comes from
 the `generation` value carried on the grade, not from row identity: a grade
 based on generation 4 can never apply to generation 5.
 
-When a card is deactivated, its heavy fields (`state`, `historyWindow`) are
-nulled so an inactive card row costs tens of bytes rather than kilobytes.
+When a card is deactivated, its `state` is nulled so an inactive card row costs
+tens of bytes rather than hundreds. The client stores no review history ring;
+that structure exists only in Postgres, for replay.
 
 ## Account cache lifecycle
 
@@ -353,43 +354,45 @@ Rules:
 - A normal edit carries the server revision it was based on.
 - A direct descendant of the canonical revision replaces it outright.
 
-### The two byte limits
+### The edit limit is absolute; the ceiling is a storage guard
 
-A merge can legitimately produce a note larger than any single edit is allowed
-to be, so there are two limits and one rule connecting them:
-
-```text
-noteMaxUtf8Bytes         maximum size of one user edit
-noteMergedMaxUtf8Bytes   absolute ceiling for stored content
-                         MUST be >= 2 * noteMaxUtf8Bytes + separator allowance
-```
-
-**Sizing the ceiling at twice the edit limit makes ordinary merge overflow
-impossible.** Two edits each capped at `noteMaxUtf8Bytes` cannot together
-exceed `2 × noteMaxUtf8Bytes`, so a first merge always fits with room for the
-separator. This is not a mitigation; it removes the case.
-
-The rule connecting them, so the system cannot create a note the user is then
-forbidden to save:
+A merge can produce a note larger than any single edit is allowed to be. There
+are therefore two numbers, but only one of them is a rule the user experiences:
 
 ```text
-effective put limit = min(
-  max(noteMaxUtf8Bytes, currentCanonicalUtf8Bytes),
-  noteMergedMaxUtf8Bytes
-)
+noteMaxUtf8Bytes         maximum size of ONE user edit. No exceptions, ever,
+                         including when the current note is already larger.
+noteMergedMaxUtf8Bytes   absolute storage ceiling for merged content.
+                         MUST be >= 2 * noteMaxUtf8Bytes + separator allowance.
+                         Recommended: 4 * noteMaxUtf8Bytes.
 ```
 
-In words: a user may always save a note that is not longer than what is already
-there, and may always grow a note up to the ordinary edit limit. A merged
-18,000-byte note can be edited and saved at 18,000 bytes; it just cannot be
-grown. Every edit either holds or shrinks it until it is back under the edit
-limit, so the state converges without the host ever having to explain a limit
-the user did not create.
+**A merged note is a state to resolve, not a new allowance.** The backend may
+store 2,200 bytes after merging two 1,000-byte edits, and the user can read all
+of it, but they cannot save the note again until it is back under
+`noteMaxUtf8Bytes`. The over-limit editor is the forcing function that gets the
+merge cleaned up.
 
-Without this rule the system has an obvious trap: the backend merges two edits
-into a note larger than `noteMaxUtf8Bytes`, the user opens it, fixes a typo,
-presses save, and is told their note is too long. The host would be reporting a
-limit the user never exceeded.
+This is what bounds merge growth. Because every accepted edit is at most
+`noteMaxUtf8Bytes`, any merge of two divergent edits is at most
+`2 × noteMaxUtf8Bytes + separator` — permanently, not just the first time:
+
+|                                         | if a merged note could be saved at its merged size | with the absolute limit |
+| --------------------------------------- | -------------------------------------------------- | ----------------------- |
+| largest accepted user edit              | grows with each merge                              | always ≤ limit          |
+| largest two-way merge                   | grows with each merge                              | always ≤ 2 × limit      |
+| can a merged note merge again and grow? | yes, without bound                                 | no                      |
+
+An earlier draft raised the put limit to
+`min(max(noteMaxUtf8Bytes, currentCanonicalUtf8Bytes), noteMergedMaxUtf8Bytes)`
+so a user would never be told a merged note was too long. That reasoning was
+backwards. Permitting the save is what lets a merged note diverge again from
+its merged size, which is the only way the ceiling can be reached at all. The
+absolute limit costs one honest over-limit message and removes an entire class
+of growth.
+
+The host must render this as an over-limit editor with a disabled save, not as
+a failed save. See [Scenarios and UX](./SCENARIOS-AND-UX.md).
 
 ### Divergent edits merge; they do not select a loser
 
@@ -410,10 +413,17 @@ Ordering within the merge is the deterministic tuple
 `(clampedUpdatedAt, deviceId, deviceSequence)`, so every device that applies
 the same pair of edits produces byte-identical output.
 
-The merged note is set with `hasMergedEdit: true`. That flag is the host's cue
-to show a dismissible hint. The next successful `put` for that kanji clears it,
-because the user has by then either cleaned up the merged text or deliberately
-kept it.
+The merged note is set with `hasMergedEdit: true`. That flag exists so the host
+can explain the over-limit editor rather than showing a bare "too long" error,
+which would be the genuinely confusing version. The next successful `put` for
+that kanji clears it, and because that `put` had to be under
+`noteMaxUtf8Bytes`, clearing the flag and resolving the merge are the same
+event.
+
+The host must not tell the user that "both versions were kept" as though that
+were the end of the story. Both versions being present is the problem
+statement, not the resolution. The copy names the cause and the action:
+"Also edited on another device. Both edits are below. Trim to fit to save."
 
 Why this rather than a conflict copy with restore and dismiss:
 
@@ -439,34 +449,25 @@ Constraints:
   reviving text is recoverable and losing it is not. The note stays active with
   the edited content.
 
-### Chained merges and the ceiling
+### The one case the ceiling still exists for
 
-A first merge always fits, because the ceiling is sized at twice the edit
-limit. The ceiling can only be reached by a **chain**: a note is merged, the
-user does not clean it up, and two devices then diverge again on the already
-merged note. Each of those edits may be up to the merged note's size under the
-effective-limit rule, so their merge can exceed the ceiling.
+Two divergent edits can never overflow, because each is capped and the ceiling
+is at least twice the cap. What remains is **three or more devices diverging
+from the same base**: `merge(A, B)` reaches 2 × limit, and device C's edit —
+still based on the pre-merge revision — merges into that, reaching 3 × limit.
+The bound is the number of concurrently divergent devices, which no per-edit
+limit can constrain.
 
-This requires an unresolved merge plus a second concurrent divergence on the
-same kanji before anyone cleaned up. When it happens:
+Sizing the ceiling at `4 × noteMaxUtf8Bytes` puts it beyond any realistic
+number of devices editing one kanji's note offline at the same moment. Beyond
+it, the backend keeps the deterministic winner in full and cuts the remainder
+at a UTF-8 scalar boundary, ending it with an inline `⋯`.
 
-1. Keep the deterministic winner in full.
-2. Append the loser truncated at a UTF-8 scalar boundary to fit the ceiling.
-3. End the truncated block with a **visible** marker, not an HTML comment, so
-   the user can see that text was cut:
-   `⋯ [an edit from another device was too long to keep in full]`
-4. Write the loser's full text to the operational archive.
-5. Return a `note_merge_truncated` warning so the host can say something
-   specific.
-
-Truncating rather than dropping keeps the note self-describing: the user learns
-from the note itself that something was shortened, instead of from a support
-channel they will never contact. The archived copy exists for support, not as
-the user's primary recourse, and the host should not advertise it.
-
-The correct response to this case is to size `noteMaxUtf8Bytes` generously
-enough that notes rarely approach it, which makes the chain harder to reach in
-the first place.
+**This is a bounds check, not a feature.** There is no warning code, no banner,
+no archived recovery copy, and no scenario, because at that point the note is
+already in the over-limit state the user must resolve before saving anything.
+Adding a dedicated explanation would mean writing UI for an event rarer than
+the failure modes the design does not write UI for either.
 
 Client timestamps are imperfect. Clamping and deterministic ties guarantee
 convergence, not knowledge of the user's true intent.
@@ -903,8 +904,8 @@ Bootstrap data never partially becomes the active projection:
 1. Start a bootstrap and record `bootstrapId` and a fixed `snapshotRevision`.
 2. Create the account database and set access to `bootstrapping`.
 3. For each page: verify schema versions, then in **one transaction** write the
-   page's entities directly into the live tables and persist the returned
-   `bootstrapCursor` in `accountMeta`.
+   page's entities directly into the live tables. The page cursor is held in
+   memory for the duration of the loop.
 4. When `hasMore` is false, in one small transaction set the account cursor to
    `snapshotRevision` and mark the cache active.
 5. Pull deltas after that revision.
@@ -915,10 +916,21 @@ unobservable. The invariant is satisfied by the access gate rather than by a
 staging table, which is why `bootstrapPages`, per-page hashes, signed resumable
 page tokens, and a domain manifest are all unnecessary.
 
-Because `bootstrapCursor` commits with the page that produced it, closing the
-browser mid-bootstrap resumes from the next unwritten page. An implementation
-may instead delete the partial database and restart; for an account of this
-size that is a defensible simplification and removes the resume path entirely.
+### An interrupted bootstrap restarts; it does not resume
+
+A bootstrap interrupted by a closed browser deletes its partial database and
+starts again. Durable resume was specified in an earlier draft and is removed.
+
+Resuming would have to persist the page cursor with each page, keep a
+server-side bootstrap ID alive across sessions with its own expiry, and carry
+`resumeBootstrapId` through the protocol — all to avoid re-downloading an
+account measured in hundreds of kilobytes over a connection that was working
+moments earlier. Restarting is a `deleteDatabase` call.
+
+Note what is **not** being dropped: paging itself stays, exactly as specified.
+The page loop and the mandatory `hasMore` are what keep one response bounded
+and what a later large-account release depends on. Only the durable resume of a
+partly finished loop is gone.
 
 Pages are sized by byte budget rather than entity count, because entity sizes
 differ by two orders of magnitude between a bookmark and a long note. One
@@ -952,14 +964,16 @@ Migration rules:
 
 ## Storage pressure and persistence
 
-The engine should expose `navigator.storage.estimate()` and a host-triggered
-`navigator.storage.persist()` request where supported.
+The engine reads `navigator.storage.estimate()` internally to compute the
+`storage` fields of the engine snapshot, and exposes a host-triggered
+`navigator.storage.persist()` request where supported. It does not re-export
+the raw estimate; a host that wants exact byte numbers can call the platform
+API itself, since it is not account-scoped.
 
 Policy:
 
 - Compact the acknowledged outbox immediately.
 - Null the heavy fields of deactivated cards.
-- Keep only the configured hot review ring per card.
 - Warn before the pending outbox approaches a configured byte threshold.
 - Do not silently discard unacknowledged operations.
 - If IndexedDB cannot commit a new mutation, return `storage_quota`; do not

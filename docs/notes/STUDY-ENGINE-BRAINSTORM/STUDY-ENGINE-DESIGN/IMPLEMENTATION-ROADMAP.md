@@ -57,7 +57,7 @@ Research launch is not on the critical path for core StudyEngine.
   - note edit byte limit, and the merged-note ceiling at no less than twice it;
   - sync batch count/byte limits;
   - bootstrap page byte budget;
-  - review ring size;
+  - backend review replay ring size;
   - `openReviewEntitlementMarginMs`;
   - operational retention per class, with raw review events at account
     lifetime.
@@ -173,7 +173,7 @@ optimistic and is overwritten by the next server value.
     `{ reviewing: cardId }` hint.
 - Single outbox primitives.
 - Projection rebuild rule: server value plus replayed pending operations.
-- storage estimate/persistence API.
+- storage pressure reporting and the persistence request.
 - migration lock/failure behavior.
 - logout prepare/confirmation/keep/remove/offline-revocation flow.
 
@@ -551,7 +551,7 @@ Before broad rollout, dashboards/alerts exist for:
 - bootstrap duration/failure;
 - sync latency, retries, gaps, cursor lag;
 - review replay/fallback rates;
-- note merge and merge-truncation rates;
+- note merge rate;
 - delivery outbox oldest undelivered age;
 - IndexedDB migration/lock failures;
 - runtime unavailable binding in official production;

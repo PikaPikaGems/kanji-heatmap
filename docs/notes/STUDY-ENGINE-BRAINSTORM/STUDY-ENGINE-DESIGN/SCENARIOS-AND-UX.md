@@ -32,7 +32,7 @@ network.
 | [8](#8-two-devices-edit-the-same-note)                             | Note edited on two devices      | Yes, gentle           |
 | [9](#9-a-stale-editor-saves-over-a-newer-note)                     | Stale editor saves              | Yes, gentle           |
 | [10](#10-note-deleted-on-one-device-edited-on-another)             | Delete versus edit              | Quiet toast           |
-| [10a](#10a-a-merged-note-is-too-long-to-keep-in-full)              | Chained merge hits the ceiling  | Yes, in the note      |
+| [10a](#10a-three-devices-diverge-on-the-same-note-at-once)         | Three-way note divergence       | No extra UI           |
 | [11](#11-adding-a-kanji-already-in-the-pile-with-a-different-word) | Word change on a pile item      | Yes, blocking confirm |
 | [12](#12-two-devices-add-the-same-kanji-with-different-words)      | Concurrent add, different words | Quiet reconcile       |
 | [13](#13-bookmark-added-on-one-device-removed-on-another)          | Bookmark race                   | No                    |
@@ -195,12 +195,38 @@ Means "sun" or "day". In 日本 it reads にち.
 Mnemonic: a window with the sun behind it.
 ```
 
-**What the user sees.** The next time they open that note, both texts, plus a
-dismissible hint:
+**What the user sees.** The next time they open that note: both texts, a byte
+counter that is over the limit, a disabled save, and one line explaining why.
 
-> **This note was edited on two devices and both versions were kept.**
-> Delete whichever part you do not want.
-> `[Got it]`
+```text
+┌──────────────────────────────────────────────┐
+│ Also edited on another device.               │
+│ Both edits are below — trim to fit to save.  │
+├──────────────────────────────────────────────┤
+│ Means "sun" or "day". In 日本 it reads にち. │
+│                                              │
+│ ---                                          │
+│                                              │
+│ Mnemonic: a window with the sun behind it.   │
+│                                              │
+├──────────────────────────────────────────────┤
+│                       1,847 / 1,000  [ Save ]│
+│                          ^^ red      ^^ off  │
+└──────────────────────────────────────────────┘
+```
+
+**The over-limit state is the entire resolution UI.** There is no dialog, no
+restore button, and no dismiss. The merged note is readable at its merged size,
+but `noteMaxUtf8Bytes` applies to every save with no exception, so the user
+cannot save anything until they have deleted the half they do not want. The
+limit does the work that a "resolve conflict" flow would otherwise have to do.
+
+**Do not say "both versions were kept" and stop there.** Both versions being
+present is the problem statement, not the resolution — announcing it as an
+outcome tells the user something they cannot act on. The line above names the
+cause and the required action in the same breath, and it is the only reason
+`hasMergedEdit` exists: without it the host could only show a bare "too long"
+error for a length the user did not create.
 
 **Why merge rather than keep a recoverable losing copy.** A conflict copy
 satisfies "nothing was lost" only if the user finds it. A copy attached to a
@@ -255,60 +281,23 @@ it syncs and the user visits that kanji:
 If they still want it gone, they delete it again. That is one extra tap in a
 rare case, and it is the correct direction to fail in.
 
-### 10a. A merged note is too long to keep in full
+### 10a. Three devices diverge on the same note at once
 
-**How rare this is matters.** A first merge can never overflow, because the
-stored ceiling is sized at no less than twice the edit limit and each edit is
-individually capped at the edit limit. Reaching the ceiling requires a
-**chain**: a note merges, the user ignores the merged result, and two devices
-then diverge again on that already merged note. It is rare enough that the
-design should be judged on being simple and honest rather than clever.
+**What happens.** Two divergent edits can never overflow the stored ceiling,
+because each edit is capped at `noteMaxUtf8Bytes` and the ceiling is at least
+twice that. Only a third device diverging from the same pre-merge base can push
+past it. At `4 × noteMaxUtf8Bytes` this is beyond any realistic number of
+devices editing one kanji's note offline simultaneously.
 
-**What happens.** The deterministic winner is kept in full. The loser is
-appended truncated at a UTF-8 scalar boundary, with a **visible** marker rather
-than an HTML comment. The loser's full text goes to the operational archive.
+**What the user sees.** Scenario 8, unchanged. The note is over the limit and
+must be trimmed to save. If the absolute ceiling was reached, the tail is cut
+at a UTF-8 scalar boundary and ends in `⋯`.
 
-**What the user sees**, inside the note itself:
-
-```markdown
-[winning version, in full]
-
----
-
-[losing version, cut off mid-sentence]⋯
-
-> An edit from another device was too long to keep here in full.
-```
-
-Plus the scenario 8 banner with one extra sentence:
-
-> **This note was edited on two devices.** Both versions were kept, but one was
-> too long to fit and was shortened.
-> `[Got it]`
-
-**Why truncate rather than drop the loser entirely.** Truncating keeps the note
-self-describing. The user learns from the note in front of them that something
-was cut, rather than from a support channel they will never contact. A silent
-drop plus an archived copy satisfies an internal notion of "nothing was lost"
-while presenting the user with a note that quietly lost text.
-
-**Do not advertise the archive.** It exists so support can recover the text if
-someone genuinely needs it. Putting "contact support to recover your text" in
-the UI for an event this rare trains every user to distrust the merge feature
-in exchange for helping approximately nobody.
-
-**The real fix is upstream.** Size `noteMaxUtf8Bytes` generously enough that
-notes rarely approach it. A study note for one kanji that is anywhere near a
-10 KB limit is already unusual; two chained merges of such notes is the tail of
-a tail.
-
-**Related host rule.** A merged note can legitimately exceed the ordinary edit
-limit, so the effective save limit is
-`min(max(noteMaxUtf8Bytes, currentBytes), ceiling)`. The user can always save a
-merged note; they simply cannot make it longer. Without this the system would
-create an oversized note and then refuse to save the user's cleanup of it,
-reporting a limit the user never exceeded. A host character counter should
-reflect the effective limit, not the base one.
+**No dedicated UI, deliberately.** No warning code, no banner sentence, no
+archived recovery copy, no support path. The user is already in the state
+scenario 8 puts them in — an over-limit note they must resolve — so a separate
+explanation would add a concept without changing what they do next. This is a
+bounds check, like rejecting a malformed timestamp.
 
 ---
 

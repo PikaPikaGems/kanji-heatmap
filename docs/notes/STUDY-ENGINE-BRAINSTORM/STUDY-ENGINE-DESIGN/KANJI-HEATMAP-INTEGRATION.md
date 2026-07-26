@@ -404,11 +404,18 @@ integration should:
 - query `notes.watch(kanji)`;
 - keep editor draft as host UI state;
 - call `notes.put` at an explicit save/debounce boundary;
-- use the backend-published byte limit, and note that the effective save limit
-  for an already-merged note is `max(noteMaxUtf8Bytes, currentBytes)`, so a
-  character counter must reflect that rather than the base limit;
-- show a dismissible hint when `hasMergedEdit` is set, and render the merge
-  separator visibly in the editor;
+- enforce `noteMaxUtf8Bytes` on every save, including when the current note is
+  already larger because the backend merged it. A merged note is readable at
+  its merged size and must be trimmed before it can be saved again;
+- **count UTF-8 bytes, and do not label the counter "characters."** A kanji is
+  three bytes, so a 1,000-byte limit is roughly 333 kanji. A counter labelled
+  in characters would cut Japanese notes at a third of the advertised length.
+  `new TextEncoder().encode(content).length` is the whole implementation;
+- when `hasMergedEdit` is set, render the over-limit state as an explanation
+  and not as a failed save: an inline line reading "Also edited on another
+  device. Both edits are below — trim to fit to save.", the byte counter in an
+  error style, and the save control disabled. Render the merge separator
+  visibly in the editor;
 - warn before saving when the canonical note changes underneath an open editor
   with unsaved changes;
 - sanitize Markdown in the host;
