@@ -211,8 +211,8 @@ which is exactly `useSyncExternalStore`'s tearing-safety requirement.
 
 #### `/reading-practice` and `/writing-practice` (existing)
 
-These are **not** FSRS routes. They stay exactly as they are — host-built decks
-from host data — and gain one line at the end of a round.
+Host-built decks from host data, unchanged, plus one line at the end of a round.
+Scheduling belongs to `/reading-reviews` and `/writing-reviews`.
 
 ```mermaid
 sequenceDiagram
