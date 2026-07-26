@@ -204,6 +204,10 @@ creates a fresh generation with no restored state.
   programmer errors, broken invariants, or unexpected infrastructure failure.
 - Expose framework-neutral status stores and query stores through
   `getSnapshot()` plus `subscribe(listener)`.
+- The engine snapshot carries engine status only, never a data version. Entity
+  changes reach the host through query stores, which wake precisely rather than
+  globally. A field with no reader is not added to a published contract, since
+  adding one later is not a breaking change and removing one is.
 
 ### Authentication and entitlement
 

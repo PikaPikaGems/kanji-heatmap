@@ -488,7 +488,6 @@ export interface StudyEngineSnapshot {
     persisted: boolean | "unknown";
     pressure: "normal" | "warning" | "critical";
   };
-  dataRevision: number;
   diagnosticId?: string;
 }
 
@@ -523,8 +522,31 @@ export type AccessSnapshot =
     };
 ```
 
-`dataRevision` is a cheap coarse invalidation indicator. Domain query stores
-remain the source for entity data.
+The snapshot carries engine status only. It carries no data version.
+
+### There is no `dataRevision`
+
+An earlier draft included a monotonic `dataRevision` that bumped whenever any
+account data changed, described as "a cheap coarse invalidation indicator" for
+a host caching something derived from engine data outside the query stores.
+
+It is removed for three reasons. It shipped with a documented non-use — half
+its description told the reader not to use it for entity data, and a field
+carrying that instruction is eventually used for entity data anyway, failing as
+a stale tile rather than as a crash. It was too coarse to serve even its
+intended purpose, because every write bumps it, so a memo keyed on it is
+invalidated by every grade in a review session including for entities that did
+not change. And query stores already cover the path it existed for, waking on
+cross-tab IndexedDB commits precisely rather than globally.
+
+It did do one thing nothing else does: after a **pure pull** — no pending
+operations, server changes applied, sync returns to idle — the snapshot is
+byte-identical to what it was before, while the account's data has changed.
+That is a real gap, and it is the right reason to add the field back if a host
+ever hits it. Adding a field to a published contract is not a breaking change;
+removing one is, so a first release should not commit to a field with no
+reader. Its diagnostic value is real but belongs in a diagnostics surface
+rather than in the reactive snapshot every component subscribes to.
 
 There is one synchronization status because there is one outbox and one
 acknowledgement path. Archive delivery happens on the backend and cannot be
