@@ -12,6 +12,7 @@ market-specific privacy review.
 The design has two intentionally separate datasets:
 
 1. **Operational archive**
+
    - Account-associated.
    - Contains accepted raw practice and FSRS review events.
    - Supports support investigation, account export, audit, future operational
