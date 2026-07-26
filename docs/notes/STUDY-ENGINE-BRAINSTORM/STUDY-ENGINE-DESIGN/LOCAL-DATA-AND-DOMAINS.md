@@ -117,63 +117,45 @@ interface AccountLocalMeta {
 }
 ```
 
-Eight tables, down from fifteen. The removed tables and why they are no longer
-required:
+Eight tables. Four things a reader may expect to find here are deliberately
+absent, because each is a structure an implementer is likely to reach for:
 
-| Removed                  | Reason                                                              |
-| ------------------------ | ------------------------------------------------------------------- |
-| `noteConflicts`          | Concurrent note edits merge into the canonical note                 |
-| `reviewSettingsVersions` | Replay applies the winning current settings                         |
-| `archiveOutbox`          | The backend fans events out to the archive                          |
-| `syncInbox`              | A pull response is applied in one transaction from memory           |
-| `bootstrapPages`         | Pages write into live tables under the bootstrap gate               |
-| `localLeases`            | The review handle is in-memory; there is no persistent lease        |
-| `deviceSlot` columns     | Summaries and counters are derived by the backend                   |
-| `historyWindow` column   | The review ring is a backend replay structure with no client reader |
+| Not present            | Why it is unnecessary                                        |
+| ---------------------- | ------------------------------------------------------------ |
+| a note conflict table  | Divergent note edits merge into the canonical note           |
+| a sync staging table   | A pull response is applied in one transaction from memory    |
+| a bootstrap page table | Pages write into live tables under the `bootstrapping` gate  |
+| a review lease table   | The review handle is in memory; there is no persistent lease |
 
-### Why `syncInbox` is gone
+### Sync needs no staging table
 
-Its removal is the least obvious of the seven, so it is worth stating what it
-did. It was a durable staging table holding pulled change groups:
+A durable inbox holding pulled change groups before applying them looks
+necessary and is not. It would exist to do two jobs.
 
-```ts
-interface SyncInboxRow {
-  accountRevision: number;
-  encodedChangeGroup: Uint8Array;
-  receivedAt: UnixMs;
-}
-```
-
-It had two jobs, and both are now handled elsewhere.
-
-**Job one: keep "apply the delta" and "advance the cursor" atomic.** If a pull
+**Keeping "apply the delta" and "advance the cursor" atomic.** If a pull
 returns change groups at revisions 11, 14, and 18, the local cache must never
 end up with 11 and 14 applied while the cursor still says 10 — or worse, the
-cursor at 18 with group 18 unapplied. Staging made the received data durable
-first, so a crash mid-apply could resume.
+cursor at 18 with group 18 unapplied.
 
-This is unnecessary, because the whole response is applied in a single Dexie
-transaction. The engine cannot hold an IndexedDB transaction across an
-`await fetch()` — IndexedDB auto-commits when unrelated asynchronous work is
-awaited — but it does not need to: the response is fully received into memory
-first, bounded by the published `syncMaxBytes`, and only then is one
-transaction opened that writes every change group and the new cursor together.
-A crash before commit leaves the cursor unchanged and the identical range is
-re-pulled. A crash after commit is simply done. Staging would add a full extra
-write of every byte and buy no atomicity that the transaction does not already
-provide.
+One Dexie transaction already provides this. The engine cannot hold an
+IndexedDB transaction across an `await fetch()` — IndexedDB auto-commits when
+unrelated asynchronous work is awaited — but it does not need to: the response
+is fully received into memory first, bounded by the published `syncMaxBytes`,
+and only then is one transaction opened that writes every change group and the
+new cursor together. A crash before commit leaves the cursor unchanged and the
+identical range is re-pulled. A crash after commit is simply done. Staging
+would add a full extra write of every byte and buy no atomicity the transaction
+does not already provide.
 
-**Job two: hold back a card the user currently has open.** The earlier design
-had sync stage an incoming card row rather than apply it, so an open review's
-previews could not shift underneath the user, then apply it after grade or
-cancel.
+**Holding back a card the user currently has open**, so an open review's
+previews cannot shift underneath them.
 
 This is unnecessary because the review handle owns a frozen in-memory snapshot
 of the card and settings. Previews are computed from the snapshot, and the
 grade is computed from the snapshot and carries it as `priorState`. Nothing in
-the grade path reads the live row, so the live row is free to move. The rule
-became "the handle is the snapshot, the projection is free to move," which
-also removed a deferred-apply ordering constraint from the sync path.
+the grade path reads the live row, so the live row is free to move: **the
+handle is the snapshot, the projection is free to move.** That rule also keeps
+a deferred-apply ordering constraint out of the sync path.
 
 Suggested IndexedDB indexes:
 
@@ -383,13 +365,13 @@ This is what bounds merge growth. Because every accepted edit is at most
 | largest two-way merge                   | grows with each merge                              | always ≤ 2 × limit      |
 | can a merged note merge again and grow? | yes, without bound                                 | no                      |
 
-An earlier draft raised the put limit to
+It is tempting to raise the limit for an already-merged note — to
 `min(max(noteMaxUtf8Bytes, currentCanonicalUtf8Bytes), noteMergedMaxUtf8Bytes)`
-so a user would never be told a merged note was too long. That reasoning was
-backwards. Permitting the save is what lets a merged note diverge again from
-its merged size, which is the only way the ceiling can be reached at all. The
-absolute limit costs one honest over-limit message and removes an entire class
-of growth.
+— so a user is never told a note is too long at a length they did not create.
+Do not. Permitting that save is exactly what lets a merged note diverge again
+from its merged size, which is the only way the ceiling can be reached at all.
+The absolute limit costs one honest over-limit message and removes an entire
+class of growth.
 
 The host must render this as an over-limit editor with a disabled save, not as
 a failed save. See [Scenarios and UX](./SCENARIOS-AND-UX.md).
@@ -434,10 +416,10 @@ Why this rather than a conflict copy with restore and dismiss:
   `noteConflicts` table in IndexedDB, no `note_conflict` entity in bootstrap
   or delta, no `restoreConflict`, no `dismissConflict`, no conflict view types,
   and no conflict recovery UI.
-- It removes an R2 write from inside the sync transaction. The previous design
-  had to durably archive a displaced conflict copy before replacing it, which
-  put an external service dependency on the transactional hot path for an
-  event that occurs a few times per user per year.
+- It keeps R2 out of the sync transaction. Any design that displaces a losing
+  copy must durably archive it before replacing it, which puts an external
+  service dependency on the transactional hot path for an event that occurs a
+  few times per user per year.
 - The resolution UI is the editor the user already has. Both texts are in
   front of them and they delete the half they do not want.
 
@@ -568,10 +550,8 @@ The engine, not the host, adds account/device/event identity.
 
 `activity.record()` appends exactly one `practice_activity_event_add` operation
 to the outbox and applies the same reduction locally as an optimistic
-projection. It does not additionally write a summary operation. Under the
-previous design a single Speed Katakana completion produced three rows across
-two outboxes: a raw archive event, a daily summary snapshot, and a challenge
-summary snapshot.
+projection. It does not additionally write a summary operation, so one Speed
+Katakana completion is one row rather than three across two pipelines.
 
 ## Daily summaries
 
@@ -606,31 +586,29 @@ high-water mark. The originating local day is retained even when the user
 travels; `timeZonesSeen` is bounded and informational, and counts belong to
 `localDate`.
 
-### Why derivation replaced device-owned snapshots
+### Why devices do not send summaries
 
-The previous design had each device send an absolute snapshot of its own
-component of each day, partitioned by `deviceSlot` so two devices could not
-conflict. It worked, but it had three costs that derivation removes.
+Having each device send an absolute snapshot of its own component of each day,
+partitioned so two devices cannot conflict, is a workable design. It is not the
+one here, for three reasons.
 
 **Rewrite amplification.** A daily summary changes on every single grade. As an
-absolute snapshot in a strictly contiguous sequence, that meant one
-`daily_summary_put` operation per grade: two hundred reviews in a day produced
-two hundred redundant snapshots. Coalescing them would have punched holes in
-the sequence the protocol requires to be gap-free, and no version of the design
-specified how. Deriving removes the operation kind entirely, so a grade emits
-one row instead of three and a practice completion emits one instead of three.
+absolute snapshot in a strictly contiguous sequence, that is one summary
+operation per grade: two hundred reviews in a day produce two hundred redundant
+snapshots. Coalescing them would punch holes in a sequence the protocol
+requires to be gap-free. Deriving removes the operation kind entirely, so a
+grade emits one row instead of three.
 
-**Two writers for one number.** The device wrote the summary and also sent the
-raw event that explained it. The backend could only partially reconcile them,
-which is why the earlier specification had to say the server should validate
-that a component "equals a possible reduction of locally accepted typed values
-where practical." That hedge was the design admitting it had two sources of
-truth it could not fully align. There is now one.
+**Two writers for one number.** A device that writes the summary and also sends
+the raw event explaining it gives the backend two sources of truth it can only
+partially reconcile — leaving it to validate that a component "equals a possible
+reduction of locally accepted typed values where practical," which is a hedge
+rather than a rule. Derivation leaves one source.
 
-**A whole partitioning scheme.** `deviceSlot` existed almost entirely to keep
+**A whole partitioning scheme.** Per-device slots exist almost entirely to keep
 two devices from colliding on counters. With the backend incrementing, nothing
-needs partitioning, so slot allocation, slot caps, and slot reuse policy are
-all gone, along with the per-card counter component maps.
+needs partitioning, so slot allocation, slot caps, and slot reuse policy do not
+exist, and neither do per-card counter component maps.
 
 ### Exactly-once increments
 
@@ -786,30 +764,28 @@ Do not attempt to model notes, bookmarks, or settings as facts. Deriving a
 note's content from an event log would require event-sourcing note text, which
 buys nothing and costs a domain.
 
-### Why one outbox instead of two
+### Why not a second outbox for raw events
 
-The previous design had a hot outbox for the transactional sync endpoint and an
-archive outbox for a separate durable event endpoint, each with its own
-sequence space and high-water mark. That split existed only because raw events
-had a second destination.
+Splitting raw events into their own pipeline, with its own sequence space,
+high-water mark, and endpoint, is the natural instinct — events feel like they
+want a separate durable path to the archive.
 
-Once the backend derives summaries and card state from facts, it must have the
-fact inside the sync transaction, so there is exactly one delivery path.
-Archival becomes a backend-side fan-out behind a transactional delivery outbox.
+It does not work once the backend derives summaries and card state from facts,
+because then the backend must have the fact **inside** the sync transaction.
+There is therefore exactly one delivery path, and archival becomes a
+backend-side fan-out behind a transactional delivery outbox.
 
-This is better on the axis that motivated the split. Under two pipelines, an R2
-outage produced a client-visible degraded archive backlog. Under one, the
-client's obligation ends at the sync acknowledgement and the backlog is a
-server-side condition the operator can see and alert on. Removed with the
-second pipeline: `archiveSequence`, `acceptedThroughArchiveSequence`,
-`POST /api/events/batch`, `ArchiveSnapshot`, and the shared-`eventId`
-coupling between two rows describing the same action.
+This is also better on the axis that motivates the split. With two pipelines an
+R2 outage produces a client-visible degraded archive backlog that the browser
+has to model, expose, and retry. With one, the client's obligation ends at the
+sync acknowledgement and the backlog is a server-side condition the operator
+can see and alert on.
 
-The cost accepted in exchange: raw events now travel on the transactional path
-and count against published sync count and byte limits. For the version-one
-event types, which are small, this is negligible. A future fat event type such
-as per-utterance shadowing telemetry would deserve a reassessment rather than
-an automatic second pipeline.
+The cost accepted in exchange: raw events travel on the transactional path and
+count against published sync count and byte limits. For the version-one event
+types, which are small, this is negligible. A future fat event type such as
+per-utterance shadowing telemetry would deserve a reassessment rather than an
+automatic second pipeline.
 
 ## Cross-tab coordination
 
@@ -864,24 +840,20 @@ It exists to guarantee three things:
 All three are properties of one page's memory. None of them require durable
 storage, and a reload or crash correctly discards the handle.
 
-### Why the cross-tab lease was removed
+### Why there is no cross-tab lock
 
-The earlier design added a `localLeases` table so two tabs could not present the
-same card: due queries filtered out leased cards, the owning tab renewed the
-lease on a timer, and a crashed tab's lease was taken over after expiry.
+A persistent lease per open card — with renewal, expiry, and crash takeover —
+would prevent two tabs presenting the same card. It buys exclusion, and
+exclusion is not a correctness property here: two tabs grading one card produce
+two facts from one device, which the backend replays chronologically to the
+correct answer. The outcome is right; the experience is merely odd, in a
+situation that is rare for a single-user study application.
 
-That machinery bought exclusion only, and exclusion is not a correctness
-property here. If two tabs do grade the same card, the result is two review
-facts from one device, which the backend replays chronologically to the correct
-answer. The outcome is right; the experience is merely odd, in a situation that
-is rare for a single-user study application.
+Avoided with it: a lease table, a lease predicate in every due query, renewal
+under background-tab timer throttling, and crash takeover.
 
-Removed with it: the `localLeases` table, the lease filter in every due query,
-lease renewal under background-tab timer throttling, crash takeover, and the
-`review_already_open` error.
-
-The tab-exclusion behavior is retained best-effort at a fraction of the cost. A
-tab that opens a card broadcasts `{ reviewing: cardId }` on the existing
+Tab exclusion is retained best-effort at a fraction of the cost. A tab that
+opens a card broadcasts `{ reviewing: cardId }` on the existing
 `BroadcastChannel`; other tabs keep an in-memory set and skip those cards when
 building a due list. A missed broadcast degrades to both tabs showing the card,
 which is the harmless case that already converges.
@@ -913,24 +885,23 @@ Bootstrap data never partially becomes the active projection:
 Step 2 is what makes step 3 safe. Both reads and writes are gated on the
 account not being in `bootstrapping` state, so a partially written database is
 unobservable. The invariant is satisfied by the access gate rather than by a
-staging table, which is why `bootstrapPages`, per-page hashes, signed resumable
-page tokens, and a domain manifest are all unnecessary.
+staging table, which is why per-page hashes, signed resumable page tokens, and
+a domain manifest are all unnecessary.
 
 ### An interrupted bootstrap restarts; it does not resume
 
 A bootstrap interrupted by a closed browser deletes its partial database and
-starts again. Durable resume was specified in an earlier draft and is removed.
+starts again.
 
-Resuming would have to persist the page cursor with each page, keep a
-server-side bootstrap ID alive across sessions with its own expiry, and carry
-`resumeBootstrapId` through the protocol — all to avoid re-downloading an
-account measured in hundreds of kilobytes over a connection that was working
-moments earlier. Restarting is a `deleteDatabase` call.
+Durable resume would have to persist the page cursor with each page, keep a
+server-side bootstrap ID alive across sessions with its own expiry, and carry a
+resume token through the protocol — all to avoid re-downloading an account
+measured in hundreds of kilobytes over a connection that was working moments
+earlier. Restarting is a `deleteDatabase` call.
 
-Note what is **not** being dropped: paging itself stays, exactly as specified.
-The page loop and the mandatory `hasMore` are what keep one response bounded
-and what a later large-account release depends on. Only the durable resume of a
-partly finished loop is gone.
+Paging itself is unaffected. The page loop and the mandatory `hasMore` are what
+keep one response bounded and what a later large-account release depends on;
+only durable resume of a partly finished loop is out of scope.
 
 Pages are sized by byte budget rather than entity count, because entity sizes
 differ by two orders of magnitude between a bookmark and a long note. One

@@ -63,8 +63,9 @@ A device sends two kinds of thing, and never a third:
 
 A device **never** sends a summary or a canonical card state. The backend
 derives daily summaries, challenge summaries, and FSRS schedules from facts.
-This is why there is no `daily_summary_put` operation: under the old design a
-200-review day produced 200 redundant summary snapshots.
+This is why there is no summary operation of any kind. If a device sent an
+absolute daily snapshot, a 200-review day would emit 200 redundant snapshots in
+a sequence the protocol requires to be gap-free.
 
 ### One outbox, one sequence, one acknowledgement
 
@@ -80,9 +81,9 @@ Every entity is keyed by something bounded — kanji, `(kanji, cardType)`,
 Deletion sets `active = false` and bumps a revision, which means a delta query
 of `server_revision > cursor` naturally carries deletions.
 
-This one decision removed tombstones, tombstone garbage collection, per-device
-cursor tracking, the device cap, device retirement, and unbounded review-pile
-generation growth.
+This one decision is why there are no tombstones, no tombstone garbage
+collection, no per-device cursor tracking, no device cap, no device retirement,
+and no unbounded review-pile generation growth.
 
 ### A projection is a function, not an accumulator
 
@@ -175,10 +176,13 @@ type QuerySnapshot<T> =
 | `sync`      | `now`                                | `ManualSyncReason?`            | `SyncOutcome`                          |
 | `storage`   | `requestPersistence`                 | —                              | `{ persisted }`                        |
 
-Note what is **not** there: no `getCardInfo`, no `preview()`, no `watchDue()`
-list, no `sessionStatus()` poll, no conflict list, no device management, no
-`prepareLogout`. Each was removed because it had no reader, duplicated the
-engine snapshot, or could race with something else.
+Note what is **not** there. There is no untyped `getCardInfo`, no standalone
+`preview()` that could race with card replacement, no live due **list** (a
+session wants a stable queue and a badge wants `watchDueCount`), no
+`sessionStatus()` poll (the engine snapshot is the status source of truth), no
+conflict list (divergent notes merge), no device management (nothing waits on a
+device's cursor), and no separate logout-preparation call (`logout()` returns
+`confirmation_required` with the impact).
 
 ### How the host binds to it
 
@@ -582,7 +586,7 @@ erDiagram
 The metadata database holds **no** notes, card state, events, session token, or
 entitlement boolean, and no database name contains an email or raw account ID.
 
-Eight tables per account database (down from fifteen in the first draft):
+Eight tables per account database:
 
 | Table                | Primary key          | Holds                                                 |
 | -------------------- | -------------------- | ----------------------------------------------------- |

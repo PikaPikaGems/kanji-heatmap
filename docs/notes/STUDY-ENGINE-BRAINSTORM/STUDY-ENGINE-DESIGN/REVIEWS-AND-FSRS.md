@@ -113,8 +113,8 @@ canonical card in every delta, and keeping two implementations of one structure
 agreeing about the same events.
 
 Rows are keyed by bounded natural keys, and `generation` is a column rather
-than part of the key. One kanji has one pile row and two card rows no matter
-how many times it is removed and re-added.
+than part of the key. One kanji has one pile row and two card rows however many
+times it is removed and re-added, so repeated re-adding cannot grow the table.
 
 Stale-write protection is unchanged and does not depend on opaque IDs. Every
 operation carries the generation it observed, and the backend rejects an
@@ -217,23 +217,11 @@ Settings rules:
 - Updating settings does not reschedule every current card.
 - The new settings apply to the next grade and to any short replay window that
   resolves after the setting wins.
+- One current settings document exists, identified by a monotonic
+  `settingsRevision`. Superseded revisions are not retained: replay applies one
+  winning current settings version across its whole window rather than
+  switching per event, so nothing reads an older one.
 - The public API exposes `watchCurrent()` and `update()`.
-
-### There is no historical settings version table
-
-An earlier draft kept a `reviewSettingsVersions` table, retained "hot only
-while needed by rings or outboxes," with older versions moving to operational
-history.
-
-It had no reader. Replay deliberately applies one winning settings version
-across its whole window rather than switching per event, and that version is
-the current one. The only other consumer was validating a client-proposed
-result state against the settings it claimed to use, and that validation is
-removed along with `provisionalResultState`.
-
-A monotonic `settingsRevision` integer replaces the table, the
-`settingsVersion: string` field on the review fact, and the retention rule
-governing when an old version could be discarded.
 
 ## Pile operations
 
@@ -424,28 +412,23 @@ a base it recognizes. There is no staged inbox and no deferred-apply ordering.
 The handle is not persistent review history. A reload or crash discards it, and
 its expiry is what ends an abandoned review when `cancel()` is never called.
 
-### There is no cross-tab review lease
+### Two tabs may open the same card, and that is fine
 
-An earlier draft persisted a `localLeases` row per open card so two tabs could
-not present the same card, with due queries filtering leased cards, timer-based
-renewal, and crash takeover after expiry.
+Exclusion is not a correctness property here. If two tabs do grade the same
+card, the result is two review facts from one device, which the backend replays
+chronologically to the correct schedule. The outcome is right; the experience
+is merely odd, in a situation that is rare for a single-user study application.
 
-That machinery bought exclusion, and exclusion is not a correctness property
-here. Two tabs grading the same card produce two facts from one device, which
-replay resolves correctly. The outcome is right; the experience is merely odd,
-in a situation that is rare for a single-user study application.
+So there is no lease: no per-card lock row, no lease predicate in due queries,
+no renewal timer fighting background-tab throttling, and no crash takeover.
+Exclusion is handled best-effort by a `BroadcastChannel` hint — a tab that
+opens a card announces it, others skip that card while building a due list, and
+a missed message degrades to the harmless case above.
 
-Removed with it: the `localLeases` table, the lease predicate in every due
-query, renewal under background-tab timer throttling, crash takeover, and the
-`review_already_open` error.
-
-Tab exclusion is retained best-effort through a `BroadcastChannel` hint, which
-requires no table, no expiry, and no takeover logic.
-
-Leases were never a cross-device mechanism and could not have been. A Web Locks
-or IndexedDB record lives inside one browser profile. Two **devices** reviewing
-the same card concurrently is normal and expected, and is resolved by
-chronological replay rather than by locking.
+A lock could not have helped across devices in any case. Web Locks and
+IndexedDB records live inside one browser profile. Two **devices** reviewing the
+same card concurrently is normal and expected, and is resolved by chronological
+replay.
 
 ## Grade transaction
 
@@ -536,22 +519,19 @@ interface ReviewFactV1 {
 }
 ```
 
-### Why `priorState` stays and `provisionalResultState` goes
+### Why the fact carries `priorState` but not a full result
 
 `priorState` is load-bearing. When the incoming common base falls outside the
 server's ring, exact replay is impossible and the backend must recompute the
 incoming branch before it can compare branches. It recomputes from this field.
-Remove it and the fallback degrades to "the server keeps its own branch and the
+Without it, the fallback degrades to "the server keeps its own branch and the
 incoming facts count only for statistics," which is a real behavior loss.
 
-`provisionalResultState` is not load-bearing. The backend explicitly never
-trusted it and always recomputed the result with `py-fsrs`. Its only value was
-detecting a `ts-fsrs`/`py-fsrs` divergence, which a single `provisionalDueAt`
-number serves just as well at a fraction of the bytes. A material mismatch
-still produces a compatibility diagnostic.
-
-`settingsVersion: string` became `settingsRevision: number` when the historical
-settings version table was removed.
+The fact deliberately does **not** carry the client's computed result state.
+The backend never trusts a client result and always recomputes with `py-fsrs`,
+so the only value such a field would have is detecting a `ts-fsrs`/`py-fsrs`
+divergence — which the single `provisionalDueAt` number does just as well at a
+fraction of the bytes. A material mismatch produces a compatibility diagnostic.
 
 `reportedWallTime` can be retained in operational history. Merge order uses a
 server-adjusted and clamped `reviewedAt`.
@@ -716,9 +696,9 @@ flowchart LR
 The server acknowledges the grade operation so its device sequence can advance,
 records an explicit `ignored_deleted_generation` warning, and does not
 reactivate either card. It **does** increment the derived daily summary,
-because the user did perform the review. Under the previous design that
-followed automatically from the device owning its own summary; under
-derivation it must be stated as an explicit backend rule.
+because the user did perform the review. Because summaries are derived rather
+than device-owned, this must be an explicit backend rule rather than something
+that follows automatically.
 
 A grade for generation 4 can never apply to generation 5.
 
@@ -742,11 +722,9 @@ the device sequence high-water mark, so a retry cannot double count. These
 totals remain exact even when schedule fallback chooses one branch and
 discards the other's contribution to the due date.
 
-There is no per-device component map. `Record<DeviceSlot, …>` existed only so
-two devices could write the same card's counters without conflicting. Once the
-backend is the only writer, partitioning has nothing left to prevent, and
-retired-device counter compaction stops being a deferred problem because it
-never arises.
+These are plain totals with no per-device dimension. Partitioning counters by
+device would only be needed if two devices could write them; the backend is the
+only writer, so there is nothing to partition.
 
 ## Backend scheduler authority
 
@@ -844,17 +822,6 @@ never reviewed" from "not in the pile" without a second query.
 `getDue` requires a single `CardType`. `beginReview` returns previews; there is
 no separate public `preview(kanji, cardType)` that can race with card
 replacement.
-
-### There is no `watchDue()`
-
-An earlier draft exposed `watchDue()`, `watchDueCount()`, and `getDue()` — three
-ways to ask one question. A review session must not consume a live-updating
-list: a queue that reorders between the card being chosen and the card being
-opened is worse than a stale one, and the session already re-queries after each
-grade. The consumer that genuinely needs live data is the **badge**, which needs
-a number rather than a list, and `watchDueCount()` serves it. Removing
-`watchDue()` also removes a live query whose result set changes on a timer as
-cards come due, for no reader.
 
 ## Review session behavior
 

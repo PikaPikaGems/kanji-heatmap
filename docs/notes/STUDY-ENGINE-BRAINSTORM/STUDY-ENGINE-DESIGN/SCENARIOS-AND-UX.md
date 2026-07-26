@@ -61,12 +61,11 @@ recorded from one device and the backend replays them chronologically. The
 schedule is correct; the user reviewed the same card twice in a row, which is
 mildly odd and harmless.
 
-**Why there is no lock.** An earlier design persisted a lease row per open card
-with renewal, expiry, and crash takeover. It prevented exactly this cosmetic
-duplicate, and cost a table, a predicate in every due query, and timer logic
-that had to survive background-tab throttling. The duplicate is not a
-correctness problem, so the machinery was removed and replaced with the
-broadcast hint.
+**Why there is no lock.** A lease row per open card, with renewal, expiry, and
+crash takeover, would prevent exactly this cosmetic duplicate — at the cost of
+a table, a predicate in every due query, and timer logic that has to survive
+background-tab throttling. The duplicate is not a correctness problem, so a
+broadcast hint carries the whole feature instead.
 
 **Host guidance.** Do not surface "this card is open elsewhere." The user
 opened two tabs of their own study app; explaining the internals of that is not
@@ -147,14 +146,14 @@ returning `read_only`.
 > reviewing.
 > `[Renew]` `[Not now]`
 
-**Why this rather than allowing one last grade.** An earlier design let a card
-opened while writable complete one grade after expiry. It protected at most one
-card grade, in an event that occurs roughly once per account lifetime, with a
-low probability of landing inside the few seconds a card is open — and it paid
-for that with a permanent exception in the write gate, a caveat on a top-level
-invariant, and a special field on the handle. Refusing to open the card is
-strictly better: no work is lost because none was started, the user is informed
-earlier, and the gate stays uniform.
+**Why this rather than allowing one last grade.** Letting a card opened while
+writable complete one grade after expiry protects at most one card grade, in an
+event that occurs roughly once per account lifetime, with a low probability of
+landing inside the few seconds a card is open — and it pays for that with a
+permanent exception in the write gate, a caveat on a top-level invariant, and a
+special field on the handle. Refusing to open the card is strictly better: no
+work is lost because none was started, the user is informed earlier, and the
+gate stays uniform.
 
 **Note the lease is not the subscription.** The lease is an offline proxy with
 its own duration. A paying user who has been offline longer than the lease

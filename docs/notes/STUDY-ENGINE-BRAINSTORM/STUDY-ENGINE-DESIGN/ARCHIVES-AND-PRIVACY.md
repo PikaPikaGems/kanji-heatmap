@@ -190,25 +190,21 @@ hot sync.
 
 Notes are not research events and are never sent to research transformation.
 
-Concurrent divergent note edits merge into the canonical note, so in the normal
-case nothing is displaced and nothing reaches the archive. The previous design
-required a durable R2 write **inside the sync transaction** before a conflict
-copy could be replaced, which put an external service dependency on the
-transactional hot path for an event occurring a few times per user per year.
-That requirement is gone.
+**The archive stores no note text at all.** Concurrent divergent note edits
+merge into the canonical note, so nothing is ever displaced and nothing needs
+archiving. Because `noteMaxUtf8Bytes` applies to every save with no exception
+for an already-merged note, every accepted edit is at most the limit and every
+two-way merge is at most twice it, permanently. The stored ceiling can only be
+approached by three or more devices diverging from the same base at once, and
+at `4 * noteMaxUtf8Bytes` that is beyond a realistic device count; beyond it
+the tail is cut at a UTF-8 scalar boundary.
 
-**No residual case remains, and the archive stores no note text at all.**
-Because `noteMaxUtf8Bytes` applies to every save with no exception for an
-already-merged note, every accepted edit is at most the limit and every two-way
-merge is at most twice it — permanently, not just the first time. The stored
-ceiling can only be approached by three or more devices diverging from the same
-base at once, and at `4 * noteMaxUtf8Bytes` that is beyond a realistic device
-count. Beyond it the tail is simply cut at a UTF-8 scalar boundary.
-
-An earlier draft archived the displaced text so support could recover it. That
-is now dead weight: it protects an unreachable case, and it would put note
-content — the most sensitive class of data in the system — into an archive that
-otherwise holds only behavioral events.
+This matters for two reasons beyond simplicity. Any design that displaces a
+losing copy needs a durable R2 write **inside the sync transaction** before it
+can replace one, putting an external service dependency on the transactional
+hot path for an event occurring a few times per user per year. And archiving
+note text at all would put the most sensitive class of data in the system into
+a store that otherwise holds only behavioral events.
 
 ## R2 object layout
 

@@ -112,28 +112,24 @@ interface RegisteredDevice {
 }
 ```
 
-There is no device slot. Slots existed to partition summary and counter
-components so two devices could not conflict on a shared number. With the
-backend deriving those values from facts, nothing needs partitioning, and slot
-allocation, slot caps, and slot reuse policy are all removed.
+Registration holds per-device sequence state and nothing else: a `deviceId`,
+its accepted sequence high-water mark, and a last-seen timestamp.
 
-There is also **no device cap and no device retirement**. Registration exists
-only to hold per-device sequence state: a `deviceId`, its accepted sequence
-high-water mark, and a last-seen timestamp. A stale registration from a browser
-that was reset costs one small row.
+There is **no device slot, no device cap, and no device retirement.** Each is
+worth stating, because all three are conventional and all three would be dead
+weight here.
 
-The earlier design capped registered devices and offered manual retirement,
-because a long-offline device blocked tombstone collection account-wide — its
-unacknowledged cursor kept every tombstone alive. Device policy and storage
-growth were entangled, which is why the risk register listed "device-slot and
-tombstone growth" as a principal risk and why retirement had to be manual to
-avoid discarding a browser holding unsynced work.
+Slots would exist to partition summary and counter components so two devices
+could not conflict on a shared number. The backend derives those values from
+facts and is their only writer, so there is nothing to partition.
 
-Soft deletion on bounded natural keys severed that entanglement. Nothing is
-waiting on any device's cursor, so an abandoned registration has no downstream
-cost. Removed with the cap: `device_limit_reached`, `device_retired`, the
-`setup_blocked` access state, the `SetupBlocked` lifecycle branch, the
-`registeredDeviceLimit` policy value, and the manual retirement recovery path.
+A cap and a retirement flow become necessary when a long-offline device holds
+something back account-wide — under tombstone-based deletion, its unacknowledged
+cursor keeps every tombstone alive, which entangles device policy with storage
+growth and forces retirement to be manual so a browser holding unsynced work is
+never discarded. Soft deletion on bounded natural keys breaks that link.
+Nothing waits on any device's cursor, so a stale registration from a browser
+that was reset costs one small row and nothing else.
 
 Abuse control remains a backend concern, handled where other abuse is handled:
 registration is rate-limited per account, and an implausible registration rate
@@ -298,8 +294,8 @@ interface SyncOperationBase {
 }
 ```
 
-`DailySummaryPutOperation` and `ChallengeSummaryPutOperation` no longer exist.
-A device never sends a summary or a canonical card state.
+There is no summary operation of any kind. A device never sends a summary or a
+canonical card state.
 
 The request batch must:
 
@@ -462,16 +458,14 @@ challenge_summaries  (account_id, activity_type, challenge_id)
 ```
 
 Deletion sets `active = false` and bumps the revision. Deltas carry it like any
-other update. This removes, in full:
+other update. Avoided in full:
 
-- the `Tombstone` variant of every entity change;
-- the tombstone garbage collection job;
-- the requirement to track every device's acknowledged cursor before reclaiming
-  a row;
-- the coupling between device retirement policy and storage growth;
-- the unbounded growth of review pile generations, which the previous design
-  flagged as needing "special monitoring" because a kanji can be removed and
-  re-added repeatedly.
+- a `Tombstone` variant on every entity change;
+- a tombstone garbage collection job;
+- tracking every device's acknowledged cursor before reclaiming a row;
+- coupling between device retirement policy and storage growth;
+- unbounded growth of review pile generations, which would otherwise need
+  special monitoring because a kanji can be removed and re-added repeatedly.
 
 A pile item is one row per kanji whose `generation` column increments on
 re-add, not one row per generation. Stale-write protection is preserved,

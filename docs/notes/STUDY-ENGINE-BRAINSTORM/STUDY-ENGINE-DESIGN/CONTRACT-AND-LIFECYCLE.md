@@ -53,9 +53,8 @@ export type ServerCursor = string;
 
 `CardId` is an opaque handle the host passes back to `beginReview`. It is
 derived from `(kanji, cardType, generation)` rather than being an independent
-identity, so no separate ID column is required. `DeviceSlot` and `PileItemId`
-no longer exist: slots were only needed to partition per-device counters, and
-pile items are keyed by kanji with `generation` as a column.
+identity, so no separate ID column is required. Pile items are keyed by kanji
+with `generation` as a column, so they need no independent ID either.
 
 Runtime validation must reject invalid date strings, non-finite timestamps,
 multi-scalar kanji identifiers, invalid time zones, and identifiers outside
@@ -295,9 +294,9 @@ Domain types are detailed in
 [Local data and domains](./LOCAL-DATA-AND-DOMAINS.md) and
 [Reviews and FSRS](./REVIEWS-AND-FSRS.md).
 
-There is no public `sessionStatus()` polling requirement. The engine snapshot is
-the status source of truth. There is no public `settings.all()` because
-historical scheduler settings are internal.
+The engine snapshot is the status source of truth, so no polling call is
+required. Scheduler settings history is internal, so only the current settings
+document is public.
 
 ## Public command and view types
 
@@ -428,11 +427,12 @@ export interface SyncOutcome {
 }
 ```
 
-`estimate()` was removed: `StudyEngineSnapshot.storage` already carries
-`persisted` and a `pressure` band, live, with no round trip, and raw
-`navigator.storage.estimate()` is not account-scoped so a host that wants exact
-byte numbers can call it directly. `requestPersistence()` stays because it must
-be invoked from a user gesture and the engine decides when it is worth asking.
+`StorageApi` exposes only `requestPersistence()`, because that call must be
+invoked from a user gesture and the engine decides when asking is worthwhile.
+Storage state is read from `StudyEngineSnapshot.storage`, which carries
+`persisted` and a `pressure` band live with no round trip; a host needing exact
+byte numbers calls `navigator.storage.estimate()` directly, since it is not
+account-scoped.
 
 `PracticeActivityEventInput` is the versioned union in
 [Local data and domains](./LOCAL-DATA-AND-DOMAINS.md).
@@ -522,31 +522,8 @@ export type AccessSnapshot =
     };
 ```
 
-The snapshot carries engine status only. It carries no data version.
-
-### There is no `dataRevision`
-
-An earlier draft included a monotonic `dataRevision` that bumped whenever any
-account data changed, described as "a cheap coarse invalidation indicator" for
-a host caching something derived from engine data outside the query stores.
-
-It is removed for three reasons. It shipped with a documented non-use — half
-its description told the reader not to use it for entity data, and a field
-carrying that instruction is eventually used for entity data anyway, failing as
-a stale tile rather than as a crash. It was too coarse to serve even its
-intended purpose, because every write bumps it, so a memo keyed on it is
-invalidated by every grade in a review session including for entities that did
-not change. And query stores already cover the path it existed for, waking on
-cross-tab IndexedDB commits precisely rather than globally.
-
-It did do one thing nothing else does: after a **pure pull** — no pending
-operations, server changes applied, sync returns to idle — the snapshot is
-byte-identical to what it was before, while the account's data has changed.
-That is a real gap, and it is the right reason to add the field back if a host
-ever hits it. Adding a field to a published contract is not a breaking change;
-removing one is, so a first release should not commit to a field with no
-reader. Its diagnostic value is real but belongs in a diagnostics surface
-rather than in the reactive snapshot every component subscribes to.
+The snapshot carries engine status only. Entity data reaches the host through
+query stores, which wake precisely on the rows that changed.
 
 There is one synchronization status because there is one outbox and one
 acknowledgement path. Archive delivery happens on the backend and cannot be
@@ -710,10 +687,10 @@ and locks domain queries even if a stale local lease remains.
 The write gate has **no exceptions**. Every study mutation, including `grade`,
 requires a currently valid entitlement lease.
 
-An earlier draft of this design allowed one grade to complete after the lease
-expired mid-card. That was removed. It carved a special case into the most
-security-relevant gate in the system, made invariant 5 untrue as written, and
-protected at most one card grade in an event that occurs roughly once per
+The obvious alternative is to let a card that is already open finish grading
+after its lease expires. Do not: it carves a special case into the most
+security-relevant gate in the system, makes invariant 5 untrue as written, and
+protects at most one card grade in an event that occurs roughly once per
 account lifetime with a low probability of landing inside the few seconds a
 card is open.
 
@@ -768,15 +745,13 @@ export interface LogoutConfirmation {
 }
 ```
 
-There is no `prepareLogout()`. The host calls `logout()` directly; if removal
-would discard pending work, the call returns `confirmation_required` carrying
-the same `LogoutImpact` that a preparation call would have produced, and the
-host re-calls with `confirmDiscardPending: true`.
+Logout is one call. The host calls `logout()` directly; if removal would
+discard pending work, the call returns `confirmation_required` carrying a
+`LogoutImpact`, and the host re-calls with `confirmDiscardPending: true`.
 
-A separate preparation call would only have helped a host that wanted to show
-pending counts _before_ the user ticked the checkbox. That count is already
-available without a round trip: `StudyEngineSnapshot.sync.pendingOperations` is
-live in every host that renders sync status at all.
+A separate preparation call is not needed to show pending counts _before_ the
+user ticks the checkbox, because `StudyEngineSnapshot.sync.pendingOperations`
+is already live in every host that renders sync status at all.
 
 ```mermaid
 flowchart TD

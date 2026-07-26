@@ -620,14 +620,14 @@ Risk: reset browsers accumulate device registrations.
 Mitigation: rate-limit registration per account and alert on implausible rates.
 No cap, no retirement flow.
 
-This stopped being a principal risk. Under the previous design a long-offline
-device kept tombstones alive account-wide, so device policy and storage growth
-were entangled — which is why a hard cap and a manual retirement path existed,
-and why retirement had to be manual to avoid discarding a browser holding
-unsynced work. Soft deletion on bounded natural keys severed that coupling.
-Nothing waits on any device's cursor, so a stale registration costs one small
-row and nothing else, and a hard cap would only produce a paying user locked
-out of their own account pending support.
+This is a minor risk rather than a principal one, and that is a consequence of
+soft deletion on bounded natural keys. Where deletion uses tombstones, a
+long-offline device keeps them alive account-wide, entangling device policy
+with storage growth and forcing a hard cap plus a manual retirement path —
+manual so that a browser holding unsynced work is never discarded. Here nothing
+waits on any device's cursor, so a stale registration costs one small row and
+nothing else, and a hard cap would only produce a paying user locked out of
+their own account pending support.
 
 ## Definition of core launch-ready
 
