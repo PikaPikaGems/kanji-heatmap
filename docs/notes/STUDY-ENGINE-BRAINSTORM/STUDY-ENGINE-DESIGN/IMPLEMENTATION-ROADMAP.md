@@ -54,11 +54,10 @@ Research launch is not on the critical path for core StudyEngine.
   - scheduler compatibility fixtures.
 - Select initial backend-published values:
   - entitlement lease policy;
-  - note byte limit and merged-note byte allowance;
+  - note edit byte limit, and the merged-note ceiling at no less than twice it;
   - sync batch count/byte limits;
   - bootstrap page byte budget;
   - review ring size;
-  - registered-device cap;
   - `openReviewEntitlementMarginMs`;
   - operational retention per class, with raw review events at account
     lifetime.
@@ -220,7 +219,9 @@ This is the first complete backend-to-host-independent sync slice.
 
 - Same operation retried after unknown timeout.
 - Note edited on two offline devices, producing a byte-identical merge on both.
-- Merge that exceeds the merged byte limit.
+- First merge of two maximum-size edits, which must fit under the ceiling.
+- Chained merge on an uncleaned merged note, reaching the ceiling.
+- Saving a merged note that exceeds the ordinary edit limit.
 - Stale editor saves over a newer note.
 - Note deleted on one device and edited on another; the edit wins.
 - Bookmark add/remove race.
@@ -502,7 +503,7 @@ No single test level is sufficient.
 - Cursor pagination and deactivation propagation.
 - Bootstrap paging, resume, and refusal of an unconsumable `hasMore`.
 - offline lease/session transitions.
-- device cap and retired device rejection.
+- registration of a device beyond any previously assumed cap.
 
 ### Browser/PWA checks
 
@@ -616,14 +617,17 @@ manifest/file hashes, immutable commit, fail required production.
 
 Risk: reset browsers accumulate device registrations.
 
-Mitigation: backend cap, manual retirement, monitoring; do not auto-retire a
-possibly offline device in version one.
+Mitigation: rate-limit registration per account and alert on implausible rates.
+No cap, no retirement flow.
 
-This risk shrank considerably. Under the previous design a long-offline device
-also kept tombstones alive account-wide, so device retirement policy and
-storage growth were entangled and pile generations needed dedicated
-monitoring. Soft deletion on bounded natural keys removes that coupling: a
-stale device registration now costs one small row and nothing else.
+This stopped being a principal risk. Under the previous design a long-offline
+device kept tombstones alive account-wide, so device policy and storage growth
+were entangled — which is why a hard cap and a manual retirement path existed,
+and why retirement had to be manual to avoid discarding a browser holding
+unsynced work. Soft deletion on bounded natural keys severed that coupling.
+Nothing waits on any device's cursor, so a stale registration costs one small
+row and nothing else, and a hard cap would only produce a paying user locked
+out of their own account pending support.
 
 ## Definition of core launch-ready
 

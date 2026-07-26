@@ -404,7 +404,9 @@ integration should:
 - query `notes.watch(kanji)`;
 - keep editor draft as host UI state;
 - call `notes.put` at an explicit save/debounce boundary;
-- use the backend-published byte limit;
+- use the backend-published byte limit, and note that the effective save limit
+  for an already-merged note is `max(noteMaxUtf8Bytes, currentBytes)`, so a
+  character counter must reflect that rather than the base limit;
 - show a dismissible hint when `hasMergedEdit` is set, and render the merge
   separator visibly in the editor;
 - warn before saving when the canonical note changes underneath an open editor
@@ -549,7 +551,10 @@ The host implements:
 - entitlement/read-only notice;
 - a “Remove my study data from this computer” logout checkbox;
 - “What is this?” explanation;
-- pending-data discard confirmation.
+- pending-data discard confirmation, driven by the `confirmation_required`
+  result from `logout()` itself. There is no `prepareLogout()`; a live pending
+  count is already on the engine snapshot if the host wants to show one before
+  the user ticks the box.
 
 The logout checkbox default is a host decision, not an engine one. Check it by
 default on what looks like a personal device; leave it **unchecked** once a

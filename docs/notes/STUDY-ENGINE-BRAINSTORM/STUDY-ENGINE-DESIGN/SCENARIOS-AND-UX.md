@@ -32,6 +32,7 @@ network.
 | [8](#8-two-devices-edit-the-same-note)                             | Note edited on two devices      | Yes, gentle           |
 | [9](#9-a-stale-editor-saves-over-a-newer-note)                     | Stale editor saves              | Yes, gentle           |
 | [10](#10-note-deleted-on-one-device-edited-on-another)             | Delete versus edit              | Quiet toast           |
+| [10a](#10a-a-merged-note-is-too-long-to-keep-in-full)              | Chained merge hits the ceiling  | Yes, in the note      |
 | [11](#11-adding-a-kanji-already-in-the-pile-with-a-different-word) | Word change on a pile item      | Yes, blocking confirm |
 | [12](#12-two-devices-add-the-same-kanji-with-different-words)      | Concurrent add, different words | Quiet reconcile       |
 | [13](#13-bookmark-added-on-one-device-removed-on-another)          | Bookmark race                   | No                    |
@@ -253,6 +254,61 @@ it syncs and the user visits that kanji:
 
 If they still want it gone, they delete it again. That is one extra tap in a
 rare case, and it is the correct direction to fail in.
+
+### 10a. A merged note is too long to keep in full
+
+**How rare this is matters.** A first merge can never overflow, because the
+stored ceiling is sized at no less than twice the edit limit and each edit is
+individually capped at the edit limit. Reaching the ceiling requires a
+**chain**: a note merges, the user ignores the merged result, and two devices
+then diverge again on that already merged note. It is rare enough that the
+design should be judged on being simple and honest rather than clever.
+
+**What happens.** The deterministic winner is kept in full. The loser is
+appended truncated at a UTF-8 scalar boundary, with a **visible** marker rather
+than an HTML comment. The loser's full text goes to the operational archive.
+
+**What the user sees**, inside the note itself:
+
+```markdown
+[winning version, in full]
+
+---
+
+[losing version, cut off mid-sentence]⋯
+
+> An edit from another device was too long to keep here in full.
+```
+
+Plus the scenario 8 banner with one extra sentence:
+
+> **This note was edited on two devices.** Both versions were kept, but one was
+> too long to fit and was shortened.
+> `[Got it]`
+
+**Why truncate rather than drop the loser entirely.** Truncating keeps the note
+self-describing. The user learns from the note in front of them that something
+was cut, rather than from a support channel they will never contact. A silent
+drop plus an archived copy satisfies an internal notion of "nothing was lost"
+while presenting the user with a note that quietly lost text.
+
+**Do not advertise the archive.** It exists so support can recover the text if
+someone genuinely needs it. Putting "contact support to recover your text" in
+the UI for an event this rare trains every user to distrust the merge feature
+in exchange for helping approximately nobody.
+
+**The real fix is upstream.** Size `noteMaxUtf8Bytes` generously enough that
+notes rarely approach it. A study note for one kanji that is anywhere near a
+10 KB limit is already unusual; two chained merges of such notes is the tail of
+a tail.
+
+**Related host rule.** A merged note can legitimately exceed the ordinary edit
+limit, so the effective save limit is
+`min(max(noteMaxUtf8Bytes, currentBytes), ceiling)`. The user can always save a
+merged note; they simply cannot make it longer. Without this the system would
+create an oversized note and then refuse to save the user's cleanup of it,
+reporting a limit the user never exceeded. A host character counter should
+reflect the effective limit, not the base one.
 
 ---
 

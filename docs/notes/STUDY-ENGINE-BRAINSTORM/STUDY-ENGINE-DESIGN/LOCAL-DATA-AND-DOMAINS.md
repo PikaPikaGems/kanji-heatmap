@@ -131,13 +131,49 @@ required:
 | `localLeases`            | The review handle is in-memory; there is no persistent lease |
 | `deviceSlot` columns     | Summaries and counters are derived by the backend            |
 
-`syncInbox` deserves an explicit note because its removal is not obvious. It
-existed so that applying a delta and advancing the cursor were atomic. They
-still are: a pull response is bounded by the published byte limit, so the
-engine holds it in memory, applies every change group and the new cursor in one
-Dexie transaction, and commits. A crash before commit changes nothing and the
-same cursor is retried. A staging table adds a write amplification and buys no
-additional atomicity.
+### Why `syncInbox` is gone
+
+Its removal is the least obvious of the seven, so it is worth stating what it
+did. It was a durable staging table holding pulled change groups:
+
+```ts
+interface SyncInboxRow {
+  accountRevision: number;
+  encodedChangeGroup: Uint8Array;
+  receivedAt: UnixMs;
+}
+```
+
+It had two jobs, and both are now handled elsewhere.
+
+**Job one: keep "apply the delta" and "advance the cursor" atomic.** If a pull
+returns change groups at revisions 11, 14, and 18, the local cache must never
+end up with 11 and 14 applied while the cursor still says 10 — or worse, the
+cursor at 18 with group 18 unapplied. Staging made the received data durable
+first, so a crash mid-apply could resume.
+
+This is unnecessary, because the whole response is applied in a single Dexie
+transaction. The engine cannot hold an IndexedDB transaction across an
+`await fetch()` — IndexedDB auto-commits when unrelated asynchronous work is
+awaited — but it does not need to: the response is fully received into memory
+first, bounded by the published `syncMaxBytes`, and only then is one
+transaction opened that writes every change group and the new cursor together.
+A crash before commit leaves the cursor unchanged and the identical range is
+re-pulled. A crash after commit is simply done. Staging would add a full extra
+write of every byte and buy no atomicity that the transaction does not already
+provide.
+
+**Job two: hold back a card the user currently has open.** The earlier design
+had sync stage an incoming card row rather than apply it, so an open review's
+previews could not shift underneath the user, then apply it after grade or
+cancel.
+
+This is unnecessary because the review handle owns a frozen in-memory snapshot
+of the card and settings. Previews are computed from the snapshot, and the
+grade is computed from the snapshot and carries it as `priorState`. Nothing in
+the grade path reads the live row, so the live row is free to move. The rule
+became "the handle is the snapshot, the projection is free to move," which
+also removed a deferred-apply ordering constraint from the sync path.
 
 Suggested IndexedDB indexes:
 
@@ -309,13 +345,51 @@ interface KanjiNoteRow {
 
 Rules:
 
-- The backend publishes a maximum UTF-8 byte count. Both engine and backend
-  validate it.
+- The backend publishes `noteMaxUtf8Bytes`, the maximum size of a **user
+  edit**. Both engine and backend validate it.
 - `put()` requires non-empty content after trimming for validation. A host that
   clears the editor calls explicit `remove()`, which deactivates the note.
   Empty or whitespace-only `put()` returns `validation_failed`.
 - A normal edit carries the server revision it was based on.
 - A direct descendant of the canonical revision replaces it outright.
+
+### The two byte limits
+
+A merge can legitimately produce a note larger than any single edit is allowed
+to be, so there are two limits and one rule connecting them:
+
+```text
+noteMaxUtf8Bytes         maximum size of one user edit
+noteMergedMaxUtf8Bytes   absolute ceiling for stored content
+                         MUST be >= 2 * noteMaxUtf8Bytes + separator allowance
+```
+
+**Sizing the ceiling at twice the edit limit makes ordinary merge overflow
+impossible.** Two edits each capped at `noteMaxUtf8Bytes` cannot together
+exceed `2 × noteMaxUtf8Bytes`, so a first merge always fits with room for the
+separator. This is not a mitigation; it removes the case.
+
+The rule connecting them, so the system cannot create a note the user is then
+forbidden to save:
+
+```text
+effective put limit = min(
+  max(noteMaxUtf8Bytes, currentCanonicalUtf8Bytes),
+  noteMergedMaxUtf8Bytes
+)
+```
+
+In words: a user may always save a note that is not longer than what is already
+there, and may always grow a note up to the ordinary edit limit. A merged
+18,000-byte note can be edited and saved at 18,000 bytes; it just cannot be
+grown. Every edit either holds or shrinks it until it is back under the edit
+limit, so the state converges without the host ever having to explain a limit
+the user did not create.
+
+Without this rule the system has an obvious trap: the backend merges two edits
+into a note larger than `noteMaxUtf8Bytes`, the user opens it, fixes a typo,
+presses save, and is told their note is too long. The host would be reporting a
+limit the user never exceeded.
 
 ### Divergent edits merge; they do not select a loser
 
@@ -359,17 +433,40 @@ Why this rather than a conflict copy with restore and dismiss:
 
 Constraints:
 
-- If the merged content would exceed the published note byte limit, the backend
-  keeps the deterministic winner alone, sets `hasMergedEdit`, and returns a
-  `note_merge_truncated` warning. The displaced text is retained in the
-  operational archive for support recovery. This is the one case where an edit
-  is not immediately visible to the user, and it requires two edits that are
-  together larger than the limit.
 - The marker is an HTML comment so it renders invisibly if the user never
   cleans it up.
 - Delete-versus-edit does not merge. An edit beats a concurrent delete, because
   reviving text is recoverable and losing it is not. The note stays active with
   the edited content.
+
+### Chained merges and the ceiling
+
+A first merge always fits, because the ceiling is sized at twice the edit
+limit. The ceiling can only be reached by a **chain**: a note is merged, the
+user does not clean it up, and two devices then diverge again on the already
+merged note. Each of those edits may be up to the merged note's size under the
+effective-limit rule, so their merge can exceed the ceiling.
+
+This requires an unresolved merge plus a second concurrent divergence on the
+same kanji before anyone cleaned up. When it happens:
+
+1. Keep the deterministic winner in full.
+2. Append the loser truncated at a UTF-8 scalar boundary to fit the ceiling.
+3. End the truncated block with a **visible** marker, not an HTML comment, so
+   the user can see that text was cut:
+   `⋯ [an edit from another device was too long to keep in full]`
+4. Write the loser's full text to the operational archive.
+5. Return a `note_merge_truncated` warning so the host can say something
+   specific.
+
+Truncating rather than dropping keeps the note self-describing: the user learns
+from the note itself that something was shortened, instead of from a support
+channel they will never contact. The archived copy exists for support, not as
+the user's primary recourse, and the host should not advertise it.
+
+The correct response to this case is to size `noteMaxUtf8Bytes` generously
+enough that notes rarely approach it, which makes the chain harder to reach in
+the first place.
 
 Client timestamps are imperfect. Clamping and deterministic ties guarantee
 convergence, not knowledge of the user's true intent.

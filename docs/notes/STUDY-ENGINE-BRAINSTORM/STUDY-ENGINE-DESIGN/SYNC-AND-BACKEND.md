@@ -79,7 +79,6 @@ a mismatch.
     "syncMaxBytes": 524288,
     "bootstrapPageMaxBytes": 262144,
     "reviewRingSize": 8,
-    "registeredDeviceLimit": 12,
     "openReviewEntitlementMarginMs": 120000,
     "rawPracticeEventRetentionDays": 365,
     "rawReviewEventRetentionDays": null
@@ -118,17 +117,28 @@ components so two devices could not conflict on a shared number. With the
 backend deriving those values from facts, nothing needs partitioning, and slot
 allocation, slot caps, and slot reuse policy are all removed.
 
-The backend still registers devices, because it needs per-device sequence
-state, and still publishes a cap for abuse control. Reaching it returns
-`device_limit_reached`; manual or support-assisted retirement is the
-version-one recovery path. This avoids automatically retiring a browser that
-may still hold unsynced offline work. A retired device ID is permanently
-rejected.
+There is also **no device cap and no device retirement**. Registration exists
+only to hold per-device sequence state: a `deviceId`, its accepted sequence
+high-water mark, and a last-seen timestamp. A stale registration from a browser
+that was reset costs one small row.
 
-The cap is no longer coupled to delta correctness. Under the previous design a
-long-offline device kept tombstones alive account-wide, so device retirement
-policy and storage growth were entangled. Soft deletion removes that coupling
-entirely.
+The earlier design capped registered devices and offered manual retirement,
+because a long-offline device blocked tombstone collection account-wide — its
+unacknowledged cursor kept every tombstone alive. Device policy and storage
+growth were entangled, which is why the risk register listed "device-slot and
+tombstone growth" as a principal risk and why retirement had to be manual to
+avoid discarding a browser holding unsynced work.
+
+Soft deletion on bounded natural keys severed that entanglement. Nothing is
+waiting on any device's cursor, so an abandoned registration has no downstream
+cost. Removed with the cap: `device_limit_reached`, `device_retired`, the
+`setup_blocked` access state, the `SetupBlocked` lifecycle branch, the
+`registeredDeviceLimit` policy value, and the manual retirement recovery path.
+
+Abuse control remains a backend concern, handled where other abuse is handled:
+registration is rate-limited per account, and an implausible registration rate
+is an alerting signal, not a hard product wall that locks a paying user out of
+their own account until support intervenes.
 
 ## Paged bootstrap
 
@@ -481,10 +491,17 @@ thousand small rows. Deactivated card rows null their `state` and
   a rule and an HTML comment marker, ordered by the deterministic tuple
   `(clampedUpdatedAt, deviceId, deviceSequence)` so every runtime produces
   byte-identical output. Set `has_merged_edit`.
-- If the merged content would exceed `noteMergedMaxUtf8Bytes`, keep the
-  deterministic winner alone, set `has_merged_edit`, return a
-  `note_merge_truncated` warning, and retain the displaced text in the
-  operational archive for support recovery.
+- Validate a `note_put` against
+  `min(max(noteMaxUtf8Bytes, currentCanonicalBytes), noteMergedMaxUtf8Bytes)`,
+  so a user can always save a merged note that the system made oversized, but
+  can never grow it.
+- Size `noteMergedMaxUtf8Bytes` at no less than
+  `2 * noteMaxUtf8Bytes + separator`, which makes a first merge provably
+  unable to overflow.
+- Only a chained merge can reach the ceiling. When it does, keep the winner in
+  full, append the loser truncated at a UTF-8 scalar boundary with a visible
+  marker, archive the loser's full text, and return a `note_merge_truncated`
+  warning.
 - An edit beats a concurrent delete. The note stays active with the edited
   content, because reviving text is recoverable and losing it is not.
 - The next accepted `note_put` for that kanji clears `has_merged_edit`.
@@ -737,7 +754,7 @@ Redis is not authoritative for:
 R2 stores:
 
 - account-associated operational event objects under retention policy;
-- note text displaced by a merge that exceeded the merged byte limit;
+- note text truncated by a chained merge that reached the byte ceiling;
 - separately transformed research objects;
 - optional export bundles.
 
@@ -774,7 +791,7 @@ Record metrics without note content or direct event payloads:
 - pile add rejections by `pile_item_exists`;
 - delivery outbox oldest undelivered age and R2 write failures;
 - entitlement/read-only transitions;
-- device-limit counts and inactive-row growth per account;
+- registered device count and inactive-row growth per account;
 - `beginReview` refusals due to the entitlement margin;
 - Postgres transaction retries/deadlocks.
 

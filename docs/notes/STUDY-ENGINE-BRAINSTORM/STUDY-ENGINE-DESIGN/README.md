@@ -407,9 +407,10 @@ The architecture supports these decisions but does not invent their values:
 - Study Contract and StudyEngine licenses. The choice determines whether
   proprietary third-party UIs may bundle StudyEngine.
 - Entitlement lease durations and renewal policy.
-- Note byte limit, merged-note byte allowance, sync request limits, bootstrap
-  page byte budget, review ring size, the `beginReview` entitlement margin, and
-  the registered-device cap.
+- Note edit byte limit, and the merged-note ceiling, which must be at least
+  twice the edit limit plus a separator allowance.
+- Sync request limits, bootstrap page byte budget, review ring size, and the
+  `beginReview` entitlement margin.
 - Operational archive retention periods for classes other than raw review
   events, which are retained for the account lifetime.
 - Research de-identification review and jurisdiction-specific disclosure.

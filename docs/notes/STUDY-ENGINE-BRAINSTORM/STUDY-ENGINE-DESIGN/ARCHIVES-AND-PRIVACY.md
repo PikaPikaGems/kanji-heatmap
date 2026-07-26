@@ -14,8 +14,8 @@ The design has two intentionally separate datasets:
 1. **Operational archive**
    - Account-associated.
    - Contains accepted raw practice and FSRS review events.
-   - May contain note text displaced by a merge that exceeded the merged byte
-     limit.
+   - May contain note text truncated by a chained merge that reached the byte
+     ceiling.
    - Supports support investigation, account export, audit, future operational
      recovery features, and per-user FSRS weight fitting if that deferred
      feature is ever built.
@@ -199,15 +199,24 @@ copy could be replaced, which put an external service dependency on the
 transactional hot path for an event occurring a few times per user per year.
 That requirement is gone.
 
-One residual case remains. If two divergent edits are together larger than
-`noteMergedMaxUtf8Bytes`, the backend keeps the deterministic winner alone and
-writes the displaced text to the operational archive for support recovery. That
-write goes through the ordinary delivery outbox and does not block the sync
-transaction.
+One residual case remains, and it is narrow. Because
+`noteMergedMaxUtf8Bytes` is sized at no less than twice the edit limit, a first
+merge can never overflow. Only a **chained** merge can reach the ceiling: a
+note is merged, the user does not clean it up, and two devices then diverge
+again on the already merged note. In that case the loser is truncated in the
+note with a visible marker and its full text is written to the archive.
 
-The object includes kanji, displaced Markdown content, the canonical revision
-at displacement, writer metadata, and timestamps. It is exportable and is
-deleted with the account.
+That write goes through the ordinary delivery outbox and does not block the
+sync transaction.
+
+The object includes kanji, the full untruncated Markdown, the canonical
+revision at truncation, writer metadata, and timestamps. It is exportable and
+is deleted with the account.
+
+This copy exists for support, not as the user's recourse. The truncated note
+already tells the user text was shortened, which is the honest signal; a
+product should not answer a data question with "contact support" for a case
+this rare when the note itself can say it.
 
 ## R2 object layout
 

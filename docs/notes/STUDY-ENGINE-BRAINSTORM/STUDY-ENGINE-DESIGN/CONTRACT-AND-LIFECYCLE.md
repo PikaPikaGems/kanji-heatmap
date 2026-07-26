@@ -81,8 +81,7 @@ export type StudyError =
         | "entitlement_missing"
         | "entitlement_expired"
         | "protocol_incompatible"
-        | "catalog_incompatible"
-        | "device_retired";
+        | "catalog_incompatible";
     }
   | { code: "bootstrap_required" }
   | { code: "offline"; operation: string }
@@ -93,8 +92,6 @@ export type StudyError =
   | { code: "review_handle_expired" }
   | { code: "review_handle_consumed" }
   | { code: "review_generation_deleted" }
-  | { code: "device_limit_reached" }
-  | { code: "device_retired" }
   | { code: "storage_quota" }
   | { code: "rate_limited"; retryAt?: UnixMs }
   | { code: "pin_invalid" | "pin_expired" | "pin_attempts_exhausted" }
@@ -242,7 +239,6 @@ export interface AuthApi {
   requestPin(input: RequestPinInput): Promise<Result<PinChallenge>>;
   verifyPin(input: VerifyPinInput): Promise<Result<VerifyPinOutcome>>;
   refreshSession(): Promise<Result<SessionRefreshOutcome>>;
-  prepareLogout(): Promise<Result<LogoutImpact>>;
   logout(input: LogoutInput): Promise<Result<LogoutOutcome>>;
 }
 
@@ -314,7 +310,7 @@ incompatible meanings:
 ```ts
 export interface VerifyPinOutcome {
   accountId: AccountId;
-  access: "bootstrapping" | "writable" | "read_only" | "setup_blocked";
+  access: "bootstrapping" | "writable" | "read_only";
 }
 
 export interface SessionRefreshOutcome {
@@ -518,14 +514,8 @@ export type AccessSnapshot =
         | "entitlement_missing"
         | "entitlement_expired"
         | "protocol_incompatible"
-        | "catalog_incompatible"
-        | "device_retired";
+        | "catalog_incompatible";
       hasReadableCache: boolean;
-    }
-  | {
-      kind: "setup_blocked";
-      accountId: AccountId;
-      reason: "device_limit_reached";
     }
   | {
       kind: "cache_locked";
@@ -548,11 +538,7 @@ export type SyncSnapshot =
   | { kind: "syncing"; pendingOperations: number; startedAt: UnixMs }
   | {
       kind: "blocked";
-      reason:
-        | "read_only"
-        | "protocol_incompatible"
-        | "device_limit_reached"
-        | "device_retired";
+      reason: "read_only" | "protocol_incompatible";
       pendingOperations: number;
     }
   | {
@@ -574,11 +560,8 @@ stateDiagram-v2
     Starting --> CacheLocked: Migration or corruption failure
     SignedOut --> Authenticating: PIN verified
     Authenticating --> Bootstrapping: No reusable cache
-    Authenticating --> SetupBlocked: Device limit reached
     Authenticating --> Writable: Reusable cache and premium lease
     Authenticating --> ReadOnly: Reusable cache without premium
-    SetupBlocked --> Bootstrapping: Device slot made available
-    SetupBlocked --> SignedOut: Logout
     Bootstrapping --> Writable: Snapshot activated
     Bootstrapping --> ReadOnly: Entitlement lost
     Writable --> ReadOnly: Lease expires
@@ -763,6 +746,16 @@ export interface LogoutConfirmation {
   impact: LogoutImpact;
 }
 ```
+
+There is no `prepareLogout()`. The host calls `logout()` directly; if removal
+would discard pending work, the call returns `confirmation_required` carrying
+the same `LogoutImpact` that a preparation call would have produced, and the
+host re-calls with `confirmDiscardPending: true`.
+
+A separate preparation call would only have helped a host that wanted to show
+pending counts _before_ the user ticked the checkbox. That count is already
+available without a round trip: `StudyEngineSnapshot.sync.pendingOperations` is
+live in every host that renders sync status at all.
 
 ```mermaid
 flowchart TD
