@@ -1,7 +1,7 @@
 # Archives and Privacy
 
 This document owns raw-event durability, operational and research archive
-separation, note-conflict cold history, retention, opt-out behavior, export and
+separation, displaced note text, retention, opt-out behavior, export and
 deletion boundaries, and privacy limitations.
 
 It is an engineering specification, not legal advice. Launch policy requires
@@ -12,13 +12,15 @@ market-specific privacy review.
 The design has two intentionally separate datasets:
 
 1. **Operational archive**
-
    - Account-associated.
    - Contains accepted raw practice and FSRS review events.
-   - May contain displaced note conflict copies.
-   - Supports support investigation, account export, audit, and future
-     operational recovery features.
-   - Has a backend-published retention period.
+   - May contain note text displaced by a merge that exceeded the merged byte
+     limit.
+   - Supports support investigation, account export, audit, future operational
+     recovery features, and per-user FSRS weight fitting if that deferred
+     feature is ever built.
+   - Raw review events are retained for the account lifetime. Other classes
+     have a backend-published retention period.
    - Is deleted with the account, subject to documented backup/deletion
      processing.
 
@@ -35,7 +37,9 @@ dropping one column.
 
 ```mermaid
 flowchart LR
-    Engine[StudyEngineArchiveOutbox] --> Ingest[DurableEventIngest]
+    Engine[StudyEngineOutbox] --> Sync[SyncTransaction]
+    Sync --> Delivery[TransactionalDeliveryOutbox]
+    Delivery --> Ingest[RetryingArchiveWorker]
     Ingest --> Operational[AccountOperationalArchive]
     Operational --> Retention[OperationalRetention]
     Operational --> Eligibility[ResearchParticipationCheck]
@@ -47,45 +51,59 @@ flowchart LR
 
 ## Event delivery contract
 
-The operational pipeline is durable at least once:
-
-- Every event has a stable globally unique `eventId`.
-- Every device has a monotonic archive sequence.
-- The browser retains the event until acknowledged.
-- Retry uses the same ID and sequence.
-- The backend deduplicates.
-- The backend acknowledges only after a durable queue or R2 accepts the event.
-- Redis-only acceptance does not satisfy durability.
-
-Exactly-once network delivery is neither required nor realistic. Exactly-once
-materialization is achieved by idempotent event IDs.
-
-## Local archive outbox
-
-Practice and review transactions append raw events in the same local
-transaction as their hot projections:
+Archival is a **backend** responsibility. The browser has no archive pipeline,
+no archive sequence space, and no archive acknowledgement to wait for.
 
 ```mermaid
 flowchart TD
     UserAction[AcceptedStudyAction] --> LocalTx[IndexedDBTransaction]
-    LocalTx --> Projection[HotLocalProjection]
-    LocalTx --> HotOperation[HotSyncOperation]
-    LocalTx --> RawEvent[ArchiveOutboxEvent]
-    HotOperation --> HotSync[UnifiedHotSync]
-    RawEvent --> ArchiveUpload[DurableArchiveUpload]
+    LocalTx --> Projection[OptimisticLocalProjection]
+    LocalTx --> Operation[OneOutboxOperation]
+    Operation --> Sync[UnifiedSync]
+    Sync --> Ingest[BackendIngestTransaction]
+    Ingest --> Canonical[CanonicalStateAndDerivedSummaries]
+    Ingest --> Delivery[TransactionalDeliveryOutboxRow]
+    Delivery --> Worker[RetryingWorker]
+    Worker --> R2[OperationalArchive]
 ```
 
-Hot and archive paths have independent acknowledgements. An archive outage:
+The contract:
 
-- does not block hot sync;
-- does not invalidate already committed study work;
-- leaves raw events in the local archive outbox;
-- exposes pending count, bytes, oldest age, and degraded status;
-- retries with independent backoff.
+- Every fact has a stable globally unique `eventId`.
+- The browser retains the operation until the sync acknowledgement.
+- The backend appends the raw event to a transactional delivery outbox inside
+  the same transaction that accepts the fact, so an acknowledged fact can never
+  be lost before reaching the archive.
+- A retrying worker drains that table into R2 and deletes delivered rows.
+- The sink deduplicates by `eventId`.
+- Redis may accelerate or batch this work but can never be the only copy.
 
-The user may continue studying while new archive events can still be committed
-locally. If storage quota prevents that durable local write, the mutation
-returns `storage_quota`; the engine must not silently drop a promised event.
+Exactly-once network delivery is neither required nor realistic. Exactly-once
+materialization is achieved by idempotent event IDs.
+
+### What the single pipeline changed
+
+Previously the browser kept a second outbox and uploaded raw events to a
+separate endpoint with its own sequence space and high-water mark. An R2
+outage then surfaced in the browser as a degraded archive status with a growing
+local backlog, which the engine had to model, expose, warn about, and retry
+independently of hot sync.
+
+With one pipeline, the client's obligation ends at the sync acknowledgement and
+an R2 outage is a server-side backlog the operator can see and alert on. That
+is a better place for it. Removed: `archiveSequence`,
+`acceptedThroughArchiveSequence`, `POST /api/events/batch`, `ArchiveSnapshot`,
+`archiveBacklogWarningBytes`, and the state in which hot data had converged
+while its raw events were still queued locally.
+
+The tradeoff accepted in exchange: raw events now travel on the transactional
+sync path and count against published sync count and byte limits. For the
+version-one event types this is negligible. A future fat event type would
+deserve a fresh assessment rather than an automatic second pipeline.
+
+Local storage pressure is now one condition rather than two. If quota prevents
+committing the mutation, it returns `storage_quota` and nothing is reported as
+saved.
 
 ## Operational event envelope
 
@@ -170,19 +188,26 @@ This “fat” event supports explanation and future model analysis without
 querying the current card row. It does not make the archive authoritative for
 hot sync.
 
-### Note conflict history
+### Displaced note text
 
-Notes are not research events. When the single hot note conflict slot must be
-replaced:
+Notes are not research events and are never sent to research transformation.
 
-1. Build an encrypted/account-associated conflict record.
-2. Durably write it to operational cold storage.
-3. Record archive object identity in the note conflict transaction.
-4. Only then replace the hot conflict copy.
+Concurrent divergent note edits merge into the canonical note, so in the normal
+case nothing is displaced and nothing reaches the archive. The previous design
+required a durable R2 write **inside the sync transaction** before a conflict
+copy could be replaced, which put an external service dependency on the
+transactional hot path for an event occurring a few times per user per year.
+That requirement is gone.
 
-The cold conflict object includes kanji, losing Markdown content, canonical
-revision at displacement, writer metadata, and timestamps. It is exportable
-and deleted with the account. It is never sent to research transformation.
+One residual case remains. If two divergent edits are together larger than
+`noteMergedMaxUtf8Bytes`, the backend keeps the deterministic winner alone and
+writes the displaced text to the operational archive for support recovery. That
+write goes through the ordinary delivery outbox and does not block the sync
+transaction.
+
+The object includes kanji, displaced Markdown content, the canonical revision
+at displacement, writer metadata, and timestamps. It is exportable and is
+deleted with the account.
 
 ## R2 object layout
 
@@ -190,12 +215,20 @@ One possible logical layout:
 
 ```text
 operational/v1/accounts/<accountArchiveKey>/events/<yyyy>/<mm>/<batchId>.jsonl.zst
-operational/v1/accounts/<accountArchiveKey>/note-conflicts/<yyyy>/<objectId>.json.zst
+operational/v1/accounts/<accountArchiveKey>/displaced-notes/<yyyy>/<objectId>.json.zst
 operational/v1/accounts/<accountArchiveKey>/exports/<exportId>.zip
 
 research/v1/reviews/<yyyy>/<mm>/<partitionId>.parquet
 research/v1/practice/<eventType>/<yyyy>/<mm>/<partitionId>.parquet
 ```
+
+The operational prefix is partitioned **by account first**, and must stay that
+way. Reading one user's full review history is then a prefix list plus a few
+object reads, which is what per-user FSRS weight fitting would require. A
+global time-partitioned layout would be more convenient for population
+analytics and would turn per-user training into a full-corpus scan. Population
+analytics is what the research dataset is for; it should not dictate the
+operational layout.
 
 File formats are replaceable implementation details, but objects must have:
 
@@ -213,47 +246,34 @@ affect event identity or deduplication.
 
 Operational and research data should use separate buckets or strict prefixes
 with separate IAM policies, lifecycle rules, and audit logs. A research worker
-should not need permission to read note conflicts.
+should not need permission to read displaced note text.
 
-## Durable acceptance options
+## Durable acceptance
 
-The backend may acknowledge after either:
+The sync transaction is the point of durability. Because the raw event is
+appended to a transactional Postgres delivery outbox in the same transaction
+that accepts the fact, acknowledging the sync request already guarantees the
+event will reach the archive.
 
-1. A durable queue accepts the validated event batch, and a retrying consumer
-   writes R2.
-2. R2 directly writes an idempotent batch object before response.
-3. A transactional Postgres delivery outbox commits, followed by a retrying R2
-   worker.
-
-If using a Postgres delivery outbox, it is short-lived infrastructure, not a
-permanent user event table. Monitor its oldest undelivered row and delete rows
-after verified R2 persistence.
+The delivery outbox is short-lived infrastructure, not a permanent user event
+table. Monitor its oldest undelivered row and delete rows after verified R2
+persistence.
 
 Redis may cache or coalesce work but cannot be the only accepted copy.
 
-## Archive sequence and deduplication
+## Deduplication
 
-For each registered device, the backend stores:
+Deduplication is now a property of sync rather than a second protocol.
 
-```ts
-interface ArchiveDeviceState {
-  deviceId: DeviceId;
-  acceptedThroughArchiveSequence: number;
-  lastAcceptedAt: UnixMs;
-}
-```
-
-The browser sends contiguous batches. Handling:
-
-- A batch beginning at high-water + 1 is validated and accepted atomically.
-- An exact/old retry is deduplicated by sequence and event ID.
-- A gap is rejected without advancing.
-- Reusing a sequence with a different event ID is a protocol integrity error.
-- Reusing an event ID with different content is an integrity/security error.
-
-The durable sink should keep an event-ID dedupe index or deterministic object
-key long enough to cover client retry windows. Sequence high-water handles the
-normal case; content hash guards inconsistent duplicates.
+- An operation at or below the device's `accepted_sequence` is skipped before
+  it can produce a delivery outbox row, so a client retry cannot enqueue the
+  same event twice.
+- Reusing a sequence with a different `eventId` is a protocol integrity error.
+- Reusing an `eventId` with different content is an integrity or security
+  error.
+- The R2 sink still keeps an event-ID dedupe index or a deterministic object
+  key, because the worker itself retries and may write the same batch twice.
+- Content hashes guard inconsistent duplicates.
 
 ## Operational retention
 
@@ -265,12 +285,24 @@ The policy response should state:
 interface OperationalRetentionPolicy {
   policyVersion: string;
   rawPracticeEventDays: number;
-  rawReviewEventDays: number;
-  displacedNoteConflictDays: number;
+  rawReviewEventDays: number | null; // null means account lifetime
+  displacedNoteDays: number;
   exportBundleDays: number;
   deletionSlaDays: number;
 }
 ```
+
+`rawReviewEventDays` is `null`. Review events are retained for the account
+lifetime because they are the only corpus from which a user's own FSRS weights
+could later be fitted, and because the anonymized research dataset cannot serve
+that purpose by construction.
+
+The cost is small enough that it is not the deciding factor. A heavy user
+generating on the order of 25,000 reviews a year produces roughly 15 MB of raw
+JSON, which compresses to about 1 MB a year. The deciding factors are the
+disclosure this requires and the fact that account deletion becomes the only
+path by which review history leaves the system, which makes the deletion
+workflow's R2 prefix sweep load-bearing rather than merely tidy.
 
 The UI may display this policy, but StudyEngine does not provide legal copy.
 
@@ -281,8 +313,9 @@ Lifecycle rules:
 - A compaction manifest preserves the earliest source expiry.
 - Delete expired Postgres archive mappings.
 - Export generation does not reset source retention.
-- Operational retention expiration may make old conflict copies or raw events
-  unavailable. Current hot projections remain unaffected.
+- Operational retention expiration may make old displaced note text or raw
+  practice events unavailable. Raw review events do not expire. Current hot
+  projections remain unaffected.
 
 ## Research participation
 
@@ -409,12 +442,12 @@ have a reproducible export job.
 
 An export can contain:
 
-- current notes and recoverable conflict copy;
+- current notes;
 - bookmarks;
 - FSRS settings and current cards;
 - device-owned daily/challenge summaries;
 - retained operational raw events;
-- retained displaced note conflicts;
+- retained displaced note text;
 - policy/version metadata.
 
 It must not contain:
@@ -463,14 +496,13 @@ deletion by definition.
 Under the selected first-release access policy:
 
 - Cached hot data is readable.
-- New study mutations and hot sync are blocked.
-- Archive upload is blocked with other authenticated premium operations.
-- Pending hot/archive outboxes remain local.
-- Renewal resumes both pipelines.
+- New study mutations and sync are blocked.
+- The pending outbox remains local and intact.
+- Renewal resumes it.
 - Support handles opt-out, export, and deletion.
 
-Because no new study events can be created in read-only mode, the archive
-backlog cannot grow after entitlement loss. Existing operational events may
+Because no new study events can be created in read-only mode, the pending
+outbox cannot grow after entitlement loss. Existing operational events may
 remain eligible for research transformation until support records opt-out.
 This behavior must be disclosed and reviewed.
 
@@ -484,7 +516,7 @@ Operational safeguards:
 - No public buckets.
 - Short-lived service credentials and audited access.
 - Content checksums and immutable event IDs.
-- Malware/content-size controls for note conflict payloads.
+- Content-size controls for displaced note payloads.
 - Redaction of note content and event payloads from application logs.
 - Backup policies aligned with deletion/retention disclosures.
 
@@ -492,7 +524,7 @@ Client safeguards:
 
 - Do not place account IDs or content in console logs.
 - Do not cache authenticated API responses in the service worker.
-- Keep archive outbox in the isolated account database.
+- Keep the outbox in the isolated account database.
 - Purge it on confirmed local removal or remote deletion.
 - Expose storage pressure rather than silently dropping events.
 
@@ -503,11 +535,13 @@ the browser profile or same-origin code may inspect retained data.
 
 ### Durable sink unavailable
 
-- Return retryable failure without acknowledgement.
-- Keep local events pending.
-- Continue hot sync.
-- Back off independently with jitter.
-- Alert on oldest backend delivery-outbox age and client backlog telemetry.
+R2 being unavailable is now invisible to clients. The fact was already accepted
+and its delivery outbox row is durable.
+
+- Leave the delivery outbox row undelivered.
+- Do not fail or delay sync.
+- Back the worker off with jitter.
+- Alert on oldest undelivered delivery-outbox age.
 
 ### Partial object write or checksum mismatch
 
@@ -537,7 +571,7 @@ the browser profile or same-origin code may inspect retained data.
 
 Track without content:
 
-- local archive backlog count/bytes/oldest age;
+- client pending outbox count/bytes/oldest age;
 - ingest batch count/bytes/latency;
 - duplicate and content-mismatch rates;
 - durable queue/outbox oldest age;
@@ -547,7 +581,7 @@ Track without content:
 - traceable staging age;
 - account deletion completion and SLA breaches;
 - export generation duration/failure;
-- note-conflict displacement count.
+- note merge count and merge-truncation displacement count.
 
 Access to operational/research monitoring must not provide a side channel for
 reading user content.

@@ -9,10 +9,11 @@ boundaries.
 - One request/response protocol converges every hot domain.
 - Client retries are safe after timeouts and unknown responses.
 - No permanent hot event table is required to pull deltas.
+- No tombstone is required to propagate a deletion.
 - New devices can bootstrap large accounts without one unbounded response.
-- Raw archive delivery cannot block hot synchronization.
-- Entitlement, protocol, catalog, and device failures preserve local outboxes.
-- The backend is canonical after it processes a hot operation.
+- Raw archive delivery is a backend concern and cannot block a client.
+- Entitlement, protocol, catalog, and device failures preserve the local outbox.
+- The backend is canonical after it processes an operation.
 
 ## Same-origin transport
 
@@ -38,9 +39,11 @@ GET  /api/auth/session
 POST /api/sync/bootstrap
 GET  /api/sync/bootstrap/page
 POST /api/sync
-
-POST /api/events/batch
 ```
+
+There is no client-facing event endpoint. Raw events arrive as ordinary
+operations inside `POST /api/sync` and the backend fans them out to the
+archive on its own side.
 
 Versioning may appear in the URL or an explicit media type. Every body still
 contains a protocol version so cached proxies and incorrect routes cannot hide
@@ -71,20 +74,28 @@ a mismatch.
   "policy": {
     "policyVersion": "2026-07",
     "noteMaxUtf8Bytes": 10000,
-    "hotSyncMaxOperations": 250,
-    "hotSyncMaxBytes": 524288,
-    "bootstrapPageMaxBytes": 524288,
-    "archiveBatchMaxEvents": 500,
-    "archiveBatchMaxBytes": 1048576,
+    "noteMergedMaxUtf8Bytes": 20000,
+    "syncMaxOperations": 250,
+    "syncMaxBytes": 524288,
+    "bootstrapPageMaxBytes": 262144,
     "reviewRingSize": 8,
     "registeredDeviceLimit": 12,
-    "operationalArchiveRetentionDays": 365
+    "openReviewEntitlementMarginMs": 120000,
+    "rawPracticeEventRetentionDays": 365,
+    "rawReviewEventRetentionDays": null
   }
 }
 ```
 
 Numbers are examples, not decisions. The backend publishes policy values
 within bounds supported by the engine release.
+
+`rawReviewEventRetentionDays` is `null`, meaning retained for the account
+lifetime. Raw review events are the only corpus from which per-user FSRS
+weights could later be fitted; the research dataset is anonymized and cannot
+serve that purpose. Storage cost is not the constraint at this volume, so the
+decision is a disclosure decision rather than an engineering one. Account
+deletion becomes the only path by which review history leaves the system.
 
 The response must not tell a signed-out caller which retained local account
 database to open. Account identity comes only from a valid session or a valid
@@ -97,22 +108,27 @@ A successful first bootstrap registers:
 ```ts
 interface RegisteredDevice {
   deviceId: DeviceId; // random, opaque
-  deviceSlot: DeviceSlot; // small integer, unique within account
-  acceptedHotSequence: number;
-  acceptedArchiveSequence: number;
+  acceptedSequence: number;
   lastSeenAt: UnixMs;
 }
 ```
 
-Device slots are backend-assigned, never client-selected, and not automatically
-reused. The backend publishes a cap. Reaching it returns
-`device_limit_reached`; manual/support retirement is the version-one recovery
-path.
+There is no device slot. Slots existed to partition summary and counter
+components so two devices could not conflict on a shared number. With the
+backend deriving those values from facts, nothing needs partitioning, and slot
+allocation, slot caps, and slot reuse policy are all removed.
 
-This avoids automatically retiring a browser that may still hold unsynced
-offline work. A retired device ID is permanently rejected. A later design may
-migrate only its unsynced deltas to a fresh device slot, but that is not a
-version-one behavior.
+The backend still registers devices, because it needs per-device sequence
+state, and still publishes a cap for abuse control. Reaching it returns
+`device_limit_reached`; manual or support-assisted retirement is the
+version-one recovery path. This avoids automatically retiring a browser that
+may still hold unsynced offline work. A retired device ID is permanently
+rejected.
+
+The cap is no longer coupled to delta correctness. Under the previous design a
+long-offline device kept tombstones alive account-wide, so device retirement
+policy and storage growth were entangled. Soft deletion removes that coupling
+entirely.
 
 ## Paged bootstrap
 
@@ -149,54 +165,53 @@ Proposed response:
   "snapshotRevision": 4812,
   "device": {
     "deviceId": "dev_...",
-    "deviceSlot": 3,
-    "acceptedHotSequence": 0,
-    "acceptedArchiveSequence": 0
+    "acceptedSequence": 0
   },
   "page": {
-    "pageToken": "opaque",
+    "cursor": "opaque",
     "pageNumber": 0,
     "hasMore": true
-  },
-  "manifest": {
-    "schemaVersion": 1,
-    "domains": [
-      "notes",
-      "note_conflicts",
-      "bookmarks",
-      "review_pile_items",
-      "review_cards",
-      "review_settings",
-      "daily_summaries",
-      "challenge_summaries"
-    ]
   }
 }
 ```
 
-Each page contains whole typed entities, a page hash, uncompressed byte count,
-and the next opaque token. A token is bound to account, bootstrap ID, snapshot
-revision, and expiry.
+Each page contains whole typed entities and the next opaque cursor. A cursor is
+bound to account, bootstrap ID, snapshot revision, and expiry.
+
+The cursor is keyset, not offset: a fixed domain order with primary key order
+inside each domain, encoded opaquely. Pages are bounded by
+`bootstrapPageMaxBytes` rather than an entity count, because a long note and a
+bookmark differ in size by two orders of magnitude. One entity is never split
+across pages.
+
+Pages are written directly into the client's live tables while its access state
+is `bootstrapping`, so no staging table, per-page hash, or domain manifest is
+required. See [Local data and domains](./LOCAL-DATA-AND-DOMAINS.md).
+
+A client must treat `hasMore` as mandatory. A client that cannot consume a
+response it does not fully understand must fail loudly rather than activate a
+partial account as though it were complete. This is the single forward
+compatibility rule that matters here, and it is the reason paging is defined in
+version one rather than added later.
 
 ```mermaid
 sequenceDiagram
     participant Engine
     participant API
-    participant Staging as IndexedDBStaging
-    participant Active as ActiveProjection
+    participant DB as AccountDatabase
 
     Engine->>API: Start bootstrap
     API-->>Engine: Bootstrap ID and revision R
-    loop Until no more pages
-        Engine->>API: Get page token
-        API-->>Engine: Entities, hash, next token
-        Engine->>Staging: Verify and persist page
+    Engine->>DB: Create database, access = bootstrapping
+    loop Until hasMore is false
+        Engine->>API: Get page at cursor
+        API-->>Engine: Entities and next cursor
+        Engine->>DB: One transaction: entities plus cursor
     end
-    Engine->>Staging: Verify manifest and counts
-    Engine->>Active: Atomically activate revision R
+    Engine->>DB: Set cursor to R, mark cache active
     Engine->>API: Pull deltas after R
     API-->>Engine: Changes through revision N
-    Engine->>Active: Apply and advance cursor to N
+    Engine->>DB: Apply and advance cursor to N
 ```
 
 ### Snapshot consistency without a long transaction
@@ -206,33 +221,39 @@ The start response captures account revision `R`.
 Pages select current rows whose `server_revision <= R`. If a row changes after
 `R` before its page is read, its current revision is now greater than `R`, so
 the page may omit it. The post-activation delta after `R` returns its newest
-state. If it was deleted, the delta returns its tombstone.
+state. If it was deactivated, the delta returns the row with `active` false.
 
 This yields a convergent snapshot without holding one Postgres transaction
-open across multiple HTTP requests.
+open across multiple HTTP requests. Because deletion is a revision-bumping
+update rather than a row removal, a row deactivated after `R` is delivered by
+the same delta mechanism as any other change.
 
 The bootstrap API must not split one entity across pages. It may split domains
 and may return large revision groups as one bounded exception.
 
-## Unified hot-sync request
+Inactive rows may be omitted from bootstrap pages. A new device does not need
+to know which kanji the account once bookmarked and later removed; absent means
+inactive. Deltas must still carry deactivations, because a device that already
+holds the active row needs to learn it was deactivated.
+
+## Unified sync request
 
 One envelope pushes a contiguous operation batch and pulls canonical changes:
 
 ```ts
-interface HotSyncRequest {
+interface SyncRequest {
   protocol: { major: number; minor: number };
   engineVersion: string;
   catalogVersion: string;
   catalogSha256: string;
   device: {
     deviceId: DeviceId;
-    deviceSlot: DeviceSlot;
   };
   cursor: ServerCursor;
   push: {
     firstSequence: number;
     lastSequence: number;
-    operations: readonly HotOperation[];
+    operations: readonly SyncOperation[];
   } | null;
   pull: {
     maxChangeGroups: number;
@@ -244,25 +265,29 @@ interface HotSyncRequest {
 The operation union is versioned and typed:
 
 ```ts
-type HotOperation =
+type SyncOperation =
+  // State intents, resolved by deterministic LWW or note merge
   | NotePutOperation
   | NoteRemoveOperation
-  | BookmarkSetOperation
+  | BookmarkAddOperation
   | BookmarkRemoveOperation
   | ReviewSettingsUpdateOperation
   | ReviewPileAddOperation
   | ReviewPileRemoveOperation
+  // Immutable facts, from which the backend derives state
   | ReviewGradeOperation
-  | DailySummaryPutOperation
-  | ChallengeSummaryPutOperation;
+  | PracticeActivityEventAddOperation;
 
-interface HotOperationBase {
+interface SyncOperationBase {
   schemaVersion: 1;
   operationId: string;
   deviceSequence: number;
   occurredAt: UnixMs;
 }
 ```
+
+`DailySummaryPutOperation` and `ChallengeSummaryPutOperation` no longer exist.
+A device never sends a summary or a canonical card state.
 
 The request batch must:
 
@@ -276,10 +301,10 @@ The request batch must:
 No generic patch operation is accepted. Every operation has domain-specific
 validation and reduction.
 
-## Unified hot-sync response
+## Unified sync response
 
 ```ts
-interface HotSyncResponse {
+interface SyncResponse {
   protocol: { major: number; minor: number };
   serverTime: UnixMs;
   acceptedThroughSequence: number;
@@ -303,24 +328,30 @@ Entity changes contain complete canonical current rows, not JSON Patch:
 ```ts
 type ServerEntityChange =
   | { type: "note"; value: CanonicalNote }
-  | { type: "note_conflict"; value: CanonicalNoteConflict | Tombstone }
-  | { type: "bookmark"; value: CanonicalBookmark | Tombstone }
-  | { type: "review_pile_item"; value: CanonicalReviewPileItem | Tombstone }
-  | { type: "review_card"; value: CanonicalReviewCard | Tombstone }
+  | { type: "bookmark"; value: CanonicalBookmark }
+  | { type: "review_pile_item"; value: CanonicalReviewPileItem }
+  | { type: "review_card"; value: CanonicalReviewCard }
   | { type: "review_settings"; value: CanonicalReviewSettings }
-  | { type: "daily_summary"; value: CanonicalDeviceDailySummary }
+  | { type: "daily_summary"; value: CanonicalDailySummary }
   | { type: "challenge_summary"; value: CanonicalChallengeSummary };
 ```
 
-The engine stages one response, applies every group transactionally in
-revision order, removes acknowledged outbox rows, and then advances the local
-cursor. A crash before commit safely retries.
+There is no `Tombstone` variant. Every canonical row carries an `active`
+boolean, and a deletion is an ordinary revision-bumping update that sets it
+false. A deactivated row is a complete row like any other.
+
+The engine holds one response in memory, applies every group transactionally in
+revision order, removes acknowledged outbox rows, and advances the local cursor
+in the same transaction. A crash before commit safely retries from the
+unchanged cursor. A staging table is not required: the response is already
+bounded by `syncMaxBytes`, so nothing is gained by persisting it before
+applying it.
 
 ## Server operation transaction
 
 ```mermaid
 flowchart TD
-    Request[HotSyncRequest] --> Auth[ValidateSessionAndEntitlement]
+    Request[SyncRequest] --> Auth[ValidateSessionAndEntitlement]
     Auth --> Compatibility[ValidateProtocolCatalogDevice]
     Compatibility --> Lock[LockAccountAndDeviceSyncRows]
     Lock --> Sequence{SequenceStatus}
@@ -341,12 +372,29 @@ Within one Postgres transaction:
    catalog, scheduler, application, and device.
 2. Lock the account revision row and device sync-state row.
 3. Classify the push as new, exact retry, old retry, or invalid gap.
-4. Apply new operations in sequence.
+4. Apply new operations in sequence. For a fact, this means updating canonical
+   card state, incrementing the derived daily and challenge summaries, and
+   enqueueing the raw event on the transactional delivery outbox.
 5. Allocate a new account revision for each logical operation that changes
    canonical state. All rows changed by that operation share its revision.
-6. Advance `accepted_hot_sequence` only after every operation succeeds.
+6. Advance `accepted_sequence` only after every operation succeeds.
 7. Select pull changes after the request cursor up to a fixed target revision.
 8. Commit and return.
+
+### Derived summaries are exactly-once by construction
+
+Step 6 is what makes step 4's increments safe. An operation at or below
+`accepted_sequence` is skipped in step 3, and the high-water advance commits
+atomically with the increments it authorized. A separate deduplication table is
+not required on the sync path.
+
+This is the property that makes incremental derivation viable at all. Without
+it, `reviews = reviews + 1` would be unsafe under retry and the design would
+be forced back to absolute device-owned snapshots.
+
+Summaries must be incremented into durable tables at ingest. They must never be
+defined as a query over the archive, because summaries persist for the account
+lifetime while other archive classes expire.
 
 The batch is atomic. Engine-generated validation should prevent one malformed
 operation from poisoning an outbox. If the backend nevertheless rejects a
@@ -376,79 +424,136 @@ No permanent change log is needed:
 
 - If one row changed at revisions 11 and 18, returning only its revision-18
   current state is sufficient.
-- A deletion remains as a tombstone until safe garbage collection.
+- A deletion is a revision-bumping update that sets `active` false, so it is
+  selected by the same query as any other change.
 - Pull pagination never splits a change group. The cursor advances only through
   the final complete group in the response.
 - The server captures `targetRevision` before selecting. A row updated after
   that target appears on the next pull.
 
-### Tombstone collection
+### No tombstones, and therefore no tombstone collection
 
-A tombstone may be hard-deleted only when:
+A tombstone is only necessary when a row is physically removed, because a
+removed row cannot be selected by `server_revision > cursor` and an offline
+device would never learn of the deletion.
 
-- every non-retired registered device has acknowledged a cursor later than its
-  revision;
-- no active bootstrap references an earlier snapshot;
-- no domain retention rule requires it;
-- operational archive obligations are satisfied.
+Every hot entity in this design is keyed by a bounded natural key, so no row
+ever needs to be physically removed for a domain reason:
 
-Because devices are not automatically retired, a long-offline device may keep
-tombstones alive. Bounded domain keys and the registered-device policy keep
-this manageable. Review pile generations need special monitoring because a
-single kanji can be removed and re-added repeatedly.
+```text
+notes                (account_id, kanji)
+bookmarks            (account_id, kanji)
+review_pile_items    (account_id, kanji)                 + generation column
+review_cards         (account_id, kanji, card_type)      + generation column
+daily_summaries      (account_id, local_date)
+challenge_summaries  (account_id, activity_type, challenge_id)
+```
+
+Deletion sets `active = false` and bumps the revision. Deltas carry it like any
+other update. This removes, in full:
+
+- the `Tombstone` variant of every entity change;
+- the tombstone garbage collection job;
+- the requirement to track every device's acknowledged cursor before reclaiming
+  a row;
+- the coupling between device retirement policy and storage growth;
+- the unbounded growth of review pile generations, which the previous design
+  flagged as needing "special monitoring" because a kanji can be removed and
+  re-added repeatedly.
+
+A pile item is one row per kanji whose `generation` column increments on
+re-add, not one row per generation. Stale-write protection is preserved,
+because it derives from the generation value carried on an operation rather
+than from row identity.
+
+The cost is that rows are never reclaimed. Bounded by the kanji set, an account
+that bookmarked and un-bookmarked every kanji it ever saw retains a few
+thousand small rows. Deactivated card rows null their `state` and
+`history_window` columns so an inactive card costs tens of bytes.
 
 ## Domain processing
 
 ### Notes
 
 - Compare `baseServerRevision` with the canonical note.
-- A direct descendant becomes canonical.
-- Divergent edits use deterministic LWW.
-- Preserve the loser in the hot conflict slot.
-- Before replacing an occupied hot conflict, durably archive the displaced
-  content according to operational policy.
+- A direct descendant becomes canonical outright.
+- Divergent edits **merge**: the canonical content becomes both texts joined by
+  a rule and an HTML comment marker, ordered by the deterministic tuple
+  `(clampedUpdatedAt, deviceId, deviceSequence)` so every runtime produces
+  byte-identical output. Set `has_merged_edit`.
+- If the merged content would exceed `noteMergedMaxUtf8Bytes`, keep the
+  deterministic winner alone, set `has_merged_edit`, return a
+  `note_merge_truncated` warning, and retain the displaced text in the
+  operational archive for support recovery.
+- An edit beats a concurrent delete. The note stays active with the edited
+  content, because reviving text is recoverable and losing it is not.
+- The next accepted `note_put` for that kanji clears `has_merged_edit`.
+
+No conflict table, no displaced-copy archival inside the sync transaction, and
+no restore or dismiss endpoint. See
+[Local data and domains](./LOCAL-DATA-AND-DOMAINS.md).
 
 ### Bookmarks
 
-- Key by kanji.
-- Store the representative word surface.
-- Apply deterministic LWW to set/remove operations.
-- Keep tombstones for delta correctness.
+- Key by kanji. Store no word.
+- Apply deterministic LWW to add/remove operations.
+- Removal sets `active = false`; the row is retained for delta correctness.
 
 ### Review settings
 
 - Validate against the versioned scheduler schema and narrower backend policy.
-- Resolve divergence by deterministic LWW.
-- Create a new settings version; never mutate an old referenced version.
+- Resolve divergence by deterministic LWW on
+  `(origin, clampedUpdatedAt, deviceId, deviceSequence)`, where `origin` sorts
+  a server-authored write after any device-authored write.
+- Store one current settings row with a monotonic `settings_revision`. There is
+  no historical settings version table: replay applies the winning current
+  settings across its short window, so older versions have no reader.
 - Apply forward only.
 
 ### Review pile and grades
 
-- Add creates one pile generation and exactly two cards.
-- Remove creates generation/card tombstones and wins over concurrent grades.
+- Add creates one pile generation and exactly two cards, and records the
+  representative `word` the cards test.
+- Add for a kanji whose active item already carries the same word is
+  idempotent. Add with a different word is rejected `pile_item_exists`.
+- Two devices adding the same kanji offline with different words: the first
+  accepted wins, the second returns a `pile_item_exists` warning, and the
+  losing device reconciles to the canonical word.
+- Remove deactivates the item and both cards and wins over concurrent grades.
 - Grade operations are immutable facts.
 - Replay exactly when the card ring contains a complete common base.
 - Otherwise use the immediate deterministic LWW fallback.
+- A grade for a deactivated generation is acknowledged so its sequence can
+  advance, does not resurrect card state, and **does** increment the daily
+  summary, because the user performed the review.
 - Return backend-canonical cards and affected summaries.
 
 See [Reviews and FSRS](./REVIEWS-AND-FSRS.md).
 
 ### Daily summaries
 
-- Verify the request device owns `deviceSlot`.
-- Upsert `(account_id, local_date, device_slot)` only when
-  `deviceRevision` increases.
-- Reject counter regression and malformed dates.
-- Do not merge another device's counters into this row.
-- Account aggregate responses sum component rows.
+Derived, never pushed.
+
+- On each accepted fact, upsert `(account_id, local_date)` with the appropriate
+  increment inside the ingest transaction.
+- Widen `first_activity_at` and `last_activity_at`.
+- Append to `time_zones_seen` if the value is new and the list is under bound.
+- Reject malformed dates.
+- Allocate an account revision so the updated summary reaches every device.
 
 ### Challenge summaries
 
-- Upsert `(account_id, activity_type, challenge_id, device_slot)`.
-- Accept only a newer device revision.
-- Validate that the component equals a possible reduction of locally accepted
-  typed values where practical.
-- Account aggregate responses apply documented comparators.
+Derived, never pushed.
+
+- On each accepted practice fact, upsert
+  `(account_id, activity_type, challenge_id)`.
+- Increment `attempt_count`.
+- Replace `latest` when the incoming occurrence is later; break equal times by
+  stable `event_id`.
+- Replace a best record when the incoming value is larger; keep the earlier
+  achievement time on equal values, then stable `event_id`.
+- Every rule above commutes, so a fact arriving a week late from a device that
+  was offline produces the same row as one arriving on time.
 
 ## Postgres hot schema
 
@@ -465,19 +570,18 @@ devices
 device_sync_state
 ```
 
-`device_sync_state` stores accepted hot/archive sequences, latest acknowledged
-cursor, timestamps, and retirement state.
+`device_sync_state` stores the accepted sequence high-water mark, latest
+acknowledged cursor, timestamps, and retirement state. There is one sequence
+space per device.
 
 ### Study data
 
 ```text
 notes
-note_conflicts
 bookmarks
 review_pile_items
 review_cards
 review_settings
-review_settings_versions
 daily_summaries
 challenge_summaries
 ```
@@ -487,23 +591,21 @@ Common columns:
 ```text
 account_id
 server_revision
+active
 created_at
 updated_at
-tombstone or deleted_at where applicable
 ```
 
-Important keys:
+Important keys, all bounded natural keys:
 
 ```text
 notes:                  (account_id, kanji)
-note_conflicts:         (account_id, kanji)
 bookmarks:              (account_id, kanji)
-review_pile_items:      (account_id, pile_item_id), unique active kanji
-review_cards:           (account_id, card_id), unique pile generation + type
+review_pile_items:      (account_id, kanji)                 + generation column
+review_cards:           (account_id, kanji, card_type)      + generation column
 review_settings:        (account_id)
-review_settings_versions:(account_id, settings_version)
-daily_summaries:        (account_id, local_date, device_slot)
-challenge_summaries:    (account_id, activity_type, challenge_id, device_slot)
+daily_summaries:        (account_id, local_date)
+challenge_summaries:    (account_id, activity_type, challenge_id)
 ```
 
 Indexes must support:
@@ -511,8 +613,7 @@ Indexes must support:
 - due cards by account, card type, due instant, and active state;
 - all rows with `server_revision > cursor` across each hot table;
 - daily date ranges;
-- challenge batches;
-- settings versions referenced by current rings.
+- challenge batches.
 
 The backend should query each table's revision index and merge sorted results.
 Do not build a polymorphic permanent change-log table merely to implement the
@@ -520,49 +621,45 @@ cursor.
 
 ## No full hot event table
 
-Review facts arrive through hot sync and raw review events also travel through
-the independent archive outbox. Practice summaries arrive through hot sync and
-raw practice events travel through the archive outbox.
+Facts arrive through sync, update canonical state and derived summaries, and
+are then handed to the archive pipeline. Postgres retains no permanent
+per-review row.
 
-Postgres may use short-lived infrastructure records such as a transactional
-delivery outbox if required for a durable queue. Such rows are bounded,
-monitored, and deleted after delivery; they are not the account's permanent
-review history.
+## Backend-side archive fan-out
 
-## Raw event endpoint
+There is no client-facing event endpoint and no second client sequence space.
+Inside the same transaction that accepts a fact, the backend appends the raw
+event to a **transactional delivery outbox** table. A retrying worker drains
+that table into R2 and deletes delivered rows.
 
-Archive ingestion is independent:
-
-```ts
-interface EventBatchRequest {
-  protocol: { major: number; minor: number };
-  deviceId: DeviceId;
-  firstArchiveSequence: number;
-  lastArchiveSequence: number;
-  events: readonly OperationalArchiveEvent[];
-}
-
-interface EventBatchResponse {
-  acceptedThroughArchiveSequence: number;
-  acceptedEventIds: readonly string[];
-  serverTime: UnixMs;
-}
+```mermaid
+flowchart LR
+    Sync[SyncTransaction] --> Canonical[CanonicalStateAndSummaries]
+    Sync --> Delivery[DeliveryOutboxRow]
+    Delivery --> Worker[RetryingArchiveWorker]
+    Worker --> R2[OperationalArchive]
+    Worker --> Delete[DeleteDeliveredRow]
 ```
 
-The backend acknowledges only after a durable queue or R2 accepts every newly
-acknowledged event. Redis-only buffering is not sufficient. Stable event IDs
-deduplicate retries.
+Properties:
 
-The archive endpoint and hot sync have independent sequence spaces. A review
-event may be hot-accepted before it is archive-accepted or vice versa; both
-paths converge independently.
+- The client's obligation ends at the sync acknowledgement. An R2 outage is a
+  server-side backlog the operator can see and alert on, not a degraded status
+  the browser has to model, expose, and retry.
+- Durability is guaranteed by the same transaction that accepted the fact, so
+  an acknowledged fact can never be lost before it reaches the archive.
+- Delivery outbox rows are bounded infrastructure, monitored by oldest
+  undelivered age, and deleted after verified R2 persistence. They are not the
+  account's permanent review history.
+- Stable event IDs deduplicate at the sink.
+- Redis may accelerate or batch this work but can never be the only copy.
 
 Detailed object layout and research transformation are in
 [Archives and privacy](./ARCHIVES-AND-PRIVACY.md).
 
 ## Sync triggers
 
-The engine schedules hot sync on:
+The engine schedules sync on:
 
 - successful startup with an active account;
 - regained connectivity;
@@ -573,8 +670,6 @@ The engine schedules hot sync on:
 - outbox byte/count threshold;
 - explicit `sync.now()`.
 
-Archive upload uses similar connectivity and threshold triggers.
-
 Do not sync after every grade. The local outbox exists to batch.
 
 `navigator.onLine` is only a hint. A failed request drives actual offline and
@@ -582,8 +677,8 @@ backoff status.
 
 ## Retry and backoff
 
-Retryable failures use capped exponential backoff with jitter. A successful
-request resets the relevant hot or archive backoff independently.
+Retryable failures use capped exponential backoff with jitter. There is one
+backoff, because there is one outbox and one endpoint.
 
 Rules:
 
@@ -601,17 +696,23 @@ Rules:
 
 ## Mid-review pull safety
 
-A sync response may contain a card currently protected by an active local
-review handle. The engine:
+A sync response may contain a card the user currently has open. This needs no
+special handling and no staging table.
 
-1. Stores the server change in a staged inbox.
-2. Does not replace the frozen active-review snapshot.
-3. Accepts the local grade as another immutable fact.
-4. Releases the handle after local grade/cancel.
-5. Applies/reconciles the staged server card and queues/sends the local fact.
-6. Accepts the later backend-canonical state.
+The review handle owns a **frozen in-memory snapshot** of the card and settings
+as they were when the card was opened. The grade is computed from that
+snapshot, and the resulting fact carries it as `priorState`. Nothing about
+grading reads the live projection row.
 
-Other entities in the response may apply immediately.
+The engine therefore applies every change in the response immediately,
+including that card's row. The open card's displayed previews do not change,
+because they came from the frozen snapshot rather than from the row. When the
+user grades, the fact is based on `priorState`, the backend sees an incoming
+branch from a base it recognizes, and replay reconciles the two.
+
+This replaces a staged inbox, a deferred-apply step, and a handle-release
+ordering constraint with one rule: **the handle is the snapshot, the projection
+is free to move.**
 
 ## Redis responsibilities
 
@@ -636,7 +737,7 @@ Redis is not authoritative for:
 R2 stores:
 
 - account-associated operational event objects under retention policy;
-- displaced note conflict copies;
+- note text displaced by a merge that exceeded the merged byte limit;
 - separately transformed research objects;
 - optional export bundles.
 
@@ -658,21 +759,23 @@ The backend must:
 - compare IDs and sequences in constant behavior where practical;
 - redact notes, PINs, cookies, leases, and event payloads from logs;
 - use parameterized SQL and transaction timeouts;
-- rate-limit authentication, bootstrap, sync, and archive endpoints separately.
+- rate-limit authentication, bootstrap, and sync endpoints separately.
 
 ## Observability
 
 Record metrics without note content or direct event payloads:
 
 - bootstrap starts, resumptions, bytes, pages, duration, and failure reason;
-- hot batch count/bytes/latency and operations by kind;
+- sync batch count/bytes/latency and operations by kind;
 - duplicate retry and sequence-gap counts;
 - delta sizes and cursor lag;
 - review replay versus LWW fallback rates;
-- note conflict rates;
-- archive backlog age, durable-ingest latency, and dedupe rate;
+- note merge rate and merge-truncation rate;
+- pile add rejections by `pile_item_exists`;
+- delivery outbox oldest undelivered age and R2 write failures;
 - entitlement/read-only transitions;
-- device-limit and tombstone counts;
+- device-limit counts and inactive-row growth per account;
+- `beginReview` refusals due to the entitlement margin;
 - Postgres transaction retries/deadlocks.
 
 Correlate a request with a random diagnostic/request ID, not an email address.
@@ -688,7 +791,7 @@ flowchart LR
     Browser[StudyEngineBrowser] --> PagesProxy[CloudflarePagesProxy]
     PagesProxy --> FastAPI[FastAPI]
     FastAPI --> Postgres[Postgres]
-    FastAPI --> Durable[DurableArchiveAcceptance]
+    FastAPI --> Durable[TransactionalDeliveryOutbox]
     Durable --> R2[R2]
     FastAPI --> Redis[RedisEphemeral]
 ```

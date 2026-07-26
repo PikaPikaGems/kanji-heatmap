@@ -27,7 +27,7 @@ flowchart TD
     P1 --> P3[Phase3 BrowserRuntimeAndCache]
     P2 --> P4[Phase4 NotesBookmarksVerticalSlice]
     P3 --> P4
-    P4 --> P5[Phase5 ActivityAndOperationalArchive]
+    P4 --> P5[Phase5 PracticeFactsAndDerivedSummaries]
     P4 --> P6[Phase6 LocalFSRS]
     P5 --> P7[Phase7 MultiDeviceReviewSync]
     P6 --> P7
@@ -54,12 +54,14 @@ Research launch is not on the critical path for core StudyEngine.
   - scheduler compatibility fixtures.
 - Select initial backend-published values:
   - entitlement lease policy;
-  - note byte limit;
-  - sync/archive batch limits;
-  - bootstrap page size;
+  - note byte limit and merged-note byte allowance;
+  - sync batch count/byte limits;
+  - bootstrap page byte budget;
   - review ring size;
   - registered-device cap;
-  - operational retention.
+  - `openReviewEntitlementMarginMs`;
+  - operational retention per class, with raw review events at account
+    lifetime.
 - Complete legal/product review of:
   - default research participation;
   - support-only opt-out/export/deletion after entitlement loss;
@@ -86,15 +88,20 @@ Research launch is not on the critical path for core StudyEngine.
   - notes/bookmarks/activity/review public inputs and views;
   - protocol/catalog/scheduler metadata guards.
 - Build pure reducers for:
-  - note LWW/conflict selection;
-  - bookmark set/remove;
-  - device daily summary;
-  - Speed Katakana challenge summary;
-  - settings validation/version selection;
+  - note direct-descendant and divergent merge, including deterministic merge
+    ordering and byte-limit fallback;
+  - bookmark add/remove;
+  - daily summary increments;
+  - Speed Katakana challenge summary comparators;
+  - settings validation and LWW including `origin`;
   - event ordering and stable tie-breaks.
 - Create canonical fixture files for every reducer.
 - Define artifact manifest JSON schema.
 - Define protocol and archive event JSON schemas/OpenAPI components.
+
+The summary reducers exist in both TypeScript and Python and must agree. They
+do not need FSRS-level fixture strictness, because a client projection is
+optimistic and is overwritten by the next server value.
 
 ### Important constraints
 
@@ -156,15 +163,17 @@ Research launch is not on the critical path for core StudyEngine.
 - `kh-study-engine/core` and `kh-study-engine/browser` entrypoints.
 - Explicit browser factory/config validation.
 - Metadata DB and isolated per-account Dexie DB.
-- Two-total-account LRU cache behavior.
+- Two-total-account cache behavior. At a limit of two there is one inactive
+  cache, so no recency ordering is needed.
 - Offline signed-lease validation and persisted monotonic time guard.
 - Engine status store and generic query-store implementation.
 - Cross-tab:
   - live query propagation;
   - account mutation/sync lock;
-  - BroadcastChannel notifications;
-  - IndexedDB lease fallback.
-- Hot/archive outbox primitives.
+  - BroadcastChannel notifications, including the best-effort
+    `{ reviewing: cardId }` hint.
+- Single outbox primitives.
+- Projection rebuild rule: server value plus replayed pending operations.
 - storage estimate/persistence API.
 - migration lock/failure behavior.
 - logout prepare/confirmation/keep/remove/offline-revocation flow.
@@ -173,11 +182,13 @@ Research launch is not on the critical path for core StudyEngine.
 
 - Two tabs cannot allocate duplicate sequences.
 - Signed-out queries cannot read retained account data.
-- Third-account activation evicts only the least-recently-used safe inactive
-  cache.
+- Third-account activation displaces the inactive cache, and refuses only when
+  that cache holds pending operations.
 - Migration failure preserves the DB and reports a diagnostic.
 - Pending-data logout requires confirmation before deletion.
 - Browser restart recovers pending outbox rows.
+- A server value landing while operations are pending neither double-counts nor
+  drops them.
 
 ## Phase 4: notes and bookmarks vertical slice
 
@@ -185,73 +196,87 @@ This is the first complete backend-to-host-independent sync slice.
 
 ### Backend deliverables
 
-- `notes`, `note_conflicts`, and `bookmarks` tables.
-- Account-revision allocation, row revisions, tombstones, and delta selection.
-- Paged bootstrap containing these domains.
+- `notes` and `bookmarks` tables with `active` flags.
+- Account-revision allocation, row revisions, and delta selection with no
+  tombstones.
+- Paged bootstrap containing these domains, with a keyset cursor and a byte
+  budget.
 - Unified `/sync` with contiguous device sequences.
-- Note direct-descendant and divergent LWW/conflict behavior.
-- Bookmark set/remove behavior.
-- Tombstone collection guardrails.
+- Note direct-descendant and divergent merge behavior, including merge-byte
+  fallback.
+- Bookmark add/remove behavior.
 
 ### Engine deliverables
 
 - Note and bookmark repositories/query stores.
 - UTF-8 note limit validation.
-- Local mutation + hot outbox transactions.
-- Bootstrap staging/activation.
-- Push/pull sync, retries, cursor application.
-- Hot note conflict restore/dismiss.
+- Local mutation + single-outbox transactions.
+- Paged bootstrap into live tables under the bootstrapping access gate,
+  including the mandatory hard failure on an unconsumable `hasMore`.
+- Push/pull sync, retries, cursor application in one transaction.
+- `hasMergedEdit` surfacing.
 
 ### Convergence scenarios
 
 - Same operation retried after unknown timeout.
-- Note edited on two offline devices.
-- Note deleted on one device and edited on another.
-- Bookmark set/remove race.
+- Note edited on two offline devices, producing a byte-identical merge on both.
+- Merge that exceeds the merged byte limit.
+- Stale editor saves over a newer note.
+- Note deleted on one device and edited on another; the edit wins.
+- Bookmark add/remove race.
 - Client offline across multiple server revisions.
 - Bootstrap row changes after snapshot revision.
+- Bootstrap interrupted mid-page and resumed.
 - Pull response crash before/after cursor commit.
 
 ### Exit gate
 
 - Every scenario converges deterministically.
+- Two runtimes produce byte-identical merged note content from the same pair of
+  edits.
 - No note content appears in logs.
 - A signed-out/lapsed user gets the specified locked/read-only behavior.
-- No permanent server change-log table is required.
+- No permanent server change-log table and no tombstone collection job is
+  required.
+- A partially bootstrapped account is never observable as an empty account.
 
-## Phase 5: activity summaries and operational archive
+## Phase 5: practice facts, derived summaries, and the archive fan-out
 
 ### Deliverables
 
 - Typed version-one practice event union.
-- Local reducers for:
-  - per-device daily summaries;
-  - all-time/range views;
-  - Speed Katakana challenge components.
-- Daily/challenge Postgres tables and unified hot-sync operations.
-- Archive outbox and `/events/batch`.
-- Durable acceptance through selected queue/R2/outbox mechanism.
+- `practice_activity_event_add` operation, client and server.
+- Backend derivation at ingest into durable `daily_summaries` and
+  `challenge_summaries` tables, inside the transaction that advances the device
+  sequence high-water mark.
+- Matching TypeScript reducers for optimistic local projection.
+- All-time and range views over derived daily rows.
+- Transactional delivery outbox and retrying R2 worker.
 - Operational object schema, compression, checksums, and lifecycle metadata.
 - Account export/deletion primitives for retained operational data.
-- Backlog status and storage-pressure warnings.
+- Storage-pressure warnings on the single outbox.
 
 ### Critical scenarios
 
-- Two devices contribute to one local date.
-- One batch retries after durable acceptance but before response.
-- Hot summary sync succeeds while archive ingest fails.
-- Archive sequence gap.
-- Same event ID arrives with different content.
-- Lapsed entitlement preserves backlog.
+- Two devices contribute activity to one local date.
+- A batch retries after acceptance but before the response is received; the
+  increments must not apply twice.
+- A fact arrives a week late from a long-offline device and produces the same
+  challenge row as an on-time arrival.
+- R2 unavailable while sync continues normally.
+- Same event ID reaches the sink twice.
+- Lapsed entitlement preserves the pending outbox.
 - Account deletion rejects an old returning device.
 
 ### Exit gate
 
-- Account aggregate equals the sum/reduction of device components.
-- Retried archive events materialize once.
-- Redis loss cannot lose an acknowledged event.
-- Archive outage does not block hot sync.
-- Local quota failure never reports a successful event write.
+- A retried batch produces identical summary values, proving exactly-once
+  increments come from the sequence high-water mark.
+- Derived summaries are never computed by querying the archive.
+- Redis loss cannot lose an accepted fact.
+- An R2 outage is invisible to the client and visible in delivery-outbox age.
+- Local quota failure never reports a successful write.
+- A grade for a deactivated generation still increments the daily summary.
 
 ## Phase 6: local FSRS and review UX contract
 
@@ -260,17 +285,19 @@ This is the first complete backend-to-host-independent sync slice.
 - Versioned kanji catalog artifact/hash.
 - FSRS card/settings plain schemas and adapters.
 - Pinned `ts-fsrs` version.
-- Pile add/remove/re-add generation behavior.
+- Pile add/remove/re-add generation behavior on bounded natural keys.
+- Pile item `word`, idempotent same-word add, `pile_item_exists` on a different
+  word, and atomic `replaceWord`.
 - Reading/writing due indexes and query stores.
-- `beginReview` frozen handle and cross-tab review lease.
+- `beginReview` in-memory frozen handle, the entitlement margin check, and the
+  best-effort `BroadcastChannel` reviewing hint.
 - Four canonical rating previews.
 - Local grade transaction:
   - provisional card;
-  - card/device counters;
-  - daily review summary;
-  - hot grade operation;
-  - raw archive event.
-- Forward-only settings update.
+  - card counters;
+  - optimistic daily review summary;
+  - one `review_grade` operation.
+- Forward-only settings update on a monotonic `settingsRevision`.
 
 ### Compatibility artifacts
 
@@ -288,9 +315,12 @@ This is the first complete backend-to-host-independent sync slice.
 
 - New pile item always has exactly two fresh cards.
 - Due order is stable by due instant/card ID.
-- Two tabs cannot open the same card.
-- A handle grades once and freezes previews through sync notification.
-- Mid-handle entitlement expiry allows exactly one grade.
+- A handle grades once; a second call returns `review_handle_consumed`.
+- Previews do not change when a server card update applies to the open card's
+  row.
+- `beginReview` refuses a card whose lease expires within the margin, and
+  `grade` has no entitlement exception.
+- `replaceWord` is atomic: a failure leaves the original pile item intact.
 - Removal/re-add cannot apply a stale grade to a new generation.
 
 ## Phase 7: backend FSRS and multi-device review sync
@@ -343,12 +373,14 @@ Simulate devices with independently controlled clocks, cursors, and delivery:
 - Add access/unavailable/signed-out/read-only/bootstrap/recovery UI.
 - Replace host localStorage behavior for:
   - notes;
-  - bookmarks;
+  - bookmarks, dropping `word` from the key and from `isBookmarked`;
   - daily activity;
   - Speed Katakana challenge statistics;
   - reading/writing practice activity.
 - Connect dashboard query stores.
 - Add review settings/pile/reading/writing screens as separate components.
+- Implement the host copy and flows in
+  [Scenarios and UX](./SCENARIOS-AND-UX.md).
 - Implement logout remove checkbox/info and pending-data confirmation.
 - Add versioned, exact-key localStorage cleanup with no migration.
 
@@ -467,7 +499,8 @@ No single test level is sufficient.
 
 - Reorder, duplicate, drop, timeout, and retry requests.
 - Crash before/after local/server commits.
-- Cursor pagination and tombstones.
+- Cursor pagination and deactivation propagation.
+- Bootstrap paging, resume, and refusal of an unconsumable `hasMore`.
 - offline lease/session transitions.
 - device cap and retired device rejection.
 
@@ -497,7 +530,6 @@ backend protocol min/max
 catalog version/hash
 scheduler schema/algorithm version
 practice event schema versions
-archive schema version
 IndexedDB schema version
 artifact source commit and hashes
 ```
@@ -516,12 +548,13 @@ Before broad rollout, dashboards/alerts exist for:
 - auth request/verify/rate-limit health;
 - entitlement lease issuance/expiry anomalies;
 - bootstrap duration/failure;
-- hot sync latency, retries, gaps, cursor lag;
+- sync latency, retries, gaps, cursor lag;
 - review replay/fallback rates;
-- archive backlog and durable-ingest delay;
+- note merge and merge-truncation rates;
+- delivery outbox oldest undelivered age;
 - IndexedDB migration/lock failures;
 - runtime unavailable binding in official production;
-- device/tombstone growth;
+- device count and inactive-row growth per account;
 - account deletion/export completion.
 
 No dashboard dimension uses note content, email, raw account ID, or full raw
@@ -552,7 +585,7 @@ frequency monitoring, and natural future-review correction.
 
 ### Browser storage loss/pressure
 
-Risk: browser evicts data or archive backlog fills quota.
+Risk: browser evicts data or a long-offline outbox fills quota.
 
 Mitigation: backend sync, persistence request, storage estimates/warnings, no
 silent write success, compact acknowledged/staging data.
@@ -579,12 +612,18 @@ Risk: app build executes downloaded engine code/dependency scripts.
 Mitigation: verified prebuilt ESM, no install/postinstall, safe extraction,
 manifest/file hashes, immutable commit, fail required production.
 
-### Device-slot/tombstone growth
+### Registered device growth
 
-Risk: reset browsers accumulate slots and prevent tombstone collection.
+Risk: reset browsers accumulate device registrations.
 
 Mitigation: backend cap, manual retirement, monitoring; do not auto-retire a
 possibly offline device in version one.
+
+This risk shrank considerably. Under the previous design a long-offline device
+also kept tombstones alive account-wide, so device retirement policy and
+storage growth were entangled and pile generations needed dedicated
+monitoring. Soft deletion on bounded natural keys removes that coupling: a
+stale device registration now costs one small row and nothing else.
 
 ## Definition of core launch-ready
 
@@ -595,7 +634,7 @@ Core launch is ready only when:
 - backend authority and read-only transitions work;
 - production artifact verification is mandatory;
 - migrations preserve unsynced data;
-- archive durable acceptance is operating;
+- the archive delivery outbox drains reliably and is monitored;
 - NoEngine default build remains healthy;
 - privacy/legal copy accurately describes operational data;
 - research is either fully approved or disabled;

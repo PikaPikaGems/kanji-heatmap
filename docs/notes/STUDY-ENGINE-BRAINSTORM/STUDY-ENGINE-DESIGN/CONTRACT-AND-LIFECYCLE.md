@@ -46,12 +46,16 @@ export type IanaTimeZone = string;
 
 export type AccountId = string;
 export type DeviceId = string;
-export type DeviceSlot = number;
 export type Kanji = string;
 export type CardId = string;
-export type PileItemId = string;
 export type ServerCursor = string;
 ```
+
+`CardId` is an opaque handle the host passes back to `beginReview`. It is
+derived from `(kanji, cardType, generation)` rather than being an independent
+identity, so no separate ID column is required. `DeviceSlot` and `PileItemId`
+no longer exist: slots were only needed to partition per-device counters, and
+pile items are keyed by kanji with `generation` as a column.
 
 Runtime validation must reject invalid date strings, non-finite timestamps,
 multi-scalar kanji identifiers, invalid time zones, and identifiers outside
@@ -85,7 +89,7 @@ export type StudyError =
   | { code: "validation_failed"; fields: Record<string, string> }
   | { code: "unsupported_kanji"; kanji: string }
   | { code: "stale_revision"; entity: string }
-  | { code: "review_already_open"; cardId: CardId }
+  | { code: "pile_item_exists"; kanji: Kanji; currentWord: string }
   | { code: "review_handle_expired" }
   | { code: "review_handle_consumed" }
   | { code: "review_generation_deleted" }
@@ -194,8 +198,8 @@ export interface BrowserStudyEngineConfig {
   };
   localPolicy?: {
     maximumTotalAccountCacheCount?: number; // default 2
-    activeReviewLeaseMs?: number;
-    archiveBacklogWarningBytes?: number;
+    activeReviewHandleMs?: number;
+    openReviewEntitlementMarginMs?: number; // default 120_000
   };
   adapters?: {
     fetch?: typeof globalThis.fetch;
@@ -246,16 +250,12 @@ export interface NotesApi {
   watch(kanji: Kanji): QueryStore<KanjiNoteView | null>;
   put(input: PutNoteInput): Promise<Result<KanjiNoteView>>;
   remove(input: RemoveNoteInput): Promise<Result<void>>;
-  restoreConflict(
-    input: RestoreNoteConflictInput
-  ): Promise<Result<KanjiNoteView>>;
-  dismissConflict(input: DismissNoteConflictInput): Promise<Result<void>>;
 }
 
 export interface BookmarksApi {
   watchAll(): QueryStore<readonly KanjiBookmark[]>;
   watch(kanji: Kanji): QueryStore<KanjiBookmark | null>;
-  set(input: SetBookmarkInput): Promise<Result<KanjiBookmark>>;
+  add(kanji: Kanji): Promise<Result<KanjiBookmark>>;
   remove(kanji: Kanji): Promise<Result<void>>;
 }
 
@@ -328,18 +328,19 @@ export interface LogoutOutcome {
   serverRevocation: "completed" | "pending";
 }
 
-export interface NoteConflictView {
-  losingContent: string;
-  createdAt: UnixMs;
-  canonicalServerRevision: number;
-}
-
 export interface KanjiNoteView {
   kanji: Kanji;
   content: string;
   updatedAt: UnixMs;
   serverRevision?: number;
-  conflict: NoteConflictView | null;
+
+  /**
+   * True when the backend merged a divergent edit into `content`. The host
+   * should surface a dismissible hint so the user knows to clean up the
+   * merged text. Cleared by the next successful `put`.
+   */
+  hasMergedEdit: boolean;
+  mergedAt?: UnixMs;
 }
 
 export interface PutNoteInput {
@@ -353,33 +354,15 @@ export interface RemoveNoteInput {
   expectedServerRevision?: number;
 }
 
-export interface RestoreNoteConflictInput {
-  kanji: Kanji;
-  expectedCanonicalServerRevision: number;
-}
-
-export interface DismissNoteConflictInput {
-  kanji: Kanji;
-  expectedCanonicalServerRevision: number;
-}
-
 export interface KanjiBookmark {
   kanji: Kanji;
-  word: string;
   updatedAt: UnixMs;
   serverRevision?: number;
 }
 
-export interface SetBookmarkInput {
-  kanji: Kanji;
-  word: string;
-  expectedServerRevision?: number;
-}
-
 export interface ActivityWrite {
   eventId: string;
-  hotSync: "pending";
-  archive: "pending";
+  sync: "pending";
 }
 
 export interface DailySummaryRange {
@@ -506,7 +489,6 @@ export interface StudyEngineSnapshot {
   phase: "starting" | "ready" | "faulted" | "disposed";
   access: AccessSnapshot;
   sync: SyncSnapshot;
-  archive: ArchiveSnapshot;
   storage: {
     persisted: boolean | "unknown";
     pressure: "normal" | "warning" | "critical";
@@ -555,14 +537,15 @@ export type AccessSnapshot =
 `dataRevision` is a cheap coarse invalidation indicator. Domain query stores
 remain the source for entity data.
 
-`sync` and `archive` are independent because hot data may converge while raw
-event archival is degraded:
+There is one synchronization status because there is one outbox and one
+acknowledgement path. Archive delivery happens on the backend and cannot be
+degraded independently from the browser's point of view:
 
 ```ts
 export type SyncSnapshot =
-  | { kind: "idle"; pendingHotOperations: number }
-  | { kind: "offline"; pendingHotOperations: number }
-  | { kind: "syncing"; pendingHotOperations: number; startedAt: UnixMs }
+  | { kind: "idle"; pendingOperations: number }
+  | { kind: "offline"; pendingOperations: number }
+  | { kind: "syncing"; pendingOperations: number; startedAt: UnixMs }
   | {
       kind: "blocked";
       reason:
@@ -570,24 +553,13 @@ export type SyncSnapshot =
         | "protocol_incompatible"
         | "device_limit_reached"
         | "device_retired";
-      pendingHotOperations: number;
+      pendingOperations: number;
     }
   | {
       kind: "error";
-      pendingHotOperations: number;
+      pendingOperations: number;
       retryAt?: UnixMs;
       diagnosticId: string;
-    };
-
-export type ArchiveSnapshot =
-  | { kind: "idle"; pendingEvents: number; pendingBytes: number }
-  | { kind: "uploading"; pendingEvents: number; pendingBytes: number }
-  | { kind: "offline"; pendingEvents: number; pendingBytes: number }
-  | {
-      kind: "degraded";
-      pendingEvents: number;
-      pendingBytes: number;
-      retryAt?: UnixMs;
     };
 ```
 
@@ -731,26 +703,54 @@ and locks domain queries even if a stale local lease remains.
 
 ## Mid-action expiry
 
-- A review handle opened while writable carries a short authorization grant.
-  It may grade exactly once before the handle expires, even if the entitlement
-  lease crosses its expiry while the card is open.
-- Opening another card, saving a note, changing a bookmark, changing settings,
-  adding/removing a pile item, or recording practice after expiry fails
-  `read_only`.
+The write gate has **no exceptions**. Every study mutation, including `grade`,
+requires a currently valid entitlement lease.
+
+An earlier draft of this design allowed one grade to complete after the lease
+expired mid-card. That was removed. It carved a special case into the most
+security-relevant gate in the system, made invariant 5 untrue as written, and
+protected at most one card grade in an event that occurs roughly once per
+account lifetime with a low probability of landing inside the few seconds a
+card is open.
+
+The case is engineered out at the other end instead:
+
+```ts
+// beginReview, before any state is snapshotted
+const OPEN_REVIEW_ENTITLEMENT_MARGIN_MS = 120_000; // policy constant
+
+if (lease.expiresAt - now < OPEN_REVIEW_ENTITLEMENT_MARGIN_MS) {
+  return err({ code: "read_only", reason: "entitlement_expired" });
+}
+```
+
+Consequences:
+
+- A card the user cannot finish is never opened, so no recall effort is ever
+  wasted. The user is told before they think about the card, not after.
+- The last margin-width slice of a lease cannot open a new card. For an online
+  user this never occurs, because contact refreshes the lease continuously.
+- Saving a note, changing a bookmark, changing settings, adding or removing a
+  pile item, and recording practice all fail `read_only` after expiry, exactly
+  as `grade` does.
+- Session revocation (`401`) is treated the same way. There is no carve-out for
+  an open card.
 - An unsaved note draft belongs to the host. StudyEngine never claims it was
   persisted.
 
 ## Logout and retained caches
 
-The host presents a checked-by-default “Remove data from this device” option.
-The contract requires the host to pass the choice explicitly.
+The host presents a “Remove data from this device” option and must pass the
+choice explicitly. The host owns the default. Checked-by-default is right for a
+personal device; on a shared computer it destroys the retained sibling cache
+that the two-cache policy exists to provide, so the host should offer a shared
+computer affordance instead. See
+[Scenarios and UX](./SCENARIOS-AND-UX.md).
 
 ```ts
 export interface LogoutImpact {
-  pendingHotOperations: number;
-  pendingArchiveEvents: number;
+  pendingOperations: number;
   pendingBytes: number;
-  hasUnresolvedNoteConflict: boolean;
 }
 
 export interface LogoutInput {
@@ -792,7 +792,11 @@ Logout behavior:
 - A confirmed backend account deletion always purges without a local
   preservation choice.
 - A different login may retain the prior inactive cache, subject to the
-  two-total-cache LRU policy.
+  two-total-cache limit. Because the limit is two, there is only ever one
+  inactive cache, so eviction needs no recency ordering: a third account
+  displaces the single inactive cache. A locked cache resists displacement
+  only while it holds pending operations; a locked cache with nothing pending
+  is broken, not precious, and is removed.
 
 ## Fault behavior
 

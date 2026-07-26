@@ -405,9 +405,16 @@ integration should:
 - keep editor draft as host UI state;
 - call `notes.put` at an explicit save/debounce boundary;
 - use the backend-published byte limit;
-- render conflict recovery/dismissal;
+- show a dismissible hint when `hasMergedEdit` is set, and render the merge
+  separator visibly in the editor;
+- warn before saving when the canonical note changes underneath an open editor
+  with unsaved changes;
 - sanitize Markdown in the host;
 - remove localStorage warning/calls for this feature.
+
+There is no conflict recovery screen. Divergent edits merge into the note, so
+the resolution surface is the editor itself. See
+[Scenarios and UX](./SCENARIOS-AND-UX.md) scenarios 8 through 10.
 
 ### Bookmarks
 
@@ -419,9 +426,29 @@ src/hooks/use-bookmarked-kanji.ts
 src/components/sections/KanjiDetails/KanjiWordStatusActions.tsx
 ```
 
-The host passes `{ kanji, word }` to `bookmarks.set` and enriches returned
-kanji with its own lookup data. One kanji has one bookmark/word surface.
+The host calls `bookmarks.add(kanji)` and `bookmarks.remove(kanji)` and
+enriches returned kanji with its own lookup data. A bookmark carries no word.
 Dashboard classification remains host logic.
+
+This is a behavior change with a concrete fix attached. Today
+`bookmarkStorageKey(kanji, word)` produces `b:<kanji>:<word>`, where `word`
+comes from `useKanjiRepresentativeWord`, and `buildPracticeDeck` filters with
+`isBookmarked(kanji, word)` using whatever the provider returns at that moment.
+A data update that changes a kanji's representative word therefore orphans
+every existing bookmark for that kanji: the key stops matching and the bookmark
+silently disappears from the "bookmarked only" practice filter. Removing `word`
+from the key removes the failure mode.
+
+Host changes required:
+
+```text
+src/lib/bookmarks.ts              isBookmarked(kanji), key by kanji only
+src/hooks/use-bookmarked-kanji.ts parse b:<kanji>, or read the engine store
+src/components/shared-practice/build-deck.ts
+                                  isBookmarked(kanji) at line 28
+src/components/sections/KanjiDetails/KanjiWordStatusActions.tsx
+                                  MarkAsKnownBadge takes kanji only
+```
 
 ### Practice activity
 
@@ -436,8 +463,10 @@ src/components/shared-practice/use-practice-session.ts
 ```
 
 The integration emits one typed completion event at the existing completion
-boundary. StudyEngine atomically updates the device-owned summary and archive
-outbox. Hosts do not calculate a second persistent count.
+boundary. StudyEngine writes one outbox operation and an optimistic local
+projection in the same transaction; the backend derives the canonical daily and
+challenge summaries from that fact. Hosts do not calculate a second persistent
+count.
 
 ### Dashboard
 
@@ -469,11 +498,21 @@ screens for:
 - review settings;
 - reading queue/session;
 - writing queue/session;
-- pile management;
-- note conflict recovery if presented near reviews.
+- pile management, including the destructive word-replacement confirmation.
 
 Do not build one variant-driven “study screen” containing every phase. Route
 phases through explicit components and linear early returns.
+
+Review session hosts must:
+
+- call `cancel(handleId)` in review screen teardown;
+- treat `review_handle_consumed` as a no-op rather than an error;
+- disable rating buttons on first press;
+- handle `pile_item_exists` by confirming the destructive word replacement and
+  then calling `replaceWord`, never by calling `remove` and `add` separately.
+
+Every review scenario and its proposed copy is in
+[Scenarios and UX](./SCENARIOS-AND-UX.md).
 
 ## Removal of old localStorage data
 
@@ -508,9 +547,17 @@ The host implements:
 - generic errors/rate limits;
 - bootstrap progress;
 - entitlement/read-only notice;
-- logout checkbox checked by default;
+- a “Remove my study data from this computer” logout checkbox;
 - “What is this?” explanation;
 - pending-data discard confirmation.
+
+The logout checkbox default is a host decision, not an engine one. Check it by
+default on what looks like a personal device; leave it **unchecked** once a
+second account cache exists, because checking it destroys the retained sibling
+cache that the two-cache policy exists to provide. See
+[Scenarios and UX](./SCENARIOS-AND-UX.md) scenario 15, which also covers what
+the host may and may not claim about privacy between two people sharing one
+browser profile.
 
 The engine supplies state and typed results, not copy.
 
@@ -552,12 +599,12 @@ Kanji Heatmap may report redacted metrics:
 - engine initialization failure and diagnostic ID;
 - access-state counts;
 - bootstrap progress/failure;
-- hot/archive backlog sizes;
+- pending outbox size;
 - protocol/catalog incompatibility;
 - storage pressure;
 - runtime engine version/commit.
 
-Never report note content, bookmark word, PIN, cookie, signed lease, or raw
+Never report note content, pile item word, PIN, cookie, signed lease, or raw
 event payload.
 
 An official deployed build expected to include StudyEngine should alert if the
