@@ -1,10 +1,9 @@
 # StudyEngine in One Sitting
 
 This is the short version of the nine documents beside it. It is written for
-someone
-who needs to know what StudyEngine is, what it exposes, how the app will use it,
-what happens under the hood, and what the data looks like — without reading the
-specifications that own each of those.
+someone who needs to know what StudyEngine is, what it exposes, how the app will
+use it, what happens under the hood, and what the data looks like — without
+reading the specifications that own each of those.
 
 Where this document and a topic document disagree, the topic document wins.
 Every link below points at the authority for that subject.
