@@ -192,7 +192,7 @@ flowchart TD
     Kind -->|unavailable| Hide[HostHidesOrPaywallsFeature]
     Kind -->|available| Create[createBrowserEngine]
     Create --> Start[engine.start]
-    Start --> Access{snapshot.access.kind}
+    Start --> Access{"snapshot.access.kind"}
     Access -->|signed_out| SignIn[ShowPinSignIn]
     Access -->|bootstrapping| Progress[ShowFirstSyncProgress]
     Access -->|read_only| Paywall[ReadableButNoWrites]
@@ -221,13 +221,13 @@ Scheduling belongs to `/reading-reviews` and `/writing-reviews`.
 ```mermaid
 sequenceDiagram
     participant User
-    participant Route as /reading-practice
+    participant Route as "/reading-practice"
     participant Engine
     User->>Route: Completes a round
     Route->>Route: Show end screen (host state, unchanged)
-    Route->>Engine: activity.record({ type: "reading_practice_round_completed", … })
-    Engine-->>Route: { eventId } — already durable in IndexedDB
-    Note over Engine: Optimistic daily summary updated; one outbox row queued
+    Route->>Engine: activity.record round completed
+    Engine-->>Route: eventId already durable in IndexedDB
+    Note over Engine: Optimistic daily summary updated, one outbox row queued
 ```
 
 The call is fire-and-forget from the user's point of view: it never blocks the
@@ -296,19 +296,19 @@ The engine owns no session queue. A session is a host loop over three calls:
 ```mermaid
 sequenceDiagram
     participant User
-    participant Route as /reading-reviews
+    participant Route as "/reading-reviews"
     participant Engine
-    Route->>Engine: getDue({ cardType: "reading", limit: 20 })
-    Engine-->>Route: DueCard[] (cardId, kanji, dueAt, revision)
+    Route->>Engine: getDue reading limit 20
+    Engine-->>Route: DueCard list
     loop each card
-        Route->>Engine: beginReview({ cardId, expectedRevision })
-        Engine-->>Route: ActiveReview — word, and 4 frozen previews
-        Note over Route: Show 日 / 日本 and "Good → 4 days" on the buttons
+        Route->>Engine: beginReview with expectedRevision
+        Engine-->>Route: ActiveReview with word and 4 frozen previews
+        Note over Route: Show previews on the rating buttons
         User->>Route: taps Good
-        Route->>Engine: grade({ handleId, rating: "good" })
-        Engine-->>Route: GradeOutcome (committed locally)
+        Route->>Engine: grade handleId rating good
+        Engine-->>Route: GradeOutcome committed locally
     end
-    Route->>Engine: sync.now("review_session_ended")
+    Route->>Engine: sync.now review_session_ended
 ```
 
 Host rules that matter:
@@ -399,7 +399,7 @@ them to distrust sync.
 ```mermaid
 flowchart TD
     Cmd[DomainCommand] --> Gate{WritableAccess}
-    Gate -->|no| Err[ReturnTypedError read_only auth_required]
+    Gate -->|no| Err["ReturnTypedError read_only / auth_required"]
     Gate -->|yes| Valid[ValidateInputAndPolicy]
     Valid --> Tx[OneDexieTransaction]
     Tx --> Read[ReadCurrentProjection]
@@ -412,7 +412,6 @@ flowchart TD
     Commit --> Notify[WakeQueryStoresScheduleSync]
     Notify --> Ok[ReturnLocalSuccess]
 ```
-
 The projection and the operation that will synchronize it commit **together**.
 That is what makes "durable before success" true, and what makes a crash between
 them impossible. No network call ever happens inside the transaction, because
@@ -425,15 +424,15 @@ sequenceDiagram
     participant Engine
     participant API
     participant PG as Postgres
-    Engine->>API: POST /api/sync { cursor, push: ops N..M, pull: limits }
-    API->>PG: BEGIN; lock account revision + device sync row
-    Note over PG: classify push: new / exact retry / old retry / gap
+    Engine->>API: POST /api/sync with cursor push and pull
+    API->>PG: BEGIN then lock account revision and device sync row
+    Note over PG: classify push as new, exact retry, old retry, or gap
     PG->>PG: apply ops in sequence order, allocate revisions
     PG->>PG: derive summaries, update cards, queue archive delivery
     PG->>PG: advance accepted_sequence to M
-    PG->>PG: select rows with server_revision > cursor
-    API-->>Engine: { acceptedThroughSequence, cursor', changeGroups[] }
-    Engine->>Engine: ONE Dexie tx: apply all groups + advance cursor + drop acked ops
+    PG->>PG: select rows with server_revision greater than cursor
+    API-->>Engine: acceptedThroughSequence, new cursor, changeGroups
+    Engine->>Engine: one Dexie tx apply groups, advance cursor, drop acked ops
 ```
 
 Three things make this safe with no extra machinery:
@@ -471,7 +470,7 @@ updates.
 
 ```mermaid
 flowchart TD
-    Put[note_put with baseServerRevision] --> Cmp{base == canonical?}
+    Put[note_put with baseServerRevision] --> Cmp{"base == canonical?"}
     Cmp -->|yes| Replace[ReplaceOutright]
     Cmp -->|no| Merge[ConcatenateBothTexts]
     Merge --> Order["order by (clampedUpdatedAt, deviceId, deviceSequence)"]
@@ -529,13 +528,13 @@ sequenceDiagram
     participant DB
     Engine->>API: POST /api/sync/bootstrap
     API-->>Engine: bootstrapId, snapshotRevision R
-    Engine->>DB: create database, access = "bootstrapping"
+    Engine->>DB: create database, access bootstrapping
     loop while hasMore
-        Engine->>API: GET /api/sync/bootstrap/page?cursor=…
-        API-->>Engine: entities (rows with server_revision <= R) + next cursor
+        Engine->>API: GET bootstrap page with cursor
+        API-->>Engine: entities up to revision R plus next cursor
         Engine->>DB: one transaction, straight into the live tables
     end
-    Engine->>DB: set cursor = R, mark cache active
+    Engine->>DB: set cursor to R, mark cache active
     Engine->>API: pull deltas after R
 ```
 
