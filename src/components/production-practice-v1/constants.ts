@@ -7,6 +7,10 @@ import { ProductionPracticeSettings } from "./types";
 export const SESSION_SIZE = PRACTICE_SESSION_SIZE;
 /** Look-alike grid size: always 4×3. */
 export const CANDIDATE_COUNT = 12;
+/** Fixed distractor split (target takes the 12th slot): db similars... */
+export const SIMILAR_SEED_COUNT = 6;
+/** ...and recognizer top guesses fill the rest. */
+export const MODEL_SEED_COUNT = CANDIDATE_COUNT - 1 - SIMILAR_SEED_COUNT;
 /** Ranks that count as “in top 10” for session scoring. */
 export const GRADE_TOP_K = 10;
 /**

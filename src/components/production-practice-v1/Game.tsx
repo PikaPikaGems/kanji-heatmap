@@ -165,7 +165,6 @@ export const Game = ({
     const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
     const grid = buildCandidateGrid({
       target: current.kanji,
-      inTop10: grade.inTop10,
       modelGuesses,
       similars,
       randomPool: randomKanjiPool,
