@@ -4,12 +4,35 @@ import "dmak";
 import { useEffect, useId, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { PlayCircle, Snail } from "@/components/icons";
-import assetsPaths from "@/lib/assets-paths";
 import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
+import {
+  kanjiSvgBaseUri,
+  kanjiSvgCode,
+  kanjiSvgUrl,
+} from "@/lib/kanji-svg-url";
+import {
+  StrokeOrderUnavailable,
+  STROKE_ORDER_UNAVAILABLE_VARIANT,
+  type StrokeOrderUnavailableVariant,
+} from "@/components/common/StrokeOrderUnavailable";
 import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
+
+type SvgLoadStatus = "loading" | "ready" | "error";
+
+async function preflightKanjiSvg(
+  kanji: string,
+  signal: AbortSignal
+): Promise<boolean> {
+  const res = await fetch(kanjiSvgUrl(kanji), { signal });
+  if (!res.ok) return false;
+  const body = await res.text();
+  const code = kanjiSvgCode(kanji);
+  // KanjiVG roots look like id="kvg:05c71" — reject empty / wrong payloads.
+  return body.includes(`kvg:${code}`);
+}
 
 export const KanjiDMAK = ({
   kanji,
@@ -17,6 +40,8 @@ export const KanjiDMAK = ({
   size,
   staticMode = false,
   gridShow = true,
+  unavailableVariant = STROKE_ORDER_UNAVAILABLE_VARIANT,
+  onUnavailableChange,
 }: {
   kanji: string;
   step?: number;
@@ -24,20 +49,46 @@ export const KanjiDMAK = ({
   // when true: draws all strokes instantly with stroke-order numbers visible
   staticMode?: boolean;
   gridShow?: boolean;
+  unavailableVariant?: StrokeOrderUnavailableVariant;
+  /** Fired when the SVG becomes unavailable or recovers (e.g. hint blur). */
+  onUnavailableChange?: (unavailable: boolean) => void;
 }) => {
   const id = useId();
   const kanjiId = `${id}-${kanji}-draw`;
+  const [retryKey, setRetryKey] = useState(0);
+  const [status, setStatus] = useState<SvgLoadStatus>("loading");
 
+  // Needed: probe CDN/cache reachability; no render-time API for this.
   useEffect(() => {
+    const controller = new AbortController();
+    setStatus("loading");
+    onUnavailableChange?.(false);
+
+    preflightKanjiSvg(kanji, controller.signal)
+      .then((ok) => {
+        if (controller.signal.aborted) return;
+        setStatus(ok ? "ready" : "error");
+        onUnavailableChange?.(!ok);
+      })
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setStatus("error");
+        onUnavailableChange?.(true);
+      });
+
+    return () => controller.abort();
+  }, [kanji, retryKey, onUnavailableChange]);
+
+  // Needed: dmak + Raphael mount into a DOM node; no declarative equivalent.
+  useEffect(() => {
+    if (status !== "ready") return;
+
     (window as any).Raphael = Raphael;
 
     const dmak = new (window as any).Dmak(kanji, {
       element: kanjiId,
-      uri:
-        import.meta.env.MODE === "development" ||
-        window.location.protocol === "http:"
-          ? assetsPaths.dev.KANJI_SVGS
-          : assetsPaths.KANJI_SVGS,
+      uri: kanjiSvgBaseUri(),
       height: size,
       width: size,
       step: step,
@@ -60,9 +111,20 @@ export const KanjiDMAK = ({
       document.getElementById(kanjiId)?.replaceChildren();
       // Keep window.Raphael set; other KanjiDMAK instances may still need it.
     };
-  }, [kanji, kanjiId, step, size, staticMode, gridShow]);
+  }, [status, kanji, kanjiId, step, size, staticMode, gridShow]);
 
-  return <div id={kanjiId} />;
+  if (status === "error") {
+    return (
+      <StrokeOrderUnavailable
+        size={size}
+        variant={unavailableVariant}
+        onRetry={() => setRetryKey((k) => k + 1)}
+      />
+    );
+  }
+
+  // Sized host while loading / ready — avoids layout shift vs the drawn SVG.
+  return <div id={kanjiId} style={{ width: size, height: size }} />;
 };
 
 /**
@@ -76,46 +138,63 @@ export const StrokeOrderReplay = ({
   replayClassName,
   buttonRowClassName = "flex justify-center space-x-2",
   buttonClassName,
+  unavailableVariant = STROKE_ORDER_UNAVAILABLE_VARIANT,
 }: {
   kanji: string;
   size: number;
   replayClassName?: string;
   buttonRowClassName?: string;
   buttonClassName?: string;
+  unavailableVariant?: StrokeOrderUnavailableVariant;
 }) => {
   const [key, setKey] = useState(1);
   const [speed, setSpeed] = useState<AnimationSpeed>("fast");
+  const [unavailable, setUnavailable] = useState(false);
   const replay = () => setKey((x) => x + 1);
 
   return (
     <>
       <div
         role="button"
-        tabIndex={0}
-        title="Replay stroke order"
+        tabIndex={unavailable ? -1 : 0}
+        title={unavailable ? undefined : "Replay stroke order"}
+        aria-disabled={unavailable || undefined}
         className={
           replayClassName
-            ? `${replayClassName} cursor-pointer`
-            : "cursor-pointer"
+            ? `${replayClassName} ${unavailable ? "" : "cursor-pointer"}`
+            : unavailable
+              ? undefined
+              : "cursor-pointer"
         }
         style={{ height: size }}
-        onClick={replay}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            replay();
-          }
-        }}
+        onClick={unavailable ? undefined : replay}
+        onKeyDown={
+          unavailable
+            ? undefined
+            : (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  replay();
+                }
+              }
+        }
       >
         {/** key needed to redraw on change  */}
         <div key={`${kanji}-${speed}-${key}`}>
-          <KanjiDMAK kanji={kanji} step={SPEEDS[speed].rate} size={size} />
+          <KanjiDMAK
+            kanji={kanji}
+            step={SPEEDS[speed].rate}
+            size={size}
+            unavailableVariant={unavailableVariant}
+            onUnavailableChange={setUnavailable}
+          />
         </div>
       </div>
       <div className={buttonRowClassName}>
         <PracticeButton
           size="icon"
           className={buttonClassName}
+          disabled={unavailable}
           onClick={() => {
             setSpeed("fast");
             replay();
@@ -128,6 +207,7 @@ export const StrokeOrderReplay = ({
           size="icon"
           variant="secondary"
           className={buttonClassName}
+          disabled={unavailable}
           onClick={() => {
             setSpeed("slow");
             replay();

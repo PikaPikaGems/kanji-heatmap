@@ -24,19 +24,27 @@ const HINT_SVG_SIZE = 85;
 
 const HintSection = ({ kanji }: { kanji: string }) => {
   const [blurred, setBlurred] = useState(true);
+  const [unavailable, setUnavailable] = useState(false);
 
   return (
     <div
-      className="cursor-pointer"
-      title={blurred ? "Click to reveal hint" : "Click to hide hint"}
-      onClick={() => setBlurred((b) => !b)}
+      className={unavailable ? undefined : "cursor-pointer"}
+      title={
+        unavailable
+          ? undefined
+          : blurred
+            ? "Click to reveal hint"
+            : "Click to hide hint"
+      }
+      onClick={unavailable ? undefined : () => setBlurred((b) => !b)}
     >
       <div
         style={{
-          filter: blurred ? "blur(8px)" : "none",
+          // Don't blur the offline/error icon — it must stay readable + clickable.
+          filter: unavailable || !blurred ? "none" : "blur(8px)",
           transition: "filter 0.2s ease",
           userSelect: "none",
-          pointerEvents: "none",
+          pointerEvents: unavailable ? "auto" : "none",
         }}
       >
         <KanjiDMAK
@@ -44,6 +52,7 @@ const HintSection = ({ kanji }: { kanji: string }) => {
           staticMode
           size={HINT_SVG_SIZE}
           gridShow={false}
+          onUnavailableChange={setUnavailable}
         />
       </div>
     </div>
