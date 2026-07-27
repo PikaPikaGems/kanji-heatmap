@@ -5,6 +5,7 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { outLinks } from "@/lib/external-links";
 import { cn } from "@/lib/utils";
 import { RefreshPageBtn } from "../common/RefreshPageBtn";
+import { DebugInfo } from "../common/DebugInfo";
 
 /** Linked CTA: Discord / GitHub issue / reload — shown above the icon row. */
 export const SayHiReportOrRefresh = () => {
@@ -65,7 +66,7 @@ export const ErrorSocialIcons = ({ className }: { className?: string }) => {
         className
       )}
     >
-      <LinksOutItems /> {"·"} <RefreshPageBtn />
+      <LinksOutItems /> {"·"} <RefreshPageBtn /> <DebugInfo />
     </div>
   );
 };
