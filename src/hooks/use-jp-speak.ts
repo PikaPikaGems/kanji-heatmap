@@ -1,24 +1,28 @@
 import { useCallback, useEffect, useRef } from "react";
+import { resolveJpVoice } from "@/lib/tts";
+import { useCurrentJpVoice } from "./use-jp-voice";
 
 export const useSpeak = (word: string) => {
+  const [voiceId] = useCurrentJpVoice();
   const japaneseVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
   // Effect needed: subscribes to speechSynthesis voiceschanged (voices load
-  // async in some browsers).
+  // async in some browsers), and re-resolves when the voice preference changes.
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      japaneseVoiceRef.current =
-        voices.find((voice) => voice.lang === "ja-JP") || null;
+    const loadVoice = () => {
+      japaneseVoiceRef.current = resolveJpVoice(
+        window.speechSynthesis.getVoices(),
+        voiceId
+      );
     };
 
-    loadVoices();
-    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+    loadVoice();
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoice);
 
     return () => {
-      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
+      window.speechSynthesis.removeEventListener("voiceschanged", loadVoice);
     };
-  }, []);
+  }, [voiceId]);
 
   const speak = useCallback(() => {
     // Cancel any ongoing speech (Chrome fix)
@@ -28,9 +32,10 @@ export const useSpeak = (word: string) => {
     utterance.lang = "ja-JP";
 
     if (!japaneseVoiceRef.current) {
-      const voices = window.speechSynthesis.getVoices();
-      japaneseVoiceRef.current =
-        voices.find((voice) => voice.lang === "ja-JP") || null;
+      japaneseVoiceRef.current = resolveJpVoice(
+        window.speechSynthesis.getVoices(),
+        voiceId
+      );
     }
 
     if (japaneseVoiceRef.current) {
@@ -38,7 +43,7 @@ export const useSpeak = (word: string) => {
     }
 
     window.speechSynthesis.speak(utterance);
-  }, [word]);
+  }, [word, voiceId]);
 
   return speak;
 };
