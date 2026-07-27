@@ -1,34 +1,41 @@
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { CloudOff, WifiOff } from "lucide-react";
+import { CircleAlert, CircleHelp, Flame, Turtle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type StrokeOrderUnavailableVariant =
-  | "wifi-dashed"
-  | "wifi-muted"
-  | "wifi-bare"
-  | "cloud-dashed"
-  | "wifi-circle";
+  | "question-dashed"
+  | "flame-dashed"
+  | "alert-dashed"
+  | "turtle-dashed";
 
 /**
  * Swap this constant (or pass `variant` to KanjiDMAK) to try alternatives locally.
- * - wifi-dashed: muted square + dashed cross + WifiOff (matches loading skeleton)
- * - wifi-muted: muted square + WifiOff, no cross
- * - wifi-bare: icon only in the sized box (no fill)
- * - cloud-dashed: muted square + dashed cross + CloudOff
- * - wifi-circle: muted square + soft circle behind WifiOff (clearer click target)
+ * All variants: transparent box + dashed cross axes + centered icon (click = retry).
+ * - question-dashed: CircleHelp (?)
+ * - flame-dashed: Flame
+ * - alert-dashed: CircleAlert
+ * - turtle-dashed: Turtle
  */
 export const STROKE_ORDER_UNAVAILABLE_VARIANT: StrokeOrderUnavailableVariant =
-  "wifi-dashed";
+  "question-dashed";
 
 export function strokeOrderIconSize(boxSize: number): number {
   return Math.round(Math.min(56, Math.max(18, boxSize * 0.18)));
 }
 
-const DashedCross = ({ size }: { size: number }) => (
+/** Same dashed axes used by the stroke-order loading skeleton. */
+const DashedCross = ({
+  size,
+  className,
+}: {
+  size: number;
+  className?: string;
+}) => (
   <svg
     width={size}
     height={size}
-    className="absolute inset-0 text-foreground opacity-10"
+    className={cn("absolute inset-0 text-foreground", className)}
     aria-hidden
   >
     <line
@@ -76,10 +83,11 @@ export const StrokeOrderUnavailableShell = ({
     title="Retry loading stroke order"
     aria-label="Stroke order unavailable. Click to retry."
     className={cn(
-      "relative flex items-center justify-center overflow-hidden",
+      "relative flex items-center justify-center overflow-hidden bg-transparent",
       "text-muted-foreground transition-colors",
       "hover:text-foreground/70 focus-visible:outline-none",
       "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "rounded-3xl",
       className
     )}
     style={{ width: size, height: size }}
@@ -88,26 +96,25 @@ export const StrokeOrderUnavailableShell = ({
   </button>
 );
 
-export const StrokeOrderUnavailableWifiDashed = ({
+const DashedIconFallback = ({
   size,
   onRetry,
+  Icon,
+  crossClassName = "opacity-20",
+  iconClassName,
 }: {
   size: number;
   onRetry: () => void;
+  Icon: LucideIcon;
+  crossClassName?: string;
+  iconClassName?: string;
 }) => {
   const icon = strokeOrderIconSize(size);
   return (
-    <StrokeOrderUnavailableShell
-      size={size}
-      onRetry={onRetry}
-      className={cn(
-        "bg-muted hover:bg-muted/80",
-        size < 100 ? "rounded-2xl" : "rounded-3xl"
-      )}
-    >
-      <DashedCross size={size} />
-      <WifiOff
-        className="relative z-[1]"
+    <StrokeOrderUnavailableShell size={size} onRetry={onRetry}>
+      <DashedCross size={size} className={crossClassName} />
+      <Icon
+        className={cn("relative z-[1]", iconClassName)}
         style={{ width: icon, height: icon }}
         strokeWidth={1.75}
         aria-hidden
@@ -116,111 +123,34 @@ export const StrokeOrderUnavailableWifiDashed = ({
   );
 };
 
-export const StrokeOrderUnavailableWifiMuted = ({
+export const StrokeOrderUnavailableQuestionDashed = ({
   size,
   onRetry,
 }: {
   size: number;
   onRetry: () => void;
-}) => {
-  const icon = strokeOrderIconSize(size);
-  return (
-    <StrokeOrderUnavailableShell
-      size={size}
-      onRetry={onRetry}
-      className={cn(
-        "bg-muted hover:bg-muted/80",
-        size < 100 ? "rounded-2xl" : "rounded-3xl"
-      )}
-    >
-      <WifiOff
-        style={{ width: icon, height: icon }}
-        strokeWidth={1.75}
-        aria-hidden
-      />
-    </StrokeOrderUnavailableShell>
-  );
-};
+}) => <DashedIconFallback size={size} onRetry={onRetry} Icon={CircleHelp} />;
 
-export const StrokeOrderUnavailableWifiBare = ({
+export const StrokeOrderUnavailableFlameDashed = ({
   size,
   onRetry,
 }: {
   size: number;
   onRetry: () => void;
-}) => {
-  const icon = strokeOrderIconSize(size);
-  return (
-    <StrokeOrderUnavailableShell
-      size={size}
-      onRetry={onRetry}
-      className="bg-transparent hover:bg-muted/40 rounded-3xl"
-    >
-      <WifiOff
-        style={{ width: icon, height: icon }}
-        strokeWidth={1.75}
-        aria-hidden
-      />
-    </StrokeOrderUnavailableShell>
-  );
-};
+}) => <DashedIconFallback size={size} onRetry={onRetry} Icon={Flame} />;
 
-export const StrokeOrderUnavailableCloudDashed = ({
+export const StrokeOrderUnavailableAlertDashed = ({
   size,
   onRetry,
 }: {
   size: number;
   onRetry: () => void;
-}) => {
-  const icon = strokeOrderIconSize(size);
-  return (
-    <StrokeOrderUnavailableShell
-      size={size}
-      onRetry={onRetry}
-      className={cn(
-        "bg-muted hover:bg-muted/80",
-        size < 100 ? "rounded-2xl" : "rounded-3xl"
-      )}
-    >
-      <DashedCross size={size} />
-      <CloudOff
-        className="relative z-[1]"
-        style={{ width: icon, height: icon }}
-        strokeWidth={1.75}
-        aria-hidden
-      />
-    </StrokeOrderUnavailableShell>
-  );
-};
+}) => <DashedIconFallback size={size} onRetry={onRetry} Icon={CircleAlert} />;
 
-export const StrokeOrderUnavailableWifiCircle = ({
+export const StrokeOrderUnavailableTurtleDashed = ({
   size,
   onRetry,
 }: {
   size: number;
   onRetry: () => void;
-}) => {
-  const icon = strokeOrderIconSize(size);
-  const ring = Math.round(Math.min(size * 0.55, icon * 2.4));
-  return (
-    <StrokeOrderUnavailableShell
-      size={size}
-      onRetry={onRetry}
-      className={cn(
-        "bg-muted hover:bg-muted/80",
-        size < 100 ? "rounded-2xl" : "rounded-3xl"
-      )}
-    >
-      <span
-        className="flex items-center justify-center rounded-full bg-background/70 text-muted-foreground shadow-sm ring-1 ring-border/60"
-        style={{ width: ring, height: ring }}
-      >
-        <WifiOff
-          style={{ width: icon, height: icon }}
-          strokeWidth={1.75}
-          aria-hidden
-        />
-      </span>
-    </StrokeOrderUnavailableShell>
-  );
-};
+}) => <DashedIconFallback size={size} onRetry={onRetry} Icon={Turtle} />;

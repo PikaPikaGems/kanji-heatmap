@@ -1,25 +1,23 @@
 import {
   STROKE_ORDER_UNAVAILABLE_VARIANT,
-  StrokeOrderUnavailableCloudDashed,
-  StrokeOrderUnavailableWifiBare,
-  StrokeOrderUnavailableWifiCircle,
-  StrokeOrderUnavailableWifiDashed,
-  StrokeOrderUnavailableWifiMuted,
+  StrokeOrderUnavailableAlertDashed,
+  StrokeOrderUnavailableFlameDashed,
+  StrokeOrderUnavailableQuestionDashed,
+  StrokeOrderUnavailableTurtleDashed,
   type StrokeOrderUnavailableVariant,
 } from "./variants";
 
 export type { StrokeOrderUnavailableVariant };
 export {
   STROKE_ORDER_UNAVAILABLE_VARIANT,
-  StrokeOrderUnavailableCloudDashed,
-  StrokeOrderUnavailableWifiBare,
-  StrokeOrderUnavailableWifiCircle,
-  StrokeOrderUnavailableWifiDashed,
-  StrokeOrderUnavailableWifiMuted,
+  StrokeOrderUnavailableAlertDashed,
+  StrokeOrderUnavailableFlameDashed,
+  StrokeOrderUnavailableQuestionDashed,
+  StrokeOrderUnavailableTurtleDashed,
 } from "./variants";
 
 export const STROKE_ORDER_UNAVAILABLE_VARIANTS: StrokeOrderUnavailableVariant[] =
-  ["wifi-dashed", "wifi-muted", "wifi-bare", "cloud-dashed", "wifi-circle"];
+  ["question-dashed", "flame-dashed", "alert-dashed", "turtle-dashed"];
 
 type Props = {
   size: number;
@@ -35,27 +33,29 @@ export const StrokeOrderUnavailable = ({
   variant = STROKE_ORDER_UNAVAILABLE_VARIANT,
 }: Props) => {
   switch (variant) {
-    case "wifi-muted":
-      return <StrokeOrderUnavailableWifiMuted size={size} onRetry={onRetry} />;
-    case "wifi-bare":
-      return <StrokeOrderUnavailableWifiBare size={size} onRetry={onRetry} />;
-    case "cloud-dashed":
+    case "flame-dashed":
       return (
-        <StrokeOrderUnavailableCloudDashed size={size} onRetry={onRetry} />
+        <StrokeOrderUnavailableFlameDashed size={size} onRetry={onRetry} />
       );
-    case "wifi-circle":
-      return <StrokeOrderUnavailableWifiCircle size={size} onRetry={onRetry} />;
-    case "wifi-dashed":
+    case "alert-dashed":
+      return (
+        <StrokeOrderUnavailableAlertDashed size={size} onRetry={onRetry} />
+      );
+    case "turtle-dashed":
+      return (
+        <StrokeOrderUnavailableTurtleDashed size={size} onRetry={onRetry} />
+      );
+    case "question-dashed":
     default:
-      return <StrokeOrderUnavailableWifiDashed size={size} onRetry={onRetry} />;
+      return (
+        <StrokeOrderUnavailableQuestionDashed size={size} onRetry={onRetry} />
+      );
   }
 };
 
 /**
  * Side-by-side preview of every variant at several sizes.
- * Drop temporarily into a screen to compare, e.g.:
- *   import { StrokeOrderUnavailableGallery } from "@/components/common/StrokeOrderUnavailable";
- *   // …render <StrokeOrderUnavailableGallery />
+ * Temporary page: `/gallery`
  */
 export const StrokeOrderUnavailableGallery = ({
   onRetry = () => undefined,
@@ -66,7 +66,7 @@ export const StrokeOrderUnavailableGallery = ({
   return (
     <div className="flex flex-col gap-8 p-4">
       <p className="text-sm text-muted-foreground">
-        Stroke-order unavailable fallbacks — click any box to exercise retry.
+        Transparent box + dashed axes + icon. Click any box to exercise retry.
         Set <code className="text-xs">STROKE_ORDER_UNAVAILABLE_VARIANT</code> in{" "}
         <code className="text-xs">variants.tsx</code> to pick one globally.
       </p>
