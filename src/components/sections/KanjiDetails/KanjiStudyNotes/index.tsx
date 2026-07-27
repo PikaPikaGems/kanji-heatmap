@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
-import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
+import { StudyNotesTipsPopover } from "./StudyNotesTipsPopover";
 import { StudyNotesFullscreenEditor } from "./StudyNotesFullscreenEditor";
 import { getKanjiStudyNotesStorageKey, MAX_STUDY_NOTE_LENGTH } from "./storage";
 
@@ -102,13 +101,14 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
             </div>
           ) : (
             <>
-              <StudyNotesEditorTips className="mb-3" />
+              <div className="text-left">
+                <StudyNotesTipsPopover className="mb-3" />
+              </div>
               <MarkdownEditor
                 value={notes}
                 maxLength={MAX_STUDY_NOTE_LENGTH}
                 onChange={persistNotes}
               />
-              <LocalStorageWarning className="pb-2" />
             </>
           )}
         </TabsContent>

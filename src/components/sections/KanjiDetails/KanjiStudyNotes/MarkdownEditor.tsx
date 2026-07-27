@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { EDITOR_HIGHLIGHT_CLASSES } from "./editorHighlightClasses";
 import { getMarkdownHighlightSegments } from "./markdown";
+import { LOCAL_STORAGE_WARNING } from "@/components/common/LocalStorageWarning";
 
 /*
  * HOW THIS EDITOR WORKS — and why the iOS-specific code below exists.
@@ -177,7 +178,7 @@ export const MarkdownEditor = ({
           rows={8}
           spellCheck={false}
           autoFocus={autoFocus}
-          placeholder="Write your notes here. Markdown is supported. Fun fact! Japanese texts (e.g. 日本語, にほんご) are clickable when your notes are finally displayed."
+          placeholder="Markdown works here plus useful extras! Japanese texts (e.g. 日本語, にほんご) are clickable on View Mode."
           className={cn(
             sharedEditorTextClass,
             "relative block w-full resize-none bg-transparent outline-none",
@@ -209,12 +210,15 @@ export const MarkdownEditor = ({
           onBlur={stopScrollSyncLoop}
         />
       </div>
-      <p
-        className={`mt-1.5 shrink-0 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
-        aria-live="polite"
-      >
-        {value.length} / {maxLength}
-      </p>
+      <div className="flex justify-between mt-1.5 pr-2">
+        <p className="text-xs">{LOCAL_STORAGE_WARNING}</p>
+        <p
+          className={`shrink-0 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
+          aria-live="polite"
+        >
+          {value.length} / {maxLength}
+        </p>
+      </div>
     </div>
   );
 };
