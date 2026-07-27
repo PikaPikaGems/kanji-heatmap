@@ -12,7 +12,12 @@ import {
 } from "@/components/screens/SpeedKatakanaScreen/storage";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
-import { CPM_BAND_LABELS, cpmToBand } from "@/lib/activity";
+import {
+  HEATMAP_METRIC_BAND_LABELS,
+  HeatmapCellMetric,
+  metricToBand,
+  metricValueText,
+} from "@/lib/activity";
 import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 
@@ -21,11 +26,13 @@ const CELL_PX = 20;
 const SetDetail = ({
   setNumber,
   stats,
+  metric,
   band,
 }: {
   setNumber: number;
   stats: ChallengeSetStats | null;
-  band: ReturnType<typeof cpmToBand>;
+  metric: HeatmapCellMetric;
+  band: ReturnType<typeof metricToBand>;
 }) => {
   const level = levelOf(setNumber);
   const position = positionInLevel(setNumber);
@@ -37,19 +44,17 @@ const SetDetail = ({
       </div>
       {stats ? (
         <>
-          {band > 0 ? (
-            <div className="text-muted-foreground">{CPM_BAND_LABELS[band]}</div>
-          ) : (
-            <div className="text-muted-foreground">
-              No run above 70% accuracy
-            </div>
-          )}
-          <div className="flex justify-between gap-4">
-            <span>Best CPM</span>
-            <span className="font-bold tabular-nums">{stats.bestCpm}</span>
+          <div className="text-muted-foreground">
+            {band === 0 && metric === "bestSpeedOver70"
+              ? "No run above 70% accuracy"
+              : HEATMAP_METRIC_BAND_LABELS[metric][band]}
           </div>
           <div className="flex justify-between gap-4">
-            <span>Best CPM (&gt;70%)</span>
+            <span>Best speed</span>
+            <span className="font-bold tabular-nums">{stats.bestCpm} CPM</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span>Best speed (&gt;70%)</span>
             <span className="font-bold tabular-nums">
               {stats.bestCpmWithAccuracyOver70 ?? "—"}
             </span>
@@ -61,8 +66,16 @@ const SetDetail = ({
             </span>
           </div>
           <div className="flex justify-between gap-4">
-            <span>Latest CPM</span>
-            <span className="font-bold tabular-nums">{stats.latestCpm}</span>
+            <span>Current speed</span>
+            <span className="font-bold tabular-nums">
+              {stats.latestCpm} CPM
+            </span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span>Current accuracy</span>
+            <span className="font-bold tabular-nums">
+              {stats.latestAccuracy}%
+            </span>
           </div>
           <div className="flex justify-between gap-4">
             <span>Attempts</span>
@@ -86,23 +99,34 @@ const SetDetail = ({
   );
 };
 
-const ChallengeSetCell = ({ setNumber }: { setNumber: number }) => {
+const ChallengeSetCell = ({
+  setNumber,
+  metric,
+}: {
+  setNumber: number;
+  metric: HeatmapCellMetric;
+}) => {
   const stats = readSetStats(setNumber);
-  const band = cpmToBand(stats?.bestCpmWithAccuracyOver70);
+  const band = metricToBand(stats, metric);
   const level = levelOf(setNumber);
   const pos = positionInLevel(setNumber);
   const challengeLabel = `Challenge ${level}-${pos} (#${setNumber})`;
 
-  const label = stats?.bestCpmWithAccuracyOver70
-    ? `${challengeLabel}: ${stats.bestCpmWithAccuracyOver70} CPM`
-    : `${challengeLabel}: not attempted`;
+  const label = `${challengeLabel}: ${metricValueText(stats, metric)}`;
 
   return (
     <HeatmapCell
       cellPx={CELL_PX}
       fillCn={heatmapFillCn(band)}
       label={label}
-      detail={<SetDetail setNumber={setNumber} stats={stats} band={band} />}
+      detail={
+        <SetDetail
+          setNumber={setNumber}
+          stats={stats}
+          metric={metric}
+          band={band}
+        />
+      }
     />
   );
 };
@@ -111,7 +135,11 @@ const ChallengeSetCell = ({ setNumber }: { setNumber: number }) => {
  * Fixed-size grid: 20 columns (levels) × 10 rows (sets per level).
  * Column flow fills each level top-to-bottom, then the next level.
  */
-export const SpeedKatakanaHeatmapGrid = () => {
+export const SpeedKatakanaHeatmapGrid = ({
+  metric,
+}: {
+  metric: HeatmapCellMetric;
+}) => {
   return (
     <HeatmapGrid
       cellPx={CELL_PX}
@@ -125,7 +153,13 @@ export const SpeedKatakanaHeatmapGrid = () => {
       {Array.from({ length: LEVELS }, (_, levelIndex) =>
         Array.from({ length: CHALLENGES_PER_LEVEL }, (_, posIndex) => {
           const setNumber = setFromLevelAndPos(levelIndex + 1, posIndex + 1);
-          return <ChallengeSetCell key={setNumber} setNumber={setNumber} />;
+          return (
+            <ChallengeSetCell
+              key={setNumber}
+              setNumber={setNumber}
+              metric={metric}
+            />
+          );
         })
       )}
     </HeatmapGrid>

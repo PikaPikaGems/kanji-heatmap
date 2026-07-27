@@ -9,7 +9,7 @@ import { DottedSeparator } from "@/components/ui/dotted-separator";
 
 import { LabeledCheckbox } from "@/components/common/LabeledCheckbox";
 import { FrequencyRankDataSource } from "@/components/common/freq/FrequencyRankDataSource";
-import { FreqGradient } from "@/components/common/freq/FreqGradient";
+import { GradientLegend } from "@/components/common/GradientLegend";
 import { ItemTypeSwitch } from "@/components/common/ItemTypeSwitch";
 import { JLPTBordersMeanings } from "@/components/common/jlpt/JLPTBorderMeanings";
 import { StudyStatusBorderMeanings } from "@/components/common/StudyStatusBorderMeanings";
@@ -48,7 +48,7 @@ const BackgroundColorSection = () => {
       />
       {shouldAttachMeaning && (
         <div className="animate-fade-in">
-          <FreqGradient />
+          <GradientLegend />
           <FrequencyRankDataSource
             value={initialState}
             setValue={(v) => {
