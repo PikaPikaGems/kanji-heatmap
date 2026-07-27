@@ -13,7 +13,7 @@ import { useStorageRevision } from "@/hooks/use-storage-value";
 import { SectionHeading } from "./SectionHeading";
 import { SegmentedBandBar } from "./SegmentedBandBar";
 import { DashboardPanel } from "./DashboardPanel";
-import { FreqGradient } from "@/components/common/freq/FreqGradient";
+import { GradientLegend } from "@/components/common/GradientLegend";
 
 const levelBandCounts = (level: number): number[] => {
   const bands = Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) => {
@@ -59,7 +59,7 @@ export const SpeedKatakanaBreakdown = () => {
       </div>
       <div className="flex items-center justify-center w-full mt-5">
         <div>
-          <FreqGradient lessLabel="Slow" moreLabel="Fast" />
+          <GradientLegend lessLabel="Slow" moreLabel="Fast" />
         </div>
       </div>
     </DashboardPanel>

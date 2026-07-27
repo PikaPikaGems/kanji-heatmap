@@ -3,9 +3,10 @@ import {
   freqCategoryCn,
   freqCategoryCount,
 } from "@/lib/freq/freq-category";
-import { FreqSquare } from "./FreqSquare";
+import { FreqSquare } from "./freq/FreqSquare";
 
-export const FreqGradient = ({
+/** Opacity-gradient legend (e.g. "Less…More", "Slow…Fast") for any heatmap. */
+export const GradientLegend = ({
   lessLabel = "Less",
   moreLabel = "More",
 }: {
