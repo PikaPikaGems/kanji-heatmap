@@ -5,6 +5,7 @@ import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
+import { TTS_DISCLAIMER } from "@/lib/tts";
 import { SoundMode, WordCount } from "./types";
 import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
@@ -161,7 +162,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               )}
               {soundEnabled && soundType === "speak" && (
                 <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                  ⚠️ text-to-speech might not work on all devices.
+                  {TTS_DISCLAIMER}
                 </p>
               )}
             </div>
