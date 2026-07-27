@@ -1,7 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { CircleX, InfoIcon } from "@/components/icons";
-import { GenericPopover } from "@/components/common/GenericPopover";
-import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
+import { CircleX } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +12,7 @@ import {
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { cn } from "@/lib/utils";
 import { MarkdownEditor } from "./MarkdownEditor";
-import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
+import { StudyNotesTipsPopover } from "./StudyNotesTipsPopover";
 
 interface StudyNotesFullscreenEditorProps {
   open: boolean;
@@ -73,24 +71,7 @@ export const StudyNotesFullscreenEditor = ({
             <DialogDescription className="sr-only">
               Write personal study notes for {kanji}.
             </DialogDescription>
-            <GenericPopover
-              trigger={
-                <button
-                  type="button"
-                  className="inline-flex items-center self-start gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8"
-                >
-                  <strong>Tips and optional syntax</strong>
-                  <InfoIcon size={14} />
-                </button>
-              }
-              content={
-                <div className="p-5 space-y-3 text-left">
-                  <StudyNotesEditorTips />
-                  <LocalStorageWarning className="p-2 text-center" />
-                </div>
-              }
-              contentClassName="z-[70] m-0 w-[calc(100vw-2rem)] max-w-sm p-0"
-            />
+            <StudyNotesTipsPopover contentClassName="z-[70] m-0 w-[calc(100vw-2rem)] max-w-sm p-0" />
             <DialogPrimitive.Close asChild className="absolute top-2 right-2">
               <Button
                 variant="ghost"
