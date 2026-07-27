@@ -80,7 +80,7 @@ const KanjiItemSimpleButton = ({
 
   return (
     <button
-      className={`${btnCn} flex flex-col justify-center items-center w-full `}
+      className={`${btnCn} flex flex-col justify-center items-center w-full !border-8`}
       onClick={() => {
         onClick();
         setKanji(kanji);
