@@ -4,3 +4,4 @@
 playwright-report/
 test-results/
 coverage/
+functions/types.d.ts
