@@ -1,5 +1,9 @@
 import { isKanji, shuffle } from "@/lib/utils";
-import { CANDIDATE_COUNT } from "./constants";
+import {
+  CANDIDATE_COUNT,
+  MODEL_SEED_COUNT,
+  SIMILAR_SEED_COUNT,
+} from "./constants";
 
 /**
  * Build a 12-kanji look-alike grid (always 4×3).
@@ -7,10 +11,11 @@ import { CANDIDATE_COUNT } from "./constants";
  *
  * Fill order before shuffle:
  *   1. target (always)
- *   2. seed — model guesses if in top 10, else database similars
- *   3. secondary — the other of those two
- *   4. related — similars of the model guesses / similars (lookalike neighbors)
- *   5. random deck — last resort only
+ *   2. up to MODEL_SEED_COUNT distinct recognizer top guesses
+ *   3. up to SIMILAR_SEED_COUNT distinct database similars of the target
+ *   4. overflow of either pool beyond its quota (whichever ran short)
+ *   5. related — similars of the model guesses / similars (lookalike neighbors)
+ *   6. random deck — last resort only
  *
  * Hard rule: only real kanji — no hiragana, katakana, or radicals-only glyphs.
  * Pass `isRealKanji` that checks kanji_main (e.g. `info?.jlpt != null`), not
@@ -18,7 +23,6 @@ import { CANDIDATE_COUNT } from "./constants";
  */
 export const buildCandidateGrid = ({
   target,
-  inTop10,
   modelGuesses,
   similars,
   randomPool,
@@ -26,7 +30,6 @@ export const buildCandidateGrid = ({
   isRealKanji = defaultIsRealKanji,
 }: {
   target: string;
-  inTop10: boolean;
   modelGuesses: string[];
   similars: string[];
   randomPool: string[];
@@ -40,21 +43,10 @@ export const buildCandidateGrid = ({
     getSimilars
   );
 
-  if (inTop10) {
-    return padCandidates(
-      modelGuesses,
-      target,
-      similars,
-      related,
-      randomPool,
-      isRealKanji
-    );
-  }
-
   return padCandidates(
+    modelGuesses,
     similars,
     target,
-    modelGuesses,
     related,
     randomPool,
     isRealKanji
@@ -84,9 +76,9 @@ const expandRelated = (
 };
 
 const padCandidates = (
-  seed: string[],
+  modelGuesses: string[],
+  similars: string[],
   target: string,
-  secondary: string[],
   related: string[],
   filler: string[],
   isRealKanji: (k: string) => boolean
@@ -101,9 +93,26 @@ const padCandidates = (
     out.push(k);
   };
 
+  // Fills at most `quota` *new* entries from `pool`, in order — duplicates
+  // (e.g. the target already sitting at rank 0) don't consume the quota.
+  const pushQuota = (pool: string[], quota: number) => {
+    let added = 0;
+    for (const k of pool) {
+      if (added >= quota) break;
+      const before = out.length;
+      push(k);
+      if (out.length > before) added++;
+    }
+  };
+
   push(target, true);
-  for (const k of seed) push(k);
-  for (const k of secondary) push(k);
+  pushQuota(modelGuesses, MODEL_SEED_COUNT);
+  pushQuota(similars, SIMILAR_SEED_COUNT);
+
+  // Backfill with whatever quota-limited entries didn't make the cut above
+  // (covers the case where one pool ran short of its quota).
+  for (const k of modelGuesses) push(k);
+  for (const k of similars) push(k);
   for (const k of related) push(k);
   for (const k of filler) push(k);
 
