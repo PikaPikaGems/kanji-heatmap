@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback, useRef } from "react";
+import { VList } from "virtua";
 import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import {
   useGetKanjiInfoFn,
@@ -16,6 +16,14 @@ import { ClearFiltersCTA } from "@/components/dependent/routing/ClearFiltersCTA"
 import { externalLinks } from "@/lib/external-links";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { SmallUnexpectedErrorFallback } from "@/components/error/SmallUnexpectedErrorFallback";
+
+/**
+ * Width of one results-preview item, in px. Measured from the pre-virtualisation
+ * layout, where the flex row sized each tile at 124px plus its 4px `ml-1`.
+ * Virtualising needs a definite size, and keeping this number is what makes the
+ * strip look and scroll exactly as it did.
+ */
+const RESULT_ITEM_WIDTH = 128;
 
 const StrokeDivider = ({ stroke }: { stroke: string }) => {
   return (
@@ -34,19 +42,28 @@ const StrokeDivider = ({ stroke }: { stroke: string }) => {
   );
 };
 
-const RadicalBtn = ({
+/**
+ * 253 of these render at once, so it is memoised and every prop is a primitive
+ * or a stable callback. `onToggle` takes the radical rather than closing over
+ * it, which is what lets one shared handler serve the whole grid — a per-button
+ * arrow function would make the memo useless.
+ */
+const RadicalBtn = React.memo(function RadicalBtn({
   isDisabled,
-  onClick,
+  onToggle,
   isTouchDevice,
   isSelected,
   radical,
 }: {
   isDisabled: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onToggle: (
+    radical: string,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void;
   isSelected: boolean;
   radical: string;
   isTouchDevice: boolean;
-}) => {
+}) {
   const cn1 = isDisabled
     ? "opacity-10"
     : isTouchDevice
@@ -59,18 +76,18 @@ const RadicalBtn = ({
   return (
     <button
       disabled={isDisabled}
-      onClick={onClick}
+      onClick={(e) => onToggle(radical, e)}
       className={`
         w-[47px] h-[45px] transition-all duration-500 ml-1 mb-1 kanji-font text-2xl
         disabled:cursor-not-allowed disabled:border-dotted
         ${cn1}
-        ${cn2} 
+        ${cn2}
       `}
     >
       {radical}
     </button>
   );
-};
+});
 
 const ExpandedRadicalBtn = ({
   onClick,
@@ -175,7 +192,9 @@ export const RadicalScreenLayout = ({
         {middle}
       </div>
 
-      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-x-auto overflow-y-hidden border-2 border-dotted rounded-md h-44 border-foreground/40 scrollbar-thin animate-fade-in">
+      {/* No overflow here: RadicalsResultsPreview renders a virtualised VList
+          which owns the horizontal scrolling. Two nested scrollers would fight. */}
+      <div className="z-50 flex w-full pt-4 pb-2 mt-2 mb-2 overflow-hidden border-2 border-dotted rounded-md h-44 border-foreground/40 animate-fade-in">
         {bottom}
       </div>
       <div className="absolute bottom-[170px] w-full m-auto z-50">
@@ -196,6 +215,33 @@ export const RadicalScreenContent = ({
   const isTouchDevice = useIsTouchDevice();
 
   const getBasicInfo = useGetKanjiInfoFn();
+
+  // The handler must keep one identity across renders or RadicalBtn's memo
+  // never hits, but it needs the current selection. A ref gives it both:
+  // the callback stays stable while always reading the latest values.
+  const latest = useRef({ value, setValue });
+  latest.current = { value, setValue };
+
+  const handleToggle = useCallback(
+    (
+      radical: string,
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ): void => {
+      const { value: selected, setValue: commit } = latest.current;
+      const next = new Set(selected);
+
+      if (next.delete(radical)) {
+        // Deselecting leaves focus on a button that is about to look
+        // unselected; blurring keeps the hover styling from sticking.
+        e.currentTarget.blur();
+      } else {
+        next.add(radical);
+      }
+
+      commit(next);
+    },
+    []
+  );
 
   if (getBasicInfo == null) {
     return null;
@@ -221,20 +267,7 @@ export const RadicalScreenContent = ({
                   {index === 0 && <StrokeDivider stroke={stroke} />}
                   <RadicalBtn
                     isDisabled={isDisabled}
-                    onClick={(e) => {
-                      const prev = value;
-                      const newSelected = new Set(prev);
-                      const prevHasRadical = newSelected.has(radical);
-                      prevHasRadical
-                        ? newSelected.delete(radical)
-                        : newSelected.add(radical);
-
-                      if (prevHasRadical) {
-                        e.currentTarget.blur();
-                      }
-
-                      setValue(newSelected);
-                    }}
+                    onToggle={handleToggle}
                     radical={radical}
                     isSelected={isSelected}
                     isTouchDevice={isTouchDevice}
@@ -336,13 +369,33 @@ export const RadicalsResultsPreview = ({
     return null;
   }
 
+  // Every match stays scrollable; only the visible ones are mounted. Each item
+  // runs useItemBtnCn and renders ExpandedBtnContent, so rendering all of them
+  // is what froze the drawer — selecting a common radical matches well over a
+  // thousand kanji. VList owns the horizontal scrolling for this strip, which
+  // is why the container in RadicalScreenLayout does not set overflow itself.
   return (
-    <>
-      {data.map((kanji) => {
-        return (
-          <KanjiItemSimpleButton key={kanji} kanji={kanji} onClick={onClick} />
-        );
-      })}
-    </>
+    <VList
+      horizontal
+      className="w-full h-full scrollbar-thin"
+      // Each item is a fixed RESULT_ITEM_WIDTH, so telling VList up front avoids
+      // a measure-then-reflow pass on open.
+      itemSize={RESULT_ITEM_WIDTH}
+      overscan={4}
+      data-testid="results-strip"
+    >
+      {data.map((kanji) => (
+        <div
+          key={kanji}
+          // pr-1 leaves room for the ml-1 that KanjiItemSimpleButton carries, so
+          // the item occupies exactly RESULT_ITEM_WIDTH and matches the spacing
+          // the flex row produced before this was virtualised.
+          className="h-full pr-1"
+          style={{ width: RESULT_ITEM_WIDTH }}
+        >
+          <KanjiItemSimpleButton kanji={kanji} onClick={onClick} />
+        </div>
+      ))}
+    </VList>
   );
 };

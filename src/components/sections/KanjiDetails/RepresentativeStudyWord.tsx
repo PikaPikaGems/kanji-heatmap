@@ -1,4 +1,4 @@
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -50,7 +50,7 @@ const WhatIsARepresentativeStudyWord = () => {
 };
 
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
-  const data = useKanjiRepresentativeWord(kanji);
+  const data = useKanjiRepresentativeWordDetails(kanji);
 
   if (!data) {
     return (

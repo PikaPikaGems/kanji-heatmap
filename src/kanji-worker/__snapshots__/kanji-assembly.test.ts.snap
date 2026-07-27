@@ -1,0 +1,465 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`extractKanjiGeneralData (characterization against real data) > 五: pinned payload 1`] = `
+{
+  "allKun": [
+    "いつ",
+    "いつ。つ",
+  ],
+  "allOn": [
+    "ゴ",
+  ],
+  "jlpt": "n5",
+  "jouyouGrade": 1,
+  "kklcIndex": 7,
+  "meanings": [
+    "five",
+  ],
+  "rtk": 5,
+  "strokes": 4,
+  "wk": 2,
+}
+`;
+
+exports[`extractKanjiGeneralData (characterization against real data) > 朝: allOn is katakana, allKun stays hiragana, jlpt comes from main info 1`] = `
+{
+  "allKun": [
+    "あさ",
+  ],
+  "allOn": [
+    "チョウ",
+  ],
+  "jlpt": "n4",
+  "jouyouGrade": 2,
+  "kklcIndex": 145,
+  "meanings": [
+    "morning",
+    "dynasty",
+    "regime",
+    "epoch",
+    "period",
+    "(north) korea",
+  ],
+  "rtk": 53,
+  "strokes": 12,
+  "wk": 8,
+}
+`;
+
+exports[`extractKanjiHoverData (characterization against real data) > 一: no phonetic, no parts, okurigana dropped from partsList 1`] = `
+{
+  "frequency": {
+    "aozoraChar": 2,
+    "aozoraDoc": 1,
+    "bunka": 2,
+    "dramaSubs": 5,
+    "google": 3,
+    "jisho": 2,
+    "jiten": 2,
+    "jpdb": 4,
+    "kd": 12,
+    "kuf": 12,
+    "mcd": 30,
+    "netflix": 15,
+    "novels5100": 2,
+    "onlineNewsChar": 41,
+    "onlineNewsDoc": 21,
+    "twitter": 8,
+    "wikiChar": 9,
+    "wikiDoc": 7,
+    "wkfr": 12,
+  },
+  "jlpt": "n5",
+  "jouyouGrade": 1,
+  "keyword": "one",
+  "kklcIndex": 2,
+  "kun": "ひと-",
+  "mainVocab": {
+    "first": {
+      "meaning": "one, for one thing, only",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "一",
+          "keyword": "one",
+        },
+      ],
+      "word": "一つ",
+      "wordPartDetails": [
+        [
+          "一",
+          "ひと",
+        ],
+        [
+          "つ",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "10,000, ten thousand",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "一",
+          "keyword": "one",
+        },
+        {
+          "isKanji": true,
+          "kanji": "万",
+          "keyword": "ten thousand",
+        },
+      ],
+      "word": "一万",
+      "wordPartDetails": [
+        [
+          "一",
+          "いち",
+        ],
+        [
+          "万",
+          "まん",
+        ],
+      ],
+    },
+  },
+  "on": "いち",
+  "parts": [],
+  "phonetic": undefined,
+  "repReading": "いち・ひと",
+  "repWord": "一",
+  "rtk": 1,
+  "strokes": 1,
+  "wk": 1,
+}
+`;
+
+exports[`extractKanjiHoverData (characterization against real data) > 五: phonetic component that is itself a kanji 1`] = `
+{
+  "frequency": {
+    "aozoraChar": 56,
+    "aozoraDoc": 69,
+    "bunka": 75,
+    "dramaSubs": 597,
+    "google": 699,
+    "jisho": 31,
+    "jiten": 719,
+    "jpdb": 393,
+    "kd": 375,
+    "kuf": 381,
+    "mcd": 217,
+    "netflix": 825,
+    "novels5100": 80,
+    "onlineNewsChar": 590,
+    "onlineNewsDoc": 654,
+    "twitter": 635,
+    "wikiChar": 502,
+    "wikiDoc": 477,
+    "wkfr": 291,
+  },
+  "jlpt": "n5",
+  "jouyouGrade": 1,
+  "keyword": "five",
+  "kklcIndex": 7,
+  "kun": "いつ",
+  "mainVocab": {
+    "first": {
+      "meaning": "5th day of the month, five days",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "五",
+          "keyword": "five",
+        },
+        {
+          "isKanji": true,
+          "kanji": "日",
+          "keyword": "day",
+        },
+      ],
+      "word": "五日",
+      "wordPartDetails": [
+        [
+          "五",
+          "いつ",
+        ],
+        [
+          "日",
+          "か",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "fifteen, 15",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "十",
+          "keyword": "ten",
+        },
+        {
+          "isKanji": true,
+          "kanji": "五",
+          "keyword": "five",
+        },
+      ],
+      "word": "十五",
+      "wordPartDetails": [
+        [
+          "十",
+          "じゅう",
+        ],
+        [
+          "五",
+          "ご",
+        ],
+      ],
+    },
+  },
+  "on": "ご",
+  "parts": [
+    {
+      "isKanji": true,
+      "keyword": "one",
+      "part": "一",
+    },
+    {
+      "isKanji": true,
+      "keyword": "power",
+      "part": "力",
+    },
+  ],
+  "phonetic": {
+    "isKanji": true,
+    "keyword": "five",
+    "phonetic": "五",
+    "sound": [
+      "ご",
+    ],
+  },
+  "repReading": "ご",
+  "repWord": "五",
+  "rtk": 5,
+  "strokes": 4,
+  "wk": 2,
+}
+`;
+
+exports[`extractKanjiHoverData (characterization against real data) > 六: parts mix kanji and non-kanji components 1`] = `
+{
+  "frequency": {
+    "aozoraChar": 141,
+    "aozoraDoc": 129,
+    "bunka": 173,
+    "dramaSubs": 1104,
+    "google": 961,
+    "jisho": 93,
+    "jiten": 1012,
+    "jpdb": 660,
+    "kd": 738,
+    "kuf": 637,
+    "mcd": 294,
+    "netflix": 1313,
+    "novels5100": 181,
+    "onlineNewsChar": 1329,
+    "onlineNewsDoc": 1287,
+    "twitter": 754,
+    "wikiChar": 746,
+    "wikiDoc": 745,
+    "wkfr": 681,
+  },
+  "jlpt": "n5",
+  "jouyouGrade": 1,
+  "keyword": "six",
+  "kklcIndex": 8,
+  "kun": "む",
+  "mainVocab": {
+    "first": {
+      "meaning": "6th day of the month, six days",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "六",
+          "keyword": "six",
+        },
+        {
+          "isKanji": true,
+          "kanji": "日",
+          "keyword": "day",
+        },
+      ],
+      "word": "六日",
+      "wordPartDetails": [
+        [
+          "六",
+          "むい",
+        ],
+        [
+          "日",
+          "か",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "June, sixth month of the lunar calendar",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "六",
+          "keyword": "six",
+        },
+        {
+          "isKanji": true,
+          "kanji": "月",
+          "keyword": "month",
+        },
+      ],
+      "word": "六月",
+      "wordPartDetails": [
+        [
+          "六",
+          "ろく",
+        ],
+        [
+          "月",
+          "がつ",
+        ],
+      ],
+    },
+  },
+  "on": "ろく",
+  "parts": [
+    {
+      "isKanji": false,
+      "keyword": "kettle lid",
+      "part": "亠",
+    },
+    {
+      "isKanji": true,
+      "keyword": "eight",
+      "part": "八",
+    },
+  ],
+  "phonetic": undefined,
+  "repReading": "ろく",
+  "repWord": "六",
+  "rtk": 6,
+  "strokes": 4,
+  "wk": 2,
+}
+`;
+
+exports[`extractKanjiHoverData (characterization against real data) > 朝: phonetic is a non-kanji component, katakana vocab chars are dropped from partsList 1`] = `
+{
+  "frequency": {
+    "aozoraChar": 213,
+    "aozoraDoc": 172,
+    "bunka": 182,
+    "dramaSubs": 199,
+    "google": 364,
+    "jisho": 248,
+    "jiten": 314,
+    "jpdb": 426,
+    "kd": 289,
+    "kuf": 225,
+    "mcd": 448,
+    "netflix": 339,
+    "novels5100": 234,
+    "onlineNewsChar": 35,
+    "onlineNewsDoc": 54,
+    "twitter": 104,
+    "wikiChar": 291,
+    "wikiDoc": 336,
+    "wkfr": 638,
+  },
+  "jlpt": "n4",
+  "jouyouGrade": 2,
+  "keyword": "morning",
+  "kklcIndex": 145,
+  "kun": "あさ",
+  "mainVocab": {
+    "first": {
+      "meaning": "TV Asahi",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "朝",
+          "keyword": "morning",
+        },
+        {
+          "isKanji": true,
+          "kanji": "日",
+          "keyword": "day",
+        },
+      ],
+      "word": "テレビ朝日",
+      "wordPartDetails": [
+        [
+          "テレビ",
+        ],
+        [
+          "朝",
+          "あさ",
+        ],
+        [
+          "日",
+          "ひ",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "this morning",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "今",
+          "keyword": "now",
+        },
+        {
+          "isKanji": true,
+          "kanji": "朝",
+          "keyword": "morning",
+        },
+      ],
+      "word": "今朝",
+      "wordPartDetails": [
+        [
+          "今朝",
+          "けさ",
+        ],
+      ],
+    },
+  },
+  "on": "ちょう",
+  "parts": [
+    {
+      "isKanji": true,
+      "keyword": "ten",
+      "part": "十",
+    },
+    {
+      "isKanji": true,
+      "keyword": "early",
+      "part": "早",
+    },
+    {
+      "isKanji": true,
+      "keyword": "month",
+      "part": "月",
+    },
+  ],
+  "phonetic": {
+    "isKanji": false,
+    "keyword": "thin car",
+    "phonetic": "𠦝",
+    "sound": [
+      "ちょう",
+      "かん",
+    ],
+  },
+  "repReading": "あさ",
+  "repWord": "朝",
+  "rtk": 53,
+  "strokes": 12,
+  "wk": 8,
+}
+`;

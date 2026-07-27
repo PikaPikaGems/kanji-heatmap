@@ -24,7 +24,7 @@ vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
 }));
 
 vi.mock("@/providers/kanji-representative-word-hooks", () => ({
-  useKanjiRepresentativeWord: (kanji: string) =>
+  useKanjiRepresentativeWordDetails: (kanji: string) =>
     kanji === "車"
       ? {
           word: "車",

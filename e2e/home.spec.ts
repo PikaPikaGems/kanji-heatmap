@@ -67,6 +67,46 @@ test.describe("explore screen", () => {
     await expect(page.getByRole("dialog")).toBeHidden();
   });
 
+  test("radical results preview virtualises without dropping matches", async ({
+    page,
+  }) => {
+    // The strip is virtualised, so only a window of the matches is in the DOM at
+    // once. jsdom cannot check this — it reports a zero-size viewport — so the
+    // guarantee that every match stays reachable is verified here.
+    await page.goto("/?search-type=radicals");
+    await page.getByPlaceholder("Click to select one or more radicals").click();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 30_000 });
+
+    await page.getByRole("button", { name: "水", exact: true }).first().click();
+
+    const strip = page.getByTestId("results-strip");
+    await expect(strip).toBeVisible();
+
+    const before = await strip.evaluate((el) => ({
+      mounted: el.querySelectorAll("button").length,
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      first: el.querySelector("button")?.textContent ?? "",
+    }));
+
+    // Scrollable, and mounting far fewer items than it can scroll through.
+    expect(before.scrollWidth).toBeGreaterThan(before.clientWidth);
+    expect(before.mounted).toBeGreaterThan(0);
+    expect(before.mounted * 200).toBeLessThan(before.scrollWidth * 2);
+
+    await strip.evaluate((el) => {
+      el.scrollLeft = el.scrollWidth;
+    });
+
+    // Later matches render on demand, so the leading item changes rather than
+    // the list simply ending early.
+    await expect
+      .poll(async () =>
+        strip.evaluate((el) => el.querySelector("button")?.textContent ?? "")
+      )
+      .not.toBe(before.first);
+  });
+
   test("clicking a kanji opens and closes the detail drawer", async ({
     page,
   }) => {

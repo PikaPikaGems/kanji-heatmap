@@ -1,37 +1,28 @@
 import { JLTPTtypes } from "../jlpt";
-import {
-  KanjiExtendedInfo,
-  KanjiInfoFrequency,
-  KanjiMainInfo,
-} from "./kanji-worker-types";
+import { KanjiInfoFrequency, WordPartDetail } from "./kanji-worker-types";
 
 export type KanjiInfoRequestType = "hover-card" | "general" | "radical-keyword";
 
-export type VocabExtendedInfo = {
-  vocabInfo?: {
-    first?: {
-      word: string;
-      meaning: string;
-      wordPartDetails: string[][];
-    };
-    second?: {
-      word: string;
-      meaning: string;
-      wordPartDetails: string[][];
-    };
-  };
-};
-export type KanjiCacheItem = {
-  main: KanjiMainInfo;
-  extended?: KanjiExtendedInfo & VocabExtendedInfo;
+type VocabWord = {
+  word: string;
+  meaning: string;
+  wordPartDetails: WordPartDetail[];
 };
 
+export type VocabExtendedInfo = {
+  vocabInfo?: {
+    // null (not undefined) when the kanji has no first/second sample word —
+    // that is what the worker's retrieveVocabInfo returns.
+    first?: VocabWord | null;
+    second?: VocabWord | null;
+  };
+};
 export type KanjiWordDetails = {
   word: string;
   meaning: string;
   // word: part details
   // "行為": [["行", "こう"], ["為","い"]]
-  wordPartDetails: string[][];
+  wordPartDetails: WordPartDetail[];
   partsList: {
     kanji: string;
     keyword: string;
@@ -70,9 +61,6 @@ export type HoverItemReturnData = {
   };
 };
 
-export type KanjiCacheType = Record<string, KanjiCacheItem>;
-export type KanjiPhoneticCacheType = Record<string, string[]>;
-export type KanjiPartKeywordCacheType = Record<string, string>;
 export type KanjiVocabCacheType = Record<
   string,
   { meaning: string; parts: string[][] }

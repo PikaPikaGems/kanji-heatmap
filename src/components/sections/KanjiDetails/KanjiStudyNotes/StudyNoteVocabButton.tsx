@@ -6,7 +6,7 @@ import {
   useVocabDetails,
   useWordKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { isJapanese } from "wanakana";
 
 interface StudyNoteVocabButtonProps {
@@ -26,7 +26,7 @@ export const StudyNoteVocabButton = ({
 }: StudyNoteVocabButtonProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
-  const representativeWord = useKanjiRepresentativeWord(
+  const representativeWord = useKanjiRepresentativeWordDetails(
     isSingleKanji(word) ? word : ""
   );
 

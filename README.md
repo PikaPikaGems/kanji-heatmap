@@ -70,10 +70,14 @@ Configure the visualizer settings in `vite.config.ts` if you want.
 
 ## Updating kanji data
 
+Upstream data is an **input**, not something the app serves directly: it goes
+into `./raw-data`, and `scripts/generate-v2-json.mjs` turns it into the files
+the app fetches from `./public/json/v2`. See `raw-data/README.md`.
+
 If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same parent directory, you can copy its output files directly:
 
 ```bash
-cp ../kanji-heatmap-data/output/*.json ./public/json
+cp ../kanji-heatmap-data/output/*.json ./raw-data
 ```
 
 Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) repository:
@@ -82,16 +86,16 @@ Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/Pika
 curl -OL https://github.com/PikaPikaGems/kanji-heatmap-data/releases/latest/download/kanji-heatmap-data.tar.gz
 ```
 
-Uncompress and store the JSON files in `./public/json`:
+Uncompress and store the JSON files in `./raw-data`:
 
 ```bash
-tar -xzf ./kanji-heatmap-data.tar.gz -C ./public/json/
+tar -xzf ./kanji-heatmap-data.tar.gz -C ./raw-data/
 ```
 
 You should have the following files updated (among others from the release):
 
 ```bash
-ls -la public/json
+ls -la raw-data
 ```
 
 ```text
@@ -108,11 +112,56 @@ vocab_furigana.json
 vocab_meaning.json
 ```
 
-Delete the `tar.gz` file since it is no longer needed:
+Regenerate the files the app actually serves, then delete the `tar.gz` since
+it is no longer needed:
 
 ```bash
+pnpm run generate-json
 rm kanji-heatmap-data.tar.gz
 ```
+
+`generate-json` reads `./raw-data` and writes `./public/json/v2` plus
+`docs/data/component-coverage.json`. It fails instead of writing if the data
+breaks an invariant (missing kanji, conflicting component keywords, furigana
+that does not round-trip, a sort field that is not a number).
+
+#### Checking data sizes
+
+`generate-json` prints the size and entry count of everything it writes, so
+the quickest check is to run it and read the output.
+
+To measure the files independently — inputs and served output, raw and
+gzipped, which is what matters over the wire — paste this:
+
+```bash
+for f in raw-data/*.json public/json/*.json public/json/v2/*.json docs/data/*.json; do
+  printf "%7s %7s  %s\n" \
+    "$(( $(stat -c%s "$f") / 1024 ))K" \
+    "$(( $(gzip -9 -c "$f" | wc -c) / 1024 ))K" \
+    "$f"
+done | sort -k3
+```
+
+Columns are raw, gzipped, path. (On macOS, `stat -c%s` is `stat -f%z`.)
+
+Totals per directory, and the eager/lazy split that
+`docs/notes/kanji-worker-data-redesign.md` documents:
+
+```bash
+# gzipped total of everything served from public/json/v2, summed per file
+# (each is fetched separately, so the per-file sum is what goes over the wire —
+# don't `cat` them together first, that compresses across files and overstates)
+for f in public/json/v2/*.json; do gzip -9 -c "$f" | wc -c; done |
+  awk '{t+=$1} END {printf "%.0f KB gz total\n", t/1024}'
+
+# the one file loaded before first paint — everything else is lazy
+gzip -9 -c public/json/v2/kanji_main.json | wc -c |
+  awk '{printf "%.0f KB gz eager\n", $1/1024}'
+```
+
+§5 of `docs/notes/kanji-worker-data-redesign.md` lists the expected size and
+entry count of every generated file, so these commands verify the design note
+rather than trusting it.
 
 ### Regenerating derived JSON
 
@@ -126,15 +175,18 @@ The `/speed-katakana` game loads word lists from `public/json/katakana/challenge
 
 #### Other required data
 
-These files in `public/` should exist (see also `./src/lib/assets-paths.ts`):
+Every JSON the app fetches from `public/` is committed, so a fresh clone plus
+`pnpm run generate-speed-katakana` is enough to run the site. The only data
+_not_ in the repo is the per-kanji vocabulary, which is gitignored because it
+is one file per kanji (see also `./src/lib/assets-paths.ts`):
 
-- `/json/kanji-structure-hlorenzi.json`
-- `/json/kanji-readings-details.json`
-- `/json/kanji-structure-kanjium.json`
-- `/json/kanji-structure-scott.json`
-- `/json/kanji-structure-yagays.json`
 - `/kanji-textbook-words-min/<KANJI>.json`
 - `/kanji-words/v4/<KANJI>.json`
+
+These paths are used in development only. In production the same data is
+served from `https://assets.pikapikagems.com`, so the site works without them;
+locally, the vocabulary sections of the kanji drawer stay empty until you
+populate the two directories.
 
 ## Talk to us
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  KanjiExtendedInfo,
+  KanjiGeneralInfo,
   KanjiInfoFrequency,
   KanjiMainInfo,
 } from "@/lib/kanji/kanji-worker-types";
@@ -13,68 +13,68 @@ import { filterKanji, searchKanji, sortKanji } from "./kanji-search";
 const mainInfo = (
   keyword: string,
   jlpt: JLTPTtypes = "none",
-  netflix: number | null = null
+  netflix: number | null = null,
+  // Sort and filter read these from the main info, so the fixtures carry them.
+  numbers: {
+    strokes?: number;
+    jouyouGrade?: number;
+    wk?: number;
+    kklcIndex?: number;
+    rtk?: number;
+  } = {}
 ): KanjiMainInfo => ({
   keyword,
   jlpt,
   on: "",
   kun: "",
   frequency: { netflix } as KanjiInfoFrequency,
+  strokes: numbers.strokes ?? 1,
+  jouyouGrade: numbers.jouyouGrade ?? -1,
+  wk: numbers.wk ?? -1,
+  kklcIndex: numbers.kklcIndex ?? -1,
+  rtk: numbers.rtk ?? -1,
+  repWord: null,
+  repReading: null,
 });
 
+// Meanings and readings only: strokes and grade now live on the main info.
 const extendedInfo = ({
-  strokes = 1,
   meanings = [],
   allOn = [],
   allKunStripped = [],
-  jouyouGrade = -1,
 }: {
-  strokes?: number;
   meanings?: string[];
   allOn?: string[];
   allKunStripped?: string[];
-  jouyouGrade?: number;
-}): KanjiExtendedInfo => ({
-  parts: new Set(),
-  strokes,
-  rtk: -1,
-  wk: -1,
-  jouyouGrade,
+}): KanjiGeneralInfo => ({
   meanings,
   allOn: new Set(allOn),
   allKun: new Set(allKunStripped),
   allKunStripped: new Set(allKunStripped),
-  kklcIndex: -1,
 });
 
 // 水 (water), 火 (fire), 山 (mountain) — enough to exercise every search type.
 const pool = {
   main: {
-    水: mainInfo("water", "n5", 10),
-    火: mainInfo("fire", "n4", 5),
-    山: mainInfo("mountain", "none", null),
+    水: mainInfo("water", "n5", 10, { strokes: 4, jouyouGrade: 1 }),
+    火: mainInfo("fire", "n4", 5, { strokes: 4, jouyouGrade: -1 }),
+    山: mainInfo("mountain", "none", null, { strokes: 3, jouyouGrade: 2 }),
   },
   extended: {
     水: extendedInfo({
-      strokes: 4,
       meanings: ["water", "liquid"],
       allOn: ["すい"],
       allKunStripped: ["みず"],
-      jouyouGrade: 1,
     }),
     火: extendedInfo({
-      strokes: 4,
       meanings: ["fire", "flame"],
       allOn: ["か"],
       allKunStripped: ["ひ"],
-      jouyouGrade: -1,
     }),
     山: extendedInfo({
-      strokes: 3,
       meanings: ["mountain"],
       allOn: ["さん"],
       allKunStripped: ["やま"],
-      jouyouGrade: 2,
     }),
   },
   similar: { 水: ["氷"] },
@@ -262,11 +262,15 @@ describe("searchKanji", () => {
     expect(result).toEqual(["山", "水", "火"]);
   });
 
-  it("skips kanji that exist in main but lack extended info", () => {
+  it("does not crash or match text when a kanji lacks extended info", () => {
+    // Strokes and grade come from the main info now, so a kanji present in
+    // main is filtered and sorted normally even with no extended entry. What
+    // must still hold is that text searches, which do read extended, skip it
+    // instead of throwing.
     const mismatchedPool = {
       main: {
         ...pool.main,
-        氷: mainInfo("ice", "n2", 20),
+        氷: mainInfo("ice", "n2", 20, { strokes: 5 }),
       },
       extended: pool.extended,
     };
@@ -283,6 +287,24 @@ describe("searchKanji", () => {
         settings({ type: "readings", text: "", primary: "strokes" }),
         mismatchedPool
       )
-    ).toEqual(["山", "水", "火"]);
+    ).toEqual(["山", "水", "火", "氷"]);
+
+    // "meanings" also matches the keyword, which lives in main, so 氷 is
+    // still findable without extended info.
+    expect(
+      searchKanji(settings({ type: "meanings", text: "ice" }), mismatchedPool)
+    ).toEqual(["氷"]);
+
+    // Reading searches read extended only, so 氷 is skipped rather than
+    // throwing on undefined.
+    expect(
+      searchKanji(settings({ type: "onyomi", text: "hi" }), mismatchedPool)
+    ).toEqual([]);
+    expect(
+      searchKanji(
+        settings({ type: "meanings", text: "frozen" }),
+        mismatchedPool
+      )
+    ).toEqual([]);
   });
 });

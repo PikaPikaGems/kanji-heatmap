@@ -4,16 +4,19 @@ import { FilterSettings } from "@/lib/settings/settings";
 export const needsClientListFilters = (filters: FilterSettings) =>
   filters.bookmarkedOnly || filters.withAnchorWordsOnly;
 
+/** Anything that can answer "is this kanji in the set?". */
+type Membership = { has: (kanji: string) => boolean };
+
 /**
- * Apply bookmark / anchor-word filters that the kanji worker cannot see
- * (localStorage bookmarks + representative-word JSON).
+ * Apply bookmark / anchor-word filters that the worker search cannot express
+ * (localStorage bookmarks, and the anchor-word toggle).
  */
 export const applyClientListFilters = (
   kanjis: string[],
   filters: FilterSettings,
   ctx: {
-    bookmarkedKanji: ReadonlySet<string>;
-    kanjiWithAnchorWords: ReadonlySet<string> | null;
+    bookmarkedKanji: Membership;
+    kanjiWithAnchorWords: Membership | null;
   }
 ): string[] => {
   let result = kanjis;

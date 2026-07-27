@@ -3,19 +3,20 @@ import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper"
 import { useContextWithCatch } from "../providers/helpers";
 
 import { SearchSettings } from "@/lib/settings/settings";
-import { KanjiInfoRequestType } from "@/lib/kanji/kanji-info-types";
+import {
+  GeneralKanjiItem,
+  HoverItemReturnData,
+  KanjiInfoRequestType,
+} from "@/lib/kanji/kanji-info-types";
 import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import {
+  GetBasicKanjiInfo,
+  SearchResponse,
+} from "@/lib/kanji/kanji-worker-types";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
-export type KanjiRequestFn = (
-  k: string,
-  type: KanjiInfoRequestType
-) => Promise<unknown>;
-
-export const ActionContext = createContext<KanjiRequestFn | null>(null);
 export const IsReadyContext = createContext<boolean>(false);
 export const GetBasicKanjiInfoContext = createContext<GetBasicKanjiInfo | null>(
   null
@@ -44,13 +45,20 @@ interface QueryState<T> {
  * Pass `run = null` to disable the query (empty / "none" inputs); the hook
  * resets to idle. `keepPreviousData` keeps the last data visible during the
  * next load (default true — avoids a flash of empty state between requests).
+ * `initialData` seeds the first render, so a remount with an answer already in
+ * hand renders it immediately instead of flashing a loading state.
  */
-const useWorkerQuery = <T,>(
+export const useWorkerQuery = <T,>(
   run: (() => Promise<T>) | null,
   deps: DependencyList,
-  keepPreviousData = true
+  keepPreviousData = true,
+  initialData?: T
 ): QueryState<T> => {
-  const [state, setState] = useState<QueryState<T>>({ status: "idle" });
+  const [state, setState] = useState<QueryState<T>>(
+    initialData === undefined
+      ? { status: "idle" }
+      : { status: "success", data: initialData }
+  );
 
   // Effect needed: dispatches a request to the web worker (external async
   // system) keyed to `deps`; the cancelled flag drops stale responses.
@@ -93,15 +101,6 @@ const useWorkerQuery = <T,>(
   return state;
 };
 
-export const useKanjiWorkerRequest = () => {
-  const fn = useContextWithCatch(
-    ActionContext,
-    "KanjiWorker",
-    "KanjiWorkerRequest"
-  );
-  return fn;
-};
-
 export const useIsKanjiWorkerReady = () => {
   const ready = useContextWithCatch(
     IsReadyContext,
@@ -120,64 +119,44 @@ export const useGetKanjiInfoFn = () => {
   return fn;
 };
 
-type SearchResult = { kanjis: string[]; possibleRadicals?: Set<string> };
+/**
+ * Search results keyed by the settings that produced them.
+ *
+ * The list screen unmounts on every route change, so returning to it used to
+ * restart the query from scratch and show the loading skeleton again for a
+ * result the worker had already computed. The data is static, so a previous
+ * answer for identical settings is always still correct.
+ */
+const searchResultCache = new Map<string, SearchResponse>();
+
+const searchCacheKey = (settings: SearchSettings) => JSON.stringify(settings);
 
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
-  // ItemCountBadge (and similar) can mount before the worker finishes loading
-  // main + extended maps. Searching with only main populated crashes the
-  // worker on `exInfo.strokes` and rejects every pending request via onerror.
+  // ItemCountBadge (and similar) can mount before the worker is ready; the
+  // query stays idle until then rather than racing initialisation.
   const ready = useIsKanjiWorkerReady();
+  const cacheKey = searchCacheKey(searchSettings);
 
-  const state = useWorkerQuery<SearchResult>(
+  const state = useWorkerQuery<SearchResponse>(
     ready
       ? () =>
           requestWorker({
             type: "search",
             payload: searchSettings,
-          }) as Promise<SearchResult>
+          }).then((response) => {
+            searchResultCache.set(cacheKey, response);
+            return response;
+          })
       : null,
-    [searchSettings, ready]
+    [searchSettings, ready],
+    true,
+    searchResultCache.get(cacheKey)
   );
 
   return {
     status: state.status,
     data: state.data?.kanjis,
     additionalData: state.data?.possibleRadicals,
-    error: (state.error as string | undefined) ?? null,
-  };
-};
-
-/** Shared across hook instances so list cells don't each hit the worker. */
-let jouyouGradeMapCache: Record<string, number> | null = null;
-let jouyouGradeMapPromise: Promise<Record<string, number>> | null = null;
-
-const fetchJouyouGradeMap = () => {
-  if (jouyouGradeMapCache) {
-    return Promise.resolve(jouyouGradeMapCache);
-  }
-  if (!jouyouGradeMapPromise) {
-    jouyouGradeMapPromise = requestWorker({
-      type: "jouyou-grade-map",
-    }).then((data) => {
-      jouyouGradeMapCache = data as Record<string, number>;
-      return jouyouGradeMapCache;
-    });
-  }
-  return jouyouGradeMapPromise;
-};
-
-/** Kanji → jouyou school grade from the extended cache (ready once worker is). */
-export const useJouyouGradeMap = (enabled = true) => {
-  const ready = useIsKanjiWorkerReady();
-
-  const state = useWorkerQuery<Record<string, number>>(
-    ready && enabled ? fetchJouyouGradeMap : null,
-    [ready, enabled]
-  );
-
-  return {
-    status: state.status,
-    data: state.data ?? jouyouGradeMapCache ?? undefined,
     error: (state.error as string | undefined) ?? null,
   };
 };
@@ -191,7 +170,7 @@ export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
           requestWorker({
             type: "search-result-count",
             payload: searchSettings,
-          }) as Promise<number>
+          })
       : null,
     [searchSettings, ready]
   );
@@ -207,19 +186,14 @@ export const useKanjiInfo = (
   kanji: string,
   requestType: KanjiInfoRequestType | "none"
 ) => {
-  const requestFn = useKanjiWorkerRequest();
-
-  const state = useWorkerQuery<unknown>(
+  const state = useWorkerQuery<HoverItemReturnData | GeneralKanjiItem>(
     requestType === "none"
       ? null
       : () =>
-          requestFn == null
-            ? Promise.reject({
-                message:
-                  "requestFn does not exist. Please check KanjiWorkerProvider",
-              })
-            : requestFn(kanji, requestType),
-    [kanji, requestType, requestFn]
+          requestType === "hover-card"
+            ? requestWorker({ type: "kanji-hover", payload: kanji })
+            : requestWorker({ type: "kanji-general", payload: kanji }),
+    [kanji, requestType]
   );
 
   return {
@@ -259,20 +233,13 @@ export interface VocabInfo {
   parts: WordPartDetail[];
 }
 
-type VocabWorkerResponse = {
-  word: string;
-  meaning: string;
-  wordPartDetails: WordPartDetail[];
-} | null;
-
 // Hook to get vocab info for a specific word
 export const useVocabDetails = (word: string) => {
   const state = useWorkerQuery<VocabInfo | null>(
     word
       ? () =>
           requestWorker({ type: "retrieve-vocab-info", payload: word }).then(
-            (result) => {
-              const response = result as VocabWorkerResponse;
+            (response) => {
               if (response == null) {
                 return null;
               }
@@ -313,6 +280,22 @@ export const useWordKanjis = (word: string) => {
   }, [word, getKanjiInfo]);
 };
 
+/**
+ * The whole similar-kanji map, for callers that need to look up many kanji at
+ * once. The worker already holds this dataset, so asking it avoids a second
+ * download of the same file on the main thread.
+ */
+export const useSimilarKanjiMap = () => {
+  const ready = useIsKanjiWorkerReady();
+
+  const state = useWorkerQuery<Record<string, string[]>>(
+    ready ? () => requestWorker({ type: "similar-map" }) : null,
+    [ready]
+  );
+
+  return state.data;
+};
+
 export const useSimilarKanjis = (kanji: string) => {
   const state = useWorkerQuery<string[]>(
     kanji
@@ -320,7 +303,7 @@ export const useSimilarKanjis = (kanji: string) => {
           requestWorker({
             type: "kanji-similar",
             payload: kanji,
-          }) as Promise<string[]>
+          })
       : null,
     [kanji],
     // Reset to empty between kanji so the previous kanji's matches never show
