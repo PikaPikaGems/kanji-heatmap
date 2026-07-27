@@ -119,11 +119,10 @@ function loadSvg(
     if (xhr.readyState !== 4) return;
     if (xhr.status === 200) {
       callbacks.done(index, parseResponse(xhr.response, code));
-    } else if (xhr.status === 0) {
-      // Aborted / navigated away — ignore.
     } else {
-      callbacks.error(xhr.statusText);
-      // Still complete so Dmak.prepare runs instead of hanging forever.
+      // Non-200 includes status 0 (offline / network error). Always complete
+      // so Dmak.prepare runs instead of hanging on a blank host forever.
+      callbacks.error(xhr.statusText || "network");
       callbacks.done(index, []);
     }
   };
