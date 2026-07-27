@@ -87,14 +87,15 @@ export const SortAndFilterSettingsForm = ({
                     defaultValue={null}
                   />
                 </div>
-                {isCommunityOrder(sortValues.secondary) && (
-                  <div
-                    key={`disclaimer-${sortValues.secondary}`}
-                    className="px-3 mt-1 text-xs text-left animate-fade-in"
-                  >
-                    {orderDisclaimer}
-                  </div>
-                )}
+                {isCommunityOrder(sortValues.secondary) &&
+                  !isCommunityOrder(sortValues.primary) && (
+                    <div
+                      key={`disclaimer-${sortValues.secondary}`}
+                      className="px-3 mt-1 text-xs text-left animate-fade-in"
+                    >
+                      {orderDisclaimer}
+                    </div>
+                  )}
               </div>
             )
           }
@@ -167,7 +168,7 @@ export const SortAndFilterSettingsForm = ({
         />
       </div>
       <div className="px-2 pt-4 mt-4 border-t">
-        <div className="flex min-h-12 items-center justify-end">
+        <div className="flex items-center justify-end min-h-12">
           {!isDisabled ? (
             <div key="item-count" className="w-full animate-fade-in-slow">
               <ItemCount
@@ -177,7 +178,7 @@ export const SortAndFilterSettingsForm = ({
           ) : (
             <div
               key="no-changes"
-              className="flex w-full items-center justify-end text-xs animate-fade-in-slow"
+              className="flex items-center justify-end w-full text-xs animate-fade-in-slow"
             >
               There are no changes to apply yet.
             </div>
