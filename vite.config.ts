@@ -212,11 +212,11 @@ const pwaConfig = {
       // FONTS
       // **********************
       {
-        urlPattern: /assets\/.*\.(woff2|woff)$/i,
+        urlPattern: /\/(assets|font)\/.*\.(woff2|woff)$/i,
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-heatmap-fonts",
-          expiration: { maxEntries: 30, maxAgeSeconds: 365 * 24 * 60 * 60 },
+          expiration: { maxEntries: 40, maxAgeSeconds: 365 * 24 * 60 * 60 },
         },
       },
       // **********************
@@ -259,12 +259,12 @@ const pwaConfig = {
         // Speed-katakana challenge sets: 200 small files, and a player only ever
         // revisits a handful, so this is the one that should be evicting.
         urlPattern: /\/json\/katakana\/.*\.json$/i,
-        handler: "StaleWhileRevalidate" as const,
+        handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-heatmap-katakana-cache",
           expiration: {
-            maxEntries: 50,
-            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+            maxEntries: 230,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // 1 week
           },
         },
       },
