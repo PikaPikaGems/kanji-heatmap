@@ -35,6 +35,8 @@ import {
   AlertCircle,
   Undo2,
   Trash2,
+  Download,
+  Loader2,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -72,4 +74,6 @@ export {
   AlertCircle,
   Undo2,
   Trash2,
+  Download,
+  Loader2,
 };
