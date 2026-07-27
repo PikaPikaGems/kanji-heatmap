@@ -21,7 +21,8 @@
     "format:check": "prettier --check .",
     "generate-more-info": "node scripts/generate-more-info.mjs",
     "generate-speed-katakana": "node scripts/generate-speed-katakana.mjs",
-    "generate-json": "node scripts/generate-v2-json.mjs"
+    "generate-json": "node scripts/generate-v2-json.mjs",
+    "download-kanji-svgs": "node scripts/download-kanji-svgs.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",
