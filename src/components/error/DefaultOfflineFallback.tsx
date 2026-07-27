@@ -1,11 +1,10 @@
 import { DefaultErrorFallback } from "./DefaultErrorFallback";
 
 export const DefaultOfflineFallback = () => {
-  const offlineMessage = `This feature isn’t cached yet 😅—Try it out once while online, and it'll be available anytime, anywhere—even offline! 📱✨`;
-
+  const offlineMessage = `Not cached yet 😅 Try it once while you're online, and it'll be available anytime, anywhere—even offline! 📱✨`;
   return (
     <div className="mt-10">
-      <DefaultErrorFallback message={offlineMessage} showDefaultCta={false} />
+      <DefaultErrorFallback message={offlineMessage} />
     </div>
   );
 };
