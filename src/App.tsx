@@ -18,6 +18,7 @@ import {
 import { Header, FloatingIsland, PracticeFab } from "@/components/site-layout/";
 import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
+import { StrokeOrderUnavailableGalleryPage } from "@/components/screens/StrokeOrderUnavailableGalleryPage";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 
 const {
@@ -111,6 +112,11 @@ const App = () => {
                         <Route path="/docs">
                           <Redirect to="/about" />
                         </Route>
+                        {/* Temporary: compare stroke-order unavailable fallbacks */}
+                        <Route
+                          path="/gallery"
+                          component={StrokeOrderUnavailableGalleryPage}
+                        />
                         <Route path="*">
                           <div className="w-full pr-4 mt-14">
                             <PageNotFound />
