@@ -66,7 +66,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
         text-to-speech, which may not work in some devices.
       </p>
       <p className="text-xs text-left">
-        {"⚠️"} We strive for accuracy, but mistakes can happen. If you find an
+        {"⚠️"} We strive for accuracy, but mistakes can happen. If you find a
         content issue, please report it{" "}
         <ExternalTextLink href={outLinks.githubContentIssue} text="here" /> 🐞🐛
         . Always verify important information with official sources.
