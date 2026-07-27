@@ -89,9 +89,8 @@ export function preloadKanjiSvgs(
 export function preloadKatakanaChallenges(
   onProgress?: (done: number, total: number) => void
 ): CancellablePreload {
-  const urls = Array.from(
-    { length: KATAKANA_CHALLENGE_SET_COUNT },
-    (_, i) => katakanaChallengeUrl(i + 1)
+  const urls = Array.from({ length: KATAKANA_CHALLENGE_SET_COUNT }, (_, i) =>
+    katakanaChallengeUrl(i + 1)
   );
   return runPool(urls, onProgress);
 }
