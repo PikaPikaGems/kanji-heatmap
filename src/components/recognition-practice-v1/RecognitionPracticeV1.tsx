@@ -12,7 +12,7 @@ import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import { RecognitionPracticeSettings, SessionResult } from "./types";
 
 /** Toggle off to size the shell with `bottom-0` instead of visualViewport height. */
-const visualPortOn = true;
+const visualPortOn = false;
 
 const RecognitionPracticeV1 = () => {
   useHtmlDocumentTitle(recognitionPracticePageMeta.heading);
