@@ -1,4 +1,5 @@
 import assetsPaths from "@/lib/assets-paths";
+import { localKanjiSvgUrl } from "@/lib/kanji-svg-url";
 import type { MainKanjiInfoResponseType } from "@/lib/kanji/kanji-worker-types";
 
 const CONCURRENCY = 6;
@@ -10,12 +11,6 @@ export const KATAKANA_CACHE_NAME = "kanji-heatmap-katakana-cache";
 type CancellablePreload = {
   promise: Promise<void>;
   cancel: () => void;
-};
-
-/** Same 5-digit hex convention as dmak-safe-loader.ts's loadSvg. */
-const kanjiSvgUrl = (kanji: string) => {
-  const code = `00000${kanji.charCodeAt(0).toString(16)}`.slice(-5);
-  return `${assetsPaths.KANJI_SVGS}${code}.svg`;
 };
 
 const katakanaChallengeUrl = (setNumber: number) =>
@@ -72,7 +67,7 @@ export function preloadKanjiSvgs(
     .then((res) => res.json() as Promise<MainKanjiInfoResponseType>)
     .then((data) => {
       if (cancelled) return;
-      const urls = Object.keys(data).map(kanjiSvgUrl);
+      const urls = Object.keys(data).map(localKanjiSvgUrl);
       inner = runPool(urls, onProgress);
       return inner.promise;
     });

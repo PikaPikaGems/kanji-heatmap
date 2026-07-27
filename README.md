@@ -188,6 +188,26 @@ served from `https://assets.pikapikagems.com`, so the site works without them;
 locally, the vocabulary sections of the kanji drawer stay empty until you
 populate the two directories.
 
+#### Kanji stroke-order SVGs
+
+Stroke-order SVGs for the kanji in `raw-data/filtered_kanji.json` (the
+~2426-kanji core set) are committed under `public/json/svg/` and served
+same-origin, so the "Download Kanji SVGs" preload in Settings — and every
+kanji drawer view — never has to hit `assets.pikapikagems.com` for them.
+Kanji outside that set (e.g. 唸) still lazy-load from the CDN on demand; see
+`src/lib/kanji-svg-url.ts` for the local-first/CDN-fallback lookup.
+
+To (re)populate `public/json/svg/` from a machine with network access:
+
+```bash
+pnpm run download-kanji-svgs
+```
+
+By default it pulls from `kanjivg.tagaini.net` (the canonical KanjiVG
+source); pass `--source=pikapikagems` to pull from
+`assets.pikapikagems.com` instead, or `--force` to re-download files that
+already exist. See the script's header comment for details.
+
 ## Talk to us
 
 - [Discord](https://discord.gg/Ash8ZrGb4s)
