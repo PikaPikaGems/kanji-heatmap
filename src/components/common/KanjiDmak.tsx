@@ -10,11 +10,7 @@ import {
   kanjiSvgCode,
   kanjiSvgUrl,
 } from "@/lib/kanji-svg-url";
-import {
-  StrokeOrderUnavailable,
-  STROKE_ORDER_UNAVAILABLE_VARIANT,
-  type StrokeOrderUnavailableVariant,
-} from "@/components/common/StrokeOrderUnavailable";
+import { StrokeOrderUnavailable } from "@/components/common/StrokeOrderUnavailable";
 import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
@@ -40,7 +36,6 @@ export const KanjiDMAK = ({
   size,
   staticMode = false,
   gridShow = true,
-  unavailableVariant = STROKE_ORDER_UNAVAILABLE_VARIANT,
   onUnavailableChange,
 }: {
   kanji: string;
@@ -49,7 +44,6 @@ export const KanjiDMAK = ({
   // when true: draws all strokes instantly with stroke-order numbers visible
   staticMode?: boolean;
   gridShow?: boolean;
-  unavailableVariant?: StrokeOrderUnavailableVariant;
   /** Fired when the SVG becomes unavailable or recovers (e.g. hint blur). */
   onUnavailableChange?: (unavailable: boolean) => void;
 }) => {
@@ -117,7 +111,6 @@ export const KanjiDMAK = ({
     return (
       <StrokeOrderUnavailable
         size={size}
-        variant={unavailableVariant}
         onRetry={() => setRetryKey((k) => k + 1)}
       />
     );
@@ -138,14 +131,12 @@ export const StrokeOrderReplay = ({
   replayClassName,
   buttonRowClassName = "flex justify-center space-x-2",
   buttonClassName,
-  unavailableVariant = STROKE_ORDER_UNAVAILABLE_VARIANT,
 }: {
   kanji: string;
   size: number;
   replayClassName?: string;
   buttonRowClassName?: string;
   buttonClassName?: string;
-  unavailableVariant?: StrokeOrderUnavailableVariant;
 }) => {
   const [key, setKey] = useState(1);
   const [speed, setSpeed] = useState<AnimationSpeed>("fast");
@@ -185,7 +176,6 @@ export const StrokeOrderReplay = ({
             kanji={kanji}
             step={SPEEDS[speed].rate}
             size={size}
-            unavailableVariant={unavailableVariant}
             onUnavailableChange={setUnavailable}
           />
         </div>
