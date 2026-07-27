@@ -133,7 +133,7 @@ export const Game = ({
         visual-viewport height changes so the keyboard opening/closing does
         not shove content around. Fine-pointer devices center instead.
       */}
-      <div className="flex flex-col items-center shrink-0 px-4 pt-8 text-center">
+      <div className="flex flex-col items-center px-4 pt-8 text-center shrink-0">
         <div
           className={current.fontIndex === null ? "kanji-font" : ""}
           style={
@@ -155,7 +155,7 @@ export const Game = ({
           text={current.englishGloss}
           resetKey={index}
           forceReveal={feedback != null}
-          className="mt-6 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+          className="mt-1 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
         />
       </div>
 
