@@ -3,4 +3,7 @@
   "name": "kanji-heatmap",
   "compatibility_date": "2026-06-16",
   "pages_build_output_dir": "./dist",
+  "secrets": {
+    "required": ["KH_API_URL", "KH_APP_NAME"],
+  },
 }
