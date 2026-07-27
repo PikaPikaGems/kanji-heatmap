@@ -1,4 +1,6 @@
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect } from "react";
+import { notifyStorage } from "@/lib/storage";
+import { useStorageValue } from "./use-storage-value";
 
 const LOCAL_STORAGE_THEME_COLOR_KEY = "theme-color";
 
@@ -24,37 +26,49 @@ export const themeColorsRgb = [
   "99, 102, 241", // indigo (indigo-500)
 ];
 
-// rgbToHex(color)
-export const useChangeThemeColor = () => {
-  const colorIdRef = useRef(0);
+const readThemeColorIndex = () => {
+  const stored = Number(localStorage.getItem(LOCAL_STORAGE_THEME_COLOR_KEY));
+  return Number.isNaN(stored) ? 0 : stored;
+};
+
+/** Applies + persists a theme color index without notifying other instances. */
+const applyThemeColorStyle = (colorIndex: number) => {
+  document.documentElement.style.setProperty(
+    "--theme-color-selected",
+    themeColorsRgb[colorIndex]
+  );
+  localStorage.setItem(LOCAL_STORAGE_THEME_COLOR_KEY, colorIndex.toString());
+};
+
+/**
+ * Reactive current theme-color index + a direct setter. Stays in sync across
+ * every hook instance (cycle button, settings grid) via the same
+ * storage-event plumbing as useLocalStorageFlag.
+ */
+export const useCurrentThemeColor = () => {
+  const colorIndex = useStorageValue(
+    readThemeColorIndex,
+    (key) => key === LOCAL_STORAGE_THEME_COLOR_KEY
+  );
 
   const setThemeColor = useCallback((colorIndex: number) => {
-    document.documentElement.style.setProperty(
-      "--theme-color-selected",
-      themeColorsRgb[colorIndex]
-    );
-    localStorage.setItem(LOCAL_STORAGE_THEME_COLOR_KEY, colorIndex.toString());
+    applyThemeColorStyle(colorIndex);
+    notifyStorage(LOCAL_STORAGE_THEME_COLOR_KEY);
   }, []);
-
-  const nextThemeColor = useCallback(() => {
-    colorIdRef.current = (colorIdRef.current + 1) % themeColorsRgb.length;
-    setThemeColor(colorIdRef.current);
-  }, [setThemeColor]);
 
   // Layout effect needed: applies the persisted theme color to a CSS var on
   // the root element before paint (avoids a color flash).
   useLayoutEffect(() => {
-    const themeColor = Number(
-      localStorage.getItem(LOCAL_STORAGE_THEME_COLOR_KEY)
-    );
+    applyThemeColorStyle(readThemeColorIndex());
+  }, []);
 
-    if (Number.isNaN(themeColor)) {
-      setThemeColor(0);
-      return;
-    }
+  return [colorIndex, setThemeColor] as [number, (colorIndex: number) => void];
+};
 
-    setThemeColor(themeColor);
-  }, [setThemeColor]);
+export const useChangeThemeColor = () => {
+  const [colorIndex, setThemeColor] = useCurrentThemeColor();
 
-  return nextThemeColor;
+  return useCallback(() => {
+    setThemeColor((colorIndex + 1) % themeColorsRgb.length);
+  }, [colorIndex, setThemeColor]);
 };

@@ -13,6 +13,7 @@ import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
+import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -70,6 +71,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
       >
         <DebugInfo />
         <RefreshPageBtn />
+        <SettingsModal />
       </div>
     </div>
   );

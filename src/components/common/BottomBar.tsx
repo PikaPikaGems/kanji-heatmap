@@ -5,6 +5,7 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
+import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
 
 export const BottomBar = ({
   includeNode,
@@ -26,6 +27,7 @@ export const BottomBar = ({
         <DotIcon className="w-2 m-0" />
         <DebugInfo />
         <RefreshPageBtn />
+        <SettingsModal />
         <ModeToggle />
         {includeNode}
       </div>

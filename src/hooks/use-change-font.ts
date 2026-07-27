@@ -1,4 +1,6 @@
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect } from "react";
+import { notifyStorage } from "@/lib/storage";
+import { useStorageValue } from "./use-storage-value";
 
 const LOCAL_STORAGE_KANJI_FONT_KEY = "kanji-font";
 export const NUMBER_OF_FONTS = 15;
@@ -7,36 +9,49 @@ export const NUMBER_OF_FONTS = 15;
 export const randomFontIndex = () =>
   Math.floor(Math.random() * NUMBER_OF_FONTS);
 
-export const useChangeFont = () => {
-  const fontIdRef = useRef(0);
+const readFontIndex = () => {
+  const stored = Number(localStorage.getItem(LOCAL_STORAGE_KANJI_FONT_KEY));
+  return Number.isNaN(stored) ? 0 : stored;
+};
+
+/** Applies + persists a font index without notifying other instances. */
+const applyFontStyle = (fontNum: number) => {
+  document.documentElement.style.setProperty(
+    "--kanji-font",
+    `var(--jap-font-${fontNum})`
+  );
+  localStorage.setItem(LOCAL_STORAGE_KANJI_FONT_KEY, fontNum.toString());
+};
+
+/**
+ * Reactive current font index + a direct setter. Stays in sync across every
+ * hook instance (cycle buttons, settings grid) via the same storage-event
+ * plumbing as useLocalStorageFlag.
+ */
+export const useCurrentFont = () => {
+  const fontIndex = useStorageValue(
+    readFontIndex,
+    (key) => key === LOCAL_STORAGE_KANJI_FONT_KEY
+  );
 
   const setFont = useCallback((fontNum: number) => {
-    document.documentElement.style.setProperty(
-      "--kanji-font",
-      `var(--jap-font-${fontNum})`
-    );
-    localStorage.setItem(LOCAL_STORAGE_KANJI_FONT_KEY, fontNum.toString());
+    applyFontStyle(fontNum);
+    notifyStorage(LOCAL_STORAGE_KANJI_FONT_KEY);
   }, []);
-
-  const nextFont = useCallback(() => {
-    fontIdRef.current = (fontIdRef.current + 1) % NUMBER_OF_FONTS;
-    setFont(fontIdRef.current);
-  }, [setFont]);
 
   // Layout effect needed: applies the persisted kanji font to a CSS var on
   // the root element before paint (avoids a font flash).
   useLayoutEffect(() => {
-    const kanjiFont = Number(
-      localStorage.getItem(LOCAL_STORAGE_KANJI_FONT_KEY)
-    );
+    applyFontStyle(readFontIndex());
+  }, []);
 
-    if (Number.isNaN(kanjiFont)) {
-      setFont(0);
-      return;
-    }
+  return [fontIndex, setFont] as [number, (fontNum: number) => void];
+};
 
-    setFont(kanjiFont);
-  }, [setFont]);
+export const useChangeFont = () => {
+  const [fontIndex, setFont] = useCurrentFont();
 
-  return nextFont;
+  return useCallback(() => {
+    setFont((fontIndex + 1) % NUMBER_OF_FONTS);
+  }, [fontIndex, setFont]);
 };
