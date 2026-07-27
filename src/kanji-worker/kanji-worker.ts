@@ -304,6 +304,21 @@ const HANDLERS: {
     ]);
     return { mainInfoMap, componentsMap };
   },
+  // Best-effort: allSettled so one failed fetch does not abort the rest;
+  // lazyDataset clears failed promises so a later real request can retry.
+  preload: async () => {
+    await Promise.allSettled([
+      loadHoverInfo(),
+      loadVocab(),
+      loadGeneralInfo(),
+      loadSimilar(),
+      loadDecomposition(),
+      loadRepWordDetails(),
+      loadStructures(),
+      loadReadingDetails(),
+    ]);
+    return null;
+  },
   "component-map": () => loadComponents(),
   "rep-word-details": () => loadRepWordDetails(),
   "similar-map": () => loadSimilar(),

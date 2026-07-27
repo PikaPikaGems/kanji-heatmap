@@ -240,6 +240,11 @@ export type VocabInfoResponse = {
 export interface WorkerApi {
   /** One round trip that hands the main thread everything it reads during render. */
   init: { payload: undefined; response: InitSnapshot };
+  /**
+   * Warm remaining lazy datasets in the worker. Returns null — nothing to ship
+   * to the main thread; caches stay worker-side.
+   */
+  preload: { payload: undefined; response: null };
   "retrieve-vocab-info": { payload: string; response: VocabInfoResponse };
   search: { payload: SearchSettings; response: SearchResponse };
   "search-result-count": { payload: SearchSettings; response: number };

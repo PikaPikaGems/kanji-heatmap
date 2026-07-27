@@ -39,6 +39,8 @@ export function KanjiWorkerProvider({
         if (cancelled) return;
         snapshotRef.current = snapshot;
         setIsReady(true);
+        // Best-effort: warm lazy datasets in the worker after first paint path.
+        void requestWorker({ type: "preload" }).catch(() => {});
       })
       .catch(() => {
         if (!cancelled) setWorkerError(true);
