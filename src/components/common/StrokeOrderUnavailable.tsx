@@ -1,4 +1,4 @@
-import { Ambulance } from "lucide-react";
+import { SnailIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function iconSize(boxSize: number): number {
@@ -55,15 +55,15 @@ export const StrokeOrderUnavailable = ({
       className={cn(
         "relative flex items-center justify-center overflow-hidden",
         "rounded-3xl bg-transparent",
-        "text-muted-foreground transition-colors hover:text-foreground/70",
+        "text-foreground transition-colors",
         "focus-visible:outline-none focus-visible:ring-2",
-        "focus-visible:ring-ring focus-visible:ring-offset-2"
+        "focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-muted-foreground/5"
       )}
       style={{ width: size, height: size }}
     >
       <DashedCross size={size} />
-      <Ambulance
-        className="relative z-[1]"
+      <SnailIcon
+        className="relative z-[1] animate-pulse "
         style={{ width: icon, height: icon }}
         strokeWidth={1.75}
         aria-hidden
