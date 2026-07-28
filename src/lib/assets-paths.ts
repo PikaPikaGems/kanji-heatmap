@@ -4,6 +4,8 @@ const ASSETS_BASE_URL = (import.meta.env.VITE_ENV_ASSET_URL ?? "").replace(
   ""
 );
 
+console.log("VITE_ENV_ASSET_URL", import.meta.env.VITE_ENV_ASSET_URL);
+
 const assetsPaths = {
   MAIN_KANJI_INFO_FILE_PATH: "/json/v2/kanji_main.json",
   EXTENDED_GENERAL_FILE_PATH: "/json/v2/kanji_extended_general.json",
