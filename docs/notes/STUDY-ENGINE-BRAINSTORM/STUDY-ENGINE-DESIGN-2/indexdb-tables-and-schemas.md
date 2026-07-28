@@ -356,19 +356,22 @@ A note or bookmark can exist locally before reaching the server — written
 offline, still in the outbox. A summary can't: it only exists once the
 backend derives it.
 
-**When does the server write settings itself, rather than relaying what a
-device sent?**
-Three cases, all of them dull. A new account has settings before any device
-has written any. A scheduler upgrade can change what a valid weight vector
-even looks like. And a published limit can move so that a stored value no
-longer fits inside it. In all three the row arrives with `origin: "server"`
-and no writing device, because none was involved.
+**Open question: nothing currently produces `origin: "server"`.**
+The field is reserved for one thing — per-user FSRS weight training, a batch
+job over the archive that would write a settings revision the backend
+authored. That job isn't built. It's the reason raw review events are kept
+for the life of the account, since the research dataset is anonymized and
+can't be fitted per person, so the field is deliberate rather than left
+over.
 
-What's deliberately not on that list is weight optimization. The backend may
-work out better `modelWeights` from review history and offer them, but it
-never applies them on its own — changing how somebody's scheduler behaves is
-their call to make. An accepted suggestion arrives as an ordinary device
-write, indistinguishable from any other settings change.
+There's a tension to settle before it ships, though. The engine never
+changes how somebody's scheduler behaves without their say-so — a fitted
+weight vector is offered, not applied. But an offer the person accepts is an
+ordinary device write, so it arrives with `origin: "device"` like any other
+settings change, and `origin: "server"` still has no producer. Either the
+suggestion needs somewhere of its own to live (it isn't `ReviewSettings` —
+those are the values in force), or the field is describing a write that
+won't happen. Worth deciding rather than discovering later.
 
 This is also why `origin` isn't the same question as `serverRevision`. A row
 can have a `serverRevision` and still be provisional — synced once, then

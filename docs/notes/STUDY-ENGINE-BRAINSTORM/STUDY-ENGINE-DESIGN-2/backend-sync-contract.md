@@ -279,6 +279,25 @@ interface ReviewGradeOperation extends SyncOperationBase {
   generation: number; // which attempt at this kanji was graded
   rating: "again" | "hard" | "good" | "easy";
 
+  // The card's schedule as it stood when the review was opened, copied from
+  // the frozen handle. This is the load-bearing field: when two devices
+  // grade the same card offline, the backend replays both in time order if
+  // it still has a common starting point, and rebuilds this branch from
+  // `priorState` when it doesn't. Without it that fallback degrades to
+  // "the server keeps its own branch and these grades count only toward
+  // statistics" — the schedule silently loses a device's work. Shape is
+  // `FsrsCardStateV1` in indexdb-tables-and-schemas.md.
+  priorState: FsrsCardStateV1;
+
+  // What the local scheduler thought the next due date would be. The
+  // backend recomputes the real one and never trusts this; it's here so a
+  // disagreement between the two scheduler libraries shows up as a
+  // diagnostic instead of a slow drift nobody notices.
+  provisionalDueAt: UnixMs;
+
+  baseServerRevision: number; // the card revision this grade was based on
+  settingsRevision: number; // which settings were in force, so a replay uses them
+
   // The device's time zone when the review happened, e.g. "Asia/Manila".
   // The server needs it to file this grade under the right local day — it
   // can't work that out from `occurredAt`, which is just an instant.
@@ -453,6 +472,8 @@ the value was sent twice.
 | `targetRevision`                    | Nothing read it. The client loops on `hasMoreChanges` and stores the opaque cursor; the server's internal selection bound isn't its business.                                                                                                                                              |
 | `pull.maxChangeGroups`              | `maxPullBytes` already bounds the response. Two knobs for one limit meant an undefined answer when they disagreed.                                                                                                                                                                         |
 | `schemaVersion` on each operation   | The host never chooses it and the engine build already fixes it. An incompatible shape change arrives as a new operation variant, which is the rule `activity-public-api.md` already settled on.                                                                                           |
+| `schedulerVersion` on a grade       | `priorState` already carries it — it's a field of `FsrsCardStateV1`, and it's the state being replayed that has to match a scheduler, not the envelope around it.                                                                                                                          |
+| `reportedWallTime` on a grade       | The device's raw clock reading before clamping, kept only for operational history. Merge order uses the clamped `occurredAt`, and a device already learns about a clamp from `clamped_occurred_at`. Cost: a wrong system clock can't be diagnosed after the fact from the operation alone. |
 
 `engineVersion` and `applicationId` stay, because the server genuinely
 branches on both — one gates incompatible builds, the other is allowlisted.
