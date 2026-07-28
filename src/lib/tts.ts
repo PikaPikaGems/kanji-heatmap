@@ -4,45 +4,32 @@ export const TTS_DISCLAIMER =
 
 export const DEFAULT_JP_VOICE_ID = "default";
 
-export type JpVoiceOption = {
-  id: string;
-  label: string;
-  match: (voice: SpeechSynthesisVoice) => boolean;
-};
+/** Japanese voices currently installed in this browser. */
+export const listJpVoices = (
+  voices: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice[] => voices.filter((v) => v.lang.startsWith("ja"));
 
-/** The 6 most commonly available built-in Japanese TTS voices across Chrome, macOS/iOS, and Windows/Edge. */
-export const JP_VOICE_OPTIONS: JpVoiceOption[] = [
-  {
-    id: "google",
-    label: "Google 日本語",
-    match: (v) => v.name.includes("Google 日本語"),
-  },
-  {
-    id: "kyoko",
-    label: "Kyoko (Apple)",
-    match: (v) => v.name.includes("Kyoko"),
-  },
-  {
-    id: "otoya",
-    label: "Otoya (Apple)",
-    match: (v) => v.name.includes("Otoya"),
-  },
-  {
-    id: "nanami",
-    label: "Microsoft Nanami",
-    match: (v) => v.name.includes("Nanami"),
-  },
-  {
-    id: "keita",
-    label: "Microsoft Keita",
-    match: (v) => v.name.includes("Keita"),
-  },
-  {
-    id: "haruka",
-    label: "Microsoft Haruka",
-    match: (v) => v.name.includes("Haruka"),
-  },
-];
+/**
+ * Finds a preferred Japanese voice without falling back. Preference ids are
+ * `SpeechSynthesisVoice.voiceURI` values. Legacy short ids from an older
+ * hardcoded list (e.g. "kyoko") are still matched by name.
+ */
+export const findJpVoice = (
+  voices: SpeechSynthesisVoice[],
+  voiceId: string
+): SpeechSynthesisVoice | null => {
+  if (voiceId === DEFAULT_JP_VOICE_ID) return null;
+
+  const jaVoices = listJpVoices(voices);
+  return (
+    jaVoices.find(
+      (v) =>
+        v.voiceURI === voiceId ||
+        v.name === voiceId ||
+        v.name.toLowerCase().includes(voiceId.toLowerCase())
+    ) || null
+  );
+};
 
 /**
  * Resolves the actual voice to speak with: the user's preferred voice if
@@ -53,11 +40,8 @@ export const resolveJpVoice = (
   voices: SpeechSynthesisVoice[],
   voiceId: string
 ): SpeechSynthesisVoice | null => {
-  const jaVoices = voices.filter((v) => v.lang === "ja-JP");
+  const jaVoices = listJpVoices(voices);
+  if (jaVoices.length === 0) return null;
 
-  const option = JP_VOICE_OPTIONS.find((o) => o.id === voiceId);
-  const preferred = option && jaVoices.find(option.match);
-  if (preferred) return preferred;
-
-  return jaVoices[0] || null;
+  return findJpVoice(voices, voiceId) || jaVoices[0];
 };

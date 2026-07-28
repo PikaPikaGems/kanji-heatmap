@@ -8,8 +8,7 @@ export const OrderDisclaimer = () => (
     official editions.{" "}
     <ExternalTextLink
       href={outLinks.githubIssue}
-      text="Suggest an improvement"
+      text="Suggest an improvement."
     />
-    .
   </>
 );

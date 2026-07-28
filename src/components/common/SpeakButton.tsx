@@ -13,16 +13,24 @@ export const SpeakButton = ({
   word,
   iconType,
   autoFocus,
+  variant,
 }: {
   word: string;
   iconType: AudioIconType;
   autoFocus?: boolean;
+  variant?:
+    | "outline"
+    | "ghost"
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "link";
 }) => {
   const speak = useSpeak(word);
 
   return (
     <Button
-      variant={"outline"}
+      variant={variant ?? "outline"}
       size="iconXl"
       className="relative"
       onClick={() => {
