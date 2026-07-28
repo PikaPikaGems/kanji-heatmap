@@ -52,8 +52,12 @@ interface PublishedPolicy {
   syncMaxOperations: number; // most operations one push may carry
   syncMaxBytes: number; // most bytes one request or response may be
   bootstrapPageMaxBytes: number; // most bytes one bootstrap page may be
-  rawPracticeEventRetentionDays: number; // how long raw practice events are kept
-  rawReviewEventRetentionDays: number | null; // null means the life of the account
+
+  // Both are null: raw practice and review events are kept for the life of
+  // the account. Nullable rather than absent so a limit could be published
+  // later without a protocol change.
+  rawPracticeEventRetentionDays: number | null;
+  rawReviewEventRetentionDays: number | null;
 }
 ```
 
