@@ -226,7 +226,12 @@ interface ReviewSettingsRow {
   settings: ReviewSettings; // the values ReviewsApi.settings exposes as-is
   settingsRevision: number; // monotonic; applied forward only
   updatedAt: UnixMs;
-  origin: "device" | "server"; // a server write wins over a device write at the same instant
+  // Where this row's values came from. "device" means a local change that
+  // the server hasn't acknowledged yet — provisional, and what's on screen
+  // may still move. "server" means these are the canonical values. The
+  // backend writes settings in its own right, not only by relaying what a
+  // device sent; see F.A.Q.
+  origin: "device" | "server";
   writerDeviceId?: DeviceId; // which device changed them; absent when origin is "server"
   writerDeviceSequence?: number;
   serverRevision?: number;
@@ -350,6 +355,24 @@ they're bounded by the kanji set.
 A note or bookmark can exist locally before reaching the server — written
 offline, still in the outbox. A summary can't: it only exists once the
 backend derives it.
+
+**When does the server write settings itself, rather than relaying what a
+device sent?**
+Four cases, and the first is the one that matters. `modelWeights` are fitted
+from review history — that's a batch job over every grade the account has
+ever recorded, which is the backend's data and nobody else's, and it's the
+reason raw review events are kept for the life of the account. The other
+three are duller: a new account has settings before any device has written
+any; a scheduler upgrade can change what a valid weight vector even looks
+like; and a published limit can move so that a stored value no longer fits
+inside it. In all four the row arrives with `origin: "server"` and no
+writing device, because none was involved.
+
+This is also why `origin` isn't the same question as `serverRevision`. A row
+can have a `serverRevision` and still be provisional — synced once, then
+edited locally again — so "has this ever reached the server" and "is what
+I'm looking at confirmed" are two different things, and only `origin`
+answers the second.
 
 **What is the entitlement lease, and what happens when it runs out?**
 It answers one question: may this device keep accepting writes while it

@@ -465,15 +465,29 @@ protect is provided by the single transaction instead. If a future client
 ever does need to apply a huge pull in chunks, the grouping has to come
 back — that's the one thing this makes harder.
 
-**Open question: two tabs saving settings can silently clobber each other.**
-`review_settings_update` sends every setting and no base revision, so the
-later `occurredAt` wins outright. Open one settings screen in two tabs,
-change retention in one and learning steps in the other, and the second save
-quietly reverts the first — there's nothing in the operation for the server
-to notice with. The fix is the one notes already use: carry the revision the
-form was loaded at, and reject a save built on a stale one. Flagging it here
-rather than adding the field silently, since it also needs a decision about
-what the host does with the rejection.
+**Open question: a settings save can silently undo the backend's own work.**
+`review_settings_update` sends every setting and carries no base revision,
+so the later `occurredAt` wins outright and nothing can notice that the
+device was working from an old copy. Two tabs disagreeing is the mild
+version. The sharp one: the backend fits `modelWeights` from review history
+and pushes them down, and any device that saves a settings change from a
+screen loaded before that push sends the old weights back as part of the
+whole-object write — quietly reverting an optimization nobody asked it to
+touch. Three fields the person never typed can be destroyed by a change to
+one they did.
+
+Three ways out, and they aren't exclusive. Carry the revision the form was
+loaded at and reject a stale save, which is what notes already do. Send only
+the fields that actually changed, so a device never restates a value it
+didn't author. Or take `modelWeights` out of the device's hands entirely and
+let the backend own them, which makes the conflict disappear for the one
+field where it does real damage — at the cost of the power user who wants to
+paste in a weight vector from somewhere else.
+
+Left open rather than settled here, because picking among them is an API
+decision, not a wire-format one: the first needs a story for what the host
+shows when a save is rejected, and the third changes what
+`ReviewsApi.settings.update` is allowed to accept.
 
 **What happens if the backend permanently rejects one operation?**
 Sync locks and a diagnostic surfaces. That's right about not creating a gap
