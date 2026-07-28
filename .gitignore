@@ -21,6 +21,11 @@ public/js/*
 dist-ssr
 *.local
 
+# Local env (template: .env.sample)
+.env
+.env.*
+!.env.sample
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
