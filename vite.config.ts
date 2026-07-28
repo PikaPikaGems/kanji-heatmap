@@ -80,6 +80,12 @@ const kanjiCanvasRefPatternsPlugin: Plugin = {
   },
 };
 
+/** CDN origin from `VITE_ENV_ASSET_URL` (Cloudflare Pages build secret). */
+const ASSETS_ORIGIN = (process.env.VITE_ENV_ASSET_URL ?? "").replace(/\/$/, "");
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const pwaConfig = {
   // registerType: 'prompt' <-- if we want to ensure user updates
   registerType: "autoUpdate" as const,
@@ -285,35 +291,57 @@ const pwaConfig = {
       // **********************
       // Cache KANJI SAMPLE VOCABULARY from external source
       // **********************
-      {
-        urlPattern: ({ url }: { url: { pathname: string; origin: string } }) =>
-          url.origin === "https://assets.pikapikagems.com" &&
-          url.pathname.startsWith("/kanji-common-words/v1/"),
-        handler: "CacheFirst" as const,
-        options: {
-          cacheName: "kanji-vocabulary-cache",
-          expiration: {
-            maxEntries: 3000,
-            maxAgeSeconds: 365 * 24 * 60 * 60, // One year
-          },
-          fetchOptions: {
-            mode: "cors" as const,
-            credentials: "omit" as const,
-          },
-        },
-      },
+      ...(ASSETS_ORIGIN
+        ? [
+            {
+              urlPattern: new RegExp(
+                `^${escapeRegExp(ASSETS_ORIGIN)}/kanji-common-words/v4/`
+              ),
+              handler: "CacheFirst" as const,
+              options: {
+                cacheName: "kanji-vocabulary-cache",
+                expiration: {
+                  maxEntries: 3000,
+                  maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+                },
+                fetchOptions: {
+                  mode: "cors" as const,
+                  credentials: "omit" as const,
+                },
+              },
+            },
+          ]
+        : []),
 
       // **********************
       // Cache KANJI SVG — committed local files (public/svg/, the
       // ~2426 filtered_kanji.json set) plus the CDN fallback for everything
       // else (e.g. 唸), sharing one cache so clearKanjiSvgCache() covers both.
       // **********************
+      ...(ASSETS_ORIGIN
+        ? [
+            {
+              urlPattern: new RegExp(
+                `^${escapeRegExp(ASSETS_ORIGIN)}/kanji/.*\\.svg(\\?.*)?$`,
+                "i"
+              ),
+              handler: "CacheFirst" as const,
+              options: {
+                cacheName: "kanji-svg-cache",
+                expiration: {
+                  maxEntries: 3000,
+                  maxAgeSeconds: 365 * 24 * 60 * 60, // One year
+                },
+                fetchOptions: {
+                  mode: "cors" as const,
+                  credentials: "omit" as const,
+                },
+              },
+            },
+          ]
+        : []),
       {
-        urlPattern: ({ url }: { url: { pathname: string; origin: string } }) =>
-          url.pathname.endsWith(".svg") &&
-          ((url.origin === "https://assets.pikapikagems.com" &&
-            url.pathname.startsWith("/kanji/")) ||
-            url.pathname.startsWith("/svg/")),
+        urlPattern: /\/svg\/.*\.svg$/i,
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-svg-cache",
@@ -338,6 +366,7 @@ const visualizer_templates: TemplateType[] = [
   "list",
   "flamegraph",
 ] as const;
+
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [
