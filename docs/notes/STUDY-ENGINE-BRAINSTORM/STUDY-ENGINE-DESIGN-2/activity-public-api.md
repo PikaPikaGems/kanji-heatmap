@@ -44,14 +44,23 @@ type ActivityError =
 
 // ---- Recording a completed practice round ----
 
-// One variant per practice mode. Adding a new mode (speaking, shadowing)
-// adds a new variant in a coordinated engine release — see FAQ.
+// One variant per practice mode. Adding a new mode adds a new variant in a
+// coordinated engine release — see FAQ.
 type PracticeActivityEventInput =
   | {
       type: "speed_katakana_session_completed";
       challengeId: string;
       accuracyPercent: number;
       charactersPerMinute: number;
+      startedAt: UnixMs;
+      endedAt: UnixMs;
+      timeZone: IanaTimeZone;
+    }
+  // No accuracy/speed fields — attemptCount is derived by counting these
+  // facts, the same way speed_katakana's attemptCount is. See FAQ.
+  | {
+      type: "speaking_practice_session_completed";
+      challengeId: string;
       startedAt: UnixMs;
       endedAt: UnixMs;
       timeZone: IanaTimeZone;
@@ -83,8 +92,8 @@ interface ActivityWrite {
 // ---- Reading activity back ----
 
 interface DailySummaryRange {
-  from: LocalDate; // inclusive
-  to: LocalDate; // inclusive
+  from: LocalDate; // inclusive, the oldest date in the window
+  totalDays: number; // window extends forward from `from`; see FAQ
 }
 
 // One row per local day that had any activity. See FAQ for how to treat a
@@ -93,6 +102,7 @@ interface DailySummary {
   readonly localDate: LocalDate;
 
   readonly speedKatakanaSessions: number;
+  readonly speakingPracticeSessions: number;
   readonly readingPracticeRounds: number;
   readonly writingPracticeRounds: number;
 
@@ -110,10 +120,7 @@ interface AllTimeSummary extends Omit<DailySummary, "localDate"> {
   readonly daysActive: number; // count of distinct local days with any activity
 }
 
-interface ChallengeSummaryQuery {
-  activityType: "speed_katakana"; // only one activity type has challenges today
-  challengeIds?: readonly string[]; // omit for every challenge
-}
+type ChallengeActivityType = "speed_katakana" | "speaking_practice";
 
 interface ChallengeScore {
   readonly value: number; // accuracyPercent or charactersPerMinute, depending on which "best" this is
@@ -121,7 +128,14 @@ interface ChallengeScore {
   readonly eventId: string; // breaks a tie when two attempts land on the exact same value
 }
 
-interface ChallengeSummary {
+// One shape per activityType, not one row with fields that only sometimes
+// apply. See FAQ for why speaking practice's shape is this thin.
+type ChallengeSummary =
+  | SpeedKatakanaChallengeSummary
+  | SpeakingPracticeChallengeSummary;
+
+interface SpeedKatakanaChallengeSummary {
+  readonly activityType: "speed_katakana";
   readonly challengeId: string;
   readonly attemptCount: number;
 
@@ -137,6 +151,12 @@ interface ChallengeSummary {
   readonly bestCharactersPerMinuteAbove70Accuracy?: ChallengeScore;
 }
 
+interface SpeakingPracticeChallengeSummary {
+  readonly activityType: "speaking_practice";
+  readonly challengeId: string;
+  readonly attemptCount: number;
+}
+
 // ---- The API itself ----
 
 interface ActivityApi {
@@ -144,16 +164,34 @@ interface ActivityApi {
   // screen, and if the engine is unavailable or read-only, just skip it.
   record(input: PracticeActivityEventInput): Promise<Result<ActivityWrite>>;
 
-  // Powers a calendar-style heatmap. Ranged rather than "everything," since
-  // rows accumulate for the life of the account. See FAQ.
-  watchDaily(input: DailySummaryRange): QueryStore<readonly DailySummary[]>;
+  // Powers a calendar-style heatmap. Windowed rather than "everything,"
+  // since rows accumulate for the life of the account. See FAQ.
+  watchDailySummaries(
+    input: DailySummaryRange
+  ): QueryStore<readonly DailySummary[]>;
 
   // Cheap totals and cake day, without pulling the full daily history. See FAQ.
   watchAllTime(): QueryStore<AllTimeSummary>;
 
-  watchChallenges(
-    input: ChallengeSummaryQuery
-  ): QueryStore<readonly ChallengeSummary[]>;
+  // null means this challenge has never been attempted. Powers a
+  // per-challenge view (e.g. stats shown before starting that challenge
+  // again). See FAQ.
+  watchSingleChallengeSummary(input: {
+    activityType: "speed_katakana";
+    challengeId: string;
+  }): QueryStore<SpeedKatakanaChallengeSummary | null>;
+  watchSingleChallengeSummary(input: {
+    activityType: "speaking_practice";
+    challengeId: string;
+  }): QueryStore<SpeakingPracticeChallengeSummary | null>;
+
+  // Powers a full-collection view (e.g. a grid of every challenge at once).
+  watchAllChallengeSummaries(
+    activityType: "speed_katakana"
+  ): QueryStore<readonly SpeedKatakanaChallengeSummary[]>;
+  watchAllChallengeSummaries(
+    activityType: "speaking_practice"
+  ): QueryStore<readonly SpeakingPracticeChallengeSummary[]>;
 }
 ```
 
@@ -219,13 +257,58 @@ event's shape ever needs to change incompatibly, that shows up as a new
 as a new variant), not as the host manually incrementing a version number it
 has no way to reason about.
 
-**What happens when a new practice mode (like speaking or shadowing) is
-added?**
+**What happens when a new practice mode is added?**
 It arrives as a new variant in `PracticeActivityEventInput`, shipped
 together with the backend logic that knows how to fold it into a daily
 summary — never as a free-form event the backend has to guess how to count.
 An unrecognized `type` fails validation rather than silently going
-uncounted.
+uncounted. Speaking practice, added after this document's first draft, is
+the concrete example: one new write variant, one new `DailySummary` count,
+and — because it's challenge-based like Speed Katakana rather than
+round-based like reading/writing practice — one new branch of
+`ChallengeSummary`. See the next few questions.
+
+**Why is speaking practice's event named
+`speaking_practice_session_completed` rather than
+`..._round_completed`, the way reading/writing practice are?**
+The suffix says which bucket a practice type falls into. A "session" belongs
+to one `challengeId` and shows up in `watchSingleChallengeSummary`/
+`watchAllChallengeSummaries` (Speed Katakana, speaking practice); a "round"
+has no challenge identity and only ever contributes a count to
+`DailySummary` (reading, writing practice). The name is a small signal for
+which part of this API a given practice type actually touches.
+
+**Why did `ChallengeSummary` become a union with an `activityType`
+discriminant, when a single flat shape would be simpler?**
+Because it's no longer true that every challenge looks like Speed Katakana.
+Speaking practice is challenge-based too, but doesn't have a speed, an
+accuracy, or a "best" of anything — see the next question. Forcing both
+into one shape would mean either lying with fields that don't apply
+(`bestAccuracy` on something with no such concept) or making half the
+fields optional and leaving the host to guess which ones are real for a
+given row. A union says outright which fields exist for which
+`activityType`.
+
+**Why does `SpeakingPracticeChallengeSummary` only expose `attemptCount`,
+when the practice-event input still carries `startedAt`/`endedAt` like
+everything else?**
+Those are two different questions — what gets recorded, and what gets
+surfaced — and they don't have to move together. `startedAt`/`endedAt` are
+recorded on every practice event regardless of type, because the backend
+needs them (local-day derivation, the archive, `DailySummary`'s counts).
+None of that requires exposing anything more than a count back to the host
+today. If a "last practiced" timestamp or a duration stat turns out to
+matter for speaking practice later, that's an additive field on
+`SpeakingPracticeChallengeSummary`, not a breaking change — exactly the
+reasoning notes and bookmarks use elsewhere in this API for leaving a field
+out until something actually reads it.
+
+**Why doesn't the speaking-practice input carry its own `attemptCount`?**
+Same reason Speed Katakana's input doesn't: it isn't the host's number to
+report. `attemptCount` is the backend counting how many
+`speaking_practice_session_completed` facts it has seen for a given
+`challengeId` — one increment per completed session, derived the same way
+Speed Katakana's `attemptCount` already is.
 
 **Why doesn't a practice round record which kanji were involved?**
 A reading or writing round exercises many kanji at once and reports one
@@ -241,8 +324,8 @@ account's history isn't pre-filled with hundreds of empty rows a year.
 Build a calendar grid by treating any `localDate` missing from the result
 as all-zero, not by expecting one row per day in the range.
 
-**Why is `watchDaily` ranged instead of returning full history the way
-`bookmarks.watchAll()` does?**
+**Why is `watchDailySummaries` windowed instead of returning full history
+the way `bookmarks.watchAll()` does?**
 Bookmarks and notes are small, roughly bounded by the kanji catalog. Daily
 activity isn't — one row accumulates per active day for as long as the
 account exists, which for a multi-year user is a lot of rows to hand back
@@ -250,29 +333,59 @@ by default. A host asks for the window it's actually going to render (a
 year for a calendar view, a month for a smaller widget) instead of paying
 for history nobody's looking at.
 
-**If `watchDaily` is ranged, how does a host show all-time totals and cake
-day without fetching the entire history?**
+**If `watchDailySummaries` is windowed, how does a host show all-time
+totals and cake day without fetching the entire history?**
 That's what `watchAllTime()` is for — one row, maintained by the engine the
 same way a daily row is, instead of asking every host to sum however many
 years of daily rows exist just to show a handful of totals.
+
+**Why is the window expressed as `from` + `totalDays` instead of `from` +
+`to`?**
+The common case — a rolling window like "the last 365 days" — only needs one
+date computed (`from`), not two. The one case this makes slightly more
+awkward is browsing a specific past calendar year, where `totalDays` has to
+be 365 or 366 depending on the year; getting that wrong just renders one day
+short in a leap year, not a data problem — nothing gets written or
+miscounted the way the `localDate` UTC-slice bug would. If exact
+calendar-year browsing turns out to be common enough to deserve its own
+shape, that's a second, additive query shape later, not a reason to
+complicate the common case now.
 
 **Why doesn't `AllTimeSummary` break `daysActive` down by activity kind
 (e.g. "days you did Speed Katakana")?**
 It doesn't today — `daysActive` counts any day with any activity, full
 stop. A host that wants a per-kind version has to derive it by walking
-`watchDaily` results itself, which is fine for a bounded range but
+`watchDailySummaries` results itself, which is fine for a bounded window but
 expensive for "all time." Flagging this rather than deciding it silently:
 if a per-kind all-time breakdown turns out to matter, it belongs on
 `AllTimeSummary` directly, not reconstructed by every host that needs it.
 
-**Why does `ChallengeSummaryQuery` require `activityType`, but
-`ChallengeSummary` rows don't repeat it back?**
-On the way in, it's meaningful — it says which kind of challenge the host
-is asking about, and a future second challenge type would make it
-load-bearing. On the way out, every row already came from a query scoped to
-one `activityType`, so the value would be identical on every single row:
-information the caller already gave, echoed back at no benefit. Kept where
-it says something; dropped where it doesn't.
+**Why is `watchSingleChallengeSummary` a separate method from
+`watchAllChallengeSummaries`, instead of one method with an optional
+filter?**
+An earlier draft of this document argued the opposite — one method, an
+optional list of IDs, no single-item method at all — on the reasoning that a
+challenge summary has no meaningful "not present" state worth a dedicated
+`null`-returning call. That reasoning didn't hold up: a screen that shows
+one challenge's history before the player starts it again is a real,
+single-item, live view, and `null` for "never attempted this one" is exactly
+as meaningful there as `null` is for an unbookmarked kanji. Once that
+pattern exists, an all-in-one method with an optional filter is worse than
+the split: the filtered case — a specific handful of IDs, neither one nor
+all — never had an actual reader, so it's dropped rather than kept "just in
+case."
+
+**Why do `watchSingleChallengeSummary`/`watchAllChallengeSummaries` take
+`activityType` as a literal per overload instead of one signature typed to
+the general union?**
+So the return type is already narrowed at the call site — asking for
+`"speaking_practice"` gets back `SpeakingPracticeChallengeSummary` directly,
+not the wider `ChallengeSummary` union the host would otherwise have to
+narrow itself with an `if (row.activityType === ...)` check before reading
+anything past `attemptCount`. `activityType` still lives on every row
+regardless — a value that gets passed around at runtime should say what it
+is on its own, not rely on whoever's holding it remembering which call
+produced it.
 
 **Why do `bestAccuracy`/`bestCharactersPerMinute` carry an `eventId`, but
 the "latest" fields don't?**
@@ -290,15 +403,6 @@ Speed Katakana rewards typing fast, but raw speed alone can be gamed by
 mashing through wrong answers — this is the "fast and actually correct"
 record instead. It's `undefined` until some attempt has actually cleared
 70% accuracy; there's nothing to report before that.
-
-**Why is there no `watchChallenge(challengeId)`, just `watchChallenges`
-with an optional filter?**
-A challenge summary has no "not present" state worth a `null` the way a
-single bookmark or note does — a challenge either has an attempt history (a
-row) or doesn't (no row, filtered out). `watchChallenges({ challengeIds:
-[id] })` already covers "just this one" without doubling the method surface
-for a distinction that doesn't exist here the way it does for bookmarks or
-notes.
 
 **Why doesn't `DailySummary` or `ChallengeSummary` carry a
 `serverRevision`, the way a note or bookmark does?**
