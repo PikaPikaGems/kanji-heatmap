@@ -112,12 +112,16 @@ vocab_furigana.json
 vocab_meaning.json
 ```
 
-Regenerate the files the app actually serves, then delete the `tar.gz` since
-it is no longer needed:
+Delete the `tar.gz` since it is no longer needed:
+
+```
+rm kanji-heatmap-data.tar.gz
+```
+
+Regenerate the files the app actually serves
 
 ```bash
 pnpm run generate-json
-rm kanji-heatmap-data.tar.gz
 ```
 
 `generate-json` reads `./raw-data` and writes `./public/json/v2` plus
@@ -130,38 +134,14 @@ that does not round-trip, a sort field that is not a number).
 `generate-json` prints the size and entry count of everything it writes, so
 the quickest check is to run it and read the output.
 
-To measure the files independently — inputs and served output, raw and
-gzipped, which is what matters over the wire — paste this:
+For raw and gzipped sizes (per file, plus v2 eager/lazy totals):
 
 ```bash
-for f in raw-data/*.json public/json/*.json public/json/v2/*.json docs/data/*.json; do
-  printf "%7s %7s  %s\n" \
-    "$(( $(stat -c%s "$f") / 1024 ))K" \
-    "$(( $(gzip -9 -c "$f" | wc -c) / 1024 ))K" \
-    "$f"
-done | sort -k3
-```
-
-Columns are raw, gzipped, path. (On macOS, `stat -c%s` is `stat -f%z`.)
-
-Totals per directory, and the eager/lazy split that
-`docs/notes/kanji-worker-data-redesign.md` documents:
-
-```bash
-# gzipped total of everything served from public/json/v2, summed per file
-# (each is fetched separately, so the per-file sum is what goes over the wire —
-# don't `cat` them together first, that compresses across files and overstates)
-for f in public/json/v2/*.json; do gzip -9 -c "$f" | wc -c; done |
-  awk '{t+=$1} END {printf "%.0f KB gz total\n", t/1024}'
-
-# the one file loaded before first paint — everything else is lazy
-gzip -9 -c public/json/v2/kanji_main.json | wc -c |
-  awk '{printf "%.0f KB gz eager\n", $1/1024}'
+./scripts/print-file-sizes.sh
 ```
 
 §5 of `docs/notes/kanji-worker-data-redesign.md` lists the expected size and
-entry count of every generated file, so these commands verify the design note
-rather than trusting it.
+entry count of every generated file.
 
 ### Regenerating derived JSON
 
@@ -184,7 +164,7 @@ is one file per kanji (see also `./src/lib/assets-paths.ts`):
 - `/kanji-words/v4/<KANJI>.json`
 
 These paths are used in development only. In production the same data is
-served from `https://assets.pikapikagems.com`, so the site works without them;
+served from a cloud storage, so the site works without them;
 locally, the vocabulary sections of the kanji drawer stay empty until you
 populate the two directories.
 
