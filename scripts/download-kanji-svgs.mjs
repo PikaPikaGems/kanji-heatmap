@@ -26,7 +26,7 @@ const root = resolve(__dirname, "..");
 
 const SOURCES = {
   tagaini: "https://kanjivg.tagaini.net/kanjivg/kanji/",
-  pikapikagems: "https://assets.pikapikagems.com/kanji/",
+  pikapikagems: "", // add your cloudfare bucket url here,
 };
 
 const args = process.argv.slice(2);

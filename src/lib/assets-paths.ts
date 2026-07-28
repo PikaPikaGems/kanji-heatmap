@@ -1,3 +1,9 @@
+/** CDN origin from `VITE_ENV_ASSET_URL` (set in Cloudflare Pages). No trailing slash. */
+const ASSETS_BASE_URL = (import.meta.env.VITE_ENV_ASSET_URL ?? "").replace(
+  /\/$/,
+  ""
+);
+
 const assetsPaths = {
   MAIN_KANJI_INFO_FILE_PATH: "/json/v2/kanji_main.json",
   EXTENDED_GENERAL_FILE_PATH: "/json/v2/kanji_extended_general.json",
@@ -6,9 +12,9 @@ const assetsPaths = {
   VOCAB_FILE: "/json/v2/vocab.json",
   REP_WORD_DETAILS_FILE: "/json/v2/rep_word_details.json",
   CUM_USE: "/json/v2/cum_use.json",
-  KANJI_SVGS: "https://assets.pikapikagems.com/kanji/",
-  KANJI_VOCAB: "https://assets.pikapikagems.com/kanji-common-words/v4", // Note: No slash at the end is intentional
-  TEXT_BOOK_VOCAB: "https://assets.pikapikagems.com/kanji-textbook-words/v4", // Note: No slash at the end is intentional
+  KANJI_SVGS: `${ASSETS_BASE_URL}/kanji/`,
+  KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v4`, // Note: No slash at the end is intentional
+  TEXT_BOOK_VOCAB: `${ASSETS_BASE_URL}/kanji-textbook-words/v4`, // Note: No slash at the end is intentional
   dev: {
     KANJI_SVGS: "https://kanjivg.tagaini.net/kanjivg/kanji/",
     KANJI_VOCAB: "/kanji-words/v4", // Note: No slash at the end is intentional
