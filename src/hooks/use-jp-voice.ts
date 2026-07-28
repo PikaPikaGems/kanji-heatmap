@@ -9,10 +9,10 @@ const readVoiceId = () =>
   localStorage.getItem(LOCAL_STORAGE_JP_VOICE_KEY) || DEFAULT_JP_VOICE_ID;
 
 /**
- * Reactive current Japanese TTS voice preference (an id from
- * JP_VOICE_OPTIONS, or DEFAULT_JP_VOICE_ID) + a setter. Stays in sync across
- * every hook instance and browser tabs via the same storage-event plumbing
- * as useLocalStorageFlag.
+ * Reactive current Japanese TTS voice preference (a voiceURI from the
+ * device's available voices, or DEFAULT_JP_VOICE_ID) + a setter. Stays in
+ * sync across every hook instance and browser tabs via the same
+ * storage-event plumbing as useLocalStorageFlag.
  */
 export const useCurrentJpVoice = () => {
   const voiceId = useStorageValue(

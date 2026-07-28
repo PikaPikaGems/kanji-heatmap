@@ -22,6 +22,7 @@ import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
+import { useAvailableJpVoices } from "@/hooks/use-available-jp-voices";
 import {
   useCurrentThemeColor,
   themeColorsRgb,
@@ -32,12 +33,9 @@ import {
   clearKanjiSvgCache,
   clearKatakanaCache,
 } from "@/lib/offline-preload";
-import {
-  DEFAULT_JP_VOICE_ID,
-  JP_VOICE_OPTIONS,
-  TTS_DISCLAIMER,
-} from "@/lib/tts";
+import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
+import { SpeakButton } from "@/components/common/SpeakButton";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -238,18 +236,24 @@ const ColorGrid = () => {
 
 const JpVoiceSelect = () => {
   const [voiceId, setVoiceId] = useCurrentJpVoice();
+  const availableVoices = useAvailableJpVoices();
+
+  // Prefer an exact voiceURI match for the select value; legacy short ids
+  // (e.g. "kyoko") map to the matching installed voice when possible.
+  const matched = findJpVoice(availableVoices, voiceId);
+  const selectValue = matched?.voiceURI ?? DEFAULT_JP_VOICE_ID;
 
   return (
     <div className="text-left">
-      <Select value={voiceId} onValueChange={setVoiceId}>
+      <Select value={selectValue} onValueChange={setVoiceId}>
         <SelectTrigger aria-label="Japanese text-to-speech voice">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={DEFAULT_JP_VOICE_ID}>Default</SelectItem>
-          {JP_VOICE_OPTIONS.map((option) => (
-            <SelectItem key={option.id} value={option.id}>
-              {option.label}
+          {availableVoices.map((voice) => (
+            <SelectItem key={voice.voiceURI} value={voice.voiceURI}>
+              {voice.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -340,9 +344,10 @@ export const SettingsModal = () => {
           </div>
 
           <div className="mb-4 text-left">
-            <span className="block mb-2 text-sm font-semibold">
-              Japanese Voice
-            </span>
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
+              Japanese Voice{" "}
+              <SpeakButton word={"こんにちは"} iconType="volume-2" />
+            </div>
             <JpVoiceSelect />
           </div>
 
