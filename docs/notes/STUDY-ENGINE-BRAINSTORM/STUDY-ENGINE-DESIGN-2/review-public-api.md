@@ -291,12 +291,8 @@ build yourself to send to the engine (a query, an add request) aren't marked
 readonly at all, since you're the one constructing them fresh each time.
 
 **Why is it called `repetitions` and what does it count?**
-It counts every grade this
-card has ever been given, regardless of rating. It
-deliberately does _not_ mean "successful reviews since the last lapse,"
-which was an earlier draft's definition — that would really be a low-key
-version of the "current streak" idea just below, needing a new resetting
-counter the engine doesn't have today.
+It counts every grade this card has ever been given, regardless of rating.
+It deliberately does _not_ mean "successful reviews since the last lapse,".
 
 **What happened to `bestStreak` and `currentStreak` ("how many reviews
 since you last rated Again")?**
