@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Trash2, Download, Loader2 } from "@/components/icons";
+import { Trash2, Download, Loader2 } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
@@ -36,6 +36,7 @@ import {
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/common/SpeakButton";
+import { Settings } from "lucide-react";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -295,7 +296,7 @@ export const SettingsModal = () => {
           aria-label="Open User Preferences"
           className="ml-1"
         >
-          <Settings2 className="w-[1.2rem] h-[1.2rem]" />
+          <Settings className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
