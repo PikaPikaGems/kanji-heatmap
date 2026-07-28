@@ -279,13 +279,6 @@ interface ReviewGradeOperation extends SyncOperationBase {
   generation: number; // which attempt at this kanji was graded
   rating: "again" | "hard" | "good" | "easy";
 
-  // The card's schedule when the review was opened. The backend needs it to
-  // work out the right answer when two devices graded the same card offline.
-  priorState: FsrsCardStateV1;
-
-  provisionalDueAt: UnixMs; // the local guess; the backend recomputes and never trusts it
-  baseServerRevision: number; // the card revision this grade was based on
-  settingsRevision: number; // which settings were in force at the time
   timeZone: IanaTimeZone; // which local day this counts toward, e.g. "Asia/Manila"
 }
 
@@ -448,8 +441,7 @@ the value was sent twice.
 | `targetRevision`                    | Nothing read it. The client loops on `hasMoreChanges` and stores the opaque cursor; the server's internal selection bound isn't its business.                                                                                                                                              |
 | `pull.maxChangeGroups`              | `maxPullBytes` already bounds the response. Two knobs for one limit meant an undefined answer when they disagreed.                                                                                                                                                                         |
 | `schemaVersion` on each operation   | The host never chooses it and the engine build already fixes it. An incompatible shape change arrives as a new operation variant, which is the rule `activity-public-api.md` already settled on.                                                                                           |
-| `schedulerVersion` on a grade       | `priorState` already carries it — it's a field of `FsrsCardStateV1`, and it's the state being replayed that has to match a scheduler, not the envelope around it.                                                                                                                          |
-| `reportedWallTime` on a grade       | The device's raw clock reading before clamping, kept only for operational history. Merge order uses the clamped `occurredAt`, and a device already learns about a clamp from `clamped_occurred_at`. Cost: a wrong system clock can't be diagnosed after the fact from the operation alone. |
+| Card state on a grade               | A grade says which card, what rating, when. The schedule it produces is the backend's to compute — a device sending state back would make it an input to its own source of truth.                                                                                                          |
 
 `engineVersion` and `applicationId` stay, because the server genuinely
 branches on both — one gates incompatible builds, the other is allowlisted.
