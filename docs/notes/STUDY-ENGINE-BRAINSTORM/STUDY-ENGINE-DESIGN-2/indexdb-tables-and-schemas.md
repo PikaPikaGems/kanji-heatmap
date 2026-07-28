@@ -358,15 +358,17 @@ backend derives it.
 
 **When does the server write settings itself, rather than relaying what a
 device sent?**
-Four cases, and the first is the one that matters. `modelWeights` are fitted
-from review history — that's a batch job over every grade the account has
-ever recorded, which is the backend's data and nobody else's, and it's the
-reason raw review events are kept for the life of the account. The other
-three are duller: a new account has settings before any device has written
-any; a scheduler upgrade can change what a valid weight vector even looks
-like; and a published limit can move so that a stored value no longer fits
-inside it. In all four the row arrives with `origin: "server"` and no
-writing device, because none was involved.
+Three cases, all of them dull. A new account has settings before any device
+has written any. A scheduler upgrade can change what a valid weight vector
+even looks like. And a published limit can move so that a stored value no
+longer fits inside it. In all three the row arrives with `origin: "server"`
+and no writing device, because none was involved.
+
+What's deliberately not on that list is weight optimization. The backend may
+work out better `modelWeights` from review history and offer them, but it
+never applies them on its own — changing how somebody's scheduler behaves is
+their call to make. An accepted suggestion arrives as an ordinary device
+write, indistinguishable from any other settings change.
 
 This is also why `origin` isn't the same question as `serverRevision`. A row
 can have a `serverRevision` and still be provisional — synced once, then
