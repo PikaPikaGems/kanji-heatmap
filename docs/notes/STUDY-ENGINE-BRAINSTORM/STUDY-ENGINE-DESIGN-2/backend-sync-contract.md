@@ -279,29 +279,14 @@ interface ReviewGradeOperation extends SyncOperationBase {
   generation: number; // which attempt at this kanji was graded
   rating: "again" | "hard" | "good" | "easy";
 
-  // The card's schedule as it stood when the review was opened, copied from
-  // the frozen handle. This is the load-bearing field: when two devices
-  // grade the same card offline, the backend replays both in time order if
-  // it still has a common starting point, and rebuilds this branch from
-  // `priorState` when it doesn't. Without it that fallback degrades to
-  // "the server keeps its own branch and these grades count only toward
-  // statistics" — the schedule silently loses a device's work. Shape is
-  // `FsrsCardStateV1` in indexdb-tables-and-schemas.md.
+  // The card's schedule when the review was opened. The backend needs it to
+  // work out the right answer when two devices graded the same card offline.
   priorState: FsrsCardStateV1;
 
-  // What the local scheduler thought the next due date would be. The
-  // backend recomputes the real one and never trusts this; it's here so a
-  // disagreement between the two scheduler libraries shows up as a
-  // diagnostic instead of a slow drift nobody notices.
-  provisionalDueAt: UnixMs;
-
+  provisionalDueAt: UnixMs; // the local guess; the backend recomputes and never trusts it
   baseServerRevision: number; // the card revision this grade was based on
-  settingsRevision: number; // which settings were in force, so a replay uses them
-
-  // The device's time zone when the review happened, e.g. "Asia/Manila".
-  // The server needs it to file this grade under the right local day — it
-  // can't work that out from `occurredAt`, which is just an instant.
-  timeZone: IanaTimeZone;
+  settingsRevision: number; // which settings were in force at the time
+  timeZone: IanaTimeZone; // which local day this counts toward, e.g. "Asia/Manila"
 }
 
 interface PracticeActivityEventAddOperation extends SyncOperationBase {
@@ -341,11 +326,8 @@ interface SyncResponse {
 
 type SyncWarning =
   // Two devices added the same kanji with different words. Whichever
-  // reached the server first is canonical — note that this is arrival
-  // order, not the later `occurredAt` that settles a bookmark or a note.
-  // Nobody is judging which word is better; arrival order is just something
-  // both devices can agree on without anyone having to. Reconcile to
-  // `canonicalWord`.
+  // reached the server first wins — note that's arrival order, not the
+  // later `occurredAt` that settles a bookmark. Reconcile to `canonicalWord`.
   | {
       code: "pile_item_exists";
       deviceSequence: number;
@@ -427,25 +409,19 @@ backend-derived summaries possible at all.
 
 **Why do the two facts carry an `eventId` when `deviceSequence` already
 identifies the operation?**
-They answer different questions. `deviceSequence` identifies a slot in one
-device's outbox — it means nothing on another device, and it's gone once the
-row is acknowledged and deleted. `eventId` identifies the thing that
-happened, account-wide and permanently. It has to be on the wire because the
-host is handed it the moment it calls `record()` or `grade()`, long before
-anything syncs, and gets shown it again much later inside
-`bestAccuracy.eventId` on a challenge summary. If the server minted its own
-instead, those two ids would never match and "which attempt set this record"
-would be unanswerable. State intents have no `eventId` for the mirror-image
-reason: nothing ever points back at "the time you bookmarked this," so there
-is nothing to name.
+`deviceSequence` names a slot in one device's outbox, and it's gone once the
+row is acknowledged. `eventId` names the thing that happened, account-wide
+and for good. It's on the wire because the host is handed it by `record()`
+or `grade()` before anything syncs, and sees it again later in
+`bestAccuracy.eventId` — if the server minted its own, those two would never
+match. State intents have none, because nothing ever points back at "the
+time you bookmarked this."
 
-**Why does a review grade carry a time zone when a note edit doesn't?**
-Because a grade is counted into a local day and a note edit isn't. Filing it
-by `occurredAt` alone would mean slicing an instant in UTC, which puts a 7 AM
-review in Manila on the previous day — permanently, since daily rows are
-never rebuilt. The time zone is the one piece the server can't reconstruct
-after the fact, so the device sends it. Practice events already carry theirs
-inside `event`; this is the same rule applied to the other kind of fact.
+**Why does a grade carry a time zone when a note edit doesn't?**
+A grade is counted into a local day; a note edit isn't. Working the day out
+from `occurredAt` alone would slice it in UTC, filing a 7 AM review in Manila
+under the previous day — permanently, since daily rows are never rebuilt.
+Practice events already carry theirs inside `event`.
 
 **Why are some problems `warnings` instead of errors?**
 All three cases describe an operation that was _accepted_ and produced a
@@ -492,22 +468,13 @@ back — that's the one thing this makes harder.
 
 **Open question: two settings saves can silently clobber each other.**
 `review_settings_update` sends every setting and carries no base revision,
-so the later `occurredAt` wins outright and nothing can notice the device
-was working from an old copy. Open the settings screen in two tabs, change
-retention in one and learning steps in the other, and the second save
-quietly reverts the first. The same thing happens across two devices, with a
-longer gap in between.
-
-The damage is bounded, and worth saying so the size of this is clear: every
-value here is one the person set themselves and can set again, and nothing
-rewrites `modelWeights` behind their back — the backend only ever suggests
-those, never applies them. So this is a real bug and a small one.
-
-Two ways out. Carry the revision the form was loaded at and reject a save
-built on a stale one, which is what notes already do. Or send only the
-fields that actually changed, so a save can't restate values it never
-touched. Left open because the first needs a decision about what the host
-shows when a save is rejected.
+so the later `occurredAt` wins and nothing notices the device was working
+from an old copy. Change retention in one tab and learning steps in another,
+and the second save reverts the first. Everything at stake is a value the
+person set and can set again, so it's a real bug and a small one. The fix is
+the one notes already use — carry the revision the form was loaded at — and
+it's left open because it needs a decision about what the host shows when a
+save is rejected.
 
 **What happens if the backend permanently rejects one operation?**
 Sync locks and a diagnostic surfaces. That's right about not creating a gap

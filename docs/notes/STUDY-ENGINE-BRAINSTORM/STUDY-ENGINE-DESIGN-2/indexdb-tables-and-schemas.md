@@ -356,52 +356,28 @@ A note or bookmark can exist locally before reaching the server — written
 offline, still in the outbox. A summary can't: it only exists once the
 backend derives it.
 
-**Open question: nothing currently produces `origin: "server"`.**
-The field is reserved for one thing — per-user FSRS weight training, a batch
-job over the archive that would write a settings revision the backend
-authored. That job isn't built. It's the reason raw review events are kept
-for the life of the account, since the research dataset is anonymized and
-can't be fitted per person, so the field is deliberate rather than left
-over.
-
-There's a tension to settle before it ships, though. The engine never
-changes how somebody's scheduler behaves without their say-so — a fitted
-weight vector is offered, not applied. But an offer the person accepts is an
-ordinary device write, so it arrives with `origin: "device"` like any other
-settings change, and `origin: "server"` still has no producer. Either the
-suggestion needs somewhere of its own to live (it isn't `ReviewSettings` —
-those are the values in force), or the field is describing a write that
-won't happen. Worth deciding rather than discovering later.
-
-This is also why `origin` isn't the same question as `serverRevision`. A row
-can have a `serverRevision` and still be provisional — synced once, then
-edited locally again — so "has this ever reached the server" and "is what
-I'm looking at confirmed" are two different things, and only `origin`
-answers the second.
+**What's `origin` for, when `serverRevision` already says whether a row has
+synced?**
+They answer different questions. A row can have a `serverRevision` and still
+be provisional — synced once, then edited locally again — so "has this ever
+reached the server" and "is what I'm looking at confirmed" aren't the same.
+`origin` answers the second. Nothing writes `"server"` today; it's reserved
+for a possible future job that fits FSRS weights from review history.
 
 **What is the entitlement lease, and what happens when it runs out?**
 It answers one question: may this device keep accepting writes while it
-can't reach the server? Online, the server decides — a lapsed account gets
+can't reach the server? Online the server decides — a lapsed account gets a
 `402` and the engine goes read-only. Offline there's nobody to ask, so the
-lease is the last answer the server gave, with a date attached. Sync
-refreshes it whenever it's getting close to expiring, so a device that syncs
-even occasionally never notices it exists.
+lease is the last answer the server gave, with a date on it. Sync refreshes
+it well before expiry, so a device that syncs even occasionally never
+notices it exists.
 
-When it does run out offline, the engine goes read-only and keeps the
-outbox — the same thing a `402` does — and nothing is deleted or locked.
-Reads keep working. That distinction is the whole point: the failure this
-guards against isn't piracy, it's a paying customer on a long flight losing
-access to their own notes because a date passed. For the same reason the
-window should be generous — weeks, not hours. Someone who cancels gets a
-little while longer offline, which costs nothing; someone who paid gets
-locked out of their own writing, which is unforgivable.
-
-It's stored, not verified. The engine never checks the signature and never
-parses the blob — it reads the expiry sitting next to it. Anyone with
-devtools can edit that date, and that's fine: the server re-checks
-entitlement on every sync regardless, so a forged lease buys nothing except
-an outbox full of operations that come back rejected. The lease is offline
-grace, not a lock.
+When it does run out, the engine goes read-only and keeps the outbox —
+exactly what a `402` does. Nothing is deleted and reads keep working, which
+is the point: the risk here isn't piracy, it's someone who paid losing
+access to their own notes on a long flight. The engine never verifies the
+token, only reads the date beside it; the server re-checks entitlement on
+every sync anyway, so the lease is offline grace rather than a lock.
 
 **Why store the summaries locally if the backend owns them?**
 So the heatmap works offline. They're a cache, which is why they have no
