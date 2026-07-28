@@ -44,12 +44,16 @@ type QuerySnapshot<T> =
 type Result<T> = { ok: true; value: T } | { ok: false; error: ReviewError };
 
 type ReviewError =
-  | { code: "pile_item_exists"; kanji: Kanji; currentWord: string }
+  | { code: "pile_item_exists"; kanji: Kanji; canonicalWord: string }
   | { code: "storage_quota" }
   | { code: "read_only" } // account entitlement has lapsed
   | { code: "stale_revision" } // the card changed since it was queried
   | { code: "review_handle_expired" }
-  | { code: "review_handle_consumed" };
+  | { code: "review_handle_consumed" }
+  // A settings value the scheduler can't work with — see FAQ. `field` names
+  // the one that's wrong, so a form can point at it instead of showing a
+  // generic failure.
+  | { code: "invalid_settings"; field: keyof ReviewSettings; reason: string };
 
 // ---- Settings (shared by both card types) ----
 
@@ -238,6 +242,19 @@ A `Result` error is expected and part of normal use — "this kanji is already
 in your pile with a different word," "you're out of storage." A "failed"
 query is unexpected — the kind of thing that shouldn't happen and that
 someone would want to investigate.
+
+**What makes settings invalid, and why does the engine check them at all?**
+Because these values go straight into the scheduler, and bad ones don't fail
+loudly — they quietly produce nonsense intervals. A retention target of 5
+(rather than 0.9), a negative maximum interval, an empty learning-steps
+list, or the wrong number of `modelWeights` for the scheduler in use are all
+shapes the algorithm will accept and then misbehave on. `update()` rejects
+them with `invalid_settings` before anything is stored, naming the field so
+a settings form can mark that input rather than showing one generic error.
+`reason` is a short plain-language explanation ("must be between 0.7 and
+0.99") that a form can show as-is. The host doesn't need its own copy of the
+valid ranges to call this safely — though bounding a slider is still nicer
+than letting someone submit and be told no.
 
 **Why is `CardId` a meaningless string instead of just the kanji?**
 Because a kanji can be removed from the pile and added back later, starting

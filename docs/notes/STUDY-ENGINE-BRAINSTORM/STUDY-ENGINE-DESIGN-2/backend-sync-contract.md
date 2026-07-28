@@ -22,6 +22,7 @@ account ID in a request body is ignored.
 
 ```ts
 type UnixMs = number;
+type IanaTimeZone = string; // e.g. "Asia/Manila"
 
 // How far this device has consumed the account's history. Opaque — store
 // it, send it back, never parse it.
@@ -140,15 +141,11 @@ interface SyncRequest {
   maxPullBytes: number; // how large a response this device will accept; <= syncMaxBytes
 }
 
-interface SyncOperationBase {
-  deviceSequence: number; // position in this device's single sequence space; identifies the operation
-  occurredAt: UnixMs; // when the user did it; clamped if implausibly far in the future
-}
-
 // One variant per outbox `kind`, each with its own validation. There is no
-// generic patch operation.
+// generic "patch this field" operation — every shape below says exactly
+// what it changes.
 type SyncOperation =
-  // State intents — a desired value, resolved by last-writer-wins or merge
+  // State intents — "this is what the value should be now"
   | NotePutOperation
   | NoteRemoveOperation
   | BookmarkAddOperation
@@ -156,14 +153,143 @@ type SyncOperation =
   | ReviewSettingsUpdateOperation
   | ReviewPileAddOperation
   | ReviewPileRemoveOperation
-  // Facts — immutable records of something the user did
+  // Facts — "this happened"
   | ReviewGradeOperation
   | PracticeActivityEventAddOperation;
+
+// Every operation carries these two.
+interface SyncOperationBase {
+  // This device's own counter — one per operation, never reused, never
+  // renumbered. It's what makes a resend safe: the server recognises a
+  // repeated number as the same operation it already handled rather than a
+  // second one, which is why a timeout can't double-count anything.
+  deviceSequence: number;
+
+  // When the person actually did this, by the device's clock. It's how two
+  // devices that changed the same thing while offline get ordered. A time
+  // implausibly far in the future (a wrong system clock) is pulled back,
+  // and the device is told with a `clamped_occurred_at` warning.
+  occurredAt: UnixMs;
+}
+```
+
+#### The push: state intents
+
+A desired value, not a record of an event. Sending one twice is harmless —
+the second just restates the same wish. When two devices disagree, the
+server settles it; only notes keep both sides.
+
+```ts
+interface NotePutOperation extends SyncOperationBase {
+  kind: "note_put";
+  kanji: string;
+  content: string; // the whole note text, not a diff
+
+  // The `serverRevision` the editor was showing when this edit started.
+  // Absent for a note that has never reached the server. If the server's
+  // copy has moved past this number, some other device edited the same note
+  // in the meantime, and the two texts are merged rather than one silently
+  // replacing the other.
+  baseServerRevision?: number;
+}
+
+interface NoteRemoveOperation extends SyncOperationBase {
+  kind: "note_remove";
+  kanji: string;
+
+  // Same meaning as above, and the reason a delete can lose: if another
+  // device edited this note after that revision, the edit stays and the
+  // delete is dropped. Losing a delete is recoverable — delete it again.
+  // Losing someone's writing isn't.
+  baseServerRevision?: number;
+}
+
+// No revision on either bookmark operation. A bookmark is on or off, so the
+// later `occurredAt` simply wins and there's no text underneath for a stale
+// write to destroy.
+interface BookmarkAddOperation extends SyncOperationBase {
+  kind: "bookmark_add";
+  kanji: string;
+}
+
+interface BookmarkRemoveOperation extends SyncOperationBase {
+  kind: "bookmark_remove";
+  kanji: string;
+}
+
+interface ReviewSettingsUpdateOperation extends SyncOperationBase {
+  kind: "review_settings_update";
+
+  // Every setting, every time — there's no partial update. The server
+  // stores what it's handed and stamps the next revision number itself, so
+  // the device doesn't pick one. Shape is `ReviewSettings` from
+  // review-public-api.md.
+  settings: ReviewSettings;
+}
+
+interface ReviewPileAddOperation extends SyncOperationBase {
+  kind: "review_pile_add";
+  kanji: string;
+  word: string; // what its two cards will test, fixed from here on
+
+  // Which attempt at this kanji this is. Starts at 1, and goes up each time
+  // the kanji is removed from the pile and added back. It exists so a grade
+  // still queued against the old attempt can't land on the fresh one and
+  // corrupt a schedule that just started over.
+  generation: number;
+}
+
+interface ReviewPileRemoveOperation extends SyncOperationBase {
+  kind: "review_pile_remove";
+  kanji: string;
+  generation: number; // which attempt is being removed
+}
+```
+
+#### The push: facts
+
+Something that already happened. A fact is never edited or withdrawn, and
+every backend-derived number — daily counts, challenge bests, card schedules
+— is counted from these two shapes and nothing else.
+
+```ts
+interface ReviewGradeOperation extends SyncOperationBase {
+  kind: "review_grade";
+
+  // The same id `grade()` already handed the host. See F.A.Q for why a fact
+  // carries its own id when `deviceSequence` already identifies it.
+  eventId: string;
+
+  kanji: string;
+  cardType: "reading" | "writing";
+  generation: number; // which attempt at this kanji was graded
+  rating: "again" | "hard" | "good" | "easy";
+
+  // The device's time zone when the review happened, e.g. "Asia/Manila".
+  // The server needs it to file this grade under the right local day — it
+  // can't work that out from `occurredAt`, which is just an instant.
+  timeZone: IanaTimeZone;
+}
+
+interface PracticeActivityEventAddOperation extends SyncOperationBase {
+  kind: "practice_activity_event_add";
+
+  // The same id `activity.record()` already handed the host.
+  eventId: string;
+
+  // Exactly what the host passed to `activity.record()`, unchanged — the
+  // `PracticeActivityEventInput` union in activity-public-api.md. It
+  // already carries `startedAt`, `endedAt`, and `timeZone`, so there's
+  // nothing to restate here.
+  event: PracticeActivityEventInput;
+}
 ```
 
 A device never sends a daily summary, a challenge summary, or a canonical
 card state. The backend derives all three from the facts above, so there is
 no summary operation of any kind.
+
+#### The response
 
 ```ts
 interface SyncResponse {
@@ -262,6 +388,28 @@ the same transaction as the increments it authorized. So resending after a
 timeout is exactly as safe as sending once — which is what makes
 backend-derived summaries possible at all.
 
+**Why do the two facts carry an `eventId` when `deviceSequence` already
+identifies the operation?**
+They answer different questions. `deviceSequence` identifies a slot in one
+device's outbox — it means nothing on another device, and it's gone once the
+row is acknowledged and deleted. `eventId` identifies the thing that
+happened, account-wide and permanently. It has to be on the wire because the
+host is handed it the moment it calls `record()` or `grade()`, long before
+anything syncs, and gets shown it again much later inside
+`bestAccuracy.eventId` on a challenge summary. If the server minted its own
+instead, those two ids would never match and "which attempt set this record"
+would be unanswerable. State intents have no `eventId` for the mirror-image
+reason: nothing ever points back at "the time you bookmarked this," so there
+is nothing to name.
+
+**Why does a review grade carry a time zone when a note edit doesn't?**
+Because a grade is counted into a local day and a note edit isn't. Filing it
+by `occurredAt` alone would mean slicing an instant in UTC, which puts a 7 AM
+review in Manila on the previous day — permanently, since daily rows are
+never rebuilt. The time zone is the one piece the server can't reconstruct
+after the fact, so the device sends it. Practice events already carry theirs
+inside `event`; this is the same rule applied to the other kind of fact.
+
 **Why are some problems `warnings` instead of errors?**
 All three cases describe an operation that was _accepted_ and produced a
 correct result that just isn't the one the device expected. Rejecting them
@@ -279,7 +427,7 @@ the value was sent twice.
 | Cut                                 | Why                                                                                                                                                                                                                                                                                        |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `push.firstSequence`/`lastSequence` | They're the first and last `deviceSequence` in `push`. Trade-off: the server can no longer reject a batch by its range before parsing the array — but body size is already checked before decoding.                                                                                        |
-| `operationId`                       | It was `(deviceId, deviceSequence)`, and both are already in the request. `deviceSequence` alone identifies an operation within a device, which is the only scope that matters.                                                                                                            |
+| `operationId`                       | It was `(deviceId, deviceSequence)`, and both are already in the request. `deviceSequence` alone identifies an operation within a device, which is the only scope that matters. Not to be confused with `eventId`, which names a fact rather than the operation that carried it.           |
 | `catalogVersion`                    | `catalogSha256` identifies the catalog exactly. Trade-off: the server looks the readable name up from the hash for its own error messages instead of being told it.                                                                                                                        |
 | `bootstrapId`                       | Nothing read it. The cursor already binds a page to its run. Trade-off: one less thing to quote in a bug report; the account revision and device ID still identify the run.                                                                                                                |
 | `hasMore` (bootstrap)               | Folded into `nextCursor: ServerCursor \| null`. Trade-off: this was deliberately an explicit, mandatory field so a client couldn't quietly activate a partial account — that rule now attaches to `nextCursor`, which is harder to ignore, since you can't page at all without reading it. |
@@ -302,6 +450,16 @@ the response. Nothing consumed that today, and the atomicity it was meant to
 protect is provided by the single transaction instead. If a future client
 ever does need to apply a huge pull in chunks, the grouping has to come
 back — that's the one thing this makes harder.
+
+**Open question: two tabs saving settings can silently clobber each other.**
+`review_settings_update` sends every setting and no base revision, so the
+later `occurredAt` wins outright. Open one settings screen in two tabs,
+change retention in one and learning steps in the other, and the second save
+quietly reverts the first — there's nothing in the operation for the server
+to notice with. The fix is the one notes already use: carry the revision the
+form was loaded at, and reject a save built on a stale one. Flagging it here
+rather than adding the field silently, since it also needs a decision about
+what the host does with the rejection.
 
 **What happens if the backend permanently rejects one operation?**
 Sync locks and a diagnostic surfaces. That's right about not creating a gap

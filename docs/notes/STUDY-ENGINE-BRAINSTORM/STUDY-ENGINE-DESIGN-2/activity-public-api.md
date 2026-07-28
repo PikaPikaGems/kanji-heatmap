@@ -348,9 +348,13 @@ for history nobody's looking at.
 
 **If `watchDailySummaries` is windowed, how does a host show all-time
 totals and cake day without fetching the entire history?**
-That's what `watchAllTime()` is for — one row, maintained by the engine the
-same way a daily row is, instead of asking every host to sum however many
-years of daily rows exist just to show a handful of totals.
+That's what `watchAllTime()` is for. Nothing extra is stored for it — the
+engine works it out from the daily rows it already has (earliest date is the
+cake day, number of rows is `daysActive`, the rest are sums) and keeps the
+answer in memory, redoing it when a daily row changes. Even a decade of
+practice every single day is well under four thousand small rows, so this is
+cheap; the point of the method is that the host doesn't have to pull that
+history down and add it up itself.
 
 **Why is the window expressed as `from` + `totalDays` instead of `from` +
 `to`?**
