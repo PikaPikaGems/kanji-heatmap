@@ -22,16 +22,19 @@ const MetricRadioOption = ({
 }) => {
   const inputId = useId();
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex space-x-2">
       <input
         type="radio"
         id={inputId}
         name={name}
         checked={checked}
         onChange={() => onChange(metric)}
-        className="h-4 w-4 shrink-0 accent-primary"
+        className="w-4 h-4 shrink-0 accent-primary"
       />
-      <label htmlFor={inputId} className="text-sm font-medium leading-none">
+      <label
+        htmlFor={inputId}
+        className="text-xs font-medium leading-none translate-y-0.5"
+      >
         {HEATMAP_METRIC_LABELS[metric]}
       </label>
     </div>
@@ -50,18 +53,21 @@ export const SpeedKatakanaHeatmapSettingsPopover = ({
     <GenericPopover
       trigger={
         <button
+          key={metric}
           type="button"
           className={cn(
-            "inline-flex items-center gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8",
+            "inline-flex items-center gap-1 animate-fade-in-slow text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8",
             className
           )}
         >
-          <strong>Color by</strong>
+          <strong>
+            Colored by {HEATMAP_METRIC_LABELS[metric].toLowerCase()}
+          </strong>
           <Settings2 size={14} />
         </button>
       }
       content={
-        <div className="p-5 space-y-3 text-left w-64">
+        <div className="p-5 space-y-3 text-left">
           <div className="text-xs font-extrabold uppercase text-muted-foreground">
             Color cells by
           </div>
@@ -78,7 +84,7 @@ export const SpeedKatakanaHeatmapSettingsPopover = ({
           </div>
         </div>
       }
-      contentClassName="m-0 w-[calc(100vw-2rem)] max-w-sm p-0"
+      contentClassName="m-0 p-0 max-w-56"
     />
   );
 };
