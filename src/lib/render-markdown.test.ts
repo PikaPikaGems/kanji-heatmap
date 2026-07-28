@@ -25,4 +25,15 @@ describe("renderMarkdown", () => {
     expect(html).not.toContain('href="/privacy" target="_blank"');
     expect(html).not.toContain('href="mailto:a@b.com" target="_blank"');
   });
+
+  it("strips embedded raw script tags", () => {
+    const html = renderMarkdown("Hello <script>alert(1)</script> world");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("alert(1)");
+  });
+
+  it("strips javascript: URLs from links", () => {
+    const html = renderMarkdown("[click me](javascript:alert(1))");
+    expect(html).not.toContain("javascript:");
+  });
 });

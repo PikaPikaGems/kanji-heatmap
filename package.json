@@ -60,6 +60,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "dmak": "^0.3.1",
+    "dompurify": "^3.4.12",
     "fuzzysearch": "^1.0.3",
     "lucide-react": "^0.474.0",
     "marked": "^18.0.6",

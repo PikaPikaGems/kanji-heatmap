@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { marked } from "marked";
 
 const DOC_LINK_CLASS =
@@ -30,4 +31,6 @@ marked.use({
 
 /** Parse first-party markdown into HTML for docs pages. */
 export const renderMarkdown = (markdown: string): string =>
-  marked.parse(markdown, { async: false }) as string;
+  DOMPurify.sanitize(marked.parse(markdown, { async: false }) as string, {
+    ADD_ATTR: ["target"],
+  });

@@ -116,6 +116,9 @@ importers:
       dmak:
         specifier: ^0.3.1
         version: 0.3.1
+      dompurify:
+        specifier: ^3.4.12
+        version: 3.4.12
       fuzzysearch:
         specifier: ^1.0.3
         version: 1.0.3
@@ -270,7 +273,7 @@ importers:
     optionalDependencies:
       kanjicanvas:
         specifier: github:asdfjkl/kanjicanvas
-        version: https://codeload.github.com/asdfjkl/kanjicanvas/tar.gz/a9214105f156def3b96930e5fcf10b7652b7a1f7
+        version: git+https://git@github.com:asdfjkl/kanjicanvas.git#a9214105f156def3b96930e5fcf10b7652b7a1f7
 
 packages:
 
@@ -3031,6 +3034,9 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
+  dompurify@3.4.12:
+    resolution: {integrity: sha512-zQvGet8Z2sWbQhCmfFz/T5QWH2oBmjnqK3qvOjaqaNLrLEF912WamU+ohnTp0TCep/MFVHpdJuCZEdFOdTnEFg==}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -3683,8 +3689,8 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  kanjicanvas@https://codeload.github.com/asdfjkl/kanjicanvas/tar.gz/a9214105f156def3b96930e5fcf10b7652b7a1f7:
-    resolution: {tarball: https://codeload.github.com/asdfjkl/kanjicanvas/tar.gz/a9214105f156def3b96930e5fcf10b7652b7a1f7}
+  kanjicanvas@git+https://git@github.com:asdfjkl/kanjicanvas.git#a9214105f156def3b96930e5fcf10b7652b7a1f7:
+    resolution: {commit: a9214105f156def3b96930e5fcf10b7652b7a1f7, repo: git@github.com:asdfjkl/kanjicanvas.git, type: git}
     version: 0.0.0
 
   keyv@4.5.4:
@@ -7775,6 +7781,10 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
+  dompurify@3.4.12:
+    optionalDependencies:
+      '@types/trusted-types': 2.0.7
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -8585,7 +8595,8 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  kanjicanvas@https://codeload.github.com/asdfjkl/kanjicanvas/tar.gz/a9214105f156def3b96930e5fcf10b7652b7a1f7: {}
+  kanjicanvas@git+https://git@github.com:asdfjkl/kanjicanvas.git#a9214105f156def3b96930e5fcf10b7652b7a1f7:
+    optional: true
 
   keyv@4.5.4:
     dependencies:
