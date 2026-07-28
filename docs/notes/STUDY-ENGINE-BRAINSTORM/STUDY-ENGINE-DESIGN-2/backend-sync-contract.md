@@ -321,8 +321,12 @@ interface SyncResponse {
 }
 
 type SyncWarning =
-  // A pile add lost to another device that added the same kanji with a
-  // different word. Reconcile to the canonical word.
+  // Two devices added the same kanji with different words. Whichever
+  // reached the server first is canonical — note that this is arrival
+  // order, not the later `occurredAt` that settles a bookmark or a note.
+  // Nobody is judging which word is better; arrival order is just something
+  // both devices can agree on without anyone having to. Reconcile to
+  // `canonicalWord`.
   | {
       code: "pile_item_exists";
       deviceSequence: number;
