@@ -15,8 +15,8 @@ import { JouyouGradeBadge } from "@/components/common/JouyouGradeBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { OrderDisclaimer } from "@/components/common/OrderDisclaimer";
 import { jitenMoeFn, jpdbFn, kanshudoFn } from "@/lib/external-links";
-import { orderDisclaimer } from "@/lib/options/options-label-maps";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -95,7 +95,7 @@ export const General = ({ kanji }: { kanji: string }) => {
   const indexBadges: {
     label: string;
     value?: number;
-    description: string;
+    description: ReactNode;
   }[] = [
     {
       label: "Strokes",
@@ -103,10 +103,10 @@ export const General = ({ kanji }: { kanji: string }) => {
       description:
         "The total number of pen strokes used to write the kanji correctly.",
     },
-    { label: "WK", value: data.wk, description: orderDisclaimer },
-    { label: "KKLC", value: data.kklcIndex, description: orderDisclaimer },
-    { label: "RTK", value: data.rtk, description: orderDisclaimer },
-    { label: "RTKB", value: data.rtkb, description: orderDisclaimer },
+    { label: "WK", value: data.wk, description: <OrderDisclaimer /> },
+    { label: "KKLC", value: data.kklcIndex, description: <OrderDisclaimer /> },
+    { label: "RTK", value: data.rtk, description: <OrderDisclaimer /> },
+    { label: "RTKB", value: data.rtkb, description: <OrderDisclaimer /> },
   ];
 
   const readingRows: {

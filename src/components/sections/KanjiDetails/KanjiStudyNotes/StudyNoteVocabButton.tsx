@@ -32,7 +32,9 @@ export const StudyNoteVocabButton = ({
 
   if (!wordHasKanji(word)) {
     if (isJapanese(word)) {
-      return <RomajiBadge kana={word} className={cn("text-lg px-2 py-0")} />;
+      return (
+        <RomajiBadge kana={word} className={cn("text-base px-2 py-0.5")} />
+      );
     }
 
     return word;

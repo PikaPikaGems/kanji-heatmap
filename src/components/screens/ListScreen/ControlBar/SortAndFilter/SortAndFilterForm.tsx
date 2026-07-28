@@ -18,10 +18,8 @@ import {
   SortOrderSectionLayout,
 } from "./SortOrderPresentation";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
-import {
-  isCommunityOrder,
-  orderDisclaimer,
-} from "@/lib/options/options-label-maps";
+import { OrderDisclaimer } from "@/components/common/OrderDisclaimer";
+import { isCommunityOrder } from "@/lib/options/options-label-maps";
 import { useSortAndFilterForm } from "./use-sort-and-filter-form";
 
 export const SortAndFilterSettingsForm = ({
@@ -64,7 +62,7 @@ export const SortAndFilterSettingsForm = ({
                   key={`disclaimer-${sortValues.primary}`}
                   className="px-3 mt-1 text-xs text-left animate-fade-in"
                 >
-                  {orderDisclaimer}
+                  <OrderDisclaimer />
                 </div>
               )}
             </>
@@ -93,7 +91,7 @@ export const SortAndFilterSettingsForm = ({
                       key={`disclaimer-${sortValues.secondary}`}
                       className="px-3 mt-1 text-xs text-left animate-fade-in"
                     >
-                      {orderDisclaimer}
+                      <OrderDisclaimer />
                     </div>
                   )}
               </div>

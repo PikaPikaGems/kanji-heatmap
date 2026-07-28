@@ -28,7 +28,7 @@ export const SingleKanjiPart = ({
       content={
         <div className="p-2 text-xs font-bold">
           {phonetics.map((phonetic) => (
-            <RomajiBadge key={phonetic} kana={phonetic} />
+            <RomajiBadge key={phonetic} kana={phonetic} className="text-md" />
           ))}
 
           {keyword == null ? (

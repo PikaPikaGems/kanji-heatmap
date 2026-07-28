@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 
@@ -8,7 +9,7 @@ export const PrimaryBadgeWithPopover = ({
 }: {
   label: string;
   value: number;
-  description: string;
+  description: ReactNode;
 }) => (
   <GenericPopover
     contentClassName="text-sm"

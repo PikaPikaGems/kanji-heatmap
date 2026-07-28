@@ -46,9 +46,6 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_KKLC_INDEX]: "KKLC",
 };
 
-export const orderDisclaimer =
-  "⚠️ Community-maintained WK, KKLC, and RTK orders may differ from the official editions. Please refer to the official sources if exact ordering matters.";
-
 export const COMMUNITY_ORDER_KEYS = [
   K_WK_LVL,
   K_KKLC_INDEX,

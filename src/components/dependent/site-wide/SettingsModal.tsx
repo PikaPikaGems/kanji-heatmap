@@ -10,10 +10,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Settings2, Trash2, Download, Loader2 } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
+import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
+import { useAvailableJpVoices } from "@/hooks/use-available-jp-voices";
 import {
   useCurrentThemeColor,
   themeColorsRgb,
@@ -24,7 +33,9 @@ import {
   clearKanjiSvgCache,
   clearKatakanaCache,
 } from "@/lib/offline-preload";
+import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
+import { SpeakButton } from "@/components/common/SpeakButton";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -223,6 +234,35 @@ const ColorGrid = () => {
   );
 };
 
+const JpVoiceSelect = () => {
+  const [voiceId, setVoiceId] = useCurrentJpVoice();
+  const availableVoices = useAvailableJpVoices();
+
+  // Prefer an exact voiceURI match for the select value; legacy short ids
+  // (e.g. "kyoko") map to the matching installed voice when possible.
+  const matched = findJpVoice(availableVoices, voiceId);
+  const selectValue = matched?.voiceURI ?? DEFAULT_JP_VOICE_ID;
+
+  return (
+    <div className="text-left">
+      <Select value={selectValue} onValueChange={setVoiceId}>
+        <SelectTrigger aria-label="Japanese text-to-speech voice">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={DEFAULT_JP_VOICE_ID}>Default</SelectItem>
+          {availableVoices.map((voice) => (
+            <SelectItem key={voice.voiceURI} value={voice.voiceURI}>
+              {voice.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <p className="pt-2 text-xs text-muted-foreground">{TTS_DISCLAIMER}</p>
+    </div>
+  );
+};
+
 const LightDarkRow = () => {
   const { theme, setTheme } = useTheme();
   const isDark =
@@ -301,6 +341,14 @@ export const SettingsModal = () => {
               Background Color
             </span>
             <ColorGrid />
+          </div>
+
+          <div className="mb-4 text-left">
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
+              Japanese Voice{" "}
+              <SpeakButton word={"こんにちは"} iconType="volume-2" />
+            </div>
+            <JpVoiceSelect />
           </div>
 
           <LightDarkRow />
