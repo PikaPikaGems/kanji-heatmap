@@ -26,7 +26,6 @@ between to keep a copy of.
 
 ```ts
 type UnixMs = number;
-type IanaTimeZone = string; // e.g. "Asia/Manila"
 
 // How far this device has consumed the account's history. Opaque — store
 // it, send it back, never parse it.
@@ -47,16 +46,6 @@ type ServerEntityChange =
   | { type: "review_settings"; value: CanonicalReviewSettings }
   | { type: "daily_summary"; value: CanonicalDailySummary }
   | { type: "challenge_summary"; value: CanonicalChallengeSummary };
-
-// How long this device may keep accepting writes without reaching the
-// server — the last answer the server gave, with a date on it. `token` is
-// stored as-is and never parsed by the engine; `expiresAt` is the part it
-// acts on. See indexdb-tables-and-schemas.md for what happens when it runs
-// out while offline.
-interface EntitlementLease {
-  token: string;
-  expiresAt: UnixMs;
-}
 
 // Limits the backend publishes and the engine must respect. Sent during
 // bootstrap, and again whenever one of them changes.
@@ -111,7 +100,7 @@ interface BootstrapPageResponse {
   nextCursor: ServerCursor | null; // pass back for the next page; null means that was the last
 
   policy: PublishedPolicy; // on the first page; may repeat
-  entitlementLease?: EntitlementLease; // how long this device may write while offline
+  entitlementLease?: string; // signed proof the account is paid up, for offline restarts
 }
 ```
 
@@ -278,8 +267,6 @@ interface ReviewGradeOperation extends SyncOperationBase {
   cardType: "reading" | "writing";
   generation: number; // which attempt at this kanji was graded
   rating: "again" | "hard" | "good" | "easy";
-
-  timeZone: IanaTimeZone; // which local day this counts toward, e.g. "Asia/Manila"
 }
 
 interface PracticeActivityEventAddOperation extends SyncOperationBase {
@@ -312,15 +299,14 @@ interface SyncResponse {
   hasMoreChanges: boolean; // true means call again with the new cursor
 
   changes: readonly ServerEntityChange[]; // apply all of them, in order, or none
-  entitlementLease?: EntitlementLease; // only when the stored one is nearing expiry
+  entitlementLease?: string; // refreshed when it was close to expiring
   policy?: PublishedPolicy; // only when a published value changed
   warnings: readonly SyncWarning[]; // accepted, but something needs reconciling
 }
 
 type SyncWarning =
-  // Two devices added the same kanji with different words. Whichever
-  // reached the server first wins — note that's arrival order, not the
-  // later `occurredAt` that settles a bookmark. Reconcile to `canonicalWord`.
+  // A pile add lost to another device that added the same kanji with a
+  // different word. Reconcile to the canonical word.
   | {
       code: "pile_item_exists";
       deviceSequence: number;
@@ -410,12 +396,6 @@ or `grade()` before anything syncs, and sees it again later in
 match. State intents have none, because nothing ever points back at "the
 time you bookmarked this."
 
-**Why does a grade carry a time zone when a note edit doesn't?**
-A grade is counted into a local day; a note edit isn't. Working the day out
-from `occurredAt` alone would slice it in UTC, filing a 7 AM review in Manila
-under the previous day — permanently, since daily rows are never rebuilt.
-Practice events already carry theirs inside `event`.
-
 **Why are some problems `warnings` instead of errors?**
 All three cases describe an operation that was _accepted_ and produced a
 correct result that just isn't the one the device expected. Rejecting them
@@ -457,16 +437,6 @@ the response. Nothing consumed that today, and the atomicity it was meant to
 protect is provided by the single transaction instead. If a future client
 ever does need to apply a huge pull in chunks, the grouping has to come
 back — that's the one thing this makes harder.
-
-**Open question: two settings saves can silently clobber each other.**
-`review_settings_update` sends every setting and carries no base revision,
-so the later `occurredAt` wins and nothing notices the device was working
-from an old copy. Change retention in one tab and learning steps in another,
-and the second save reverts the first. Everything at stake is a value the
-person set and can set again, so it's a real bug and a small one. The fix is
-the one notes already use — carry the revision the form was loaded at — and
-it's left open because it needs a decision about what the host shows when a
-save is rejected.
 
 **What happens if the backend permanently rejects one operation?**
 Sync locks and a diagnostic surfaces. That's right about not creating a gap

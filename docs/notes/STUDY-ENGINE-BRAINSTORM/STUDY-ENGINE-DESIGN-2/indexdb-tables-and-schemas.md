@@ -69,9 +69,9 @@ interface AccountCacheRow {
 filled and must not be read or written, and a `locked` one failed a
 migration or an integrity check.
 
-No account data lives here at all — no notes, bookmarks, cards, session
-token, or entitlement lease. Only which caches exist and which one is in
-use. The lease is per-account, so it lives in `accountMeta` below.
+No study data lives here — no notes, bookmarks, cards, or session token. It
+may hold the signed entitlement lease, which is what lets an offline restart
+know the account is still paid up.
 
 ### The account database — 9 tables
 
@@ -109,17 +109,6 @@ interface AccountMetaRow {
   deviceId: DeviceId; // this browser's identity, assigned by the backend on first bootstrap
   nextDeviceSequence: number; // the number the next outbox row will take
   cursor: ServerCursor; // how far this cache has consumed the account's history
-
-  // How long this cache may keep accepting writes without reaching the
-  // server. Absent until the first sync that issues one. See F.A.Q.
-  entitlementLease?: EntitlementLease;
-}
-
-// Stored exactly as the server sent it. `token` is never parsed here —
-// `expiresAt` is the only part anything reads.
-interface EntitlementLease {
-  token: string;
-  expiresAt: UnixMs;
 }
 ```
 
@@ -226,12 +215,7 @@ interface ReviewSettingsRow {
   settings: ReviewSettings; // the values ReviewsApi.settings exposes as-is
   settingsRevision: number; // monotonic; applied forward only
   updatedAt: UnixMs;
-  // Where this row's values came from. "device" means a local change that
-  // the server hasn't acknowledged yet — provisional, and what's on screen
-  // may still move. "server" means these are the canonical values. The
-  // backend writes settings in its own right, not only by relaying what a
-  // device sent; see F.A.Q.
-  origin: "device" | "server";
+  origin: "device" | "server"; // a server write wins over a device write at the same instant
   writerDeviceId?: DeviceId; // which device changed them; absent when origin is "server"
   writerDeviceSequence?: number;
   serverRevision?: number;
@@ -355,31 +339,6 @@ they're bounded by the kanji set.
 A note or bookmark can exist locally before reaching the server — written
 offline, still in the outbox. A summary can't: it only exists once the
 backend derives it.
-
-**What's `origin` for, when `serverRevision` already says whether a row has
-synced?**
-They answer different questions. `origin` says whether you're looking at a
-local guess or the real thing: `"device"` is a change this browser made that
-hasn't come back from the server yet, `"server"` is the canonical value.
-Every sync that brings settings down writes `"server"`. A row can have a
-`serverRevision` and still be provisional — synced once, then edited again
-locally — so "has this ever reached the server" and "is this confirmed"
-aren't the same question.
-
-**What is the entitlement lease, and what happens when it runs out?**
-It answers one question: may this device keep accepting writes while it
-can't reach the server? Online the server decides — a lapsed account gets a
-`402` and the engine goes read-only. Offline there's nobody to ask, so the
-lease is the last answer the server gave, with a date on it. Sync refreshes
-it well before expiry, so a device that syncs even occasionally never
-notices it exists.
-
-When it does run out, the engine goes read-only and keeps the outbox —
-exactly what a `402` does. Nothing is deleted and reads keep working, which
-is the point: the risk here isn't piracy, it's someone who paid losing
-access to their own notes on a long flight. The engine never verifies the
-token, only reads the date beside it; the server re-checks entitlement on
-every sync anyway, so the lease is offline grace rather than a lock.
 
 **Why store the summaries locally if the backend owns them?**
 So the heatmap works offline. They're a cache, which is why they have no
