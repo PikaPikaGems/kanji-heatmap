@@ -285,7 +285,8 @@ acknowledged. One row per mutation.
 ```ts
 interface OutboxRow {
   deviceSequence: number; // primary key; taken from accountMeta.nextDeviceSequence
-  operationId: string; // stable across retries, so a resend isn't applied twice
+  // and the operation's identity — stable across retries, which is what
+  // makes a resend safe. There is no separate operationId.
   kind:
     | "note_put"
     | "note_remove"
@@ -312,7 +313,7 @@ reviewPileItems:     &kanji, generation, serverRevision, active
 reviewCards:         &[kanji+cardType], [cardType+dueAt], generation, serverRevision, active
 dailySummaries:      &localDate, serverRevision
 challengeSummaries:  &[activityType+challengeId], serverRevision
-outbox:              &deviceSequence, operationId, state
+outbox:              &deviceSequence, state
 ```
 
 `&` marks the primary key. The `serverRevision` indexes exist because

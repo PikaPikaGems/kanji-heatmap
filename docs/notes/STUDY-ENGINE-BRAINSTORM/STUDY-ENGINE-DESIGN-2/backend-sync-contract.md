@@ -71,11 +71,10 @@ No request body. Query parameters:
 ```text
 protocolMajor    engine's protocol major
 protocolMinor    engine's protocol minor
-engineVersion    build identifier, for diagnostics and compatibility gates
-applicationId    which host embeds this engine, e.g. "kanji-heatmap"
-catalogVersion   which kanji catalog the engine is pinned to
-catalogSha256    hash of that catalog; a version string is a claim, a hash is a check
-cursor           omit on the first call; otherwise the value from the last page
+engineVersion    build identifier; the server gates incompatible builds on it
+applicationId    which host embeds this engine, e.g. "kanji-heatmap"; allowlisted
+catalogSha256    hash of the kanji catalog the engine is pinned to
+cursor           omit on the first call; otherwise nextCursor from the last page
 ```
 
 The first call — the one without a `cursor` — starts a run and registers
@@ -86,17 +85,11 @@ interface BootstrapPageResponse {
   protocol: ProtocolVersion;
   serverTime: UnixMs; // for clock-skew diagnostics; never overwrites local time
 
-  bootstrapId: string; // identifies this run
   snapshotRevision: number; // the account revision this run is a picture of
-
-  device: {
-    deviceId: string; // assigned on the first page; send it on every /sync after
-    acceptedSequence: number; // 0 for a newly registered device
-  };
+  deviceId: string; // assigned on the first page; send it on every /sync after
 
   entities: readonly ServerEntityChange[]; // this page's rows; one entity is never split
-  cursor: ServerCursor | null; // pass back for the next page; null on the last
-  hasMore: boolean; // whether another page follows
+  nextCursor: ServerCursor | null; // pass back for the next page; null means that was the last
 
   policy: PublishedPolicy; // on the first page; may repeat
   entitlementLease?: string; // signed proof the account is paid up, for offline restarts
@@ -106,14 +99,13 @@ interface BootstrapPageResponse {
 Pages are capped by `bootstrapPageMaxBytes` rather than an entity count,
 since a long note and a bookmark differ in size by two orders of magnitude.
 
-**How it's used.** Call with no `cursor`; record `bootstrapId`,
-`snapshotRevision`, `deviceId`. Create the account database and mark it
-`bootstrapping`, which is what keeps a half-filled database unreadable. Loop
-while `hasMore`, writing each page's `entities` straight into the live
-tables in one transaction and calling again with the returned `cursor`. When
-`hasMore` is false, set the local cursor to `snapshotRevision`, mark the
-cache active, and `POST /sync` to pick up anything that changed during the
-loop.
+**How it's used.** Call with no `cursor`; record `snapshotRevision` and
+`deviceId`. Create the account database and mark it `bootstrapping`, which
+is what keeps a half-filled database unreadable. Loop while `nextCursor`
+isn't null, writing each page's `entities` straight into the live tables in
+one transaction and calling again with it. When it comes back null, set the
+local cursor to `snapshotRevision`, mark the cache active, and `POST /sync`
+to pick up anything that changed during the loop.
 
 Two rules: a client that can't fully understand a response must fail loudly
 rather than activate a partial account as if it were complete, and an
@@ -130,30 +122,22 @@ interface SyncRequest {
   protocol: ProtocolVersion;
   engineVersion: string;
   applicationId: string;
-  catalogVersion: string;
   catalogSha256: string;
 
-  device: { deviceId: string }; // from bootstrap; must match the session's device
+  deviceId: string; // from bootstrap; must match the session's registered device
 
   cursor: ServerCursor; // how far this device has already applied
 
-  // null when nothing is queued — a pull-only sync is normal and common.
-  push: {
-    firstSequence: number; // acceptedThroughSequence + 1, or a retry at or below it
-    lastSequence: number; // firstSequence + operations.length - 1
-    operations: readonly SyncOperation[]; // ordered by deviceSequence, no gaps
-  } | null;
+  // Empty when nothing is queued — a pull-only sync is normal and common.
+  // Ordered by deviceSequence, contiguous, starting at
+  // acceptedThroughSequence + 1 or resending a batch at or below it.
+  push: readonly SyncOperation[];
 
-  pull: {
-    maxChangeGroups: number; // how many revisions of changes to apply at once
-    maxBytes: number; // at or below the published syncMaxBytes
-  };
+  maxPullBytes: number; // how large a response this device will accept; <= syncMaxBytes
 }
 
 interface SyncOperationBase {
-  schemaVersion: 1;
-  operationId: string; // stable across retries, so a resend isn't applied twice
-  deviceSequence: number; // position in this device's single sequence space
+  deviceSequence: number; // position in this device's single sequence space; identifies the operation
   occurredAt: UnixMs; // when the user did it; clamped if implausibly far in the future
 }
 
@@ -183,19 +167,13 @@ interface SyncResponse {
   serverTime: UnixMs;
 
   acceptedThroughSequence: number; // every outbox row at or below this is done
-  cursor: ServerCursor; // the new position, once every group below is applied
-  targetRevision: number; // the revision the server selected up to when it answered
+  cursor: ServerCursor; // the new position, once every change below is applied
   hasMoreChanges: boolean; // true means call again with the new cursor
 
-  changeGroups: readonly ServerChangeGroup[]; // apply in order; never split across responses
+  changes: readonly ServerEntityChange[]; // apply all of them, in order, or none
   entitlementLease?: string; // refreshed when it was close to expiring
   policy?: PublishedPolicy; // only when a published value changed
   warnings: readonly SyncWarning[]; // accepted, but something needs reconciling
-}
-
-interface ServerChangeGroup {
-  accountRevision: number; // every row below changed together, as one logical operation
-  changes: readonly ServerEntityChange[];
 }
 
 type SyncWarning =
@@ -203,33 +181,37 @@ type SyncWarning =
   // different word. Reconcile to the canonical word.
   | {
       code: "pile_item_exists";
-      operationId: string;
+      deviceSequence: number;
       kanji: string;
       canonicalWord: string;
     }
   // A grade arrived for a pile generation another device removed. It still
   // counts toward the daily summary, but doesn't resurrect the card.
-  | { code: "ignored_deleted_generation"; operationId: string; kanji: string }
+  | {
+      code: "ignored_deleted_generation";
+      deviceSequence: number;
+      kanji: string;
+    }
   // The reported time was implausibly far in the future and was pulled back.
-  | { code: "clamped_occurred_at"; operationId: string; clampedTo: UnixMs };
+  | { code: "clamped_occurred_at"; deviceSequence: number; clampedTo: UnixMs };
 ```
 
 **How it's used.** Take the next contiguous batch of `pending` outbox rows
 within `syncMaxOperations` and `syncMaxBytes`, mark them `sending`, send
 with the current cursor. On success, in **one local transaction**: apply
-every change group in revision order, delete outbox rows at or below
+every change in order, delete outbox rows at or below
 `acceptedThroughSequence`, and store the new cursor. A crash before that
 commit safely retries from the unchanged cursor. Then go again if
 `hasMoreChanges` is true or rows remain.
 
 Three rules that aren't optional:
 
-- Never change a sequence number or `operationId` on retry. A timeout is an
-  unknown outcome, not a failure — resend the identical batch.
+- Never renumber an operation on retry. A timeout is an unknown outcome, not
+  a failure — resend the identical batch with the identical sequences.
 - Never skip a rejected operation; that punches a gap in a sequence the
   protocol requires to be contiguous. See the last F.A.Q. entry.
-- Never apply a change group partially. The cursor advances only through the
-  last group fully applied.
+- Never apply a response partially. The cursor is only valid once every
+  change that came with it has been written.
 
 Sync runs on startup, on regained connectivity, on visibility after real
 inactivity, at the end of a review session, on a settings change, on
@@ -265,7 +247,7 @@ database transaction open across HTTP requests.
 **Is `POST /sync` paginated?**
 Both halves, differently. The push is capped by `syncMaxOperations` and
 `syncMaxBytes` — send the next contiguous batch, repeat until the outbox is
-empty. The pull is capped by `maxBytes`/`maxChangeGroups` and signalled by
+empty. The pull is capped by `maxPullBytes` and signalled by
 `hasMoreChanges` — repeat with the returned cursor until it's false. No page
 numbers, because neither side walks a fixed result set.
 
@@ -281,6 +263,41 @@ All three cases describe an operation that was _accepted_ and produced a
 correct result that just isn't the one the device expected. Rejecting them
 would create a sequence gap over something that isn't an error. A warning
 asks a device to reconcile its guess; it doesn't ask it to retry.
+
+**Fields you might expect here that aren't.**
+Each was cut because something else in the same payload already carries it,
+or because nothing reads it. The trade-off is the same in most cases: the
+server has to derive a value instead of being handed it, and loses the
+chance to cross-check two fields against each other — but a cross-check
+that can fail is itself a failure mode, and one that only exists because
+the value was sent twice.
+
+| Cut                                 | Why                                                                                                                                                                                                                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `push.firstSequence`/`lastSequence` | They're the first and last `deviceSequence` in `push`. Trade-off: the server can no longer reject a batch by its range before parsing the array — but body size is already checked before decoding.                                                                                        |
+| `operationId`                       | It was `(deviceId, deviceSequence)`, and both are already in the request. `deviceSequence` alone identifies an operation within a device, which is the only scope that matters.                                                                                                            |
+| `catalogVersion`                    | `catalogSha256` identifies the catalog exactly. Trade-off: the server looks the readable name up from the hash for its own error messages instead of being told it.                                                                                                                        |
+| `bootstrapId`                       | Nothing read it. The cursor already binds a page to its run. Trade-off: one less thing to quote in a bug report; the account revision and device ID still identify the run.                                                                                                                |
+| `hasMore` (bootstrap)               | Folded into `nextCursor: ServerCursor \| null`. Trade-off: this was deliberately an explicit, mandatory field so a client couldn't quietly activate a partial account — that rule now attaches to `nextCursor`, which is harder to ignore, since you can't page at all without reading it. |
+| `device.acceptedSequence`           | Bootstrap only runs for an empty cache, so it was always `0`.                                                                                                                                                                                                                              |
+| `targetRevision`                    | Nothing read it. The client loops on `hasMoreChanges` and stores the opaque cursor; the server's internal selection bound isn't its business.                                                                                                                                              |
+| `pull.maxChangeGroups`              | `maxPullBytes` already bounds the response. Two knobs for one limit meant an undefined answer when they disagreed.                                                                                                                                                                         |
+| `schemaVersion` on each operation   | The host never chooses it and the engine build already fixes it. An incompatible shape change arrives as a new operation variant, which is the rule `activity-public-api.md` already settled on.                                                                                           |
+
+`engineVersion` and `applicationId` stay, because the server genuinely
+branches on both — one gates incompatible builds, the other is allowlisted.
+`snapshotRevision` stays too: it's what the local cursor is set to when
+bootstrap finishes, so cutting it would just mean adding a replacement.
+
+**Why is `changes` a flat list instead of groups of changes per revision?**
+Because grouping only helps a client that stops partway, and nothing here
+does. A response is bounded by `maxPullBytes`, read fully into memory, and
+applied in one transaction — all of it or none. The trade-off is that
+"these three rows changed as one logical operation" is no longer visible in
+the response. Nothing consumed that today, and the atomicity it was meant to
+protect is provided by the single transaction instead. If a future client
+ever does need to apply a huge pull in chunks, the grouping has to come
+back — that's the one thing this makes harder.
 
 **What happens if the backend permanently rejects one operation?**
 Sync locks and a diagnostic surfaces. That's right about not creating a gap
