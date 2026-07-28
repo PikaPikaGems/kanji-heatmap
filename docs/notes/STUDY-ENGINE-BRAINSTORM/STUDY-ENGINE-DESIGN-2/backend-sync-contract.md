@@ -16,6 +16,10 @@ Both go out with a Secure HttpOnly session cookie and
 `credentials: "include"`. The account is whoever the cookie says — an
 account ID in a request body is ignored.
 
+Both responses are `Cache-Control: no-store`. They carry someone's notes,
+and a `GET` in particular is otherwise fair game for a browser or a proxy in
+between to keep a copy of.
+
 ## 1. The two routes
 
 ### Shared pieces
@@ -43,6 +47,16 @@ type ServerEntityChange =
   | { type: "review_settings"; value: CanonicalReviewSettings }
   | { type: "daily_summary"; value: CanonicalDailySummary }
   | { type: "challenge_summary"; value: CanonicalChallengeSummary };
+
+// How long this device may keep accepting writes without reaching the
+// server — the last answer the server gave, with a date on it. `token` is
+// stored as-is and never parsed by the engine; `expiresAt` is the part it
+// acts on. See indexdb-tables-and-schemas.md for what happens when it runs
+// out while offline.
+interface EntitlementLease {
+  token: string;
+  expiresAt: UnixMs;
+}
 
 // Limits the backend publishes and the engine must respect. Sent during
 // bootstrap, and again whenever one of them changes.
@@ -97,7 +111,7 @@ interface BootstrapPageResponse {
   nextCursor: ServerCursor | null; // pass back for the next page; null means that was the last
 
   policy: PublishedPolicy; // on the first page; may repeat
-  entitlementLease?: string; // signed proof the account is paid up, for offline restarts
+  entitlementLease?: EntitlementLease; // how long this device may write while offline
 }
 ```
 
@@ -301,7 +315,7 @@ interface SyncResponse {
   hasMoreChanges: boolean; // true means call again with the new cursor
 
   changes: readonly ServerEntityChange[]; // apply all of them, in order, or none
-  entitlementLease?: string; // refreshed when it was close to expiring
+  entitlementLease?: EntitlementLease; // only when the stored one is nearing expiry
   policy?: PublishedPolicy; // only when a published value changed
   warnings: readonly SyncWarning[]; // accepted, but something needs reconciling
 }

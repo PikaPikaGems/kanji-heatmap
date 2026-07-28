@@ -6,6 +6,24 @@ actually on disk" has an answer.
 
 ## 1. The tables
 
+```ts
+// ---- Basic building blocks ----
+
+type UnixMs = number;
+type Kanji = string; // a single kanji character
+type LocalDate = string; // YYYY-MM-DD, e.g. "2026-07-28"
+
+type AccountId = string; // the account these rows belong to
+type DeviceId = string; // one browser profile, assigned by the backend
+
+// How far this cache has consumed the account's history. Opaque — store it,
+// send it back, never parse it.
+type ServerCursor = string;
+
+// `ReviewSettings` below is the same shape ReviewsApi exposes — see
+// review-public-api.md.
+```
+
 Two databases. One per browser for bookkeeping, one per cached account for
 that account's data, so that forgetting an account is a single
 `deleteDatabase` rather than a delete sweep across every table.
@@ -51,9 +69,9 @@ interface AccountCacheRow {
 filled and must not be read or written, and a `locked` one failed a
 migration or an integrity check.
 
-No study data lives here — no notes, bookmarks, cards, or session token. It
-may hold the signed entitlement lease, which is what lets an offline restart
-know the account is still paid up.
+No account data lives here at all — no notes, bookmarks, cards, session
+token, or entitlement lease. Only which caches exist and which one is in
+use. The lease is per-account, so it lives in `accountMeta` below.
 
 ### The account database — 9 tables
 
@@ -91,6 +109,17 @@ interface AccountMetaRow {
   deviceId: DeviceId; // this browser's identity, assigned by the backend on first bootstrap
   nextDeviceSequence: number; // the number the next outbox row will take
   cursor: ServerCursor; // how far this cache has consumed the account's history
+
+  // How long this cache may keep accepting writes without reaching the
+  // server. Absent until the first sync that issues one. See F.A.Q.
+  entitlementLease?: EntitlementLease;
+}
+
+// Stored exactly as the server sent it. `token` is never parsed here —
+// `expiresAt` is the only part anything reads.
+interface EntitlementLease {
+  token: string;
+  expiresAt: UnixMs;
 }
 ```
 
@@ -246,8 +275,8 @@ interface SpeedKatakanaChallengeSummaryRow {
   challengeId: string;
   attemptCount: number; // completed sessions for this challenge
   latest: {
-    // the most recent attempt
-    eventId: string;
+    // the most recent attempt. No eventId — unlike a best, "latest" has
+    // nothing to tie-break, since there's only ever one most-recent.
     occurredAt: UnixMs;
     accuracyPercent: number;
     charactersPerMinute: number;
@@ -321,6 +350,30 @@ they're bounded by the kanji set.
 A note or bookmark can exist locally before reaching the server — written
 offline, still in the outbox. A summary can't: it only exists once the
 backend derives it.
+
+**What is the entitlement lease, and what happens when it runs out?**
+It answers one question: may this device keep accepting writes while it
+can't reach the server? Online, the server decides — a lapsed account gets
+`402` and the engine goes read-only. Offline there's nobody to ask, so the
+lease is the last answer the server gave, with a date attached. Sync
+refreshes it whenever it's getting close to expiring, so a device that syncs
+even occasionally never notices it exists.
+
+When it does run out offline, the engine goes read-only and keeps the
+outbox — the same thing a `402` does — and nothing is deleted or locked.
+Reads keep working. That distinction is the whole point: the failure this
+guards against isn't piracy, it's a paying customer on a long flight losing
+access to their own notes because a date passed. For the same reason the
+window should be generous — weeks, not hours. Someone who cancels gets a
+little while longer offline, which costs nothing; someone who paid gets
+locked out of their own writing, which is unforgivable.
+
+It's stored, not verified. The engine never checks the signature and never
+parses the blob — it reads the expiry sitting next to it. Anyone with
+devtools can edit that date, and that's fine: the server re-checks
+entitlement on every sync regardless, so a forged lease buys nothing except
+an outbox full of operations that come back rejected. The lease is offline
+grace, not a lock.
 
 **Why store the summaries locally if the backend owns them?**
 So the heatmap works offline. They're a cache, which is why they have no
