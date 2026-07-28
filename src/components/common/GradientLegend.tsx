@@ -14,7 +14,10 @@ export const GradientLegend = ({
   moreLabel?: string;
 } = {}) => {
   return (
-    <div className="flex my-3 space-x-1 items-center w-full">
+    <div
+      className="flex items-center w-full my-3 space-x-1 animate-fade-in"
+      key={lessLabel + moreLabel}
+    >
       <div className="text-xs">{lessLabel}</div>
       {Array.from({ length: freqCategoryCount }).map((_, item) => {
         const cn = freqCategoryCn[item as FreqCategory];

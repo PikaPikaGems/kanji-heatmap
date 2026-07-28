@@ -25,11 +25,11 @@ export const SpeedKatakanaHeatmap = () => {
         title={speedKatakanaPageMeta.shortLabel}
         description={`Each cell is one challenge set (10 katakana words). Cells are currently colored by "${HEATMAP_METRIC_LABELS[metric]}" — brighter cells mean a higher value. Columns are levels 1–20; rows are sets within each level.`}
       />
-      <div className="flex justify-end mb-1">
+      <div className="flex justify-center mb-6 animate-fade-in">
         <SpeedKatakanaHeatmapSettingsPopover />
       </div>
       <SpeedKatakanaHeatmapGrid key={revision} metric={metric} />
-      <div className="flex items-center justify-center w-full">
+      <div className="flex flex-col items-center justify-center w-full">
         <div>
           <GradientLegend
             lessLabel={gradientLabels.less}
