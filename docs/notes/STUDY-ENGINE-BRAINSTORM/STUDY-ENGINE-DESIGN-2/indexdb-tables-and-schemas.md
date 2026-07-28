@@ -358,11 +358,13 @@ backend derives it.
 
 **What's `origin` for, when `serverRevision` already says whether a row has
 synced?**
-They answer different questions. A row can have a `serverRevision` and still
-be provisional — synced once, then edited locally again — so "has this ever
-reached the server" and "is what I'm looking at confirmed" aren't the same.
-`origin` answers the second. Nothing writes `"server"` today; it's reserved
-for a possible future job that fits FSRS weights from review history.
+They answer different questions. `origin` says whether you're looking at a
+local guess or the real thing: `"device"` is a change this browser made that
+hasn't come back from the server yet, `"server"` is the canonical value.
+Every sync that brings settings down writes `"server"`. A row can have a
+`serverRevision` and still be provisional — synced once, then edited again
+locally — so "has this ever reached the server" and "is this confirmed"
+aren't the same question.
 
 **What is the entitlement lease, and what happens when it runs out?**
 It answers one question: may this device keep accepting writes while it
