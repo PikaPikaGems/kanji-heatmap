@@ -8,10 +8,10 @@ export function kanjiSvgCode(kanji: string): string {
 
 /**
  * The ~2426 kanji in `raw-data/filtered_kanji.json` ship as committed SVGs
- * under `public/json/svg/`, so those don't need the CDN at all. Everything
+ * under `public/svg/`, so those don't need the CDN at all. Everything
  * outside that set (e.g. 唸) still lazy-loads from the CDN below.
  */
-export const LOCAL_KANJI_SVG_BASE_URI = "/json/svg/";
+export const LOCAL_KANJI_SVG_BASE_URI = "/svg/";
 
 export function localKanjiSvgUrl(kanji: string): string {
   return `${LOCAL_KANJI_SVG_BASE_URI}${kanjiSvgCode(kanji)}.svg`;
