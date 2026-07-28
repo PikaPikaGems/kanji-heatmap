@@ -17,7 +17,7 @@ import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
 import { DurationNav } from "./DurationNav";
 import { CalendarGrid } from "./CalendarGrid";
 import { DashboardPanel } from "./DashboardPanel";
-import { FreqGradient } from "@/components/common/freq/FreqGradient";
+import { GradientLegend } from "@/components/common/GradientLegend";
 
 export const ActivityCalendarHeatmap = () => {
   const { byDay } = useActivityData();
@@ -63,7 +63,7 @@ export const ActivityCalendarHeatmap = () => {
       </div>
       <div className="flex items-center justify-center w-full mt-6">
         <div>
-          <FreqGradient />
+          <GradientLegend />
         </div>
       </div>
     </DashboardPanel>
