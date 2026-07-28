@@ -5,11 +5,7 @@ import { useEffect, useId, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { PlayCircle, Snail } from "@/components/icons";
 import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
-import {
-  kanjiSvgBaseUri,
-  kanjiSvgCode,
-  kanjiSvgUrl,
-} from "@/lib/kanji-svg-url";
+import { resolveKanjiSvgBaseUri } from "@/lib/kanji-svg-url";
 import { StrokeOrderUnavailable } from "@/components/common/StrokeOrderUnavailable";
 import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
 
@@ -17,18 +13,6 @@ import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
 installSafeDmakLoader();
 
 type SvgLoadStatus = "loading" | "ready" | "error";
-
-async function preflightKanjiSvg(
-  kanji: string,
-  signal: AbortSignal
-): Promise<boolean> {
-  const res = await fetch(kanjiSvgUrl(kanji), { signal });
-  if (!res.ok) return false;
-  const body = await res.text();
-  const code = kanjiSvgCode(kanji);
-  // KanjiVG roots look like id="kvg:05c71" — reject empty / wrong payloads.
-  return body.includes(`kvg:${code}`);
-}
 
 export const KanjiDMAK = ({
   kanji,
@@ -51,18 +35,20 @@ export const KanjiDMAK = ({
   const kanjiId = `${id}-${kanji}-draw`;
   const [retryKey, setRetryKey] = useState(0);
   const [status, setStatus] = useState<SvgLoadStatus>("loading");
+  const [svgBaseUri, setSvgBaseUri] = useState<string | null>(null);
 
-  // Needed: probe CDN/cache reachability; no render-time API for this.
+  // Needed: probe local/CDN reachability; no render-time API for this.
   useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
     onUnavailableChange?.(false);
 
-    preflightKanjiSvg(kanji, controller.signal)
-      .then((ok) => {
+    resolveKanjiSvgBaseUri(kanji, controller.signal)
+      .then((baseUri) => {
         if (controller.signal.aborted) return;
-        setStatus(ok ? "ready" : "error");
-        onUnavailableChange?.(!ok);
+        setSvgBaseUri(baseUri);
+        setStatus(baseUri ? "ready" : "error");
+        onUnavailableChange?.(!baseUri);
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
@@ -76,13 +62,13 @@ export const KanjiDMAK = ({
 
   // Needed: dmak + Raphael mount into a DOM node; no declarative equivalent.
   useEffect(() => {
-    if (status !== "ready") return;
+    if (status !== "ready" || !svgBaseUri) return;
 
     (window as any).Raphael = Raphael;
 
     const dmak = new (window as any).Dmak(kanji, {
       element: kanjiId,
-      uri: kanjiSvgBaseUri(),
+      uri: svgBaseUri,
       height: size,
       width: size,
       step: step,
@@ -105,7 +91,7 @@ export const KanjiDMAK = ({
       document.getElementById(kanjiId)?.replaceChildren();
       // Keep window.Raphael set; other KanjiDMAK instances may still need it.
     };
-  }, [status, kanji, kanjiId, step, size, staticMode, gridShow]);
+  }, [status, svgBaseUri, kanji, kanjiId, step, size, staticMode, gridShow]);
 
   if (status === "error") {
     return (
