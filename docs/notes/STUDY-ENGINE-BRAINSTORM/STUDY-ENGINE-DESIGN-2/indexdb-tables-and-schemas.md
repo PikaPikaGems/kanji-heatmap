@@ -65,8 +65,9 @@ interface AccountCacheRow {
 }
 ```
 
-`state` is the gate on everything: a `bootstrapping` cache is still being
-filled and must not be read or written, and a `locked` one failed a
+`state` is the gate on everything: `bootstrapping` is still being filled and
+must not be read or written, `active` is the one currently signed in,
+`inactive` is the other cache kept for fast switching, and `locked` failed a
 migration or an integrity check.
 
 No study data lives here — no notes, bookmarks, cards, or session token. It
@@ -179,7 +180,7 @@ interface ReviewCardRow {
 
 interface FsrsCardStateV1 {
   schemaVersion: 1; // the scheduler's schema, which versions separately from this database
-  schedulerAlgorithm: "fsrs";
+  schedulerAlgorithm: "fsrs"; // reserved for a possible future algorithm; always "fsrs" today
   schedulerVersion: string; // which scheduler produced this state
   dueAt: UnixMs; // when this card comes up next
   lastReviewAt: UnixMs | null; // null until first graded
@@ -249,11 +250,8 @@ interface DailySummaryRow {
 games. One row per challenge attempted, one shape per activity type.
 
 ```ts
-interface ChallengeScoreRecord {
-  eventId: string; // which attempt set it; breaks ties on equal values
-  value: number;
-  achievedAt: UnixMs;
-}
+// Same shape as `ChallengeScore` in activity-public-api.md — value,
+// achievedAt, eventId.
 
 type ChallengeSummaryRow =
   | SpeedKatakanaChallengeSummaryRow
@@ -263,16 +261,16 @@ interface SpeedKatakanaChallengeSummaryRow {
   activityType: "speed_katakana"; // with challengeId, the primary key
   challengeId: string;
   attemptCount: number; // completed sessions for this challenge
-  latest: {
-    // the most recent attempt. No eventId — unlike a best, "latest" has
-    // nothing to tie-break, since there's only ever one most-recent.
-    occurredAt: UnixMs;
-    accuracyPercent: number;
-    charactersPerMinute: number;
-  };
-  bestAccuracy: ChallengeScoreRecord;
-  bestCharactersPerMinute: ChallengeScoreRecord;
-  bestCharactersPerMinuteAbove70Accuracy?: ChallengeScoreRecord; // absent until one clears 70%
+
+  // The most recent attempt. No eventId — unlike a best, "latest" has
+  // nothing to tie-break, since there's only ever one most-recent.
+  latestAt: UnixMs;
+  latestAccuracyPercent: number;
+  latestCharactersPerMinute: number;
+
+  bestAccuracy: ChallengeScore;
+  bestCharactersPerMinute: ChallengeScore;
+  bestCharactersPerMinuteAbove70Accuracy?: ChallengeScore; // absent until one clears 70%
   serverRevision: number;
 }
 
@@ -304,7 +302,7 @@ interface OutboxRow {
     | "review_pile_remove"
     | "review_grade"
     | "practice_activity_event_add";
-  payload: unknown; // the operation's data, narrowed by `kind` internally
+  payload: unknown; // one of the nine operation shapes in backend-sync-contract.md, narrowed by `kind`
   state: "pending" | "sending"; // a crashed "sending" row returns to "pending" on startup
 }
 ```

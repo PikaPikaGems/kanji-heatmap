@@ -50,7 +50,7 @@ type ServerEntityChange =
 // Limits the backend publishes and the engine must respect. Sent during
 // bootstrap, and again whenever one of them changes.
 interface PublishedPolicy {
-  policyVersion: string;
+  policyVersion: string; // identifies this set of limits; changes whenever a value below does
   noteMaxUtf8Bytes: number; // maximum size of one saved note edit
   noteMergedMaxUtf8Bytes: number; // storage ceiling after a merge; never shown to a user
   syncMaxOperations: number; // most operations one push may carry
@@ -263,6 +263,9 @@ interface ReviewGradeOperation extends SyncOperationBase {
   // carries its own id when `deviceSequence` already identifies it.
   eventId: string;
 
+  // Together, these three are what a review's opaque `CardId`
+  // (review-public-api.md) encodes. Sent separately here because the engine
+  // already had them unpacked before grading.
   kanji: string;
   cardType: "reading" | "writing";
   generation: number; // which attempt at this kanji was graded
@@ -326,8 +329,9 @@ type SyncWarning =
 
 **How it's used.** Take the next contiguous batch of `pending` outbox rows
 within `syncMaxOperations` and `syncMaxBytes`, mark them `sending`, send
-with the current cursor. On success, in **one local transaction**: apply
-every change in order, delete outbox rows at or below
+with the current cursor. On success, in **one local transaction**: read
+`warnings` — each one is keyed by a `deviceSequence` in the batch you're
+about to clear — apply every change in order, delete outbox rows at or below
 `acceptedThroughSequence`, and store the new cursor. A crash before that
 commit safely retries from the unchanged cursor. Then go again if
 `hasMoreChanges` is true or rows remain.
