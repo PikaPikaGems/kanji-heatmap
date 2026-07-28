@@ -171,13 +171,13 @@ populate the two directories.
 #### Kanji stroke-order SVGs
 
 Stroke-order SVGs for the kanji in `raw-data/filtered_kanji.json` (the
-~2426-kanji core set) are committed under `public/json/svg/` and served
+~2426-kanji core set) are committed under `public/svg/` and served
 same-origin, so the "Download Kanji SVGs" preload in Settings — and every
 kanji drawer view — never has to hit `assets.pikapikagems.com` for them.
 Kanji outside that set (e.g. 唸) still lazy-load from the CDN on demand; see
 `src/lib/kanji-svg-url.ts` for the local-first/CDN-fallback lookup.
 
-To (re)populate `public/json/svg/` from a machine with network access:
+To (re)populate `public/svg/` from a machine with network access:
 
 ```bash
 pnpm run download-kanji-svgs

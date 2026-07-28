@@ -304,7 +304,7 @@ const pwaConfig = {
       },
 
       // **********************
-      // Cache KANJI SVG — committed local files (public/json/svg/, the
+      // Cache KANJI SVG — committed local files (public/svg/, the
       // ~2426 filtered_kanji.json set) plus the CDN fallback for everything
       // else (e.g. 唸), sharing one cache so clearKanjiSvgCache() covers both.
       // **********************
@@ -313,7 +313,7 @@ const pwaConfig = {
           url.pathname.endsWith(".svg") &&
           ((url.origin === "https://assets.pikapikagems.com" &&
             url.pathname.startsWith("/kanji/")) ||
-            url.pathname.startsWith("/json/svg/")),
+            url.pathname.startsWith("/svg/")),
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-svg-cache",
