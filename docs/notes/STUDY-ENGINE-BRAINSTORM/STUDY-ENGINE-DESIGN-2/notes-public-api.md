@@ -109,7 +109,7 @@ Render the note as normal — the merged content, separator included, is
 genuinely the note now — but disable Save and explain why, rather than
 showing a bare "too long" error: something like "Also edited on another
 device. Both edits are below — trim to fit to save." `maxUtf8Bytes` still
-applies to a merged note with no exception, so the over-limit editor *is*
+applies to a merged note with no exception, so the over-limit editor _is_
 the resolution flow. The person deletes the half they don't want and saves
 normally, which clears `hasMergedEdit` on that same save.
 

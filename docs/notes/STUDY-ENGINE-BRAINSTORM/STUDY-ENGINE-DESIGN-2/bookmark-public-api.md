@@ -82,7 +82,7 @@ kanji alone removes that failure mode entirely.
 Because there's nothing a stale write could lose. A bookmark is a boolean,
 resolved by plain last-write-wins: if two devices disagree about whether 日
 is bookmarked, whichever change happened last simply wins, and the loser's
-screen quietly updates on next sync. That's fine *because* there's no
+screen quietly updates on next sync. That's fine _because_ there's no
 content to overwrite — contrast this with a note
 ([notes-public-api.md](./notes-public-api.md)), where blindly letting the
 latest write win could silently erase real text someone wrote. That's
