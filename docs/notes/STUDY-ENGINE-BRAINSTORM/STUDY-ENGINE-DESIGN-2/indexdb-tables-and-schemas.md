@@ -18,6 +18,10 @@ kh-study-engine-account-<cacheId>    everything one account owns
 `<cacheId>` is a random ID, never an email address or account ID — database
 names are readable without opening anything.
 
+Two account caches are kept, so two people sharing one device (or one person
+with a second account) can switch back and forth without re-downloading
+everything each time. The limit is an engine constant, not stored state.
+
 ### The metadata database — 2 stores
 
 **`browserMeta`** — one row, the state of this browser as a whole.
@@ -27,8 +31,6 @@ interface BrowserMetaRow {
   key: "singleton";
   schemaVersion: number; // shape of this database, for migrations
   activeCacheId: string | null; // which cache is signed in; null when signed out
-  maximumTotalAccountCacheCount: number; // default 2; under review, may become 1
-  lastObservedWallTime: UnixMs; // last clock reading, to notice a large backwards jump
   logoutPending: boolean; // a logout didn't finish; complete it on next start
 }
 ```
@@ -39,15 +41,15 @@ interface BrowserMetaRow {
 interface AccountCacheRow {
   localCacheId: string; // the <cacheId> in the database name
   accountId: AccountId; // which account this cache holds
-  databaseName: string; // the database to open
-  databaseSchemaVersion: number;
-  createdAt: UnixMs;
   lastActivatedAt: UnixMs; // last time this account signed in; decides what gets evicted
-  lastOpenedAt: UnixMs; // diagnostics only; does not affect eviction
-  state: "active" | "inactive" | "locked";
+  state: "bootstrapping" | "active" | "inactive" | "locked";
   lockReason?: "migration_failed" | "corrupt"; // only when locked
 }
 ```
+
+`state` is the gate on everything: a `bootstrapping` cache is still being
+filled and must not be read or written, and a `locked` one failed a
+migration or an integrity check.
 
 No study data lives here — no notes, bookmarks, cards, or session token. It
 may hold the signed entitlement lease, which is what lets an offline restart
@@ -86,19 +88,14 @@ off. One row.
 interface AccountMetaRow {
   key: "singleton";
   accountId: AccountId; // checked on open; a mismatch means don't use this cache
-  deviceId: DeviceId; // assigned by the backend on first bootstrap
-
+  deviceId: DeviceId; // this browser's identity, assigned by the backend on first bootstrap
   nextDeviceSequence: number; // the number the next outbox row will take
-  acceptedThroughDeviceSequence: number; // the server has confirmed everything up to here
   cursor: ServerCursor; // how far this cache has consumed the account's history
-
-  activeBootstrapId?: string; // present only mid-bootstrap; marks the database unsafe to read
-  bootstrapSnapshotRevision?: number; // the revision that bootstrap is filling up to
 }
 ```
 
-This is the only place device identity lives. There is no `devices` table —
-a browser profile is one device.
+This is the only place device identity is stored. There is no `devices`
+table — a browser profile is one device.
 
 **2. `notes`** — one Markdown note per kanji.
 
@@ -106,13 +103,13 @@ a browser profile is one device.
 interface KanjiNoteRow {
   kanji: Kanji; // primary key
   content: string; // the note text; never empty while active
-  contentUtf8Bytes: number; // its size, precomputed so a check doesn't re-encode the string
   updatedAt: UnixMs; // when this text was written
 
-  writerDeviceId: DeviceId; // which device wrote it
-  writerDeviceSequence: number; // together with the above, breaks ties between simultaneous edits
+  // Which device wrote it. Also the tiebreaker, with updatedAt, that makes
+  // two devices merging the same note produce byte-identical results.
+  writerDeviceId: DeviceId;
+  writerDeviceSequence: number;
 
-  baseServerRevision: number; // what this edit was based on; how the backend spots divergence
   serverRevision?: number; // absent until this note has synced once
   active: boolean; // false means removed; the row stays
 
@@ -129,8 +126,7 @@ interface KanjiBookmarkRow {
   kanji: Kanji; // primary key
   updatedAt: UnixMs;
   writerDeviceId: DeviceId; // which device set it
-  writerDeviceSequence: number; // tiebreaker
-  baseServerRevision: number;
+  writerDeviceSequence: number; // tiebreaker, same as notes
   serverRevision?: number; // absent until synced once
   active: boolean; // false means un-bookmarked
 }
@@ -143,10 +139,6 @@ interface ReviewPileItemRow {
   kanji: Kanji; // primary key
   word: string; // the word its cards test, frozen at add time so a data update can't change it
   generation: number; // increments on each re-add, so a stale grade can't hit a fresh card
-  createdAt: UnixMs;
-  createdByDeviceId: DeviceId;
-  removedAt?: UnixMs;
-  removedByDeviceId?: DeviceId;
   serverRevision?: number;
   active: boolean; // false means removed from the pile
 }
@@ -168,7 +160,7 @@ interface ReviewCardRow {
 }
 
 interface FsrsCardStateV1 {
-  schemaVersion: 1;
+  schemaVersion: 1; // the scheduler's schema, which versions separately from this database
   schedulerAlgorithm: "fsrs";
   schedulerVersion: string; // which scheduler produced this state
   dueAt: UnixMs; // when this card comes up next
@@ -178,14 +170,16 @@ interface FsrsCardStateV1 {
   elapsedDays: number; // days since the last review, as of that review
   scheduledDays: number; // the interval that was intended between the last two reviews
   learningStep: number; // position in the configured learning/relearning steps
-  repetitions: number; // times graded
-  lapses: number; // times this card fell back to relearning
+  repetitions: number; // the scheduler's own copy of `counters.reviews`
+  lapses: number; // the scheduler's own copy of `counters.lapses`
   learningState: "new" | "learning" | "review" | "relearning";
 }
 
+// The lasting record of what happened to this card. `state` is what the
+// scheduler needs and gets nulled on deactivation; these survive it.
 interface ReviewCounters {
   reviews: number; // every grade this card has ever received
-  lapses: number;
+  lapses: number; // times it fell back to relearning
   again: number; // the four below break `reviews` down by rating
   hard: number;
   good: number;
@@ -199,13 +193,12 @@ row.
 ```ts
 interface ReviewSettingsRow {
   key: "singleton";
-  schemaVersion: 1;
   schedulerVersion: string;
   settings: ReviewSettings; // the values ReviewsApi.settings exposes as-is
   settingsRevision: number; // monotonic; applied forward only
   updatedAt: UnixMs;
   origin: "device" | "server"; // a server write wins over a device write at the same instant
-  writerDeviceId?: DeviceId; // absent when origin is "server"
+  writerDeviceId?: DeviceId; // which device changed them; absent when origin is "server"
   writerDeviceSequence?: number;
   serverRevision?: number;
 }
@@ -216,9 +209,7 @@ any. Days with nothing have no row.
 
 ```ts
 interface DailySummaryRow {
-  schemaVersion: 1;
   localDate: LocalDate; // primary key; the device's local day when the activity happened
-  timeZonesSeen: readonly IanaTimeZone[]; // which zones contributed; nothing reads this yet
 
   speedKatakanaSessions: number; // practice counts
   speakingPracticeSessions: number;
@@ -232,8 +223,6 @@ interface DailySummaryRow {
   ratingGood: number;
   ratingEasy: number;
 
-  firstActivityAt: UnixMs; // earliest and latest activity that day; not exposed publicly
-  lastActivityAt: UnixMs;
   serverRevision: number; // never optional — a device can't create this row
 }
 ```
@@ -253,7 +242,6 @@ type ChallengeSummaryRow =
   | SpeakingPracticeChallengeSummaryRow;
 
 interface SpeedKatakanaChallengeSummaryRow {
-  schemaVersion: 1;
   activityType: "speed_katakana"; // with challengeId, the primary key
   challengeId: string;
   attemptCount: number; // completed sessions for this challenge
@@ -271,7 +259,6 @@ interface SpeedKatakanaChallengeSummaryRow {
 }
 
 interface SpeakingPracticeChallengeSummaryRow {
-  schemaVersion: 1;
   activityType: "speaking_practice";
   challengeId: string;
   attemptCount: number; // the only stat speaking practice tracks
@@ -284,9 +271,11 @@ acknowledged. One row per mutation.
 
 ```ts
 interface OutboxRow {
-  deviceSequence: number; // primary key; taken from accountMeta.nextDeviceSequence
-  // and the operation's identity — stable across retries, which is what
-  // makes a resend safe. There is no separate operationId.
+  // Primary key, taken from accountMeta.nextDeviceSequence, and the
+  // operation's identity. Stable across retries, which is what makes a
+  // resend safe. Rows are deleted only when the server acknowledges them,
+  // so the lowest one here is the sync high-water mark.
+  deviceSequence: number;
   kind:
     | "note_put"
     | "note_remove"
@@ -298,9 +287,7 @@ interface OutboxRow {
     | "review_grade"
     | "practice_activity_event_add";
   payload: unknown; // the operation's data, narrowed by `kind` internally
-  createdAt: UnixMs;
   state: "pending" | "sending"; // a crashed "sending" row returns to "pending" on startup
-  attemptCount: number; // how many sends have been tried; drives backoff
 }
 ```
 
@@ -347,3 +334,32 @@ days active, the rest are sums. Bounded by the account's age in days.
 **Is it nine tables or eight?**
 Nine. The original design document says "eight" directly above a list of
 nine, in two places.
+
+**Why do `repetitions` and `lapses` appear in both `state` and `counters`?**
+Because they belong to two different owners. `counters` is the lasting
+record and survives a card being deactivated; `state` is the object handed
+to the scheduler library, which needs its own copies of those two numbers to
+do its arithmetic. `counters` is the source of truth if they ever disagree.
+
+**Columns that were here and got removed.**
+Each either had nothing reading it or was recoverable from something else on
+disk. Listed so the reasoning is reviewable and any of them is easy to put
+back — none of these removals is load-bearing for anything else.
+
+| Removed                                                                                 | Why, and what it costs                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AccountCacheRow.databaseName`                                                          | It's always `kh-study-engine-account-<localCacheId>`. Cost: changing that naming convention now needs a migration that enumerates existing databases instead of reading their names from a row.                                                                                                                |
+| `AccountCacheRow.databaseSchemaVersion`                                                 | IndexedDB reports a database's version when you open it. Cost: you can't decide whether to open one based on its version without opening it — but opening is how you'd find out anyway.                                                                                                                        |
+| `AccountCacheRow.createdAt`, `.lastOpenedAt`                                            | Nothing read either. `lastOpenedAt` was already commented "does not affect eviction"; `lastActivatedAt` is the one eviction uses.                                                                                                                                                                              |
+| `BrowserMetaRow.maximumTotalAccountCacheCount`                                          | Fixed at two and nothing wrote it, so it's an engine constant rather than stored state. Cost: changing the limit is a release, not a setting.                                                                                                                                                                  |
+| `BrowserMetaRow.lastObservedWallTime`                                                   | Collected to notice a large backwards clock jump, but nothing acted on one. Cost: if clock-jump handling is ever specified, this comes back.                                                                                                                                                                   |
+| `AccountMetaRow.activeBootstrapId`, `.bootstrapSnapshotRevision`                        | Replaced by `"bootstrapping"` as a fourth `AccountCacheRow.state`, so the "don't touch this database yet" gate lives in one place instead of two. An interrupted bootstrap restarts rather than resuming, so nothing about the run needs to survive a crash.                                                   |
+| `AccountMetaRow.acceptedThroughDeviceSequence`                                          | Acknowledged outbox rows are deleted, so the high-water mark is `min(pending deviceSequence) - 1`. **The least certain removal here** — it costs a stored number and buys a derivation on a path that matters.                                                                                                 |
+| `KanjiNoteRow.contentUtf8Bytes`                                                         | `new TextEncoder().encode(content).length` on a size-capped string. Cost: recomputed on each validation instead of read.                                                                                                                                                                                       |
+| `KanjiNoteRow.baseServerRevision`, `KanjiBookmarkRow.baseServerRevision`                | Same value as the row's `serverRevision` at the moment an edit is made, and the outbox operation carries its own copy to send.                                                                                                                                                                                 |
+| `ReviewPileItemRow.createdAt`, `.createdByDeviceId`, `.removedAt`, `.removedByDeviceId` | Four audit fields with no reader. Note these are device-provenance fields, unlike `writerDeviceId` on notes and bookmarks, which stays because it has a defined job — it's part of the tuple that makes concurrent edits resolve identically everywhere. Cost: no "added on" date if a pile UI ever wants one. |
+| `DailySummaryRow.firstActivityAt`, `.lastActivityAt`                                    | Already marked "not exposed publicly," and nothing internal read them.                                                                                                                                                                                                                                         |
+| `DailySummaryRow.timeZonesSeen`                                                         | Collected but never read. It exists for a streak-and-travel policy that isn't written yet — flying east loses a day, west can double-count. Cost: that policy has to start collecting from scratch.                                                                                                            |
+| `schemaVersion` on the summary, challenge, and settings rows                            | The database has one version already. Kept on `FsrsCardStateV1`, which versions separately because the scheduler does.                                                                                                                                                                                         |
+| `OutboxRow.attemptCount`                                                                | There's one backoff for the whole outbox, not one per row, so nothing consumed a per-row count.                                                                                                                                                                                                                |
+| `OutboxRow.createdAt`                                                                   | Nothing read it. `deviceSequence` already orders the queue.                                                                                                                                                                                                                                                    |
