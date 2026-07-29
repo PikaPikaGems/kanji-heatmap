@@ -230,19 +230,39 @@ any. Days with nothing have no row.
 interface DailySummaryRow {
   localDate: LocalDate; // primary key; the device's local day when the activity happened
 
-  speedKatakanaSessions: number; // practice counts
+  // Flat here regardless of how ActivitiesSummary.practiceEventsCount
+  // groups these for a host — that grouping is a public presentation
+  // choice, not a change in what's tracked, so watchDailySummaries()
+  // reshapes these into it rather than storing it pre-grouped.
+  speedKatakanaSessions: number;
   speakingPracticeSessions: number;
   readingPracticeRounds: number;
   writingPracticeRounds: number;
 
-  readingCardsReviewed: number; // FSRS review counts
-  writingCardsReviewed: number;
-  ratingAgain: number; // those reviews broken down by rating
-  ratingHard: number;
-  ratingGood: number;
-  ratingEasy: number;
+  // Unlike the above, this one is a real change in what's tracked, not just
+  // presentation — same grouping as ActivitiesSummary.reviews in
+  // activity-public-api.md, since ratings now have to be counted per card
+  // type instead of combined, and totalReviewItemsAdded didn't exist
+  // before at all. Nothing to reshape from, so nothing gained by keeping it
+  // flat.
+  reviews: {
+    totalReviewItemsAdded: number; // credited when pile.add() creates or reactivates a pile item
+    reading: DailyReviewCounts;
+    writing: DailyReviewCounts;
+  };
 
   serverRevision: number; // never optional — a device can't create this row
+}
+
+// Same shape as ReviewSummary in activity-public-api.md. Not to be confused
+// with ReviewCounters below — this is one day's counts, that's one card's
+// lifetime totals.
+interface DailyReviewCounts {
+  totalReviewCount: number;
+  again: number;
+  hard: number;
+  good: number;
+  easy: number;
 }
 ```
 
@@ -262,8 +282,12 @@ interface SpeedKatakanaChallengeSummaryRow {
   challengeId: string;
   attemptCount: number; // completed sessions for this challenge
 
-  // The most recent attempt. No eventId — unlike a best, "latest" has
-  // nothing to tie-break, since there's only ever one most-recent.
+  // Flat here regardless of how SpeedKatakanaChallengeSummary groups these
+  // into `latest`/`best` for a host — same reasoning as DailySummaryRow's
+  // practice counts above: a public presentation choice, not a change in
+  // what's tracked, so watchAllChallenges()/watchChallenge() reshape these
+  // on read. No eventId alongside the latest fields — unlike a best, there's
+  // nothing to tie-break, since there's only ever one most-recent attempt.
   latestAt: UnixMs;
   latestAccuracyPercent: number;
   latestCharactersPerMinute: number;
@@ -343,8 +367,10 @@ local writer and no `active` column. Before a sync, what's displayed is the
 last server value with any still-pending outbox operations replayed on top.
 
 **Where are all-time totals? There's no table for them.**
-Computed from `dailySummaries` — earliest row is the cake day, row count is
-days active, the rest are sums. Bounded by the account's age in days.
+Computed from `dailySummaries` — earliest row is the cake day,
+`daysActive.total` is the row count, `daysActive`'s per-kind fields are a
+count of rows where that kind's field is nonzero, and every other field is
+a plain sum. Bounded by the account's age in days.
 
 **Is it nine tables or eight?**
 Nine. The original design document says "eight" directly above a list of

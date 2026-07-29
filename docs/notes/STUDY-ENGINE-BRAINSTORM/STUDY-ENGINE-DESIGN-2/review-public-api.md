@@ -192,7 +192,8 @@ interface ReviewsApi {
     watchAll(): QueryStore<readonly ReviewPileItemView[]>;
 
     // Adding the same kanji with the exact same word twice (e.g. a double
-    // tap) returns the existing item rather than creating a duplicate.
+    // tap) returns the existing item rather than creating a duplicate, and
+    // doesn't count as a second add for `totalReviewItemsAdded` — see FAQ.
     add(input: {
       kanji: Kanji;
       word: string;

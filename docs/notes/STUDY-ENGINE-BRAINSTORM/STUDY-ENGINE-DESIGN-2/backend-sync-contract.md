@@ -238,6 +238,13 @@ interface ReviewPileAddOperation extends SyncOperationBase {
   // still queued against the old attempt can't land on the fresh one and
   // corrupt a schedule that just started over.
   generation: number;
+
+  // The engine's own Intl.DateTimeFormat().resolvedOptions().timeZone read
+  // at the moment pile.add() runs — not a host input; see review-public-api.md's
+  // FAQ for why this one doesn't need to come from the host the way a
+  // practice event's `timeZone` does. Used to credit the right local day in
+  // ActivitiesSummary.reviews.totalReviewItemsAdded (activity-public-api.md).
+  timeZone: string;
 }
 
 interface ReviewPileRemoveOperation extends SyncOperationBase {
@@ -394,9 +401,9 @@ identifies the operation?**
 row is acknowledged. `eventId` names the thing that happened, account-wide
 and for good. It's on the wire because the host is handed it by `record()`
 or `grade()` before anything syncs, and sees it again later in
-`bestAccuracy.eventId` — if the server minted its own, those two would never
-match. State intents have none, because nothing ever points back at "the
-time you bookmarked this."
+`best.accuracy.eventId` — if the server minted its own, those two would
+never match. State intents have none, because nothing ever points back at
+"the time you bookmarked this."
 
 **Why are some problems `warnings` instead of errors?**
 All three cases describe an operation that was _accepted_ and produced a

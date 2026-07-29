@@ -96,6 +96,17 @@ interface DailySummaryRange {
   totalDays: number; // window extends forward from `from`; see FAQ
 }
 
+// One card type's review activity for a day (or all-time, via
+// AllTimeSummary). Shared between reading and writing so both are counted
+// the same way instead of two near-identical shapes. See FAQ.
+interface ReviewSummary {
+  readonly totalReviewCount: number;
+  readonly again: number;
+  readonly hard: number;
+  readonly good: number;
+  readonly easy: number;
+}
+
 // The counts shared by one local day (`watchDailySummaries`) and the
 // account's all-time totals (`AllTimeSummary`, via
 // Omit<ActivitiesSummary, "localDate">) — see FAQ for why one shape covers
@@ -103,23 +114,41 @@ interface DailySummaryRange {
 interface ActivitiesSummary {
   readonly localDate: LocalDate;
 
-  readonly speedKatakanaSessions: number;
-  readonly speakingPracticeSessions: number;
-  readonly readingPracticeRounds: number;
-  readonly writingPracticeRounds: number;
+  readonly practiceEventsCount: {
+    readonly speedKatakana: number; // sessions
+    readonly speaking: number; // sessions
+    readonly reading: number; // rounds
+    readonly writing: number; // rounds
+  };
 
   // FSRS review activity lands in the same row as practice activity. See FAQ.
-  readonly readingCardsReviewed: number;
-  readonly writingCardsReviewed: number;
-  readonly ratingAgain: number;
-  readonly ratingHard: number;
-  readonly ratingGood: number;
-  readonly ratingEasy: number;
+  readonly reviews: {
+    // A pile item counts on the day pile.add() actually creates or
+    // reactivates it — not on a redundant add of something already active.
+    // Not split by card type: a pile item always creates one reading card
+    // and one writing card together, so the two counts would always be
+    // identical. See FAQ.
+    readonly totalReviewItemsAdded: number;
+    readonly reading: ReviewSummary;
+    readonly writing: ReviewSummary;
+  };
 }
 
 interface AllTimeSummary extends Omit<ActivitiesSummary, "localDate"> {
   readonly cakeDay: LocalDate | null; // null only for an account with no activity yet
-  readonly daysActive: number; // count of distinct local days with any activity
+  readonly daysActive: {
+    readonly total: number; // distinct local days with any activity at all
+    readonly practiceEventsCount: {
+      readonly speedKatakana: number;
+      readonly speaking: number;
+      readonly reading: number;
+      readonly writing: number;
+    };
+    readonly reviews: {
+      readonly reading: number;
+      readonly writing: number;
+    };
+  };
 }
 
 type ChallengeActivityType = "speed_katakana" | "speaking_practice";
@@ -141,16 +170,20 @@ interface SpeedKatakanaChallengeSummary {
   readonly challengeId: string;
   readonly attemptCount: number;
 
-  readonly latestAt: UnixMs;
-  readonly latestAccuracyPercent: number;
-  readonly latestCharactersPerMinute: number;
+  readonly latest: {
+    readonly timestamp: UnixMs;
+    readonly accuracyVal: number;
+    readonly cpmVal: number;
+  };
 
-  readonly bestAccuracy: ChallengeScore;
-  readonly bestCharactersPerMinute: ChallengeScore;
-  // Undefined until an attempt has cleared 70% accuracy — a raw speed
-  // record set by mashing through wrong answers shouldn't count as a
-  // "fast and accurate" best. See FAQ.
-  readonly bestCharactersPerMinuteAbove70Accuracy?: ChallengeScore;
+  readonly best: {
+    readonly accuracy: ChallengeScore;
+    readonly cpm: ChallengeScore;
+    // Undefined until an attempt has cleared 70% accuracy — a raw speed
+    // record set by mashing through wrong answers shouldn't count as a
+    // "fast and accurate" best. See FAQ.
+    readonly cpmOver70?: ChallengeScore;
+  };
 }
 
 interface SpeakingPracticeChallengeSummary {
@@ -288,7 +321,7 @@ Because it's no longer true that every challenge looks like Speed Katakana.
 Speaking practice is challenge-based too, but doesn't have a speed, an
 accuracy, or a "best" of anything — see the next question. Forcing both
 into one shape would mean either lying with fields that don't apply
-(`bestAccuracy` on something with no such concept) or making half the
+(`best.accuracy` on something with no such concept) or making half the
 fields optional and leaving the host to guess which ones are real for a
 given row. A union says outright which fields exist for which
 `activityType`.
@@ -350,8 +383,10 @@ for history nobody's looking at.
 totals and cake day without fetching the entire history?**
 That's what `watchAllTime()` is for. Nothing extra is stored for it — the
 engine works it out from the daily rows it already has (earliest date is the
-cake day, number of rows is `daysActive`, the rest are sums) and keeps the
-answer in memory, redoing it when a daily row changes. Even a decade of
+cake day, `daysActive.total` is the row count, `daysActive`'s per-kind
+fields count rows where that kind happened at all, everything else is a
+sum) and keeps the answer in memory, redoing it when a daily row changes.
+Even a decade of
 practice every single day is well under four thousand small rows, so this is
 cheap; the point of the method is that the host doesn't have to pull that
 history down and add it up itself.
@@ -368,14 +403,48 @@ calendar-year browsing turns out to be common enough to deserve its own
 shape, that's a second, additive query shape later, not a reason to
 complicate the common case now.
 
-**Why doesn't `AllTimeSummary` break `daysActive` down by activity kind
-(e.g. "days you did Speed Katakana")?**
-It doesn't today — `daysActive` counts any day with any activity, full
-stop. A host that wants a per-kind version has to derive it by walking
-`watchDailySummaries` results itself, which is fine for a bounded window but
-expensive for "all time." Flagging this rather than deciding it silently:
-if a per-kind all-time breakdown turns out to matter, it belongs on
-`AllTimeSummary` directly, not reconstructed by every host that needs it.
+**Why does `AllTimeSummary.daysActive` break down by activity kind, instead
+of staying the single number it started as?**
+An earlier draft left it as one count and flagged the per-kind version
+rather than building it speculatively: "if it turns out to matter, it
+belongs on `AllTimeSummary` directly, not reconstructed by every host that
+needs it." It now matters — a profile stat like "you've added a review item
+on 120 days" needs the per-kind total as a cheap all-time number, the same
+way plain `daysActive` already is one. This is separate from a day-by-day
+heatmap itself, which reads each day's own count straight off
+`watchDailySummaries` and never touches `AllTimeSummary` at all;
+`daysActive`'s breakdown only exists for a total worth showing without
+walking the whole window to add it up. Structured the same way as
+`ActivitiesSummary` (`practiceEventsCount`/`reviews`) so the two stay easy
+to read side by side — see the next few questions.
+
+**Why did `ActivitiesSummary` change from one flat list of counts to
+`practiceEventsCount`/`reviews` sub-objects?**
+The flat list grew two things that don't actually belong to the same bucket
+— game/practice counts and FSRS review counts — into one wall of
+same-looking numbers. Nesting groups them the way this API already talks
+about them elsewhere (see "What counts as 'practice activity'" above),
+without losing the "one row, one query" property that question was about:
+it's still one `ActivitiesSummary` per day, just organized instead of flat.
+
+**Why does `reviews.totalReviewItemsAdded` count once, not split into
+`reading`/`writing` the way ratings are?**
+Because a pile item always creates one reading card and one writing card
+together — adding a kanji to the pile has no reading-only or writing-only
+form, so a split would just be the same number twice. It sits next to
+`reading`/`writing` rather than inside `ReviewSummary` for that reason: it's
+a fact about the pile item, not about either card type.
+
+**Why isn't adding a pile item a `PracticeActivityEventInput` variant, the
+way a practice round is?**
+That union exists for facts the engine has no way to see on its own — a
+round that ran entirely in host UI. Adding a pile item is the opposite: the
+engine executes `pile.add()` itself (review-public-api.md), so it already
+knows an add happened the instant it happens, the same way it already knows
+about a grade without a host reporting it separately. It updates the day's
+`totalReviewItemsAdded` as part of that call, not through a second, separate
+report — see that document's FAQ for how it credits the correct local day
+without needing a `timeZone` from the host.
 
 **Why is `watchChallenge` a separate method from `watchAllChallenges`,
 instead of one method with an optional filter?**
@@ -404,22 +473,28 @@ regardless — a value that gets passed around at runtime should say what it
 is on its own, not rely on whoever's holding it remembering which call
 produced it.
 
-**Why do `bestAccuracy`/`bestCharactersPerMinute` carry an `eventId`, but
-the "latest" fields don't?**
+**Why do `best.accuracy`/`best.cpm` carry an `eventId`, but
+`latest` doesn't?**
 Bests need a tiebreaker — two attempts can land on the exact same accuracy
 or speed, and something has to decide which one "wins" so every device
 converges on the same answer. `eventId` is that tiebreaker, and since it's
 already there, it doubles as a handle if a host ever wants to point at
-"which attempt set this record." "Latest" has nothing to tie-break — by
+"which attempt set this record." `latest` has nothing to tie-break — by
 definition there's exactly one most-recent attempt — so there's no matching
 reason to carry its `eventId` along.
 
-**What is `bestCharactersPerMinuteAbove70Accuracy` for, and why can it be
-missing?**
+**What is `best.cpmOver70` for, and why can it be missing?**
 Speed Katakana rewards typing fast, but raw speed alone can be gamed by
 mashing through wrong answers — this is the "fast and actually correct"
 record instead. It's `undefined` until some attempt has actually cleared
 70% accuracy; there's nothing to report before that.
+
+**Why do `latest`/`best` nest instead of staying flat
+(`latestAccuracyPercent`, `bestCharactersPerMinute`, ...)?**
+The flat names existed to carry "which of these is this" in the name itself
+since there was nothing else to group them by. Nesting says the same thing
+structurally — `best.accuracy` instead of `bestAccuracy` — and reads better
+once there's more than one or two fields per group.
 
 **Why doesn't `ActivitiesSummary` or `ChallengeSummary` carry a
 `serverRevision`, the way a note does?**
