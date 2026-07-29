@@ -424,7 +424,6 @@ interface ActivityRecordSummary {
   };
 }
 
-// 🚨 IMPORTANT: this is derived from tables not stored
 type DailySummary = ActivityRecordSummary & { localDate: LocalDate };
 
 // 🚨 IMPORTANT: this is derived from tables not stored
