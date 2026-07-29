@@ -184,7 +184,6 @@ type ReviewError =
   | { code: "review_handle_consumed" }
   // A settings value the scheduler can't work with
   | { code: "invalid_settings"; field: keyof ReviewSettings; reason: string };
-  // TODO: How will this be handled?
   | { code: "stale_revision" } // the card changed since it was queried
 
 
@@ -256,7 +255,6 @@ interface RatingPreview {
 
   // intervalMs = scheduledAt - openedAt <--- for a label like "3d"
   scheduledAt: UnixMs; // when the card would next be due if this rating is picked
-  intervalMs: number; // how far out that is from now, for a label like "3d"
 }
 
 
@@ -288,22 +286,22 @@ interface ReviewsApi {
   };
 
   pile: {
-    // timeZone?: IanaTimeZone? only as a test hook. but probably not needed
+    // should we optionally pass timeZone?: IanaTimeZone? only as a test hook. but probably not needed
     add(input: {kanji: Kanji, word: string,  }): Promise<Result<ReviewPileItemView>>
     remove(kanji: Kanji): Promise<Result<void>>
 
     // null = kanji not in pile
     watch(kanji: Kanji): QueryStore<ReviewPileItemView | null>
     // TODO: Confirm: No need to paginate since only less than 3,000 kanji at most
-    // Important: Should Memoized component card's update only re-renders its own tile, not the whole grid
+    // Important: Make sure we Memoize component so that card's update only re-renders its own tile, not the whole grid
     watchAll(): QueryStore<ReviewPileItemView[]>
   }
 
   watchDueCount(cardType: CardType): QueryStore<number>
 
-  // Used to build a review session. limit: number of cards, asOf?: Testing/tooling escape hatch only
+  // Used to build a review session. limit: number of cards, should we optionally pass asOf?: Testing/tooling escape hatch only probably not needed
   getDue(
-      input: {cardType: CardType, limit: number, asOf?: UnixMs; }
+      input: {cardType: CardType, limit: number }
   ): Promise<Result<DueCard[]>>
 
   beginReview(
@@ -340,15 +338,11 @@ The two-tab case, concretely:
 3. Tab A `grade(H_A, "good")` → card moves to revision 6, H_A consumed.
 4. Tab B `grade(H_B, "good")` → engine sees H_B was opened against revision 5 but the card is now 6 → returns `stale_revision`. Tab B shows "already reviewed elsewhere" and moves on.
 
-So the double-grade safety comes from the revision check at grade time, **not** from locking the card at begin. I'd deliberately avoid locking: locks need expiry, unlock-on-cancel, and still leak on a crash — the revision guard is simpler and crash-safe, since an abandoned handle just expires with no side effects. `review_handle_consumed` is really just a double-submit programming guard, and `review_handle_expired` is the timeout — you could collapse `consumed`.
+So the double-grade safety comes from the revision check at grade time, **not** from locking the card at begin. I'd deliberately avoid locking: locks need expiry, unlock-on-cancel, and still leak on a crash — the revision guard is simpler and crash-safe, since an abandoned handle just expires with no side effects. `review_handle_consumed` is really just a double-submit programming guard, and `review_handle_expired` is the timeout.
 
 ### 3. Do we keep "settings.watch current" or make it just a snapshot ?
 
-settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is your uniform primitive; making settings the one get() special-case just forces the host to branch. Keep watchCurrent() so surfaces that depend on settings (a due-count badge) stay fresh, but the edit form uses a local draft and treats update()'s returned Result<ReviewSettings> as the source of truth after save.
-
-### 4. What is ` asOf` in getDueCards() for?
-
-A test hook to pretend "now" is a future date so you can unit-test scheduling without waiting real days — keep it, mark it test-only.
+settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is your uniform primitive; making settings the one get() special-case just forces the host to branch. Keep watchCurrent() so surfaces that depend on settings stay fresh, but the edit form uses a local draft and treats update()'s returned Result<ReviewSettings> as the source of truth after save.
 
 # Activities
 
@@ -616,7 +610,7 @@ POST /api/sync
 
 ## 2. TODO: Discuss how frontend interacts with backend
 
-# Backend Postresgres and IndexDB tables and Schema
+# Backend Postgresql and IndexDB tables and Schema
 
 - NOTE: Index DB will have an "outbox" table
 - TODO: Final schemas here
@@ -632,8 +626,7 @@ POST /api/sync
 - review_cards
 - review_settings
 - daily_summaries
-- katakana_challenge_summaries
-- speaking_challenge_summaries
+- katakana_challenge_summaries + speaking_challenge_summaries  (maybe combine to just one table each will have a fixed size just 200 challenges each)
 
 # Common Columns
 
