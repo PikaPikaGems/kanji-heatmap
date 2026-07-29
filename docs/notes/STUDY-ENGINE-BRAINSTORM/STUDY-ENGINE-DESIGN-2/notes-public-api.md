@@ -36,11 +36,12 @@ type Result<T> = { ok: true; value: T } | { ok: false; error: NoteError };
 
 type NoteError =
   | { code: "unsupported_kanji"; kanji: Kanji }
-  // The host should never actually see this in practice — it should catch
-  // both cases itself before calling put(). Covers an empty (after trim)
-  // save, and a save over maxUtf8Bytes.
+  // The host should never actually see this in practice — it should check
+  // content against maxUtf8Bytes live, as the person types, and keep
+  // save() from ever being called over the limit. Only covers an over-limit
+  // save; a trimmed-empty save is valid (it deletes the note — see FAQ) and
+  // never hits this.
   | { code: "validation_failed" }
-  | { code: "stale_revision" } // expectedServerRevision was given, and the note has since moved on
   | { code: "storage_quota" }
   | { code: "read_only" }; // account entitlement has lapsed
 
@@ -50,30 +51,24 @@ type NoteError =
 // devices edit it at the same time — nothing here is a "pick a winner" flow.
 interface KanjiNoteView {
   readonly kanji: Kanji;
-  readonly content: string; // never empty — put() rejects blank saves; remove() deletes instead
+  // Never empty — a trimmed-empty save deletes the note instead of
+  // producing a view. See FAQ.
+  readonly content: string;
   readonly updatedAt: UnixMs;
   // Undefined until this note has synced to the server at least once.
   readonly serverRevision?: number;
   // True when the backend merged a divergent edit from another device into
-  // `content`. `content` can be over `maxUtf8Bytes` when this is true —
-  // render an over-limit editor with a disabled save, not a bare length
+  // `content`. `content` can be over `maxUtf8Bytes` when this is true — the
+  // same over-limit handling as any long note applies, not a bare length
   // error. See FAQ.
   readonly hasMergedEdit: boolean;
   readonly mergedAt?: UnixMs; // set only alongside hasMergedEdit
 }
 
-interface PutNoteInput {
+interface SaveNoteInput {
   kanji: Kanji;
+  // Trimmed-empty content deletes the note. See FAQ.
   content: string;
-  // Omit for a brand-new note, or one that's never synced yet. Otherwise,
-  // the serverRevision this edit was read at, so the engine can tell if the
-  // note changed elsewhere since.
-  expectedServerRevision?: number;
-}
-
-interface RemoveNoteInput {
-  kanji: Kanji;
-  expectedServerRevision?: number;
 }
 
 // ---- The API itself ----
@@ -87,31 +82,44 @@ interface NotesApi {
   // null means this kanji has no active note.
   watch(kanji: Kanji): QueryStore<KanjiNoteView | null>;
 
-  put(input: PutNoteInput): Promise<Result<KanjiNoteView>>;
-  remove(input: RemoveNoteInput): Promise<Result<void>>;
+  // Trimmed-empty content deletes the note — `value` comes back `null`.
+  // Otherwise `value` is the saved KanjiNoteView. This is the only write:
+  // there's no separate remove(), because the UI has no delete affordance
+  // either — clearing the text and letting autosave fire *is* how a note
+  // gets deleted. See FAQ.
+  save(input: SaveNoteInput): Promise<Result<KanjiNoteView | null>>;
 }
 ```
 
 ## 2. F.A.Q
 
 **How do note conflicts actually get resolved?**
-They don't, in the sense of picking a winner. When two devices edit the same
-note while offline and their edits diverge, the backend joins both texts into
-one canonical note, separated by a rule and an invisible marker, ordered so
-every device that applies the same pair produces byte-identical output.
-Nothing is discarded and nothing needs restoring — which is also why there's
-no conflict list, no `restoreConflict`/`dismissConflict`, and no separate
-conflict-review screen anywhere in this API. `hasMergedEdit` and `mergedAt`
-are the entire signal; see the next question for what to do with them.
+They don't, in the sense of picking a winner — but only among two genuine
+edits. When two devices each save non-empty, divergent content for the same
+note while offline, the backend joins both texts into one canonical note,
+separated by a rule and an invisible marker, ordered so every device that
+applies the same pair produces byte-identical output. Nothing is discarded
+and nothing needs restoring — which is also why there's no conflict list, no
+`restoreConflict`/`dismissConflict`, and no separate conflict-review screen
+anywhere in this API. `hasMergedEdit` and `mergedAt` are the entire signal;
+see the next question for what to do with them. A delete (a trimmed-empty
+save) on one side racing a real edit on the other isn't this kind of
+divergence at all — see "Does clearing a note ever race with an edit?"
+below for that case.
 
 **What should the host actually do when `hasMergedEdit` is true?**
 Render the note as normal — the merged content, separator included, is
-genuinely the note now — but disable Save and explain why, rather than
-showing a bare "too long" error: something like "Also edited on another
-device. Both edits are below — trim to fit to save." `maxUtf8Bytes` still
-applies to a merged note with no exception, so the over-limit editor _is_
-the resolution flow. The person deletes the half they don't want and saves
-normally, which clears `hasMergedEdit` on that same save.
+genuinely the note now — and show something like "Also edited on another
+device. Both edits are below." No merge-specific save gating is needed
+beyond what already applies to every note: if the merge pushed `content`
+over `maxUtf8Bytes`, the same live length check and `validation_failed`
+path that guards any long note keeps autosave from firing until it's
+trimmed — there's no separate "paused" state to introduce. `hasMergedEdit`
+itself only flips to false once an edit actually saves, but the host
+doesn't need to wait for that: it's fine to drop the banner locally as soon
+as the person starts typing, since a refresh before that first save lands
+would just show the same merged note and banner again — which is still the
+correct thing to show.
 
 **Why does merging, rather than keeping a separate "losing copy," make
 sense?**
@@ -123,25 +131,43 @@ the losing text, and, worth calling out on its own, no note content ever has
 to leave the live database at all. That matters more here than it would
 elsewhere, since notes are the most personal text this API stores.
 
-**Does removing a note ever race with an edit?**
-Yes, and the edit always wins: if a note is deleted on one device while it's
-edited on another, the edited version stays active. Losing a delete is
-recoverable (delete it again); losing text silently would not be. The device
-that deleted it just sees the note reappear next time it syncs — there's no
-error for this, because the local `remove()` call did succeed. The note just
-didn't stay gone.
+**Why does a trimmed-empty save delete the note, instead of being
+rejected?**
+Because the UI has no delete button — autosave is the only write path a
+person has. If empty content were invalid, there'd be no way to remove a
+note at all short of leaving it around forever. So `save()` treats
+trimmed-empty content as the delete: it's what "the person cleared the box"
+already means in an autosave-only editor. This is also why there's no
+separate `remove()` — it would just be `save()` with a size check bolted on.
 
-**Why is `expectedServerRevision` optional, unlike a review card's
-`revision`/`expectedRevision`?**
-Because a note might not have one yet. A `DueCard` always already exists on
-the server before a host ever sees it, but a brand-new note — or one written
-entirely offline — has never synced, so there's nothing yet to compare
-against. Pass it when you have it (you read the note before editing it);
-omit it for a note you know is new.
+**Does clearing a note ever race with an edit?**
+Yes, and the edit always wins: if a note is cleared (a trimmed-empty save)
+on one device while it's edited on another, the edited version stays
+active. This isn't a merge — an empty save has no content to join with the
+other side, so there's nothing to do but keep the real edit. Losing a clear
+is recoverable (clear it again); losing text silently would not be. The
+device that cleared it just sees the note reappear next time it syncs —
+there's no error for this, because the local `save()` call did succeed (it
+returned `null` locally, same as any delete). The note just didn't stay
+gone.
+
+**Why doesn't `save()` take an expected revision, the way a review card's
+grade carries `expectedRevision`?**
+Because there's no way for a note save to be meaningfully rejected in the
+first place — every non-empty divergence gets merged, never refused (see
+`NoteSaveOperation.baseServerRevision` in backend-sync-contract.md). A
+`DueCard`'s `expectedRevision` exists because grading against the wrong
+card state is a real error worth failing loud for; nothing analogous exists
+for a note, since two texts can always be joined into one canonical result.
+The engine still tracks each note's `serverRevision` internally, purely as
+bookkeeping for that merge — it's not something a host needs to read back
+and resupply in order to save correctly, so it isn't part of
+`SaveNoteInput`.
 
 **Why doesn't `KanjiNoteView` have an `active` or `exists` flag?**
 Because `watch()` already tells you that: no active note for this kanji
-comes back as `null`. A field that's always `true` on everything you can
+comes back as `null` — whether it was never created or was deleted by a
+trimmed-empty save. A field that's always `true` on everything you can
 actually see wouldn't add anything.
 
 **Why is there no `NoteId`, the way reviews have an opaque `CardId`?**

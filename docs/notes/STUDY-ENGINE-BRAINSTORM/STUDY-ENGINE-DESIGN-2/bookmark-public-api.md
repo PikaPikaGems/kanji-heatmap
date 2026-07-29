@@ -77,17 +77,19 @@ every existing bookmark for it silently stops matching and disappears from
 the "bookmarked only" filter — no user action, no way to notice. Keying by
 kanji alone removes that failure mode entirely.
 
-**Why don't `add`/`remove` take a revision, the way a note's `put` takes
-`expectedServerRevision`?**
+**Why is plain last-write-wins fine for bookmarks, when a note needs a merge
+story instead?**
 Because there's nothing a stale write could lose. A bookmark is a boolean,
-resolved by plain last-write-wins: if two devices disagree about whether 日
-is bookmarked, whichever change happened last simply wins, and the loser's
-screen quietly updates on next sync. That's fine _because_ there's no
-content to overwrite — contrast this with a note
+resolved by whichever change happened last: if two devices disagree about
+whether 日 is bookmarked, the loser's screen quietly updates on next sync,
+and nothing is destroyed by that. That's fine _because_ there's no content
+to overwrite — contrast this with a note
 ([notes-public-api.md](./notes-public-api.md)), where blindly letting the
-latest write win could silently erase real text someone wrote. That's
-exactly why notes need a revision check and a merge story, and bookmarks
-need neither.
+latest write win could silently erase real text someone wrote, which is
+exactly why two divergent note edits get joined instead of one overwriting
+the other. Neither API makes the host reason about a revision either
+way — that merge, like this last-write-wins rule, is handled entirely
+inside the engine and backend.
 
 **Is there a conflict UI for bookmarks, like the note merge screen?**
 No, and there's nothing for one to do. Two devices disagreeing about a

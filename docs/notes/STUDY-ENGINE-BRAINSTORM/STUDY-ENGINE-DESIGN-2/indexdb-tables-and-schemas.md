@@ -293,8 +293,7 @@ interface OutboxRow {
   // so the lowest one here is the sync high-water mark.
   deviceSequence: number;
   kind:
-    | "note_put"
-    | "note_remove"
+    | "note_save"
     | "bookmark_add"
     | "bookmark_remove"
     | "review_settings_update"
@@ -302,7 +301,7 @@ interface OutboxRow {
     | "review_pile_remove"
     | "review_grade"
     | "practice_activity_event_add";
-  payload: unknown; // one of the nine operation shapes in backend-sync-contract.md, narrowed by `kind`
+  payload: unknown; // one of the eight operation shapes in backend-sync-contract.md, narrowed by `kind`
   state: "pending" | "sending"; // a crashed "sending" row returns to "pending" on startup
 }
 ```

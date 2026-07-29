@@ -4,7 +4,7 @@ Two routes carry every domain — notes, bookmarks, review pile, cards,
 settings, activity. One endpoint means one cursor, one queue, and one place
 where "did this land" gets answered.
 
-The caller is the engine, not a host app. A host calls `notes.put()` and
+The caller is the engine, not a host app. A host calls `notes.save()` and
 `activity.record()`; the engine decides when anything goes over the wire.
 
 ```text
@@ -149,8 +149,7 @@ interface SyncRequest {
 // what it changes.
 type SyncOperation =
   // State intents — "this is what the value should be now"
-  | NotePutOperation
-  | NoteRemoveOperation
+  | NoteSaveOperation
   | BookmarkAddOperation
   | BookmarkRemoveOperation
   | ReviewSettingsUpdateOperation
@@ -183,27 +182,26 @@ the second just restates the same wish. When two devices disagree, the
 server settles it; only notes keep both sides.
 
 ```ts
-interface NotePutOperation extends SyncOperationBase {
-  kind: "note_put";
+interface NoteSaveOperation extends SyncOperationBase {
+  kind: "note_save";
   kanji: string;
-  content: string; // the whole note text, not a diff
+  // The whole note text, not a diff. Trimmed-empty deletes the note —
+  // notes.save() doesn't distinguish the two, so neither does this
+  // operation. See notes-public-api.md.
+  content: string;
 
-  // The `serverRevision` the editor was showing when this edit started.
-  // Absent for a note that has never reached the server. If the server's
-  // copy has moved past this number, some other device edited the same note
-  // in the meantime, and the two texts are merged rather than one silently
-  // replacing the other.
-  baseServerRevision?: number;
-}
-
-interface NoteRemoveOperation extends SyncOperationBase {
-  kind: "note_remove";
-  kanji: string;
-
-  // Same meaning as above, and the reason a delete can lose: if another
-  // device edited this note after that revision, the edit stays and the
-  // delete is dropped. Losing a delete is recoverable — delete it again.
-  // Losing someone's writing isn't.
+  // The local KanjiNoteRow's own `serverRevision` at the moment this
+  // operation was queued — engine bookkeeping, not something a host
+  // supplies (notes.save() takes no revision at all). Absent for a note
+  // that has never reached the server. What a stale value does depends on
+  // `content`: non-empty text merges with whatever the server now has
+  // rather than overwriting it; trimmed-empty content is a delete, and a
+  // delete loses outright to a newer edit instead of merging with it — the
+  // edit stays, and the delete is silently dropped (recoverable: delete it
+  // again). Losing a delete is fine; losing someone's writing silently
+  // would not be. Either way, there is no revision-conflict rejection —
+  // this field only ever changes how the write resolves, never whether it
+  // does.
   baseServerRevision?: number;
 }
 
