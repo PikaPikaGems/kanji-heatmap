@@ -25,7 +25,7 @@
 - Backend Canonical Data is Authoritative, Index DB stores, and assumes an optimistic provisional updates which will be overwritten when backend returns canonical data
 - you need to login to view your data. You need a "premium entitlement lease" or "premium subscription" in order to add, save, and update new data, without premium, your data will be read-only.
 - At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they do not log-in within 14 days or so.
-
+- Only a fixed number of kanji is available. Less than 3000 kanjis.
 # Building Blocks
 
 ```ts
@@ -283,6 +283,7 @@ interface ReviewsApi {
   settings: {
     watchCurrent(): QueryStore<ReviewSettings>;
     update(settings: ReviewSettings): Promise<Result<ReviewSettings>>;
+    getDefaults(): ReviewSettings;
   };
 
   pile: {
@@ -292,8 +293,8 @@ interface ReviewsApi {
 
     // null = kanji not in pile
     watch(kanji: Kanji): QueryStore<ReviewPileItemView | null>
-    // TODO: Confirm: No need to paginate since only less than 3,000 kanji at most
-    // Important: Make sure we Memoize component so that card's update only re-renders its own tile, not the whole grid
+    // TODO: need to Confirm: No need to paginate since only 3,000 pile items at most?
+    // Important: Make sure we Memoize component so a specific update only re-renders the relevant components, not the whole grid
     watchAll(): QueryStore<ReviewPileItemView[]>
   }
 
@@ -365,18 +366,18 @@ type SpeekKatakanaEventRecord = {
   challengeId: string;
   accuracyVal: number;
   cpmVal: number;
+  pointerType: "fine" | "coarse";
   startedAt: UnixMs;
   endedAt: UnixMs;
-  pointerType: "fine" | "course";
   timeZone: IanaTimeZone;
 };
 
 type SpeakingPracticeEventRecord = {
   type: "speaking_practice_session_completed";
   challengeId: string;
+  totalSecondsSpent: number; // TODO: Decide if I count this in the frontend and sendstartedAt: UnixMs;
   startedAt: UnixMs;
   endedAt: UnixMs;
-  totalSecondsSpent: number; // TODO: Decide if I count this in the frontend and send
   timeZone: IanaTimeZone;
 };
 
