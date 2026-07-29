@@ -8,7 +8,6 @@ and why each piece exists.
 ```ts
 // ---- Basic building blocks ----
 
-type UnixMs = number;
 type Kanji = string; // a single kanji character
 
 // ---- Live, reactive reads ----
@@ -39,27 +38,18 @@ type BookmarkError =
   | { code: "storage_quota" }
   | { code: "read_only" }; // account entitlement has lapsed
 
-// ---- The bookmark itself ----
-
-// A bookmark is set membership for one kanji, nothing more. See FAQ for why
-// it carries no word.
-interface KanjiBookmark {
-  readonly kanji: Kanji;
-  readonly updatedAt: UnixMs;
-  readonly serverRevision?: number; // undefined until this bookmark has synced at least once
-}
-
 // ---- The API itself ----
 
 interface BookmarksApi {
-  // null means this kanji isn't bookmarked.
-  watch(kanji: Kanji): QueryStore<KanjiBookmark | null>;
+  // A bookmark is set membership, nothing more — see FAQ. true means this
+  // kanji is bookmarked.
+  watch(kanji: Kanji): QueryStore<boolean>;
 
   // The complete set. No paging — this is small, account-scoped data, not
   // bounded the way review history could be.
-  watchAll(): QueryStore<readonly KanjiBookmark[]>;
+  watchAll(): QueryStore<readonly Kanji[]>;
 
-  add(kanji: Kanji): Promise<Result<KanjiBookmark>>;
+  add(kanji: Kanji): Promise<Result<void>>;
   remove(kanji: Kanji): Promise<Result<void>>;
 }
 ```
@@ -97,11 +87,22 @@ boolean isn't a conflict in any sense that needs surfacing — nothing is
 lost, nothing needs the person's attention, and last-write-wins is already
 the correct outcome, not a fallback that settles for it.
 
-**Why doesn't `KanjiBookmark` have an `active` flag?**
-Same reason as a note: `watch(kanji)` returning `null` already means "not
-bookmarked," and an item present in `watchAll()`'s list is, by definition,
-active. A flag that's always `true` on everything you can actually see
-wouldn't tell you anything.
+**Why do `watch()`/`watchAll()` return plain `boolean`/`Kanji[]`, and
+`add()`/`remove()` return `Result<void>`, instead of a `KanjiBookmark`
+object carrying `updatedAt`/`serverRevision`?**
+An earlier draft carried both fields on every one of these four calls,
+mirroring `KanjiNoteView`. Neither had a reader: there's no "recently
+bookmarked" screen ordering by `updatedAt`, and no per-write sync-pending
+indicator reading `serverRevision`, unlike a note where `hasMergedEdit`/
+`mergedAt` do real work. A bookmark has no payload beyond membership, so
+`true`/`false` already says everything `watch()` needs to say, and `add()`/
+`remove()` have nothing left worth handing back beyond success or a typed
+error — whichever screen called them is, in practice, already subscribed to
+`watch()` for that same kanji, which reflects the write on its own. The
+underlying local row (`KanjiBookmarkRow` in indexdb-tables-and-schemas.md)
+still keeps `updatedAt`, `serverRevision`, and `writerDeviceId` — the engine
+needs all three internally for last-write-wins tie-breaking. This cut is
+the public surface only, not what's tracked underneath.
 
 **Why is there no `BookmarkId`?**
 A bookmark has no history to distinguish — it's either on or off for a given

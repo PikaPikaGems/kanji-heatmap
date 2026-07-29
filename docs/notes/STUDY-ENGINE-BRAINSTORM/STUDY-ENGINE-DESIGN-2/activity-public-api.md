@@ -422,7 +422,10 @@ record instead. It's `undefined` until some attempt has actually cleared
 70% accuracy; there's nothing to report before that.
 
 **Why doesn't `ActivitiesSummary` or `ChallengeSummary` carry a
-`serverRevision`, the way a note or bookmark does?**
-Both are entirely engine/backend-derived — nothing a host writes ever
-competes to overwrite one, the way an edit could race a note. A revision
-check exists to catch a stale write; there's no write here to be stale.
+`serverRevision`, the way a note does?**
+Because both are entirely engine/backend-derived — there's no local host
+write that could ever be ahead of or behind the server's copy, the way a
+note edit could be before it's synced. `KanjiNoteView` keeps `serverRevision`
+for that reason. Bookmarks don't carry one at all (bookmark-public-api.md):
+once a bookmark is genuinely just boolean membership with no payload,
+there's nothing left for a revision to describe.

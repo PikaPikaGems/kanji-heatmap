@@ -55,8 +55,10 @@ interface KanjiNoteView {
   // producing a view. See FAQ.
   readonly content: string;
   readonly updatedAt: UnixMs;
-  // Undefined until this note has synced to the server at least once.
-  readonly serverRevision?: number;
+  // True while this kanji has a save sitting in the local outbox that the
+  // server hasn't acknowledged yet. Flips to false the moment sync
+  // confirms it, no host action needed. See FAQ.
+  readonly hasPendingSync: boolean;
   // True when the backend merged a divergent edit from another device into
   // `content`. `content` can be over `maxUtf8Bytes` when this is true — the
   // same over-limit handling as any long note applies, not a bare length
@@ -121,6 +123,39 @@ as the person starts typing, since a refresh before that first save lands
 would just show the same merged note and banner again — which is still the
 correct thing to show.
 
+**What should the host do if another device's edit arrives while someone is
+actively editing, not just viewing?**
+If the host has a separate edit mode and view mode, the safe pattern is to
+drop back to view mode the moment `watch()` delivers content that differs
+from what the open draft started from, rather than trying to reconcile a
+draft that's still being typed into. Show a banner explaining why — "This
+note was edited elsewhere. Edit to see both versions." — and hold the
+interrupted draft in memory (ordinary host-side state, nothing
+engine-related) instead of discarding it. Re-entering edit mode pre-fills
+the textarea with that held draft plus the current content, concatenated;
+from there it's a normal edit — trim, autosave, done, merging exactly like
+any other divergent edit.
+
+This has to go through a mode switch rather than resolving on the spot
+because of timing: by the time `watch()` has something new to deliver, the
+engine's local copy of the note has already moved past whatever the open
+draft was based on. A save fired right then — even an automatic,
+well-intentioned one — would report the new, current revision as its base
+and look like an uncontested edit to the backend, silently overwriting the
+other device's text instead of merging with it (see "How do note conflicts
+actually get resolved?" above). Routing through view mode first is what
+prevents that: nothing can be saved until the person has consciously looked
+at the current content again, so whatever they eventually save is always
+genuinely built on it — no revision-tracking required on the host's part.
+It also needs no new engine method: the host already holds both sides of
+the comparison — its own draft, and whatever `watch()` last delivered —
+without the engine ever needing to know an edit is in progress.
+
+One honest gap: if the person abandons view mode without ever going back to
+edit — closes the tab, navigates away — the held draft was only ever in
+memory, so it's gone. Same as any unsaved text in any app; nothing specific
+to this design.
+
 **Why does merging, rather than keeping a separate "losing copy," make
 sense?**
 A recoverable losing copy only actually gets recovered if the person finds
@@ -162,7 +197,27 @@ for a note, since two texts can always be joined into one canonical result.
 The engine still tracks each note's `serverRevision` internally, purely as
 bookkeeping for that merge — it's not something a host needs to read back
 and resupply in order to save correctly, so it isn't part of
-`SaveNoteInput`.
+`SaveNoteInput`. It isn't part of `KanjiNoteView` either; see the next
+question for the one sync-state signal a host actually gets.
+
+**Why `hasPendingSync` instead of exposing `serverRevision`?**
+`serverRevision` used to sit on `KanjiNoteView` for roughly this reason, but
+it didn't actually work: it flips from `undefined` to a number the first
+time a note syncs and then stays a number forever after, so the most it
+could ever say is "has this note reached the server at least once," never
+"is what's in front of me saved right now" — which is the thing worth
+telling a person. `hasPendingSync` says that directly: true whenever this
+kanji has a save sitting in the local outbox the server hasn't acknowledged
+yet, false the instant it's confirmed. A small "Saving…" / "Saved" label
+near the editor is enough, and it needs no host action beyond rendering
+whatever `watch()` currently reports. It's a plain boolean rather than a
+richer status (`"pending" | "sending" | "failed"`, say) because the engine
+already retries a stuck send with backoff on its own — see
+backend-sync-contract.md's sync status table — so there's nothing for a
+host to do differently between "queued" and "currently sending," and a sync
+failure serious enough to need a person's attention (a `409` lock, say) is
+an account-wide condition, not a per-note one, so it belongs in a separate,
+account-level diagnostic, not on every note's view.
 
 **Why doesn't `KanjiNoteView` have an `active` or `exists` flag?**
 Because `watch()` already tells you that: no active note for this kanji
