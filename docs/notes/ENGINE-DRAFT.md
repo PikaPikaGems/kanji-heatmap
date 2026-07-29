@@ -24,7 +24,7 @@
 - engine design must be framework agnostic
 - Backend Canonical Data is Authoritative, Index DB stores, and assumes an optimistic provisional updates which will be overwritten when backend returns canonical data
 - you need to login to view your data. You need a "premium entitlement lease" or "premium subscription" in order to add, save, and update new data, without premium, your data will be read-only.
-- At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they down log-in within two days.
+- At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they do not log-in within 14 days or so.
 
 # Building Blocks
 
