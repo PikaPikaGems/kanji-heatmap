@@ -24,6 +24,7 @@
 - engine design must be framework agnostic
 - Backend Canonical Data is Authoritative, Index DB stores, and assumes an optimistic provisional updates which will be overwritten when backend returns canonical data
 - you need to login to view your data. You need a "premium entitlement lease" or "premium subscription" in order to add, save, and update new data, without premium, your data will be read-only.
+- At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they down log-in within two days.
 
 # Building Blocks
 
@@ -99,12 +100,13 @@ interface KanjiNoteView {
   hasMergedEdit: boolean;
   mergedAt?: UnixMs; // set only alongside hasMergedEdit
 
-  // TODO: Discuss this
-  localUpdatedAt: UnixMs;
-  lastSync: UnixMs;
   // kanji has a save sitting in the local outbox that the
   // server hasn't acknowledged yet.
   status: "pending-sync" | "synced";
+
+  // below if we want to show the following in the view
+  localUpdatedAt: UnixMs; // "edited two minutes ago"
+  lastSync: UnixMs; // "last synced 10 minutes ago"
 }
 
 type SaveNoteInput = { kanji: Kanji; content: string };
@@ -125,7 +127,21 @@ interface NotesApi {
 
 ## FAQ
 
-1. `TODO:` Write down here how are conflicts / simultaneous editing handled? Share specific scenarios
+### 1. How do note conflicts actually get resolved?
+
+When two devices each save non-empty, divergent content for the same note while offline, the backend joins both texts into one canonical note, separated by a rule and an invisible marker, ordered so every device that applies the same pair produces byte-identical output.
+
+### 2. What should the host actually do when hasMergedEdit is true?
+
+Render the note as normal — the merged content, separator included, is genuinely the note now — and show something like "Also edited on another device. Both edits are below." hasMergedEdit itself only flips to false once an edit actually saves, but the host doesn't need to wait for that: it's fine to drop the banner locally as soon as the person starts typing,
+
+### 3. What should the host do if another device's edit arrives while someone is actively editing, not just viewing?
+
+What should the host do if another device's edit arrives while someone is actively editing, not just viewing? If the host has a separate edit mode and view mode, the safe pattern is to drop back to view mode the moment watch() delivers content that differs from what the open draft started from, rather than trying to reconcile a draft that's still being typed into. Show a banner explaining why — "This note was edited elsewhere. Edit to see both versions." — and hold the interrupted draft in memory (ordinary host-side state, nothing engine-related) instead of discarding it. Re-entering edit mode pre-fills the textarea with that held draft plus the current content, concatenated; from there it's a normal edit — trim, autosave, done, merging exactly like any other divergent edit.
+
+This has to go through a mode switch rather than resolving on the spot because of timing: by the time watch() has something new to deliver, the engine's local copy of the note has already moved past whatever the open draft was based on. A save fired right then — even an automatic, well-intentioned one — would report the new, current revision as its base and look like an uncontested edit to the backend, silently overwriting the other device's text instead of merging with it (see "How do note conflicts actually get resolved?" above). Routing through view mode first is what prevents that: nothing can be saved until the person has consciously looked at the current content again, so whatever they eventually save is always genuinely built on it — no revision-tracking required on the host's part. It also needs no new engine method: the host already holds both sides of the comparison — its own draft, and whatever watch() last delivered — without the engine ever needing to know an edit is in progress.
+
+One honest gap: if the person abandons view mode without ever going back to edit — closes the tab, navigates away — the held draft was only ever in memory, so it's gone. Same as any unsaved text in any app; nothing specific to this design.
 
 # Bookmark
 
@@ -155,7 +171,6 @@ type FsrsRating = "again" | "hard" | "good" | "easy";
 type FsrsLearningState = "new" | "learning" | "review" | "relearning";
 
 
-// TODO: Discuss this if we really need the below
 // Opaque. Internally it identifies a kanji + card type + "which attempt at
 // this kanji" (in case it was removed and re-added), but a host never reads
 // or builds one — it just stores whatever it was given and passes it back.
@@ -238,9 +253,10 @@ interface DueCard {
 
 interface RatingPreview {
   rating: FsrsRating;
+
+  // intervalMs = scheduledAt - openedAt <--- for a label like "3d"
   scheduledAt: UnixMs; // when the card would next be due if this rating is picked
   intervalMs: number; // how far out that is from now, for a label like "3d"
-  // TODO: Do we really need both scheduledAt and intervalMs, or do we just need one? Any potential issues with timezone?
 }
 
 
@@ -267,15 +283,13 @@ interface ActiveReview {
 
 interface ReviewsApi {
   settings: {
-    // TODO: Discuss what happens if ReviewSettings change while being updated?
-    // maybe we should just get the snapshot instead of "watching" this or am I wronG?
     watchCurrent(): QueryStore<ReviewSettings>;
     update(settings: ReviewSettings): Promise<Result<ReviewSettings>>;
   };
 
   pile: {
-    // TODO: Question: do we optional timeZone?: for testing?
-    add(input: {kanji: Kanji, word: string}): Promise<Result<ReviewPileItemView>>
+    // timeZone?: IanaTimeZone? only as a test hook. but probably not needed
+    add(input: {kanji: Kanji, word: string,  }): Promise<Result<ReviewPileItemView>>
     remove(kanji: Kanji): Promise<Result<void>>
 
     // null = kanji not in pile
@@ -288,7 +302,6 @@ interface ReviewsApi {
   watchDueCount(cardType: CardType): QueryStore<number>
 
   // Used to build a review session. limit: number of cards, asOf?: Testing/tooling escape hatch only
-  // what is asOf for?
   getDue(
       input: {cardType: CardType, limit: number, asOf?: UnixMs; }
   ): Promise<Result<DueCard[]>>
@@ -307,8 +320,35 @@ interface ReviewsApi {
 
 ## FAQ
 
-1. TODO: Discusse her What is the CardId ? Why can't we just use Kanji as the Identifier? Is CardId here to track whether it's 'active': true / "deletedAt"? Pros and cons of having CardId?
-2. TODO: Walk through the grading process, why getDue() explain why we need to pass expectedRevision in beginReview, what the handleId is for and how having multiple tabs open with the same review work
+### 1. Why CardId instead of `{ kanji, cardType }` as key
+
+The only thing forcing an opaque id over that tuple in case it was removed and re-added. Lets the engine soft-delete old cards (`is_active = false`) for history/sync without key collisions. Re-add starts fresh → the new cards must be distinguishable from the old soft-deleted ones (same kanji + type), so you need a generation marker → keep CardId, opaque. My lean: reset-on-re-add is the more intuitive behavior ("I removed it, I want a clean slate"), and the opaque id costs the host almost nothing.
+
+### 2. The grading walkthrough
+
+Each piece earns its place by covering a specific way a review can go stale between listing and grading:
+
+- **`getDue({ cardType, limit })`** returns a snapshot of what's due _right now_, each `DueCard` carrying a `revision` — a version stamp for that card at fetch time. You build the session queue from this.
+- **`beginReview({ cardId, expectedRevision })`** — `expectedRevision` is the `revision` you got from `getDue`. The engine checks it against the card's current revision; if they differ (graded in another tab, changed by sync), it returns `stale_revision` and you skip/refetch. If it matches, it computes each rating's next-due time _now_, **freezes those into `previews`**, and hands back a handle. Freezing is why grading is deterministic: whatever the user reads ("Good → 5d") is exactly what they get even if they stare at the card for 30 seconds.
+- **`grade({ handleId, rating })`** applies the frozen preview and consumes the handle. It uses `handleId`, not `cardId`, because the handle identifies _this specific open review_ — open the same card twice and you get two independent handles.
+- **`expiresAt`** cleans up a handle whose tab crashed or closed without grading or cancelling, so nothing leaks.
+
+The two-tab case, concretely:
+
+1. Tab A and Tab B both `getDue`, both see card X at revision 5.
+2. Both `beginReview(X, expectedRevision: 5)` — begin does **not** bump the revision, so both succeed and get handles H_A and H_B, each with its own frozen previews.
+3. Tab A `grade(H_A, "good")` → card moves to revision 6, H_A consumed.
+4. Tab B `grade(H_B, "good")` → engine sees H_B was opened against revision 5 but the card is now 6 → returns `stale_revision`. Tab B shows "already reviewed elsewhere" and moves on.
+
+So the double-grade safety comes from the revision check at grade time, **not** from locking the card at begin. I'd deliberately avoid locking: locks need expiry, unlock-on-cancel, and still leak on a crash — the revision guard is simpler and crash-safe, since an abandoned handle just expires with no side effects. `review_handle_consumed` is really just a double-submit programming guard, and `review_handle_expired` is the timeout — you could collapse `consumed`.
+
+### 3. Do we keep "settings.watch current" or make it just a snapshot ?
+
+settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is your uniform primitive; making settings the one get() special-case just forces the host to branch. Keep watchCurrent() so surfaces that depend on settings (a due-count badge) stay fresh, but the edit form uses a local draft and treats update()'s returned Result<ReviewSettings> as the source of truth after save.
+
+### 4. What is ` asOf` in getDueCards() for?
+
+A test hook to pretend "now" is a future date so you can unit-test scheduling without waiting real days — keep it, mark it test-only.
 
 # Activities
 
@@ -444,7 +484,10 @@ type AllTimeSummary = ActivityRecordSummary &
 ```ts
 interface ChallengeScore {
   value: number;
-  achievedAt: UnixMs; // TODO: decide should we store LocalDate instead or both
+  achievedAt: LocalDate; // TODO: decide should we store UnixMs or as LocalDate instead or both
+  /* Suggestion by LLM
+  You only ever show "best CPM, set Mar 3," never "2 hours ago," so you don't need instant precision. And LocalDate frozen at achievement time is travel-stable, whereas deriving the day from UnixMs at render risks the date shifting when the user changes timezone. Never store both — that just invites the two to disagree.
+   */
 }
 
 interface SpeedKatakanaChallengeSummary {
@@ -510,7 +553,15 @@ interface ActivityApi {
 }
 ```
 
+## F.A.Q
+
+### 1. Why split the challenges into separate functions? Should we split the tables as well?
+
+The reason to keep them separate isn't the method names, it's that there's no screen that wants them mixed. A katakana challenge summary and a speaking challenge summary share almost no fields — katakana has accuracy/cpm/best-scores, speaking has just attempt count and seconds — and no view renders "all my challenges of both kinds in one list." They're different collection screens. If it were me: split read API, single storage table with a discriminator (fewer tables, and the two shapes are small)
+
 # Authentication, Storage, and Sync API
+
+TODO: Fleshout this area
 
 # Backend Sync Contract
 
@@ -543,14 +594,32 @@ POST /api/auth/pin/verify
 POST /api/auth/logout
 GET  /api/auth/session
 
-POST /api/sync/bootstrap <--- what is this for?
+POST /api/sync/bootstrap
 GET  /api/sync/bootstrap/page
 POST /api/sync
 ```
 
 ## FAQ
 
-1. Discuss how frontend interacts with backend
+## 1. There are two ways to structure bootstrap, and they differ by exactly whether that POST exists
+
+**Option A — two-step, with the POST (pinned snapshot).**
+
+- `POST /api/sync/bootstrap` — _opens_ a bootstrap: server pins "your snapshot is revision R," and hands back R (plus maybe a page count / token). It's a POST because it **creates server-side state** — a pinned cursor the pages read against. GETs shouldn't have that side effect.
+- `GET /api/sync/bootstrap/page?...` — pulls each page, all read at the pinned R, so paging never sees a moving target even if another device writes mid-download.
+- Done → your cursor = R → switch to `POST /api/sync`.
+
+**Option B — just the paged GET, no opening POST.**
+
+- `GET /api/sync/bootstrap/page?cursor=...` — page straight through, each page reads at whatever "now" is. No pinned snapshot.
+- Risk: a write landing between page 1 and page 5 can make paging slightly inconsistent — but it self-heals on your first incremental `/api/sync`, since that pulls anything you missed. So the `POST /api/sync/bootstrap` line exists _only_ to buy the pinned-snapshot guarantee. If you drop it, you keep just `GET /api/sync/bootstrap/page` + `POST /api/sync`.
+
+## 2. TODO: Discuss how frontend interacts with backend
+
+# Backend Postresgres and IndexDB tables and Schema
+
+- NOTE: Index DB will have an "outbox" table
+- TODO: Final schemas here
 
 ## Possible Backend Tables
 
@@ -563,8 +632,8 @@ POST /api/sync
 - review_cards
 - review_settings
 - daily_summaries
-- challenge_summaries  
-  ❓❓ TODO: Open question. split into katakana_challenge_summaries + speaking_challenge_summaries?
+- katakana_challenge_summaries
+- speaking_challenge_summaries
 
 # Common Columns
 
@@ -575,6 +644,6 @@ POST /api/sync
 - updated_at
 ```
 
-# IndexDB tables and Schema
-
 # Open Questions
+
+TODO
