@@ -625,6 +625,8 @@ type CanonicalEntities =
 
 ## Proposed Database Table Schema (by Backend)
 
+TODO: `review_cards` row should have a BUFFER CARD RING (Last 8 review events) (TO BE DISCUSSED)
+
 ```
 sync_bootstraps
 - user_id
@@ -940,3 +942,13 @@ Frontend will try again to send pending events later
 - katakana_challenge_summaries
 - speaking_challenge_summaries
 ```
+
+# TODO:
+
+- Discuss final `sync` operations, request and response types
+- Discuss `auth` endpoints, request and response types
+- Discuss canonicalRecords types
+- Discuss operationTypes
+- Finalize SQL Database Schemas
+- Finalize IndexDB Shemas
+- Discuss behavior when versions such as reviewsSchedulerVersion and reviewsSettings version mismatch of backend and frontend, how to handle
