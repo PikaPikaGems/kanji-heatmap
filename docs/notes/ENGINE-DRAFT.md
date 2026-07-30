@@ -63,25 +63,32 @@ type ReviewSummary = {
   easy?: number
 }
 
+type UserInfo: {
+  accountId: string
+  entitlement: true;
+}
 
 type EngineAPI {
+  version: string
   bookmarks: BookmarksAPI
   notes: NotesAPI
   reviews: ReviewsAPI
   activity: ActivityAPI
 
   // TODO: Flesh this out
-  auth: {
-    // requestPin({ email: string}): PinChallengeId
-    // verifyPin({ challengeId: , pin })
-    // logout()
-  }
+  // auth: {
+  //  requestPin({ email: string }): Promise<Result<void>>
+  //  verifyPin({ email: string, pin: string })
+  //  logout(): Promise<Result<void>>
+  //  me(): Promise<Result<UserInfo>>
+  // }
+
   // sync: { now(manualSyncReason?: string): Promise<Result<SyncOutcome>> }
   // storage: { deleteCache(): Promise<Result<void>> } ;
 }
 
 interface Engine =
-  | { type: 'unavailable '}
+  | { type: 'unavailable'}
   | { type: 'available', engine: EngineAPI }
 ```
 
@@ -281,6 +288,8 @@ interface ActiveReview {
 }
 
 interface ReviewsApi {
+  schedulerVersion: number;
+  settingsVersion: number;
   settings: {
     watchCurrent(): QueryStore<ReviewSettings>;
     update(settings: ReviewSettings): Promise<Result<ReviewSettings>>;
@@ -320,6 +329,15 @@ interface ReviewsApi {
 ```
 
 ## FAQ
+
+### What is `schedulerVersion` for?
+
+Backend and frontend must agree which schedule algorithm to use. Backend is authoritative so if backend's version is equal or greater, backend can process it. But if frontend's version is greater, then backend will reject events, and frontend will try again later. If frontend is outdated, we can prompt the user to "hard refresh", storing "lastPromptedToHardRefresh" in localstorage so that we won't annoyingly always prompt the user to hear refresh.
+
+### What is `settingsVersions` for?
+
+TODO
+If the schema of the scheduler's settings has changed, then we must handle backend and frontend mismatch.
 
 ### For testing, do we need to optionally have a (1) `asOf` input parameter for `getDue()` (2) `timezone` for `pile.add()` and `pile.remove()`?
 
@@ -580,7 +598,7 @@ The reason to keep them separate isn't the method names, it's that there's no sc
 
 TODO: Fleshout this area
 
-# Backend Sync Contract
+# Backend Sync Types
 
 ```ts
 type SyncOperation =
@@ -600,38 +618,34 @@ type ServerEntityChange =
   | { type: "review_card"; value: CanonicalReviewCard }
   | { type: "review_settings"; value: CanonicalReviewSettings }
   | { type: "daily_summary"; value: CanonicalDailySummary }
-  | { type: "challenge_summary"; value: CanonicalChallengeSummary };
+  | { type: "speed_katakana_challenge_summary"; value: CanonicalSpeedKatakanaChallengeSummary };
+  | { type: "speaking_practice_challenge_summary"; value: CanonicalSpeakingPracticeChallengeSummary };
+
 ```
 
 ## Proposed Endpoints
 
 ```
-POST /api/auth/pin/request
-POST /api/auth/pin/verify
-POST /api/auth/logout
-GET  /api/auth/session
+# TODO: Auth endpoints, request and response types
 
 POST /api/sync/bootstrap
 GET  /api/sync/bootstrap/page
 POST /api/sync
 ```
 
+## Bootstrap requests and responses
+
 ## FAQ
 
-## 1. There are two ways to structure bootstrap, and they differ by exactly whether that POST exists
+### What happens when server unavailable (503) like for server maintenance?
 
-**Option A — two-step, with the POST (pinned snapshot).**
+Frontend will try again to send pending events later
+
+### 1. How does bootstrap work TLDR?
 
 - `POST /api/sync/bootstrap` — _opens_ a bootstrap: server pins "your snapshot is revision R," and hands back R (plus maybe a page count / token). It's a POST because it **creates server-side state** — a pinned cursor the pages read against. GETs shouldn't have that side effect.
 - `GET /api/sync/bootstrap/page?...` — pulls each page, all read at the pinned R, so paging never sees a moving target even if another device writes mid-download.
 - Done → your cursor = R → switch to `POST /api/sync`.
-
-**Option B — just the paged GET, no opening POST.**
-
-- `GET /api/sync/bootstrap/page?cursor=...` — page straight through, each page reads at whatever "now" is. No pinned snapshot.
-- Risk: a write landing between page 1 and page 5 can make paging slightly inconsistent — but it self-heals on your first incremental `/api/sync`, since that pulls anything you missed. So the `POST /api/sync/bootstrap` line exists _only_ to buy the pinned-snapshot guarantee. If you drop it, you keep just `GET /api/sync/bootstrap/page` + `POST /api/sync`.
-
-## 2. TODO: Discuss how frontend interacts with backend
 
 # Backend Postgresql and IndexDB tables and Schema
 
@@ -647,17 +661,6 @@ POST /api/sync
 - review_cards
 - review_settings
 - daily_summaries
-- katakana_challenge_summaries + speaking_challenge_summaries (maybe combine to just one table each will have a fixed size just 200 challenges each)
-
-# Common Columns
-
-- account_id
-- server_revision
-- is_active
-- created_at
-- updated_at
+- katakana_challenge_summaries
+- speaking_challenge_summaries
 ```
-
-# Open Questions
-
-TODO
