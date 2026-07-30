@@ -611,7 +611,7 @@ type SyncOperation =
   | ReviewGradeOperation
   | PracticeActivityEventRecordOperation;
 
-type ServerEntityChange =
+type CanonicalEntities =
   | { type: "note"; value: CanonicalNote }
   | { type: "bookmark"; value: CanonicalBookmark }
   | { type: "review_pile_item"; value: CanonicalReviewPileItem }
@@ -623,7 +623,166 @@ type ServerEntityChange =
 
 ```
 
-## Proposed Endpoints
+## Proposed Database Table Schema (by Backend)
+
+```
+sync_bootstraps
+- user_id
+- bootstrap_id
+- target_revision
+- expires_at
+
+daily_summaries
+- user_id
+- revision
+- summary_date (date without timezone, not UTC)
+- speed_katakana_attempts
+- speaking_attempts
+- reading_attempts
+- writing_attempts
+- review_reading_again
+- review_reading_hard
+- review_reading_good
+- review_reading_easy
+- review_writing_again
+- review_writing_hard
+- review_writing_good
+- review_writing_easy
+
+speed_katakana_challenge_summaries
+- user_id
+- revision
+- challenge_id
+- pointer_type
+- attempt_count
+- latest_attempted_at (UTC)
+- latest_accuracy
+- latest_cpm
+- best_accuracy_score
+- best_accuracy_timestamp
+- best_cpm_score
+- best_cpm_timestamp
+- best_cpm_acc70_score
+- best_cpm_acc70_timestamp
+
+speaking_practice_challenge_summaries
+- user_id
+- revision
+- challenge_id
+- attempt_count
+- last_attempted_at
+
+review_pile_items
+- user_id
+- revision
+- kanji
+- word
+- added_on_local (user timezone date) - remove???
+- added_at (UTC timestamp)
+
+review_cards
+- user_id
+- revision
+- kanji - remove? can use review pile item
+- review_pile_item_id - what if FK in pile item instead?
+- card_type (reading, writing)
+- is_active
+- due_at (UTC)
+- stability
+- difficulty
+- elapsed_days
+- scheduled_days
+- learning_state (new, learning, review, relearning)
+- last_reviewed_at (UTC)
+- first_reviewed_at (UTC)
+- lapses
+- repititions
+- again_ratings
+- hard_ratings
+- good_ratings
+- easy_ratings
+
+review_settings
+- user_id
+- revision
+- request_retention
+- maximum_interval_days
+- enable_fuzz
+- enable_short_term
+- learning_steps_minutes (null, number[])
+- relearning_steps_minutes (null, number[])
+- model_weights (number[21])
+
+notes
+- user_id
+- revision
+- kanji
+- content (TEXT)
+- has_merged_edit
+- merged_at (UTC)
+
+bookmarks
+- user_id
+- revision
+- is_active
+- kanji
+```
+
+## Proposed Endpoints (BY BACKEND DRAFT)
+
+start: POST /api/kanjiheatmap/v1/sync/bootstrap
+
+- request
+  - reviewsSettingsVersion (reject if not the same)
+  - ADD ONLY IF NEEDED:
+    - reviewsSchedulerVersion (TBD)
+- response
+  - bootstrapId
+  - targetRevision
+  - expiresAt
+  - cursor
+  - hasMore
+
+page: GET /api/kanjiheatmap/v1/sync/bootstrap/page
+
+- request (query params)
+  - bootstrapId
+  - cursor
+  - ADD ONLY IF NEEDED:
+    - reviewsSettingsVersion (are reviewsSettingsVersion changes backward compatible?)
+- response
+  - pageRevision
+  - cursor
+  - hasMore
+  - entities[]
+
+## Sync API
+
+sync: POST /api/kanjiheatmap/v1/sync
+
+- request
+  - appliedServerRevision
+  - syncOperations[]
+  - TBD
+    - reviewsSchedulerVersion
+    - reviewsSettingsVersion
+- response
+  - cursor
+  - hasMore
+  - failedOperations[]
+
+page: GET /api/kanjiheatmap/v1/sync
+
+- request
+  - appliedServerRevision
+  - cursor
+- response
+  - pageRevision
+  - cursor
+  - hasMore
+  - entities[name=Mithi Sevilla]
+
+## Proposed Endpoints (BY FRONTEND DRAFT)
 
 ```
 # TODO: Auth endpoints, request and response types
@@ -633,15 +792,132 @@ GET  /api/sync/bootstrap/page
 POST /api/sync
 ```
 
-## Bootstrap requests and responses
+### `POST /api/sync/bootstrap`
+
+Request
+
+```ts
+type BootstrapRequest = {
+  // TODO: Discuss, how we want to handle this
+  // do we reject if there's a mismatch?
+  clientReviewsSettingsVersion: number;
+
+  // TODO: Do we need to send this? why?
+  // clientReviewsSchedulerVersion: number;
+};
+```
+
+Response
+
+```ts
+type BootstrapResponse = {
+  bootstrapId: string;
+  targetRevision: number; // or pinnedRevision, decide which name
+  expiresAt: UTCTimestamp; // finish pages before this
+
+  // "opaque" cursor, does not look like revision
+  cursor: number;
+  hasMore: boolean;
+
+  // intentionally no approximateEntityCount, pageSize
+  // entitlement is handled by auth/me route
+  // TODO: Discuss: why we don't need reviewsSchedulerVersion and reviewsSettingsVersion
+};
+```
+
+### `GET /api/sync/bootstrap/page`
+
+Request
+
+```ts
+// Query:
+// ?bootstrapId=XXX&cursor=YYYY
+
+type BootstrapPageRequest = {
+  bootstrapId: string;
+  cursor: string;
+
+  // TODO: Finalize: what if reviewsSettings version changed
+  // within the serverRevision range? how to handle in get
+};
+```
+
+Response
+
+```ts
+type BootstrapPageResponse = {
+  entities: CanonicalEntities[];
+
+  cursor: string;
+  hasMore: boolean;
+  // Latest server revision we have pulled
+  pageRevision: number;
+};
+```
+
+Client Loop
+
+```py
+
+POST bootstrap → sessionId, targetRevision
+
+while !done:
+  GET page → upsert entities into IndexDB
+  localCursor = R
+
+discard bootstrapSessionId
+
+→ steady-state POST /api/sync
+```
+
+If another device writes mid-bootstrap, pages stay at pinned R; those writes arrive on the next incremental sync after cursor = R
+
+### `POST /api/sync`
+
+Usage: normal path — push outbox + pull since cursor. Engine sync.now() maps here.
+
+request
+
+```ts
+type SyncRequest = {
+  appliedServerRevision: number;
+  // the outbox, in the order the user performed them (may be empty)
+  operations: SyncOperation[];
+};
+```
+
+response
+
+```ts
+type SyncResponse = {
+  entities: ServerEntityChange[];
+  failedOperations: EventId[];
+
+  // TODO: Pending
+  cursor: string;
+  // client should immediately sync again with ops=[]
+  hasMore: boolean;
+
+  // AFTER applying ops + including pulled changes
+  pageRevision: number;
+};
+```
 
 ## FAQ
+
+### Why is the cursor Opaque?
+
+TODO
+
+### What happens if bootstrap session expires before finishing?
+
+TODO
 
 ### What happens when server unavailable (503) like for server maintenance?
 
 Frontend will try again to send pending events later
 
-### 1. How does bootstrap work TLDR?
+### How does bootstrap work TLDR?
 
 - `POST /api/sync/bootstrap` — _opens_ a bootstrap: server pins "your snapshot is revision R," and hands back R (plus maybe a page count / token). It's a POST because it **creates server-side state** — a pinned cursor the pages read against. GETs shouldn't have that side effect.
 - `GET /api/sync/bootstrap/page?...` — pulls each page, all read at the pinned R, so paging never sees a moving target even if another device writes mid-download.
