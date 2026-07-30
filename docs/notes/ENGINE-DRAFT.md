@@ -32,7 +32,8 @@
 ```ts
 type UnixMs = number;
 type Kanji = string;
-type LocalDate = string; "MM-DD-YYY" or something
+type LocalDate = string; // "MM-DD-YYYY"
+type UTCTimeStamp = string // "2026-06-04 14:30:00"
 
 type StudyError = { code: "read_only" } // account entitlement has lapsed
 
@@ -176,10 +177,6 @@ type CardType = "reading" | "writing";
 type FsrsRating = "again" | "hard" | "good" | "easy";
 type FsrsLearningState = "new" | "learning" | "review" | "relearning";
 
-
-// Opaque. Internally it identifies a kanji + card type + "which attempt at
-// this kanji" (in case it was removed and re-added), but a host never reads
-// or builds one — it just stores whatever it was given and passes it back.
 type CardId = string;
 
 type ReviewError =
@@ -193,7 +190,7 @@ type ReviewError =
   | { code: "stale_revision" } // the card changed since it was queried
 
 
-
+//Note, we set review cards limit to unlimited, and new cards added limit to unlimited
 interface ReviewSettings {
   requestRetention: number
   maximumIntervalDays: number
@@ -204,23 +201,22 @@ interface ReviewSettings {
   modelWeights: number[] // 21 numbers for latest FSRS
 }
 
-
 interface CardProgress {
-  firstReviewedAt?: UnixMs;
-
+  createdAt:UTCTimestamp;
+  firstReviewedAt?: UTCTimestamp;
   ratingsSummary?: ReviewSummary
 
   // ===================
   // IMPORTANT: ALL FIELDS BELOW IS FROM THE TS-FSRS LIBRARY
   // ===================
 
-  dueAt: UnixMs;
+  dueAt: UTCTimestamp;
   stability: number // roughly: days until recall probability drops to the target retention
   difficulty: number // 1..10, higher = harder for this user to remember
   elapsedDays: number // days since lastReviewAt, as of the most recent review
   scheduledDays: number // the interval that was intended between the last two reviews
   learningState: FsrsLearningState
-  lastReviewAt?: UnixMs
+  lastReviewAt?: UTCTimestamp
 
   // Times this card fell out of "review"/"relearning" and had to be
   // relearned — NOT the same as "number of Again ratings". Pressing Again
@@ -230,7 +226,6 @@ interface CardProgress {
   // stored by FRSRS: total number of times this card has ever been graded
   // redundant with our ratingsCount field, but it's ok
   repetitions: number
-
 
   // How to grab the R value programmatically
   // Your current, real-time probability of successfully recalling the card at this exact moment
@@ -248,7 +243,7 @@ interface ReviewPileItemView {
 interface DueCard {
   cardId: CardId;
   kanji: Kanji;
-  dueAt: UnixMs;
+  dueAt: UTCTimestamp;
   // Pass this back as `expectedRevision` to beginReview, so the engine can
   // tell if the card changed after this list was fetched but before it was
   // opened (e.g. graded already in another tab).
@@ -260,7 +255,7 @@ interface RatingPreview {
   rating: FsrsRating;
 
   // intervalMs = scheduledAt - openedAt <--- for a label like "3d"
-  scheduledAt: UnixMs; // when the card would next be due if this rating is picked
+  scheduledAt: UTCTimestamp; // when the card would next be due if this rating is picked
 }
 
 
@@ -299,7 +294,7 @@ interface ReviewsApi {
 
     // null = kanji not in pile
     watch(kanji: Kanji): QueryStore<ReviewPileItemView | null>
-    // TODO: need to Confirm: No need to paginate since only 3,000 pile items at most?
+    // TODO: need to confirm: No need to paginate since only 3,000 pile items at most?
     // Important: Make sure we Memoize component so a specific update only re-renders the relevant components, not the whole grid
     watchAll(): QueryStore<ReviewPileItemView[]>
   }
@@ -326,11 +321,23 @@ interface ReviewsApi {
 
 ## FAQ
 
-### 1. Why CardId instead of `{ kanji, cardType }` as key
+### For testing, do we need to optionally have a (1) `asOf` input parameter for `getDue()` (2) `timezone` for `pile.add()` and `pile.remove()`?
 
-The only thing forcing an opaque id over that tuple in case it was removed and re-added. Lets the engine soft-delete old cards (`is_active = false`) for history/sync without key collisions. Re-add starts fresh → the new cards must be distinguishable from the old soft-deleted ones (same kanji + type), so you need a generation marker → keep CardId, opaque. My lean: reset-on-re-add is the more intuitive behavior ("I removed it, I want a clean slate"), and the opaque id costs the host almost nothing.
+Todo
 
-### 2. The grading walkthrough
+### `pile.watchAll()` is not paginated. Will this potential cause issues for less than 3000 items?
+
+Todo
+
+### Why CardId instead of `{ kanji, cardType }` as key
+
+Just for keeping identity separate from attributes on principle. `kanji` and `card_type` are attributes of a card; using them as the primary key means your identity is made of business data.
+
+### Why do we use CardId for some inputs and outputs of exposed functions instead of just passing Kanji + CardType instead?
+
+kanji/cardType appear on the views because screens show them, never as the key on the identity operations. That keeps identity (opaque, stable) cleanly separated from display (readable, attribute-y), which is the exact discipline that made keeping CardId worthwhile in the first place — so don't undercut it by tuple-keying beginReview
+
+### The grading walkthrough
 
 Each piece earns its place by covering a specific way a review can go stale between listing and grading:
 
@@ -348,9 +355,17 @@ The two-tab case, concretely:
 
 So the double-grade safety comes from the revision check at grade time, **not** from locking the card at begin. I'd deliberately avoid locking: locks need expiry, unlock-on-cancel, and still leak on a crash — the revision guard is simpler and crash-safe, since an abandoned handle just expires with no side effects. `review_handle_consumed` is really just a double-submit programming guard, and `review_handle_expired` is the timeout.
 
-### 3. Do we keep "settings.watch current" or make it just a snapshot ?
+### Do we keep "settings.watch current" or make it just a snapshot ?
 
 settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is your uniform primitive; making settings the one get() special-case just forces the host to branch. Keep watchCurrent() so surfaces that depend on settings stay fresh, but the edit form uses a local draft and treats update()'s returned Result<ReviewSettings> as the source of truth after save.
+
+### Should we keep a "generationId" to track and "help the user understand why their progress reset." ?
+
+No, you already have the data for the good version of this feature, in event_log. Every add, remove, and re-add can be an event with a timestamp. If a user asks "why did my progress reset," the honest, complete answer is reconstructable from the event feed: "you removed this card on Feb 10 and re-added it on Mar 3, which reset it." That's strictly better than a counter — it has the dates, the sequence, the whole story.
+
+### How does the stored card state in postgres table or index db interact with ts-fsrs and py-fsrs ?
+
+### How will we handle merge conflicts for cards given multidevice sync?
 
 # Activities
 
@@ -368,13 +383,16 @@ type ActivityError =
 ## Activity Records
 
 ```ts
+// IMPORTANT NOTE: I may actually send more information such as
+// activity settings and things like that, which we will store
+// in cold storage for research purposes
 type EventRecordTimeRange = {
   startedAt: UnixMs;
   endedAt: UnixMs;
   timeZone: IanaTimeZone;
 };
 
-type SpeekKatakanaEventRecord = EventRecordTimeRange & {
+type SpeedKatakanaEventRecord = EventRecordTimeRange & {
   type: "speed_katakana_session_completed";
   challengeId: string;
   accuracyVal: number;
@@ -385,7 +403,6 @@ type SpeekKatakanaEventRecord = EventRecordTimeRange & {
 type SpeakingPracticeEventRecord = EventRecordTimeRange & {
   type: "speaking_practice_session_completed";
   challengeId: string;
-  totalSecondsSpent: number; // TODO: Decide if we want this
 };
 
 type ReadingPracticeEventRecord = EventRecordTimeRange & {
@@ -420,17 +437,22 @@ interface ActivityRecordSummary {
   reviews: {
     reading: ReviewSummary;
     writing: ReviewSummary;
-    // 🚨 IMPORTANT: number of items created that day, derived from table, not stored
+    // 🚨 IMPORTANT: number of items created that day, derived from tables, not stored
     newItems: number;
   };
 }
 
-type DailySummary = ActivityRecordSummary & { localDate: LocalDate };
+// 🚨 IMPORTANT: this is stored in a table
+type DailySummary = ActivityRecordSummary & {
+  summaryDate: LocalDate;
+  lastUpdatedAt: UTCTimestamp;
+};
 
-// 🚨 IMPORTANT: this is derived from tables not stored
+// 🚨 IMPORTANT: this is derived from tables, not stored
 // This aggregates the number of days you have at least one of these activites
 // usually within a specific date range (example last 365 days or year 2026)
 interface ActivityDaysSummary {
+  totalDaysActive: number;
   practice: {
     speedKatakana: number;
     speaking: number;
@@ -441,19 +463,19 @@ interface ActivityDaysSummary {
   reviews: {
     reading: number; // total reviews
     writing: number; // total reviews
-    newItems: number; // new items added
+    newItems: number; // total new items added
   };
 }
 
 type DailySummaryRange = { from: LocalDate; totalDays: TotalDays };
 
-// 🚨 IMPORTANT: this is derived from tables not stored
+// 🚨 IMPORTANT: this is derived from tables, not stored
 // Summary given a date range
 type AggregatedSummary = ActivityRecordSummary &
   ActivityDaysSummary &
   DailySummaryRange;
 
-// 🚨 IMPORTANT: this is derived from tables not stored
+// 🚨 IMPORTANT: this is derived from tables, not stored
 type FirstAttemptsSummary = {
   cakeDay: LocalDate; // first time you did an activity (not when you subscribed)
   practice: {
@@ -477,14 +499,11 @@ type AllTimeSummary = ActivityRecordSummary &
 ## SpeedKatakana and Speaking Practice
 
 ```ts
-type AttemptedAt = LocalDate; // TODO: decide should we store UnixMs or as LocalDate instead or both
-/* Suggestion by LLM
-  You only ever show "best CPM, set Mar 3," never "2 hours ago," so you don't need instant precision. And LocalDate frozen at achievement time is travel-stable, whereas deriving the day from UnixMs at render risks the date shifting when the user changes timezone. Never store both — that just invites the two to disagree.
-   */
+type AttemptedAt = LocalDate;
 
 interface ChallengeScore {
   value: number;
-  achievedAt: AttemptedAt; // TODO: decide should we store UnixMs or as LocalDate instead or both
+  achievedAt: AttemptedAt;
 }
 
 interface SpeedKatakanaChallengeSummary {
@@ -510,7 +529,7 @@ interface SpeakingPracticeChallengeSummary {
   activityType: "speaking_practice";
   challengeId: number;
   attemptCount: number;
-  totalSecondsSpent: number; // TODO: decide if we should store this
+  lastAttemptedAt: AttemptedAt;
 }
 ```
 
@@ -533,6 +552,7 @@ interface ActivityApi {
     input: DailySummaryRange
   ): QueryStore<ActivitiesSummary[]>;
 
+  //
   // Cheap totals and cake day, without pulling the full daily history.
   watchAllTime(): QueryStore<AllTimeSummary>;
 
@@ -617,8 +637,6 @@ POST /api/sync
 
 - NOTE: Index DB will have an "outbox" table
 - TODO: Final schemas here
-
-## Possible Backend Tables
 
 ```md
 # study data
