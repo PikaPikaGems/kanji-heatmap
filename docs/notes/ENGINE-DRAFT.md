@@ -26,12 +26,15 @@
 - you need to login to view your data. You need a "premium entitlement lease" or "premium subscription" in order to add, save, and update new data, without premium, your data will be read-only.
 - At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they do not log-in within 14 days or so.
 - Only a fixed number of kanji is available. Less than 3000 kanjis.
+
 # Building Blocks
 
 ```ts
 type UnixMs = number;
 type Kanji = string;
 type LocalDate = string; "MM-DD-YYY" or something
+
+type StudyError = { code: "read_only" } // account entitlement has lapsed
 
 interface QueryStore<T> {
   getSnapshot(): QuerySnapshot<T>;
@@ -88,7 +91,7 @@ type NoteError =
   | { code: "unsupported_kanji"; kanji: Kanji }
   | { code: "validation_failed"; reason: "length_exceeded" }
   | { code: "storage_quota" }
-  | { code: "read_only" }; // account entitlement has lapsed
+  | { code: "read_only" };
 
 // One canonical note exists per kanji.
 interface KanjiNoteView {
@@ -106,7 +109,6 @@ interface KanjiNoteView {
 
   // below if we want to show the following in the view
   localUpdatedAt: UnixMs; // "edited two minutes ago"
-  lastSync: UnixMs; // "last synced 10 minutes ago"
 }
 
 type SaveNoteInput = { kanji: Kanji; content: string };
@@ -143,13 +145,17 @@ This has to go through a mode switch rather than resolving on the spot because o
 
 One honest gap: if the person abandons view mode without ever going back to edit — closes the tab, navigates away — the held draft was only ever in memory, so it's gone. Same as any unsaved text in any app; nothing specific to this design.
 
+### 4. Why did we remove Note's "lastSync" ?
+
+This is sync-engine state, not note state: it's the same value on every note, so stamping it per-kanji is just duplicating one global number N times.
+
 # Bookmark
 
 ```ts
 type BookmarkError =
   | { code: "unsupported_kanji"; kanji: Kanji }
   | { code: "storage_quota" }
-  | { code: "read_only" }; // account entitlement has lapsed
+  | { code: "read_only" };
 
 interface BookmarksApi {
   watch(kanji: Kanji): QueryStore<boolean>;
@@ -179,7 +185,7 @@ type CardId = string;
 type ReviewError =
   | { code: "pile_item_exists"; kanji: Kanji; canonicalWord: string }
   | { code: "storage_quota" }
-  | { code: "read_only" } // account entitlement has lapsed
+  | { code: "read_only" }
   | { code: "review_handle_expired" }
   | { code: "review_handle_consumed" }
   // A settings value the scheduler can't work with
@@ -288,7 +294,7 @@ interface ReviewsApi {
 
   pile: {
     // should we optionally pass timeZone?: IanaTimeZone? only as a test hook. but probably not needed
-    add(input: {kanji: Kanji, word: string,  }): Promise<Result<ReviewPileItemView>>
+    add(input: {kanji: Kanji, word: string }): Promise<Result<ReviewPileItemView>>
     remove(kanji: Kanji): Promise<Result<void>>
 
     // null = kanji not in pile
@@ -300,7 +306,8 @@ interface ReviewsApi {
 
   watchDueCount(cardType: CardType): QueryStore<number>
 
-  // Used to build a review session. limit: number of cards, should we optionally pass asOf?: Testing/tooling escape hatch only probably not needed
+  // Used to build a review session. limit: number of cards,
+  //  should we optionally asOf?: Testing/tooling escape hatch only probably not needed
   getDue(
       input: {cardType: CardType, limit: number }
   ): Promise<Result<DueCard[]>>
@@ -352,7 +359,7 @@ settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is y
 ```ts
 type ActivityError =
   | { code: "storage_quota" }
-  | { code: "read_only" } // account entitlement has lapsed
+  | { code: "read_only" }
   // The host should rarely see this in practice — it means a round somehow
   // finished with an impossible shape, e.g. attemptedCount below correctCount.
   | { code: "validation_failed" };
@@ -361,42 +368,36 @@ type ActivityError =
 ## Activity Records
 
 ```ts
-type SpeekKatakanaEventRecord = {
+type EventRecordTimeRange = {
+  startedAt: UnixMs;
+  endedAt: UnixMs;
+  timeZone: IanaTimeZone;
+};
+
+type SpeekKatakanaEventRecord = EventRecordTimeRange & {
   type: "speed_katakana_session_completed";
   challengeId: string;
   accuracyVal: number;
   cpmVal: number;
   pointerType: "fine" | "coarse";
-  startedAt: UnixMs;
-  endedAt: UnixMs;
-  timeZone: IanaTimeZone;
 };
 
-type SpeakingPracticeEventRecord = {
+type SpeakingPracticeEventRecord = EventRecordTimeRange & {
   type: "speaking_practice_session_completed";
   challengeId: string;
-  totalSecondsSpent: number; // TODO: Decide if I count this in the frontend and sendstartedAt: UnixMs;
-  startedAt: UnixMs;
-  endedAt: UnixMs;
-  timeZone: IanaTimeZone;
+  totalSecondsSpent: number; // TODO: Decide if we want this
 };
 
-type ReadingPracticeEventRecord = {
+type ReadingPracticeEventRecord = EventRecordTimeRange & {
   type: "reading_practice_round_completed";
   correctCount: number;
   attemptedCount: number;
-  startedAt: UnixMs;
-  endedAt: UnixMs;
-  timeZone: IanaTimeZone;
 };
 
-type WritingPracticeEventRecord = {
+type WritingPracticeEventRecord = EventRecordTimeRange & {
   type: "writing_practice_round_completed";
   correctCount: number;
   attemptedCount: number;
-  startedAt: UnixMs;
-  endedAt: UnixMs;
-  timeZone: IanaTimeZone;
 };
 
 type PracticeActivityEventRecord =
@@ -419,7 +420,7 @@ interface ActivityRecordSummary {
   reviews: {
     reading: ReviewSummary;
     writing: ReviewSummary;
-    // number of items created that day, derived from table, not stored
+    // 🚨 IMPORTANT: number of items created that day, derived from table, not stored
     newItems: number;
   };
 }
@@ -438,13 +439,13 @@ interface ActivityDaysSummary {
   };
 
   reviews: {
-    reading: number;
-    writing: number;
-    newItems: number;
+    reading: number; // total reviews
+    writing: number; // total reviews
+    newItems: number; // new items added
   };
 }
 
-type DailySummaryRange = { from: LocalDate; to: TotalDays };
+type DailySummaryRange = { from: LocalDate; totalDays: TotalDays };
 
 // 🚨 IMPORTANT: this is derived from tables not stored
 // Summary given a date range
@@ -476,12 +477,14 @@ type AllTimeSummary = ActivityRecordSummary &
 ## SpeedKatakana and Speaking Practice
 
 ```ts
-interface ChallengeScore {
-  value: number;
-  achievedAt: LocalDate; // TODO: decide should we store UnixMs or as LocalDate instead or both
-  /* Suggestion by LLM
+type AttemptedAt = LocalDate; // TODO: decide should we store UnixMs or as LocalDate instead or both
+/* Suggestion by LLM
   You only ever show "best CPM, set Mar 3," never "2 hours ago," so you don't need instant precision. And LocalDate frozen at achievement time is travel-stable, whereas deriving the day from UnixMs at render risks the date shifting when the user changes timezone. Never store both — that just invites the two to disagree.
    */
+
+interface ChallengeScore {
+  value: number;
+  achievedAt: AttemptedAt; // TODO: decide should we store UnixMs or as LocalDate instead or both
 }
 
 interface SpeedKatakanaChallengeSummary {
@@ -491,7 +494,7 @@ interface SpeedKatakanaChallengeSummary {
   pointerType: "fine" | "coarse";
 
   latest: {
-    attemptedAt: UnixMs;
+    attemptedAt: AttemptedAt;
     accuracyVal: number;
     cpmVal: number;
   };
@@ -551,7 +554,7 @@ interface ActivityApi {
 
 ### 1. Why split the challenges into separate functions? Should we split the tables as well?
 
-The reason to keep them separate isn't the method names, it's that there's no screen that wants them mixed. A katakana challenge summary and a speaking challenge summary share almost no fields — katakana has accuracy/cpm/best-scores, speaking has just attempt count and seconds — and no view renders "all my challenges of both kinds in one list." They're different collection screens. If it were me: split read API, single storage table with a discriminator (fewer tables, and the two shapes are small)
+The reason to keep them separate isn't the method names, it's that there's no screen that wants them mixed. A katakana challenge summary and a speaking challenge summary share almost no fields — katakana has accuracy/cpm/best-scores, speaking has just attempt count and seconds — and no view renders "all my challenges of both kinds in one list." They're different collection screens. Your options either two tables of single storage table with a discriminator (fewer tables, and the two shapes are small)
 
 # Authentication, Storage, and Sync API
 
@@ -626,7 +629,7 @@ POST /api/sync
 - review_cards
 - review_settings
 - daily_summaries
-- katakana_challenge_summaries + speaking_challenge_summaries  (maybe combine to just one table each will have a fixed size just 200 challenges each)
+- katakana_challenge_summaries + speaking_challenge_summaries (maybe combine to just one table each will have a fixed size just 200 challenges each)
 
 # Common Columns
 
