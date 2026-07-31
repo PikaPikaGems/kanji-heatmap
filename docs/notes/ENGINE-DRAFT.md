@@ -228,8 +228,8 @@ interface CardProgress {
   // while still learning a brand-new card is normal and doesn't count here.
   lapses: number
 
-  // stored by FRSRS: total number of times this card has ever been graded
-  // redundant with our ratingsCount field, but it's ok
+  // stored by FSRS: total number of times this card has ever been graded
+  // redundant since it can be derived from ratingsSummary field, but it's ok
   repetitions: number
 
   // Your current, real-time probability of successfully recalling the card at this exact moment
@@ -249,7 +249,7 @@ interface DueCard {
   cardId: CardId;
   kanji: Kanji;
   dueAt: UTCTimestamp;
-  // Pass this back as `expectedRevision` to beginReview, so the engine can
+  // Pass this back as `expectedRevision` to `beginReview()`, so the engine can
   // tell if the card changed after this list was fetched but before it was
   // opened (e.g. graded already in another tab).
   revision: number;
@@ -295,8 +295,7 @@ interface ReviewsApi {
   };
 
   pile: {
-    // TODO: Discuss: For testing, For add() and remove(),
-    // should we optionally pass timeZone?: IanaTimeZone? 
+    // TODO: Discuss: For testing, For add() and remove()m should we optionally pass timeZone?: IanaTimeZone? 
     add(input: {kanji: Kanji, word: string }): Promise<Result<ReviewPileItemView>>
     remove(kanji: Kanji): Promise<Result<void>>
 
@@ -310,8 +309,7 @@ interface ReviewsApi {
   watchDueCount(cardType: CardType): QueryStore<number>
 
   // Used to build a review session. limit: number of cards,
-  // TODO: Discuss: For testing, For getDue() 
-  // hould we optionally asOf?: 
+  // TODO: Discuss: For testing, For getDue() should we optionally asOf?: 
   getDue(
       input: {cardType: CardType, limit: number }
   ): Promise<Result<DueCard[]>>
@@ -384,8 +382,7 @@ Backend and frontend must agree which SRS scheduler algorithm to use. Backend is
 
 ### What is `settingsVersions` for?
 
-If the schema of the scheduler's settings has changed, then we must handle backend and frontend mismatch. (For example: Number of weights have changed from 21 to 24)
-
+If the schema of the scheduler's settings has an incompatible change, then we must handle backend and frontend mismatch. (For example: Number of weights have changed from 21 to 24)
 
 # Activities
 
