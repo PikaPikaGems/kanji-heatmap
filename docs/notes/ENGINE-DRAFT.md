@@ -1,23 +1,16 @@
 # Contents
 
-1. Building Blocks and Engine Contract
-2. Notes
-3. Bookmark
-4. Review
-5. Activity
+1. Design Principles and Constraints
+2. Engine Building Blocks
+3. Notes
+4. Bookmark
+5. Review
+6. Activity
+7. Authentication, Storage, and Sync API
+8. Backend Sync Contract
+9. Table Schemas: IndexDB and SQL
+10. Open Questions
 
-- Primitives
-- ActivityRecords
-- Daily Summaries
-- Speed Katakana Challenge Summary
-- Exposed Activity API
-
-6. Authentication, Storage, and Sync API
-7. Backend Sync Contract
-8. IndexDB tables and Schema
-9. Open Questions
-
-## Invariants
 ## Design Principles & Constraints
 
 - **Keep dependencies minimal.** Use **DexieJS** for IndexedDB and **TS-FSRS** for spaced repetition. Avoid introducing additional dependencies unless they provide substantial, well-justified value.
@@ -30,7 +23,7 @@
 - **Finite content set.** The application manages a fixed corpus of fewer than **3,000 kanji**. The set is predefined and does not support arbitrary user-created kanji entries.
 
 
-# Building Blocks
+# Engine Building Blocks
 
 ```ts
 type UnixMs = number;
@@ -207,7 +200,6 @@ interface ReviewSettings {
 }
 
 interface CardProgress {
-  createdAt:UTCTimestamp;
   firstReviewedAt?: UTCTimestamp;
   ratingsSummary?: ReviewSummary
 
@@ -233,7 +225,7 @@ interface CardProgress {
   repetitions: number
 
   // Your current, real-time probability of successfully recalling the card at this exact moment
-  // Get this from the fsrs library = scheduler.get_retrievability(card, new Date());
+  // NOTE: THIS IS NOT STORED: Get this from the fsrs library = scheduler.get_retrievability(card, new Date());
   retrievability: number
 
 }
@@ -243,6 +235,10 @@ interface ReviewPileItemView {
   word: string; // the word these two cards test, fixed at add time
   reading: CardProgress;
   writing: CardProgress;
+  
+  serverCreatedAt: UTCTimestamp;
+  clientCreatedAt: UTCTimestamp;
+  clientCreatedAtTimezone: IanaTimeZone;
 }
 
 interface DueCard {
@@ -265,7 +261,7 @@ interface RatingPreview {
 
 
 interface ActiveReview {
-  // The token you pass to grade()/cancel(). This — not cardId — identifies
+  // The token you pass to grade()/cancel(). This handleId  — not cardId — identifies
   // *this specific open review*, so opening the same card twice gives out
   // two independent handles with their own expiry.
   handleId: string;
@@ -564,13 +560,12 @@ interface ActivityApi {
   // Fire-and-forget from the host's point of view
   record(input: PracticeActivityEventRecord): Promise<Result<ActivityWrite>>;
 
-  // Powers a calendar-style heatmap.
+  // Powers a calendar-style heatmap
   watchDailySummaries(
     input: DailySummaryRange
   ): QueryStore<ActivitiesSummary[]>;
 
-  //
-  // Cheap totals and cake day, without pulling the full daily history.
+  // Cheap totals and cake day, without pulling the full daily history
   watchAllTime(): QueryStore<AllTimeSummary>;
 
   // null means this challenge has never been attempted.
@@ -591,7 +586,7 @@ interface ActivityApi {
 
 ### 1. Why split the challenges into separate functions? Should we split the tables as well?
 
-The reason to keep them separate isn't the method names, it's that there's no screen that wants them mixed. A katakana challenge summary and a speaking challenge summary share almost no fields — katakana has accuracy/cpm/best-scores, speaking has just attempt count and seconds — and no view renders "all my challenges of both kinds in one list." They're different collection screens. Your options either two tables of single storage table with a discriminator (fewer tables, and the two shapes are small)
+The reason to keep them separate isn't the method names, it's that there's no screen that wants them mixed. A katakana challenge summary and a speaking challenge summary share almost no fields — katakana has accuracy/cpm/best-scores, speaking has just attempt count and seconds — and no view renders "all my challenges of both kinds in one list." They're different collection screens. Yes, there should be a table for each challenge time because they're almost always used independently, not together. 
 
 # Authentication, Storage, and Sync API
 
