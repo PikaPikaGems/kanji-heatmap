@@ -21,19 +21,12 @@
 ## Design Principles & Constraints
 
 - **Keep dependencies minimal.** Use **DexieJS** for IndexedDB and **TS-FSRS** for spaced repetition. Avoid introducing additional dependencies unless they provide substantial, well-justified value.
-
 - **Offline-first with multi-device synchronization.** The system should work seamlessly while offline and synchronize changes across devices when connectivity is restored.
-
 - **Framework-agnostic architecture.** The core engine must remain independent of any frontend framework so it can be reused across different platforms and UI technologies.
-
 - **Backend is the source of truth.** The backend maintains the canonical state of all study data. IndexedDB stores a local optimistic copy to enable instant interactions while offline. Any provisional local state should be reconciled and, if necessary, overwritten by the canonical backend data during synchronization.
-
 - **Authentication is required.** Users must be signed in to access their study data.
-
 - **Premium controls write access.** Users without an active premium entitlement (or subscription) may view their study data, but all study data remains read-only. Creating, updating, or deleting study data requires an active premium entitlement.
-
 - **Support multiple cached accounts.** IndexedDB may cache study data for up to **two user accounts** on the same device (for example, siblings sharing a computer). Signing out does **not** automatically remove locally cached study data. Instead, users must explicitly choose **"Log Out and Delete All Locally Cached Study Data"**, with a confirmation prompt, since deleting the cache requires a full resynchronization the next time they sign in. As a safeguard, cached study data should be automatically removed if the corresponding account has not signed in for approximately **14 days**.
-
 - **Finite content set.** The application manages a fixed corpus of fewer than **3,000 kanji**. The set is predefined and does not support arbitrary user-created kanji entries.
 
 
@@ -41,11 +34,10 @@
 
 ```ts
 type UnixMs = number;
-type Kanji = string;
 type LocalDate = string; // "MM-DD-YYYY"
 type UTCTimeStamp = string // "2026-06-04 14:30:00"
 
-type StudyError = { code: "read_only" } // account entitlement has lapsed
+type StudyError = { code: "read_only" } // account's premium entitlement has lapsed
 
 interface QueryStore<T> {
   getSnapshot(): QuerySnapshot<T>;
@@ -65,6 +57,8 @@ type QuerySnapshot<T> =
     };
 
 type Result<T> = { ok: true; value: T } | { ok: false; error: E };
+
+type Kanji = string;
 
 type ReviewSummary = {
   again?: number
@@ -98,7 +92,7 @@ type EngineAPI {
 
 interface Engine =
   | { type: 'unavailable'}
-  | { type: 'available', engine: EngineAPI }
+  | { type: 'available', version: string, engine: EngineAPI }
 ```
 
 # Notes
@@ -110,11 +104,11 @@ type NoteError =
   | { code: "storage_quota" }
   | { code: "read_only" };
 
-// One canonical note exists per kanji.
+// At most, one canonical note exists per kanji.
 interface KanjiNoteView {
   kanji: Kanji;
   content: string;
-
+	
   // True when the backend merged a divergent edit from another device into
   // `content`. `content` can be over `maxUtf8Bytes` when this is true
   hasMergedEdit: boolean;
@@ -123,16 +117,12 @@ interface KanjiNoteView {
   // kanji has a save sitting in the local outbox that the
   // server hasn't acknowledged yet.
   status: "pending-sync" | "synced";
-
-  // below if we want to show the following in the view
-  localUpdatedAt: UnixMs; // "edited two minutes ago"
 }
 
 type SaveNoteInput = { kanji: Kanji; content: string };
 
 interface NotesApi {
-  // The maximum UTF-8 byte size of one saved edit. Fixed for the life of the
-  // engine session. Check it live against `content` as the person types —
+  // The maximum UTF-8 byte size of one saved edit. Check it live against `content` as the person types —
   // `new TextEncoder().encode(content).length` — not just at save time.
   maxUtf8Bytes: number;
 
@@ -148,21 +138,20 @@ interface NotesApi {
 
 ### 1. How do note conflicts actually get resolved?
 
-When two devices each save non-empty, divergent content for the same note while offline, the backend joins both texts into one canonical note, separated by a rule and an invisible marker, ordered so every device that applies the same pair produces byte-identical output.
+When two devices each save non-empty, divergent content for the same note while offline, the backend joins both texts into one canonical note, separated by a marker.
 
 ### 2. What should the host actually do when hasMergedEdit is true?
 
 Render the note as normal — the merged content, separator included, is genuinely the note now — and show something like "Also edited on another device. Both edits are below." hasMergedEdit itself only flips to false once an edit actually saves, but the host doesn't need to wait for that: it's fine to drop the banner locally as soon as the person starts typing.
 
 ### 3. What should the host do if another device's edit arrives while someone is actively editing, not just viewing?
+The host should have a separate `edit mode` and `view mode`, Drop back to view mode the moment `watch()` delivers content that differs from what the open draft started from, rather than trying to reconcile a draft that's still being typed into. Show a banner explaining why — **"This note was edited elsewhere. Go back to edit mode and see both versions.**" — and hold the interrupted draft in memory (ordinary host-side state, nothing engine-related) instead of discarding it. Re-entering edit mode pre-fills the textarea with that held draft plus the current content, concatenated; from there it's a normal edit — trim, autosave, done, merging exactly like any other divergent edit.
 
-What should the host do if another device's edit arrives while someone is actively editing, not just viewing? If the host has a separate edit mode and view mode, the safe pattern is to drop back to view mode the moment watch() delivers content that differs from what the open draft started from, rather than trying to reconcile a draft that's still being typed into. Show a banner explaining why — "This note was edited elsewhere. Click and go back to edit mode and see both versions." — and hold the interrupted draft in memory (ordinary host-side state, nothing engine-related) instead of discarding it. Re-entering edit mode pre-fills the textarea with that held draft plus the current content, concatenated; from there it's a normal edit — trim, autosave, done, merging exactly like any other divergent edit.
-
-This has to go through a mode switch rather than resolving on the spot because of timing: by the time watch() has something new to deliver, the engine's local copy of the note has already moved past whatever the open draft was based on. A save fired right then — even an automatic, well-intentioned one — would report the new, current revision as its base and look like an uncontested edit to the backend, silently overwriting the other device's text instead of merging with it (see "How do note conflicts actually get resolved?" above). Routing through view mode first is what prevents that: nothing can be saved until the person has consciously looked at the current content again, so whatever they eventually save is always genuinely built on it — no revision-tracking required on the host's part. It also needs no new engine method: the host already holds both sides of the comparison — its own draft, and whatever watch() last delivered — without the engine ever needing to know an edit is in progress.
+This has to go through a mode switch rather than resolving on the spot because of timing: by the time `watch()` has something new to deliver, the engine's local copy of the note has already moved past whatever the open draft was based on. A save fired right then — even an automatic, well-intentioned one — would report the new, current revision as its base and look like an uncontested edit to the backend, silently overwriting the other device's text instead of merging with it. Routing through view mode first is what prevents that: nothing can be saved until the person has consciously looked at the current content again, so whatever they eventually save is always genuinely built on it — no revision-tracking required on the host's part. It also needs no new engine method: the host already holds both sides of the comparison — its own draft, and whatever `watch()`` last delivered — without the engine ever needing to know an edit is in progress.
 
 One honest gap: if the person abandons view mode without ever going back to edit — closes the tab, navigates away — the held draft was only ever in memory, so it's gone. Same as any unsaved text in any app; nothing specific to this design.
 
-### 4. Why did we remove Note's "lastSync" ?
+### 4. Why doesn't Note have a "lastSyncedAt" field?
 
 This is sync-engine state, not note state: it's the same value on every note, so stamping it per-kanji is just duplicating one global number N times.
 
@@ -243,10 +232,10 @@ interface CardProgress {
   // redundant with our ratingsCount field, but it's ok
   repetitions: number
 
-  // How to grab the R value programmatically
   // Your current, real-time probability of successfully recalling the card at this exact moment
-  // retrievability = scheduler.get_retrievability(card, new Date());
+  // Get this from the fsrs library = scheduler.get_retrievability(card, new Date());
   retrievability: number
+
 }
 
 interface ReviewPileItemView {
@@ -306,13 +295,14 @@ interface ReviewsApi {
   };
 
   pile: {
-    // should we optionally pass timeZone?: IanaTimeZone? only as a test hook. but probably not needed
+    // TODO: Discuss: For testing, For add() and remove(),
+    // should we optionally pass timeZone?: IanaTimeZone? 
     add(input: {kanji: Kanji, word: string }): Promise<Result<ReviewPileItemView>>
     remove(kanji: Kanji): Promise<Result<void>>
 
     // null = kanji not in pile
     watch(kanji: Kanji): QueryStore<ReviewPileItemView | null>
-    // TODO: need to confirm: No need to paginate since only 3,000 pile items at most?
+    // TODO: Verify: Is there really no need to paginate since only 3,000 pile items at most?
     // Important: Make sure we Memoize component so a specific update only re-renders the relevant components, not the whole grid
     watchAll(): QueryStore<ReviewPileItemView[]>
   }
@@ -320,7 +310,8 @@ interface ReviewsApi {
   watchDueCount(cardType: CardType): QueryStore<number>
 
   // Used to build a review session. limit: number of cards,
-  //  should we optionally asOf?: Testing/tooling escape hatch only probably not needed
+  // TODO: Discuss: For testing, For getDue() 
+  // hould we optionally asOf?: 
   getDue(
       input: {cardType: CardType, limit: number }
   ): Promise<Result<DueCard[]>>
@@ -339,28 +330,11 @@ interface ReviewsApi {
 
 ## FAQ
 
-### What is `schedulerVersion` for?
-
-Backend and frontend must agree which schedule algorithm to use. Backend is authoritative so if backend's version is equal or greater, backend can process it. But if frontend's version is greater, then backend will reject events, and frontend will try again later. If frontend is outdated, we can prompt the user to "hard refresh", storing "lastPromptedToHardRefresh" in localstorage so that we won't annoyingly always prompt the user to hear refresh.
-
-### What is `settingsVersions` for?
-
-TODO
-If the schema of the scheduler's settings has changed, then we must handle backend and frontend mismatch.
-
-### For testing, do we need to optionally have a (1) `asOf` input parameter for `getDue()` (2) `timezone` for `pile.add()` and `pile.remove()`?
-
-Todo
-
-### `pile.watchAll()` is not paginated. Will this potential cause issues for less than 3000 items?
-
-Todo
-
 ### Why CardId instead of `{ kanji, cardType }` as key
 
 Just for keeping identity separate from attributes on principle. `kanji` and `card_type` are attributes of a card; using them as the primary key means your identity is made of business data.
 
-### Why do we use CardId for some inputs and outputs of exposed functions instead of just passing Kanji + CardType instead?
+### Why do we use `CardId` for some inputs and outputs of exposed functions instead of just passing `Kanji + CardType` instead?
 
 kanji/cardType appear on the views because screens show them, never as the key on the identity operations. That keeps identity (opaque, stable) cleanly separated from display (readable, attribute-y), which is the exact discipline that made keeping CardId worthwhile in the first place — so don't undercut it by tuple-keying beginReview
 
@@ -382,17 +356,36 @@ The two-tab case, concretely:
 
 So the double-grade safety comes from the revision check at grade time, **not** from locking the card at begin. I'd deliberately avoid locking: locks need expiry, unlock-on-cancel, and still leak on a crash — the revision guard is simpler and crash-safe, since an abandoned handle just expires with no side effects. `review_handle_consumed` is really just a double-submit programming guard, and `review_handle_expired` is the timeout.
 
-### Do we keep "settings.watch current" or make it just a snapshot ?
+### Do we keep "settings.watchCurrent" or make it just a snapshot ?
 
-settings.watchCurrent — keep watch, don't bind the form to it. QueryStore is your uniform primitive; making settings the one get() special-case just forces the host to branch. Keep watchCurrent() so surfaces that depend on settings stay fresh, but the edit form uses a local draft and treats update()'s returned Result<ReviewSettings> as the source of truth after save.
+Keep, but don't bind the form to it. QueryStore is the uniform primitive; making settings the one get() special-case just forces the host to branch. Keep `watchCurrent()` so surfaces that depend on settings stay fresh, but the edit form uses a local draft and treats `update()`'s returned `Result<ReviewSettings>` as the source of truth after save.
 
 ### Should we keep a "generationId" to track and "help the user understand why their progress reset." ?
 
-No, you already have the data for the good version of this feature, in event_log. Every add, remove, and re-add can be an event with a timestamp. If a user asks "why did my progress reset," the honest, complete answer is reconstructable from the event feed: "you removed this card on Feb 10 and re-added it on Mar 3, which reset it." That's strictly better than a counter — it has the dates, the sequence, the whole story.
+No, you already have the data for the good version of this feature, in `event_log`. Every add, remove, and re-add can be an event with a timestamp. If a user asks "why did my progress reset," the honest, complete answer is reconstructable from the event feed: "you removed this card on Feb 10 and re-added it on Mar 3, which reset it." That's strictly better than a counter — it has the dates, the sequence, the whole story.
+
+### For testing, do we need to optionally have a (1) `asOf` input parameter for `getDue()` (2) `timezone` for `pile.add()` and `pile.remove()`?
+
+TODO
+
+### `pile.watchAll()` is not paginated. Will this potential cause issues for less than 3000 items?
+
+TODO
 
 ### How does the stored card state in postgres table or index db interact with ts-fsrs and py-fsrs ?
-
+TODO
 ### How will we handle merge conflicts for cards given multidevice sync?
+TODO
+	
+
+### What is `schedulerVersion` for?
+
+Backend and frontend must agree which SRS scheduler algorithm to use. Backend is authoritative so if backend's version is equal or greater, backend can process it. But if frontend's version is greater, then backend will reject events, and frontend will try again later. If frontend is outdated, we can prompt the user to "hard refresh", storing "lastPromptedToHardRefresh" in localstorage so that we won't annoyingly always prompt the user to hear refresh.
+
+### What is `settingsVersions` for?
+
+If the schema of the scheduler's settings has changed, then we must handle backend and frontend mismatch. (For example: Number of weights have changed from 21 to 24)
+
 
 # Activities
 
