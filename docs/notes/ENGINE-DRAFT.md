@@ -18,14 +18,24 @@
 9. Open Questions
 
 ## Invariants
+## Design Principles & Constraints
 
-- Use DexieJS, TS-FSRS, INDEXDB, no other dependencies
-- Support offline first, multidevice syncing
-- engine design must be framework agnostic
-- Backend Canonical Data is Authoritative, Index DB stores, and assumes an optimistic provisional updates which will be overwritten when backend returns canonical data
-- you need to login to view your data. You need a "premium entitlement lease" or "premium subscription" in order to add, save, and update new data, without premium, your data will be read-only.
-- At most two accounts can be be cached in indexdb at a time (for two siblings sharing computers). Logging out doesn't automatically delete there data in the local unless they explicitly say "Logout and Delete all Locally Cached Study Data". Although the data will be deleted locally if they do not log-in within 14 days or so.
-- Only a fixed number of kanji is available. Less than 3000 kanjis.
+- **Keep dependencies minimal.** Use **DexieJS** for IndexedDB and **TS-FSRS** for spaced repetition. Avoid introducing additional dependencies unless they provide substantial, well-justified value.
+
+- **Offline-first with multi-device synchronization.** The system should work seamlessly while offline and synchronize changes across devices when connectivity is restored.
+
+- **Framework-agnostic architecture.** The core engine must remain independent of any frontend framework so it can be reused across different platforms and UI technologies.
+
+- **Backend is the source of truth.** The backend maintains the canonical state of all study data. IndexedDB stores a local optimistic copy to enable instant interactions while offline. Any provisional local state should be reconciled and, if necessary, overwritten by the canonical backend data during synchronization.
+
+- **Authentication is required.** Users must be signed in to access their study data.
+
+- **Premium controls write access.** Users without an active premium entitlement (or subscription) may view their study data, but all study data remains read-only. Creating, updating, or deleting study data requires an active premium entitlement.
+
+- **Support multiple cached accounts.** IndexedDB may cache study data for up to **two user accounts** on the same device (for example, siblings sharing a computer). Signing out does **not** automatically remove locally cached study data. Instead, users must explicitly choose **"Log Out and Delete All Locally Cached Study Data"**, with a confirmation prompt, since deleting the cache requires a full resynchronization the next time they sign in. As a safeguard, cached study data should be automatically removed if the corresponding account has not signed in for approximately **14 days**.
+
+- **Finite content set.** The application manages a fixed corpus of fewer than **3,000 kanji**. The set is predefined and does not support arbitrary user-created kanji entries.
+
 
 # Building Blocks
 
@@ -82,7 +92,6 @@ type EngineAPI {
   //  logout(): Promise<Result<void>>
   //  me(): Promise<Result<UserInfo>>
   // }
-
   // sync: { now(manualSyncReason?: string): Promise<Result<SyncOutcome>> }
   // storage: { deleteCache(): Promise<Result<void>> } ;
 }
