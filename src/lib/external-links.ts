@@ -4,11 +4,6 @@ export const kanshudoFn = (kanji: string) =>
 
 export const jitenMoeFn = (kanji: string) => `https://jiten.moe/kanji/${kanji}`;
 export const externalLinks: { name: string; url: (x: string) => string }[] = [
-  {
-    name: "Kagi Translate",
-    url: (kanji: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
-  },
   { name: "⭐️ JPDB.io", url: jpdbFn },
   {
     name: "⭐️ Jiten.Moe",
@@ -98,6 +93,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "Uchiwakekanji Explosion",
     url: (kanji: string) => `https://uchiwakekanji.github.io/jp/?k=${kanji}`,
+  },
+  {
+    name: "Hanabira",
+    url: (kanji: string) => `https://hanabira.org/kanji/${kanji}`,
   },
   {
     name: "Romaji Desu",
@@ -241,11 +240,6 @@ export const vocabExternalLinksCore = [
     name: "Jiten.Moe",
 
     url: (word: string) => `https://jiten.moe/parse?text=${word}&parsed=true`,
-  },
-  {
-    name: "Kagi Translate",
-    url: (word: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
   },
 ];
 
