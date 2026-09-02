@@ -1,6 +1,7 @@
 import { useJsonFetch } from "@/hooks/use-json";
 import { SAMPLE_VOCAB_PATH } from "@/lib/assets-paths";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
+import { sampleVocabSourceLinks } from "@/lib/external-links";
 import { CommonWordEntry } from "@/lib/sample-vocabulary";
 import { PaginatedVocabulary } from "./PaginatedVocabulary";
 import { TableSkeleton } from "./TableSkeleton";
@@ -28,14 +29,7 @@ export const SampleVocabulary = ({ kanji }: { kanji: string }) => {
           next: { key: "d", shiftKey: true, label: "Shift + D" },
         }}
       />
-      <PrimaryDataSources
-        links={[
-          {
-            text: "JP Word Ranks Lookup",
-            url: "https://pikapikagems.github.io/japanese-word-ranks/about/",
-          },
-        ]}
-      />
+      <PrimaryDataSources links={sampleVocabSourceLinks} />
     </div>
   );
 };

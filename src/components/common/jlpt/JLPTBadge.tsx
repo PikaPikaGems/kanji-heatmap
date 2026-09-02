@@ -1,6 +1,7 @@
 import { JLPTListItems, JLTPTtypes } from "@/lib/jlpt";
 import { GenericPopover } from "../GenericPopover";
 import { ExternalTextLink } from "../ExternalTextLink";
+import { otherOutLinks } from "@/lib/external-links";
 
 export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
   return (
@@ -18,7 +19,10 @@ export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
           content={
             <div className="w-64 px-4 py-3 text-xs">
               The <strong>Japanese‑Language Proficiency Test</strong>
-              <ExternalTextLink href="https://jlpt.jp" text="(jlpt.jp)" />{" "}
+              <ExternalTextLink
+                href={otherOutLinks.jlpt}
+                text="(jlpt.jp)"
+              />{" "}
               certifies non‑native speakers’ Japanese skills across five levels.{" "}
               <em>(N5 easiest → N1 hardest)</em>
             </div>

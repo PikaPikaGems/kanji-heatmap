@@ -8,6 +8,7 @@ import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar
 import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
+import { otherOutLinks } from "@/lib/external-links";
 import { Rocket } from "lucide-react";
 
 export const StrokeAnimation = ({ kanji }: { kanji: string }) => (
@@ -60,9 +61,6 @@ const HintSection = ({ kanji }: { kanji: string }) => {
 };
 
 type GradeStatus = "idle" | "loading" | "success" | "error";
-
-const DAKANJI_CREDIT_HREF =
-  "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition";
 
 const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -142,7 +140,7 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
       <p className="max-w-[310px] text-center text-[11px] leading-relaxed opacity-70">
         Grading powered by DaKanji ·{" "}
         <a
-          href={DAKANJI_CREDIT_HREF}
+          href={otherOutLinks.dakanji}
           target="_blank"
           rel="noopener noreferrer"
           className="font-bold underline underline-offset-2 hover:opacity-80"
