@@ -10,7 +10,7 @@ export const practiceButtonVariants = cva(
     "border-2 border-b-[5px]",
     "transition-[transform,border-width,filter] duration-75 ease-out",
     "active:translate-y-[3px] active:border-b-2",
-    "disabled:pointer-events-none disabled:opacity-20",
+    "disabled:pointer-events-none",
     "disabled:active:translate-y-0 disabled:active:border-b-[5px] disabled:cursor-not-allowed",
     "outline-none [-webkit-tap-highlight-color:transparent]",
     "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -19,14 +19,15 @@ export const practiceButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          "background-theme-color-with-opacity-100 text-white border-theme-color-darker hover:brightness-105",
+          "background-theme-color-with-opacity-100 text-white border-theme-color-darker hover:brightness-105 disabled:opacity-50",
         inverted:
-          "bg-foreground text-background border-neutral-800 dark:border-neutral-400 hover:brightness-105",
-        danger: "bg-rose-500 text-white border-rose-800 hover:brightness-105",
+          "bg-foreground text-background border-neutral-800 dark:border-neutral-400 hover:brightness-105 disabled:opacity-20",
+        danger:
+          "bg-rose-500 text-white border-rose-800 hover:brightness-105 disabled:opacity-20",
         secondary:
-          "bg-background text-foreground border-foreground/30 hover:bg-accent",
+          "bg-background text-foreground border-foreground/30 hover:bg-accent disabled:opacity-20",
         ghost:
-          "bg-transparent text-muted-foreground border-transparent border-b-transparent shadow-none active:translate-y-0 hover:text-foreground",
+          "bg-transparent text-muted-foreground border-transparent border-b-transparent shadow-none active:translate-y-0 hover:text-foreground disabled:opacity-20",
       },
       size: {
         default: "h-12 px-6 text-base",

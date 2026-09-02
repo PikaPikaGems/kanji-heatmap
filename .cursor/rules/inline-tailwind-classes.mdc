@@ -1,0 +1,26 @@
+---
+description: Colocate Tailwind className strings; do not extract _CN unless reused
+alwaysApply: true
+---
+
+# Inline Tailwind classes
+
+Do **not** extract Tailwind `className` strings into `_CN` (or similar) constants unless the **same** string is reused in multiple places.
+
+Colocate classes on the JSX / `className` (or the one function that returns them).
+
+```tsx
+// ❌ BAD — used only once
+const SHEET_CLOSE_BTN_CN = "p-4 border-2 border-dashed rounded-xl bg-background";
+<Button className={`${SHEET_CLOSE_BTN_CN} z-1000!`} />
+
+// ✅ GOOD — inline
+<Button className="p-4 border-2 border-dashed rounded-xl bg-background z-1000!" />
+
+// ✅ OK — shared across call sites, or the same token twice (classList add/remove)
+const SETTLE_CN = "animate-scroll-lock-settle";
+el.classList.remove(SETTLE_CN);
+el.classList.add(SETTLE_CN);
+```
+
+Reuse includes two uses in the same file. Do not duplicate the string just to “colocate.”

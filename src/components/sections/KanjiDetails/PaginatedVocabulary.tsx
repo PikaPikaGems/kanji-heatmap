@@ -1,11 +1,5 @@
 import { useMemo } from "react";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody } from "@/components/ui/table";
 import { Keyboard } from "@/components/icons";
 import { CommonWordEntry, sortWordData } from "@/lib/sample-vocabulary";
 import { Pagination } from "./Pagination";
@@ -14,6 +8,7 @@ import {
   useKeyboardPagination,
   PaginationShortcuts,
 } from "./pagination-hooks";
+import { VocabularyTableHeader } from "./VocabularyTableHeader";
 import { WordRow } from "./WordRow";
 
 const ShortcutKey = ({ label }: { label: string }) => (
@@ -81,19 +76,7 @@ export const PaginatedVocabulary = ({
       </p>
       {pagination}
       <Table className="w-full min-w-[400px] mt-4 animate-fade-in">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-left w-fit">Speak</TableHead>
-            <TableHead className="text-center w-fit">Word</TableHead>
-            <TableHead className="text-center w-fit">Reading</TableHead>
-            <TableHead className="text-center min-w-16 max-w-24">
-              Translation
-            </TableHead>
-            <TableHead className="text-center w-fit">Tags</TableHead>
-            <TableHead className="w-24 text-left">Jisho.org</TableHead>
-            <TableHead className="w-24 text-left">Jotoba.de</TableHead>
-          </TableRow>
-        </TableHeader>
+        <VocabularyTableHeader />
         <TableBody>
           {pageData.map((entry) => (
             <WordRow key={entry.w} entry={entry} />

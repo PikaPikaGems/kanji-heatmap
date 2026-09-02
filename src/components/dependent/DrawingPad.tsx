@@ -26,6 +26,7 @@ export const DrawingPad = ({
   showForgotBtn = false,
   onClickForgot,
   forgotDisabled = false,
+  overlay,
 }: {
   svgSize: number;
   // Optional controlled strokes. When provided, the parent owns the strokes
@@ -43,6 +44,8 @@ export const DrawingPad = ({
   showForgotBtn?: boolean;
   onClickForgot?: () => void;
   forgotDisabled?: boolean;
+  /** Rendered over the pad square (e.g. a short-viewport grade banner). */
+  overlay?: ReactNode;
 }) => {
   const [internalStrokes, setInternalStrokes] = useState<Stroke[]>([]);
   const strokes = controlledStrokes ?? internalStrokes;
@@ -126,6 +129,7 @@ export const DrawingPad = ({
     <div className="flex flex-col items-center gap-2 mx-auto my-2 sm:m-4">
       <div
         ref={wrapperRef}
+        className="relative"
         style={{ touchAction: "none", lineHeight: 0 }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -198,6 +202,7 @@ export const DrawingPad = ({
               ) : null;
             })()}
         </svg>
+        {overlay}
       </div>
       <div className="flex justify-center mt-2 space-x-2">
         {showForgotBtn && (

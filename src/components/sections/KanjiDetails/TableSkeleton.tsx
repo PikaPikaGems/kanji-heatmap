@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { VocabularyTableHeader } from "./VocabularyTableHeader";
 
 /** Placeholder table shown while a vocabulary JSON is loading. */
 export const TableSkeleton = () => {
@@ -25,19 +19,7 @@ export const TableSkeleton = () => {
   return (
     <div className="px-2 mx-2 overflow-x-auto mt-14 animate pulse">
       <Table className="w-full min-w-[400px]">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-left w-fit">Speak</TableHead>
-            <TableHead className="text-center w-fit">Word</TableHead>
-            <TableHead className="text-center w-fit">Reading</TableHead>
-            <TableHead className="w-12 text-center">Translation</TableHead>
-            <TableHead className="text-center w-fit min-w-16 max-w-24">
-              Tags
-            </TableHead>
-            <TableHead className="w-24 text-left">Jisho.org</TableHead>
-            <TableHead className="w-24 text-left">Jotoba.de</TableHead>
-          </TableRow>
-        </TableHeader>
+        <VocabularyTableHeader />
         <TableBody>
           {Array.from({ length: 10 }).map((_, i) => (
             <TableRow key={i}>

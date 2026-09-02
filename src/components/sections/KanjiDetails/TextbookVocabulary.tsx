@@ -1,6 +1,7 @@
 import { useJsonFetch } from "@/hooks/use-json";
 import { TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
+import { textbookVocabSourceLinks } from "@/lib/external-links";
 import {
   TextbookWordEntry,
   toCommonWordEntries,
@@ -39,30 +40,7 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
           next: { key: "d", label: "d" },
         }}
       />
-      <PrimaryDataSources
-        links={[
-          {
-            text: "Anki Deck: 1564742924",
-            url: "https://ankiweb.net/shared/info/1564742924",
-          },
-          {
-            text: "Anki Deck: 779483253",
-            url: "https://ankiweb.net/shared/info/779483253",
-          },
-          {
-            text: "Anki Deck: 2106223612",
-            url: "https://ankiweb.net/shared/info/2106223612",
-          },
-          {
-            text: "Anki Deck: 1468618470",
-            url: "https://ankiweb.net/shared/info/1468618470",
-          },
-          {
-            text: "Kanji Mastery Blog",
-            url: "https://kanjimastery.blogspot.com/",
-          },
-        ]}
-      />
+      <PrimaryDataSources links={textbookVocabSourceLinks} />
     </div>
   );
 };

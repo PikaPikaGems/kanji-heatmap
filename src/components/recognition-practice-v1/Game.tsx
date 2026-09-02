@@ -172,7 +172,7 @@ export const Game = ({
               spellCheck={false}
               aria-label='Type the reading or type "forgot"'
               placeholder='Type the reading or type "forgot"'
-              className="relative w-full p-0 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
+              className="relative w-full p-0 px-2 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
               {...kanaInput}
             />

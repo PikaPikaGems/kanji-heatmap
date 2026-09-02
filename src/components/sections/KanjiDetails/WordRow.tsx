@@ -119,12 +119,12 @@ export const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
         </TableCell>
         <TableCell className="w-12">
           <BugIconErrorBoundary>
-            <JishoBtn word={entry.w} />
+            <JotobaBtn word={entry.w} />
           </BugIconErrorBoundary>
         </TableCell>
         <TableCell className="w-12">
           <BugIconErrorBoundary>
-            <JotobaBtn word={entry.w} />
+            <JishoBtn word={entry.w} />
           </BugIconErrorBoundary>
         </TableCell>
       </TableRow>

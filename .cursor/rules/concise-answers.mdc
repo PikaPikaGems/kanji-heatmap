@@ -1,0 +1,12 @@
+---
+description: Keep chat answers concise
+alwaysApply: true
+---
+
+# Concise answers
+
+Prefer short replies. Lead with the answer, then only the details that change a decision.
+
+- Skip recap of the question, long preambles, and exhaustive tables unless asked
+- Do not restate code or file lists the user already has
+- Use bullets over paragraphs; stop when the next sentence would be filler

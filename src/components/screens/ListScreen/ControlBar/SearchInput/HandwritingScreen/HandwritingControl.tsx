@@ -9,6 +9,7 @@ import {
   recognizeWithGoogle,
   recognizeWithKanjiCanvas,
 } from "./recognizers";
+import { otherOutLinks } from "@/lib/external-links";
 
 // "google" = online API; "kanjicanvas" / "dakanji" = on-device.
 export type HandwritingVariant = "google" | "kanjicanvas" | "dakanji";
@@ -34,7 +35,7 @@ const VARIANT_CONFIG = {
     errorText: "Google's handwriting API can't be accessed right now.",
     idleContent: (
       <IdleCredit
-        href="https://www.google.com/inputtools/services/features/handwriting.html"
+        href={otherOutLinks.googleHandwriting}
         label="Google Handwriting API"
       />
     ),
@@ -43,10 +44,7 @@ const VARIANT_CONFIG = {
     recognize: recognizeWithDaKanji,
     errorText: "The DaKanji recognizer couldn't be loaded right now.",
     idleContent: (
-      <IdleCredit
-        href="https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition"
-        label="Dariyooo (DaAppLab)"
-      />
+      <IdleCredit href={otherOutLinks.dakanji} label="Dariyooo (DaAppLab)" />
     ),
   },
   kanjicanvas: {
@@ -54,7 +52,7 @@ const VARIANT_CONFIG = {
     errorText: "The handwriting recognizer couldn't be loaded right now.",
     idleContent: (
       <IdleCredit
-        href="https://github.com/asdfjkl/kanjicanvas"
+        href={otherOutLinks.kanjiCanvas}
         label="KanjiCanvas (asdfjkl)"
       />
     ),

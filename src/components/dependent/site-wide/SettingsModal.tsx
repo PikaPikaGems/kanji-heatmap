@@ -1,12 +1,6 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
@@ -17,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Download, Loader2 } from "@/components/icons";
+import { Trash2, Download, Loader2, CircleX } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
@@ -37,6 +31,7 @@ import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
+import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -58,7 +53,7 @@ const FONT_NAMES = [
 ];
 
 const sectionHeadingCn =
-  "mb-3  border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
+  "mb-3 mt-6 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
 
 type PreloadProgress = { done: number; total: number } | null;
 type CancelFn = () => void;
@@ -66,14 +61,12 @@ type CancelFn = () => void;
 const DataDownloadRow = ({
   label,
   sizeHint,
-  enabledKey,
   completeKey,
   startPreload,
   clearCache,
 }: {
   label: string;
   sizeHint: string;
-  enabledKey: string;
   completeKey: string;
   startPreload: (onProgress: (done: number, total: number) => void) => {
     promise: Promise<void>;
@@ -81,42 +74,43 @@ const DataDownloadRow = ({
   };
   clearCache: () => Promise<void>;
 }) => {
-  const [enabled, setEnabled] = useLocalStorageFlag(enabledKey);
   const [complete, setComplete] = useLocalStorageFlag(completeKey);
   const [progress, setProgress] = useState<PreloadProgress>(null);
   const [cancelFn, setCancelFn] = useState<CancelFn | null>(null);
 
   const isRunning = progress !== null && !complete;
 
-  const handleToggle = (next: boolean) => {
-    setEnabled(next);
-
-    if (!next) {
-      cancelFn?.();
-      setCancelFn(null);
-      setProgress(null);
-      return;
-    }
-
-    if (complete) return;
+  const handleDownload = () => {
+    if (complete || isRunning) return;
 
     setProgress({ done: 0, total: 0 });
     const { promise, cancel } = startPreload((done, total) =>
       setProgress({ done, total })
     );
-    setCancelFn(() => cancel);
+
+    let cancelled = false;
+    setCancelFn(() => () => {
+      cancelled = true;
+      cancel();
+    });
     promise.then(() => {
+      if (cancelled) return;
       setComplete(true);
       setProgress(null);
       setCancelFn(null);
     });
   };
 
+  const handleCancel = () => {
+    cancelFn?.();
+    setCancelFn(null);
+    setProgress(null);
+  };
+
   const handleClear = async () => {
     cancelFn?.();
     setCancelFn(null);
     setProgress(null);
-    setEnabled(false);
     setComplete(false);
     await clearCache();
   };
@@ -134,20 +128,39 @@ const DataDownloadRow = ({
           <span className="text-xs text-muted-foreground">{sizeHint}</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2"
-            onClick={handleClear}
-            aria-label={`Clear ${label} cache`}
-          >
-            <Trash2 className="size-4" />
-          </Button>
-          <Switch
-            checked={enabled}
-            onCheckedChange={handleToggle}
-            aria-label={`Toggle ${label}`}
-          />
+          {complete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={handleClear}
+              aria-label={`Clear ${label} cache`}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
+          {!complete &&
+            (isRunning ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={handleCancel}
+                aria-label={`Cancel ${label}`}
+              >
+                <CircleX className="size-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={handleDownload}
+                aria-label={label}
+              >
+                <Download className="size-4" />
+              </Button>
+            ))}
         </div>
       </div>
 
@@ -299,20 +312,17 @@ export const SettingsModal = () => {
           <Settings className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-left">User Preferences</DialogTitle>
-          <DialogDescription className="sr-only">
-            Offline data caching and presentation preferences
-          </DialogDescription>
-        </DialogHeader>
-
+      <ScrollableDialogContent
+        size="md"
+        title="User Preferences"
+        description="Offline data caching, stroke animation, and presentation preferences"
+        titleClassName="text-left"
+      >
         <section>
           <h3 className={sectionHeadingCn}>Data</h3>
           <DataDownloadRow
             label="Download Kanji SVGs"
             sizeHint="~16 MB · stroke order for ~2000 kanji"
-            enabledKey="svg-preload-enabled"
             completeKey="svg-preload-complete"
             startPreload={preloadKanjiSvgs}
             clearCache={clearKanjiSvgCache}
@@ -320,14 +330,13 @@ export const SettingsModal = () => {
           <DataDownloadRow
             label="Download Katakana Challenges"
             sizeHint="~1 MB · 10,000 speed katakana words"
-            enabledKey="katakana-preload-enabled"
             completeKey="katakana-preload-complete"
             startPreload={preloadKatakanaChallenges}
             clearCache={clearKatakanaCache}
           />
         </section>
 
-        <section>
+        <section className="mt-6">
           <h3 className={sectionHeadingCn}>Presentation</h3>
 
           <div className="mb-4 text-left">
@@ -353,8 +362,16 @@ export const SettingsModal = () => {
           </div>
 
           <LightDarkRow />
+
+          <section className="mt-6">
+            <h3 className={sectionHeadingCn}>Stroke order</h3>
+            <p className="mb-3 text-xs text-left text-muted-foreground">
+              Used for kanji details, writing practice, and production practice.
+            </p>
+            <StrokeAnimationSettingsFields />
+          </section>
         </section>
-      </DialogContent>
+      </ScrollableDialogContent>
     </Dialog>
   );
 };

@@ -1,4 +1,5 @@
 import { Search } from "@/components/icons";
+import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { cn } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
 
@@ -6,7 +7,7 @@ export const SearchInputErrorFallback = () => (
   <section className="relative flex-1 min-w-0">
     <button
       type="button"
-      onClick={() => window.location.reload()}
+      onClick={() => void forceHardRefresh()}
       aria-label="Search failed to load. Refresh page."
       className={cn(
         "flex w-full items-center rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm",

@@ -8,6 +8,10 @@ import {
 } from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
+import {
+  similarKanjiSourceLinks,
+  structureSourceLinks,
+} from "@/lib/external-links";
 import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
 import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
 import { dedupe } from "@/lib/utils";
@@ -57,18 +61,7 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
           ))}
         </div>
       </div>
-      <PrimaryDataSources
-        links={[
-          {
-            text: "lennart-finke/kanjidist-visualiser",
-            url: "https://github.com/lennart-finke/kanjidist-visualiser/blob/master/data/dkanjistat.json",
-          },
-          {
-            text: "Yencken, Lars (2010) Orthographic support for passing the reading hurdle in Japanese. PhD Thesis, University of Melbourne, Melbourne, Australia",
-            url: "https://lars.yencken.org/datasets/kanji-confusion/",
-          },
-        ]}
-      />
+      <PrimaryDataSources links={similarKanjiSourceLinks} />
     </>
   );
 };
@@ -118,30 +111,7 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
         </TableBody>
       </Table>
 
-      <PrimaryDataSources
-        links={[
-          {
-            text: "mifunetoshiro/kanjium",
-            url: "https://github.com/mifunetoshiro/kanjium/blob/master/data/source_files/kanjidict.txt",
-          },
-          {
-            text: "hlorenzi/jisho-open",
-            url: "https://raw.githubusercontent.com/hlorenzi/jisho-open/main/backend/src/data/kanji_structural_category.ts",
-          },
-          {
-            text: "yagays/kanjivg-radical",
-            url: "https://github.com/yagays/kanjivg-radical/blob/master/data/kanji2radical.json",
-          },
-          {
-            text: "ScottOglesby/kanji-bakuhatsu",
-            url: "https://github.com/ScottOglesby/kanji-bakuhatsu/blob/master/raw/kanji-composition-map.txt",
-          },
-          {
-            text: "scriptin/topokanji",
-            url: "https://github.com/scriptin/topokanji",
-          },
-        ]}
-      />
+      <PrimaryDataSources links={structureSourceLinks} />
 
       <SimilarKanjis kanji={kanji} />
     </>

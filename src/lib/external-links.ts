@@ -4,11 +4,6 @@ export const kanshudoFn = (kanji: string) =>
 
 export const jitenMoeFn = (kanji: string) => `https://jiten.moe/kanji/${kanji}`;
 export const externalLinks: { name: string; url: (x: string) => string }[] = [
-  {
-    name: "Kagi Translate",
-    url: (kanji: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${kanji}`,
-  },
   { name: "⭐️ JPDB.io", url: jpdbFn },
   {
     name: "⭐️ Jiten.Moe",
@@ -98,6 +93,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "Uchiwakekanji Explosion",
     url: (kanji: string) => `https://uchiwakekanji.github.io/jp/?k=${kanji}`,
+  },
+  {
+    name: "Hanabira",
+    url: (kanji: string) => `https://hanabira.org/kanji/${kanji}`,
   },
   {
     name: "Romaji Desu",
@@ -196,6 +195,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
 // https: //www.verbix.com/webverbix/japanese/miru
 
 export const outLinks = {
+  site: "https://kanjiheatmap.com",
   githubIssue: "https://github.com/PikaPikaGems/kanji-heatmap/issues/241",
   githubContentIssue:
     "https://github.com/PikaPikaGems/kanji-heatmap-data/issues/27",
@@ -212,7 +212,94 @@ export const otherOutLinks = {
   webSpeechApi:
     "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
   jmdictFurigana: "https://github.com/Doublevil/JmdictFurigana",
+  dakanji: "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition",
+  googleHandwriting:
+    "https://www.google.com/inputtools/services/features/handwriting.html",
+  kanjiCanvas: "https://github.com/asdfjkl/kanjicanvas",
+  jlpt: "https://jlpt.jp",
+  jpWordRanksAbout: "https://pikapikagems.github.io/japanese-word-ranks/about/",
+  kanjidistVisualiser:
+    "https://github.com/lennart-finke/kanjidist-visualiser/blob/master/data/dkanjistat.json",
+  yenckenKanjiConfusion: "https://lars.yencken.org/datasets/kanji-confusion/",
+  kanjium:
+    "https://github.com/mifunetoshiro/kanjium/blob/master/data/source_files/kanjidict.txt",
+  lorenziJishoOpen:
+    "https://raw.githubusercontent.com/hlorenzi/jisho-open/main/backend/src/data/kanji_structural_category.ts",
+  yagaysKanjiVgRadical:
+    "https://github.com/yagays/kanjivg-radical/blob/master/data/kanji2radical.json",
+  scottKanjiBakuhatsu:
+    "https://github.com/ScottOglesby/kanji-bakuhatsu/blob/master/raw/kanji-composition-map.txt",
+  topoKanji: "https://github.com/scriptin/topokanji",
+  ankiDeck1564742924: "https://ankiweb.net/shared/info/1564742924",
+  ankiDeck779483253: "https://ankiweb.net/shared/info/779483253",
+  ankiDeck2106223612: "https://ankiweb.net/shared/info/2106223612",
+  ankiDeck1468618470: "https://ankiweb.net/shared/info/1468618470",
+  kanjiMasteryBlog: "https://kanjimastery.blogspot.com/",
 };
+
+export const similarKanjiSourceLinks = [
+  {
+    text: "lennart-finke/kanjidist-visualiser",
+    url: otherOutLinks.kanjidistVisualiser,
+  },
+  {
+    text: "Yencken, Lars (2010) Orthographic support for passing the reading hurdle in Japanese. PhD Thesis, University of Melbourne, Melbourne, Australia",
+    url: otherOutLinks.yenckenKanjiConfusion,
+  },
+];
+
+export const structureSourceLinks = [
+  {
+    text: "mifunetoshiro/kanjium",
+    url: otherOutLinks.kanjium,
+  },
+  {
+    text: "hlorenzi/jisho-open",
+    url: otherOutLinks.lorenziJishoOpen,
+  },
+  {
+    text: "yagays/kanjivg-radical",
+    url: otherOutLinks.yagaysKanjiVgRadical,
+  },
+  {
+    text: "ScottOglesby/kanji-bakuhatsu",
+    url: otherOutLinks.scottKanjiBakuhatsu,
+  },
+  {
+    text: "scriptin/topokanji",
+    url: otherOutLinks.topoKanji,
+  },
+];
+
+export const textbookVocabSourceLinks = [
+  {
+    text: "Anki Deck: 1564742924",
+    url: otherOutLinks.ankiDeck1564742924,
+  },
+  {
+    text: "Anki Deck: 779483253",
+    url: otherOutLinks.ankiDeck779483253,
+  },
+  {
+    text: "Anki Deck: 2106223612",
+    url: otherOutLinks.ankiDeck2106223612,
+  },
+  {
+    text: "Anki Deck: 1468618470",
+    url: otherOutLinks.ankiDeck1468618470,
+  },
+  {
+    text: "Kanji Mastery Blog",
+    url: otherOutLinks.kanjiMasteryBlog,
+  },
+];
+
+export const sampleVocabSourceLinks = [
+  {
+    text: "JP Word Ranks Lookup",
+    url: otherOutLinks.jpWordRanksAbout,
+  },
+];
 
 export const vocabExternalLinksCore = [
   {
@@ -241,11 +328,6 @@ export const vocabExternalLinksCore = [
     name: "Jiten.Moe",
 
     url: (word: string) => `https://jiten.moe/parse?text=${word}&parsed=true`,
-  },
-  {
-    name: "Kagi Translate",
-    url: (word: string) =>
-      `https://translate.kagi.com/?from=ja&to=en&text=${word}`,
   },
 ];
 

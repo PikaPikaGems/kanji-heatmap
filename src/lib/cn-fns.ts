@@ -47,9 +47,6 @@ const ALT_BORDER_CN = [
   "border-theme-color-with-opacity-75",
 ] as const;
 
-const ALT_BIG_TILE_CN = "!border-8 !rounded-xl motion-reduce:transition-none";
-const ALT_SMALL_TILE_CN = "!border-4 !rounded-lg motion-reduce:transition-none";
-
 const cnGradientAlt = () => {
   // Skip 0/100 so tiles stay mid-opacity — pulse reads on every tile.
   const bg = freqCategoryCn[selectRandom([1, 2, 3] as const)] ?? 0;
@@ -58,9 +55,9 @@ const cnGradientAlt = () => {
 };
 
 export const randomCnGradientAlt = () => {
-  return `${cnGradientAlt()} ${ALT_BIG_TILE_CN}`;
+  return `${cnGradientAlt()} !border-8 !rounded-xl motion-reduce:transition-none`;
 };
 
 export const randomCn2GradientAlt = () => {
-  return `${cnGradientAlt()} ${ALT_SMALL_TILE_CN}`;
+  return `${cnGradientAlt()} !border-4 !rounded-lg motion-reduce:transition-none`;
 };

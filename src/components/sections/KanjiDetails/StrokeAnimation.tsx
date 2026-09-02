@@ -7,7 +7,12 @@ import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { recognizeWithDaKanji } from "@/components/screens/ListScreen/ControlBar/SearchInput/HandwritingScreen/recognizers";
 import { gradeMessage, type GradeResult } from "@/lib/dakanji-grade";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
-import { CONTAINER_CN, SVG_SIZE } from "./stroke-animation-constants";
+import {
+  CONTAINER_CN,
+  HINT_SVG_SIZE,
+  SVG_SIZE,
+} from "./stroke-animation-constants";
+import { otherOutLinks } from "@/lib/external-links";
 import { Rocket } from "lucide-react";
 
 export const StrokeAnimation = ({ kanji }: { kanji: string }) => (
@@ -16,11 +21,10 @@ export const StrokeAnimation = ({ kanji }: { kanji: string }) => (
       kanji={kanji}
       size={SVG_SIZE}
       replayClassName={CONTAINER_CN}
+      showSettings={true}
     />
   </div>
 );
-
-const HINT_SVG_SIZE = 85;
 
 const HintSection = ({ kanji }: { kanji: string }) => {
   const [blurred, setBlurred] = useState(true);
@@ -61,8 +65,56 @@ const HintSection = ({ kanji }: { kanji: string }) => {
 
 type GradeStatus = "idle" | "loading" | "success" | "error";
 
-const DAKANJI_CREDIT_HREF =
-  "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition";
+const GradeStatusCopy = ({
+  status,
+  kanji,
+  result,
+}: {
+  status: GradeStatus;
+  kanji: string;
+  result: GradeResult | null;
+}) => {
+  if (status === "loading") {
+    return (
+      <div className="animate-fade-in opacity-80">
+        <RecognizingStatus label="採点中 · Grading…" />
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="animate-fade-in">
+        すみません 🥺 🙇. The grader {`couldn't`} be loaded right now.
+      </div>
+    );
+  }
+
+  if (status === "success" && result != null) {
+    return (
+      <div className="animate-practice-bounce-soft">
+        {gradeMessage(kanji, result)}
+      </div>
+    );
+  }
+
+  return <div className="font-bold">Draw the kanji, then tap 🚀 to grade.</div>;
+};
+
+const DaKanjiCredit = () => (
+  <p className="max-w-[310px] text-center text-[11px] leading-relaxed opacity-70">
+    Grading powered by DaKanji ·{" "}
+    <a
+      href={otherOutLinks.dakanji}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-bold underline underline-offset-2 hover:opacity-80"
+    >
+      Dariyooo (DaAppLab)
+    </a>{" "}
+    💪
+  </p>
+);
 
 const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -116,41 +168,24 @@ const WritingPracticeMode = ({ kanji }: { kanji: string }) => {
         submitDisabled={status === "loading"}
         onClickSubmit={onGrade}
         onClickClear={onClear}
+        overlay={
+          status === "idle" ? undefined : (
+            <div className="absolute inset-x-0 top-0 z-10 hidden px-2 pt-2 pointer-events-none [@media(max-height:40rem)]:block">
+              <div className="px-2 py-1.5 text-sm font-bold text-center rounded-2xl bg-background/90">
+                <GradeStatusCopy
+                  status={status}
+                  kanji={kanji}
+                  result={result}
+                />
+              </div>
+            </div>
+          )
+        }
       />
-
-      <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center">
-        {status === "loading" && (
-          <div className="animate-fade-in opacity-80">
-            <RecognizingStatus label="採点中 · Grading…" />
-          </div>
-        )}
-        {status === "error" && (
-          <div className="animate-fade-in">
-            すみません 🙇🏽‍♀️ 🙇. The grader {`couldn't`} be loaded right now.
-          </div>
-        )}
-        {status === "success" && result != null && (
-          <div className="animate-practice-bounce-soft">
-            {gradeMessage(kanji, result)}
-          </div>
-        )}
-        {status === "idle" && (
-          <div className="font-bold">Draw the kanji, then tap 🚀 to grade.</div>
-        )}
+      <div className="w-full max-w-[310px] min-h-10 px-2 text-base font-bold text-center [@media(max-height:40rem)]:hidden">
+        <GradeStatusCopy status={status} kanji={kanji} result={result} />
       </div>
-
-      <p className="max-w-[310px] text-center text-[11px] leading-relaxed opacity-70">
-        Grading powered by DaKanji ·{" "}
-        <a
-          href={DAKANJI_CREDIT_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-bold underline underline-offset-2 hover:opacity-80"
-        >
-          Dariyooo (DaAppLab)
-        </a>{" "}
-        💪
-      </p>
+      <DaKanjiCredit />
     </div>
   );
 };

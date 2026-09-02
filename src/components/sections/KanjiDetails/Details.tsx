@@ -23,7 +23,7 @@ import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 
 const StudyNotesLoadingFallback = () => (
   <div
-    className="flex w-full h-48 items-center justify-center"
+    className="flex items-center justify-center w-full h-48"
     role="status"
     aria-label="Loading"
   >

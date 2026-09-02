@@ -40,7 +40,7 @@ export const ClozeWord = ({
         <span className="mx-0.5">{kanji}</span>
       ) : (
         <span
-          className="inline-flex items-center romaji-font justify-center mx-1 min-w-[1.25em] px-2  border-2 border-dotted rounded-xl border-foreground/70 align-middle"
+          className="inline-flex items-center justify-center mx-1 min-w-[1.25em] pb-4 pt-2 border-2 border-dotted rounded-xl border-foreground/70 align-middle"
           aria-label="missing kanji"
         >
           ?

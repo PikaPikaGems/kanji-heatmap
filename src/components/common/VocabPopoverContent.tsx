@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { SeeMore } from "@/components/common/SeeMore";
@@ -21,6 +21,14 @@ export const VocabPopoverContent = ({
   definition,
   optionalSection,
 }: VocabPopoverContentProps) => {
+  const [showAllLinks, setShowAllLinks] = useState(false);
+  const maxLinks = 6;
+  const canSeeAllLinks = vocabExternalLinks.length <= maxLinks;
+  const visibleLinks =
+    canSeeAllLinks || showAllLinks
+      ? vocabExternalLinks
+      : vocabExternalLinks.slice(0, maxLinks);
+
   return (
     <div className="p-2 w-72">
       {wordKanjis.length > 0 && (
@@ -58,13 +66,23 @@ export const VocabPopoverContent = ({
         🧐 Explore this word further →
       </div>
       <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
-        {vocabExternalLinks.map((item) => (
+        {visibleLinks.map((item) => (
           <ExternalTextLink
             key={item.name}
             href={item.url(word)}
             text={item.name}
           />
         ))}
+        {!canSeeAllLinks && (
+          <button
+            className="mx-2 my-1 font-bold underline"
+            onClick={() => {
+              setShowAllLinks((prev) => !prev);
+            }}
+          >
+            {showAllLinks ? <>See less</> : <>See more</>}
+          </button>
+        )}
       </div>
     </div>
   );

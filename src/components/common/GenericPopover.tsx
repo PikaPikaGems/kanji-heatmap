@@ -13,6 +13,7 @@ export const GenericPopover = ({
   content,
   contentClassName = "w-auto p-0 m-0",
   showArrow = true,
+  modal = false,
   open,
   onOpenChange,
 }: {
@@ -21,12 +22,17 @@ export const GenericPopover = ({
   /** Merged over PopoverContent's base classes (w-72 p-4 …). */
   contentClassName?: string;
   showArrow?: boolean;
+  /**
+   * Needed inside Dialog/Drawer: otherwise the portaled content sits outside
+   * the overlay and cannot be clicked.
+   */
+  modal?: boolean;
   /** Pass both for a controlled popover; omit for uncontrolled. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) => {
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
+    <Popover modal={modal} open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className={contentClassName} collisionPadding={16}>
         {showArrow && <PopoverCardArrow />}

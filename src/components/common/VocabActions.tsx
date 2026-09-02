@@ -30,10 +30,10 @@ export const VocabActions = ({
   return (
     <div className="relative flex flex-wrap items-center justify-center p-2 space-x-1">
       <BugIconErrorBoundary>
-        <JishoBtn word={word} />
+        <JotobaBtn word={word} />
       </BugIconErrorBoundary>
       <BugIconErrorBoundary>
-        <JotobaBtn word={word} />
+        <JishoBtn word={word} />
       </BugIconErrorBoundary>
       <SpeakButton word={word} iconType="volume-2" />
       {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />}

@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { SearchSettings } from "@/lib/settings/settings";
 import { ErrorBoundary } from "@/components/error";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import {
   HoverCard,
   HoverCardContent,
@@ -44,17 +38,15 @@ export const SortAndFilterSettingsDialog = ({
           Sort and Filter Settings
         </HoverCardContent>
       </HoverCard>
-      <DialogContent
-        className={"max-h-svh z-50 flex flex-col min-h-0 px-1 md:px-4 pb-4"}
+      <ScrollableDialogContent
+        title="Sorting and Filtering Settings"
+        description="Manage your Sorting and Filtering Settings"
+        scrollBody={false}
+        className="max-h-svh px-1 pb-4 md:px-4"
+        headerClassName="px-0 pt-0"
+        titleClassName="px-2 text-left"
+        bodyClassName="px-0"
       >
-        <DialogHeader>
-          <DialogTitle className="px-2 m-0 text-left">
-            Sorting and Filtering Settings
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Manage your Sorting and Filtering Settings
-          </DialogDescription>
-        </DialogHeader>
         {isOpen && (
           <ErrorBoundary>
             <SortAndFilterSettingsForm
@@ -66,7 +58,7 @@ export const SortAndFilterSettingsDialog = ({
             />
           </ErrorBoundary>
         )}
-      </DialogContent>
+      </ScrollableDialogContent>
     </Dialog>
   );
 };
