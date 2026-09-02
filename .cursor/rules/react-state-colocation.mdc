@@ -1,0 +1,58 @@
+---
+description: Split components by state use; merge exclusive flags into one status
+alwaysApply: true
+---
+
+# React state: extract & unify
+
+## 1. Split components by which state they need
+
+Do not pile unrelated `useState` into one component. If a subtree does **not** read some of the parent’s state, extract it so that state stays next to the UI that uses it (single responsibility, looser coupling).
+
+- Parent keeps only state its own render/handlers need
+- Child owns state that only it uses
+- Pass data/callbacks down; do not lift state “just in case”
+
+```tsx
+// ❌ BAD — header re-renders / is coupled to form state it never uses
+const Page = () => {
+  const [query, setQuery] = useState("");
+  const [draft, setDraft] = useState("");
+  return (
+    <>
+      <h1>Search</h1>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />
+    </>
+  );
+};
+
+// ✅ GOOD — each segment owns only the state it depends on
+const SearchField = () => {
+  const [query, setQuery] = useState("");
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+};
+
+const NotesDraft = () => {
+  const [draft, setDraft] = useState("");
+  return <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />;
+};
+```
+
+## 2. Mutually exclusive flags → one status
+
+If several booleans cannot be true together (or must stay in sync), they are **one** discriminant, not many `useState`s.
+
+```tsx
+// ❌ BAD — impossible / inconsistent combinations
+const [isLoading, setIsLoading] = useState(true);
+const [isError, setIsError] = useState(false);
+const [isSuccess, setIsSuccess] = useState(false);
+
+// ✅ GOOD
+const [status, setStatus] = useState<"pending" | "errored" | "completed">(
+  "pending"
+);
+```
+
+Prefer a union (or a small tagged object) over parallel flags like `isOpen` + `isClosing` + `didFail` when they describe the same process.

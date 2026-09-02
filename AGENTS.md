@@ -8,6 +8,7 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Tests: do NOT add or change automated tests unless the user explicitly asks. See `tests-only-when-asked.mdc`.
 - React hooks: avoid `useEffect`, `useMemo`, `useCallback`, and `forwardRef` unless truly necessary and there is no simpler way; if you must use one, add a short comment explaining why. Prefer deriving values during render. See `avoid-react-effect-memo-callback-forwardref.mdc`.
 - Single responsibility: one screen → one component (no `variant` enums stuffed into a "god" screen); route phases with a linear early-return chain in that component’s body (wrap with the layout shell at the call site; do not use `renderPhase()`). Prefer early exits in conditionals generally. See `react-single-responsibility-screens.mdc`.
+- React state: do not pile unrelated `useState` into one component — extract subtrees that do not depend on some of that state. Mutually exclusive flags (`isLoading` / `isError` / `isSuccess`) should be one status union. See `react-state-colocation.mdc`.
 - Formatting: run Prettier on the exact files you edit (`pnpm exec prettier --write <paths>`); do not run a full-repo format unless asked. Match `.prettierrc.json`. See `prettier-format.mdc`.
 - Tailwind: colocate `className` strings; do not extract `_CN` (or similar) constants unless the same string is reused in multiple places. See `inline-tailwind-classes.mdc`.
 
