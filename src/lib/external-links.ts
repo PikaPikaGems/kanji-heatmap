@@ -217,6 +217,7 @@ export const otherOutLinks = {
     "https://www.google.com/inputtools/services/features/handwriting.html",
   kanjiCanvas: "https://github.com/asdfjkl/kanjicanvas",
   jlpt: "https://jlpt.jp",
+  wallerJlpt: "https://www.tanos.co.uk/jlpt/",
   jpWordRanksAbout: "https://pikapikagems.github.io/japanese-word-ranks/about/",
   kanjidistVisualiser:
     "https://github.com/lennart-finke/kanjidist-visualiser/blob/master/data/dkanjistat.json",

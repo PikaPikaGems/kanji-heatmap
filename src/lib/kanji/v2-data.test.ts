@@ -68,6 +68,7 @@ type V2MainEntry = [
   number,
   number,
   number,
+  number,
   string | null,
   string | null,
 ];
@@ -127,7 +128,7 @@ describe("kanji_main.json", () => {
 
     for (const kanji of kanjiList) {
       const rep = v1Rep[kanji];
-      const [word, reading] = main[kanji].slice(10);
+      const [word, reading] = main[kanji].slice(11);
 
       if (rep == null) {
         expect([word, reading], kanji).toEqual([null, null]);
@@ -142,19 +143,39 @@ describe("kanji_main.json", () => {
     expect(withRepWord).toBe(kanjiList.length - 78);
   });
 
-  it("gives every entry the full 12 slots", () => {
+  it("gives every entry the full 13 slots", () => {
     for (const kanji of kanjiList) {
-      expect(main[kanji], kanji).toHaveLength(12);
+      expect(main[kanji], kanji).toHaveLength(13);
     }
   });
 
   it("answers every sort field with a number, so sorting never needs a lazy file", () => {
     for (const kanji of kanjiList) {
-      for (const slot of [5, 6, 7, 8, 9]) {
+      for (const slot of [5, 6, 7, 8, 9, 10]) {
         expect(typeof main[kanji][slot], `${kanji} slot ${slot}`).toBe(
           "number"
         );
       }
+    }
+  });
+
+  it("carries the TopoKanji Twitter index from the source list", () => {
+    const lines = fs
+      .readFileSync(
+        path.join(process.cwd(), "raw-data", "topokanji_index_twitter.txt"),
+        "utf8"
+      )
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    const expected = new Map<string, number>();
+    for (let i = 0; i < lines.length; i++) {
+      expected.set([...lines[i]][0], i + 1);
+    }
+
+    for (const kanji of kanjiList) {
+      expect(main[kanji][10], kanji).toBe(expected.get(kanji) ?? -1);
     }
   });
 });
@@ -177,9 +198,8 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
   });
 
   it("drops the two dead fields and nothing else", () => {
-    // _rtk_old (slot 2) was already discarded by the v1 transform, and rtkb
-    // (slot 11 of the tuple type) never reached a runtime payload. Everything
-    // else must live in main, general or hover.
+    // _rtk_old (slot 2) is discarded; slot 11 is the single rtk index and
+    // lives on kanji_main. Everything else must live in main, general or hover.
     for (const kanji of kanjiList.slice(0, 200)) {
       const combined = [
         ...main[kanji].slice(5, 10),

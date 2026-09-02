@@ -17,6 +17,7 @@ exports[`extractKanjiGeneralData (characterization against real data) > 五: pin
   ],
   "rtk": 5,
   "strokes": 4,
+  "topoTwitterIndex": 419,
   "wk": 2,
 }
 `;
@@ -42,6 +43,7 @@ exports[`extractKanjiGeneralData (characterization against real data) > 朝: all
   ],
   "rtk": 53,
   "strokes": 12,
+  "topoTwitterIndex": 210,
   "wk": 8,
 }
 `;
@@ -129,6 +131,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
   "repWord": "一",
   "rtk": 1,
   "strokes": 1,
+  "topoTwitterIndex": 2,
   "wk": 1,
 }
 `;
@@ -240,6 +243,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
   "repWord": "五",
   "rtk": 5,
   "strokes": 4,
+  "topoTwitterIndex": 419,
   "wk": 2,
 }
 `;
@@ -344,6 +348,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
   "repWord": "六",
   "rtk": 6,
   "strokes": 4,
+  "topoTwitterIndex": 959,
   "wk": 2,
 }
 `;
@@ -460,6 +465,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
   "repWord": "朝",
   "rtk": 53,
   "strokes": 12,
+  "topoTwitterIndex": 210,
   "wk": 8,
 }
 `;

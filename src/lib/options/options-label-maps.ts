@@ -26,6 +26,7 @@ import {
   K_RANK_WKFR,
   K_RTK_INDEX,
   K_STROKES,
+  K_TOPOKANJI_TWITTER_INDEX,
   K_WK_LVL,
 } from "./options-constants";
 import {
@@ -44,6 +45,7 @@ export const nonFreqOptionLabels: Record<SortGroup | SortNonGroup, string> = {
   [K_RTK_INDEX]: "RTK",
   [K_MEANING_KEY]: "English Keyword",
   [K_KKLC_INDEX]: "KKLC",
+  [K_TOPOKANJI_TWITTER_INDEX]: "TopoKanji",
 };
 
 export const COMMUNITY_ORDER_KEYS = [

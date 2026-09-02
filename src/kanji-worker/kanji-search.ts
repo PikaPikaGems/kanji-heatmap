@@ -14,6 +14,7 @@ import {
   K_MEANING_KEY,
   K_RTK_INDEX,
   K_STROKES,
+  K_TOPOKANJI_TWITTER_INDEX,
   K_WK_LVL,
 } from "@/lib/options/options-constants";
 import { FREQ_RANK_OPTIONS_NONE_REMOVED } from "@/lib/options/options-arr";
@@ -263,6 +264,8 @@ const SORT_COMPARATORS: Record<string, SortComparator> = {
   [K_WK_LVL]: (a, b) => numericSort(a.wk, b.wk),
   [K_RTK_INDEX]: (a, b) => numericSort(a.rtk, b.rtk),
   [K_KKLC_INDEX]: (a, b) => numericSort(a.kklcIndex, b.kklcIndex),
+  [K_TOPOKANJI_TWITTER_INDEX]: (a, b) =>
+    numericSort(a.topoTwitterIndex, b.topoTwitterIndex),
   [K_MEANING_KEY]: (a, b) => alphaSort(a.keyword, b.keyword),
   ...Object.fromEntries(
     FREQ_RANK_OPTIONS_NONE_REMOVED.map((freqKey) => [
