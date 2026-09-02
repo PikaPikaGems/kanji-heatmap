@@ -10,6 +10,7 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Single responsibility: one screen → one component (no `variant` enums stuffed into a "god" screen); route phases with a linear early-return chain in that component’s body (wrap with the layout shell at the call site; do not use `renderPhase()`). Prefer early exits in conditionals generally. See `react-single-responsibility-screens.mdc`.
 - React state: do not pile unrelated `useState` into one component — extract subtrees that do not depend on some of that state. Mutually exclusive flags (`isLoading` / `isError` / `isSuccess`) should be one status union. See `react-state-colocation.mdc`.
 - Formatting: run Prettier on the exact files you edit (`pnpm exec prettier --write <paths>`); do not run a full-repo format unless asked. Match `.prettierrc.json`. See `prettier-format.mdc`.
+- PRs: run Prettier, commit remaining changes, then push and create the PR. See `pr-before-create.mdc`.
 - Tailwind: colocate `className` strings; do not extract `_CN` (or similar) constants unless the same string is reused in multiple places. See `inline-tailwind-classes.mdc`.
 
 ## Cursor Cloud specific instructions

@@ -7,5 +7,3 @@ https://github.com/sylhare/kanji/blob/master/resources/kanji-data-media-master/l
 https://github.com/sylhare/kanji/blob/master/resources/kanji-data-media-master/language-data/ka_data.csv
 
 https://github.com/sylhare/kanji/blob/master/resources/kanji-radicals.csv
-
-
