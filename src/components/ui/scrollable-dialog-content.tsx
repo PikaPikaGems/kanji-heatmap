@@ -26,12 +26,6 @@ type ScrollableDialogContentProps = Omit<
   scrollBody?: boolean;
 };
 
-const shellCn =
-  "flex max-h-[96dvh] min-h-0 flex-col gap-0 overflow-hidden px-0 py-0";
-const headerCn = "shrink-0 px-6 pt-4 pb-2";
-const scrollBodyCn = "min-h-0 flex-1 overflow-y-auto px-4 pb-6";
-const flexBodyCn = "flex min-h-0 flex-1 flex-col";
-
 export const ScrollableDialogContent = ({
   title,
   description,
@@ -45,16 +39,27 @@ export const ScrollableDialogContent = ({
   ...props
 }: ScrollableDialogContentProps) => (
   <DialogContent
-    className={cn(shellCn, size === "md" && "max-w-md", className)}
+    className={cn(
+      "flex max-h-[96dvh] min-h-0 flex-col gap-0 overflow-hidden px-0 py-0",
+      size === "md" && "max-w-md",
+      className
+    )}
     {...props}
   >
-    <DialogHeader className={cn(headerCn, headerClassName)}>
+    <DialogHeader className={cn("shrink-0 px-6 pt-4 pb-2", headerClassName)}>
       <DialogTitle className={cn("m-0", titleClassName)}>{title}</DialogTitle>
       {description != null && (
         <DialogDescription className="sr-only">{description}</DialogDescription>
       )}
     </DialogHeader>
-    <div className={cn(scrollBody ? scrollBodyCn : flexBodyCn, bodyClassName)}>
+    <div
+      className={cn(
+        scrollBody
+          ? "min-h-0 flex-1 overflow-y-auto px-4 pb-6"
+          : "flex min-h-0 flex-1 flex-col",
+        bodyClassName
+      )}
+    >
       {children}
     </div>
   </DialogContent>
