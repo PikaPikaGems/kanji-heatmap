@@ -21,6 +21,7 @@ const mainInfo = (
     wk?: number;
     kklcIndex?: number;
     rtk?: number;
+    topoTwitterIndex?: number;
   } = {}
 ): KanjiMainInfo => ({
   keyword,
@@ -33,6 +34,7 @@ const mainInfo = (
   wk: numbers.wk ?? -1,
   kklcIndex: numbers.kklcIndex ?? -1,
   rtk: numbers.rtk ?? -1,
+  topoTwitterIndex: numbers.topoTwitterIndex ?? -1,
   repWord: null,
   repReading: null,
 });

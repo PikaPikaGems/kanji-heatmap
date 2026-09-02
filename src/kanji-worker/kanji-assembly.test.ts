@@ -172,5 +172,6 @@ describe("extractKanjiGeneralData (characterization against real data)", () => {
     expect(result.wk).toBe(main.wk);
     expect(result.rtk).toBe(main.rtk);
     expect(result.kklcIndex).toBe(main.kklcIndex);
+    expect(result.topoTwitterIndex).toBe(main.topoTwitterIndex);
   });
 });

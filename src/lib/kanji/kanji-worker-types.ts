@@ -24,6 +24,7 @@ export type KanjiMainInfo = {
   wk: number;
   kklcIndex: number;
   rtk: number;
+  topoTwitterIndex: number;
   // Rendered by expanded tiles during render, so it cannot be async.
   repWord: string | null;
   repReading: string | null;
@@ -182,6 +183,7 @@ export type MainKanjiInfoItemType = [
   wk: number,
   kklcIndex: number,
   rtk: number,
+  topoTwitterIndex: number,
   repWord: string | null,
   repReading: string | null,
 ];

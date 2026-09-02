@@ -24,6 +24,8 @@ const REPORT_PATH = path.join(ROOT, "docs", "data", "component-coverage.json");
 const readRaw = (name) =>
   JSON.parse(fs.readFileSync(path.join(RAW_DIR, name), "utf8"));
 
+const readRawText = (name) => fs.readFileSync(path.join(RAW_DIR, name), "utf8");
+
 const problems = [];
 const fail = (message) => problems.push(message);
 
@@ -54,6 +56,35 @@ const structureSources = {
 
 const kanjiList = Object.keys(main);
 const isKanji = (char) => main[char] != null;
+
+// TopoKanji Twitter: one character per line, 1-based index. Radicals that
+// are not in kanji_main are skipped for storage but do not compact later
+// indexes, so a kanji's number matches the published list.
+const topoTwitterIndex = new Map();
+{
+  const lines = readRawText("topokanji_index_twitter.txt")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  for (let i = 0; i < lines.length; i++) {
+    const chars = [...lines[i]];
+    if (chars.length !== 1) {
+      fail(
+        `topokanji_index_twitter: line ${i + 1} is not a single character: ${JSON.stringify(lines[i])}`
+      );
+      continue;
+    }
+    const char = chars[0];
+    if (topoTwitterIndex.has(char)) {
+      fail(
+        `topokanji_index_twitter: duplicate ${char} at lines ${topoTwitterIndex.get(char)} and ${i + 1}`
+      );
+      continue;
+    }
+    topoTwitterIndex.set(char, i + 1);
+  }
+}
 
 // v1 tuple layouts, named once so the field mapping below reads clearly.
 // kanji_main:     [keyword, on, kun, jlptRaw, freq]
@@ -112,6 +143,7 @@ for (const kanji of kanjiList) {
     numberAt(kanji, "wk"),
     numberAt(kanji, "kklcIndex"),
     numberAt(kanji, "rtk"),
+    topoTwitterIndex.get(kanji) ?? -1,
     rep ? rep[0] : null,
     rep ? rep[1] : null,
   ];
@@ -400,8 +432,8 @@ expectSameSize("kanji_extended_hover", outHover, kanjiList.length);
 expectSameSize("vocab", outVocab, Object.keys(vocabFurigana).length);
 
 for (const [kanji, entry] of Object.entries(outMain)) {
-  if (entry.length !== 12) {
-    fail(`kanji_main: ${kanji} has ${entry.length} slots, expected 12`);
+  if (entry.length !== 13) {
+    fail(`kanji_main: ${kanji} has ${entry.length} slots, expected 13`);
     break;
   }
 }
@@ -409,7 +441,14 @@ for (const [kanji, entry] of Object.entries(outMain)) {
 // Every sort and filter option must be answerable from kanji_main alone,
 // otherwise the eagerly loaded file is incomplete and sorting would need a
 // lazy dataset at first paint.
-const MAIN_SLOT = { strokes: 5, jouyouGrade: 6, wk: 7, kklcIndex: 8, rtk: 9 };
+const MAIN_SLOT = {
+  strokes: 5,
+  jouyouGrade: 6,
+  wk: 7,
+  kklcIndex: 8,
+  rtk: 9,
+  topoTwitterIndex: 10,
+};
 for (const [field, slot] of Object.entries(MAIN_SLOT)) {
   const missingField = kanjiList.find(
     (kanji) => typeof outMain[kanji]?.[slot] !== "number"

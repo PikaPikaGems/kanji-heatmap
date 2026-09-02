@@ -16,7 +16,12 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { OrderDisclaimer } from "@/components/common/OrderDisclaimer";
-import { jitenMoeFn, jpdbFn, kanshudoFn } from "@/lib/external-links";
+import {
+  jitenMoeFn,
+  jpdbFn,
+  kanshudoFn,
+  otherOutLinks,
+} from "@/lib/external-links";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -106,6 +111,16 @@ export const General = ({ kanji }: { kanji: string }) => {
     { label: "WK", value: data.wk, description: <OrderDisclaimer /> },
     { label: "KKLC", value: data.kklcIndex, description: <OrderDisclaimer /> },
     { label: "RTK", value: data.rtk, description: <OrderDisclaimer /> },
+    {
+      label: "TopoKanji",
+      value: data.topoTwitterIndex,
+      description: (
+        <>
+          Component-before-compound order, weighted by Twitter frequency. From{" "}
+          <ExternalTextLink href={otherOutLinks.topoKanji} text="TopoKanji" />.
+        </>
+      ),
+    },
   ];
 
   const readingRows: {

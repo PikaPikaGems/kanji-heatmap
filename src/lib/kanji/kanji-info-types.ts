@@ -38,6 +38,7 @@ export type GeneralKanjiItem = {
   rtk: number;
   strokes: number;
   kklcIndex: number;
+  topoTwitterIndex: number;
   jlpt: JLTPTtypes;
 };
 

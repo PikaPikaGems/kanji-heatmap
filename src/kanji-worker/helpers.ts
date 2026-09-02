@@ -127,6 +127,7 @@ export const transformToMainKanjiInfo = (
     wk,
     kklcIndex,
     rtk,
+    topoTwitterIndex,
     repWord,
     repReading,
   ] = raw;
@@ -153,6 +154,7 @@ export const transformToMainKanjiInfo = (
     wk,
     kklcIndex,
     rtk,
+    topoTwitterIndex,
     repWord,
     repReading,
     frequency: {

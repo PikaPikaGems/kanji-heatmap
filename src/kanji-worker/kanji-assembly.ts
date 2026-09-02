@@ -107,7 +107,8 @@ export const extractKanjiGeneralData = (
   generalInfo: KanjiGeneralInfo
 ) => {
   const { allKun, allOn, meanings } = generalInfo;
-  const { jouyouGrade, wk, rtk, strokes, kklcIndex, jlpt } = main;
+  const { jouyouGrade, wk, rtk, strokes, kklcIndex, topoTwitterIndex, jlpt } =
+    main;
 
   return {
     allKun: Array.from(allKun),
@@ -118,6 +119,7 @@ export const extractKanjiGeneralData = (
     rtk,
     strokes,
     kklcIndex,
+    topoTwitterIndex,
     jlpt,
   } as GeneralKanjiItem;
 };

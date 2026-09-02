@@ -7,10 +7,6 @@ app actually fetches into `public/json/v2/`.
 Never hand-edit anything in `public/json/v2/` — change a source here and
 regenerate with `pnpm run generate-json`.
 
-## New
-
-- Topokanji Index Twitter - https://github.com/scriptin/topokanji/blob/master/lists/twitter.txt
-
 ## What lives here
 
 | Source                                                                                                                                                                                                                                                                                                                   | Where it comes from                                                                                                                   |
@@ -20,6 +16,7 @@ regenerate with `pnpm run generate-json`.
 | `radicals.json`                                                                                                                                                                                                                                                                                                          | Extracted from `src/lib/radicals.ts`; the single source for radical groupings, component keywords and lookalike aliases               |
 | `components_manual_overrides.json`                                                                                                                                                                                                                                                                                       | Hand-curated. See below                                                                                                               |
 | `katakana-kore.txt`                                                                                                                                                                                                                                                                                                      | Word list for the Speed Katakana game (`scripts/generate-speed-katakana.mjs`)                                                         |
+| `topokanji_index_twitter.txt`                                                                                                                                                                                                                                                                                            | [TopoKanji](https://github.com/scriptin/topokanji) Twitter list (`lists/twitter.txt`) — one character per line, 1-based index         |
 
 ## components_manual_overrides.json
 
