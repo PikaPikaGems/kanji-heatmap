@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNetworkState } from "@/hooks/use-network-state";
+import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { cn } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
 
@@ -26,7 +27,7 @@ export const RefreshPageBtn = ({ cnOverride }: { cnOverride?: string }) => {
             setOfflineHintKey((key) => key + 1);
             return;
           }
-          window.location.reload();
+          void forceHardRefresh();
         }}
         aria-label="Refresh page"
       >

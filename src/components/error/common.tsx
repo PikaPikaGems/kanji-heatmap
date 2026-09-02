@@ -3,6 +3,7 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { cnTextLink } from "@/lib/generic-cn";
 import { outLinks } from "@/lib/external-links";
+import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { cn } from "@/lib/utils";
 import { RefreshPageBtn } from "../common/RefreshPageBtn";
 import { DebugInfo } from "../common/DebugInfo";
@@ -28,7 +29,7 @@ export const SayHiReportOrRefresh = () => {
         type="button"
         className={`${cnTextLink} px-0.5 py-0`}
         onClick={() => {
-          window?.location.reload();
+          void forceHardRefresh();
         }}
       >
         refresh
