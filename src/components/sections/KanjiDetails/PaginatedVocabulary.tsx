@@ -90,8 +90,8 @@ export const PaginatedVocabulary = ({
               Translation
             </TableHead>
             <TableHead className="text-center w-fit">Tags</TableHead>
-            <TableHead className="w-24 text-left">Jisho.org</TableHead>
             <TableHead className="w-24 text-left">Jotoba.de</TableHead>
+            <TableHead className="w-24 text-left">Jisho.org</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

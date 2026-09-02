@@ -34,8 +34,8 @@ export const TableSkeleton = () => {
             <TableHead className="text-center w-fit min-w-16 max-w-24">
               Tags
             </TableHead>
-            <TableHead className="w-24 text-left">Jisho.org</TableHead>
             <TableHead className="w-24 text-left">Jotoba.de</TableHead>
+            <TableHead className="w-24 text-left">Jisho.org</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
