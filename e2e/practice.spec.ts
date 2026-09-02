@@ -150,14 +150,10 @@ test.describe("practice modes", () => {
     await expect(
       page.getByRole("heading", { name: "Recognition unavailable" })
     ).toBeVisible({ timeout: 30_000 });
-    await expect(
-      page.getByRole("button", { name: "Continue without recognition" })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
 
-    await page
-      .getByRole("button", { name: "Continue without recognition" })
-      .click();
+    await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(
       page.getByText("Playing without stroke grading", { exact: false })

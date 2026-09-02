@@ -1,12 +1,6 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
@@ -299,14 +293,12 @@ export const SettingsModal = () => {
           <Settings className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-left">User Preferences</DialogTitle>
-          <DialogDescription className="sr-only">
-            Offline data caching and presentation preferences
-          </DialogDescription>
-        </DialogHeader>
-
+      <ScrollableDialogContent
+        size="md"
+        title="User Preferences"
+        description="Offline data caching and presentation preferences"
+        titleClassName="text-left"
+      >
         <section>
           <h3 className={sectionHeadingCn}>Data</h3>
           <DataDownloadRow
@@ -354,7 +346,7 @@ export const SettingsModal = () => {
 
           <LightDarkRow />
         </section>
-      </DialogContent>
+      </ScrollableDialogContent>
     </Dialog>
   );
 };

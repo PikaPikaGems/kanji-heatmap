@@ -1,11 +1,11 @@
 export const ModelLoadingScreen = ({
-  message = "Loading handwriting model…",
+  message = "Loading handwriting AI…",
 }: {
   message?: string;
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-6 px-6 text-center animate-fade-in">
-      <div className="text-4xl animate-pulse" aria-hidden>
+      <div className="text-4xl animate-bounce" aria-hidden>
         ✍️
       </div>
       <div>

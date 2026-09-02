@@ -1,11 +1,6 @@
 import { lazy, Suspense } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
+import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { ErrorBoundary } from "@/components/error";
 import { StrokeAnimationLoadingScreen } from "@/components/sections/KanjiDetails/StrokeAnimationLoadingScreen";
 
@@ -24,30 +19,22 @@ export const WritingPracticeModal = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[96dvh] max-w-md overflow-hidden px-0 py-0">
-        <div className="min-h-0 overflow-y-auto px-4">
-          <DialogHeader className="px-6 pt-6 pb-0">
-            <DialogTitle className="flex items-center text-center">
-              <span className="text-3xl kanji-font">{kanji}</span>
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              Practice writing stroke order for {kanji}
-            </DialogDescription>
-          </DialogHeader>
-          <ErrorBoundary details="StrokeAnimation in WritingPracticeModal">
-            <Suspense fallback={<StrokeAnimationLoadingScreen />}>
-              {/* Remount when opened so stroke order restarts from the first stroke. */}
-              {open && (
-                <StrokeAnimation
-                  key={kanji}
-                  kanji={kanji}
-                  defaultPracticeMode
-                />
-              )}
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-      </DialogContent>
+      <ScrollableDialogContent
+        size="md"
+        title={<span className="text-3xl kanji-font">{kanji}</span>}
+        description={`Practice writing stroke order for ${kanji}`}
+        headerClassName="pt-4"
+        titleClassName="flex items-center text-center"
+      >
+        <ErrorBoundary details="StrokeAnimation in WritingPracticeModal">
+          <Suspense fallback={<StrokeAnimationLoadingScreen />}>
+            {/* Remount when opened so stroke order restarts from the first stroke. */}
+            {open && (
+              <StrokeAnimation key={kanji} kanji={kanji} defaultPracticeMode />
+            )}
+          </Suspense>
+        </ErrorBoundary>
+      </ScrollableDialogContent>
     </Dialog>
   );
 };

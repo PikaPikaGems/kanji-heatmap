@@ -30,7 +30,7 @@ const WhatIsARepresentativeStudyWord = () => {
           </span>
         }
         content={
-          <div className="p-4 text-xs text-left w-96">
+          <div className="p-4 text-xs text-left w-72">
             <p className="py-2">
               An <strong>Anchor Word</strong> is a Japanese word chosen to
               create a strong, memorable connection between a kanji and one of

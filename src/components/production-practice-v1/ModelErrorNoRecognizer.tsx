@@ -12,7 +12,7 @@ export const ModelErrorNoRecognizer = ({
   <ModelErrorShell
     title="Recognition unavailable"
     description="Neither handwriting recognizer could start. You can still practice — pick the correct kanji after each drawing, without stroke grading."
-    continueLabel="Continue without recognition"
+    continueLabel="Continue"
     errorReport={errorReport}
     onContinue={onContinue}
     onCancel={onCancel}
