@@ -1,6 +1,7 @@
 import { JLPTListItems, JLTPTtypes } from "@/lib/jlpt";
 import { GenericPopover } from "../GenericPopover";
 import { ExternalTextLink } from "../ExternalTextLink";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { otherOutLinks } from "@/lib/external-links";
 
 export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
@@ -18,13 +19,25 @@ export const JLPTBadge = ({ jlpt }: { jlpt: JLTPTtypes }) => {
           }
           content={
             <div className="w-64 px-4 py-3 text-xs">
-              The <strong>Japanese‑Language Proficiency Test</strong>
-              <ExternalTextLink
-                href={otherOutLinks.jlpt}
-                text="(jlpt.jp)"
-              />{" "}
-              certifies non‑native speakers’ Japanese skills across five levels.{" "}
-              <em>(N5 easiest → N1 hardest)</em>
+              <p>
+                The <strong>Japanese‑Language Proficiency Test</strong>
+                <ExternalTextLink
+                  href={otherOutLinks.jlpt}
+                  text="(jlpt.jp)"
+                />{" "}
+                certifies non‑native speakers’ Japanese skills across five
+                levels. <em>(N5 easiest → N1 hardest)</em>
+              </p>
+              <DottedSeparator className="my-2" />
+              <p className="text-muted-foreground">
+                Level labels from{" "}
+                <ExternalTextLink
+                  href={otherOutLinks.wallerJlpt}
+                  text="Jonathan Waller’s JLPT resources"
+                  className="whitespace-normal"
+                />
+                .
+              </p>
             </div>
           }
         />
