@@ -7,7 +7,9 @@ import { PlayCircle, Snail } from "@/components/icons";
 import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { resolveKanjiSvgBaseUri } from "@/lib/kanji-svg-url";
 import { StrokeOrderUnavailable } from "@/components/common/StrokeOrderUnavailable";
-import { AnimationSpeed, SPEEDS } from "./kanji-dmak-speeds";
+import { StrokeAnimationSettingsPopover } from "./StrokeAnimationSettingsPopover";
+import { useStrokeAnimationSettings } from "@/hooks/use-stroke-animation-settings";
+import { AnimationSpeed, dmakStepForSpeed } from "./kanji-dmak-speeds";
 
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
@@ -16,7 +18,7 @@ type SvgLoadStatus = "loading" | "ready" | "error";
 
 export const KanjiDMAK = ({
   kanji,
-  step = SPEEDS.slow.rate,
+  step,
   size,
   staticMode = false,
   gridShow = true,
@@ -25,7 +27,7 @@ export const KanjiDMAK = ({
   kanji: string;
   step?: number;
   size: number;
-  // when true: draws all strokes instantly with stroke-order numbers visible
+  // when true: draws all strokes instantly
   staticMode?: boolean;
   gridShow?: boolean;
   /** Fired when the SVG becomes unavailable or recovers (e.g. hint blur). */
@@ -36,6 +38,7 @@ export const KanjiDMAK = ({
   const [retryKey, setRetryKey] = useState(0);
   const [status, setStatus] = useState<SvgLoadStatus>("loading");
   const [svgBaseUri, setSvgBaseUri] = useState<string | null>(null);
+  const [{ showStrokeOrderNumbers }] = useStrokeAnimationSettings();
 
   // Needed: probe local/CDN reachability; no render-time API for this.
   useEffect(() => {
@@ -80,7 +83,10 @@ export const KanjiDMAK = ({
             order: { visible: true },
             attr: { stroke: "random" },
           }
-        : { attr: { stroke: "random" } },
+        : {
+            attr: { stroke: "random" },
+            order: { visible: showStrokeOrderNumbers },
+          },
 
       grid: { show: gridShow },
     });
@@ -91,7 +97,17 @@ export const KanjiDMAK = ({
       document.getElementById(kanjiId)?.replaceChildren();
       // Keep window.Raphael set; other KanjiDMAK instances may still need it.
     };
-  }, [status, svgBaseUri, kanji, kanjiId, step, size, staticMode, gridShow]);
+  }, [
+    status,
+    svgBaseUri,
+    kanji,
+    kanjiId,
+    step,
+    size,
+    staticMode,
+    gridShow,
+    showStrokeOrderNumbers,
+  ]);
 
   if (status === "error") {
     return (
@@ -117,53 +133,69 @@ export const StrokeOrderReplay = ({
   replayClassName,
   buttonRowClassName = "flex justify-center space-x-2",
   buttonClassName,
+  showSettings = false,
 }: {
   kanji: string;
   size: number;
   replayClassName?: string;
   buttonRowClassName?: string;
   buttonClassName?: string;
+  showSettings?: boolean;
 }) => {
   const [key, setKey] = useState(1);
   const [speed, setSpeed] = useState<AnimationSpeed>("fast");
   const [unavailable, setUnavailable] = useState(false);
+  const [settings] = useStrokeAnimationSettings();
   const replay = () => setKey((x) => x + 1);
 
   return (
     <>
-      <div
-        role="button"
-        tabIndex={unavailable ? -1 : 0}
-        title={unavailable ? undefined : "Replay stroke order"}
-        aria-disabled={unavailable || undefined}
-        className={
-          replayClassName
-            ? `${replayClassName} ${unavailable ? "" : "cursor-pointer"}`
-            : unavailable
-              ? undefined
-              : "cursor-pointer"
-        }
-        style={{ height: size }}
-        onClick={unavailable ? undefined : replay}
-        onKeyDown={
-          unavailable
-            ? undefined
-            : (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  replay();
-                }
-              }
-        }
-      >
-        {/** key needed to redraw on change  */}
-        <div key={`${kanji}-${speed}-${key}`}>
-          <KanjiDMAK
-            kanji={kanji}
-            step={SPEEDS[speed].rate}
-            size={size}
-            onUnavailableChange={setUnavailable}
+      <div className={replayClassName} style={{ height: size }}>
+        {/* Overlay border so dotted stroke doesn't change the box's layout size. */}
+        <div
+          className="relative overflow-hidden rounded-3xl"
+          style={{ width: size, height: size }}
+        >
+          <div
+            role="button"
+            tabIndex={unavailable ? -1 : 0}
+            title={unavailable ? undefined : "Replay stroke order"}
+            aria-disabled={unavailable || undefined}
+            className={unavailable ? undefined : "cursor-pointer"}
+            style={{ width: size, height: size }}
+            onClick={unavailable ? undefined : replay}
+            onKeyDown={
+              unavailable
+                ? undefined
+                : (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      replay();
+                    }
+                  }
+            }
+          >
+            {/** key needed to redraw on change  */}
+            <div
+              key={`${kanji}-${speed}-${key}-${settings.fastSpeed}-${settings.slowSpeed}-${settings.showStrokeOrderNumbers}`}
+            >
+              <KanjiDMAK
+                kanji={kanji}
+                step={dmakStepForSpeed(speed, settings)}
+                size={size}
+                onUnavailableChange={setUnavailable}
+              />
+            </div>
+          </div>
+          <div
+            aria-hidden
+            className="absolute inset-0 border-2 border-dotted pointer-events-none rounded-3xl border-foreground"
           />
+          {showSettings && (
+            <div className="absolute z-10 top-3 left-3">
+              <StrokeAnimationSettingsPopover />
+            </div>
+          )}
         </div>
       </div>
       <div className={buttonRowClassName}>

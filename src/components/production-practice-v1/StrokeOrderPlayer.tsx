@@ -1,8 +1,9 @@
 import { StrokeOrderReplay } from "@/components/common/KanjiDmak";
+import { SMALL_SVG_SIZE } from "../sections/KanjiDetails/stroke-animation-constants";
 
 export const StrokeOrderPlayer = ({
   kanji,
-  size = 160,
+  size = SMALL_SVG_SIZE,
 }: {
   kanji: string;
   size?: number;

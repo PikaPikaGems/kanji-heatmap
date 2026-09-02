@@ -31,6 +31,7 @@ import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
+import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -52,7 +53,7 @@ const FONT_NAMES = [
 ];
 
 const sectionHeadingCn =
-  "mb-3  border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
+  "mb-3 mt-6 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
 
 type PreloadProgress = { done: number; total: number } | null;
 type CancelFn = () => void;
@@ -314,7 +315,7 @@ export const SettingsModal = () => {
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Offline data caching and presentation preferences"
+        description="Offline data caching, stroke animation, and presentation preferences"
         titleClassName="text-left"
       >
         <section>
@@ -335,7 +336,7 @@ export const SettingsModal = () => {
           />
         </section>
 
-        <section>
+        <section className="mt-6">
           <h3 className={sectionHeadingCn}>Presentation</h3>
 
           <div className="mb-4 text-left">
@@ -361,6 +362,14 @@ export const SettingsModal = () => {
           </div>
 
           <LightDarkRow />
+
+          <section className="mt-6">
+            <h3 className={sectionHeadingCn}>Stroke order</h3>
+            <p className="mb-3 text-xs text-left text-muted-foreground">
+              Used for kanji details, writing practice, and production practice.
+            </p>
+            <StrokeAnimationSettingsFields />
+          </section>
         </section>
       </ScrollableDialogContent>
     </Dialog>

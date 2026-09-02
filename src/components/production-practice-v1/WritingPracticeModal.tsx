@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { ErrorBoundary } from "@/components/error";
-import { StrokeAnimationLoadingScreen } from "@/components/sections/KanjiDetails/StrokeAnimationLoadingScreen";
+import { WritingPracticeLoadingScreen } from "@/components/sections/KanjiDetails/StrokeAnimationLoadingScreen";
 
 const StrokeAnimation = lazy(
   () => import("@/components/sections/KanjiDetails/StrokeAnimation")
@@ -27,7 +27,7 @@ export const WritingPracticeModal = ({
         titleClassName="flex items-center text-center"
       >
         <ErrorBoundary details="StrokeAnimation in WritingPracticeModal">
-          <Suspense fallback={<StrokeAnimationLoadingScreen />}>
+          <Suspense fallback={<WritingPracticeLoadingScreen />}>
             {/* Remount when opened so stroke order restarts from the first stroke. */}
             {open && (
               <StrokeAnimation key={kanji} kanji={kanji} defaultPracticeMode />
