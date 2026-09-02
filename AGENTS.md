@@ -4,6 +4,7 @@
 
 The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow them even if you are a tool that does not load those files:
 
+- Chat: keep answers concise; prefer bullets over paragraphs. See `concise-answers.mdc`.
 - Tests: do NOT add or change automated tests unless the user explicitly asks. See `tests-only-when-asked.mdc`.
 - React hooks: avoid `useEffect`, `useMemo`, `useCallback`, and `forwardRef` unless truly necessary and there is no simpler way; if you must use one, add a short comment explaining why. Prefer deriving values during render. See `avoid-react-effect-memo-callback-forwardref.mdc`.
 - Single responsibility: one screen → one component (no `variant` enums stuffed into a "god" screen); route phases with a linear early-return chain in that component’s body (wrap with the layout shell at the call site; do not use `renderPhase()`). Prefer early exits in conditionals generally. See `react-single-responsibility-screens.mdc`.
