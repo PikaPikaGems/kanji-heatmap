@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Download, Loader2 } from "@/components/icons";
+import { Trash2, Download, Loader2, CircleX } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
@@ -60,14 +60,12 @@ type CancelFn = () => void;
 const DataDownloadRow = ({
   label,
   sizeHint,
-  enabledKey,
   completeKey,
   startPreload,
   clearCache,
 }: {
   label: string;
   sizeHint: string;
-  enabledKey: string;
   completeKey: string;
   startPreload: (onProgress: (done: number, total: number) => void) => {
     promise: Promise<void>;
@@ -75,42 +73,43 @@ const DataDownloadRow = ({
   };
   clearCache: () => Promise<void>;
 }) => {
-  const [enabled, setEnabled] = useLocalStorageFlag(enabledKey);
   const [complete, setComplete] = useLocalStorageFlag(completeKey);
   const [progress, setProgress] = useState<PreloadProgress>(null);
   const [cancelFn, setCancelFn] = useState<CancelFn | null>(null);
 
   const isRunning = progress !== null && !complete;
 
-  const handleToggle = (next: boolean) => {
-    setEnabled(next);
-
-    if (!next) {
-      cancelFn?.();
-      setCancelFn(null);
-      setProgress(null);
-      return;
-    }
-
-    if (complete) return;
+  const handleDownload = () => {
+    if (complete || isRunning) return;
 
     setProgress({ done: 0, total: 0 });
     const { promise, cancel } = startPreload((done, total) =>
       setProgress({ done, total })
     );
-    setCancelFn(() => cancel);
+
+    let cancelled = false;
+    setCancelFn(() => () => {
+      cancelled = true;
+      cancel();
+    });
     promise.then(() => {
+      if (cancelled) return;
       setComplete(true);
       setProgress(null);
       setCancelFn(null);
     });
   };
 
+  const handleCancel = () => {
+    cancelFn?.();
+    setCancelFn(null);
+    setProgress(null);
+  };
+
   const handleClear = async () => {
     cancelFn?.();
     setCancelFn(null);
     setProgress(null);
-    setEnabled(false);
     setComplete(false);
     await clearCache();
   };
@@ -128,20 +127,39 @@ const DataDownloadRow = ({
           <span className="text-xs text-muted-foreground">{sizeHint}</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2"
-            onClick={handleClear}
-            aria-label={`Clear ${label} cache`}
-          >
-            <Trash2 className="size-4" />
-          </Button>
-          <Switch
-            checked={enabled}
-            onCheckedChange={handleToggle}
-            aria-label={`Toggle ${label}`}
-          />
+          {complete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={handleClear}
+              aria-label={`Clear ${label} cache`}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
+          {!complete &&
+            (isRunning ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={handleCancel}
+                aria-label={`Cancel ${label}`}
+              >
+                <CircleX className="size-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={handleDownload}
+                aria-label={label}
+              >
+                <Download className="size-4" />
+              </Button>
+            ))}
         </div>
       </div>
 
@@ -304,7 +322,6 @@ export const SettingsModal = () => {
           <DataDownloadRow
             label="Download Kanji SVGs"
             sizeHint="~16 MB · stroke order for ~2000 kanji"
-            enabledKey="svg-preload-enabled"
             completeKey="svg-preload-complete"
             startPreload={preloadKanjiSvgs}
             clearCache={clearKanjiSvgCache}
@@ -312,7 +329,6 @@ export const SettingsModal = () => {
           <DataDownloadRow
             label="Download Katakana Challenges"
             sizeHint="~1 MB · 10,000 speed katakana words"
-            enabledKey="katakana-preload-enabled"
             completeKey="katakana-preload-complete"
             startPreload={preloadKatakanaChallenges}
             clearCache={clearKatakanaCache}
