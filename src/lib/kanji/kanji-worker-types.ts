@@ -188,25 +188,6 @@ export type MainKanjiInfoItemType = [
 
 export type MainKanjiInfoResponseType = Record<string, MainKanjiInfoItemType>;
 
-export type ExtendedKanjiInfoItemType = [
-  string[], // component parts
-  number, // strokes
-  number, // rtk index
-  number, // wk level
-  number, // jouyou grade
-  string[], // meanings
-  string[], // on readings
-  string[], // kun readings
-  string, // semantic phonetic if any
-  string[], // sample vocabulary,
-  number, // kklc index
-  number, // rtkb index
-];
-export type ExtendedKanjiInfoResponseType = Record<
-  string,
-  ExtendedKanjiInfoItemType
->;
-
 // ---------------------------------------------------------------------------
 // Worker protocol
 //

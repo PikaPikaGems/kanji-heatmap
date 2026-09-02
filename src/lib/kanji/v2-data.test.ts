@@ -177,9 +177,8 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
   });
 
   it("drops the two dead fields and nothing else", () => {
-    // _rtk_old (slot 2) was already discarded by the v1 transform, and rtkb
-    // (slot 11 of the tuple type) never reached a runtime payload. Everything
-    // else must live in main, general or hover.
+    // _rtk_old (slot 2) is discarded; slot 11 is the single rtk index and
+    // lives on kanji_main. Everything else must live in main, general or hover.
     for (const kanji of kanjiList.slice(0, 200)) {
       const combined = [
         ...main[kanji].slice(5, 10),

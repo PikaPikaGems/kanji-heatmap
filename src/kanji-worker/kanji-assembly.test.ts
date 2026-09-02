@@ -153,10 +153,6 @@ describe("extractKanjiGeneralData (characterization against real data)", () => {
     const result = generalDataFor("朝");
 
     expect(result.jlpt).toBe(mainInfoMap["朝"].jlpt);
-    // The GeneralKanjiItem type declares rtkb, but the runtime payload has
-    // never carried it — pinned so a future protocol change can't silently
-    // alter the shape.
-    expect("rtkb" in result).toBe(false);
     expect(result).toMatchSnapshot();
   });
 
