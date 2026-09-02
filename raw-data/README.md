@@ -7,6 +7,10 @@ app actually fetches into `public/json/v2/`.
 Never hand-edit anything in `public/json/v2/` — change a source here and
 regenerate with `pnpm run generate-json`.
 
+## New 
+- Topokanji Index Twitter - https://github.com/scriptin/topokanji/blob/master/lists/twitter.txt
+
+
 ## What lives here
 
 | Source                                                                                                                                                                                                                                                                                                                   | Where it comes from                                                                                                                   |
