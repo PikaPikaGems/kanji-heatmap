@@ -24,20 +24,31 @@ export const ModelErrorScreen = ({ variant, ... }) => {
 
 ## 2. Parent phase routing → early returns
 
-In the parent that chooses which screen to show, prefer a **linear early-return chain** (or `renderPhase()` that returns once). Do not stack `{phase === … && …}` blocks in one JSX tree.
+In the component that chooses which screen to show, use a **linear early-return chain** as that component’s body. Wrap it with the layout shell **at the call site**. Do not hide the chain in `renderPhase()` (or similar) and invoke it inside the shell.
+
+Do not stack `{phase === … && …}` blocks in one JSX tree.
 
 ```tsx
-// ❌ BAD
-return (
-  <Shell>
-    {phase === "initial" && <InitialScreen />}
-    {phase === "loading" && <ModelLoadingScreen />}
-    {phase === "error" && <ModelError… />}
-  </Shell>
-);
+// ❌ BAD — inner render helper, shell wraps the call
+const MyComponent = () => {
+  const renderPhase = () => {
+    if (phase === "initial") return <InitialScreen … />;
+    if (phase === "loading-dakanji") return <ModelLoadingScreen message="…" />;
+    if (phase === "loading-backup") return <ModelLoadingScreen message="…" />;
+    if (phase === "error-lighter") return <ModelErrorLighterRecognizer … />;
+    if (phase === "error-none") return <ModelErrorNoRecognizer … />;
+    if (phase === "playing") return <Game … />;
+    if (phase === "ended") return <EndSession … />;
+    return null;
+  };
 
-// ✅ GOOD
-const renderPhase = () => {
+  return <Shell>{renderPhase()}</Shell>;
+};
+
+<MyComponent />;
+
+// ✅ GOOD — early returns are the component; shell wraps at the call site
+const MyComponent = () => {
   if (phase === "initial") return <InitialScreen … />;
   if (phase === "loading-dakanji") return <ModelLoadingScreen message="…" />;
   if (phase === "loading-backup") return <ModelLoadingScreen message="…" />;
@@ -48,7 +59,9 @@ const renderPhase = () => {
   return null;
 };
 
-return <Shell>{renderPhase()}</Shell>;
+<Shell>
+  <MyComponent />
+</Shell>;
 ```
 
 Prefer flat phase/status values that map 1:1 to screens (`loading-dakanji`, `error-lighter`) over nested `{ status, variant, tryingBackup }` when it keeps the if-chain readable.
