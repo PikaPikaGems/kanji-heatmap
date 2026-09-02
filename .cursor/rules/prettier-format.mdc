@@ -7,6 +7,10 @@ alwaysApply: true
 
 This repo uses Prettier (`.prettierrc.json`). Do not rely on approximate style — run the formatter.
 
+## Before creating a PR
+
+Run Prettier, **commit** remaining changes, then push/open the PR. See `pr-before-create.mdc`.
+
 ## After editing files
 
 When you create or modify source files, run Prettier on **only those paths** before finishing:

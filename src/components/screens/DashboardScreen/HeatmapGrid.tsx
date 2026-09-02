@@ -59,66 +59,75 @@ export const HeatmapGrid = ({
   rowCount: number;
   topLabels: ReactNode[];
   topLabelCn?: string;
-  leftLabels: ReactNode[];
+  /** One label per row, shared by every column (weekday-style). Omit when
+   * rows are not the same meaning across columns. */
+  leftLabels?: ReactNode[];
   children: ReactNode;
-}) => (
-  <div className="overflow-x-auto pb-2 mb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
-    <div
-      className="inline-grid"
-      style={{
-        gridTemplateAreas: `"empty top" "left squares"`,
-        gridTemplateColumns: "auto 1fr",
-        columnGap: 6,
-        rowGap: gapPx,
-      }}
-    >
-      {/* Top labels — one column per grid column, same width as cells */}
-      <div
-        className="text-[10px] leading-none text-muted-foreground"
-        style={{
-          gridArea: "top",
-          display: "grid",
-          gridTemplateColumns: `repeat(${topLabels.length}, ${cellPx}px)`,
-          columnGap: gapPx,
-        }}
-      >
-        {topLabels.map((label, i) => (
-          <div key={i} className={topLabelCn}>
-            {label}
-          </div>
-        ))}
-      </div>
+}) => {
+  const showLeft = leftLabels != null && leftLabels.length > 0;
 
-      {/* Left labels — same row height as cells so they align */}
+  return (
+    <div className="overflow-x-auto pb-2 mb-4 px-1 [-webkit-mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_8px,black_calc(100%-8px),transparent)] sm:[-webkit-mask-image:none] sm:[mask-image:none]">
       <div
-        className="text-[10px] leading-none text-muted-foreground"
+        className="inline-grid"
         style={{
-          gridArea: "left",
-          display: "grid",
-          gridTemplateRows: `repeat(${rowCount}, ${cellPx}px)`,
+          gridTemplateAreas: showLeft
+            ? `"empty top" "left squares"`
+            : `"top" "squares"`,
+          gridTemplateColumns: showLeft ? "auto 1fr" : "1fr",
+          columnGap: 6,
           rowGap: gapPx,
         }}
       >
-        {leftLabels.map((label, i) => (
-          <div key={i} className="flex items-center justify-end pr-0.5">
-            {label}
-          </div>
-        ))}
-      </div>
+        {/* Top labels — one column per grid column, same width as cells */}
+        <div
+          className="text-[10px] leading-none text-muted-foreground"
+          style={{
+            gridArea: "top",
+            display: "grid",
+            gridTemplateColumns: `repeat(${topLabels.length}, ${cellPx}px)`,
+            columnGap: gapPx,
+          }}
+        >
+          {topLabels.map((label, i) => (
+            <div key={i} className={topLabelCn}>
+              {label}
+            </div>
+          ))}
+        </div>
 
-      {/* Squares — column flow: down each column, then the next */}
-      <div
-        style={{
-          gridArea: "squares",
-          display: "grid",
-          gridAutoFlow: "column",
-          gridAutoColumns: cellPx,
-          gridTemplateRows: `repeat(${rowCount}, ${cellPx}px)`,
-          gap: gapPx,
-        }}
-      >
-        {children}
+        {showLeft ? (
+          <div
+            className="text-[10px] leading-none text-muted-foreground"
+            style={{
+              gridArea: "left",
+              display: "grid",
+              gridTemplateRows: `repeat(${rowCount}, ${cellPx}px)`,
+              rowGap: gapPx,
+            }}
+          >
+            {leftLabels.map((label, i) => (
+              <div key={i} className="flex items-center justify-end pr-0.5">
+                {label}
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {/* Squares — column flow: down each column, then the next */}
+        <div
+          style={{
+            gridArea: "squares",
+            display: "grid",
+            gridAutoFlow: "column",
+            gridAutoColumns: cellPx,
+            gridTemplateRows: `repeat(${rowCount}, ${cellPx}px)`,
+            gap: gapPx,
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

@@ -1,5 +1,5 @@
 ---
-description: Keep chat answers concise
+description: Keep chat answers concise; prefer bullets
 alwaysApply: true
 ---
 
@@ -7,6 +7,10 @@ alwaysApply: true
 
 Prefer short replies. Lead with the answer, then only the details that change a decision.
 
+**Prefer bullet points** for explanations, options, steps, and file notes. A one-line lead-in is fine; do not write multi-paragraph answers when bullets would do.
+
 - Skip recap of the question, long preambles, and exhaustive tables unless asked
 - Do not restate code or file lists the user already has
-- Use bullets over paragraphs; stop when the next sentence would be filler
+- One idea per bullet; nest at most one level
+- Stop when the next sentence would be filler
+- A couple of sentences in a row is OK for a single nuance; do not collapse into telegrams

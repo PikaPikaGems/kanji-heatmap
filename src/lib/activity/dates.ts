@@ -155,6 +155,64 @@ export const buildCalendarWeeks = (range: DateRange): (string | null)[][] => {
   return weeks;
 };
 
+/** Rows per half-month column in the compact (vertical) calendar. */
+export const VERTICAL_MONTH_HALF_ROWS = 16;
+
+const dateKeyIfValidAndInRange = (
+  year: number,
+  monthIndex: number,
+  day: number,
+  range: DateRange
+): string | null => {
+  const date = new Date(year, monthIndex, day);
+  if (date.getFullYear() !== year || date.getMonth() !== monthIndex) {
+    return null;
+  }
+  const key = toLocalDateKey(date);
+  return isDateKeyInRange(key, range) ? key : null;
+};
+
+/**
+ * Two columns per calendar month (days 1–16, then 17–32). Invalid days and
+ * dates outside `range` are null. Last-365 spans 13 months → 26 columns.
+ */
+export const buildMonthHalfColumns = (
+  range: DateRange
+): (string | null)[][] => {
+  const start = parseLocalDateKey(range.start);
+  const end = parseLocalDateKey(range.end);
+  const columns: (string | null)[][] = [];
+
+  let year = start.getFullYear();
+  let month = start.getMonth();
+  const endYear = end.getFullYear();
+  const endMonth = end.getMonth();
+
+  while (year < endYear || (year === endYear && month <= endMonth)) {
+    const firstHalf: (string | null)[] = [];
+    const secondHalf: (string | null)[] = [];
+    for (let day = 1; day <= VERTICAL_MONTH_HALF_ROWS; day++) {
+      firstHalf.push(dateKeyIfValidAndInRange(year, month, day, range));
+    }
+    for (
+      let day = VERTICAL_MONTH_HALF_ROWS + 1;
+      day <= VERTICAL_MONTH_HALF_ROWS * 2;
+      day++
+    ) {
+      secondHalf.push(dateKeyIfValidAndInRange(year, month, day, range));
+    }
+    columns.push(firstHalf, secondHalf);
+    if (month === 11) {
+      month = 0;
+      year += 1;
+    } else {
+      month += 1;
+    }
+  }
+
+  return columns;
+};
+
 export type MonthLabelType = "short" | "japanese-numbers";
 
 const JAPANESE_MONTH_LABELS = [
