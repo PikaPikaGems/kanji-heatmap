@@ -59,7 +59,7 @@ const DayDetail = ({
   );
 };
 
-const CalendarDayCell = ({
+export const CalendarDayCell = ({
   dateKey,
   byDay,
   filters,
