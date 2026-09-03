@@ -16,12 +16,12 @@ import {
 // contract that move relies on: the same values reach the app, and the data
 // stays clean enough to be looked up by exact string match.
 
-describe("radicals data loaded from raw-data/radicals.json", () => {
+describe("radicals data loaded from raw-data", () => {
   it("exposes every table with the expected size", () => {
     expect(Object.keys(radicalsGroupedByStrokeCount)).toHaveLength(15);
     expect(Object.keys(moreRadicalKeywords)).toHaveLength(45);
     expect(Object.keys(nonRadicalVariantKeywords)).toHaveLength(5);
-    expect(Object.keys(radicalFalseFriends)).toHaveLength(18);
+    expect(Object.keys(radicalFalseFriends)).toHaveLength(19);
   });
 
   it("keeps known sample values intact after the move", () => {
@@ -59,6 +59,11 @@ describe("radicals data loaded from raw-data/radicals.json", () => {
       "component_keyword.json"
     );
     const kanjiMain = readRawData<Record<string, unknown>>("kanji_main.json");
+    const formKeywords = readRawData<Record<string, { k?: string }>>(
+      "radical_form_keywords.json"
+    );
+    const aiRadicals =
+      readRawData<Record<string, { k?: string }>>("AI_radicals.json");
 
     for (const [char, alias] of Object.entries(radicalFalseFriends)) {
       const resolvable =
@@ -66,7 +71,9 @@ describe("radicals data loaded from raw-data/radicals.json", () => {
         alias in moreRadicalKeywords ||
         alias in nonRadicalVariantKeywords ||
         alias in componentKeywords ||
-        alias in kanjiMain;
+        alias in kanjiMain ||
+        formKeywords[alias]?.k != null ||
+        aiRadicals[alias]?.k != null;
       expect(resolvable, `${char} -> ${alias} resolves to a known entry`).toBe(
         true
       );

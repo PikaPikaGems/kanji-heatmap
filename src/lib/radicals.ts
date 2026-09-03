@@ -63,9 +63,10 @@ B or Ｂ (full-width B)	                        ⻏, ⻖
 */
 
 import radicalsData from "../../raw-data/radicals.json";
+import radicalAliases from "../../raw-data/radical_aliases.json";
 
 // The tables below are generated data, not code: they live in
-// raw-data/radicals.json so the JSON generator and the app read exactly the
+// raw-data JSON so the JSON generator and the app read exactly the
 // same source. Edit the JSON, never these bindings.
 export const radicalsGroupedByStrokeCount =
   radicalsData.radicalsGroupedByStrokeCount;
@@ -79,9 +80,9 @@ export const nonRadicalVariantKeywords: Record<string, string> =
 /**
  * Lookalike characters that should resolve to another entry: different
  * Unicode codepoints that mean the same component (罒 vs ⺲, 亻 vs ⺅, ...).
+ * Search may hop further (彐 → ヨ); keyword copy stops at the first k.
  */
-export const radicalFalseFriends: Record<string, string> =
-  radicalsData.radicalFalseFriends;
+export const radicalFalseFriends: Record<string, string> = radicalAliases;
 
 // IMPORTANT NOTE THINGS I HAVE DONE:
 // Updated kanji-structure.json

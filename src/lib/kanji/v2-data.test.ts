@@ -54,8 +54,11 @@ const v1Radicals = raw<{
   radicalsGroupedByStrokeCount: Record<string, string[]>;
   moreRadicalKeywords: Record<string, string>;
   nonRadicalVariantKeywords: Record<string, string>;
-  radicalFalseFriends: Record<string, string>;
 }>("radicals.json");
+const aiRadicals = raw<Record<string, { k?: string }>>("AI_radicals.json");
+const formKeywords = raw<Record<string, { k?: string }>>(
+  "radical_form_keywords.json"
+);
 
 type V2MainEntry = [
   string,
@@ -274,7 +277,8 @@ describe("vocab.json", () => {
 describe("components.json", () => {
   it("keeps every component_keyword entry that is not itself a kanji", () => {
     for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
-      if (main[char] != null) continue; // covered by the de-duplication test
+      if (main[char] != null) continue;
+      if (aiRadicals[char]?.k != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });
@@ -296,11 +300,13 @@ describe("components.json", () => {
     for (const [char, keyword] of Object.entries(
       v1Radicals.moreRadicalKeywords
     )) {
+      if (aiRadicals[char]?.k != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
     for (const [char, keyword] of Object.entries(
       v1Radicals.nonRadicalVariantKeywords
     )) {
+      if (aiRadicals[char]?.k != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });
@@ -321,12 +327,10 @@ describe("components.json", () => {
     }
   });
 
-  it("gives a component with its own keyword precedence over its alias", () => {
-    // 罒 aliases ⺲, but both carry a keyword from different sources. The
-    // character's own entry must win — aliases only fill gaps.
-    expect(components["罒"]?.k).toBe(v1ComponentKeywords["罒"]);
-    expect(components["⺲"]?.k).toBe(v1Radicals.moreRadicalKeywords["⺲"]);
-    expect(components["罒"]?.k).not.toBe(components["⺲"]?.k);
+  it("gives encoding twins the same keyword", () => {
+    // 罒 aliases ⺲; they are the same net, so they share a name.
+    expect(components["罒"]?.k).toBe(components["⺲"]?.k);
+    expect(components["罒"]?.k).toBe("small net");
   });
 
   it("fills a keywordless lookalike from its alias", () => {
@@ -343,6 +347,15 @@ describe("components.json", () => {
     expect(components["彐"]?.k).toBe("pig snout");
     expect(components["ヨ"]?.k).toBe("katakana yo");
     expect(components["⺕"]?.k).toBe("pig snout");
+  });
+
+  it("fills a form-variant gap from radical_form_keywords.json", () => {
+    expect(components["辵"]?.k).toBe(formKeywords["辵"].k);
+  });
+
+  it("lets AI_radicals.json overwrite an existing keyword", () => {
+    expect(components["辶"]?.k).toBe(aiRadicals["辶"].k);
+    expect(components["⻌"]?.k).toBe(aiRadicals["⻌"].k);
   });
 
   it("never stores an empty or untrimmed keyword", () => {

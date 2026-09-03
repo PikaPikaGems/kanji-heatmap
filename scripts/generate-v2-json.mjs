@@ -45,6 +45,9 @@ const similarKanjis = readRaw("similar-kanjis.json");
 const readingDetails = readRaw("kanji-readings-details.json");
 const cumUse = readRaw("cum_use.json");
 const radicals = readRaw("radicals.json");
+const radicalAliases = readRaw("radical_aliases.json");
+const formKeywords = readRaw("radical_form_keywords.json");
+const aiRadicals = readRaw("AI_radicals.json");
 const manualOverrides = readRaw("components_manual_overrides.json");
 
 const structureSources = {
@@ -206,124 +209,298 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
   outVocab[word] = [encoded, vocabMeaning[word] ?? ""];
 }
 
-// ---------------------------------------------------------------------------
-// components.json — one registry replacing component_keyword.json,
-// phonetic.json and the three hand-maintained tables in radicals.ts.
-//
-// Keywords are resolved through the lookalike-alias table at build time, so
-// the runtime never has to chase an alias or consult five sources.
-// ---------------------------------------------------------------------------
+/**
+ * Build public/json/v2/components.json and the coverage report.
+ *
+ * Keyword sources, in order (later steps only run after earlier ones):
+ *
+ *   1. component_keyword.json      data tarball — fill
+ *   2. radicals.json keywords      moreRadicalKeywords + nonRadicalVariantKeywords — fill
+ *   3. radical_form_keywords.json  Kangxi form/position variants — FILL GAPS ONLY
+ *   4. AI_radicals.json            collisions, phonetics, parallel nicknames — MAY OVERWRITE
+ *   5. radical_aliases.json        encoding twins copy the target's k
+ *                                  Chains stop at the first hop that already has a
+ *                                  keyword (⺕ → 彐 "pig snout", not ヨ "katakana yo").
+ *                                  彐 → ヨ stays for search; it is not a keyword twin.
+ *   6. drop k when the char is in kanji_main — that keyword lives only there
+ *   7. components_manual_overrides.json  human last; do not machine-edit this file
+ *
+ * After merge this function:
+ *   - fails the build if the same keyword is used by two chars that are not
+ *     alias-connected, or if a component keyword collides with kanji_main
+ *   - reports missing keywords (not fatal) via docs/data/component-coverage.json
+ */
+function buildComponentsRegistry({
+  main,
+  extended,
+  componentKeywords,
+  phonetic,
+  radicals,
+  radicalAliases,
+  formKeywords,
+  aiRadicals,
+  manualOverrides,
+  structureSources,
+  kanjiList,
+  isKanji,
+  fail,
+  EXT,
+  decomposition,
+}) {
+  const components = {};
+  const keywordOrigin = {};
 
-const components = {};
-const keywordOrigin = {};
+  const keywordOf = (entry) => {
+    if (typeof entry === "string") return entry;
+    if (entry != null && typeof entry.k === "string") return entry.k;
+    return null;
+  };
 
-const setKeyword = (char, keyword, source) => {
-  if (keyword == null || keyword.trim().length === 0) return;
-  const trimmed = keyword.trim();
-  const existing = components[char]?.k;
+  const setKeyword = (char, keyword, source, { overwrite = false } = {}) => {
+    if (keyword == null || keyword.trim().length === 0) return;
+    const trimmed = keyword.trim();
+    const existing = components[char]?.k;
 
-  if (existing != null && existing.toLowerCase() !== trimmed.toLowerCase()) {
-    fail(
-      `components: conflicting keywords for ${char} — ` +
-        `"${existing}" (${keywordOrigin[char]}) vs "${trimmed}" (${source})`
-    );
-    return;
-  }
-
-  components[char] = { ...components[char], k: trimmed };
-  keywordOrigin[char] = source;
-};
-
-for (const [char, keyword] of Object.entries(componentKeywords)) {
-  setKeyword(char, keyword, "component_keyword.json");
-}
-for (const [char, keyword] of Object.entries(radicals.moreRadicalKeywords)) {
-  setKeyword(char, keyword, "radicals.moreRadicalKeywords");
-}
-for (const [char, keyword] of Object.entries(
-  radicals.nonRadicalVariantKeywords
-)) {
-  setKeyword(char, keyword, "radicals.nonRadicalVariantKeywords");
-}
-
-for (const [char, sounds] of Object.entries(phonetic)) {
-  if (!Array.isArray(sounds) || sounds.length === 0) continue;
-  components[char] = { ...components[char], s: sounds };
-}
-
-for (const [strokes, list] of Object.entries(
-  radicals.radicalsGroupedByStrokeCount
-)) {
-  for (const char of list) {
-    components[char] = { ...components[char], n: Number(strokes) };
-  }
-}
-
-// Alias resolution: a lookalike inherits its target's keyword. Aliases may
-// chain (⺕ -> 彐 -> ヨ), so follow to the end of the chain. Targets that are
-// themselves kanji are left alone — the runtime already reads kanji keywords
-// from kanji_main, and copying them here would duplicate the data.
-// Stops at the first hop that actually has a keyword: in ⺕ -> 彐 -> ヨ, 彐's
-// "pig snout" is a better answer for ⺕ than ヨ's "katakana yo" at the end of
-// the chain.
-const resolveAlias = (start) => {
-  const seen = [start];
-  let current = radicals.radicalFalseFriends[start];
-
-  while (current != null) {
-    if (seen.includes(current)) {
-      fail(`components: alias cycle ${[...seen, current].join(" -> ")}`);
-      return null;
+    if (existing != null) {
+      if (!overwrite) {
+        if (existing.toLowerCase() !== trimmed.toLowerCase()) {
+          fail(
+            `components: conflicting keywords for ${char} — ` +
+              `"${existing}" (${keywordOrigin[char]}) vs "${trimmed}" (${source})`
+          );
+        }
+        return;
+      }
     }
-    seen.push(current);
 
-    if (components[current]?.k != null || isKanji(current)) return current;
-    current = radicals.radicalFalseFriends[current];
+    components[char] = { ...components[char], k: trimmed };
+    keywordOrigin[char] = source;
+  };
+
+  for (const [char, keyword] of Object.entries(componentKeywords)) {
+    setKeyword(char, keyword, "component_keyword.json");
+  }
+  for (const [char, keyword] of Object.entries(radicals.moreRadicalKeywords)) {
+    setKeyword(char, keyword, "radicals.moreRadicalKeywords");
+  }
+  for (const [char, keyword] of Object.entries(
+    radicals.nonRadicalVariantKeywords
+  )) {
+    setKeyword(char, keyword, "radicals.nonRadicalVariantKeywords");
   }
 
-  return seen[seen.length - 1] === start ? null : seen[seen.length - 1];
-};
-
-for (const [char, alias] of Object.entries(radicals.radicalFalseFriends)) {
-  if (alias !== alias.trim() || alias.length === 0) {
-    fail(`components: alias for ${char} is not a clean value ("${alias}")`);
-    continue;
+  // Form variants: never clobber a name another source already chose.
+  for (const [char, entry] of Object.entries(formKeywords)) {
+    if (components[char]?.k != null) continue;
+    setKeyword(char, keywordOf(entry), "radical_form_keywords.json");
   }
-  if (char === alias) {
-    fail(`components: ${char} aliases itself`);
-    continue;
+
+  // AI layer may replace a bad or colliding name.
+  for (const [char, entry] of Object.entries(aiRadicals)) {
+    const keyword = keywordOf(entry);
+    if (keyword == null) continue;
+    setKeyword(char, keyword, "AI_radicals.json", { overwrite: true });
   }
-  if (components[char]?.k != null) continue;
 
-  const target = resolveAlias(char);
-  if (target == null) continue;
+  for (const [char, sounds] of Object.entries(phonetic)) {
+    if (!Array.isArray(sounds) || sounds.length === 0) continue;
+    components[char] = { ...components[char], s: sounds };
+  }
 
-  if (components[target]?.k != null) {
-    setKeyword(char, components[target].k, `alias of ${target}`);
-  } else if (!isKanji(target)) {
+  for (const [strokes, list] of Object.entries(
+    radicals.radicalsGroupedByStrokeCount
+  )) {
+    for (const char of list) {
+      components[char] = { ...components[char], n: Number(strokes) };
+    }
+  }
+
+  const resolveAlias = (start) => {
+    const seen = [start];
+    let current = radicalAliases[start];
+
+    while (current != null) {
+      if (seen.includes(current)) {
+        fail(`components: alias cycle ${[...seen, current].join(" -> ")}`);
+        return null;
+      }
+      seen.push(current);
+
+      if (components[current]?.k != null || isKanji(current)) return current;
+      current = radicalAliases[current];
+    }
+
+    return seen[seen.length - 1] === start ? null : seen[seen.length - 1];
+  };
+
+  for (const [char, alias] of Object.entries(radicalAliases)) {
+    if (alias !== alias.trim() || alias.length === 0) {
+      fail(`components: alias for ${char} is not a clean value ("${alias}")`);
+      continue;
+    }
+    if (char === alias) {
+      fail(`components: ${char} aliases itself`);
+      continue;
+    }
+    if (components[char]?.k != null) continue;
+
+    const target = resolveAlias(char);
+    if (target == null) continue;
+
+    if (components[target]?.k != null) {
+      setKeyword(char, components[target].k, `alias of ${target}`);
+    } else if (!isKanji(target)) {
+      fail(
+        `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
+      );
+    }
+  }
+
+  let droppedKanjiKeywords = 0;
+  for (const char of Object.keys(components)) {
+    if (!isKanji(char) || components[char].k == null) continue;
+    delete components[char].k;
+    droppedKanjiKeywords += 1;
+    if (Object.keys(components[char]).length === 0) delete components[char];
+  }
+
+  for (const [char, entry] of Object.entries(manualOverrides)) {
+    components[char] = { ...components[char], ...entry };
+    if (entry.k != null) {
+      keywordOrigin[char] = "components_manual_overrides.json";
+    }
+  }
+
+  // A shared keyword is allowed only inside one alias group (encoding twins).
+  // ヨ can sit in 彐's search chain with a different keyword.
+  const parent = new Map();
+  const find = (x) => {
+    if (!parent.has(x)) parent.set(x, x);
+    const p = parent.get(x);
+    if (p !== x) {
+      const root = find(p);
+      parent.set(x, root);
+      return root;
+    }
+    return x;
+  };
+  for (const [from, to] of Object.entries(radicalAliases)) {
+    parent.set(find(from), find(to));
+  }
+
+  const byKeyword = new Map();
+  for (const [char, entry] of Object.entries(components)) {
+    if (entry.k == null) continue;
+    const key = entry.k.toLowerCase();
+    if (!byKeyword.has(key)) byKeyword.set(key, []);
+    byKeyword.get(key).push(char);
+  }
+
+  for (const [, chars] of byKeyword) {
+    if (chars.length < 2) continue;
+    const roots = new Set(chars.map(find));
+    if (roots.size > 1) {
+      fail(
+        `components: keyword "${components[chars[0]].k}" is used by ` +
+          `unrelated characters ${chars.join(", ")}`
+      );
+    }
+  }
+
+  for (const [kanji, entry] of Object.entries(main)) {
+    const kanjiKeyword = String(entry[0]).toLowerCase();
+    const users = byKeyword.get(kanjiKeyword);
+    if (users == null) continue;
     fail(
-      `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
+      `components: keyword "${entry[0]}" collides with kanji ${kanji} ` +
+        `(${users.join(", ")})`
     );
   }
+
+  const isIdsOperator = (char) => {
+    const code = char.codePointAt(0);
+    return code >= 0x2ff0 && code <= 0x2fff;
+  };
+
+  const references = new Map();
+  const noteReference = (char, source) => {
+    if (typeof char !== "string" || [...char].length !== 1) return;
+    if (isKanji(char) || isIdsOperator(char)) return;
+    const ref = references.get(char) ?? { refs: 0, sources: new Set() };
+    ref.refs += 1;
+    ref.sources.add(source);
+    references.set(char, ref);
+  };
+
+  for (const kanji of kanjiList) {
+    for (const part of extended[kanji][EXT.parts] ?? []) {
+      noteReference(part, "parts");
+    }
+    noteReference(extended[kanji][EXT.phonetic], "phonetic-ref");
+  }
+  for (const chars of Object.values(decomposition)) {
+    for (const char of chars) noteReference(char, "decomposition");
+  }
+  for (const value of Object.values(structureSources.sc)) {
+    for (const char of value ?? []) noteReference(char, "sc");
+  }
+  for (const value of Object.values(structureSources.ya)) {
+    for (const char of value ?? []) noteReference(char, "ya");
+  }
+  for (const value of Object.values(structureSources.ka)) {
+    for (const char of (value ?? []).slice(0, 3)) noteReference(char, "ka");
+  }
+  for (const value of Object.values(structureSources.hl)) {
+    noteReference(value?.semantic, "hl");
+    noteReference(value?.phonetic, "hl");
+  }
+  for (const list of Object.values(radicals.radicalsGroupedByStrokeCount)) {
+    for (const char of list) noteReference(char, "radical-drawer");
+  }
+
+  const missing = [...references.entries()]
+    .filter(([char]) => components[char]?.k == null)
+    .map(([char, entry]) => ({
+      char,
+      refs: entry.refs,
+      sources: [...entry.sources].sort(),
+    }))
+    .sort((a, b) => b.refs - a.refs || a.char.localeCompare(b.char));
+
+  const coverageReport = {
+    summary: {
+      referenced: references.size,
+      withKeyword: references.size - missing.length,
+      missing: missing.length,
+    },
+    missing,
+  };
+
+  return { components, droppedKanjiKeywords, coverageReport };
 }
 
-// A keyword for a character that is itself a kanji is unreachable: every call
-// site reads kanji_main first and only falls back to the component registry.
-// Drop it so the keyword has exactly one home. Sounds and stroke counts stay —
-// kanji_main carries neither.
-let droppedKanjiKeywords = 0;
-for (const char of Object.keys(components)) {
-  if (!isKanji(char) || components[char].k == null) continue;
-  delete components[char].k;
-  droppedKanjiKeywords += 1;
-  if (Object.keys(components[char]).length === 0) delete components[char];
-}
+// ---------------------------------------------------------------------------
+// components.json
+// ---------------------------------------------------------------------------
 
-// Manual curation wins over everything the algorithm produced.
-for (const [char, entry] of Object.entries(manualOverrides)) {
-  components[char] = { ...components[char], ...entry };
-  if (entry.k != null) keywordOrigin[char] = "components_manual_overrides.json";
-}
+const { components, droppedKanjiKeywords, coverageReport } =
+  buildComponentsRegistry({
+    main,
+    extended,
+    componentKeywords,
+    phonetic,
+    radicals,
+    radicalAliases,
+    formKeywords,
+    aiRadicals,
+    manualOverrides,
+    structureSources,
+    kanjiList,
+    isKanji,
+    fail,
+    EXT,
+    decomposition,
+  });
 
 // ---------------------------------------------------------------------------
 // kanji_structures.json — the four interpretations in one file. Sources are
@@ -342,78 +519,6 @@ for (const kanji of structureKanji) {
   }
   if (Object.keys(entry).length > 0) outStructures[kanji] = entry;
 }
-
-// ---------------------------------------------------------------------------
-// Coverage report: every component referenced anywhere that still has no
-// keyword, ordered by how often it is referenced. This is the worklist for
-// raw-data/components_manual_overrides.json.
-// ---------------------------------------------------------------------------
-
-const references = new Map();
-
-// Ideographic Description Characters (⿰ ⿱ ⿸ ...) describe how a kanji is laid
-// out, not what it is made of. They are never components and must not show up
-// as gaps to fill.
-const isIdsOperator = (char) => {
-  const code = char.codePointAt(0);
-  return code >= 0x2ff0 && code <= 0x2fff;
-};
-
-const noteReference = (char, source) => {
-  if (typeof char !== "string" || [...char].length !== 1) return;
-  if (isKanji(char) || isIdsOperator(char)) return;
-  const entry = references.get(char) ?? { refs: 0, sources: new Set() };
-  entry.refs += 1;
-  entry.sources.add(source);
-  references.set(char, entry);
-};
-
-for (const kanji of kanjiList) {
-  for (const part of extended[kanji][EXT.parts] ?? []) {
-    noteReference(part, "parts");
-  }
-  noteReference(extended[kanji][EXT.phonetic], "phonetic-ref");
-}
-for (const chars of Object.values(decomposition)) {
-  for (const char of chars) noteReference(char, "decomposition");
-}
-// scott and yagays are plain component lists; kanjium is
-// [semantic, radicalVariant, phonetic, idsStructure, structureType] so only
-// the first three slots name components; hlorenzi is an object.
-for (const value of Object.values(structureSources.sc)) {
-  for (const char of value ?? []) noteReference(char, "sc");
-}
-for (const value of Object.values(structureSources.ya)) {
-  for (const char of value ?? []) noteReference(char, "ya");
-}
-for (const value of Object.values(structureSources.ka)) {
-  for (const char of (value ?? []).slice(0, 3)) noteReference(char, "ka");
-}
-for (const value of Object.values(structureSources.hl)) {
-  noteReference(value?.semantic, "hl");
-  noteReference(value?.phonetic, "hl");
-}
-for (const list of Object.values(radicals.radicalsGroupedByStrokeCount)) {
-  for (const char of list) noteReference(char, "radical-drawer");
-}
-
-const missing = [...references.entries()]
-  .filter(([char]) => components[char]?.k == null)
-  .map(([char, entry]) => ({
-    char,
-    refs: entry.refs,
-    sources: [...entry.sources].sort(),
-  }))
-  .sort((a, b) => b.refs - a.refs || a.char.localeCompare(b.char));
-
-const coverageReport = {
-  summary: {
-    referenced: references.size,
-    withKeyword: references.size - missing.length,
-    missing: missing.length,
-  },
-  missing,
-};
 
 // ---------------------------------------------------------------------------
 // Invariants that must hold before anything is written
@@ -513,6 +618,13 @@ console.log(
     `have a keyword, ${coverageReport.summary.missing} missing ` +
     `(see docs/data/component-coverage.json)`
 );
+if (coverageReport.summary.missing === 0) {
+  console.log("Component keywords: unique, none missing");
+} else {
+  console.log(
+    `Component keywords: unique among named entries; ${coverageReport.summary.missing} still missing`
+  );
+}
 console.log(
   `Dropped ${droppedKanjiKeywords} component keywords that kanji_main already answers`
 );
