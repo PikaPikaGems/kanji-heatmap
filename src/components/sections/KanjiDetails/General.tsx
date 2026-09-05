@@ -22,6 +22,7 @@ import {
   kanshudoFn,
   otherOutLinks,
 } from "@/lib/external-links";
+import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -87,6 +88,9 @@ export const General = ({ kanji }: { kanji: string }) => {
     return (
       <>
         <BareGeneral kanji={kanji} />
+        <div className="flex justify-center gap-1">
+          <KanjiActions key={kanji} kanji={kanji} />
+        </div>
       </>
     );
   }
@@ -170,6 +174,11 @@ export const General = ({ kanji }: { kanji: string }) => {
         <RomajiBadge key={on} className="text-lg" kana={on} />
       )),
     },
+    {
+      label: "Actions",
+      description: "Hear, copy, or share this kanji",
+      items: [<KanjiActions key={kanji} kanji={kanji} />],
+    },
   ];
 
   return (
@@ -197,7 +206,9 @@ export const General = ({ kanji }: { kanji: string }) => {
             <TableRow key={label} className="text-left">
               <LabelCell label={label} description={description} />
               <TableCellGrow>
-                {items}
+                {items && items.length > 0 && (
+                  <div className="flex gap-1">{items}</div>
+                )}
                 {items.length === 0 && <div> - </div>}
               </TableCellGrow>
             </TableRow>

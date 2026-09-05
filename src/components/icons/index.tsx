@@ -37,6 +37,7 @@ import {
   Trash2,
   Download,
   Loader2,
+  Share2,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -76,4 +77,5 @@ export {
   Trash2,
   Download,
   Loader2,
+  Share2,
 };
