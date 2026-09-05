@@ -5,6 +5,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
 import { vocabExternalLinksCore } from "@/lib/external-links";
 import { DotIcon, InfoIcon } from "lucide-react";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 
 import { VocabActions } from "@/components/common/VocabActions";
 
@@ -24,7 +25,7 @@ const WhatIsARepresentativeStudyWord = () => {
     <>
       <GenericPopover
         trigger={
-          <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
+          <span className={cnDottedUnderlineTrigger}>
             <strong>What is a Anchor Word? (Experimental Feature)</strong>
             <InfoIcon size={14} />
           </span>

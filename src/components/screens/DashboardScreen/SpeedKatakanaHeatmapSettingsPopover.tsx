@@ -2,6 +2,7 @@ import { useId } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { Settings2 } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import {
   HEATMAP_CELL_METRICS,
   HEATMAP_METRIC_LABELS,
@@ -56,7 +57,8 @@ export const SpeedKatakanaHeatmapSettingsPopover = ({
           key={metric}
           type="button"
           className={cn(
-            "inline-flex items-center gap-1 animate-fade-in-slow text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8",
+            cnDottedUnderlineTrigger,
+            "animate-fade-in-slow text-xs",
             className
           )}
         >

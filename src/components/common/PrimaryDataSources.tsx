@@ -1,6 +1,7 @@
 import { InfoIcon } from "lucide-react";
 import { GenericPopover } from "./GenericPopover";
 import { ExternalTextLink } from "./ExternalTextLink";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 
 type SourceLink = { text: string; url: string };
 
@@ -14,7 +15,7 @@ export const PrimaryDataSources = ({
   <div className="pl-2 my-6 text-left ">
     <GenericPopover
       trigger={
-        <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent">
+        <span className={cnDottedUnderlineTrigger}>
           <strong>{title}</strong>
           <InfoIcon size={14} />
         </span>
