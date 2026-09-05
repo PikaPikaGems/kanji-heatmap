@@ -4,31 +4,38 @@ import { useStorageValue } from "./use-storage-value";
 
 const LOCAL_STORAGE_THEME_COLOR_KEY = "theme-color";
 
-// Only store RGB values
+// Only store RGB values — one saturated swatch per hue family (24 = 4×6 grid)
 export const themeColorsRgb = [
-  "25, 60, 184", // blue (blue-700)
-  "251, 2, 168", // pink (fuchsia-600)
-  "170, 0, 255", // purple (purple-600)
-  "0, 170, 255", // light blue (sky-500)
-  "236, 0, 63", // red (rose-600)
-  "0, 166, 62", // green (green-600)
-  "234, 88, 12", // orange (orange-600)
-  "234, 179, 8", // yellow (yellow-500)
-  "20, 184, 166", // teal (teal-500)
-  "168, 85, 247", // violet (violet-500)
-  "236, 72, 153", // pink (pink-500)
-  "6, 182, 212", // cyan (cyan-500)
-  "132, 204, 22", // lime (lime-500)
-  "251, 146, 60", // amber (amber-400)
-  "244, 63, 94", // rose (rose-500)
-  "59, 130, 246", // blue (blue-500)
-  "14, 165, 233", // sky (sky-500)
-  "99, 102, 241", // indigo (indigo-500)
+  "25, 60, 184", // blue-700 (default)
+  "99, 102, 241", // indigo-500
+  "168, 85, 247", // violet-500
+  "147, 51, 234", // purple-600
+  "251, 2, 168", // fuchsia-600
+  "236, 72, 153", // pink-500
+  "225, 29, 72", // rose-600
+  "220, 38, 38", // red-600
+  "234, 88, 12", // orange-600
+  "245, 158, 11", // amber-500
+  "234, 179, 8", // yellow-500
+  "132, 204, 22", // lime-500
+  "22, 163, 74", // green-600
+  "16, 185, 129", // emerald-500
+  "20, 184, 166", // teal-500
+  "6, 182, 212", // cyan-500
+  "14, 165, 233", // sky-500
+  "59, 130, 246", // blue-500
+  "124, 58, 237", // violet-600
+  "219, 39, 119", // pink-700
+  "251, 146, 60", // amber-400
+  "125, 211, 252", // sky-300
+  "100, 116, 139", // slate-500
+  "154, 52, 18", // orange-800
 ];
 
 const readThemeColorIndex = () => {
   const stored = Number(localStorage.getItem(LOCAL_STORAGE_THEME_COLOR_KEY));
-  return Number.isNaN(stored) ? 0 : stored;
+  if (Number.isNaN(stored)) return 0;
+  return Math.min(Math.max(stored, 0), themeColorsRgb.length - 1);
 };
 
 /** Applies + persists a theme color index without notifying other instances. */
