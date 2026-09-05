@@ -115,9 +115,9 @@ const RadicalJpCard = ({
 export const RadicalSearchAction = ({ radical }: { radical: string }) => (
   <Link
     to={radicalSearchHref(radical)}
-    className="flex items-start gap-2 text-left transition-colors px-3text-xs"
+    className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
   >
-    <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent">
+    <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
       <Search size={14} />
       <strong>Find kanji that include {radical}</strong>
     </span>
