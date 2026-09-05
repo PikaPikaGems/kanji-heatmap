@@ -77,16 +77,11 @@ export const KanjiDMAK = ({
       step: step,
       // NOTE: dmak's stroke.animated is an object { drawing, erasing }, not a boolean.
       // Passing a plain boolean breaks stroke.animated.drawing access — do not change.
-      stroke: staticMode
-        ? {
-            animated: { drawing: false, erasing: false },
-            order: { visible: true },
-            attr: { stroke: "random" },
-          }
-        : {
-            attr: { stroke: "random" },
-            order: { visible: showStrokeOrderNumbers },
-          },
+      stroke: {
+        ...(staticMode ? { animated: { drawing: false, erasing: false } } : {}),
+        attr: { stroke: "random" },
+        order: { visible: showStrokeOrderNumbers },
+      },
 
       grid: { show: gridShow },
     });
