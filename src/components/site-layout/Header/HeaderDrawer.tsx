@@ -17,6 +17,10 @@ import {
   SettingsModal,
   SettingsModalTrigger,
 } from "@/components/dependent/site-wide/SettingsModal";
+import {
+  InstallAppModal,
+  InstallAppModalTrigger,
+} from "@/components/common/InstallAppModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -27,9 +31,11 @@ const infoLinks = [
 const HeaderDrawerContent = ({
   onClose,
   onOpenSettings,
+  onOpenInstallGuide,
 }: {
   onClose: () => void;
   onOpenSettings: () => void;
+  onOpenInstallGuide: () => void;
 }) => {
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
@@ -53,7 +59,7 @@ const HeaderDrawerContent = ({
         />
       </div>
 
-      <div className="flex flex-wrap justify-center w-full gap-2">
+      <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
         {infoLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
@@ -82,29 +88,38 @@ const HeaderDrawerContent = ({
         <DebugInfo />
         <SettingsModalTrigger onClick={onOpenSettings} />
       </div>
+      <div className="flex w-full pt-2 mt-6 border-t border-dashed justify-left gap-x-1">
+        <InstallAppModalTrigger onClick={onOpenInstallGuide} />
+      </div>
     </div>
   );
 };
+
+type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
 const HeaderDrawer = ({
   initiallyOpen = false,
 }: {
   initiallyOpen?: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(initiallyOpen);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
-  const openSettings = () => {
-    setIsOpen(false);
-    setSettingsOpen(true);
-  };
+  const [openedModal, setOpenedModal] = useState<OpenedModal>(
+    initiallyOpen ? "sidebar" : "none"
+  );
 
   return (
     <>
       <DrawerPrimitive.Root
         direction="right"
-        open={isOpen}
-        onOpenChange={setIsOpen}
+        open={openedModal === "sidebar"}
+        onOpenChange={(open) => {
+          if (open) {
+            setOpenedModal("sidebar");
+            return;
+          }
+          setOpenedModal((current) =>
+            current === "sidebar" ? "none" : current
+          );
+        }}
       >
         <DrawerPrimitive.Trigger asChild>
           <Button variant="outline" size="iconXl" aria-label="Open menu">
@@ -121,13 +136,21 @@ const HeaderDrawer = ({
               Site navigation links and settings
             </DrawerPrimitive.Description>
             <HeaderDrawerContent
-              onClose={() => setIsOpen(false)}
-              onOpenSettings={openSettings}
+              onClose={() => setOpenedModal("none")}
+              onOpenSettings={() => setOpenedModal("settings")}
+              onOpenInstallGuide={() => setOpenedModal("install-guide")}
             />
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       </DrawerPrimitive.Root>
-      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <SettingsModal
+        open={openedModal === "settings"}
+        onOpenChange={(open) => setOpenedModal(open ? "settings" : "none")}
+      />
+      <InstallAppModal
+        open={openedModal === "install-guide"}
+        onOpenChange={(open) => setOpenedModal(open ? "install-guide" : "none")}
+      />
     </>
   );
 };

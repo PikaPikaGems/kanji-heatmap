@@ -5,6 +5,7 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
+import { InstallAppModal } from "@/components/common/InstallAppModal";
 
 export const BottomBar = ({
   includeNode,
@@ -28,6 +29,10 @@ export const BottomBar = ({
         <DebugInfo />
         <SettingsModal />
         {includeNode}
+      </div>
+
+      <div className="flex w-full mb-8 justify-left">
+        <InstallAppModal />
       </div>
     </>
   );
