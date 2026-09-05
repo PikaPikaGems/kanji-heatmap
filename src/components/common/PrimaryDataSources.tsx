@@ -14,7 +14,7 @@ export const PrimaryDataSources = ({
   <div className="pl-2 my-6 text-left ">
     <GenericPopover
       trigger={
-        <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8">
+        <span className="inline-flex items-center gap-1 leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent">
           <strong>{title}</strong>
           <InfoIcon size={14} />
         </span>

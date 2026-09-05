@@ -115,16 +115,11 @@ const RadicalJpCard = ({
 export const RadicalSearchAction = ({ radical }: { radical: string }) => (
   <Link
     to={radicalSearchHref(radical)}
-    className="flex items-start gap-2 px-3 py-2 text-left transition-colors border-2 border-dashed rounded-xl hover:border-solid hover:bg-foreground/5"
+    className="flex items-start gap-2 text-left transition-colors px-3text-xs"
   >
-    <Search className="size-4" />
-    <span className="min-w-0">
-      <span className="block text-xs font-bold leading-snug">
-        Search by radical {radical}
-      </span>
-      <span className="mt-0.5 block text-[11px] font-light leading-snug text-muted-foreground">
-        Find kanji that include {radical}
-      </span>
+    <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent">
+      <Search size={14} />
+      <strong>Find kanji that include {radical}</strong>
     </span>
   </Link>
 );
@@ -138,7 +133,7 @@ export const RadicalPopoverContent = ({
 }) => {
   return (
     <div className="p-1" data-vaul-no-drag>
-      <div className="flex items-center gap-3 px-1 pb-3">
+      <div className="flex items-center gap-3 px-1">
         <div className="flex items-center justify-center text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
         </div>
@@ -166,7 +161,7 @@ export const GlobalRadicalLink = ({
   return (
     <GenericPopover
       modal
-      contentClassName="z-[60] w-[min(100vw-2rem,17.5rem)] p-0"
+      contentClassName="z-[60] w-min p-2"
       trigger={
         <button type="button" className={cnJPCardLink}>
           <RadicalJpCard
