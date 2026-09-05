@@ -132,6 +132,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://www.michikanji.com/kanji/${kanji}`,
   },
   {
+    name: "Lingaku",
+    url: (kanji: string) => `https://lingaku.com/jpn/dictionary/char/${kanji}`,
+  },
+  {
     name: "Joy-o-Kanji",
     url: (kanji: string) =>
       `https://www.joyokanji.com/character-home-page/${kanji}`,

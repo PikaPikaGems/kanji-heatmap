@@ -2,7 +2,10 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
 
-import { FakeComponentLink, GlobalRadicalLink } from "../routing/global-links";
+import {
+  FakeComponentLink,
+  RadicalPopoverContent,
+} from "../routing/global-links";
 import { isKnownRadical, nonRadicalVariantKeywords } from "@/lib/radicals";
 
 export const SingleKanjiPart = ({
@@ -20,7 +23,7 @@ export const SingleKanjiPart = ({
     <GenericPopover
       trigger={
         <button
-          className={`flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 hover:border-solid hover:border-[#2effff] ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`}
+          className={`flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 hover:border-solid hover:border-neon-accent ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`}
         >
           {kanji}
         </button>
@@ -42,10 +45,7 @@ export const SingleKanjiPart = ({
               <span className="italic font-normal">{"(Kanji)"}</span>
             </>
           ) : isKnownRadical(kanji) ? (
-            <>
-              <GlobalRadicalLink radical={kanji} keyword={keyword} />
-              <span className="italic font-normal">{"(Radical)"}</span>
-            </>
+            <RadicalPopoverContent radical={kanji} keyword={keyword} />
           ) : (
             <>
               <FakeComponentLink radical={kanji} keyword={keyword} />

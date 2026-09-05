@@ -63,7 +63,7 @@ export const ErrorSocialIcons = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-1 pt-4",
+        "flex flex-wrap items-center justify-center gap-x-1 pt-4",
         className
       )}
     >

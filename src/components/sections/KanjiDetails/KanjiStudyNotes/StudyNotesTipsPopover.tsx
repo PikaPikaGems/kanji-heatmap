@@ -1,6 +1,7 @@
 import { InfoIcon } from "@/components/icons";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { cn } from "@/lib/utils";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { StudyNotesEditorTips } from "./StudyNotesEditorTips";
 
 interface StudyNotesTipsPopoverProps {
@@ -18,7 +19,8 @@ export const StudyNotesTipsPopover = ({
         <button
           type="button"
           className={cn(
-            "inline-flex items-center self-start gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8",
+            cnDottedUnderlineTrigger,
+            "self-start text-xs",
             className
           )}
         >

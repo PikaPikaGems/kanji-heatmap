@@ -78,18 +78,13 @@ export const DebugInfo = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="iconXl"
-          className="mr-1"
-          aria-label="Debug info"
-        >
+        <Button variant="outline" size="iconXl" aria-label="Debug info">
           <Info className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-4 mr-2 w-52" side="top" align="start">
+      <PopoverContent className="p-3 mr-2 w-52" side="top" align="start">
         <div className="space-y-1 font-mono text-[8px]">
-          <div className="flex items-center justify-between mb-3 border-b border-dotted">
+          <div className="flex items-center justify-between pb-1 mb-3 border-b border-dotted">
             <span className="text-[10px] uppercase font-medium tracking-wide text-muted-foreground">
               Debug
             </span>

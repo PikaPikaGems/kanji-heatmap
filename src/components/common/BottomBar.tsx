@@ -5,6 +5,7 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
+import { InstallAppModal } from "@/components/common/InstallAppModal";
 
 export const BottomBar = ({
   includeNode,
@@ -20,14 +21,18 @@ export const BottomBar = ({
       </div>
 
       <div
-        className={`flex items-center justify-${justify} w-full mt-4 mb-8 space-x-1`}
+        className={`flex flex-wrap items-center gap-x-1 justify-${justify} w-full mt-4 mb-8`}
       >
         <LinksOutItems />
         <DotIcon className="w-2 m-0" />
-        <DebugInfo />
         <RefreshPageBtn />
+        <DebugInfo />
         <SettingsModal />
         {includeNode}
+      </div>
+
+      <div className="flex w-full mb-8 justify-left">
+        <InstallAppModal />
       </div>
     </>
   );

@@ -56,3 +56,19 @@ const [status, setStatus] = useState<"pending" | "errored" | "completed">(
 ```
 
 Prefer a union (or a small tagged object) over parallel flags like `isOpen` + `isClosing` + `didFail` when they describe the same process.
+
+This includes overlays: a drawer and the dialogs opened from it cannot be open together, so they are **one** `openedModal`, not `isOpen` + `settingsOpen` + `installGuideOpen`.
+
+```tsx
+// ❌ BAD — exclusive overlays as parallel booleans
+const [isOpen, setIsOpen] = useState(false);
+const [settingsOpen, setSettingsOpen] = useState(false);
+const [installGuideOpen, setInstallGuideOpen] = useState(false);
+
+// ✅ GOOD
+const [openedModal, setOpenedModal] = useState<
+  "none" | "sidebar" | "install-guide" | "settings"
+>("none");
+```
+
+Do **not** split those flags onto each button just to avoid rerenders — the parent still owns the discriminant because switching one overlay must close the others.

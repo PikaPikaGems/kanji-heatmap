@@ -13,7 +13,14 @@ import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
-import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
+import {
+  SettingsModal,
+  SettingsModalTrigger,
+} from "@/components/dependent/site-wide/SettingsModal";
+import {
+  InstallAppModal,
+  InstallAppModalTrigger,
+} from "@/components/common/InstallAppModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -21,7 +28,15 @@ const infoLinks = [
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
 
-const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
+const HeaderDrawerContent = ({
+  onClose,
+  onOpenSettings,
+  onOpenInstallGuide,
+}: {
+  onClose: () => void;
+  onOpenSettings: () => void;
+  onOpenInstallGuide: () => void;
+}) => {
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
@@ -44,7 +59,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         />
       </div>
 
-      <div className="flex flex-wrap justify-center w-full gap-2">
+      <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
         {infoLinks.map((item) => (
           <DrawerPrimitive.Close key={item.href} asChild>
             <Link
@@ -66,48 +81,77 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
       <div
-        className="flex justify-center w-full pt-1 mt-auto"
+        className="flex justify-center w-full pt-1 mt-auto gap-x-1"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <DebugInfo />
         <RefreshPageBtn />
-        <SettingsModal />
+        <DebugInfo />
+        <SettingsModalTrigger onClick={onOpenSettings} />
+      </div>
+      <div className="flex w-full pt-2 mt-6 border-t border-dashed justify-left gap-x-1">
+        <InstallAppModalTrigger onClick={onOpenInstallGuide} />
       </div>
     </div>
   );
 };
+
+type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
 const HeaderDrawer = ({
   initiallyOpen = false,
 }: {
   initiallyOpen?: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const [openedModal, setOpenedModal] = useState<OpenedModal>(
+    initiallyOpen ? "sidebar" : "none"
+  );
 
   return (
-    <DrawerPrimitive.Root
-      direction="right"
-      open={isOpen}
-      onOpenChange={setIsOpen}
-    >
-      <DrawerPrimitive.Trigger asChild>
-        <Button variant="outline" size="iconXl" aria-label="Open menu">
-          <Menu className="w-7 h-7" />
-        </Button>
-      </DrawerPrimitive.Trigger>
-      <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
-        <DrawerPrimitive.Content className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background">
-          <DrawerPrimitive.Title className="sr-only">
-            Navigation menu
-          </DrawerPrimitive.Title>
-          <DrawerPrimitive.Description className="sr-only">
-            Site navigation links and settings
-          </DrawerPrimitive.Description>
-          <HeaderDrawerContent onClose={() => setIsOpen(false)} />
-        </DrawerPrimitive.Content>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+    <>
+      <DrawerPrimitive.Root
+        direction="right"
+        open={openedModal === "sidebar"}
+        onOpenChange={(open) => {
+          if (open) {
+            setOpenedModal("sidebar");
+            return;
+          }
+          setOpenedModal((current) =>
+            current === "sidebar" ? "none" : current
+          );
+        }}
+      >
+        <DrawerPrimitive.Trigger asChild>
+          <Button variant="outline" size="iconXl" aria-label="Open menu">
+            <Menu className="w-7 h-7" />
+          </Button>
+        </DrawerPrimitive.Trigger>
+        <DrawerPrimitive.Portal>
+          <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <DrawerPrimitive.Content className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background">
+            <DrawerPrimitive.Title className="sr-only">
+              Navigation menu
+            </DrawerPrimitive.Title>
+            <DrawerPrimitive.Description className="sr-only">
+              Site navigation links and settings
+            </DrawerPrimitive.Description>
+            <HeaderDrawerContent
+              onClose={() => setOpenedModal("none")}
+              onOpenSettings={() => setOpenedModal("settings")}
+              onOpenInstallGuide={() => setOpenedModal("install-guide")}
+            />
+          </DrawerPrimitive.Content>
+        </DrawerPrimitive.Portal>
+      </DrawerPrimitive.Root>
+      <SettingsModal
+        open={openedModal === "settings"}
+        onOpenChange={(open) => setOpenedModal(open ? "settings" : "none")}
+      />
+      <InstallAppModal
+        open={openedModal === "install-guide"}
+        onOpenChange={(open) => setOpenedModal(open ? "install-guide" : "none")}
+      />
+    </>
   );
 };
 

@@ -42,10 +42,8 @@ export const SortAndFilterSettingsDialog = ({
         title="Sorting and Filtering Settings"
         description="Manage your Sorting and Filtering Settings"
         scrollBody={false}
-        className="max-h-svh px-1 pb-4 md:px-4"
-        headerClassName="px-0 pt-0"
-        titleClassName="px-2 text-left"
-        bodyClassName="px-0"
+        titleClassName="text-left"
+        bodyClassName="px-1 py-3"
       >
         {isOpen && (
           <ErrorBoundary>

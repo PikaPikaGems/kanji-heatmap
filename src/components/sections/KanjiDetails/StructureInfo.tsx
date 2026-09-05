@@ -51,11 +51,15 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
             <div key={similarKanji} className="shrink-0">
               <GenericPopover
                 trigger={
-                  <button className="flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 border-dotted hover:border-solid hover:border-[#2effff]">
+                  <button className="flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 border-dotted hover:border-solid hover:border-neon-accent">
                     {similarKanji}
                   </button>
                 }
-                content={<PartComponentLink part={similarKanji} />}
+                content={
+                  <div className="p-2">
+                    <PartComponentLink part={similarKanji} />
+                  </div>
+                }
               />
             </div>
           ))}

@@ -16,7 +16,7 @@ export type StrokeAnimationSettings = {
 
 export const DEFAULT_STROKE_ANIMATION_SETTINGS: StrokeAnimationSettings = {
   showStrokeOrderNumbers: false,
-  slowSpeed: SLOW_SPEED_MAX,
+  slowSpeed: SLOW_SPEED_MAX / 2,
   fastSpeed: FAST_SPEED_MIN,
 };
 

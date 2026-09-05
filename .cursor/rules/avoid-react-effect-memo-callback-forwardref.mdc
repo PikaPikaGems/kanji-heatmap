@@ -1,5 +1,5 @@
 ---
-description: Avoid useEffect, useMemo, useCallback, and forwardRef unless truly necessary
+description: useEffect is last resort; also avoid needless useMemo, useCallback, forwardRef
 globs: **/*.{ts,tsx}
 alwaysApply: true
 ---
@@ -8,14 +8,19 @@ alwaysApply: true
 
 Prefer deriving values during render and using simpler React patterns. Do **not** reach for `useEffect`, `useMemo`, `useCallback`, or `forwardRef` by default.
 
-## useEffect — especially avoid
+## useEffect — last resort only
 
-Do **not** use `useEffect` unless you truly need it (syncing with an external system, subscriptions, timers, imperative DOM APIs, etc.).
+Do **not** use `useEffect` if a simpler alternative exists. Prefer, in order:
 
-If there is no simpler alternative and you must use it, add a short comment at the effect explaining:
+1. Compute during render (filter, map, derived flags)
+2. Event handlers / the click that needs the user gesture
+3. Module-level setup that runs once on import (e.g. capturing a one-shot browser event)
+4. `useEffect` **only** to sync with an external system (subscriptions, timers, imperative DOM) when 1–3 cannot
+
+If you must use it, add a short comment at the effect explaining:
 
 1. Why the effect is required
-2. That there is no simpler way (e.g. not just “derive during render” or event handlers)
+2. That there is no simpler way (not just “derive during render” or event handlers)
 
 ```tsx
 // ❌ BAD — derived state / mirroring props

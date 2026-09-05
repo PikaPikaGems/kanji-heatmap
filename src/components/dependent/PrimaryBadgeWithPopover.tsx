@@ -21,7 +21,7 @@ export const PrimaryBadgeWithPopover = ({
       </button>
     }
     content={
-      <p>
+      <p className="text-xs">
         <span className="font-semibold">{label}:</span> {description}
       </p>
     }

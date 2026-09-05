@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,7 @@ import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
 import { useAvailableJpVoices } from "@/hooks/use-available-jp-voices";
-import {
-  useCurrentThemeColor,
-  themeColorsRgb,
-} from "@/hooks/use-change-theme-color";
+import { ColorGrid } from "@/components/common/ColorGrid";
 import {
   preloadKanjiSvgs,
   preloadKatakanaChallenges,
@@ -220,34 +217,6 @@ const FontGrid = () => {
   );
 };
 
-const ColorGrid = () => {
-  const [colorIndex, setThemeColor] = useCurrentThemeColor();
-
-  return (
-    <div className="grid grid-cols-6 gap-2">
-      {themeColorsRgb.map((rgb, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => setThemeColor(i)}
-          aria-pressed={colorIndex === i}
-          aria-label={`Theme color ${i + 1}`}
-          className={cn(
-            "h-10 rounded-xl border-2 transition-transform",
-            colorIndex === i
-              ? "border-theme-color-darker scale-95 ring-2 ring-offset-2 ring-offset-background"
-              : "border-transparent hover:scale-105"
-          )}
-          style={{
-            backgroundColor: `rgb(${rgb})`,
-            ...(colorIndex === i ? { borderColor: `rgb(${rgb})` } : {}),
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
 const JpVoiceSelect = () => {
   const [voiceId, setVoiceId] = useCurrentJpVoice();
   const availableVoices = useAvailableJpVoices();
@@ -297,21 +266,40 @@ const LightDarkRow = () => {
   );
 };
 
-export const SettingsModal = () => {
-  const [open, setOpen] = useState(false);
+export const SettingsModalTrigger = ({
+  onClick,
+  ...props
+}: ComponentProps<typeof Button>) => (
+  <Button
+    variant="outline"
+    size="iconXl"
+    aria-label="Open User Preferences"
+    onClick={onClick}
+    {...props}
+  >
+    <Settings className="w-[1.2rem] h-[1.2rem]" />
+  </Button>
+);
+
+export const SettingsModal = ({
+  open: openProp,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+} = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="iconXl"
-          aria-label="Open User Preferences"
-          className="ml-1"
-        >
-          <Settings className="w-[1.2rem] h-[1.2rem]" />
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <SettingsModalTrigger />
+        </DialogTrigger>
+      )}
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
@@ -348,7 +336,7 @@ export const SettingsModal = () => {
 
           <div className="mb-4 text-left">
             <span className="block mb-2 text-sm font-semibold">
-              Background Color
+              Theme Color
             </span>
             <ColorGrid />
           </div>

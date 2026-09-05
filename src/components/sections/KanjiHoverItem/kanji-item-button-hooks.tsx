@@ -10,7 +10,7 @@ import { isBookmarked } from "@/lib/bookmarks";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
 
-export const cn = `animate-fade-in-fast h-95 w-full p-1.5 rounded-lg text-2xl ml-1 border-4 bg-opacity-100 z-0 hover:border-[#2effff] transition-all transition-discrete duration-500`;
+export const cn = `animate-fade-in-fast h-95 w-full p-1.5 rounded-lg text-2xl ml-1 border-4 bg-opacity-100 z-0 hover:border-neon-accent transition-all transition-discrete duration-500`;
 export const loadingCn = `${cn} animate-pulse duration-1000 h-full !bg-lime-400 !border-3 border-white dark:border-black`;
 export const ellipsisCn =
   "!text-ellipsis !text-nowrap !w-24 !overflow-hidden !whitespace-nowrap";
