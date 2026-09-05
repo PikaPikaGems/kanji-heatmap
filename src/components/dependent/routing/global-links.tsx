@@ -115,11 +115,9 @@ const RadicalJpCard = ({
 export const RadicalSearchAction = ({ radical }: { radical: string }) => (
   <Link
     to={radicalSearchHref(radical)}
-    className="flex items-start gap-3 rounded-xl border-2 border-dashed p-2 text-left transition-colors hover:border-solid hover:border-[#2effff] hover:bg-[#2effff]/15"
+    className="flex items-start gap-2 px-3 py-2 text-left transition-colors border-2 border-dashed rounded-xl hover:border-solid hover:bg-foreground/5"
   >
-    <span className="flex items-center justify-center rounded-lg size-6 shrink-0 bg-foreground/5">
-      <Search className="size-3" />
-    </span>
+    <Search className="size-4" />
     <span className="min-w-0">
       <span className="block text-xs font-bold leading-snug">
         Search by radical {radical}
