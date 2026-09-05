@@ -45,10 +45,11 @@
       property="twitter:image"
       content="https://kanjiheatmap.com/img/social-preview.png"
     />
+    <!-- `viewport-fit=cover` must live inside `content`; as a separate HTML
+         attribute it is ignored and env(safe-area-inset-*) resolves to 0. -->
     <meta
       name="viewport"
-      viewport-fit="cover"
-      content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <title>Kanji Heatmap</title>
     <style>
