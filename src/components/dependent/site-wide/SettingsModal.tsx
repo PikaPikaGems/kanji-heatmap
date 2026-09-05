@@ -276,7 +276,6 @@ export const SettingsModal = () => {
           variant="outline"
           size="iconXl"
           aria-label="Open User Preferences"
-          className="ml-1"
         >
           <Settings className="w-[1.2rem] h-[1.2rem]" />
         </Button>

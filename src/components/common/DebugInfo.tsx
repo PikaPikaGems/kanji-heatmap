@@ -78,12 +78,7 @@ export const DebugInfo = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="iconXl"
-          className="mb-2 mr-1"
-          aria-label="Debug info"
-        >
+        <Button variant="outline" size="iconXl" aria-label="Debug info">
           <Info className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </PopoverTrigger>

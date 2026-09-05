@@ -20,12 +20,12 @@ export const BottomBar = ({
       </div>
 
       <div
-        className={`flex items-center justify-${justify} w-full mt-4 mb-8 space-x-1`}
+        className={`flex flex-wrap items-center gap-x-1 justify-${justify} w-full mt-4 mb-8`}
       >
         <LinksOutItems />
         <DotIcon className="w-2 m-0" />
-        <DebugInfo />
         <RefreshPageBtn />
+        <DebugInfo />
         <SettingsModal />
         {includeNode}
       </div>

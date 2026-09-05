@@ -66,11 +66,11 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
       <div
-        className="flex justify-center w-full pt-1 mt-auto"
+        className="flex justify-center w-full pt-1 mt-auto gap-x-1"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <DebugInfo />
         <RefreshPageBtn />
+        <DebugInfo />
         <SettingsModal />
       </div>
     </div>
