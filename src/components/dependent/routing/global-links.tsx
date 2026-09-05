@@ -115,7 +115,7 @@ const RadicalJpCard = ({
 export const RadicalSearchAction = ({ radical }: { radical: string }) => (
   <Link
     to={radicalSearchHref(radical)}
-    className="flex items-start gap-3 rounded-xl border-2 border-dashed px-3 py-2.5 text-left transition-colors hover:border-solid hover:border-[#2effff] hover:bg-[#2effff]/15"
+    className="flex items-start gap-3 rounded-xl border-2 border-dashed p-2 text-left transition-colors hover:border-solid hover:border-[#2effff] hover:bg-[#2effff]/15"
   >
     <span className="flex items-center justify-center rounded-lg size-6 shrink-0 bg-foreground/5">
       <Search className="size-3" />
@@ -139,7 +139,7 @@ export const RadicalPopoverContent = ({
   keyword: string;
 }) => {
   return (
-    <div className="p-3" data-vaul-no-drag>
+    <div className="p-1" data-vaul-no-drag>
       <div className="flex items-center gap-3 px-1 pb-3">
         <div className="flex items-center justify-center text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
