@@ -20,6 +20,7 @@ import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
+import { InstallAppModal } from "@/components/common/InstallAppModal";
 
 const StudyNotesLoadingFallback = () => (
   <div
@@ -72,6 +73,9 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
       </p>
 
       <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
+      <div className="flex w-full pt-2 mt-6 mb-8 border-t border-dashed justify-left gap-x-1">
+        <InstallAppModal />
+      </div>
     </div>
   );
 };

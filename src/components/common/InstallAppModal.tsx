@@ -7,8 +7,11 @@ import { outLinks } from "@/lib/external-links";
 
 const FIND_ADD_TO_HOME_SCREEN = (
   <>
-    Find <strong>Add to Home Screen</strong> (scroll or tap{" "}
-    <strong>View More</strong>)
+    Find{" "}
+    <strong>
+      {`"`}Add to Home Screen{`"`}
+    </strong>{" "}
+    (scroll or tap <strong>View More</strong>)
   </>
 );
 
@@ -20,7 +23,8 @@ const TAP_ADD_TO_HOME_SCREEN = (
 
 const SAFARI_STEPS: ReactNode[] = [
   <>
-    Tap ··· next to the address bar, then tap <strong>Share</strong>
+    Tap ··· (the three dots) next to the address bar, then tap{" "}
+    <strong>Share</strong>
   </>,
   FIND_ADD_TO_HOME_SCREEN,
   TAP_ADD_TO_HOME_SCREEN,
@@ -28,7 +32,7 @@ const SAFARI_STEPS: ReactNode[] = [
 
 const CHROME_STEPS: ReactNode[] = [
   <>
-    Tap <strong>Share</strong> on the right of the address bar
+    Tap the <strong>share icon</strong> on the right of the address bar
   </>,
   FIND_ADD_TO_HOME_SCREEN,
   TAP_ADD_TO_HOME_SCREEN,

@@ -17,10 +17,7 @@ import {
   SettingsModal,
   SettingsModalTrigger,
 } from "@/components/dependent/site-wide/SettingsModal";
-import {
-  InstallAppModal,
-  InstallAppModalTrigger,
-} from "@/components/common/InstallAppModal";
+import { InstallAppModalTrigger } from "@/components/common/InstallAppModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -88,7 +85,7 @@ const HeaderDrawerContent = ({
         <DebugInfo />
         <SettingsModalTrigger onClick={onOpenSettings} />
       </div>
-      <div className="flex w-full pt-2 mt-6 border-t border-dashed justify-left gap-x-1">
+      <div className="flex justify-center w-full pt-2 mt-6 border-t border-dashed gap-x-1">
         <InstallAppModalTrigger onClick={onOpenInstallGuide} />
       </div>
     </div>
@@ -146,10 +143,6 @@ const HeaderDrawer = ({
       <SettingsModal
         open={openedModal === "settings"}
         onOpenChange={(open) => setOpenedModal(open ? "settings" : "none")}
-      />
-      <InstallAppModal
-        open={openedModal === "install-guide"}
-        onOpenChange={(open) => setOpenedModal(open ? "install-guide" : "none")}
       />
     </>
   );
