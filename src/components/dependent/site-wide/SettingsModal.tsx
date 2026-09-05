@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
@@ -266,20 +266,40 @@ const LightDarkRow = () => {
   );
 };
 
-export const SettingsModal = () => {
-  const [open, setOpen] = useState(false);
+export const SettingsModalTrigger = ({
+  onClick,
+  ...props
+}: ComponentProps<typeof Button>) => (
+  <Button
+    variant="outline"
+    size="iconXl"
+    aria-label="Open User Preferences"
+    onClick={onClick}
+    {...props}
+  >
+    <Settings className="w-[1.2rem] h-[1.2rem]" />
+  </Button>
+);
+
+export const SettingsModal = ({
+  open: openProp,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+} = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="iconXl"
-          aria-label="Open User Preferences"
-        >
-          <Settings className="w-[1.2rem] h-[1.2rem]" />
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <SettingsModalTrigger />
+        </DialogTrigger>
+      )}
       <ScrollableDialogContent
         size="md"
         title="User Preferences"

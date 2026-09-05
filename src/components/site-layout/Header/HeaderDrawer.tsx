@@ -13,7 +13,10 @@ import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { DebugInfo } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
-import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
+import {
+  SettingsModal,
+  SettingsModalTrigger,
+} from "@/components/dependent/site-wide/SettingsModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -21,7 +24,13 @@ const infoLinks = [
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
 
-const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
+const HeaderDrawerContent = ({
+  onClose,
+  onOpenSettings,
+}: {
+  onClose: () => void;
+  onOpenSettings: () => void;
+}) => {
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
@@ -71,7 +80,7 @@ const HeaderDrawerContent = ({ onClose }: { onClose: () => void }) => {
       >
         <RefreshPageBtn />
         <DebugInfo />
-        <SettingsModal />
+        <SettingsModalTrigger onClick={onOpenSettings} />
       </div>
     </div>
   );
@@ -83,31 +92,43 @@ const HeaderDrawer = ({
   initiallyOpen?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const openSettings = () => {
+    setIsOpen(false);
+    setSettingsOpen(true);
+  };
 
   return (
-    <DrawerPrimitive.Root
-      direction="right"
-      open={isOpen}
-      onOpenChange={setIsOpen}
-    >
-      <DrawerPrimitive.Trigger asChild>
-        <Button variant="outline" size="iconXl" aria-label="Open menu">
-          <Menu className="w-7 h-7" />
-        </Button>
-      </DrawerPrimitive.Trigger>
-      <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
-        <DrawerPrimitive.Content className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background">
-          <DrawerPrimitive.Title className="sr-only">
-            Navigation menu
-          </DrawerPrimitive.Title>
-          <DrawerPrimitive.Description className="sr-only">
-            Site navigation links and settings
-          </DrawerPrimitive.Description>
-          <HeaderDrawerContent onClose={() => setIsOpen(false)} />
-        </DrawerPrimitive.Content>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+    <>
+      <DrawerPrimitive.Root
+        direction="right"
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      >
+        <DrawerPrimitive.Trigger asChild>
+          <Button variant="outline" size="iconXl" aria-label="Open menu">
+            <Menu className="w-7 h-7" />
+          </Button>
+        </DrawerPrimitive.Trigger>
+        <DrawerPrimitive.Portal>
+          <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <DrawerPrimitive.Content className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background">
+            <DrawerPrimitive.Title className="sr-only">
+              Navigation menu
+            </DrawerPrimitive.Title>
+            <DrawerPrimitive.Description className="sr-only">
+              Site navigation links and settings
+            </DrawerPrimitive.Description>
+            <HeaderDrawerContent
+              onClose={() => setIsOpen(false)}
+              onOpenSettings={openSettings}
+            />
+          </DrawerPrimitive.Content>
+        </DrawerPrimitive.Portal>
+      </DrawerPrimitive.Root>
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
   );
 };
 
