@@ -55,7 +55,11 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                     {similarKanji}
                   </button>
                 }
-                content={<PartComponentLink part={similarKanji} />}
+                content={
+                  <div className="p-2">
+                    <PartComponentLink part={similarKanji} />
+                  </div>
+                }
               />
             </div>
           ))}

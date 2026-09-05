@@ -2,7 +2,10 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
 
-import { FakeComponentLink, GlobalRadicalLink } from "../routing/global-links";
+import {
+  FakeComponentLink,
+  RadicalPopoverContent,
+} from "../routing/global-links";
 import { isKnownRadical, nonRadicalVariantKeywords } from "@/lib/radicals";
 
 export const SingleKanjiPart = ({
@@ -42,10 +45,7 @@ export const SingleKanjiPart = ({
               <span className="italic font-normal">{"(Kanji)"}</span>
             </>
           ) : isKnownRadical(kanji) ? (
-            <>
-              <GlobalRadicalLink radical={kanji} keyword={keyword} />
-              <span className="italic font-normal">{"(Radical)"}</span>
-            </>
+            <RadicalPopoverContent radical={kanji} keyword={keyword} />
           ) : (
             <>
               <FakeComponentLink radical={kanji} keyword={keyword} />

@@ -1,5 +1,7 @@
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import { Link } from "./router-adapter";
 import { radicalFalseFriends } from "@/lib/radicals";
@@ -24,7 +26,11 @@ export const ComponentLink = ({
       ) : (
         <FakeComponentLink radical={component} keyword={keyword} />
       )}
-      {title && <div className="text-[10px] uppercase opacity-70">{title}</div>}
+      {title && (
+        <div className="text-[10px] uppercase opacity-70 whitespace-nowrap">
+          {title}
+        </div>
+      )}
     </div>
   );
 };
@@ -82,6 +88,74 @@ const redirectRadical: Record<string, string> = {
   飠: "食",
 };
 
+const radicalSearchHref = (radical: string) => {
+  const searchText =
+    redirectRadical[radical] ?? radicalFalseFriends[radical] ?? radical;
+  return `/?search-type=radicals&search-text=${encodeURIComponent(searchText)}`;
+};
+
+const RadicalJpCard = ({
+  radical,
+  keyword,
+  fontSize,
+}: {
+  radical: string;
+  keyword: string;
+  fontSize?: FontSize;
+}) => (
+  <JPCardInner
+    label={keyword}
+    character={radical}
+    fontSize={fontSize}
+    badgeClassName="border border-black border-opacity-50"
+    badgeVariant="secondary"
+  />
+);
+
+export const RadicalSearchAction = ({ radical }: { radical: string }) => (
+  <Link
+    to={radicalSearchHref(radical)}
+    className="flex items-start gap-3 rounded-xl border-2 border-dashed px-3 py-2.5 text-left transition-colors hover:border-solid hover:border-[#2effff] hover:bg-[#2effff]/15"
+  >
+    <span className="flex items-center justify-center rounded-lg size-6 shrink-0 bg-foreground/5">
+      <Search className="size-3" />
+    </span>
+    <span className="min-w-0">
+      <span className="block text-xs font-bold leading-snug">
+        Search by radical {radical}
+      </span>
+      <span className="mt-0.5 block text-[11px] font-light leading-snug text-muted-foreground">
+        Find kanji that include {radical}
+      </span>
+    </span>
+  </Link>
+);
+
+export const RadicalPopoverContent = ({
+  radical,
+  keyword,
+}: {
+  radical: string;
+  keyword: string;
+}) => {
+  return (
+    <div className="p-3" data-vaul-no-drag>
+      <div className="flex items-center gap-3 px-1 pb-3">
+        <div className="flex items-center justify-center text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
+          {radical}
+        </div>
+        <div className="min-w-0 text-left">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Radical
+          </p>
+          <p className="text-sm font-semibold truncate">{keyword}</p>
+        </div>
+      </div>
+      <RadicalSearchAction radical={radical} />
+    </div>
+  );
+};
+
 export const GlobalRadicalLink = ({
   radical,
   keyword,
@@ -92,18 +166,20 @@ export const GlobalRadicalLink = ({
   fontSize?: FontSize;
 }) => {
   return (
-    <Link
-      to={`/?search-type=radicals&search-text=${redirectRadical[radical] ?? radicalFalseFriends[radical] ?? radical}`}
-      className={cnJPCardLink}
-    >
-      <JPCardInner
-        label={keyword}
-        character={radical}
-        fontSize={fontSize}
-        badgeClassName="border border-black border-opacity-50"
-        badgeVariant="secondary"
-      />
-    </Link>
+    <GenericPopover
+      modal
+      contentClassName="z-[60] w-[min(100vw-2rem,17.5rem)] p-0"
+      trigger={
+        <button type="button" className={cnJPCardLink}>
+          <RadicalJpCard
+            radical={radical}
+            keyword={keyword}
+            fontSize={fontSize}
+          />
+        </button>
+      }
+      content={<RadicalPopoverContent radical={radical} keyword={keyword} />}
+    />
   );
 };
 
