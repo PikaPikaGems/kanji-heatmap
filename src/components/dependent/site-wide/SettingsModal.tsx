@@ -17,10 +17,7 @@ import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
 import { useAvailableJpVoices } from "@/hooks/use-available-jp-voices";
-import {
-  useCurrentThemeColor,
-  themeColorsRgb,
-} from "@/hooks/use-change-theme-color";
+import { ColorGrid } from "@/components/common/ColorGrid";
 import {
   preloadKanjiSvgs,
   preloadKatakanaChallenges,
@@ -220,34 +217,6 @@ const FontGrid = () => {
   );
 };
 
-const ColorGrid = () => {
-  const [colorIndex, setThemeColor] = useCurrentThemeColor();
-
-  return (
-    <div className="grid grid-cols-6 gap-2">
-      {themeColorsRgb.map((rgb, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => setThemeColor(i)}
-          aria-pressed={colorIndex === i}
-          aria-label={`Theme color ${i + 1}`}
-          className={cn(
-            "h-10 rounded-xl border-2 transition-transform",
-            colorIndex === i
-              ? "border-theme-color-darker scale-95 ring-2 ring-offset-2 ring-offset-background"
-              : "border-transparent hover:scale-105"
-          )}
-          style={{
-            backgroundColor: `rgb(${rgb})`,
-            ...(colorIndex === i ? { borderColor: `rgb(${rgb})` } : {}),
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
 const JpVoiceSelect = () => {
   const [voiceId, setVoiceId] = useCurrentJpVoice();
   const availableVoices = useAvailableJpVoices();
@@ -348,7 +317,7 @@ export const SettingsModal = () => {
 
           <div className="mb-4 text-left">
             <span className="block mb-2 text-sm font-semibold">
-              Background Color
+              Theme Color
             </span>
             <ColorGrid />
           </div>
