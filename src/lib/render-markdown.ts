@@ -1,7 +1,7 @@
 import { marked } from "marked";
 
 const DOC_LINK_CLASS =
-  "underline font-bold hover:bg-[#2effff] hover:text-black rounded-md p-1";
+  "underline font-bold hover:bg-neon-accent hover:text-black rounded-md p-1";
 
 const escapeAttr = (value: string) =>
   value

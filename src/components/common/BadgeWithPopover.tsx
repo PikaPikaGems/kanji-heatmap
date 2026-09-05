@@ -31,7 +31,7 @@ export const BadgeWithPopover = ({
         <button>
           <Badge
             variant="outline"
-            className="cursor-pointer hover:bg-[#2effff] hover:text-black whitespace-nowrap m-1 t px-4"
+            className="cursor-pointer hover:bg-neon-accent hover:text-black whitespace-nowrap m-1 px-4"
           >
             {icon && <span className="mr-1 opacity-70">{icon}</span>}
             {name}

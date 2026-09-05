@@ -68,7 +68,7 @@ const RadicalBtn = React.memo(function RadicalBtn({
     ? "opacity-10"
     : isTouchDevice
       ? ""
-      : "hover:bg-[#2effff] hover:text-black hover:border-4 hover:border-solid hover:border-[#2effff] rounded-sm";
+      : "hover:bg-neon-accent hover:text-black hover:border-4 hover:border-solid hover:border-neon-accent rounded-sm";
 
   const cn2 = isSelected
     ? "rounded-xl bg-black text-white dark:bg-white dark:text-black"
