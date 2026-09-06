@@ -1,5 +1,5 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
-import { Download } from "lucide-react";
+import { Download, UploadIcon } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
@@ -7,11 +7,8 @@ import { outLinks } from "@/lib/external-links";
 
 const FIND_ADD_TO_HOME_SCREEN = (
   <>
-    Find{" "}
-    <strong>
-      {`"`}Add to Home Screen{`"`}
-    </strong>{" "}
-    (scroll or tap <strong>View More</strong>)
+    Find <strong>Add to Home Screen</strong> (scroll or tap{" "}
+    <strong>View More</strong>)
   </>
 );
 
@@ -23,8 +20,10 @@ const TAP_ADD_TO_HOME_SCREEN = (
 
 const SAFARI_STEPS: ReactNode[] = [
   <>
-    Tap ··· (the three dots) next to the address bar, then tap{" "}
-    <strong>Share</strong>
+    Tap <strong>··· (the three dots)</strong> next to the address bar, then tap{" "}
+    <strong className="inline-flex items-center translate-y-0.5">
+      <UploadIcon className="w-3 h-3 mx-1" /> Share
+    </strong>{" "}
   </>,
   FIND_ADD_TO_HOME_SCREEN,
   TAP_ADD_TO_HOME_SCREEN,
@@ -32,7 +31,11 @@ const SAFARI_STEPS: ReactNode[] = [
 
 const CHROME_STEPS: ReactNode[] = [
   <>
-    Tap the <strong>share icon</strong> on the right of the address bar
+    Tap the{" "}
+    <strong className="inline-flex items-center gap-1 translate-y-0.5 mx-1">
+      <UploadIcon className="w-3 h-3 mr-1" /> (share icon)
+    </strong>{" "}
+    on the right of the address bar
   </>,
   FIND_ADD_TO_HOME_SCREEN,
   TAP_ADD_TO_HOME_SCREEN,
@@ -67,11 +70,11 @@ export const InstallAppModalTrigger = (props: ComponentProps<"button">) => (
   <button
     type="button"
     onPointerDown={(e) => e.stopPropagation()}
-    className="inline-flex items-center gap-1 text-[10px] leading-loose underline cursor-pointer decoration-dotted underline-offset-4 hover:text-neon-accent whitespace-nowrap"
+    className="inline-flex items-center gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-4 hover:text-neon-accent whitespace-nowrap"
     {...props}
   >
     <Download size={14} />
-    <strong>Install on iOS Guide</strong>
+    <strong>Install on iOS Guide ♥️</strong>
   </button>
 );
 
