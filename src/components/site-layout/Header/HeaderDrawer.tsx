@@ -17,7 +17,10 @@ import {
   SettingsModal,
   SettingsModalTrigger,
 } from "@/components/dependent/site-wide/SettingsModal";
-import { InstallAppModalTrigger } from "@/components/common/InstallAppModal";
+import {
+  InstallAppModal,
+  InstallAppModalTrigger,
+} from "@/components/common/InstallAppModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -25,20 +28,21 @@ const infoLinks = [
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
 
+type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
+
 const HeaderDrawerContent = ({
-  onClose,
-  onOpenSettings,
-  onOpenInstallGuide,
+  onAction,
 }: {
-  onClose: () => void;
-  onOpenSettings: () => void;
-  onOpenInstallGuide: () => void;
+  onAction: (modal: OpenedModal) => void;
 }) => {
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
         <div className="flex justify-between z-1000">
-          <div onClick={onClose} onPointerDown={(e) => e.stopPropagation()}>
+          <div
+            onClick={() => onAction("none")}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <HeaderTitle />
           </div>
           <div onPointerDown={(e) => e.stopPropagation()}>
@@ -75,24 +79,23 @@ const HeaderDrawerContent = ({
           <div className="flex justify-center space-x-1">
             <LinksOutItems />
           </div>
+          <div
+            className="flex justify-center w-full pt-1 mt-auto gap-x-1"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <RefreshPageBtn />
+            <DebugInfo />
+            <SettingsModalTrigger onClick={() => onAction("settings")} />
+          </div>
         </div>
       </div>
-      <div
-        className="flex justify-center w-full pt-1 mt-auto gap-x-1"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <RefreshPageBtn />
-        <DebugInfo />
-        <SettingsModalTrigger onClick={onOpenSettings} />
-      </div>
-      <div className="flex justify-center w-full pt-2 mt-6 border-t border-dashed gap-x-1">
-        <InstallAppModalTrigger onClick={onOpenInstallGuide} />
+
+      <div className="flex justify-center w-full pt-2 mt-6 mb-12 border-t border-dashed gap-x-1">
+        <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
       </div>
     </div>
   );
 };
-
-type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
 const HeaderDrawer = ({
   initiallyOpen = false,
@@ -132,17 +135,19 @@ const HeaderDrawer = ({
             <DrawerPrimitive.Description className="sr-only">
               Site navigation links and settings
             </DrawerPrimitive.Description>
-            <HeaderDrawerContent
-              onClose={() => setOpenedModal("none")}
-              onOpenSettings={() => setOpenedModal("settings")}
-              onOpenInstallGuide={() => setOpenedModal("install-guide")}
-            />
+            <HeaderDrawerContent onAction={setOpenedModal} />
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       </DrawerPrimitive.Root>
       <SettingsModal
         open={openedModal === "settings"}
-        onOpenChange={(open) => setOpenedModal(open ? "settings" : "none")}
+        onOpenChange={(open) => setOpenedModal(open ? "settings" : "sidebar")}
+      />
+      <InstallAppModal
+        open={openedModal === "install-guide"}
+        onOpenChange={(open) =>
+          setOpenedModal(open ? "install-guide" : "sidebar")
+        }
       />
     </>
   );

@@ -1,0 +1,22 @@
+---
+description: Exclusive overlay/status actions are one onAction, not parallel handlers
+alwaysApply: true
+---
+
+# No duplicate action props
+
+If several callbacks only differ by which value they write to the **same** discriminant (`openedModal`, `status`, etc.), they are **one** `onAction`, not parallel props.
+
+```tsx
+// ❌ BAD — same state, three wrappers
+<HeaderDrawerContent
+  onClose={() => setOpenedModal("none")}
+  onOpenSettings={() => setOpenedModal("settings")}
+  onOpenInstallGuide={() => setOpenedModal("install-guide")}
+/>
+
+// ✅ GOOD
+<HeaderDrawerContent onAction={setOpenedModal} />
+```
+
+Child calls `onAction("settings")` (or `"none"`, `"install-guide"`, …). Do not add `onOpenX` / `onClose` siblings that only set that union.

@@ -72,3 +72,5 @@ const [openedModal, setOpenedModal] = useState<
 ```
 
 Do **not** split those flags onto each button just to avoid rerenders — the parent still owns the discriminant because switching one overlay must close the others.
+
+Passing that discriminant down is also one callback (`onAction`), not `onClose` + `onOpenSettings` + `onOpenInstallGuide`. See `no-duplicate-action-props.mdc`.
