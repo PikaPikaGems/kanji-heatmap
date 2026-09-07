@@ -79,6 +79,30 @@ body {
   overflow-y: scroll;
 }
 
+/*
+ * Installed PWAs (iOS "Add to Home Screen" in particular): scroll the <body>
+ * instead of the document. When the document itself scrolls, iOS standalone
+ * mode drifts position:fixed/sticky chrome (header, control bar, island, FAB)
+ * away from the viewport edges while scrolling — a long-standing WebKit issue
+ * (bugs.webkit.org/show_bug.cgi?id=297779 and friends). With `overflow: hidden`
+ * on <html>, the layout viewport never moves, so fixed elements stay pinned.
+ * The usual trade-offs of this technique (no shrinking address bar, broken
+ * window.scrollTo) don't matter in standalone mode. The kanji list virtualizer
+ * follows this scroller switch — see VirtualKanjiList.tsx.
+ */
+@media (display-mode: standalone) {
+  html {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  body {
+    height: 100%;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+}
+
 p,
 h1,
 h2,
