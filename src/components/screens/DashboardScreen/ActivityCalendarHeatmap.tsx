@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { CalendarDays } from "lucide-react";
 import {
   ActivityByDay,
   ActivityKindFilters,
@@ -12,9 +12,8 @@ import {
 } from "@/lib/activity";
 import { useActivityData } from "@/hooks/use-activity-data";
 import { useActivityHeatmapSettings } from "@/hooks/use-activity-heatmap-settings";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { SectionHeading } from "./SectionHeading";
+import { ActivityCalendarHeatmapSettingsPopover } from "./ActivityCalendarHeatmapSettingsPopover";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
 import { DurationNav } from "./DurationNav";
@@ -22,6 +21,8 @@ import { CalendarGrid } from "./CalendarGrid";
 import { VerticalCalendarGrid } from "./VerticalCalendarGrid";
 import { DashboardPanel } from "./DashboardPanel";
 import { GradientLegend } from "@/components/common/GradientLegend";
+import { OverviewCaption } from "./OverviewStat";
+import { formatRawCount } from "@/lib/format-count";
 
 const ActivityHeatmapGrid = ({
   vertical,
@@ -63,7 +64,6 @@ export const ActivityCalendarHeatmap = () => {
   const { byDay } = useActivityData();
   const [{ duration, filters, vertical }, setSetting] =
     useActivityHeatmapSettings();
-  const layoutSwitchId = useId();
 
   const range = getDurationRange(duration);
   const maxN = maxDayTotalInRange(byDay, range, filters);
@@ -71,64 +71,53 @@ export const ActivityCalendarHeatmap = () => {
 
   return (
     <DashboardPanel>
-      <SectionHeading
-        title="Activity Heatmap"
-        description="Daily practice events. Brighter days mean more activity relative to your busiest day in this range."
-      />
+      <div key={vertical ? "compact" : "wide"} className="animate-fade-in">
+        <SectionHeading
+          title="Activity Heatmap"
+          description="Daily practice events. Brighter days mean more activity relative to your busiest day in this range."
+        />
 
-      <DurationNav
-        value={duration}
-        onChange={(next) => setSetting("duration", next)}
-      />
+        <DurationNav
+          value={duration}
+          onChange={(next) => setSetting("duration", next)}
+        />
 
-      <ActivityHeatmapGrid
-        vertical={vertical}
-        range={range}
-        byDay={byDay}
-        filters={filters}
-        maxN={maxN}
-      />
-
-      <div className="mt-2">
-        <ActivityKindFiltersRow
+        <ActivityHeatmapGrid
+          vertical={vertical}
+          range={range}
+          byDay={byDay}
           filters={filters}
-          onChange={(kind, checked) =>
-            setSetting("filters", { ...filters, [kind]: checked })
-          }
+          maxN={maxN}
         />
-      </div>
-      <div className="flex items-center justify-center w-full mt-4">
-        <div>
-          <GradientLegend />
+
+        <div className="mt-2">
+          <ActivityKindFiltersRow
+            filters={filters}
+            onChange={(kind, checked) =>
+              setSetting("filters", { ...filters, [kind]: checked })
+            }
+          />
         </div>
-      </div>
+        <div className="flex items-center justify-center w-full mt-4 mb-4">
+          <div className="flex items-center gap-1">
+            <GradientLegend /> ·
+            <ActivityCalendarHeatmapSettingsPopover />
+          </div>
+        </div>
 
-      <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
-        <Label
-          htmlFor={layoutSwitchId}
-          className={!vertical ? "text-foreground font-semibold" : undefined}
-        >
-          Wide
-        </Label>
-        <Switch
-          id={layoutSwitchId}
-          checked={vertical}
-          onCheckedChange={(checked) => setSetting("vertical", checked)}
-          aria-label="Toggle compact activity heatmap"
-        />
-        <Label
-          htmlFor={layoutSwitchId}
-          className={vertical ? "text-foreground font-semibold" : undefined}
-        >
-          Compact
-        </Label>
-      </div>
-
-      <div className="mt-6">
-        <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
-          In this period
-        </p>
-        <ActivityCountsGrid stats={windowed} />
+        <div className="mt-6">
+          <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
+            In this period
+          </p>
+          <ActivityCountsGrid stats={windowed} />
+          <div className="mt-4">
+            <OverviewCaption
+              Icon={CalendarDays}
+              label="Days active"
+              value={formatRawCount(windowed.daysActive)}
+            />
+          </div>
+        </div>
       </div>
     </DashboardPanel>
   );

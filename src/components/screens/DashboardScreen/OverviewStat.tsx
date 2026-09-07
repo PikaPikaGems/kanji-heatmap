@@ -54,6 +54,23 @@ const StatValue = ({
   );
 };
 
+export const OverviewCaption = ({
+  Icon,
+  label,
+  value,
+}: {
+  Icon: LucideIcon;
+  label: string;
+  value: string;
+}) => (
+  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+    <Icon className="size-4 shrink-0" aria-hidden />
+    <span>
+      {label}: <span className="font-bold text-foreground">{value}</span>
+    </span>
+  </div>
+);
+
 export const OverviewStat = ({
   value,
   title,

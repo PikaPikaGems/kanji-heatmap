@@ -1,9 +1,11 @@
-import { Cake } from "lucide-react";
+import { Cake, CalendarDays } from "lucide-react";
 import { formatCakeDay } from "@/lib/activity";
 import { useActivityData } from "@/hooks/use-activity-data";
+import { formatRawCount } from "@/lib/format-count";
 import { SectionHeading } from "./SectionHeading";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { DashboardPanel } from "./DashboardPanel";
+import { OverviewCaption } from "./OverviewStat";
 
 export const StatsOverview = () => {
   const {
@@ -22,7 +24,6 @@ export const StatsOverview = () => {
       />
       <ActivityCountsGrid
         stats={{
-          daysActive,
           speedKatakanaDays,
           productionDays,
           recognitionDays,
@@ -31,14 +32,18 @@ export const StatsOverview = () => {
           recognitionRounds: allTime.recognitionRounds,
         }}
       />
-      <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
-        <Cake className="size-4 shrink-0" aria-hidden />
-        <span>
-          Cake day:{" "}
-          <span className="font-bold text-foreground">
-            {allTime.cakeDay ? formatCakeDay(allTime.cakeDay) : "Not yet"}
-          </span>
-        </span>
+      <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row">
+        <OverviewCaption
+          Icon={CalendarDays}
+          label="Days active"
+          value={formatRawCount(daysActive)}
+        />
+        <div className="hidden sm:flex">·</div>
+        <OverviewCaption
+          Icon={Cake}
+          label="Cake day"
+          value={allTime.cakeDay ? formatCakeDay(allTime.cakeDay) : "Not yet"}
+        />
       </div>
     </DashboardPanel>
   );

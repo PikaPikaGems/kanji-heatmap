@@ -1,4 +1,4 @@
-import { CalendarDays, Eye, Keyboard, PenLine } from "lucide-react";
+import { Eye, Keyboard, PenLine } from "lucide-react";
 import {
   productionPracticePageMeta,
   recognitionPracticePageMeta,
@@ -7,7 +7,6 @@ import {
 import { OverviewStat } from "./OverviewStat";
 
 export type ActivityCountsDisplay = {
-  daysActive: number;
   speedKatakanaDays: number;
   productionDays: number;
   recognitionDays: number;
@@ -16,40 +15,40 @@ export type ActivityCountsDisplay = {
   recognitionRounds: number;
 };
 
-/** Day totals (2×2 / 4-up) + session/round totals (3-up centered text / capped row). */
+const COUNTS_ROW_CN =
+  "grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3";
+
+/** Day totals + session/round totals (3-up centered text / capped row). */
 export const ActivityCountsGrid = ({
   stats,
 }: {
   stats: ActivityCountsDisplay;
 }) => (
   <div className="flex flex-col gap-2 sm:gap-3">
-    <div className="grid grid-cols-2 gap-2 justify-items-start sm:grid-cols-4 sm:gap-3">
-      <OverviewStat
-        value={stats.daysActive}
-        title="Total"
-        unit="Days"
-        Icon={CalendarDays}
-      />
+    <div className={COUNTS_ROW_CN}>
       <OverviewStat
         value={stats.productionDays}
         title={productionPracticePageMeta.shortLabel}
         unit="Days"
         Icon={PenLine}
+        compact
       />
       <OverviewStat
         value={stats.recognitionDays}
         title={recognitionPracticePageMeta.shortLabel}
         unit="Days"
         Icon={Eye}
+        compact
       />
       <OverviewStat
         value={stats.speedKatakanaDays}
         title={speedKatakanaPageMeta.shortLabel}
         unit="Days"
         Icon={Keyboard}
+        compact
       />
     </div>
-    <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
+    <div className={COUNTS_ROW_CN}>
       <OverviewStat
         value={stats.productionRounds}
         title={productionPracticePageMeta.shortLabel}
