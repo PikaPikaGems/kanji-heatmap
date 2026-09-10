@@ -69,14 +69,24 @@
   box-sizing: border-box;
 }
 
+/*
+ * The document root owns the page scroll (not <body>). A body-level scroll
+ * container (height:100vh + overflow) turns the whole page into a "moving
+ * canvas" on iOS, which makes position:fixed UI drift/judder while scrolling —
+ * most visibly on Chrome for iOS/iPadOS. Scrolling the root keeps fixed
+ * elements pinned to the visual viewport. overflow-y:scroll here reserves the
+ * scrollbar gutter to avoid layout shift on desktop.
+ */
+html {
+  overflow-y: scroll;
+}
+
 body {
   min-height: 100dvh;
-  height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow-y: scroll;
 }
 
 p,
