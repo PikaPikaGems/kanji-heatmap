@@ -111,10 +111,8 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
           </TableBody>
         </Table>
         <p className="my-4">
-          All data and the methodology used to determine the reading frequency
-          categories are from the research of Dr. Patrick Kandrac. The frequency
-          classifications aims to reflect how often each reading appears in
-          common vocabulary.
+          This data comes from Dr. Patrick {`Kandrac's`} research on reading
+          frequency in common vocabulary.
           <ExternalTextLink text="View full paper." href={kandracPaperUrl} />
         </p>
         <PrimaryDataSources links={readingFrequencySourceLinks} />

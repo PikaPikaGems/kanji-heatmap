@@ -7,9 +7,11 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 export const RomajiBadge = ({
   kana,
   className,
+  showFocusRing = true,
 }: {
   kana: string;
   className?: string;
+  showFocusRing?: boolean;
 }) => {
   const [isKana, setIsKana] = useState(true);
   const speak = useSpeak(kana);
@@ -21,10 +23,13 @@ export const RomajiBadge = ({
       type="button"
       className={cn(
         badgeVariants({ variant: "outline" }),
-        "m-1 py-2 px-3 cursor-pointer whitespace-nowrap",
+        "m-1 py-1 sm:py-2 px-3 cursor-pointer whitespace-nowrap",
         "hover:bg-neon-accent hover:text-black",
-        "outline-none focus:outline-none focus:ring-0",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-2xl",
+        "outline-none focus:outline-none focus:ring-0 focus:ring-offset-0",
+        showFocusRing
+          ? "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          : "focus-visible:ring-0 focus-visible:ring-offset-0",
+        "text-base sm:text-xl",
         className,
         isKana && "kanji-font"
       )}
