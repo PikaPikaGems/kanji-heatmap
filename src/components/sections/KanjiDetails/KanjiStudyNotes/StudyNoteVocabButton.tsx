@@ -79,7 +79,7 @@ export const StudyNoteVocabButton = ({
           type="button"
           aria-label={word}
           className={cn(
-            "kanji-font rounded-xl px-2 mx-1",
+            "kanji-font rounded-xl px-2 mx-1 my-0 text-lg",
             "border-theme-color-with-opacity-100 border background-theme-color-with-opacity-25",
             "hover:border-foreground",
             "hover-background-theme-color-with-opacity-100 hover:text-white",
