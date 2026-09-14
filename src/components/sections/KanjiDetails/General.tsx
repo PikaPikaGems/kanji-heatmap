@@ -41,7 +41,7 @@ const TableCellFixed = ({
 );
 
 const TableCellGrow = ({ children }: { children: ReactNode }) => (
-  <TableCell>{children}</TableCell>
+  <TableCell className="min-w-0">{children}</TableCell>
 );
 
 const LabelCell = ({
@@ -144,7 +144,11 @@ export const General = ({ kanji }: { kanji: string }) => {
       items: data.meanings
         .filter((meaning) => meaning !== "#name?")
         .map((meaning) => (
-          <Badge key={meaning} variant={"outline"} className="m-1">
+          <Badge
+            key={meaning}
+            variant={"outline"}
+            className="m-1 whitespace-nowrap"
+          >
             {meaning}
           </Badge>
         )),
@@ -200,16 +204,17 @@ export const General = ({ kanji }: { kanji: string }) => {
         )}
       </div>
       <DottedSeparator className="my-4 border-b-2" />
-      <Table>
+      <Table className="table-fixed">
         <TableBody>
           {readingRows.map(({ label, description, items }) => (
             <TableRow key={label} className="text-left">
               <LabelCell label={label} description={description} />
               <TableCellGrow>
-                {items && items.length > 0 && (
-                  <div className="flex gap-1">{items}</div>
+                {items.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">{items}</div>
+                ) : (
+                  <div> - </div>
                 )}
-                {items.length === 0 && <div> - </div>}
               </TableCellGrow>
             </TableRow>
           ))}

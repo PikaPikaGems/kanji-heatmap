@@ -1,5 +1,5 @@
 import { lazy, ReactNode, Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import { Bug, Loader2, Volume2 } from "lucide-react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -59,18 +59,44 @@ export const ImprovementCTA = () => {
   );
 };
 
+const DetailsNotice = ({
+  icon: Icon,
+  children,
+}: {
+  icon: typeof Volume2;
+  children: ReactNode;
+}) => (
+  <div className="flex items-start gap-3 px-3 py-2">
+    <span className="flex items-center justify-center size-8 shrink-0 rounded-xl border-foreground/20 bg-background/40 text-foreground/70">
+      <Icon className="size-4" />
+    </span>
+    <p className="pt-1 text-xs leading-relaxed text-left text-foreground">
+      {children}
+    </p>
+  </div>
+);
+
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return (
     <div className="my-4">
-      <p className="text-xs text-left">
-        {"⚠️"} The speak buttons 🔊 🎧 rely on your {"browser's"} built-in
-        text-to-speech, which may not work in some devices.
-      </p>
-      <p className="text-xs text-left">
-        {"⚠️"} We strive for accuracy, but mistakes can happen. Found a content
-        issue? Report it{" "}
-        <ExternalTextLink href={outLinks.githubContentIssue} text="here" /> 🐞🐛
-      </p>
+      <div className="overflow-hidden border rounded-2xl border-foreground/20 bg-muted/15">
+        <h3 className="px-3 pt-2.5 pb-1.5 text-xs font-bold tracking-widest text-left uppercase border-b text-foreground/50">
+          ⚠️ Note
+        </h3>
+        <DetailsNotice icon={Volume2}>
+          Speak buttons 🔊 🎧 use your {"browser's"} built-in text-to-speech,
+          which may not work on some devices.
+        </DetailsNotice>
+        <div className="mx-3 border-t border-dotted border-foreground/15" />
+        <DetailsNotice icon={Bug}>
+          We strive for accuracy, but mistakes can happen. Found a content
+          issue?
+          <ExternalTextLink
+            href={outLinks.githubContentIssue}
+            text="Report here!"
+          />
+        </DetailsNotice>
+      </div>
 
       <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
       <div className="flex w-full pt-2 mt-6 mb-12 border-t border-dashed justify-left gap-x-1">
@@ -81,6 +107,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
+const KanjiEssay = lazy(() => import("./KanjiEssay"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   const info = useKanjiRepresentativeWordDetails(kanji);
@@ -146,6 +173,9 @@ export const KanjiDetails = ({
           <StructureInfo kanji={kanji} />
         </ErrorBoundary>
       </SimpleAccordion>
+      <SimpleAccordion trigger={"Frequency Ranks"}>
+        <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
+      </SimpleAccordion>
       <SimpleAccordion trigger="⭐️ Personal Study Notes">
         <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
           <Suspense fallback={<StudyNotesLoadingFallback />}>
@@ -153,9 +183,18 @@ export const KanjiDetails = ({
           </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
-      <SimpleAccordion trigger={"Frequency Ranks"}>
-        <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
+      <SimpleAccordion trigger="Kanji Essay">
+        <ErrorBoundary details="KanjiEssay in KanjiDetails">
+          <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <KanjiEssay
+              key={kanji}
+              kanji={kanji}
+              keyword={data?.keyword ?? ""}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </SimpleAccordion>
+
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />
