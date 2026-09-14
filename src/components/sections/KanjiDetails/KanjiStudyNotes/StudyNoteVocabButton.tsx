@@ -33,7 +33,15 @@ export const StudyNoteVocabButton = ({
   if (!wordHasKanji(word)) {
     if (isJapanese(word)) {
       return (
-        <RomajiBadge kana={word} className={cn("text-base px-2 py-0.5")} />
+        <RomajiBadge
+          kana={word}
+          showFocusRing={false}
+          className={cn(
+            "m-0 rounded-lg border-0 bg-transparent mx-1 px-0 py-0 text-base font-normal sm:text-lg",
+            "underline decoration-dotted decoration-foreground/15 underline-offset-[5px]",
+            "dark:hover:text-lime-500 hover:bg-background hover:text-lime-600 hover:decoration-lime-600 dark:hover:decoration-lime-500 hover:decoration-solid"
+          )}
+        />
       );
     }
 
@@ -71,7 +79,7 @@ export const StudyNoteVocabButton = ({
           type="button"
           aria-label={word}
           className={cn(
-            "kanji-font rounded-xl px-2 my-0.5",
+            "kanji-font rounded-xl px-2 mx-1",
             "border-theme-color-with-opacity-100 border background-theme-color-with-opacity-25",
             "hover:border-foreground",
             "hover-background-theme-color-with-opacity-100 hover:text-white",
