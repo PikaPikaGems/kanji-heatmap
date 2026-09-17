@@ -4,8 +4,11 @@ import {
   GetBasicKanjiInfo,
   InitSnapshot,
 } from "@/lib/kanji/kanji-worker-types";
-import { GetBasicKanjiInfoContext, IsReadyContext } from "./kanji-worker-hooks";
-import { radicalFalseFriends } from "@/lib/radicals";
+import {
+  GetBasicKanjiInfoContext,
+  IsReadyContext,
+  RadicalsContext,
+} from "./kanji-worker-hooks";
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
@@ -57,20 +60,22 @@ export function KanjiWorkerProvider({
       return null;
     }
 
-    // Kanji first, then the same character under a lookalike codepoint, then
-    // the component registry — a component has a keyword but no kanji info.
-    const main =
-      snapshot.mainInfoMap[kanji] ??
-      snapshot.mainInfoMap[radicalFalseFriends[kanji]];
+    // Only this exact character counts as a kanji. Aliases like ⺮ → 竹 are
+    // radical variants, not the kanji itself; following them would make the
+    // variant open a kanji link instead of a radical search.
+    const main = snapshot.mainInfoMap[kanji];
     if (main != null) {
       return main;
     }
 
-    const keyword =
-      snapshot.componentsMap[kanji]?.k ??
-      snapshot.componentsMap[radicalFalseFriends[kanji]]?.k;
+    const component =
+      snapshot.componentsMap[kanji] ??
+      snapshot.componentsMap[snapshot.radicals.aliases[kanji]];
+    if (component?.k) {
+      return { keyword: component.k, desc: component.desc };
+    }
 
-    return keyword ? { keyword } : null;
+    return null;
   }, []);
 
   if (workerError) {
@@ -80,7 +85,11 @@ export function KanjiWorkerProvider({
   return (
     <IsReadyContext.Provider value={isReady}>
       <GetBasicKanjiInfoContext.Provider value={getKanjiBasicInfo}>
-        {children}
+        <RadicalsContext.Provider
+          value={isReady ? (snapshotRef.current?.radicals ?? null) : null}
+        >
+          {children}
+        </RadicalsContext.Provider>
       </GetBasicKanjiInfoContext.Provider>
     </IsReadyContext.Provider>
   );

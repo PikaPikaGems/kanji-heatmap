@@ -3,8 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
+import {
+  useGetKanjiInfoFn,
+  useRadicals,
+} from "@/kanji-worker/kanji-worker-hooks";
 import { Link } from "./router-adapter";
-import { radicalFalseFriends } from "@/lib/radicals";
+import { resolveRadicalForSearch } from "@/lib/radicals";
 
 export const ComponentLink = ({
   component,
@@ -84,15 +88,8 @@ export const GlobalHomeLink = () => {
   );
 };
 
-const redirectRadical: Record<string, string> = {
-  飠: "食",
-};
-
-const radicalSearchHref = (radical: string) => {
-  const searchText =
-    redirectRadical[radical] ?? radicalFalseFriends[radical] ?? radical;
-  return `/?search-type=radicals&search-text=${encodeURIComponent(searchText)}`;
-};
+const radicalSearchHref = (searchText: string) =>
+  `/?search-type=radicals&search-text=${encodeURIComponent(searchText)}`;
 
 const RadicalJpCard = ({
   radical,
@@ -112,36 +109,56 @@ const RadicalJpCard = ({
   />
 );
 
-export const RadicalSearchAction = ({ radical }: { radical: string }) => (
-  <Link
-    to={radicalSearchHref(radical)}
-    className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
-  >
-    <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
-      <Search size={14} />
-      <strong>Find kanji that include {radical}</strong>
-    </span>
-  </Link>
-);
+export const RadicalSearchAction = ({ radical }: { radical: string }) => {
+  const radicals = useRadicals();
+  const searchText = resolveRadicalForSearch(radical, radicals);
+  return (
+    <Link
+      to={radicalSearchHref(searchText)}
+      className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
+    >
+      <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
+        <Search size={14} />
+        <strong>Find kanji that include {searchText}</strong>
+      </span>
+    </Link>
+  );
+};
 
-export const RadicalPopoverContent = ({
-  radical,
-  keyword,
-}: {
-  radical: string;
-  keyword: string;
-}) => {
+export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
+  const getKanjiInfo = useGetKanjiInfoFn();
+  const resolvedDesc = getKanjiInfo?.(radical)?.desc;
+  const descMatch = resolvedDesc?.match(
+    /^(.+?)\s*\(([^)]+)\)(?:\s*·\s*(.*))?$/
+  );
+  const reading = descMatch?.[1]?.trim() ?? resolvedDesc;
+  const gloss = descMatch?.[2]?.trim();
+  const kangxi = descMatch?.[3]?.trim();
   return (
     <div className="p-1" data-vaul-no-drag>
-      <div className="flex items-center gap-3 px-1">
-        <div className="flex items-center justify-center text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
+      <div className="flex gap-3 px-1">
+        <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
         </div>
         <div className="min-w-0 text-left">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
             Radical
           </p>
-          <p className="text-sm font-semibold truncate">{keyword}</p>
+          {reading && (
+            <p className="text-sm font-bold whitespace-normal text-foreground">
+              🇯🇵 {reading}
+            </p>
+          )}
+          {gloss && (
+            <p className="text-xs whitespace-normal text-muted-foreground">
+              {gloss}
+            </p>
+          )}
+          {kangxi && (
+            <p className="text-sm whitespace-normal text-foreground">
+              {"🇨🇳"} {kangxi}
+            </p>
+          )}
         </div>
       </div>
       <RadicalSearchAction radical={radical} />
@@ -161,7 +178,7 @@ export const GlobalRadicalLink = ({
   return (
     <GenericPopover
       modal
-      contentClassName="z-[60] w-min p-2"
+      contentClassName="z-[60] p-2"
       trigger={
         <button type="button" className={cnJPCardLink}>
           <RadicalJpCard
@@ -171,7 +188,7 @@ export const GlobalRadicalLink = ({
           />
         </button>
       }
-      content={<RadicalPopoverContent radical={radical} keyword={keyword} />}
+      content={<RadicalPopoverContent radical={radical} />}
     />
   );
 };

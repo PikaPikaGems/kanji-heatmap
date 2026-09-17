@@ -295,7 +295,7 @@
     "マ": "katakana ma",
     "ユ": "hook variant",
     "𠂉": "(gun) person",
-    "⻌": "movement radical",
+    "⻌": "movement",
     "⺌": "small variant",
     "已": "snake variant",
     "ヨ": "katakana yo",
@@ -357,5 +357,9 @@
     "龺": "𠦝",
     "夊": "夂",
     "⺕": "彐"
+  },
+  "searchRedirects": {
+    "飠": "食",
+    "𩙿": "食"
   }
 }

@@ -45,6 +45,12 @@ const similarKanjis = readRaw("similar-kanjis.json");
 const readingDetails = readRaw("kanji-readings-details.json");
 const cumUse = readRaw("cum_use.json");
 const radicals = readRaw("radicals.json");
+const sylhareKeywords = readRaw("sylhare-component-keywords.json");
+const extraAliases = readRaw("radical-aliases.json");
+const allAliases = {
+  ...radicals.radicalFalseFriends,
+  ...extraAliases,
+};
 const manualOverrides = readRaw("components_manual_overrides.json");
 
 const structureSources = {
@@ -208,7 +214,7 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 
 // ---------------------------------------------------------------------------
 // components.json — one registry replacing component_keyword.json,
-// phonetic.json and the three hand-maintained tables in radicals.ts.
+// phonetic.json and the keyword tables in raw-data/radicals.json.
 //
 // Keywords are resolved through the lookalike-alias table at build time, so
 // the runtime never has to chase an alias or consult five sources.
@@ -259,6 +265,20 @@ for (const [strokes, list] of Object.entries(
   }
 }
 
+// Sylhare bushu names win over the older Heisig/ad-hoc keyword tables.
+for (const [char, entry] of Object.entries(sylhareKeywords)) {
+  if (entry?.k) {
+    components[char] = { ...components[char], k: String(entry.k).trim() };
+    keywordOrigin[char] = "sylhare-component-keywords.json";
+  }
+  if (entry?.desc) {
+    components[char] = {
+      ...components[char],
+      desc: String(entry.desc).trim(),
+    };
+  }
+}
+
 // Alias resolution: a lookalike inherits its target's keyword. Aliases may
 // chain (⺕ -> 彐 -> ヨ), so follow to the end of the chain. Targets that are
 // themselves kanji are left alone — the runtime already reads kanji keywords
@@ -268,7 +288,7 @@ for (const [strokes, list] of Object.entries(
 // the chain.
 const resolveAlias = (start) => {
   const seen = [start];
-  let current = radicals.radicalFalseFriends[start];
+  let current = allAliases[start];
 
   while (current != null) {
     if (seen.includes(current)) {
@@ -278,13 +298,13 @@ const resolveAlias = (start) => {
     seen.push(current);
 
     if (components[current]?.k != null || isKanji(current)) return current;
-    current = radicals.radicalFalseFriends[current];
+    current = allAliases[current];
   }
 
   return seen[seen.length - 1] === start ? null : seen[seen.length - 1];
 };
 
-for (const [char, alias] of Object.entries(radicals.radicalFalseFriends)) {
+for (const [char, alias] of Object.entries(allAliases)) {
   if (alias !== alias.trim() || alias.length === 0) {
     fail(`components: alias for ${char} is not a clean value ("${alias}")`);
     continue;
@@ -293,13 +313,20 @@ for (const [char, alias] of Object.entries(radicals.radicalFalseFriends)) {
     fail(`components: ${char} aliases itself`);
     continue;
   }
-  if (components[char]?.k != null) continue;
+  if (keywordOrigin[char] === "sylhare-component-keywords.json") continue;
 
   const target = resolveAlias(char);
   if (target == null) continue;
 
   if (components[target]?.k != null) {
-    setKeyword(char, components[target].k, `alias of ${target}`);
+    components[char] = { ...components[char], k: components[target].k };
+    keywordOrigin[char] = `alias of ${target}`;
+    if (components[target].desc) {
+      components[char] = {
+        ...components[char],
+        desc: components[target].desc,
+      };
+    }
   } else if (!isKanji(target)) {
     fail(
       `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
@@ -315,6 +342,7 @@ let droppedKanjiKeywords = 0;
 for (const char of Object.keys(components)) {
   if (!isKanji(char) || components[char].k == null) continue;
   delete components[char].k;
+  delete components[char].desc;
   droppedKanjiKeywords += 1;
   if (Object.keys(components[char]).length === 0) delete components[char];
 }
@@ -323,6 +351,42 @@ for (const char of Object.keys(components)) {
 for (const [char, entry] of Object.entries(manualOverrides)) {
   components[char] = { ...components[char], ...entry };
   if (entry.k != null) keywordOrigin[char] = "components_manual_overrides.json";
+}
+
+const parent = {};
+const find = (ch) => {
+  if (parent[ch] == null) parent[ch] = ch;
+  if (parent[ch] !== ch) parent[ch] = find(parent[ch]);
+  return parent[ch];
+};
+for (const [from, to] of Object.entries(allAliases)) {
+  const a = find(from);
+  const b = find(to);
+  if (a !== b) parent[a] = b;
+}
+for (const [char, entry] of Object.entries(sylhareKeywords)) {
+  if (entry?.k == null) continue;
+  const key = `k:${String(entry.k).trim().toLowerCase()}`;
+  const a = find(char);
+  const b = find(key);
+  if (a !== b) parent[a] = b;
+}
+
+const charsByKeyword = {};
+for (const [char, entry] of Object.entries(components)) {
+  if (entry?.k == null) continue;
+  const kw = String(entry.k).trim().toLowerCase();
+  if (!kw) continue;
+  (charsByKeyword[kw] ??= []).push(char);
+}
+
+for (const [kw, chars] of Object.entries(charsByKeyword)) {
+  const roots = new Set(chars.map((ch) => find(ch)));
+  if (roots.size > 1) {
+    fail(
+      `components: keyword "${kw}" is shared by unrelated glyphs ${chars.join(" ")}`
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -492,6 +556,11 @@ write("kanji_extended_hover.json", outHover);
 write("rep_word_details.json", outRepDetails);
 write("vocab.json", outVocab);
 write("components.json", components);
+write("radicals.json", {
+  groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
+  aliases: allAliases,
+  searchRedirects: radicals.searchRedirects ?? {},
+});
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.
 write("kanji_decomposition.json", decomposition);

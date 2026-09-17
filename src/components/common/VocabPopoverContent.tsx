@@ -63,7 +63,7 @@ export const VocabPopoverContent = ({
       <VocabActions kana={kana ?? ""} word={word} />
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
-        🧐 Explore this word further →
+        🧐 Explore {word} in the wild ↓
       </div>
       <div className="flex flex-wrap justify-center px-2 pb-2 text-xs">
         {visibleLinks.map((item) => (

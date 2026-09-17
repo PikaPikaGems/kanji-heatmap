@@ -107,7 +107,9 @@ describe("KanjiStudyNotes", () => {
     await waitFor(() => {
       expect(screen.getByText(/にほんご/)).toBeInTheDocument();
       expect(screen.getByText(/Japanese language/)).toBeInTheDocument();
-      expect(screen.getByText(/Explore this word further/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Explore 日本語 in the wild/)
+      ).toBeInTheDocument();
     });
   });
 
@@ -127,7 +129,7 @@ describe("KanjiStudyNotes", () => {
     await waitFor(() => {
       expect(screen.getByText(/まなぶ/)).toBeInTheDocument();
       expect(screen.getByText(/to learn/)).toBeInTheDocument();
-      expect(screen.getByText(/Explore this word further/)).toBeInTheDocument();
+      expect(screen.getByText(/Explore 学ぶ in the wild/)).toBeInTheDocument();
     });
   });
 
@@ -148,7 +150,7 @@ describe("KanjiStudyNotes", () => {
       screen.queryByRole("button", { name: "にほんご" })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/Explore this word further/)
+      screen.queryByText(/Explore .+ in the wild/)
     ).not.toBeInTheDocument();
   });
 

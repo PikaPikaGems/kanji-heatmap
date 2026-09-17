@@ -28,6 +28,15 @@ const searchResult = vi.hoisted(() => ({
 vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
   useKanjiSearchResult: () => searchResult.value,
   useGetKanjiInfoFn: () => (kanji: string) => ({ keyword: `kw-${kanji}` }),
+  useRadicals: () => ({
+    groupedByStrokeCount: {
+      "1": ["一"],
+      "4": ["水"],
+    },
+    aliases: {},
+    searchRedirects: {},
+    strokeCountMap: { 一: "1", 水: "4" },
+  }),
 }));
 
 vi.mock("@/hooks/use-is-touch-device", () => ({
