@@ -101,10 +101,10 @@ const pwaConfig = {
     display: "standalone" as const,
     lang: "en-US" as const,
     description:
-      "Efficiently identify and study the kanji most useful to you with frequency data visuals, advanced filtering, sorting, and more",
+      "Memorize 2000+ Japanese words and Kanji effectively with a joyful experience",
     start_url: ".",
-    theme_color: "#fb02a8",
-    background_color: "#FFFFFF",
+    theme_color: "#1d4ed8",
+    background_color: "#000000",
     icons: [
       {
         purpose: "maskable",
