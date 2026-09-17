@@ -1,12 +1,15 @@
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "../routing";
-
 import {
   FakeComponentLink,
   RadicalPopoverContent,
 } from "../routing/global-links";
-import { isKnownRadical, nonRadicalVariantKeywords } from "@/lib/radicals";
+import {
+  useGetKanjiInfoFn,
+  useRadicals,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { isKnownRadical } from "@/lib/radicals";
 
 export const SingleKanjiPart = ({
   kanji,
@@ -19,6 +22,10 @@ export const SingleKanjiPart = ({
   phonetics?: string[];
   isKanji: boolean;
 }) => {
+  const radicals = useRadicals();
+  const getKanjiInfo = useGetKanjiInfoFn();
+  const componentKeyword = keyword ?? getKanjiInfo?.(kanji)?.keyword ?? "...";
+
   return (
     <GenericPopover
       trigger={
@@ -34,21 +41,16 @@ export const SingleKanjiPart = ({
             <RomajiBadge key={phonetic} kana={phonetic} className="text-md" />
           ))}
 
-          {keyword == null ? (
-            <FakeComponentLink
-              radical={kanji}
-              keyword={nonRadicalVariantKeywords[kanji] ?? "..."}
-            />
-          ) : isKanji ? (
+          {isKanji && keyword != null ? (
             <>
               <GlobalKanjiLink keyword={keyword} kanji={kanji} />
               <span className="italic font-normal">{"(Kanji)"}</span>
             </>
-          ) : isKnownRadical(kanji) ? (
-            <RadicalPopoverContent radical={kanji} keyword={keyword} />
+          ) : isKnownRadical(kanji, radicals) ? (
+            <RadicalPopoverContent radical={kanji} />
           ) : (
             <>
-              <FakeComponentLink radical={kanji} keyword={keyword} />
+              <FakeComponentLink radical={kanji} keyword={componentKeyword} />
               <span className="italic font-normal">{"(Component)"}</span>
             </>
           )}

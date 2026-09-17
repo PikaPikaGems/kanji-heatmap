@@ -334,7 +334,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
   "parts": [
     {
       "isKanji": false,
-      "keyword": "kettle lid",
+      "keyword": "pot lid",
       "part": "亠",
     },
     {

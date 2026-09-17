@@ -1,4 +1,5 @@
 import { JLTPTtypes } from "../jlpt";
+import type { RadicalsRuntime } from "../radicals";
 import type { WordPartDetail } from "../furigana";
 import type {
   KanjiReadingEntry,
@@ -32,6 +33,7 @@ export type KanjiMainInfo = {
 
 export type GetBasicKanjiInfo = (kanji: string) => {
   keyword: string;
+  desc?: string;
   jlpt?: JLTPTtypes;
   on?: string;
   kun?: string;
@@ -88,6 +90,8 @@ export type KanjiHoverInfo = {
 export type ComponentInfo = {
   /** Keyword; absent when no source has one for this component. */
   k?: string;
+  /** Bushu nickname line for the radical popover. */
+  desc?: string;
   /** Sounds this component signals. */
   s?: string[];
   /** Stroke count, present for radicals shown in the drawer. */
@@ -207,6 +211,7 @@ export type MainKanjiInfoResponseType = Record<string, MainKanjiInfoItemType>;
 export type InitSnapshot = {
   mainInfoMap: Record<string, KanjiMainInfo>;
   componentsMap: ComponentsMap;
+  radicals: RadicalsRuntime;
 };
 
 export type SearchResponse = {

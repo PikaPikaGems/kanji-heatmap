@@ -308,19 +308,6 @@ export const sampleVocabSourceLinks = [
 
 export const vocabExternalLinksCore = [
   {
-    name: "JP Word Ranks",
-    url: (word: string) =>
-      `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
-  },
-  {
-    name: "JPDB.io",
-    url: (word: string) => `https://jpdb.io/search?q=${word}&lang=english#a`,
-  },
-  {
-    name: "Kanshudo",
-    url: (word: string) => `https://www.kanshudo.com/word/${word}`,
-  },
-  {
     name: "Nadeshiko",
     url: (word: string) => `https://nadeshiko.co/search/${word}`,
   },
@@ -333,6 +320,20 @@ export const vocabExternalLinksCore = [
     name: "Jiten.Moe",
 
     url: (word: string) => `https://jiten.moe/parse?text=${word}&parsed=true`,
+  },
+  {
+    name: "JPDB.io",
+    url: (word: string) => `https://jpdb.io/search?q=${word}&lang=english#a`,
+  },
+  {
+    name: "Kanshudo",
+    url: (word: string) => `https://www.kanshudo.com/word/${word}`,
+  },
+
+  {
+    name: "JP Word Ranks",
+    url: (word: string) =>
+      `https://pikapikagems.github.io/japanese-word-ranks/word/?w=${word}`,
   },
 ];
 

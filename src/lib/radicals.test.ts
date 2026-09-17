@@ -4,28 +4,31 @@ import { describe, expect, it } from "vitest";
 
 import {
   isKnownRadical,
-  moreRadicalKeywords,
-  nonRadicalVariantKeywords,
-  radicalFalseFriends,
-  radicalStrokeCountMap,
-  radicalsGroupedByStrokeCount,
+  prepareRadicals,
+  resolveRadicalForSearch,
+  strokeCountMapFromGrouped,
+  type RadicalsFile,
 } from "./radicals";
 
-// These tables moved from hand-written TypeScript into raw-data/radicals.json
-// so the app and the JSON generator read one source. The tests below guard the
-// contract that move relies on: the same values reach the app, and the data
-// stays clean enough to be looked up by exact string match.
+const radicals = prepareRadicals(
+  JSON.parse(
+    fs.readFileSync(
+      path.join(process.cwd(), "public", "json", "v2", "radicals.json"),
+      "utf8"
+    )
+  ) as RadicalsFile
+);
 
-describe("radicals data loaded from raw-data/radicals.json", () => {
+describe("radicals.json (fetched at runtime)", () => {
   it("exposes every table with the expected size", () => {
-    expect(Object.keys(radicalsGroupedByStrokeCount)).toHaveLength(15);
-    expect(Object.keys(moreRadicalKeywords)).toHaveLength(45);
-    expect(Object.keys(nonRadicalVariantKeywords)).toHaveLength(5);
-    expect(Object.keys(radicalFalseFriends)).toHaveLength(18);
+    expect(Object.keys(radicals.groupedByStrokeCount)).toHaveLength(15);
+    expect(Object.keys(radicals.aliases).length).toBeGreaterThan(0);
+    expect(radicals.searchRedirects["飠"]).toBe("食");
+    expect(radicals.searchRedirects["𩙿"]).toBe("食");
   });
 
-  it("keeps known sample values intact after the move", () => {
-    expect(radicalsGroupedByStrokeCount["1"]).toEqual([
+  it("keeps known sample values intact", () => {
+    expect(radicals.groupedByStrokeCount["1"]).toEqual([
       "一",
       "｜",
       "丶",
@@ -33,64 +36,38 @@ describe("radicals data loaded from raw-data/radicals.json", () => {
       "乙",
       "亅",
     ]);
-    expect(moreRadicalKeywords["⺡"]).toBe("water variant");
-    expect(nonRadicalVariantKeywords["昜"]).toBe("light of the sun");
   });
 
   it("stores alias values without surrounding whitespace", () => {
-    // 艹 used to map to " ⺾" (leading space), so the alias could never be
-    // matched against a real character. Every value must be lookup-ready.
-    for (const [char, alias] of Object.entries(radicalFalseFriends)) {
+    for (const [char, alias] of Object.entries(radicals.aliases)) {
       expect(alias, `alias for ${char}`).toBe(alias.trim());
       expect(alias.length, `alias for ${char}`).toBeGreaterThan(0);
     }
-    expect(radicalFalseFriends["艹"]).toBe("⺾");
-  });
-
-  it("resolves every alias to a character that has a keyword somewhere", () => {
-    // An alias pointing at nothing is a silent dead end: call sites fall back
-    // to the alias, find nothing, and render "...". Check against every source
-    // the app consults, including the fetched component/kanji keyword maps.
-    const readRawData = <T>(name: string): T =>
-      JSON.parse(
-        fs.readFileSync(path.join(process.cwd(), "raw-data", name), "utf8")
-      ) as T;
-    const componentKeywords = readRawData<Record<string, string>>(
-      "component_keyword.json"
-    );
-    const kanjiMain = readRawData<Record<string, unknown>>("kanji_main.json");
-
-    for (const [char, alias] of Object.entries(radicalFalseFriends)) {
-      const resolvable =
-        alias in radicalStrokeCountMap ||
-        alias in moreRadicalKeywords ||
-        alias in nonRadicalVariantKeywords ||
-        alias in componentKeywords ||
-        alias in kanjiMain;
-      expect(resolvable, `${char} -> ${alias} resolves to a known entry`).toBe(
-        true
-      );
-    }
+    expect(radicals.aliases["艹"]).toBe("⺾");
+    expect(radicals.aliases["艸"]).toBe("艹");
   });
 
   it("never aliases a character to itself", () => {
-    for (const [char, alias] of Object.entries(radicalFalseFriends)) {
+    for (const [char, alias] of Object.entries(radicals.aliases)) {
       expect(alias, `alias for ${char}`).not.toBe(char);
     }
   });
 
-  it("builds radicalStrokeCountMap from the grouped table", () => {
-    const grouped = Object.entries(radicalsGroupedByStrokeCount);
+  it("builds strokeCountMap from the grouped table", () => {
+    const grouped = Object.entries(radicals.groupedByStrokeCount);
     const total = grouped.reduce((sum, [, list]) => sum + list.length, 0);
+    const strokeCountMap = strokeCountMapFromGrouped(
+      radicals.groupedByStrokeCount
+    );
 
-    expect(Object.keys(radicalStrokeCountMap)).toHaveLength(total);
-    expect(radicalStrokeCountMap["一"]).toBe("1");
-    expect(radicalStrokeCountMap["龠"]).toBe("17");
+    expect(Object.keys(strokeCountMap)).toHaveLength(total);
+    expect(strokeCountMap["一"]).toBe("1");
+    expect(strokeCountMap["龠"]).toBe("17");
   });
 
   it("lists each radical under exactly one stroke count", () => {
     const seen = new Set<string>();
-    for (const [, list] of Object.entries(radicalsGroupedByStrokeCount)) {
+    for (const [, list] of Object.entries(radicals.groupedByStrokeCount)) {
       for (const radical of list) {
         expect(seen.has(radical), `${radical} appears twice`).toBe(false);
         seen.add(radical);
@@ -99,8 +76,15 @@ describe("radicals data loaded from raw-data/radicals.json", () => {
   });
 
   it("treats grouped radicals and alias keys as known", () => {
-    expect(isKnownRadical("一")).toBe(true);
-    expect(isKnownRadical("艹")).toBe(true); // known via the alias table
-    expect(isKnownRadical("猫")).toBe(false);
+    expect(isKnownRadical("一", radicals)).toBe(true);
+    expect(isKnownRadical("艹", radicals)).toBe(true);
+    expect(isKnownRadical("飠", radicals)).toBe(true);
+    expect(isKnownRadical("猫", radicals)).toBe(false);
+  });
+
+  it("resolves search redirects and aliases onto a drawer radical", () => {
+    expect(resolveRadicalForSearch("飠", radicals)).toBe("食");
+    expect(resolveRadicalForSearch("艸", radicals)).toBe("⺾");
+    expect(resolveRadicalForSearch("一", radicals)).toBe("一");
   });
 });

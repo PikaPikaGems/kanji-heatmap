@@ -9,7 +9,7 @@ import type { PostMessageResponseType } from "@/lib/kanji/kanji-worker-types";
  * and request isolation. The worker module installs `self.onmessage` when it
  * is imported, so the test drives it exactly as the browser would.
  *
- * Fetches are served from raw-data so the handlers work on real data.
+ * Fetches are served from public/json/v2 so the handlers work on real data.
  */
 
 const posted: PostMessageResponseType[] = [];
@@ -26,6 +26,7 @@ const V2_FILES = [
   "kanji_extended_general.json",
   "kanji_extended_hover.json",
   "components.json",
+  "radicals.json",
   "vocab.json",
   "kanji_decomposition.json",
   "similar_kanjis.json",

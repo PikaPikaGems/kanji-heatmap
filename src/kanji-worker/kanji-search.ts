@@ -20,7 +20,6 @@ import {
 import { FREQ_RANK_OPTIONS_NONE_REMOVED } from "@/lib/options/options-arr";
 import { getFrequency } from "@/lib/options/options-label-maps";
 import { SortKey } from "@/lib/options/options-types";
-import { radicalStrokeCountMap } from "@/lib/radicals";
 import { isKanji } from "@/lib/utils";
 
 type DataPool = {
@@ -330,7 +329,8 @@ export const searchByRadical = (
   initialKanjis: string[],
   settings: SearchSettings,
   kanjiPool: DataPool,
-  kanjiDecompositionCache: Record<string, Set<string>>
+  kanjiDecompositionCache: Record<string, Set<string>>,
+  radicalStrokeCountMap: Record<string, string>
 ) => {
   // override minimum stroke count by user with
   // the largest stroke count given all the selected radicals

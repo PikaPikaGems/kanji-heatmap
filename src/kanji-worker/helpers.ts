@@ -14,6 +14,7 @@ import {
   StructuresResponseType,
   VocabResponseType,
 } from "@/lib/kanji/kanji-worker-types";
+import type { RadicalsFile } from "@/lib/radicals";
 import assetsPaths from "@/lib/assets-paths";
 import { decodeFurigana } from "@/lib/furigana";
 import type {
@@ -43,6 +44,10 @@ export const fetchHoverKanjiInfo = createFetch<HoverInfoResponseType>(
 
 export const fetchComponents = createFetch<ComponentsMap>(
   assetsPaths.COMPONENTS_FILE
+);
+
+export const fetchRadicals = createFetch<RadicalsFile>(
+  assetsPaths.RADICALS_FILE
 );
 
 export const fetchRepWordDetails = createFetch<

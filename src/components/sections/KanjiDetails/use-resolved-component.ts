@@ -1,32 +1,23 @@
-import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import {
-  moreRadicalKeywords,
-  nonRadicalVariantKeywords,
-  radicalFalseFriends,
-} from "@/lib/radicals";
-
-const getRadicalKeyword = (component: string): string | undefined => {
-  if (moreRadicalKeywords[component]) return moreRadicalKeywords[component];
-  const canonical = radicalFalseFriends[component]?.trim();
-  if (canonical && moreRadicalKeywords[canonical])
-    return moreRadicalKeywords[canonical];
-  return undefined;
-};
+  useGetKanjiInfoFn,
+  useRadicals,
+} from "@/kanji-worker/kanji-worker-hooks";
+import { isKnownRadical } from "@/lib/radicals";
 
 export const useResolvedComponent = (component: string | null | undefined) => {
   const getKanjiInfo = useGetKanjiInfoFn();
+  const radicals = useRadicals();
   if (!component) return null;
-  const info =
-    getKanjiInfo?.(component ?? radicalFalseFriends[component]) ?? null;
+  const info = getKanjiInfo?.(component) ?? null;
   const isKanji = !!info && "on" in info;
-  const keyword = info?.keyword ?? getRadicalKeyword(component);
-  const nonRadicalKeyword = nonRadicalVariantKeywords[component] ?? "...";
+  const keyword = info?.keyword;
   return {
     component,
-    keyword: keyword ?? nonRadicalKeyword ?? "...",
-    type: (isKanji ? "kanji" : keyword ? "radical" : "unknown") as
-      | "kanji"
-      | "radical"
-      | "unknown",
+    keyword: keyword ?? "...",
+    type: (isKanji
+      ? "kanji"
+      : isKnownRadical(component, radicals) || keyword
+        ? "radical"
+        : "unknown") as "kanji" | "radical" | "unknown",
   };
 };

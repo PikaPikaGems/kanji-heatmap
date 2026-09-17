@@ -44,6 +44,9 @@ const v1Extended = raw<Record<string, V1ExtendedEntry>>("kanji_extended.json");
 const v1Rep = raw<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
+const sylhareKeywords = raw<Record<string, { k: string; desc: string }>>(
+  "sylhare-component-keywords.json"
+);
 const v1ComponentKeywords = raw<Record<string, string>>(
   "component_keyword.json"
 );
@@ -56,6 +59,11 @@ const v1Radicals = raw<{
   nonRadicalVariantKeywords: Record<string, string>;
   radicalFalseFriends: Record<string, string>;
 }>("radicals.json");
+const extraAliases = raw<Record<string, string>>("radical-aliases.json");
+const allAliases = {
+  ...v1Radicals.radicalFalseFriends,
+  ...extraAliases,
+};
 
 type V2MainEntry = [
   string,
@@ -72,7 +80,7 @@ type V2MainEntry = [
   string | null,
   string | null,
 ];
-type ComponentEntry = { k?: string; s?: string[]; n?: number };
+type ComponentEntry = { k?: string; desc?: string; s?: string[]; n?: number };
 
 const main = v2<Record<string, V2MainEntry>>("kanji_main.json");
 const general = v2<Record<string, [string[], string[], string[]]>>(
@@ -272,9 +280,12 @@ describe("vocab.json", () => {
 });
 
 describe("components.json", () => {
-  it("keeps every component_keyword entry that is not itself a kanji", () => {
+  it("keeps component_keyword entries that sylhare did not replace", () => {
     for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
-      if (main[char] != null) continue; // covered by the de-duplication test
+      if (main[char] != null) continue;
+      if (sylhareKeywords[char] != null) continue;
+      const alias = allAliases[char];
+      if (alias && sylhareKeywords[alias] != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });
@@ -292,17 +303,12 @@ describe("components.json", () => {
     }
   });
 
-  it("keeps every hand-maintained radical keyword", () => {
-    for (const [char, keyword] of Object.entries(
-      v1Radicals.moreRadicalKeywords
-    )) {
-      expect(components[char]?.k, char).toBe(keyword);
-    }
-    for (const [char, keyword] of Object.entries(
-      v1Radicals.nonRadicalVariantKeywords
-    )) {
-      expect(components[char]?.k, char).toBe(keyword);
-    }
+  it("applies sylhare bushu keywords over the older radical tables", () => {
+    expect(components["⺡"]?.k).toBe("three water");
+    expect(components["⺡"]?.desc).toContain("さんずい");
+    expect(components["⻏"]?.k).toBe("large village");
+    expect(components["⻖"]?.k).toBe("small hill left");
+    expect(components["𠂉"]?.k).toBe("no plus one");
   });
 
   it("keeps every phonetic sound list", () => {
@@ -322,27 +328,20 @@ describe("components.json", () => {
   });
 
   it("gives a component with its own keyword precedence over its alias", () => {
-    // 罒 aliases ⺲, but both carry a keyword from different sources. The
-    // character's own entry must win — aliases only fill gaps.
-    expect(components["罒"]?.k).toBe(v1ComponentKeywords["罒"]);
-    expect(components["⺲"]?.k).toBe(v1Radicals.moreRadicalKeywords["⺲"]);
-    expect(components["罒"]?.k).not.toBe(components["⺲"]?.k);
+    expect(components["罒"]?.k).toBe("net head");
+    expect(components["⺲"]?.k).toBe("net head");
   });
 
   it("fills a keywordless lookalike from its alias", () => {
-    // 艹 has no keyword of its own. It previously mapped to " ⺾" (leading
-    // space) and so resolved to nothing at all; now it inherits ⺾'s keyword.
-    expect(v1ComponentKeywords["艹"]).toBeUndefined();
-    expect(components["艹"]?.k).toBe(components["⺾"]?.k);
-    expect(components["艹"]?.k).toBe("grass variant");
+    expect(components["艹"]?.k).toBe("grass crown");
+    expect(components["⺾"]?.k).toBe("grass crown");
+    expect(components["艸"]?.k).toBe("grass crown");
   });
 
   it("stops an alias chain at the first hop that has a keyword", () => {
-    // ⺕ -> 彐 -> ヨ. 彐 ("pig snout") is a closer answer for ⺕ than ヨ
-    // ("katakana yo") at the end of the chain.
-    expect(components["彐"]?.k).toBe("pig snout");
+    expect(components["彐"]?.k).toBe("pig head");
     expect(components["ヨ"]?.k).toBe("katakana yo");
-    expect(components["⺕"]?.k).toBe("pig snout");
+    expect(components["⺕"]?.k).toBe("pig head");
   });
 
   it("never stores an empty or untrimmed keyword", () => {
@@ -447,6 +446,6 @@ describe("component coverage report", () => {
   it("does not regress past the known gap count", () => {
     // Ratchet: filling gaps in components_manual_overrides.json lowers this,
     // a bad data drop raises it. Lower the number when you improve coverage.
-    expect(report.summary.missing).toBeLessThanOrEqual(391);
+    expect(report.summary.missing).toBeLessThanOrEqual(361);
   });
 });

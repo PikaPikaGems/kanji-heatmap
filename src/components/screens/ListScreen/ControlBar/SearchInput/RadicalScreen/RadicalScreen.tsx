@@ -4,12 +4,9 @@ import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import {
   useGetKanjiInfoFn,
   useKanjiSearchResult,
+  useRadicals,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { KANJI_COUNT } from "@/lib/options/constants";
-import {
-  moreRadicalKeywords,
-  radicalsGroupedByStrokeCount,
-} from "@/lib/radicals";
 import { CircleX } from "@/components/icons";
 import { KanjiItemSimpleButton } from "@/components/sections/KanjiHoverItem/KanjiItemButton";
 import { ClearFiltersCTA } from "@/components/dependent/routing/ClearFiltersCTA";
@@ -215,6 +212,7 @@ export const RadicalScreenContent = ({
   const isTouchDevice = useIsTouchDevice();
 
   const getBasicInfo = useGetKanjiInfoFn();
+  const radicals = useRadicals();
 
   // The handler must keep one identity across renders or RadicalBtn's memo
   // never hits, but it needs the current selection. A ref gives it both:
@@ -243,17 +241,17 @@ export const RadicalScreenContent = ({
     []
   );
 
-  if (getBasicInfo == null) {
+  if (getBasicInfo == null || radicals == null) {
     return null;
   }
 
   return (
     <>
-      {Object.keys(radicalsGroupedByStrokeCount).map((stroke) => {
-        const keyValue = stroke as keyof typeof radicalsGroupedByStrokeCount;
+      {Object.keys(radicals.groupedByStrokeCount).map((stroke) => {
+        const list = radicals.groupedByStrokeCount[stroke];
         return (
           <React.Fragment key={stroke}>
-            {radicalsGroupedByStrokeCount[keyValue].map((radical, index) => {
+            {list.map((radical, index) => {
               const isSelected = value.has(radical);
               const isDisabled =
                 possibleRadicals == null
@@ -298,10 +296,7 @@ export const RadicalsSelected = ({
   return (
     <>
       {value.map((radical) => {
-        const radicalKeyword =
-          getBasicInfo(radical)?.keyword ??
-          moreRadicalKeywords[radical] ??
-          "...";
+        const radicalKeyword = getBasicInfo(radical)?.keyword ?? "...";
 
         return (
           <ExpandedRadicalBtn

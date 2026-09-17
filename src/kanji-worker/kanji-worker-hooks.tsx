@@ -14,6 +14,7 @@ import {
   GetBasicKanjiInfo,
   SearchResponse,
 } from "@/lib/kanji/kanji-worker-types";
+import type { RadicalsRuntime } from "@/lib/radicals";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
@@ -21,6 +22,7 @@ export const IsReadyContext = createContext<boolean>(false);
 export const GetBasicKanjiInfoContext = createContext<GetBasicKanjiInfo | null>(
   null
 );
+export const RadicalsContext = createContext<RadicalsRuntime | null>(null);
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
@@ -118,6 +120,9 @@ export const useGetKanjiInfoFn = () => {
   );
   return fn;
 };
+
+export const useRadicals = () =>
+  useContextWithCatch(RadicalsContext, "KanjiWorker", "Radicals");
 
 /**
  * Search results keyed by the settings that produced them.

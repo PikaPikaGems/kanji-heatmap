@@ -17,7 +17,7 @@ Radical | Alternate Form
 犬	⺨
 草	⺾
 
-# Look alike radicals 
+# Look alike radicals
 
 - (hyphen) or ー (elongated-vowel)	            一
 ^ (circumflex) or ＾ (full-width circumflex)	𠆢
@@ -35,74 +35,65 @@ B or Ｂ (full-width B)	                        ⻏, ⻖
 エ (katakana 'e')	                            工
 ネ (katakana 'ne')	                            ⺭, ⻂
 囗 (※) or 口 (※) or ロ (katakana 'ro')	         囗, 口
-
-==============
-"⻏",
-"⻖",
-
-"口",
-"囗",
-
-"土",
-"士",
-
-"夂",
-"夕",
-
-"小",
-"⺌",
-
-"川",
-"巛",
-
-"⻏",
-"⻖",
-
-"日",
-"曰",
 */
 
-import radicalsData from "../../raw-data/radicals.json";
+/** public/json/v2/radicals.json — fetched at runtime, never imported. */
+export type RadicalsFile = {
+  groupedByStrokeCount: Record<string, string[]>;
+  aliases: Record<string, string>;
+  searchRedirects: Record<string, string>;
+};
 
-// The tables below are generated data, not code: they live in
-// raw-data/radicals.json so the JSON generator and the app read exactly the
-// same source. Edit the JSON, never these bindings.
-export const radicalsGroupedByStrokeCount =
-  radicalsData.radicalsGroupedByStrokeCount;
+export type RadicalsRuntime = RadicalsFile & {
+  strokeCountMap: Record<string, string>;
+};
 
-export const moreRadicalKeywords: Record<string, string> =
-  radicalsData.moreRadicalKeywords;
+export const strokeCountMapFromGrouped = (
+  grouped: Record<string, string[]>
+): Record<string, string> => {
+  const output: Record<string, string> = {};
+  for (const [stroke, list] of Object.entries(grouped)) {
+    for (const radical of list) {
+      output[radical] = stroke;
+    }
+  }
+  return output;
+};
 
-export const nonRadicalVariantKeywords: Record<string, string> =
-  radicalsData.nonRadicalVariantKeywords;
+export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
+  groupedByStrokeCount: file.groupedByStrokeCount,
+  aliases: file.aliases ?? {},
+  searchRedirects: file.searchRedirects ?? {},
+  strokeCountMap: strokeCountMapFromGrouped(file.groupedByStrokeCount),
+});
 
 /**
- * Lookalike characters that should resolve to another entry: different
- * Unicode codepoints that mean the same component (罒 vs ⺲, 亻 vs ⺅, ...).
+ * Map a displayed component to the codepoint the radical drawer / decomposition
+ * index actually uses. Alias tables can point at a prettier glyph (艸 → 艹) or
+ * cycle (艹 ↔ ⺾); walk until we hit a selectable radical.
  */
-export const radicalFalseFriends: Record<string, string> =
-  radicalsData.radicalFalseFriends;
+export const resolveRadicalForSearch = (
+  radical: string,
+  radicals: RadicalsRuntime | null | undefined
+): string => {
+  if (radicals == null) return radical;
+  const seen = new Set<string>();
+  let current = radical;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    if (current in radicals.strokeCountMap) return current;
+    const next = radicals.searchRedirects[current] ?? radicals.aliases[current];
+    if (!next) return current;
+    current = next;
+  }
+  return radical;
+};
 
-// IMPORTANT NOTE THINGS I HAVE DONE:
-// Updated kanji-structure.json
-// 1.  艸 -> 艹
-// 2.  ⽊ (radical) -> 木 (kanji)
-// FIX ME: What is 丩 ?
-
-// returns Record<Radical, StrokeCount>
-function transformRadicalsData(): Record<string, string> {
-  const output: Record<string, string> = {};
-
-  Object.entries(radicalsGroupedByStrokeCount).forEach(([stroke, radicals]) => {
-    radicals.forEach((radical) => {
-      output[radical] = stroke;
-    });
-  });
-
-  return output;
-}
-export const radicalStrokeCountMap: Record<string, string> =
-  transformRadicalsData();
-
-export const isKnownRadical = (char: string): boolean =>
-  char in radicalStrokeCountMap || char in radicalFalseFriends;
+export const isKnownRadical = (
+  char: string,
+  radicals: RadicalsRuntime | null | undefined
+): boolean =>
+  radicals != null &&
+  (char in radicals.strokeCountMap ||
+    char in radicals.aliases ||
+    char in radicals.searchRedirects);

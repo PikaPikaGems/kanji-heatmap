@@ -18,6 +18,7 @@ import {
   fetchKanjiReadingDetails,
   fetchMainKanjiInfo,
   fetchMultiKanjiStructures,
+  fetchRadicals,
   fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
@@ -40,6 +41,7 @@ import {
   searchKanji,
 } from "./kanji-search";
 import { SearchSettings } from "@/lib/settings/settings";
+import { prepareRadicals } from "@/lib/radicals";
 
 // ---------------------------------------------------------------------------
 // Datasets
@@ -84,6 +86,8 @@ const loadMainInfo = lazyDataset(
 const loadComponents = lazyDataset(
   (): Promise<ComponentsMap> => fetchComponents()
 );
+
+const loadRadicals = lazyDataset(() => fetchRadicals().then(prepareRadicals));
 
 const loadGeneralInfo = lazyDataset(
   (): Promise<Record<string, KanjiGeneralInfo>> =>
@@ -199,10 +203,17 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
     settings.textSearch.text !== ""
   ) {
     const decomposition = await loadDecomposition();
+    const radicals = await loadRadicals();
     if (kanjiByStrokeOrder.length === 0) {
       kanjiByStrokeOrder = getSortedByStrokeCount(pool);
     }
-    return searchByRadical(kanjiByStrokeOrder, settings, pool, decomposition);
+    return searchByRadical(
+      kanjiByStrokeOrder,
+      settings,
+      pool,
+      decomposition,
+      radicals.strokeCountMap
+    );
   }
 
   return { kanjis: searchKanji(settings, pool) };
@@ -298,11 +309,12 @@ const HANDLERS: {
   ) => WorkerApi[K]["response"] | Promise<WorkerApi[K]["response"]>;
 } = {
   init: async (): Promise<InitSnapshot> => {
-    const [mainInfoMap, componentsMap] = await Promise.all([
+    const [mainInfoMap, componentsMap, radicals] = await Promise.all([
       CORE,
       loadComponents(),
+      loadRadicals(),
     ]);
-    return { mainInfoMap, componentsMap };
+    return { mainInfoMap, componentsMap, radicals };
   },
   // Best-effort: allSettled so one failed fetch does not abort the rest;
   // lazyDataset clears failed promises so a later real request can retry.

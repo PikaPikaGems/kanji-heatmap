@@ -214,7 +214,7 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 
 // ---------------------------------------------------------------------------
 // components.json — one registry replacing component_keyword.json,
-// phonetic.json and the three hand-maintained tables in radicals.ts.
+// phonetic.json and the keyword tables in raw-data/radicals.json.
 //
 // Keywords are resolved through the lookalike-alias table at build time, so
 // the runtime never has to chase an alias or consult five sources.
@@ -556,6 +556,11 @@ write("kanji_extended_hover.json", outHover);
 write("rep_word_details.json", outRepDetails);
 write("vocab.json", outVocab);
 write("components.json", components);
+write("radicals.json", {
+  groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
+  aliases: allAliases,
+  searchRedirects: radicals.searchRedirects ?? {},
+});
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.
 write("kanji_decomposition.json", decomposition);
