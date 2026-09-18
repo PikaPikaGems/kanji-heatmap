@@ -29,7 +29,7 @@ export const RomajiBadge = ({
         showFocusRing
           ? "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           : "focus-visible:ring-0 focus-visible:ring-offset-0",
-        "text-base sm:text-xl",
+        "text-lg sm:text-xl",
         className,
         isKana && "kanji-font"
       )}

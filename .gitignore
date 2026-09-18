@@ -39,7 +39,7 @@ dist-ssr
 *.tar.gz
 
 # Generated from sylhare CSV + bushu-literal-en.json (pnpm run generate-json)
-raw-data/sylhare-component-keywords.json
+# raw-data/sylhare-component-keywords.json
 
 # Test artifacts
 test-results/

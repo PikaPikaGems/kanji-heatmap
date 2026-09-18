@@ -1,10 +1,20 @@
 {
   "summary": {
     "referenced": 540,
-    "withKeyword": 179,
-    "missing": 361
+    "withKeyword": 176,
+    "missing": 364
   },
   "missing": [
+    {
+      "char": "昜",
+      "refs": 28,
+      "sources": [
+        "hl",
+        "ka",
+        "sc",
+        "ya"
+      ]
+    },
     {
       "char": "尞",
       "refs": 23,
@@ -51,6 +61,17 @@
     },
     {
       "char": "夋",
+      "refs": 19,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
+      "char": "氐",
       "refs": 19,
       "sources": [
         "hl",
@@ -946,6 +967,15 @@
         "hl",
         "sc",
         "ya"
+      ]
+    },
+    {
+      "char": "粦",
+      "refs": 5,
+      "sources": [
+        "ka",
+        "phonetic-ref",
+        "sc"
       ]
     },
     {

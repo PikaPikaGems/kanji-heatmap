@@ -41,7 +41,7 @@ import {
   searchKanji,
 } from "./kanji-search";
 import { SearchSettings } from "@/lib/settings/settings";
-import { prepareRadicals } from "@/lib/radicals";
+import { prepareRadicals, resolveRadicalForSearch } from "@/lib/radicals";
 
 // ---------------------------------------------------------------------------
 // Datasets
@@ -207,9 +207,15 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
     if (kanjiByStrokeOrder.length === 0) {
       kanjiByStrokeOrder = getSortedByStrokeCount(pool);
     }
+    const resolvedText = [...settings.textSearch.text]
+      .map((ch) => resolveRadicalForSearch(ch, radicals))
+      .join("");
     return searchByRadical(
       kanjiByStrokeOrder,
-      settings,
+      {
+        ...settings,
+        textSearch: { ...settings.textSearch, text: resolvedText },
+      },
       pool,
       decomposition,
       radicals.strokeCountMap

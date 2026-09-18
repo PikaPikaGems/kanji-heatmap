@@ -141,9 +141,6 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           {radical}
         </div>
         <div className="min-w-0 text-left">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Radical
-          </p>
           {reading && (
             <p className="text-sm font-bold whitespace-normal text-foreground">
               🇯🇵 {reading}

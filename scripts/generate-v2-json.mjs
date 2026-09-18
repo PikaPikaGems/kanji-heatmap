@@ -46,11 +46,7 @@ const readingDetails = readRaw("kanji-readings-details.json");
 const cumUse = readRaw("cum_use.json");
 const radicals = readRaw("radicals.json");
 const sylhareKeywords = readRaw("sylhare-component-keywords.json");
-const extraAliases = readRaw("radical-aliases.json");
-const allAliases = {
-  ...radicals.radicalFalseFriends,
-  ...extraAliases,
-};
+const allAliases = radicals.aliases ?? {};
 const manualOverrides = readRaw("components_manual_overrides.json");
 
 const structureSources = {
@@ -243,14 +239,6 @@ const setKeyword = (char, keyword, source) => {
 for (const [char, keyword] of Object.entries(componentKeywords)) {
   setKeyword(char, keyword, "component_keyword.json");
 }
-for (const [char, keyword] of Object.entries(radicals.moreRadicalKeywords)) {
-  setKeyword(char, keyword, "radicals.moreRadicalKeywords");
-}
-for (const [char, keyword] of Object.entries(
-  radicals.nonRadicalVariantKeywords
-)) {
-  setKeyword(char, keyword, "radicals.nonRadicalVariantKeywords");
-}
 
 for (const [char, sounds] of Object.entries(phonetic)) {
   if (!Array.isArray(sounds) || sounds.length === 0) continue;
@@ -283,9 +271,7 @@ for (const [char, entry] of Object.entries(sylhareKeywords)) {
 // chain (⺕ -> 彐 -> ヨ), so follow to the end of the chain. Targets that are
 // themselves kanji are left alone — the runtime already reads kanji keywords
 // from kanji_main, and copying them here would duplicate the data.
-// Stops at the first hop that actually has a keyword: in ⺕ -> 彐 -> ヨ, 彐's
-// "pig snout" is a better answer for ⺕ than ヨ's "katakana yo" at the end of
-// the chain.
+// Stops at the first hop that actually has a keyword.
 const resolveAlias = (start) => {
   const seen = [start];
   let current = allAliases[start];
@@ -559,7 +545,6 @@ write("components.json", components);
 write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
-  searchRedirects: radicals.searchRedirects ?? {},
 });
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.

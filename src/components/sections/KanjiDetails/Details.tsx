@@ -66,11 +66,9 @@ const DetailsNotice = ({
   icon: typeof Volume2;
   children: ReactNode;
 }) => (
-  <div className="flex items-start gap-3 px-3 py-2">
-    <span className="flex items-center justify-center size-8 shrink-0 rounded-xl border-foreground/20 bg-background/40 text-foreground/70">
-      <Icon className="size-4" />
-    </span>
-    <p className="pt-1 text-xs leading-relaxed text-left text-foreground">
+  <div className="flex items-start px-3 py-2">
+    <Icon className="mr-2 text-yellow-600  size-4 dark:text-yellow-500" />
+    <p className="text-xs leading-relaxed text-left text-foreground">
       {children}
     </p>
   </div>
@@ -81,7 +79,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
     <div className="my-4">
       <div className="overflow-hidden border rounded-2xl border-foreground/20 bg-muted/15">
         <h3 className="px-3 pt-2.5 pb-1.5 text-xs font-bold tracking-widest text-left uppercase border-b text-foreground/50">
-          ⚠️ Note
+          Note
         </h3>
         <DetailsNotice icon={Volume2}>
           Speak buttons 🔊 🎧 use your {"browser's"} built-in text-to-speech,
@@ -93,7 +91,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
           issue?
           <ExternalTextLink
             href={outLinks.githubContentIssue}
-            text="Report here!"
+            text="Suggest an edit."
           />
         </DetailsNotice>
       </div>
