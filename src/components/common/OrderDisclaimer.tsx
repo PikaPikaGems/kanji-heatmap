@@ -6,9 +6,6 @@ export const OrderDisclaimer = () => (
   <>
     ⚠️ WK, RTK, and KKLC orders are community-maintained and may differ from the
     official editions.{" "}
-    <ExternalTextLink
-      href={outLinks.githubIssue}
-      text="Suggest an improvement."
-    />
+    <ExternalTextLink href={outLinks.githubIssue} text="Suggest an edit." />
   </>
 );

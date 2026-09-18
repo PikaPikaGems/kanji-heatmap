@@ -341,14 +341,14 @@ export const RadicalsResultsPreview = ({
             defaultMsg={
               <div className="flex flex-wrap items-center justify-center space-x-1">
                 Try:
-                {externalLinks.slice(0, 5).map((item, index) => {
+                {externalLinks.slice(0, 3).map((item, index) => {
                   return (
                     <span className="my-1 block-inline" key={item.name}>
                       <ExternalTextLink
                         href={item.url("捜")}
                         text={item.name}
                       />
-                      {index == 3 ? "or" : index === 4 ? "" : ","}
+                      {index == 1 ? "or" : index === 2 ? "" : ","}
                     </span>
                   );
                 })}

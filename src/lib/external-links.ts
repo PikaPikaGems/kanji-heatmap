@@ -4,17 +4,17 @@ export const kanshudoFn = (kanji: string) =>
 
 export const jitenMoeFn = (kanji: string) => `https://jiten.moe/kanji/${kanji}`;
 export const externalLinks: { name: string; url: (x: string) => string }[] = [
-  { name: "⭐️ JPDB.io", url: jpdbFn },
+  { name: "JPDB.io", url: jpdbFn },
   {
-    name: "⭐️ Jiten.Moe",
+    name: "Jiten.Moe",
     url: jitenMoeFn,
   },
   {
-    name: "⭐️ Kanshudo",
+    name: "Kanshudo",
     url: kanshudoFn,
   },
   {
-    name: "⭐️ Kanji Alive",
+    name: "Kanji Alive",
     url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
   },
   {

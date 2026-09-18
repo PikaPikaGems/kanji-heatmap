@@ -93,7 +93,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
           issue?
           <ExternalTextLink
             href={outLinks.githubContentIssue}
-            text="Report here!"
+            text="Suggest an edit."
           />
         </DetailsNotice>
       </div>
