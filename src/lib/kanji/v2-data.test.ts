@@ -55,15 +55,9 @@ const v1Furigana = raw<Record<string, WordPartDetail[]>>("vocab_furigana.json");
 const v1Meaning = raw<Record<string, string>>("vocab_meaning.json");
 const v1Radicals = raw<{
   radicalsGroupedByStrokeCount: Record<string, string[]>;
-  moreRadicalKeywords: Record<string, string>;
-  nonRadicalVariantKeywords: Record<string, string>;
-  radicalFalseFriends: Record<string, string>;
+  aliases: Record<string, string>;
 }>("radicals.json");
-const extraAliases = raw<Record<string, string>>("radical-aliases.json");
-const allAliases = {
-  ...v1Radicals.radicalFalseFriends,
-  ...extraAliases,
-};
+const allAliases = v1Radicals.aliases;
 
 type V2MainEntry = [
   string,
@@ -338,9 +332,9 @@ describe("components.json", () => {
     expect(components["艸"]?.k).toBe("grass crown");
   });
 
-  it("stops an alias chain at the first hop that has a keyword", () => {
+  it("keeps the pig-head radical family on one keyword", () => {
     expect(components["彐"]?.k).toBe("pig head");
-    expect(components["ヨ"]?.k).toBe("katakana yo");
+    expect(components["ヨ"]?.k).toBe("pig head");
     expect(components["⺕"]?.k).toBe("pig head");
   });
 

@@ -23,8 +23,9 @@ describe("radicals.json (fetched at runtime)", () => {
   it("exposes every table with the expected size", () => {
     expect(Object.keys(radicals.groupedByStrokeCount)).toHaveLength(15);
     expect(Object.keys(radicals.aliases).length).toBeGreaterThan(0);
-    expect(radicals.searchRedirects["飠"]).toBe("食");
-    expect(radicals.searchRedirects["𩙿"]).toBe("食");
+    expect(radicals.aliases["飠"]).toBe("食");
+    expect(radicals.aliases["𩙿"]).toBe("食");
+    expect(radicals.aliases["⺩"]).toBe("王");
   });
 
   it("keeps known sample values intact", () => {
@@ -82,8 +83,9 @@ describe("radicals.json (fetched at runtime)", () => {
     expect(isKnownRadical("猫", radicals)).toBe(false);
   });
 
-  it("resolves search redirects and aliases onto a drawer radical", () => {
+  it("resolves aliases onto a drawer radical", () => {
     expect(resolveRadicalForSearch("飠", radicals)).toBe("食");
+    expect(resolveRadicalForSearch("⺩", radicals)).toBe("王");
     expect(resolveRadicalForSearch("艸", radicals)).toBe("⺾");
     expect(resolveRadicalForSearch("一", radicals)).toBe("一");
   });
