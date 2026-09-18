@@ -103,7 +103,8 @@ const composeDesc = (readingJ, literal, positionJ, meaning) => {
 const glyphsOf = (radical, alternate) => {
   const out = [];
   const push = (ch) => {
-    if (!ch || [...ch].length !== 1) return;
+    if (!ch || ch.trim().length === 0) return;
+    if ([...ch].length !== 1) return;
     if (isPua(ch)) return;
     out.push(ch);
   };

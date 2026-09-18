@@ -331,13 +331,6 @@
     "齊": "even teeth",
     "龠": "flute"
   },
-  "nonRadicalVariantKeywords": {
-    "昜": "light of the sun",
-    "訁": "say (squished)",
-    "⻗": "rain (squished)",
-    "氐": "bottom",
-    "粦": "The rice you oppose"
-  },
   "radicalFalseFriends": {
     "罒": "⺲",
     "灬": "⺣",
@@ -360,6 +353,7 @@
   },
   "searchRedirects": {
     "飠": "食",
-    "𩙿": "食"
+    "𩙿": "食",
+    "⺩": "王"
   }
 }

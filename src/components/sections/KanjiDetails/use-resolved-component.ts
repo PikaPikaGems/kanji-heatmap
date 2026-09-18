@@ -16,7 +16,7 @@ export const useResolvedComponent = (component: string | null | undefined) => {
     keyword: keyword ?? "...",
     type: (isKanji
       ? "kanji"
-      : isKnownRadical(component, radicals) || keyword
+      : isKnownRadical(component, radicals)
         ? "radical"
         : "unknown") as "kanji" | "radical" | "unknown",
   };
