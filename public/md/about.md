@@ -42,7 +42,6 @@ The data published in kanjiheatmap.com by PikaPikaGems are licensed under [CC BY
   - Kanji lists by JLPT
   - Common Words list
   - from [EDRDG's][edrdg] projects and [Jonathan Waller's JLPT resources][waller-jlpt]
-- [WaniKani](https://www.wanikani.com/) ([Terms of Service][wanikani-terms])
 - Drew Edwards' [Kanji School](https://github.com/Lemmmy/KanjiSchool) project
   - Kanji School's kanji data is from [Jisho.org](https://jisho.org/)
     - Jisho.org data is from the [KANJIDIC][kanjidic-project] project
@@ -51,6 +50,8 @@ The data published in kanjiheatmap.com by PikaPikaGems are licensed under [CC BY
   - [KANJIDIC][kanjidic-project]
 - [Usagi Chan Kanji Phonetics Deck][moe-way] by [shoui520][shoui]
 - [JmdictFurigana][jmdictfurigana] project under [CC BY-SA 4.0][cc-by-sa-4]
+- [sylhare's kanji](https://github.com/sylhare/kanji) project
+  - Component keyword data from kanji-radicals.csv
 - [Netflix Japanese Frequency List][netflix-freq-mediafire] by [OhTalkWho オタク][netflix-freq] (Dave Doebrick)
 - Chris Kempson's [Japanese Subtitles Word & Kanji Frequency Lists][ckempson-subtitles] project under [MIT][mit-license]
 - Patrick Kandrac's 2242 Kanji Frequency List ([1][pkandrac-freq-list], [2][pkandrac-research]) which sources data from:
@@ -90,5 +91,4 @@ Jonathan Waller's JLPT resources are licensed under [CC BY 4.0][cc-by-4].
 [cc-by-4]: https://creativecommons.org/licenses/by/4.0/
 [cc-by-sa-3]: https://creativecommons.org/licenses/by-sa/3.0
 [cc-by-sa-4]: https://creativecommons.org/licenses/by-sa/4.0
-[wanikani-terms]: https://www.wanikani.com/terms
 [mit-license]: https://opensource.org/licenses/MIT
