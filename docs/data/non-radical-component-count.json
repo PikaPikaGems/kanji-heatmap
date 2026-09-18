@@ -1,0 +1,3769 @@
+{
+  "summary": {
+    "selectedKanji": 2426,
+    "selection": "all",
+    "kind": "not-radical-not-kanji",
+    "components": 383,
+    "withKeyword": 24,
+    "withoutKeyword": 359,
+    "componentsWithKeyword": [
+      {
+        "cmp": "乂",
+        "cnt": 18,
+        "kw": "regulate"
+      },
+      {
+        "cmp": "廿",
+        "cnt": 15,
+        "kw": "twenty"
+      },
+      {
+        "cmp": "𠂊",
+        "cnt": 13,
+        "kw": "katakana ku"
+      },
+      {
+        "cmp": "莫",
+        "cnt": 8,
+        "kw": "shalt"
+      },
+      {
+        "cmp": "𠂇",
+        "cnt": 7,
+        "kw": "katakana na"
+      },
+      {
+        "cmp": "⺈",
+        "cnt": 7,
+        "kw": "katakana ku variant"
+      },
+      {
+        "cmp": "䒑",
+        "cnt": 7,
+        "kw": "grass crown"
+      },
+      {
+        "cmp": "尹",
+        "cnt": 6,
+        "kw": "official rank"
+      },
+      {
+        "cmp": "咅",
+        "cnt": 6,
+        "kw": "spit out"
+      },
+      {
+        "cmp": "㐅",
+        "cnt": 5,
+        "kw": "katakana me"
+      },
+      {
+        "cmp": "乍",
+        "cnt": 5,
+        "kw": "while"
+      },
+      {
+        "cmp": "㑒",
+        "cnt": 5,
+        "kw": "consensus"
+      },
+      {
+        "cmp": "匸",
+        "cnt": 5,
+        "kw": "hide enclosure"
+      },
+      {
+        "cmp": "龶",
+        "cnt": 5,
+        "kw": "growing"
+      },
+      {
+        "cmp": "兀",
+        "cnt": 4,
+        "kw": "towering"
+      },
+      {
+        "cmp": "壬",
+        "cnt": 4,
+        "kw": "9th in rank"
+      },
+      {
+        "cmp": "于",
+        "cnt": 3,
+        "kw": "out of"
+      },
+      {
+        "cmp": "夬",
+        "cnt": 2,
+        "kw": "certain"
+      },
+      {
+        "cmp": "兔",
+        "cnt": 1,
+        "kw": "hare"
+      },
+      {
+        "cmp": "吊",
+        "cnt": 1,
+        "kw": "dangle"
+      },
+      {
+        "cmp": "屏",
+        "cnt": 1,
+        "kw": "folding screen"
+      },
+      {
+        "cmp": "巷",
+        "cnt": 1,
+        "kw": "alley"
+      },
+      {
+        "cmp": "昏",
+        "cnt": 1,
+        "kw": "dusk"
+      },
+      {
+        "cmp": "洛",
+        "cnt": 1,
+        "kw": "old Kyoto"
+      }
+    ],
+    "sources": [
+      "ka",
+      "hl",
+      "ya",
+      "sc",
+      "topo"
+    ],
+    "byCount": [
+      {
+        "count": 18,
+        "components": 1
+      },
+      {
+        "count": 15,
+        "components": 1
+      },
+      {
+        "count": 13,
+        "components": 1
+      },
+      {
+        "count": 9,
+        "components": 1
+      },
+      {
+        "count": 8,
+        "components": 1
+      },
+      {
+        "count": 7,
+        "components": 6
+      },
+      {
+        "count": 6,
+        "components": 10
+      },
+      {
+        "count": 5,
+        "components": 21
+      },
+      {
+        "count": 4,
+        "components": 34
+      },
+      {
+        "count": 3,
+        "components": 49
+      },
+      {
+        "count": 2,
+        "components": 86
+      },
+      {
+        "count": 1,
+        "components": 172
+      }
+    ]
+  },
+  "components": [
+    {
+      "char": "乂",
+      "count": 18,
+      "keyword": "regulate",
+      "exampleKanji": [
+        "気",
+        "父",
+        "文",
+        "図",
+        "区",
+        "史",
+        "希",
+        "殺",
+        "更",
+        "凶",
+        "刈",
+        "又",
+        "爽",
+        "匁",
+        "吏",
+        "丈",
+        "鬱",
+        "刹"
+      ]
+    },
+    {
+      "char": "廿",
+      "count": 15,
+      "keyword": "twenty",
+      "exampleKanji": [
+        "世",
+        "度",
+        "漢",
+        "席",
+        "帯",
+        "満",
+        "勤",
+        "難",
+        "革",
+        "甘",
+        "棄",
+        "庶",
+        "嘆",
+        "謹",
+        "僅"
+      ]
+    },
+    {
+      "char": "𠂊",
+      "count": 13,
+      "keyword": "katakana ku",
+      "exampleKanji": [
+        "魚",
+        "色",
+        "急",
+        "角",
+        "負",
+        "争",
+        "成",
+        "象",
+        "久",
+        "危",
+        "免",
+        "陥",
+        "亀"
+      ]
+    },
+    {
+      "char": "昜",
+      "count": 9,
+      "keyword": "",
+      "exampleKanji": [
+        "場",
+        "湯",
+        "陽",
+        "腸",
+        "傷",
+        "揚",
+        "楊",
+        "暢",
+        "瘍"
+      ]
+    },
+    {
+      "char": "莫",
+      "count": 8,
+      "keyword": "shalt",
+      "exampleKanji": [
+        "暮",
+        "募",
+        "墓",
+        "幕",
+        "模",
+        "漠",
+        "膜",
+        "慕"
+      ]
+    },
+    {
+      "char": "丰",
+      "count": 7,
+      "keyword": "",
+      "exampleKanji": [
+        "害",
+        "拝",
+        "封",
+        "邦",
+        "奉",
+        "峰",
+        "蜂"
+      ]
+    },
+    {
+      "char": "𠂇",
+      "count": 7,
+      "keyword": "katakana na",
+      "exampleKanji": [
+        "左",
+        "右",
+        "友",
+        "有",
+        "在",
+        "布",
+        "存"
+      ]
+    },
+    {
+      "char": "⺈",
+      "count": 7,
+      "keyword": "katakana ku variant",
+      "exampleKanji": [
+        "魚",
+        "角",
+        "負",
+        "争",
+        "象",
+        "免",
+        "陥"
+      ]
+    },
+    {
+      "char": "𢦏",
+      "count": 7,
+      "keyword": "",
+      "exampleKanji": [
+        "災",
+        "裁",
+        "載",
+        "繊",
+        "栽",
+        "哉",
+        "戴"
+      ]
+    },
+    {
+      "char": "𦍌",
+      "count": 7,
+      "keyword": "",
+      "exampleKanji": [
+        "着",
+        "美",
+        "養",
+        "善",
+        "義",
+        "羨",
+        "羞"
+      ]
+    },
+    {
+      "char": "䒑",
+      "count": 7,
+      "keyword": "grass crown",
+      "exampleKanji": [
+        "前",
+        "首",
+        "豆",
+        "並",
+        "善",
+        "従",
+        "岡"
+      ]
+    },
+    {
+      "char": "尹",
+      "count": 6,
+      "keyword": "official rank",
+      "exampleKanji": [
+        "事",
+        "君",
+        "妻",
+        "伊",
+        "庸",
+        "唐"
+      ]
+    },
+    {
+      "char": "乚",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "礼",
+        "札",
+        "乱",
+        "乳",
+        "也",
+        "孔"
+      ]
+    },
+    {
+      "char": "兌",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "説",
+        "税",
+        "鋭",
+        "脱",
+        "悦",
+        "閲"
+      ]
+    },
+    {
+      "char": "兑",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "説",
+        "税",
+        "鋭",
+        "脱",
+        "悦",
+        "閲"
+      ]
+    },
+    {
+      "char": "咅",
+      "count": 6,
+      "keyword": "spit out",
+      "exampleKanji": [
+        "倍",
+        "部",
+        "賠",
+        "培",
+        "陪",
+        "剖"
+      ]
+    },
+    {
+      "char": "夋",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "酸",
+        "俊",
+        "唆",
+        "駿",
+        "峻",
+        "竣"
+      ]
+    },
+    {
+      "char": "尞",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "療",
+        "僚",
+        "寮",
+        "遼",
+        "瞭",
+        "燎"
+      ]
+    },
+    {
+      "char": "㦮",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "残",
+        "浅",
+        "銭",
+        "践",
+        "桟",
+        "箋"
+      ]
+    },
+    {
+      "char": "戔",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "残",
+        "浅",
+        "銭",
+        "践",
+        "桟",
+        "箋"
+      ]
+    },
+    {
+      "char": "曷",
+      "count": 6,
+      "keyword": "",
+      "exampleKanji": [
+        "掲",
+        "喝",
+        "渇",
+        "褐",
+        "謁",
+        "葛"
+      ]
+    },
+    {
+      "char": "㐅",
+      "count": 5,
+      "keyword": "katakana me",
+      "exampleKanji": [
+        "気",
+        "希",
+        "凶",
+        "刈",
+        "刹"
+      ]
+    },
+    {
+      "char": "乍",
+      "count": 5,
+      "keyword": "while",
+      "exampleKanji": [
+        "作",
+        "昨",
+        "詐",
+        "酢",
+        "搾"
+      ]
+    },
+    {
+      "char": "㐮",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "譲",
+        "壌",
+        "醸",
+        "嬢",
+        "穣"
+      ]
+    },
+    {
+      "char": "亼",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "今",
+        "合",
+        "命",
+        "令",
+        "余"
+      ]
+    },
+    {
+      "char": "㑒",
+      "count": 5,
+      "keyword": "consensus",
+      "exampleKanji": [
+        "験",
+        "検",
+        "険",
+        "剣",
+        "倹"
+      ]
+    },
+    {
+      "char": "俞",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "輸",
+        "諭",
+        "癒",
+        "愉",
+        "喩"
+      ]
+    },
+    {
+      "char": "僉",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "験",
+        "検",
+        "険",
+        "剣",
+        "倹"
+      ]
+    },
+    {
+      "char": "兪",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "輸",
+        "諭",
+        "癒",
+        "愉",
+        "喩"
+      ]
+    },
+    {
+      "char": "关",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "送",
+        "笑",
+        "関",
+        "咲",
+        "朕"
+      ]
+    },
+    {
+      "char": "匸",
+      "count": 5,
+      "keyword": "hide enclosure",
+      "exampleKanji": [
+        "区",
+        "医",
+        "亡",
+        "匹",
+        "匿"
+      ]
+    },
+    {
+      "char": "龶",
+      "count": 5,
+      "keyword": "growing",
+      "exampleKanji": [
+        "麦",
+        "表",
+        "毒",
+        "責",
+        "素"
+      ]
+    },
+    {
+      "char": "圣",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "軽",
+        "径",
+        "経",
+        "怪",
+        "茎"
+      ]
+    },
+    {
+      "char": "夌",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "陵",
+        "綾",
+        "稜",
+        "凌",
+        "崚"
+      ]
+    },
+    {
+      "char": "夭",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "笑",
+        "喬",
+        "妖",
+        "沃",
+        "呑"
+      ]
+    },
+    {
+      "char": "夾",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "狭",
+        "挟",
+        "峡",
+        "頰",
+        "頬"
+      ]
+    },
+    {
+      "char": "幵",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "研",
+        "開",
+        "形",
+        "刑",
+        "栞"
+      ]
+    },
+    {
+      "char": "戋",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "残",
+        "浅",
+        "銭",
+        "践",
+        "桟"
+      ]
+    },
+    {
+      "char": "翟",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "曜",
+        "濯",
+        "躍",
+        "耀",
+        "燿"
+      ]
+    },
+    {
+      "char": "𧘇",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "表",
+        "衣",
+        "裏",
+        "褒",
+        "衷"
+      ]
+    },
+    {
+      "char": "襄",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "譲",
+        "壌",
+        "醸",
+        "嬢",
+        "穣"
+      ]
+    },
+    {
+      "char": "雚",
+      "count": 5,
+      "keyword": "",
+      "exampleKanji": [
+        "観",
+        "権",
+        "歓",
+        "勧",
+        "缶"
+      ]
+    },
+    {
+      "char": "丂",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "考",
+        "号",
+        "巧",
+        "朽"
+      ]
+    },
+    {
+      "char": "𠂤",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "追",
+        "師",
+        "帥",
+        "阜"
+      ]
+    },
+    {
+      "char": "㐬",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "流",
+        "棄",
+        "硫",
+        "琉"
+      ]
+    },
+    {
+      "char": "侖",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "輪",
+        "論",
+        "倫",
+        "綸"
+      ]
+    },
+    {
+      "char": "兀",
+      "count": 4,
+      "keyword": "towering",
+      "exampleKanji": [
+        "西",
+        "光",
+        "尭",
+        "酉"
+      ]
+    },
+    {
+      "char": "龹",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "券",
+        "巻",
+        "圏",
+        "拳"
+      ]
+    },
+    {
+      "char": "冋",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "高",
+        "向",
+        "尚",
+        "喬"
+      ]
+    },
+    {
+      "char": "冓",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "構",
+        "講",
+        "購",
+        "溝"
+      ]
+    },
+    {
+      "char": "卆",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "枠",
+        "砕",
+        "酔",
+        "粋"
+      ]
+    },
+    {
+      "char": "咼",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "過",
+        "渦",
+        "禍",
+        "鍋"
+      ]
+    },
+    {
+      "char": "喿",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "操",
+        "燥",
+        "繰",
+        "藻"
+      ]
+    },
+    {
+      "char": "壬",
+      "count": 4,
+      "keyword": "9th in rank",
+      "exampleKanji": [
+        "任",
+        "妊",
+        "廷",
+        "淫"
+      ]
+    },
+    {
+      "char": "夆",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "縫",
+        "峰",
+        "蜂",
+        "逢"
+      ]
+    },
+    {
+      "char": "复",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "復",
+        "複",
+        "腹",
+        "覆"
+      ]
+    },
+    {
+      "char": "夗",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "腕",
+        "苑",
+        "宛",
+        "怨"
+      ]
+    },
+    {
+      "char": "𡗗",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "春",
+        "奏",
+        "泰",
+        "奉"
+      ]
+    },
+    {
+      "char": "尃",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "博",
+        "薄",
+        "敷",
+        "縛"
+      ]
+    },
+    {
+      "char": "并",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "併",
+        "塀",
+        "瓶",
+        "餅"
+      ]
+    },
+    {
+      "char": "开",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "研",
+        "開",
+        "形",
+        "刑"
+      ]
+    },
+    {
+      "char": "弗",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "費",
+        "仏",
+        "払",
+        "沸"
+      ]
+    },
+    {
+      "char": "戍",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "威",
+        "幾",
+        "蔑",
+        "畿"
+      ]
+    },
+    {
+      "char": "攸",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "修",
+        "条",
+        "悠",
+        "脩"
+      ]
+    },
+    {
+      "char": "朿",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "責",
+        "刺",
+        "策",
+        "跡"
+      ]
+    },
+    {
+      "char": "氐",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "低",
+        "底",
+        "邸",
+        "抵"
+      ]
+    },
+    {
+      "char": "爰",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "暖",
+        "援",
+        "緩",
+        "媛"
+      ]
+    },
+    {
+      "char": "⺦",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "状",
+        "将",
+        "寝",
+        "壮"
+      ]
+    },
+    {
+      "char": "甬",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "通",
+        "勇",
+        "痛",
+        "踊"
+      ]
+    },
+    {
+      "char": "畐",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "福",
+        "副",
+        "富",
+        "幅"
+      ]
+    },
+    {
+      "char": "禺",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "隅",
+        "偶",
+        "遇",
+        "愚"
+      ]
+    },
+    {
+      "char": "䍃",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "揺",
+        "謡",
+        "遥",
+        "瑶"
+      ]
+    },
+    {
+      "char": "臤",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "賢",
+        "緊",
+        "堅",
+        "腎"
+      ]
+    },
+    {
+      "char": "龷",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "黄",
+        "昔",
+        "共",
+        "展"
+      ]
+    },
+    {
+      "char": "蜀",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "独",
+        "触",
+        "属",
+        "濁"
+      ]
+    },
+    {
+      "char": "辟",
+      "count": 4,
+      "keyword": "",
+      "exampleKanji": [
+        "壁",
+        "避",
+        "癖",
+        "璧"
+      ]
+    },
+    {
+      "char": "卄",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "満",
+        "備",
+        "冊"
+      ]
+    },
+    {
+      "char": "业",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "並",
+        "繊",
+        "虚"
+      ]
+    },
+    {
+      "char": "丩",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "収",
+        "叫",
+        "糾"
+      ]
+    },
+    {
+      "char": "𠂎",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "留",
+        "貿",
+        "卯"
+      ]
+    },
+    {
+      "char": "𠃊",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "世",
+        "県",
+        "亡"
+      ]
+    },
+    {
+      "char": "𠃌",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "羽",
+        "成",
+        "幻"
+      ]
+    },
+    {
+      "char": "于",
+      "count": 3,
+      "keyword": "out of",
+      "exampleKanji": [
+        "宇",
+        "汚",
+        "芋"
+      ]
+    },
+    {
+      "char": "亢",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "航",
+        "抗",
+        "坑"
+      ]
+    },
+    {
+      "char": "亲",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "新",
+        "親",
+        "薪"
+      ]
+    },
+    {
+      "char": "从",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "卒",
+        "傘",
+        "坐"
+      ]
+    },
+    {
+      "char": "兹",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "磁",
+        "滋",
+        "慈"
+      ]
+    },
+    {
+      "char": "劦",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "協",
+        "脅",
+        "脇"
+      ]
+    },
+    {
+      "char": "卬",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "迎",
+        "抑",
+        "仰"
+      ]
+    },
+    {
+      "char": "𠫓",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "育",
+        "棄",
+        "充"
+      ]
+    },
+    {
+      "char": "厷",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "雄",
+        "宏",
+        "紘"
+      ]
+    },
+    {
+      "char": "𠬶",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "寝",
+        "侵",
+        "浸"
+      ]
+    },
+    {
+      "char": "叚",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "仮",
+        "暇",
+        "霞"
+      ]
+    },
+    {
+      "char": "㕣",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "船",
+        "沿",
+        "鉛"
+      ]
+    },
+    {
+      "char": "𡈼",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "望",
+        "廷",
+        "呈"
+      ]
+    },
+    {
+      "char": "坴",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "陸",
+        "陵",
+        "睦"
+      ]
+    },
+    {
+      "char": "埶",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "熱",
+        "芸",
+        "勢"
+      ]
+    },
+    {
+      "char": "堇",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "勤",
+        "謹",
+        "僅"
+      ]
+    },
+    {
+      "char": "壴",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "喜",
+        "嘉",
+        "鼓"
+      ]
+    },
+    {
+      "char": "夹",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "狭",
+        "挟",
+        "峡"
+      ]
+    },
+    {
+      "char": "奐",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "院",
+        "換",
+        "喚"
+      ]
+    },
+    {
+      "char": "帚",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "帰",
+        "婦",
+        "掃"
+      ]
+    },
+    {
+      "char": "彔",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "緑",
+        "録",
+        "剥"
+      ]
+    },
+    {
+      "char": "录",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "緑",
+        "録",
+        "禄"
+      ]
+    },
+    {
+      "char": "忩",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "総",
+        "窓",
+        "聡"
+      ]
+    },
+    {
+      "char": "悤",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "総",
+        "窓",
+        "聡"
+      ]
+    },
+    {
+      "char": "戊",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "成",
+        "茂",
+        "戚"
+      ]
+    },
+    {
+      "char": "戌",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "歳",
+        "威",
+        "滅"
+      ]
+    },
+    {
+      "char": "戠",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "職",
+        "識",
+        "織"
+      ]
+    },
+    {
+      "char": "扁",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "編",
+        "偏",
+        "遍"
+      ]
+    },
+    {
+      "char": "敝",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "弊",
+        "幣",
+        "蔽"
+      ]
+    },
+    {
+      "char": "枼",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "葉",
+        "蝶",
+        "喋"
+      ]
+    },
+    {
+      "char": "龰",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "足",
+        "走",
+        "従"
+      ]
+    },
+    {
+      "char": "𤇾",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "栄",
+        "営",
+        "蛍"
+      ]
+    },
+    {
+      "char": "𤣩",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "珍",
+        "瑠",
+        "璃"
+      ]
+    },
+    {
+      "char": "𥫗",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "簿",
+        "篤",
+        "箋"
+      ]
+    },
+    {
+      "char": "耑",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "段",
+        "端",
+        "瑞"
+      ]
+    },
+    {
+      "char": "茲",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "磁",
+        "滋",
+        "慈"
+      ]
+    },
+    {
+      "char": "𦰌",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "勤",
+        "謹",
+        "僅"
+      ]
+    },
+    {
+      "char": "𦰩",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "漢",
+        "難",
+        "嘆"
+      ]
+    },
+    {
+      "char": "蒦",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "護",
+        "獲",
+        "穫"
+      ]
+    },
+    {
+      "char": "袁",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "遠",
+        "園",
+        "猿"
+      ]
+    },
+    {
+      "char": "襾",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "票",
+        "価",
+        "覆"
+      ]
+    },
+    {
+      "char": "賁",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "噴",
+        "墳",
+        "憤"
+      ]
+    },
+    {
+      "char": "𮥶",
+      "count": 3,
+      "keyword": "",
+      "exampleKanji": [
+        "観",
+        "歓",
+        "勧"
+      ]
+    },
+    {
+      "char": "丗",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "帯",
+        "棄"
+      ]
+    },
+    {
+      "char": "⺀",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "冬",
+        "尽"
+      ]
+    },
+    {
+      "char": "乇",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "宅",
+        "託"
+      ]
+    },
+    {
+      "char": "𠂔",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "姉",
+        "柿"
+      ]
+    },
+    {
+      "char": "𠂢",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "脈",
+        "派"
+      ]
+    },
+    {
+      "char": "龴",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "予",
+        "勇"
+      ]
+    },
+    {
+      "char": "产",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "産",
+        "彦"
+      ]
+    },
+    {
+      "char": "亶",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "壇",
+        "檀"
+      ]
+    },
+    {
+      "char": "㐱",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "珍",
+        "診"
+      ]
+    },
+    {
+      "char": "兴",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "挙",
+        "誉"
+      ]
+    },
+    {
+      "char": "𠔉",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "券",
+        "巻"
+      ]
+    },
+    {
+      "char": "㒸",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "隊",
+        "遂"
+      ]
+    },
+    {
+      "char": "冏",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "商",
+        "橘"
+      ]
+    },
+    {
+      "char": "冘",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "沈",
+        "枕"
+      ]
+    },
+    {
+      "char": "剌",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "頼",
+        "辣"
+      ]
+    },
+    {
+      "char": "匊",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "菊",
+        "鞠"
+      ]
+    },
+    {
+      "char": "卂",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "迅",
+        "訊"
+      ]
+    },
+    {
+      "char": "卉",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "奔",
+        "尭"
+      ]
+    },
+    {
+      "char": "卌",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "無",
+        "舞"
+      ]
+    },
+    {
+      "char": "厉",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "励",
+        "栃"
+      ]
+    },
+    {
+      "char": "厓",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "涯",
+        "崖"
+      ]
+    },
+    {
+      "char": "𠩵",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "歴",
+        "暦"
+      ]
+    },
+    {
+      "char": "厤",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "歴",
+        "暦"
+      ]
+    },
+    {
+      "char": "叀",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "専",
+        "恵"
+      ]
+    },
+    {
+      "char": "𠬝",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "服",
+        "報"
+      ]
+    },
+    {
+      "char": "叟",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "捜",
+        "痩"
+      ]
+    },
+    {
+      "char": "𠮷",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "周",
+        "舎"
+      ]
+    },
+    {
+      "char": "咸",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "感",
+        "減"
+      ]
+    },
+    {
+      "char": "囟",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "思",
+        "細"
+      ]
+    },
+    {
+      "char": "夬",
+      "count": 2,
+      "keyword": "certain",
+      "exampleKanji": [
+        "決",
+        "快"
+      ]
+    },
+    {
+      "char": "奚",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "鶏",
+        "渓"
+      ]
+    },
+    {
+      "char": "奞",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "奮",
+        "奪"
+      ]
+    },
+    {
+      "char": "孚",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "乳",
+        "浮"
+      ]
+    },
+    {
+      "char": "孰",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "熟",
+        "塾"
+      ]
+    },
+    {
+      "char": "宓",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "密",
+        "蜜"
+      ]
+    },
+    {
+      "char": "寉",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "確",
+        "鶴"
+      ]
+    },
+    {
+      "char": "尓",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "称",
+        "弥"
+      ]
+    },
+    {
+      "char": "尗",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "叔",
+        "戚"
+      ]
+    },
+    {
+      "char": "屰",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "逆",
+        "朔"
+      ]
+    },
+    {
+      "char": "𡿺",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "脳",
+        "悩"
+      ]
+    },
+    {
+      "char": "㠯",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "官",
+        "遣"
+      ]
+    },
+    {
+      "char": "帛",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "綿",
+        "錦"
+      ]
+    },
+    {
+      "char": "㣺",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "恭",
+        "慕"
+      ]
+    },
+    {
+      "char": "㥯",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "隠",
+        "穏"
+      ]
+    },
+    {
+      "char": "𰕎",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "撤",
+        "徹"
+      ]
+    },
+    {
+      "char": "㫃",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "旗",
+        "施"
+      ]
+    },
+    {
+      "char": "显",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "湿",
+        "顕"
+      ]
+    },
+    {
+      "char": "曼",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "慢",
+        "漫"
+      ]
+    },
+    {
+      "char": "朮",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "術",
+        "述"
+      ]
+    },
+    {
+      "char": "杀",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "殺",
+        "刹"
+      ]
+    },
+    {
+      "char": "柬",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "練",
+        "錬"
+      ]
+    },
+    {
+      "char": "桼",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "漆",
+        "膝"
+      ]
+    },
+    {
+      "char": "步",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "頻",
+        "捗"
+      ]
+    },
+    {
+      "char": "溥",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "薄",
+        "簿"
+      ]
+    },
+    {
+      "char": "𤋱",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "勲",
+        "薫"
+      ]
+    },
+    {
+      "char": "熏",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "勲",
+        "薫"
+      ]
+    },
+    {
+      "char": "爫",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "采",
+        "爵"
+      ]
+    },
+    {
+      "char": "𤓻",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "鶏",
+        "渓"
+      ]
+    },
+    {
+      "char": "犀",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "遅",
+        "稚"
+      ]
+    },
+    {
+      "char": "犮",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "抜",
+        "髪"
+      ]
+    },
+    {
+      "char": "玨",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "琴",
+        "斑"
+      ]
+    },
+    {
+      "char": "电",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "電",
+        "竜"
+      ]
+    },
+    {
+      "char": "畾",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "雷",
+        "累"
+      ]
+    },
+    {
+      "char": "睘",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "環",
+        "還"
+      ]
+    },
+    {
+      "char": "睪",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "駅",
+        "訳"
+      ]
+    },
+    {
+      "char": "离",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "離",
+        "璃"
+      ]
+    },
+    {
+      "char": "娄",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "数",
+        "楼"
+      ]
+    },
+    {
+      "char": "粦",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "隣",
+        "麟"
+      ]
+    },
+    {
+      "char": "罙",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "深",
+        "探"
+      ]
+    },
+    {
+      "char": "肀",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "妻",
+        "唐"
+      ]
+    },
+    {
+      "char": "荅",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "塔",
+        "搭"
+      ]
+    },
+    {
+      "char": "菐",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "僕",
+        "撲"
+      ]
+    },
+    {
+      "char": "𧆨",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "慮",
+        "虜"
+      ]
+    },
+    {
+      "char": "褱",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "壊",
+        "懐"
+      ]
+    },
+    {
+      "char": "䜌",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "変",
+        "恋"
+      ]
+    },
+    {
+      "char": "豤",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "懇",
+        "墾"
+      ]
+    },
+    {
+      "char": "豦",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "劇",
+        "拠"
+      ]
+    },
+    {
+      "char": "貇",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "懇",
+        "墾"
+      ]
+    },
+    {
+      "char": "迶",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "随",
+        "髄"
+      ]
+    },
+    {
+      "char": "酋",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "尊",
+        "猶"
+      ]
+    },
+    {
+      "char": "闌",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "欄",
+        "蘭"
+      ]
+    },
+    {
+      "char": "陏",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "随",
+        "堕"
+      ]
+    },
+    {
+      "char": "隺",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "確",
+        "鶴"
+      ]
+    },
+    {
+      "char": "竟",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "鏡",
+        "境"
+      ]
+    },
+    {
+      "char": "麥",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "麦",
+        "麺"
+      ]
+    },
+    {
+      "char": "",
+      "count": 2,
+      "keyword": "",
+      "exampleKanji": [
+        "卒",
+        "率"
+      ]
+    },
+    {
+      "char": "コ",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "鹿"
+      ]
+    },
+    {
+      "char": "丅",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "敢"
+      ]
+    },
+    {
+      "char": "亐",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "汚"
+      ]
+    },
+    {
+      "char": "丽",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "麗"
+      ]
+    },
+    {
+      "char": "丵",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "業"
+      ]
+    },
+    {
+      "char": "乎",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "呼"
+      ]
+    },
+    {
+      "char": "乑",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "衆"
+      ]
+    },
+    {
+      "char": "乕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "逓"
+      ]
+    },
+    {
+      "char": "乛",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "今"
+      ]
+    },
+    {
+      "char": "𠃑",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "呉"
+      ]
+    },
+    {
+      "char": "乜",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "也"
+      ]
+    },
+    {
+      "char": "习",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "羽"
+      ]
+    },
+    {
+      "char": "𠄎",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "乃"
+      ]
+    },
+    {
+      "char": "亍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "行"
+      ]
+    },
+    {
+      "char": "亚",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "霊"
+      ]
+    },
+    {
+      "char": "亟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "極"
+      ]
+    },
+    {
+      "char": "亩",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "畝"
+      ]
+    },
+    {
+      "char": "佰",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "宿"
+      ]
+    },
+    {
+      "char": "侌",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "陰"
+      ]
+    },
+    {
+      "char": "𠈌",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "傘"
+      ]
+    },
+    {
+      "char": "倝",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "乾"
+      ]
+    },
+    {
+      "char": "兒",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "睨"
+      ]
+    },
+    {
+      "char": "兔",
+      "count": 1,
+      "keyword": "hare",
+      "exampleKanji": [
+        "逸"
+      ]
+    },
+    {
+      "char": "內",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "納"
+      ]
+    },
+    {
+      "char": "冉",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "再"
+      ]
+    },
+    {
+      "char": "冎",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "骨"
+      ]
+    },
+    {
+      "char": "㒼",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "満"
+      ]
+    },
+    {
+      "char": "冝",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "畳"
+      ]
+    },
+    {
+      "char": "冢",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "塚"
+      ]
+    },
+    {
+      "char": "刍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "急"
+      ]
+    },
+    {
+      "char": "刖",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "前"
+      ]
+    },
+    {
+      "char": "㓞",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "契"
+      ]
+    },
+    {
+      "char": "务",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "務"
+      ]
+    },
+    {
+      "char": "劵",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "勝"
+      ]
+    },
+    {
+      "char": "匀",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "均"
+      ]
+    },
+    {
+      "char": "匈",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "胸"
+      ]
+    },
+    {
+      "char": "匋",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "陶"
+      ]
+    },
+    {
+      "char": "卦",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "掛"
+      ]
+    },
+    {
+      "char": "厃",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "危"
+      ]
+    },
+    {
+      "char": "厈",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "岸"
+      ]
+    },
+    {
+      "char": "叒",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "桑"
+      ]
+    },
+    {
+      "char": "叧",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "別"
+      ]
+    },
+    {
+      "char": "吊",
+      "count": 1,
+      "keyword": "dangle",
+      "exampleKanji": [
+        "常"
+      ]
+    },
+    {
+      "char": "吕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "串"
+      ]
+    },
+    {
+      "char": "咢",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "顎"
+      ]
+    },
+    {
+      "char": "咨",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "諮"
+      ]
+    },
+    {
+      "char": "哥",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "歌"
+      ]
+    },
+    {
+      "char": "囷",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "菌"
+      ]
+    },
+    {
+      "char": "坒",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "陛"
+      ]
+    },
+    {
+      "char": "垔",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "煙"
+      ]
+    },
+    {
+      "char": "壳",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "殻"
+      ]
+    },
+    {
+      "char": "夅",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "降"
+      ]
+    },
+    {
+      "char": "夸",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "誇"
+      ]
+    },
+    {
+      "char": "㚘",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "替"
+      ]
+    },
+    {
+      "char": "妟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "宴"
+      ]
+    },
+    {
+      "char": "妾",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "接"
+      ]
+    },
+    {
+      "char": "婁",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "楼"
+      ]
+    },
+    {
+      "char": "孛",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "勃"
+      ]
+    },
+    {
+      "char": "宁",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "貯"
+      ]
+    },
+    {
+      "char": "它",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "蛇"
+      ]
+    },
+    {
+      "char": "寍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "寧"
+      ]
+    },
+    {
+      "char": "寽",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "将"
+      ]
+    },
+    {
+      "char": "㝵",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "得"
+      ]
+    },
+    {
+      "char": "尌",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "樹"
+      ]
+    },
+    {
+      "char": "尔",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "弥"
+      ]
+    },
+    {
+      "char": "龸",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "党"
+      ]
+    },
+    {
+      "char": "屏",
+      "count": 1,
+      "keyword": "folding screen",
+      "exampleKanji": [
+        "塀"
+      ]
+    },
+    {
+      "char": "𡵉",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "微"
+      ]
+    },
+    {
+      "char": "崔",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "催"
+      ]
+    },
+    {
+      "char": "巟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "荒"
+      ]
+    },
+    {
+      "char": "巷",
+      "count": 1,
+      "keyword": "alley",
+      "exampleKanji": [
+        "港"
+      ]
+    },
+    {
+      "char": "巿",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "肺"
+      ]
+    },
+    {
+      "char": "庚",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "庸"
+      ]
+    },
+    {
+      "char": "廌",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "薦"
+      ]
+    },
+    {
+      "char": "弍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "弐"
+      ]
+    },
+    {
+      "char": "弚",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "弟"
+      ]
+    },
+    {
+      "char": "弯",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "湾"
+      ]
+    },
+    {
+      "char": "彖",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "縁"
+      ]
+    },
+    {
+      "char": "㣊",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "修"
+      ]
+    },
+    {
+      "char": "彭",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "膨"
+      ]
+    },
+    {
+      "char": "徵",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "懲"
+      ]
+    },
+    {
+      "char": "忝",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "添"
+      ]
+    },
+    {
+      "char": "㥑",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "憂"
+      ]
+    },
+    {
+      "char": "愈",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "癒"
+      ]
+    },
+    {
+      "char": "戉",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "越"
+      ]
+    },
+    {
+      "char": "戎",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "賊"
+      ]
+    },
+    {
+      "char": "敄",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "務"
+      ]
+    },
+    {
+      "char": "敕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "整"
+      ]
+    },
+    {
+      "char": "敖",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "傲"
+      ]
+    },
+    {
+      "char": "敫",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "激"
+      ]
+    },
+    {
+      "char": "斿",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "遊"
+      ]
+    },
+    {
+      "char": "旁",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "傍"
+      ]
+    },
+    {
+      "char": "旉",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "敷"
+      ]
+    },
+    {
+      "char": "昏",
+      "count": 1,
+      "keyword": "dusk",
+      "exampleKanji": [
+        "婚"
+      ]
+    },
+    {
+      "char": "昷",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "温"
+      ]
+    },
+    {
+      "char": "朩",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "余"
+      ]
+    },
+    {
+      "char": "杂",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "雑"
+      ]
+    },
+    {
+      "char": "柰",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "隷"
+      ]
+    },
+    {
+      "char": "桀",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "傑"
+      ]
+    },
+    {
+      "char": "楚",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "礎"
+      ]
+    },
+    {
+      "char": "氿",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "染"
+      ]
+    },
+    {
+      "char": "沓",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "踏"
+      ]
+    },
+    {
+      "char": "㳄",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "羨"
+      ]
+    },
+    {
+      "char": "洛",
+      "count": 1,
+      "keyword": "old Kyoto",
+      "exampleKanji": [
+        "落"
+      ]
+    },
+    {
+      "char": "𣴎",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "様"
+      ]
+    },
+    {
+      "char": "涂",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "塗"
+      ]
+    },
+    {
+      "char": "淮",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "準"
+      ]
+    },
+    {
+      "char": "滕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "藤"
+      ]
+    },
+    {
+      "char": "潘",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "藩"
+      ]
+    },
+    {
+      "char": "澡",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "藻"
+      ]
+    },
+    {
+      "char": "烕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "滅"
+      ]
+    },
+    {
+      "char": "烝",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "蒸"
+      ]
+    },
+    {
+      "char": "爭",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "静"
+      ]
+    },
+    {
+      "char": "㸒",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "淫"
+      ]
+    },
+    {
+      "char": "㸚",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "爽"
+      ]
+    },
+    {
+      "char": "牟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "眸"
+      ]
+    },
+    {
+      "char": "甶",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "鬼"
+      ]
+    },
+    {
+      "char": "畀",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "鼻"
+      ]
+    },
+    {
+      "char": "畄",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "獣"
+      ]
+    },
+    {
+      "char": "𤴓",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "定"
+      ]
+    },
+    {
+      "char": "癸",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "葵"
+      ]
+    },
+    {
+      "char": "皃",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "貌"
+      ]
+    },
+    {
+      "char": "盍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "蓋"
+      ]
+    },
+    {
+      "char": "眞",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "塡"
+      ]
+    },
+    {
+      "char": "睿",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "叡"
+      ]
+    },
+    {
+      "char": "矣",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "挨"
+      ]
+    },
+    {
+      "char": "禹",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "属"
+      ]
+    },
+    {
+      "char": "稟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "凜"
+      ]
+    },
+    {
+      "char": "窄",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "搾"
+      ]
+    },
+    {
+      "char": "筑",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "築"
+      ]
+    },
+    {
+      "char": "类",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "類"
+      ]
+    },
+    {
+      "char": "粲",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "燦"
+      ]
+    },
+    {
+      "char": "絜",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "潔"
+      ]
+    },
+    {
+      "char": "縣",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "懸"
+      ]
+    },
+    {
+      "char": "𦈢",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "卸"
+      ]
+    },
+    {
+      "char": "罔",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "網"
+      ]
+    },
+    {
+      "char": "羍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "達"
+      ]
+    },
+    {
+      "char": "羔",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "窯"
+      ]
+    },
+    {
+      "char": "羕",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "様"
+      ]
+    },
+    {
+      "char": "羽",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "耀"
+      ]
+    },
+    {
+      "char": "耤",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "籍"
+      ]
+    },
+    {
+      "char": "聶",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "摂"
+      ]
+    },
+    {
+      "char": "肋",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "筋"
+      ]
+    },
+    {
+      "char": "䏍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "能"
+      ]
+    },
+    {
+      "char": "肙",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "絹"
+      ]
+    },
+    {
+      "char": "肰",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "然"
+      ]
+    },
+    {
+      "char": "胥",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "婿"
+      ]
+    },
+    {
+      "char": "臧",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "蔵"
+      ]
+    },
+    {
+      "char": "𦥑",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "興"
+      ]
+    },
+    {
+      "char": "舄",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "潟"
+      ]
+    },
+    {
+      "char": "芻",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "雛"
+      ]
+    },
+    {
+      "char": "苟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "敬"
+      ]
+    },
+    {
+      "char": "莧",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "寛"
+      ]
+    },
+    {
+      "char": "䖝",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "風"
+      ]
+    },
+    {
+      "char": "蚤",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "騒"
+      ]
+    },
+    {
+      "char": "䙴",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "遷"
+      ]
+    },
+    {
+      "char": "䚯",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "罰"
+      ]
+    },
+    {
+      "char": "誊",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "謄"
+      ]
+    },
+    {
+      "char": "豈",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "凱"
+      ]
+    },
+    {
+      "char": "賈",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "価"
+      ]
+    },
+    {
+      "char": "赫",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "嚇"
+      ]
+    },
+    {
+      "char": "躬",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "窮"
+      ]
+    },
+    {
+      "char": "閏",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "潤"
+      ]
+    },
+    {
+      "char": "隽",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "携"
+      ]
+    },
+    {
+      "char": "雁",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "鷹"
+      ]
+    },
+    {
+      "char": "雍",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "擁"
+      ]
+    },
+    {
+      "char": "䩗",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "覇"
+      ]
+    },
+    {
+      "char": "駦",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "騰"
+      ]
+    },
+    {
+      "char": "𩵋",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "衡"
+      ]
+    },
+    {
+      "char": "鼡",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "猟"
+      ]
+    },
+    {
+      "char": "龟",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "亀"
+      ]
+    },
+    {
+      "char": "",
+      "count": 1,
+      "keyword": "",
+      "exampleKanji": [
+        "惰"
+      ]
+    }
+  ]
+}

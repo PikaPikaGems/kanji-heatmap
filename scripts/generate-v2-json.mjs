@@ -15,6 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
+import { mergeSylhareBushuAliases } from "./sylhare-bushu-aliases.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -46,7 +47,18 @@ const readingDetails = readRaw("kanji-readings-details.json");
 const cumUse = readRaw("cum_use.json");
 const radicals = readRaw("radicals.json");
 const sylhareKeywords = readRaw("sylhare-component-keywords.json");
-const allAliases = radicals.aliases ?? {};
+const allAliases = { ...(radicals.aliases ?? {}) };
+const drawerRadicals = new Set(
+  Object.values(radicals.radicalsGroupedByStrokeCount ?? {}).flat()
+);
+mergeSylhareBushuAliases({
+  csvText: readRawText("sylhare/kanji-radicals.csv"),
+  drawerRadicals,
+  aliases: allAliases,
+  isKanji: (char) => main[char] != null,
+  skipAlts: radicals.sylhareSkipAlts,
+  extraAliases: radicals.sylhareExtraAliases,
+});
 const manualOverrides = readRaw("components_manual_overrides.json");
 
 const structureSources = {

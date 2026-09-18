@@ -70,7 +70,10 @@ const literals = JSON.parse(
 const radicalsMeta = JSON.parse(
   fs.readFileSync(path.join(RAW, "radicals.json"), "utf8")
 );
-const skipAsAlternate = new Set(Object.keys(radicalsMeta.aliases ?? {}));
+const skipAsAlternate = new Set([
+  ...Object.keys(radicalsMeta.aliases ?? {}),
+  ...(radicalsMeta.sylhareSkipAlts ?? []),
+]);
 
 const csvText = fs
   .readFileSync(path.join(RAW, "sylhare", "kanji-radicals.csv"), "utf8")

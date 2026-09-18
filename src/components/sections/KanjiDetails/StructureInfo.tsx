@@ -51,7 +51,7 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
             <div key={similarKanji} className="shrink-0">
               <GenericPopover
                 trigger={
-                  <button className="flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 border-dotted hover:border-solid hover:border-neon-accent">
+                  <button className="flex flex-col p-2 my-1 text-3xl border-2 border-dotted kanji-font rounded-2xl hover:border-solid hover:border-neon-accent">
                     {similarKanji}
                   </button>
                 }
@@ -79,32 +79,42 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
       <Table key={kanji} className="border-b animate-fade-in ">
         <TableBody>
           <TableRow className="text-left">
-            <TableCellFixed>(kanjium)</TableCellFixed>
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (kanjium)
+            </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataKanjium kanji={kanji} />
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
-            <TableCellFixed>(hlorenzi)</TableCellFixed>
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (hlorenzi)
+            </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataLorenzi kanji={kanji} />
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
-            <TableCellFixed>(yagays)</TableCellFixed>
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (yagays)
+            </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataYagays kanji={kanji} />
             </TableCellGrow>
           </TableRow>
 
           <TableRow className="text-left">
-            <TableCellFixed>(ScottOglesby)</TableCellFixed>
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (ScottOglesby)
+            </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataScott kanji={kanji} />
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
-            <TableCellFixed>(TopoKanji)</TableCellFixed>
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (TopoKanji)
+            </TableCellFixed>
             <TableCellGrow>
               <OriginalKanjiComponentBreakdown
                 kanji={kanji}
