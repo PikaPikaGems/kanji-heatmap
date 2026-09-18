@@ -67,16 +67,10 @@ const parseCsv = (text) => {
 const literals = JSON.parse(
   fs.readFileSync(path.join(RAW, "bushu-literal-en.json"), "utf8")
 );
-const extraAliases = JSON.parse(
-  fs.readFileSync(path.join(RAW, "radical-aliases.json"), "utf8")
-);
 const radicalsMeta = JSON.parse(
   fs.readFileSync(path.join(RAW, "radicals.json"), "utf8")
 );
-const skipAsAlternate = new Set([
-  ...Object.keys(extraAliases),
-  ...Object.keys(radicalsMeta.radicalFalseFriends ?? {}),
-]);
+const skipAsAlternate = new Set(Object.keys(radicalsMeta.aliases ?? {}));
 
 const csvText = fs
   .readFileSync(path.join(RAW, "sylhare", "kanji-radicals.csv"), "utf8")
@@ -124,8 +118,8 @@ for (const row of table.slice(1)) {
   }
 }
 
-const literalFor = (radical, readingJ) => {
-  const fromGlyph = radical ? literals[radical] : undefined;
+const literalFor = (glyph, readingJ) => {
+  const fromGlyph = glyph ? literals[glyph] : undefined;
   const fromReading = literals[readingJ];
   return (fromGlyph ?? fromReading ?? "").toString().trim();
 };
@@ -176,17 +170,21 @@ const extras = [
   ["マ", "ま", "", "Katakana Ma"],
   ["ユ", "ゆ", "", "Katakana Yu"],
   ["丷", "はちがしら", "", "eight"],
+  ["｜", "たてぼう", "", "line, stick"],
+  ["ノ", "の", "", "bend, stroke"],
+  ["ヨ", "けいがしら", "", "pig's head"],
+  ["⺩", "おうへん", "へん", "jewelry, jeweled king"],
 ];
 
 for (const [ch, readingJ, positionJ, meaning] of extras) {
-  const literal = literals[readingJ];
-  if (literal == null) {
+  const literal = literalFor(ch, readingJ);
+  if (!literal) {
     missingLiterals.add(readingJ);
     continue;
   }
   out[ch] = {
-    k: literal.trim(),
-    desc: composeDesc(readingJ, literal.trim(), positionJ, meaning),
+    k: literal,
+    desc: composeDesc(readingJ, literal, positionJ, meaning),
   };
 }
 

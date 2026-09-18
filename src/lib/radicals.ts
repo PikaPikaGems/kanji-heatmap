@@ -41,7 +41,6 @@ B or Ｂ (full-width B)	                        ⻏, ⻖
 export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
-  searchRedirects: Record<string, string>;
 };
 
 export type RadicalsRuntime = RadicalsFile & {
@@ -63,7 +62,6 @@ export const strokeCountMapFromGrouped = (
 export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
   groupedByStrokeCount: file.groupedByStrokeCount,
   aliases: file.aliases ?? {},
-  searchRedirects: file.searchRedirects ?? {},
   strokeCountMap: strokeCountMapFromGrouped(file.groupedByStrokeCount),
 });
 
@@ -82,7 +80,7 @@ export const resolveRadicalForSearch = (
   while (current && !seen.has(current)) {
     seen.add(current);
     if (current in radicals.strokeCountMap) return current;
-    const next = radicals.searchRedirects[current] ?? radicals.aliases[current];
+    const next = radicals.aliases[current];
     if (!next) return current;
     current = next;
   }
@@ -94,6 +92,4 @@ export const isKnownRadical = (
   radicals: RadicalsRuntime | null | undefined
 ): boolean =>
   radicals != null &&
-  (char in radicals.strokeCountMap ||
-    char in radicals.aliases ||
-    char in radicals.searchRedirects);
+  (char in radicals.strokeCountMap || char in radicals.aliases);

@@ -34,7 +34,6 @@ vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
       "4": ["水"],
     },
     aliases: {},
-    searchRedirects: {},
     strokeCountMap: { 一: "1", 水: "4" },
   }),
 }));
