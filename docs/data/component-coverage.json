@@ -1,8 +1,8 @@
 {
   "summary": {
     "referenced": 540,
-    "withKeyword": 176,
-    "missing": 364
+    "withKeyword": 181,
+    "missing": 359
   },
   "missing": [
     {
@@ -240,13 +240,6 @@
       ]
     },
     {
-      "char": "𠂊",
-      "refs": 14,
-      "sources": [
-        "ya"
-      ]
-    },
-    {
       "char": "喿",
       "refs": 14,
       "sources": [
@@ -334,14 +327,6 @@
         "ka",
         "sc",
         "ya"
-      ]
-    },
-    {
-      "char": "𧾷",
-      "refs": 12,
-      "sources": [
-        "ka",
-        "sc"
       ]
     },
     {
@@ -641,13 +626,6 @@
       ]
     },
     {
-      "char": "𠂇",
-      "refs": 7,
-      "sources": [
-        "sc"
-      ]
-    },
-    {
       "char": "卬",
       "refs": 7,
       "sources": [
@@ -830,13 +808,6 @@
       ]
     },
     {
-      "char": "㐅",
-      "refs": 5,
-      "sources": [
-        "sc"
-      ]
-    },
-    {
       "char": "亼",
       "refs": 5,
       "sources": [
@@ -893,13 +864,6 @@
       "sources": [
         "hl",
         "ka",
-        "sc"
-      ]
-    },
-    {
-      "char": "龶",
-      "refs": 5,
-      "sources": [
         "sc"
       ]
     },
