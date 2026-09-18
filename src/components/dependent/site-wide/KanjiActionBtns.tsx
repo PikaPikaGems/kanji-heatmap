@@ -40,7 +40,7 @@ const ShareKanjiButton = ({ kanji }: { kanji: string }) => {
 export const KanjiActions = ({ kanji }: { kanji: string }) => {
   return (
     <>
-      <SpeakButton word={kanji} iconType="volume-2" autoFocus />
+      <SpeakButton word={kanji} iconType="volume-2" />
       <CopyButton textToCopy={kanji} iconType="clipboard" />
       <CopyButton textToCopy={kanjiPageUrl(kanji)} iconType="link" />
       <ShareKanjiButton kanji={kanji} />
