@@ -185,6 +185,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://www.kanjimap.eu/kanji/${kanji}`,
   },
   {
+    name: "shirabe.org",
+    url: (kanji: string) => `https://shirabe.org/en/kanji?q=${kanji}`,
+  },
+  {
     name: "Immersion Kit",
     url: (kanji: string) =>
       `https://www.immersionkit.com/dictionary?keyword=${kanji}`,
@@ -363,6 +367,10 @@ export const vocabExternalLinks = [
   {
     name: "Ichi Moe",
     url: (word: string) => `https://ichi.moe/cl/word/?q=${word}`,
+  },
+  {
+    name: "shirabe.org",
+    url: (word: string) => `https://shirabe.org/en/word/${word}`,
   },
   {
     name: "Kakimashou",
