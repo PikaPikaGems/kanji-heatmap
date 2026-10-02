@@ -7,6 +7,7 @@ import {
   useWordKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useHighlightVocabKanji } from "@/hooks/use-highlight-vocab-kanji";
 import { isJapanese } from "wanakana";
 
 interface StudyNoteVocabButtonProps {
@@ -14,6 +15,12 @@ interface StudyNoteVocabButtonProps {
   kana?: string;
   definition?: string;
 }
+
+const subtleVocabClassName = cn(
+  "m-0 rounded-lg border-0 bg-transparent mx-1 px-0 py-0 text-base font-normal sm:text-lg",
+  "underline decoration-dotted decoration-foreground/15 underline-offset-[5px]",
+  "dark:hover:text-lime-500 hover:bg-background hover:text-lime-600 hover:decoration-lime-600 dark:hover:decoration-lime-500 hover:decoration-solid"
+);
 
 const wordHasKanji = (word: string) => [...word].some((char) => isKanji(char));
 
@@ -24,6 +31,7 @@ export const StudyNoteVocabButton = ({
   kana: kanaOverride,
   definition: definitionOverride,
 }: StudyNoteVocabButtonProps) => {
+  const [highlight] = useHighlightVocabKanji();
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
   const representativeWord = useKanjiRepresentativeWordDetails(
@@ -36,11 +44,7 @@ export const StudyNoteVocabButton = ({
         <RomajiBadge
           kana={word}
           showFocusRing={false}
-          className={cn(
-            "m-0 rounded-lg border-0 bg-transparent mx-1 px-0 py-0 text-base font-normal sm:text-lg",
-            "underline decoration-dotted decoration-foreground/15 underline-offset-[5px]",
-            "dark:hover:text-lime-500 hover:bg-background hover:text-lime-600 hover:decoration-lime-600 dark:hover:decoration-lime-500 hover:decoration-solid"
-          )}
+          className={subtleVocabClassName}
         />
       );
     }
@@ -79,10 +83,15 @@ export const StudyNoteVocabButton = ({
           type="button"
           aria-label={word}
           className={cn(
-            "kanji-font rounded-xl px-2 mx-1 my-0 text-lg",
-            "border-theme-color-with-opacity-100 border background-theme-color-with-opacity-25",
-            "hover:border-foreground",
-            "hover-background-theme-color-with-opacity-100 hover:text-white",
+            "kanji-font text-lg",
+            highlight
+              ? [
+                  "rounded-xl px-2 mx-1 my-0",
+                  "border-theme-color-with-opacity-100 border background-theme-color-with-opacity-25",
+                  "hover:border-foreground",
+                  "hover-background-theme-color-with-opacity-100 hover:text-white",
+                ]
+              : subtleVocabClassName,
             "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           )}
         >

@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useCallback } from "react";
 import { useAsync } from "@/hooks/use-json";
 import { getKanjiEssayUrl } from "@/lib/kanji-essays";
+import { HighlightKanjiSwitch } from "../KanjiStudyNotes/HighlightKanjiSwitch";
 import { MarkdownPreview } from "../KanjiStudyNotes/MarkdownPreview";
 import { DefaultErrorFallback } from "@/components/error";
 
@@ -75,8 +76,11 @@ const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
   }
 
   return (
-    <div className="py-4 border border-foreground/20 rounded-xl">
-      <MarkdownPreview source={data} />
+    <div>
+      <HighlightKanjiSwitch className="pb-3 pl-2 sm:justify-end" />
+      <div className="py-4 border border-foreground/20 rounded-xl">
+        <MarkdownPreview source={data} />
+      </div>
     </div>
   );
 };
