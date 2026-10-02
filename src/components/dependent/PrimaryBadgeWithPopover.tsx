@@ -15,7 +15,7 @@ export const PrimaryBadgeWithPopover = ({
     contentClassName="text-sm"
     trigger={
       <button>
-        <Badge className="m-1 cursor-pointer">
+        <Badge className="m-1 cursor-pointer hover:bg-neon-accent hover:text-black">
           {label} {value}
         </Badge>
       </button>
