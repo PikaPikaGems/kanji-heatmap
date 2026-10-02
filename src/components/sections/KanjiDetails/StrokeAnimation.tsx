@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Switch } from "@/components/ui/switch";
 import { KanjiDMAK, StrokeOrderReplay } from "@/components/common/KanjiDmak";
 import { DrawingPad } from "@/components/dependent/DrawingPad";
@@ -14,17 +14,25 @@ import {
 } from "./stroke-animation-constants";
 import { otherOutLinks } from "@/lib/external-links";
 import { Rocket } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export const StrokeAnimation = ({ kanji }: { kanji: string }) => (
-  <div className="p-4">
-    <StrokeOrderReplay
-      kanji={kanji}
-      size={SVG_SIZE}
-      replayClassName={CONTAINER_CN}
-      showSettings={true}
-    />
-  </div>
-);
+// Below `sm` DrawingPad sits 8px higher (`my-2` vs `sm:m-4`; only the top
+// differs, its gap to the buttons stays 16px) and shrinks to
+// fit narrow screens, so match both here or toggling practice mode shifts the
+// box. From `sm` up the original `p-4` + `my-4` already lines up.
+export const StrokeAnimation = ({ kanji }: { kanji: string }) => {
+  const size = useFitPadSize(SVG_SIZE);
+  return (
+    <div className="p-4">
+      <StrokeOrderReplay
+        kanji={kanji}
+        size={size}
+        replayClassName={cn(CONTAINER_CN, "mt-2 mb-4 sm:mt-4")}
+        showSettings={true}
+      />
+    </div>
+  );
+};
 
 const HintSection = ({ kanji }: { kanji: string }) => {
   const [blurred, setBlurred] = useState(true);
@@ -199,6 +207,7 @@ export const StrokeAnimationWithPracticeMode = ({
   defaultPracticeMode?: boolean;
 }) => {
   const [practiceMode, setPracticeMode] = useState(defaultPracticeMode);
+  const padSize = useFitPadSize(SVG_SIZE);
 
   return (
     <div key={kanji}>
@@ -216,8 +225,21 @@ export const StrokeAnimationWithPracticeMode = ({
             Practice writing
           </label>
 
+          {/*
+              Below `sm`, line the hint up with the pad's right edge (the pad is
+              centered, so that edge is half the pad width right of center).
+              From `sm` up it keeps hanging off the row's right edge (-right-4
+              equals the old `right: -2rem` + `m-4` margin).
+            */}
           {practiceMode && (
-            <div className="absolute right-0 z-10 px-2 m-4 border border-dashed sm:-right-8 animate-fade-in rounded-2xl -top-10 border-foreground bg-background/80">
+            <div
+              className="absolute right-[var(--hint-right)] z-10 px-2 mt-4 border border-dashed sm:-right-4 animate-fade-in rounded-2xl -top-10 border-foreground bg-background/80"
+              style={
+                {
+                  "--hint-right": `max(0px, calc(50% - ${padSize / 2}px))`,
+                } as CSSProperties
+              }
+            >
               <HintSection key={kanji} kanji={kanji} />
             </div>
           )}

@@ -148,7 +148,7 @@ export const StrokeOrderReplay = ({
       <div className={replayClassName} style={{ height: size }}>
         {/* Overlay border so dotted stroke doesn't change the box's layout size. */}
         <div
-          className="relative overflow-hidden rounded-3xl"
+          className="relative overflow-hidden rounded-3xl shrink-0"
           style={{ width: size, height: size }}
         >
           <div
