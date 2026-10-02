@@ -8,6 +8,7 @@ import { BadgeWithPopover } from "@/components/common/BadgeWithPopover";
 import { Badge } from "@/components/ui/badge";
 import { JishoBtn } from "@/components/common/JishoBtn";
 import { JotobaBtn } from "@/components/common/JotobaBtn";
+import { KanjiApiBtn } from "@/components/common/KanjiApiBtn";
 import { BugIconErrorBoundary } from "@/components/error";
 import { CommonWordEntry, FreqCategoryMap } from "@/lib/sample-vocabulary";
 
@@ -120,6 +121,11 @@ export const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
         <TableCell className="w-12">
           <BugIconErrorBoundary>
             <JotobaBtn word={entry.w} />
+          </BugIconErrorBoundary>
+        </TableCell>
+        <TableCell className="w-12">
+          <BugIconErrorBoundary>
+            <KanjiApiBtn word={entry.w} />
           </BugIconErrorBoundary>
         </TableCell>
         <TableCell className="w-12">

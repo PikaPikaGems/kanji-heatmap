@@ -51,9 +51,12 @@ export const test = base.extend({
       });
     });
 
-    await context.route(/\/api\/(jisho|jotoba|handwriting)/, (route) => {
-      route.fulfill({ contentType: "application/json", body: "{}" });
-    });
+    await context.route(
+      /\/api\/(jisho|jotoba|kanjiapi|handwriting)/,
+      (route) => {
+        route.fulfill({ contentType: "application/json", body: "{}" });
+      }
+    );
 
     await context.route(
       /\/(kanji-words|kanji-textbook-words-min)\/.*/,

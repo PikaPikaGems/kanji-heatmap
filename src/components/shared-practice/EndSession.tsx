@@ -2,13 +2,24 @@ import { useMemo } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
-import { percent } from "@/lib/utils";
+import { Link } from "@/components/dependent/routing/router-adapter";
+import { URL_PARAMS } from "@/lib/settings/url-params";
+import { dedupe, percent } from "@/lib/utils";
 import { Stat } from "./CountUpStat";
 import { EndScreenLayout } from "./EndScreenLayout";
 import { PracticeSessionResult } from "./types";
 import { RecapTile } from "./RecapTile";
 
 const CONTINUE_KEYS = ["Enter", " "] as const;
+
+/** Home-screen search listing the given kanji, in the order given. */
+const multiKanjiSearchHref = (kanji: string[]) => {
+  const params = new URLSearchParams({
+    [URL_PARAMS.textSearch.type]: "multi-kanji",
+    [URL_PARAMS.textSearch.text]: kanji.join(""),
+  });
+  return `/?${params.toString()}`;
+};
 
 export const EndSession = ({
   results,
@@ -33,6 +44,11 @@ export const EndSession = ({
   useEnterAction(onEnd, true, ["Escape"]);
 
   if (!hasMore) {
+    // `results` is the whole run here, so this covers every round.
+    const forgottenKanji = dedupe(
+      results.filter((r) => !r.correct).map((r) => r.kanji)
+    );
+
     return (
       <EndScreenLayout
         className="px-4"
@@ -44,6 +60,16 @@ export const EndSession = ({
             <Stat value={wordsCleared} unit="" label="Words cleared" />
             <Stat value={results.length} unit="" label="Attempts" />
           </>
+        }
+        afterStats={
+          forgottenKanji.length > 0 && (
+            <Link
+              href={multiKanjiSearchHref(forgottenKanji)}
+              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
+            >
+              View {forgottenKanji.length} kanji you forgot
+            </Link>
+          )
         }
         primaryLabel="Done"
         onPrimary={onEnd}

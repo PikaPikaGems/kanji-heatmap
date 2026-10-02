@@ -3,6 +3,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { HighlightKanjiSwitch } from "./HighlightKanjiSwitch";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownPreview } from "./MarkdownPreview";
 import { StudyNotesTipsPopover } from "./StudyNotesTipsPopover";
@@ -88,6 +89,9 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
               View Mode
             </TabsTrigger>
           </TabsList>
+          {mode === "view" ? (
+            <HighlightKanjiSwitch className="mb-2 pl-2 sm:ml-auto" />
+          ) : null}
         </div>
         <TabsContent
           value="edit"

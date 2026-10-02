@@ -4,8 +4,9 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ReactNode } from "react";
 import { InfoIcon } from "../icons";
-import { JishoBtn } from "./JishoBtn";
+// import { JishoBtn } from "./JishoBtn";
 import { JotobaBtn } from "./JotobaBtn";
+import { KanjiApiBtn } from "./KanjiApiBtn";
 import { BugIconErrorBoundary } from "../error";
 
 const SHOW_ICON_MEANINGS = false;
@@ -33,8 +34,13 @@ export const VocabActions = ({
         <JotobaBtn word={word} />
       </BugIconErrorBoundary>
       <BugIconErrorBoundary>
+        <KanjiApiBtn word={word} />
+      </BugIconErrorBoundary>
+      {/*
+      <BugIconErrorBoundary>
         <JishoBtn word={word} />
       </BugIconErrorBoundary>
+      */}
       <SpeakButton word={word} iconType="volume-2" />
       {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />}
       <CopyButton textToCopy={word} iconType={"clipboard"} />

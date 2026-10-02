@@ -14,12 +14,12 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: kanshudoFn,
   },
   {
-    name: "Kanji Alive",
-    url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
-  },
-  {
     name: "WaniKani",
     url: (kanji: string) => `https://www.wanikani.com/kanji/${kanji}`,
+  },
+  {
+    name: "Kanji Alive",
+    url: (kanji: string) => `https://app.kanjialive.com/${kanji}`,
   },
   {
     name: "Hochanh",
@@ -37,6 +37,7 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     name: "Jisho",
     url: (kanji: string) => `https://jisho.org/search/${kanji}%20%23kanji`,
   },
+
   {
     name: "Kyou Benkyou",
     url: (kanji: string) => `https://www.kyoubenkyou.com/search/${kanji}`,
@@ -146,10 +147,6 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
       `https://kanjivg.tagaini.net/viewer.html?kanji=${kanji}`,
   },
   {
-    name: "Kotobank",
-    url: (kanji: string) => `https://kotobank.jp/word/${kanji}`,
-  },
-  {
     name: "Weblio",
     url: (kanji: string) => `https://www.weblio.jp/content/${kanji}`,
   },
@@ -183,6 +180,14 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
   {
     name: "KanjiMap",
     url: (kanji: string) => `https://www.kanjimap.eu/kanji/${kanji}`,
+  },
+  {
+    name: "Shirabe",
+    url: (kanji: string) => `https://shirabe.org/en/kanji?q=${kanji}`,
+  },
+  {
+    name: "Kotobank",
+    url: (kanji: string) => `https://kotobank.jp/word/${kanji}`,
   },
   {
     name: "Immersion Kit",
@@ -363,6 +368,14 @@ export const vocabExternalLinks = [
   {
     name: "Ichi Moe",
     url: (word: string) => `https://ichi.moe/cl/word/?q=${word}`,
+  },
+  {
+    name: "Shirabe",
+    url: (word: string) => `https://shirabe.org/en/word/${word}`,
+  },
+  {
+    name: "Kotobank",
+    url: (word: string) => `https://kotobank.jp/word/${word}`,
   },
   {
     name: "Kakimashou",

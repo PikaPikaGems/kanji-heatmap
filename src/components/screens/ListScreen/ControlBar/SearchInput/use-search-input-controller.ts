@@ -157,6 +157,19 @@ export const useSearchInputController = ({
       return;
     }
 
+    // Android keyboards (Gboard clipboard chip, autofill) insert text without
+    // firing a paste event or a composition end, so neither the paste nor the
+    // Enter path runs. Pick multi-kanji here too when a kanji lands in the
+    // field. Kana/romaji stay out of this: they're ambiguous while typing.
+    const rawText = e.target.value.trim();
+    if (
+      inferSearchTypeFromText(rawText, searchType) === "multi-kanji" &&
+      searchType !== "multi-kanji"
+    ) {
+      syncAndAnnounceType(rawText, "multi-kanji");
+      return;
+    }
+
     // Translate first (e.g. romaji → hiragana) so the field and the
     // settled search query stay in sync. Settling the raw keystrokes
     // would search a different string than what the user sees.

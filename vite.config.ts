@@ -215,6 +215,20 @@ const pwaConfig = {
         },
       },
       // **********************
+      // KANJIAPI (proxied via Cloudflare Pages Function, trimmed per word)
+      // **********************
+      {
+        urlPattern: /\/api\/kanjiapi(\?.*)?$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "kanjiapi-api-cache",
+          expiration: {
+            maxEntries: 200,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      // **********************
       // FONTS
       // **********************
       {

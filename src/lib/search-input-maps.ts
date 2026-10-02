@@ -36,7 +36,7 @@ export const SEARCH_TYPE_OPTIONS: {
   { value: "keyword", label: "Keyword" },
   { value: "meanings", label: "Meanings" },
   { value: "multi-kanji", label: "Multi-Kanji" },
-  { value: "handwriting", label: "Draw · Google" },
+  /*  { value: "handwriting", label: "Draw · Google" }, */ // Disable until we verify it doesn't violate TOS
   { value: "handwriting-alt-2", label: "Draw · DaKanji" },
   { value: "handwriting-alt", label: "Draw · Canvas" },
   { value: "radicals", label: "Radicals" },

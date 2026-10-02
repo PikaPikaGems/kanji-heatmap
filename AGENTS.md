@@ -25,7 +25,7 @@ Kanji Heatmap is a client-side React + Vite single-page app (no backend of its o
 
 ### Cloudflare Pages Functions caveat (non-obvious)
 
-- The API proxies in `functions/api/` (Jisho, Jotoba, Google Handwriting) are **Cloudflare Pages Functions**. They are NOT served by `@cloudflare/vite-plugin` in either dev script, so `GET /api/jisho` etc. return 404 during local dev. These features also require outbound access to external services (`jisho.org`, Jotoba, Google) that may be blocked in the VM. Treat them as optional — the rest of the app is fully functional without them.
+- The API proxies in `functions/api/` (Jisho, Jotoba, KanjiAPI, Google Handwriting) are **Cloudflare Pages Functions**. They are NOT served by `@cloudflare/vite-plugin` in either dev script, so `GET /api/jisho` etc. return 404 during local dev. These features also require outbound access to external services (`jisho.org`, Jotoba, Google) that may be blocked in the VM. Treat them as optional — the rest of the app is fully functional without them.
 
 ### Checks
 

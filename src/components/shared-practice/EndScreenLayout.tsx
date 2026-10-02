@@ -13,6 +13,7 @@ export const EndScreenLayout = ({
   subtitle,
   headingExtra,
   stats,
+  afterStats,
   primaryLabel,
   onPrimary,
   secondaryLabel,
@@ -23,6 +24,8 @@ export const EndScreenLayout = ({
   subtitle: string;
   headingExtra?: ReactNode;
   stats: ReactNode;
+  /** Optional content between the stats and the buttons (e.g. a link). */
+  afterStats?: ReactNode;
   primaryLabel: string;
   onPrimary: () => void;
   secondaryLabel?: string;
@@ -48,6 +51,8 @@ export const EndScreenLayout = ({
     <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16 gap-y-8">
       {stats}
     </div>
+
+    {afterStats}
 
     <div className="flex flex-col w-full max-w-xs gap-3">
       <PracticeButton size="lg" onClick={onPrimary}>

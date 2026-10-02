@@ -4,8 +4,6 @@ import { JouyouGradeOptions } from "@/lib/jouyou-grade";
 import { isSelectionFilterActive } from "@/lib/selection-filter";
 import { FilterSettings, SearchSettings } from "@/lib/settings/settings";
 import { dedupe, isKanji } from "@/lib/utils";
-import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
-import { K_MEANING_KEY } from "@/lib/options/options-constants";
 
 export const hasNoFilters = (settings: SearchSettings) => {
   const {
@@ -35,65 +33,31 @@ export const hasNoFilters = (settings: SearchSettings) => {
   );
 };
 
-const alphaSort = (a: string, b: string) => {
-  const lowerA = a.toLowerCase();
-  const lowerB = b.toLowerCase();
-  if (lowerA < lowerB) return -1;
-  if (lowerA > lowerB) return 1;
-  return 0;
-};
-
+/**
+ * Final order of the displayed kanji, shared by the list tiles and the
+ * drawer's next / previous navigation. Follows the worker's (sorted) result
+ * order, except multi-kanji, where the pasted order always wins and kanji
+ * dropped by active filters are skipped.
+ */
 export const getFinalResults = (
   searchSettings: SearchSettings,
-  resultData: string[],
-  getBasicInfo?: GetBasicKanjiInfo | null
+  resultData: string[]
 ): string[] => {
   const { type, text } = searchSettings.textSearch;
-
   if (type !== "multi-kanji") {
     return resultData;
   }
 
-  const uniqueKanjiChars = dedupe(text.split("").filter(isKanji));
-  if (uniqueKanjiChars.length === 0) {
+  const pastedOrder = dedupe(text.split("").filter(isKanji));
+  if (pastedOrder.length === 0) {
     return resultData;
   }
-
-  const hasSort = searchSettings.sortSettings.primary !== "none";
-  const hasFilters = !hasNoFilters(searchSettings);
-
-  if (!hasSort && !hasFilters) {
-    return uniqueKanjiChars;
-  }
-
-  if (!hasSort) {
-    return resultData;
-  }
-
-  // Keyword sort is client-side so component-keyword-only kanji are included.
-  if (
-    searchSettings.sortSettings.primary === K_MEANING_KEY &&
-    getBasicInfo != null
-  ) {
-    const withKeyword: { kanji: string; keyword: string }[] = [];
-    const withoutKeyword: string[] = [];
-
-    for (const kanji of uniqueKanjiChars) {
-      const keyword = getBasicInfo(kanji)?.keyword?.trim() ?? "";
-      if (keyword.length > 0) {
-        withKeyword.push({ kanji, keyword });
-      } else {
-        withoutKeyword.push(kanji);
-      }
-    }
-
-    withKeyword.sort((a, b) => alphaSort(a.keyword, b.keyword));
-    return [...withKeyword.map((item) => item.kanji), ...withoutKeyword];
+  if (hasNoFilters(searchSettings)) {
+    return pastedOrder;
   }
 
   const resultSet = new Set(resultData);
-  const remaining = uniqueKanjiChars.filter((kanji) => !resultSet.has(kanji));
-  return [...resultData, ...remaining];
+  return pastedOrder.filter((kanji) => resultSet.has(kanji));
 };
 
 export const shouldShowAllKanji = (settings: SearchSettings) => {
