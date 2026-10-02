@@ -26,7 +26,7 @@ const WhatIsARepresentativeStudyWord = () => {
       <GenericPopover
         trigger={
           <span className={cnDottedUnderlineTrigger}>
-            <strong>What is a Anchor Word? (Experimental Feature)</strong>
+            <strong>What is an Anchor Word? (Experimental Feature)</strong>
             <InfoIcon size={14} />
           </span>
         }
