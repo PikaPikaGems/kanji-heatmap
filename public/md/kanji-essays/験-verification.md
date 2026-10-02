@@ -4,7 +4,7 @@
 
 験 is the kanji for putting something to the test. It captures the moment you try something out to see what happens — an experiment, an exam, or simply the act of finding out. It also carries the idea of a sign or result that comes from that testing: the evidence that tells you it's real or it works.
 
-## Common words that carry the 験's soul
+## Common words that carry 験's ideas
 
 ### 試験 (しけん, examination / test)
 
