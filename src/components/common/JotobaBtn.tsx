@@ -41,7 +41,7 @@ export const JotobaContent = ({ word }: { word: string }) => {
     );
   }
 
-  if (data.words.length === 0) {
+  if (!data.words?.length) {
     return <DictEmpty service="Jotoba.de" />;
   }
 

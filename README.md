@@ -15,7 +15,7 @@ pnpm install
 pnpm run dev
 ```
 
-> **Note:** When using `pnpm run dev`, features that require Cloudflare Functions — such as Jisho, Jotoba, and the Google Handwriting API — will not work. All other features work normally.
+> **Note:** When using `pnpm run dev`, features that require Cloudflare Functions — such as Jisho, Jotoba, KanjiAPI, and the Google Handwriting API — will not work. All other features work normally.
 
 ### Running locally with Cloudflare Functions
 

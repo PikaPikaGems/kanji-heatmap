@@ -48,7 +48,7 @@ export const JishoContent = ({ word }: { word: string }) => {
     );
   }
 
-  if (data.data.length === 0) {
+  if (!data.data?.length) {
     return <DictEmpty service="Jisho.org" />;
   }
 

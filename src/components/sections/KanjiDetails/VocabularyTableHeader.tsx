@@ -11,6 +11,7 @@ export const VocabularyTableHeader = () => (
       </TableHead>
       <TableHead className="text-center w-fit">Tags</TableHead>
       <TableHead className="w-24 text-left">Jotoba.de</TableHead>
+      <TableHead className="w-24 text-left">KanjiAPI.dev</TableHead>
       <TableHead className="w-24 text-left">Jisho.org</TableHead>
     </TableRow>
   </TableHeader>
