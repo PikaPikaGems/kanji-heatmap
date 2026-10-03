@@ -72,7 +72,7 @@ export function KanjiWorkerProvider({
       snapshot.componentsMap[kanji] ??
       snapshot.componentsMap[snapshot.radicals.aliases[kanji]];
     if (component?.k) {
-      return { keyword: component.k, desc: component.desc };
+      return { keyword: component.k };
     }
 
     return null;

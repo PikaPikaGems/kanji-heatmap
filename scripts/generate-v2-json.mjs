@@ -302,17 +302,14 @@ for (const [strokes, list] of Object.entries(
 }
 
 // Sylhare bushu names win over the older Heisig/ad-hoc keyword tables.
+// The keyword goes to components.json; the rest of the bushu entry (Japanese
+// name, position, meaning) goes to radicals.json as `info`.
+const radicalInfo = {};
 for (const [char, entry] of Object.entries(sylhareKeywords)) {
-  if (entry?.k) {
-    components[char] = { ...components[char], k: String(entry.k).trim() };
-    keywordOrigin[char] = "sylhare";
-  }
-  if (entry?.desc) {
-    components[char] = {
-      ...components[char],
-      desc: String(entry.desc).trim(),
-    };
-  }
+  const { k, ...info } = entry;
+  components[char] = { ...components[char], k };
+  keywordOrigin[char] = "sylhare";
+  radicalInfo[char] = info;
 }
 
 // Alias resolution: a lookalike inherits its target's keyword. Aliases may
@@ -355,12 +352,7 @@ for (const [char, alias] of Object.entries(allAliases)) {
   if (components[target]?.k != null) {
     components[char] = { ...components[char], k: components[target].k };
     keywordOrigin[char] = `alias of ${target}`;
-    if (components[target].desc) {
-      components[char] = {
-        ...components[char],
-        desc: components[target].desc,
-      };
-    }
+    if (radicalInfo[target]) radicalInfo[char] = radicalInfo[target];
   } else if (!isKanji(target)) {
     fail(
       `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
@@ -376,9 +368,12 @@ let droppedKanjiKeywords = 0;
 for (const char of Object.keys(components)) {
   if (!isKanji(char) || components[char].k == null) continue;
   delete components[char].k;
-  delete components[char].desc;
   droppedKanjiKeywords += 1;
   if (Object.keys(components[char]).length === 0) delete components[char];
+}
+// Same for radical info: a kanji never opens the radical popover.
+for (const char of Object.keys(radicalInfo)) {
+  if (isKanji(char)) delete radicalInfo[char];
 }
 
 // Manual curation wins over everything the algorithm produced.
@@ -593,6 +588,7 @@ write("components.json", components);
 write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
+  info: radicalInfo,
 });
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.

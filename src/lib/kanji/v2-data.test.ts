@@ -78,7 +78,7 @@ type V2MainEntry = [
   string | null,
   string | null,
 ];
-type ComponentEntry = { k?: string; desc?: string; s?: string[]; n?: number };
+type ComponentEntry = { k?: string; s?: string[]; n?: number };
 
 const main = v2<Record<string, V2MainEntry>>("kanji_main.json");
 const general = v2<Record<string, [string[], string[], string[]]>>(
@@ -92,6 +92,9 @@ const repDetails = v2<Record<string, [string, string]>>(
 );
 const vocab = v2<Record<string, [string, string]>>("vocab.json");
 const components = v2<Record<string, ComponentEntry>>("components.json");
+const radicalInfo = v2<{
+  info: Record<string, { ja: string; pos?: string; cn?: string }>;
+}>("radicals.json").info;
 const structures = v2<
   Record<string, { hl?: unknown; ka?: unknown; sc?: unknown; ya?: unknown }>
 >("kanji_structures.json");
@@ -306,8 +309,8 @@ describe("components.json", () => {
   it("keeps component_keyword entries that sylhare did not replace", () => {
     for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
       if (main[char] != null) continue;
-      // Sylhare bushu names (the entries with a desc) replace these.
-      if (components[char]?.desc != null) continue;
+      // Sylhare bushu names (the radicals with popover info) replace these.
+      if (radicalInfo[char] != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });
@@ -327,7 +330,13 @@ describe("components.json", () => {
 
   it("applies sylhare bushu keywords over the older radical tables", () => {
     expect(components["⺡"]?.k).toBe("three water");
-    expect(components["⺡"]?.desc).toContain("さんずい");
+    expect(components["⺡"]).not.toHaveProperty("desc");
+    expect(radicalInfo["⺡"]).toEqual({
+      ja: "さんずい",
+      pos: "へん",
+      cn: "water",
+    });
+    expect(radicalInfo["氵"]).toEqual(radicalInfo["⺡"]);
     expect(components["⻏"]?.k).toBe("large village");
     expect(components["⻖"]?.k).toBe("small hill left");
     expect(components["𠂉"]?.k).toBe("no plus one");

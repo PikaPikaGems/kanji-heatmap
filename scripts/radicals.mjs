@@ -89,23 +89,34 @@ export const readRadicalSources = (rawDir) => {
   };
 };
 
-const firstPos = (raw) => {
-  const trimmed = (raw ?? "").trim();
-  if (!trimmed) return "";
-  return trimmed.split(",")[0].trim();
+// The seven bushu positions. The CSV sometimes lists a full name after a comma
+// ("かまえ, もんがまえ") or junk ("罒"); keep only the first part, if known.
+const POSITIONS = new Set([
+  "へん",
+  "つくり",
+  "かんむり",
+  "あし",
+  "たれ",
+  "にょう",
+  "かまえ",
+]);
+const positionOf = (raw) => {
+  const first = (raw ?? "").split(",")[0].trim();
+  return POSITIONS.has(first) ? first : "";
 };
 
-const composeDesc = (readingJ, literal, positionJ, meaning) => {
-  const inner = [literal, firstPos(positionJ)].filter(
-    (part) => part.length > 0
-  );
-  const head = `${readingJ} (${inner.join(", ")})`;
-  const kx = (meaning ?? "").trim();
-  return kx.length > 0 ? `${head} · ${kx}` : head;
+/** { k, ja, pos?, cn? } — empty fields are left out. */
+const entryOf = (literal, nameJa, positionJ, meaning) => {
+  const entry = { k: literal, ja: nameJa };
+  const pos = positionOf(positionJ);
+  const cn = (meaning ?? "").trim();
+  if (pos) entry.pos = pos;
+  if (cn) entry.cn = cn;
+  return entry;
 };
 
 /**
- * Bushu name entries ({ k, desc }) per glyph, from the sylhare CSV plus our
+ * Bushu entries ({ k, ja, pos, cn }) per glyph, from the sylhare CSV plus our
  * translations and missing forms. Translations are keyed by glyph only —
  * never by reading, since readings collide (日 and 火 are both ひ).
  * Throws if a radical has no translation or a translation is unused.
@@ -145,22 +156,20 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
   );
 
   const out = {};
-  const entryOf = ({ row, readingJ, literal }) => ({
-    k: literal,
-    desc: composeDesc(readingJ, literal, row["Position-J"], row.Meaning),
-  });
+  const rowEntry = ({ row, readingJ, literal }) =>
+    entryOf(literal, readingJ, row["Position-J"], row.Meaning);
 
   // Main glyphs first, so an alternate never shadows a real radical.
   for (const n of named) {
     if (!n.literal) continue;
-    out[n.row.Radical] = entryOf(n);
+    out[n.row.Radical] = rowEntry(n);
   }
   for (const n of named) {
     if (!n.literal) continue;
     for (const ch of [...(n.row.Alternate ?? "")].filter(isGlyph)) {
       if (radicalSeen.has(ch) || out[ch] != null) continue;
       if (skipAsAlternate.has(ch)) continue;
-      out[ch] = entryOf(n);
+      out[ch] = rowEntry(n);
     }
   }
 
@@ -170,10 +179,7 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
       missingLiterals.add(ch);
       continue;
     }
-    out[ch] = {
-      k: literal,
-      desc: composeDesc(extra.nameJa, literal, extra.position, extra.meaning),
-    };
+    out[ch] = entryOf(literal, extra.nameJa, extra.position, extra.meaning);
   }
 
   if (missingLiterals.size > 0) {

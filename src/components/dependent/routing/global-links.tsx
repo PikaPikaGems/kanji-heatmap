@@ -125,38 +125,44 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
   );
 };
 
+const POSITION_EN: Record<string, string> = {
+  へん: "left side",
+  つくり: "right side",
+  かんむり: "top",
+  あし: "bottom",
+  たれ: "top-left",
+  にょう: "bottom-left",
+  かまえ: "enclosure",
+};
+
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
-  const resolvedDesc = getKanjiInfo?.(radical)?.desc;
-  const descMatch = resolvedDesc?.match(
-    /^(.+?)\s*\(([^)]+)\)(?:\s*·\s*(.*))?$/
-  );
-  const reading = descMatch?.[1]?.trim() ?? resolvedDesc;
-  const gloss = descMatch?.[2]?.trim();
-  const kangxi = descMatch?.[3]?.trim();
+  const radicals = useRadicals();
+  const info = radicals?.info[radical];
+  const keyword = getKanjiInfo?.(radical)?.keyword;
   return (
     <div className="p-1" data-vaul-no-drag>
       <div className="flex gap-3 px-1">
         <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
         </div>
-        <div className="min-w-0 text-left">
-          {reading && (
+        {info && (
+          <div className="min-w-0 text-left">
             <p className="text-sm font-bold whitespace-normal text-foreground">
-              🇯🇵 {reading}
+              🇯🇵 {keyword ? `${info.ja}, ${keyword}` : info.ja}
             </p>
-          )}
-          {gloss && (
-            <p className="text-xs whitespace-normal text-muted-foreground">
-              {gloss}
-            </p>
-          )}
-          {kangxi && (
-            <p className="text-sm whitespace-normal text-foreground">
-              {"🇨🇳"} {kangxi}
-            </p>
-          )}
-        </div>
+            {info.pos && (
+              <p className="text-xs whitespace-normal text-muted-foreground">
+                📍 {info.pos} ({POSITION_EN[info.pos]})
+              </p>
+            )}
+            {info.cn && (
+              <p className="text-sm whitespace-normal text-foreground">
+                {"🇨🇳"} {info.cn}
+              </p>
+            )}
+          </div>
+        )}
       </div>
       <RadicalSearchAction radical={radical} />
     </div>

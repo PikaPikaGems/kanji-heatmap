@@ -37,10 +37,21 @@ B or Ｂ (full-width B)	                        ⻏, ⻖
 囗 (※) or 口 (※) or ロ (katakana 'ro')	         囗, 口
 */
 
+/** Radical popover facts. The English name is the component keyword. */
+export type RadicalInfo = {
+  /** Japanese name, e.g. さんずい. */
+  ja: string;
+  /** Position: へん, つくり, かんむり, あし, たれ, にょう or かまえ. */
+  pos?: string;
+  /** Meaning, e.g. "water". */
+  cn?: string;
+};
+
 /** public/json/v2/radicals.json — fetched at runtime, never imported. */
 export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
+  info: Record<string, RadicalInfo>;
 };
 
 export type RadicalsRuntime = RadicalsFile & {
@@ -62,6 +73,7 @@ export const strokeCountMapFromGrouped = (
 export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
   groupedByStrokeCount: file.groupedByStrokeCount,
   aliases: file.aliases ?? {},
+  info: file.info ?? {},
   strokeCountMap: strokeCountMapFromGrouped(file.groupedByStrokeCount),
 });
 
