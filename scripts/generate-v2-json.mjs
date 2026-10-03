@@ -266,7 +266,6 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 // ---------------------------------------------------------------------------
 
 const components = {};
-const keywordOrigin = {};
 
 for (const [char, sounds] of Object.entries(phonetic)) {
   if (!Array.isArray(sounds) || sounds.length === 0) continue;
@@ -288,7 +287,6 @@ const radicalInfo = {};
 for (const [char, entry] of Object.entries(sylhareKeywords)) {
   const { k, ...info } = entry;
   components[char] = { ...components[char], k };
-  keywordOrigin[char] = "sylhare";
   radicalInfo[char] = info;
 }
 
@@ -314,7 +312,6 @@ for (const char of Object.keys(radicalInfo)) {
 // Manual curation wins over everything the algorithm produced.
 for (const [char, entry] of Object.entries(manualOverrides)) {
   components[char] = { ...components[char], ...entry };
-  if (entry.k != null) keywordOrigin[char] = "components/ours.json";
 }
 
 // Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
@@ -339,39 +336,18 @@ for (const [char, alias] of Object.entries(allAliases)) {
   }
 }
 
-const parent = {};
-const find = (ch) => {
-  if (parent[ch] == null) parent[ch] = ch;
-  if (parent[ch] !== ch) parent[ch] = find(parent[ch]);
-  return parent[ch];
-};
-for (const [from, to] of Object.entries(allAliases)) {
-  const a = find(from);
-  const b = find(to);
-  if (a !== b) parent[a] = b;
-}
-for (const [char, entry] of Object.entries(sylhareKeywords)) {
-  if (entry?.k == null) continue;
-  const key = `k:${String(entry.k).trim().toLowerCase()}`;
-  const a = find(char);
-  const b = find(key);
-  if (a !== b) parent[a] = b;
-}
-
+// A keyword we typed must not clash with another component's keyword.
+// Radical names may repeat on purpose (an alternate form shares its row).
 const charsByKeyword = {};
 for (const [char, entry] of Object.entries(components)) {
-  if (entry?.k == null) continue;
-  const kw = String(entry.k).trim().toLowerCase();
-  if (!kw) continue;
-  (charsByKeyword[kw] ??= []).push(char);
+  if (entry.k == null) continue;
+  (charsByKeyword[entry.k.trim().toLowerCase()] ??= []).push(char);
 }
-
-for (const [kw, chars] of Object.entries(charsByKeyword)) {
-  const roots = new Set(chars.map((ch) => find(ch)));
-  if (roots.size > 1) {
-    fail(
-      `components: keyword "${kw}" is shared by unrelated glyphs ${chars.join(" ")}`
-    );
+for (const [char, entry] of Object.entries(manualOverrides)) {
+  if (entry.k == null) continue;
+  const chars = charsByKeyword[entry.k.trim().toLowerCase()];
+  if (chars.length > 1) {
+    fail(`components: "${entry.k}" (${char}) is shared by ${chars.join(" ")}`);
   }
 }
 
