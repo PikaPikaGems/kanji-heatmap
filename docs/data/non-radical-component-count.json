@@ -25,7 +25,7 @@
       {
         "cmp": "莫",
         "cnt": 8,
-        "kw": "shalt"
+        "kw": "none"
       },
       {
         "cmp": "𠂇",
@@ -60,7 +60,7 @@
       {
         "cmp": "乍",
         "cnt": 5,
-        "kw": "while"
+        "kw": "suddenly"
       },
       {
         "cmp": "㑒",
@@ -95,7 +95,7 @@
       {
         "cmp": "夬",
         "cnt": 2,
-        "kw": "certain"
+        "kw": "decisive"
       },
       {
         "cmp": "兔",
@@ -273,7 +273,7 @@
     {
       "char": "莫",
       "count": 8,
-      "keyword": "shalt",
+      "keyword": "none",
       "exampleKanji": [
         "暮",
         "募",
@@ -514,7 +514,7 @@
     {
       "char": "乍",
       "count": 5,
-      "keyword": "while",
+      "keyword": "suddenly",
       "exampleKanji": [
         "作",
         "昨",
@@ -1869,7 +1869,7 @@
     {
       "char": "夬",
       "count": 2,
-      "keyword": "certain",
+      "keyword": "decisive",
       "exampleKanji": [
         "決",
         "快"

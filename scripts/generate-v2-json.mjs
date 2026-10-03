@@ -45,7 +45,6 @@ const fail = (message) => problems.push(message);
 const main = readRelease("kanji_main.json");
 const extended = readRelease("kanji_extended.json");
 const repWords = readRelease("kanji_representative_words.json");
-const componentKeywords = readRelease("component_keyword.json");
 const phonetic = readRelease("phonetic.json");
 const vocabFurigana = readRelease("vocab_furigana.json");
 const vocabMeaning = readRelease("vocab_meaning.json");
@@ -258,39 +257,16 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 }
 
 // ---------------------------------------------------------------------------
-// components.json — one registry replacing component_keyword.json,
-// phonetic.json and the keyword tables in raw-data/radicals/.
+// components.json — keyword, sounds and stroke count per component.
 //
-// Keywords are resolved through the lookalike-alias table at build time, so
-// the runtime never has to chase an alias or consult five sources.
+// Keyword priority (first wins): raw-data/components/ours.json, then the
+// radical name, then the alias target's keyword (followed in the app).
+// The release's component_keyword.json is not read; the keywords we kept
+// from it live in components/ours.json.
 // ---------------------------------------------------------------------------
 
 const components = {};
 const keywordOrigin = {};
-
-const setKeyword = (char, keyword, source) => {
-  if (keyword == null || keyword.trim().length === 0) return;
-  const trimmed = keyword.trim();
-  const existing = components[char]?.k;
-
-  if (existing != null && existing.toLowerCase() !== trimmed.toLowerCase()) {
-    fail(
-      `components: conflicting keywords for ${char} — ` +
-        `"${existing}" (${keywordOrigin[char]}) vs "${trimmed}" (${source})`
-    );
-    return;
-  }
-
-  components[char] = { ...components[char], k: trimmed };
-  keywordOrigin[char] = source;
-};
-
-// Release keywords rank last: an alias's target name beats them (氵 reads
-// "three water" from ⺡, not the release's "water drops").
-for (const [char, keyword] of Object.entries(componentKeywords)) {
-  if (char in allAliases) continue;
-  setKeyword(char, keyword, "component_keyword.json");
-}
 
 for (const [char, sounds] of Object.entries(phonetic)) {
   if (!Array.isArray(sounds) || sounds.length === 0) continue;
@@ -316,28 +292,6 @@ for (const [char, entry] of Object.entries(sylhareKeywords)) {
   radicalInfo[char] = info;
 }
 
-// Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
-// onto the alias: the app follows it (followAlias in src/lib/radicals.ts), so
-// every fact is stored once. Here we only check each alias leads somewhere.
-for (const [char, alias] of Object.entries(allAliases)) {
-  if (alias !== alias.trim() || alias.length === 0) {
-    fail(`components: alias for ${char} is not a clean value ("${alias}")`);
-    continue;
-  }
-  if (char === alias) {
-    fail(`components: ${char} aliases itself`);
-    continue;
-  }
-  const target = followAlias(
-    char,
-    allAliases,
-    (g) => components[g]?.k != null || isKanji(g)
-  );
-  if (target == null) {
-    fail(`components: ${char} never reaches a keyword or a kanji`);
-  }
-}
-
 // A keyword for a character that is itself a kanji is unreachable: every call
 // site reads kanji_main first and only falls back to the component registry.
 // Drop it so the keyword has exactly one home — unless an alias points at the
@@ -361,6 +315,28 @@ for (const char of Object.keys(radicalInfo)) {
 for (const [char, entry] of Object.entries(manualOverrides)) {
   components[char] = { ...components[char], ...entry };
   if (entry.k != null) keywordOrigin[char] = "components/ours.json";
+}
+
+// Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
+// onto the alias: the app follows it (followAlias in src/lib/radicals.ts), so
+// every fact is stored once. Here we only check each alias leads somewhere.
+for (const [char, alias] of Object.entries(allAliases)) {
+  if (alias !== alias.trim() || alias.length === 0) {
+    fail(`components: alias for ${char} is not a clean value ("${alias}")`);
+    continue;
+  }
+  if (char === alias) {
+    fail(`components: ${char} aliases itself`);
+    continue;
+  }
+  const target = followAlias(
+    char,
+    allAliases,
+    (g) => components[g]?.k != null || isKanji(g)
+  );
+  if (target == null) {
+    fail(`components: ${char} never reaches a keyword or a kanji`);
+  }
 }
 
 const parent = {};

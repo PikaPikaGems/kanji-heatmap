@@ -54,8 +54,8 @@ const v1Extended = release<Record<string, V1ExtendedEntry>>(
 const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
-const v1ComponentKeywords = release<Record<string, string>>(
-  "component_keyword.json"
+const ourComponents = raw<Record<string, { k?: string }>>(
+  "components/ours.json"
 );
 const v1Phonetic = release<Record<string, string[]>>("phonetic.json");
 const v1Furigana = release<Record<string, WordPartDetail[]>>(
@@ -314,27 +314,10 @@ describe("vocab.json", () => {
 });
 
 describe("components.json", () => {
-  it("keeps component_keyword entries that sylhare did not replace", () => {
-    for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
-      if (main[char] != null) continue;
-      // Sylhare bushu names (the radicals with popover info) replace these,
-      // and an alias's target name beats them.
-      if (radicalInfo[char] != null) continue;
-      if (char in aliases) continue;
-      expect(components[char]?.k, char).toBe(keyword);
-    }
-  });
-
-  it("drops the handful of component keywords that describe a kanji", () => {
-    const kanjiEntries = Object.keys(v1ComponentKeywords).filter(
-      (char) => main[char] != null
-    );
-
-    expect(kanjiEntries.length).toBeGreaterThan(0);
-    for (const char of kanjiEntries) {
-      // Unreachable at runtime: every lookup reads kanji_main first.
-      expect(components[char]?.k, char).toBeUndefined();
-      expect(main[char][0], char).toBeTruthy();
+  it("shows every keyword from components/ours.json", () => {
+    for (const [char, entry] of Object.entries(ourComponents)) {
+      if (entry.k == null) continue;
+      expect(components[char]?.k, char).toBe(entry.k);
     }
   });
 
