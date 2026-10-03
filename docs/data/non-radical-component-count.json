@@ -10,7 +10,7 @@
       {
         "cmp": "乂",
         "cnt": 18,
-        "kw": "regulate"
+        "kw": "mow"
       },
       {
         "cmp": "廿",
@@ -120,7 +120,7 @@
       {
         "cmp": "昏",
         "cnt": 1,
-        "kw": "dusk"
+        "kw": "twilight"
       },
       {
         "cmp": "洛",
@@ -190,7 +190,7 @@
     {
       "char": "乂",
       "count": 18,
-      "keyword": "regulate",
+      "keyword": "mow",
       "exampleKanji": [
         "気",
         "父",
@@ -3126,7 +3126,7 @@
     {
       "char": "昏",
       "count": 1,
-      "keyword": "dusk",
+      "keyword": "twilight",
       "exampleKanji": [
         "婚"
       ]
