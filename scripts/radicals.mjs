@@ -106,7 +106,9 @@ const composeDesc = (readingJ, literal, positionJ, meaning) => {
 
 /**
  * Bushu name entries ({ k, desc }) per glyph, from the sylhare CSV plus our
- * translations and missing forms. Throws if a name has no translation.
+ * translations and missing forms. Translations are keyed by glyph only —
+ * never by reading, since readings collide (日 and 火 are both ひ).
+ * Throws if a radical has no translation or a translation is unused.
  */
 export const buildBushuEntries = ({ sylhareRows, ours }) => {
   const literals = ours.literalEn;
@@ -115,23 +117,25 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
     ...(ours.sylhareSkipAlts ?? []),
   ]);
 
-  const literalFor = (glyph, readingJ) => {
-    const fromGlyph = glyph ? literals[glyph] : undefined;
-    const fromReading = literals[readingJ];
-    return (fromGlyph ?? fromReading ?? "").toString().trim();
+  const usedLiterals = new Set();
+  const literalFor = (glyph) => {
+    usedLiterals.add(glyph);
+    return (literals[glyph] ?? "").toString().trim();
   };
 
+  // Rows without a usable glyph (private-use codepoints, 々's "n/a") are
+  // skipped: nothing in the app can show them.
   const named = sylhareRows
     .map((row) => {
       const readingJ = (row["Reading-J"] ?? "").trim();
       if (!readingJ || readingJ === "n/a") return null;
-      const literal = literalFor(row.Radical, readingJ);
-      return { row, readingJ, literal };
+      if (!isGlyph(row.Radical)) return null;
+      return { row, readingJ, literal: literalFor(row.Radical) };
     })
     .filter(Boolean);
 
   const missingLiterals = new Set(
-    named.filter((n) => !n.literal).map((n) => n.readingJ)
+    named.filter((n) => !n.literal).map((n) => n.row.Radical)
   );
   const radicalSeen = new Set(
     sylhareRows
@@ -148,7 +152,7 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
 
   // Main glyphs first, so an alternate never shadows a real radical.
   for (const n of named) {
-    if (!n.literal || !isGlyph(n.row.Radical)) continue;
+    if (!n.literal) continue;
     out[n.row.Radical] = entryOf(n);
   }
   for (const n of named) {
@@ -161,9 +165,9 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
   }
 
   for (const [ch, extra] of Object.entries(ours.extras ?? {})) {
-    const literal = literalFor(ch, extra.nameJa);
+    const literal = literalFor(ch);
     if (!literal) {
-      missingLiterals.add(extra.nameJa);
+      missingLiterals.add(ch);
       continue;
     }
     out[ch] = {
@@ -176,6 +180,10 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
     throw new Error(
       `radicals: missing literalEn for ${[...missingLiterals].join(", ")}`
     );
+  }
+  const unused = Object.keys(literals).filter((g) => !usedLiterals.has(g));
+  if (unused.length > 0) {
+    throw new Error(`radicals: unused literalEn for ${unused.join(", ")}`);
   }
   return out;
 };
