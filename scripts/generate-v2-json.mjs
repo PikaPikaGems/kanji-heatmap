@@ -71,6 +71,24 @@ const structureSources = {
 const kanjiList = Object.keys(main);
 const isKanji = (char) => main[char] != null;
 
+// Official jōyō list, one kanji per line. kanji_extended tags ~280 name kanji
+// (伊, 彦, 智, …) as grade 9, so the list decides who gets a grade at all.
+// The list uses the official 剝; we store the common form 剥.
+const JOUYOU_FORMS = { 剝: "剥" };
+const jouyou = new Set(
+  readRawText("jouyou_kanji.txt")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((char) => JOUYOU_FORMS[char] ?? char)
+);
+if (jouyou.size !== 2136) {
+  fail(`jouyou_kanji.txt: expected 2136 kanji, got ${jouyou.size}`);
+}
+for (const char of jouyou) {
+  if (!isKanji(char)) fail(`jouyou_kanji.txt: ${char} is not in kanji_main`);
+}
+
 // TopoKanji Twitter: one character per line, 1-based index. Radicals that
 // are not in kanji_main are skipped for storage but do not compact later
 // indexes, so a kanji's number matches the published list.
@@ -136,6 +154,16 @@ const numberAt = (kanji, field) => {
   return value;
 };
 
+const JOUYOU_GRADES = new Set([1, 2, 3, 4, 5, 6, 9]);
+const jouyouGradeOf = (kanji) => {
+  const grade = numberAt(kanji, "jouyouGrade");
+  if (!jouyou.has(kanji)) return -1;
+  if (!JOUYOU_GRADES.has(grade)) {
+    fail(`kanji_main: jōyō kanji ${kanji} has grade ${grade}`);
+  }
+  return grade;
+};
+
 const outMain = {};
 for (const kanji of kanjiList) {
   const [keyword, on, kun, jlptRaw, freq] = main[kanji];
@@ -153,7 +181,7 @@ for (const kanji of kanjiList) {
     jlptRaw,
     freq,
     numberAt(kanji, "strokes"),
-    numberAt(kanji, "jouyouGrade"),
+    jouyouGradeOf(kanji),
     numberAt(kanji, "wk"),
     numberAt(kanji, "kklcIndex"),
     numberAt(kanji, "rtk"),

@@ -94,6 +94,19 @@ const structures = v2<
 
 const kanjiList = Object.keys(v1Main);
 
+// Official list uses 剝; we store the common form 剥.
+const jouyou = new Set(
+  fs
+    .readFileSync(
+      path.join(process.cwd(), "raw-data", "jouyou_kanji.txt"),
+      "utf8"
+    )
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((char) => (char === "剝" ? "剥" : char))
+);
+
 describe("kanji_main.json", () => {
   it("covers exactly the v1 kanji set", () => {
     expect(Object.keys(main).sort()).toEqual(kanjiList.sort());
@@ -114,14 +127,21 @@ describe("kanji_main.json", () => {
     for (const kanji of kanjiList) {
       const source = v1Extended[kanji];
       // v1 slots: 1 strokes, 3 wk, 4 jouyouGrade, 10 kklc, 11 rtk
+      // Grade is kept only for kanji on the official jōyō list.
       expect(main[kanji].slice(5, 10), kanji).toEqual([
         source[1],
-        source[4],
+        jouyou.has(kanji) ? source[4] : -1,
         source[3],
         source[10],
         source[11],
       ]);
     }
+  });
+
+  it("grades exactly the 2,136 jōyō kanji", () => {
+    const graded = kanjiList.filter((kanji) => main[kanji][6] !== -1);
+    expect(graded).toHaveLength(2136);
+    expect(graded.every((kanji) => jouyou.has(kanji))).toBe(true);
   });
 
   it("carries the representative word and reading, null when absent", () => {
