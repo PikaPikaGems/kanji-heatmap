@@ -121,7 +121,41 @@ kanji containing it, at any depth). Finds things radical search can't
 - 981 buttons is fine on phones without virtualization; just avoid
   re-rendering every button on each tap.
 
-### 4. Small open questions
+### 4. Review the radical translations
+
+`literalEn` in `raw-data/radicals/ours.json` is meant to be a **literal**
+translation of each Japanese radical name. Only the clearly wrong ones were
+fixed (火, 黄/⿈, 革, 示/⺭, 酉, 禸). The other ~270 were never reviewed one by
+one. Ones that look off:
+
+| Glyph | Name       | Current           | Note                             |
+| ----- | ---------- | ----------------- | -------------------------------- |
+| 辛    | からい     | bitter            | からい means spicy               |
+| 阜    | こざと     | small hill        | literally "small village" (小里) |
+| 釆    | のごめ     | divide            | literally ノ + 米                |
+| 斗    | ますづくり | ladle right       | ます is a measuring box          |
+| 幺    | いとがしら | short thread head | literally "thread head"          |
+| 缶    | みずがめ   | jar               | "water jar"                      |
+| 歹    | がつ       | bare bone         | がつ is a reading, not a meaning |
+
+The user decides each rename. Kept on purpose: のまた "no + mata", るまた
+"ru + mata", 丿/ノ "katakana no", 厶 "katakana mu", 乙/⺃ "second".
+
+### 5. Before and after merging this work
+
+- Run the end-to-end suite (`pnpm run test:e2e`). It was not run during the
+  cleanup; only unit tests and manual browser checks were.
+- Open a pull request for `claude/intelligent-babbage-buyv9k` and merge it.
+- The remote `radicals-cleanup` branch is then obsolete. Four of its files
+  were imported into `raw-data/radicals/external/` and `raw-data/misc/`. Left
+  out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
+  `components-kc.csv` (the same data as `components-ck.csv`, flipped) and
+  `kanji-composition-map.txt` (already in `raw-data/kanji-structure/scott.json`).
+- **Report the grade bug upstream:** Kanji Heatmap Data tags 279 name kanji
+  (伊, 彦, 智, …) as grade 9. This repo works around it in the build using
+  `raw-data/misc/jouyou_kanji.txt`, but the release itself is still wrong.
+
+### 6. Small open questions
 
 - **Check component keywords against kanji keywords in the build?** Today it
   only checks components against each other; 乂 "regulate" and 昏 "dusk"
