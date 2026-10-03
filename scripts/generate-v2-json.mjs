@@ -46,7 +46,7 @@ const vocabFurigana = readRelease("vocab_furigana.json");
 const vocabMeaning = readRelease("vocab_meaning.json");
 const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
 const similarKanjis = readRelease("similar-kanjis.json");
-const readingDetails = readRaw("kanji-readings-details.json");
+const readingDetails = readRaw("misc/kanji-readings-details.json");
 const cumUse = readRelease("cum_use.json");
 // Drawer grouping comes from rewhowe/kanji; aliases and skip/extra maps are ours.
 const radicals = {
@@ -71,10 +71,10 @@ mergeSylhareBushuAliases({
 const manualOverrides = readRaw("components_manual_overrides.json");
 
 const structureSources = {
-  hl: readRaw("kanji-structure-hlorenzi.json"),
-  ka: readRaw("kanji-structure-kanjium.json"),
-  sc: readRaw("kanji-structure-scott.json"),
-  ya: readRaw("kanji-structure-yagays.json"),
+  hl: readRaw("kanji-structure/hlorenzi.json"),
+  ka: readRaw("kanji-structure/kanjium.json"),
+  sc: readRaw("kanji-structure/scott.json"),
+  ya: readRaw("kanji-structure/yagays.json"),
 };
 
 const kanjiList = Object.keys(main);
@@ -85,7 +85,7 @@ const isKanji = (char) => main[char] != null;
 // The list uses the official 剝; we store the common form 剥.
 const JOUYOU_FORMS = { 剝: "剥" };
 const jouyou = new Set(
-  readRawText("jouyou_kanji.txt")
+  readRawText("misc/jouyou_kanji.txt")
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
@@ -103,7 +103,7 @@ for (const char of jouyou) {
 // indexes, so a kanji's number matches the published list.
 const topoTwitterIndex = new Map();
 {
-  const lines = readRawText("topokanji_index_twitter.txt")
+  const lines = readRawText("misc/topokanji_index_twitter.txt")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);

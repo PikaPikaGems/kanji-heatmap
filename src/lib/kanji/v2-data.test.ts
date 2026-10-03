@@ -106,7 +106,7 @@ const kanjiList = Object.keys(v1Main);
 const jouyou = new Set(
   fs
     .readFileSync(
-      path.join(process.cwd(), "raw-data", "jouyou_kanji.txt"),
+      path.join(process.cwd(), "raw-data", "misc", "jouyou_kanji.txt"),
       "utf8"
     )
     .split("\n")
@@ -192,7 +192,12 @@ describe("kanji_main.json", () => {
   it("carries the TopoKanji Twitter index from the source list", () => {
     const lines = fs
       .readFileSync(
-        path.join(process.cwd(), "raw-data", "topokanji_index_twitter.txt"),
+        path.join(
+          process.cwd(),
+          "raw-data",
+          "misc",
+          "topokanji_index_twitter.txt"
+        ),
         "utf8"
       )
       .split(/\r?\n/)
@@ -385,10 +390,10 @@ describe("components.json", () => {
 
 describe("kanji_structures.json", () => {
   const sources = {
-    hl: raw<Record<string, unknown>>("kanji-structure-hlorenzi.json"),
-    ka: raw<Record<string, unknown>>("kanji-structure-kanjium.json"),
-    sc: raw<Record<string, unknown>>("kanji-structure-scott.json"),
-    ya: raw<Record<string, unknown>>("kanji-structure-yagays.json"),
+    hl: raw<Record<string, unknown>>("kanji-structure/hlorenzi.json"),
+    ka: raw<Record<string, unknown>>("kanji-structure/kanjium.json"),
+    sc: raw<Record<string, unknown>>("kanji-structure/scott.json"),
+    ya: raw<Record<string, unknown>>("kanji-structure/yagays.json"),
   };
 
   it("reproduces each source's value verbatim under its short key", () => {
@@ -426,7 +431,7 @@ describe("pass-through files", () => {
     );
     expect(v2("similar_kanjis.json")).toEqual(release("similar-kanjis.json"));
     expect(v2("kanji_reading_details.json")).toEqual(
-      raw("kanji-readings-details.json")
+      raw("misc/kanji-readings-details.json")
     );
     expect(v2("cum_use.json")).toEqual(release("cum_use.json"));
   });

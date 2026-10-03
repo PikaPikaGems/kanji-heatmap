@@ -151,7 +151,7 @@ entry count of every generated file.
 node scripts/generate-speed-katakana.mjs && tsc -b && vite build
 ```
 
-The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
+The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/misc/katakana-kore.txt` (48 words per set, ordered by frequency).
 
 #### Other required data
 
