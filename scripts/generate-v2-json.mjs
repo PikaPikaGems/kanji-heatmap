@@ -67,7 +67,7 @@ mergeSylhareBushuAliases({
   skipAlts: ours.sylhareSkipAlts,
   extraAliases: ours.sylhareExtraAliases,
 });
-const manualOverrides = readRaw("components_manual_overrides.json");
+const manualOverrides = readRaw("components/ours.json");
 
 const structureSources = {
   hl: readRaw("kanji-structure/hlorenzi.json"),
@@ -379,7 +379,7 @@ for (const char of Object.keys(radicalInfo)) {
 // Manual curation wins over everything the algorithm produced.
 for (const [char, entry] of Object.entries(manualOverrides)) {
   components[char] = { ...components[char], ...entry };
-  if (entry.k != null) keywordOrigin[char] = "components_manual_overrides.json";
+  if (entry.k != null) keywordOrigin[char] = "components/ours.json";
 }
 
 const parent = {};
@@ -439,7 +439,7 @@ for (const kanji of structureKanji) {
 // ---------------------------------------------------------------------------
 // Coverage report: every component referenced anywhere that still has no
 // keyword, ordered by how often it is referenced. This is the worklist for
-// raw-data/components_manual_overrides.json.
+// raw-data/components/ours.json.
 // ---------------------------------------------------------------------------
 
 const references = new Map();

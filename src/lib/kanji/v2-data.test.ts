@@ -475,7 +475,7 @@ describe("component coverage report", () => {
   });
 
   it("does not regress past the known gap count", () => {
-    // Ratchet: filling gaps in components_manual_overrides.json lowers this,
+    // Ratchet: filling gaps in raw-data/components/ours.json lowers this,
     // a bad data drop raises it. Lower the number when you improve coverage.
     expect(report.summary.missing).toBeLessThanOrEqual(364);
   });

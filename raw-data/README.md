@@ -18,28 +18,4 @@ regenerate with `pnpm run generate-json`.
 | `misc/topokanji_index_twitter.txt` | [TopoKanji](https://github.com/scriptin/topokanji) Twitter list (`lists/twitter.txt`) — one character per line, 1-based index                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `misc/kanji-readings-details.json` | Reading frequency per kanji, from Dr. Patrick Kandrac's [Jōyō Kanji Readings ver. 1.1](https://www.researchgate.net/publication/357163811_Joyo_Kanji_Readings_ver_11), likely via [piyush8512/Kanji-Readings-Converter](https://github.com/piyush8512/Kanji-Readings-Converter)                                                                                                                                                                                                                                                                                                           |
 | `misc/katakana-kore.txt`           | Word list for the Speed Katakana game (`scripts/generate-speed-katakana.mjs`), from [Anki shared deck 1723626457](https://ankiweb.net/shared/info/1723626457)                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `components_manual_overrides.json` | Ours, hand-curated component keywords. See below                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-
-## components_manual_overrides.json
-
-The component registry (`public/json/v2/components.json`) is built by merging
-every algorithmic source above. This file is applied **last**, so an entry
-here always wins — use it to fill a missing keyword or correct a wrong one.
-
-```jsonc
-{
-  "尞": { "k": "torch" }, // fill a gap
-  "夋": { "k": "swagger" },
-  "⺣": { "k": "small fire" }, // override an algorithmic keyword
-}
-```
-
-Fields (all optional, same shape as a generated entry):
-
-- `k` — keyword
-- `s` — phonetic sounds, e.g. `["ちょう", "かん"]`
-- `n` — stroke count
-
-`docs/data/component-coverage.json` is regenerated alongside the registry and
-lists every component still missing a keyword, ordered by how often it is
-referenced — that is the worklist for this file.
+| `components/`                      | Our own component keywords — see `components/README.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
