@@ -16,6 +16,7 @@ gzip_size_kb() {
 
 patterns=(
   raw-data/*.json
+  raw-data/kanji-heatmap-data/*.json
   public/json/*.json
   public/json/v2/*.json
   docs/data/*.json

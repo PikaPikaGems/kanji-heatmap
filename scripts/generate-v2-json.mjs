@@ -27,6 +27,9 @@ const readRaw = (name) =>
 
 const readRawText = (name) => fs.readFileSync(path.join(RAW_DIR, name), "utf8");
 
+// Kanji Heatmap Data release files live in their own folder, untouched.
+const readRelease = (name) => readRaw(path.join("kanji-heatmap-data", name));
+
 const problems = [];
 const fail = (message) => problems.push(message);
 
@@ -34,17 +37,17 @@ const fail = (message) => problems.push(message);
 // Inputs
 // ---------------------------------------------------------------------------
 
-const main = readRaw("kanji_main.json");
-const extended = readRaw("kanji_extended.json");
-const repWords = readRaw("kanji_representative_words.json");
-const componentKeywords = readRaw("component_keyword.json");
-const phonetic = readRaw("phonetic.json");
-const vocabFurigana = readRaw("vocab_furigana.json");
-const vocabMeaning = readRaw("vocab_meaning.json");
+const main = readRelease("kanji_main.json");
+const extended = readRelease("kanji_extended.json");
+const repWords = readRelease("kanji_representative_words.json");
+const componentKeywords = readRelease("component_keyword.json");
+const phonetic = readRelease("phonetic.json");
+const vocabFurigana = readRelease("vocab_furigana.json");
+const vocabMeaning = readRelease("vocab_meaning.json");
 const decomposition = readRaw("kanji_decomposition.json");
-const similarKanjis = readRaw("similar-kanjis.json");
+const similarKanjis = readRelease("similar-kanjis.json");
 const readingDetails = readRaw("kanji-readings-details.json");
-const cumUse = readRaw("cum_use.json");
+const cumUse = readRelease("cum_use.json");
 const radicals = readRaw("radicals.json");
 const sylhareKeywords = readRaw("sylhare-component-keywords.json");
 const allAliases = { ...(radicals.aliases ?? {}) };

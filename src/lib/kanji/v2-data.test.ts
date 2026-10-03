@@ -19,6 +19,8 @@ const readJson = <T>(...segments: string[]): T =>
   ) as T;
 
 const raw = <T>(name: string) => readJson<T>("raw-data", name);
+const release = <T>(name: string) =>
+  readJson<T>("raw-data", "kanji-heatmap-data", name);
 const v2 = <T>(name: string) => readJson<T>("public", "json", "v2", name);
 
 type FreqList = number[];
@@ -39,20 +41,24 @@ type V1ExtendedEntry = [
 ];
 type V1RepEntry = [string, string, string, string] | null;
 
-const v1Main = raw<Record<string, V1MainEntry>>("kanji_main.json");
-const v1Extended = raw<Record<string, V1ExtendedEntry>>("kanji_extended.json");
-const v1Rep = raw<Record<string, V1RepEntry>>(
+const v1Main = release<Record<string, V1MainEntry>>("kanji_main.json");
+const v1Extended = release<Record<string, V1ExtendedEntry>>(
+  "kanji_extended.json"
+);
+const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
 const sylhareKeywords = raw<Record<string, { k: string; desc: string }>>(
   "sylhare-component-keywords.json"
 );
-const v1ComponentKeywords = raw<Record<string, string>>(
+const v1ComponentKeywords = release<Record<string, string>>(
   "component_keyword.json"
 );
-const v1Phonetic = raw<Record<string, string[]>>("phonetic.json");
-const v1Furigana = raw<Record<string, WordPartDetail[]>>("vocab_furigana.json");
-const v1Meaning = raw<Record<string, string>>("vocab_meaning.json");
+const v1Phonetic = release<Record<string, string[]>>("phonetic.json");
+const v1Furigana = release<Record<string, WordPartDetail[]>>(
+  "vocab_furigana.json"
+);
+const v1Meaning = release<Record<string, string>>("vocab_meaning.json");
 const v1Radicals = raw<{
   radicalsGroupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
@@ -416,11 +422,11 @@ describe("pass-through files", () => {
     expect(v2("kanji_decomposition.json")).toEqual(
       raw("kanji_decomposition.json")
     );
-    expect(v2("similar_kanjis.json")).toEqual(raw("similar-kanjis.json"));
+    expect(v2("similar_kanjis.json")).toEqual(release("similar-kanjis.json"));
     expect(v2("kanji_reading_details.json")).toEqual(
       raw("kanji-readings-details.json")
     );
-    expect(v2("cum_use.json")).toEqual(raw("cum_use.json"));
+    expect(v2("cum_use.json")).toEqual(release("cum_use.json"));
   });
 });
 

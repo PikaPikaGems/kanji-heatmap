@@ -74,7 +74,12 @@ describe("round-trip over the real vocabulary corpus", () => {
   // the UI — so the whole corpus is the test case, not a sample of it.
   const furigana = JSON.parse(
     fs.readFileSync(
-      path.join(process.cwd(), "raw-data", "vocab_furigana.json"),
+      path.join(
+        process.cwd(),
+        "raw-data",
+        "kanji-heatmap-data",
+        "vocab_furigana.json"
+      ),
       "utf8"
     )
   ) as Record<string, WordPartDetail[]>;
