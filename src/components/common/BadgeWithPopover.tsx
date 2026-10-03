@@ -7,8 +7,8 @@ export const BadgeWithPopover = ({
   desc,
   icon,
 }: {
-  name: string;
-  desc?: string;
+  name: ReactNode;
+  desc?: ReactNode;
   icon?: ReactNode;
 }) => {
   if (desc == null) {

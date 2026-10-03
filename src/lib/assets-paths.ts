@@ -14,11 +14,11 @@ const assetsPaths = {
   REP_WORD_DETAILS_FILE: "/json/v2/rep_word_details.json",
   CUM_USE: "/json/v2/cum_use.json",
   KANJI_SVGS: `${ASSETS_BASE_URL}/kanji/`,
-  KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v4`, // Note: No slash at the end is intentional
-  TEXT_BOOK_VOCAB: `${ASSETS_BASE_URL}/kanji-textbook-words/v4`, // Note: No slash at the end is intentional
+  KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v6`, // Note: No slash at the end is intentional
+  TEXT_BOOK_VOCAB: `${ASSETS_BASE_URL}/kanji-textbook-words/v7`, // Note: No slash at the end is intentional
   dev: {
     KANJI_SVGS: "https://kanjivg.tagaini.net/kanjivg/kanji/",
-    KANJI_VOCAB: "/kanji-words/v4", // Note: No slash at the end is intentional
+    KANJI_VOCAB: "/kanji-words/v6", // Note: No slash at the end is intentional
     TEXT_BOOK_VOCAB: "/kanji-textbook-words-min", // Note: No slash at the end is intentional
   },
   KANJI_DECOMPOSITION: "/json/v2/kanji_decomposition.json",
