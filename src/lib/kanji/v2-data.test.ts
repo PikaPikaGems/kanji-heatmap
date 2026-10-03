@@ -3,6 +3,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { decodeFurigana, WordPartDetail } from "@/lib/furigana";
+import {
+  componentKeyword,
+  prepareRadicals,
+  radicalInfo as infoFor,
+  type RadicalsFile,
+} from "@/lib/radicals";
 
 /**
  * Parity tests for scripts/generate-v2-json.mjs.
@@ -92,9 +98,11 @@ const repDetails = v2<Record<string, [string, string]>>(
 );
 const vocab = v2<Record<string, [string, string]>>("vocab.json");
 const components = v2<Record<string, ComponentEntry>>("components.json");
-const radicalInfo = v2<{
-  info: Record<string, { ja: string; pos?: string; cn?: string }>;
-}>("radicals.json").info;
+const v2Radicals = prepareRadicals(v2<RadicalsFile>("radicals.json"));
+const radicalInfo = v2Radicals.info;
+const aliases = v2Radicals.aliases;
+// What the app shows: follow aliases to the glyph that holds the keyword.
+const keywordOf = (char: string) => componentKeyword(char, components, aliases);
 const structures = v2<
   Record<string, { hl?: unknown; ka?: unknown; sc?: unknown; ya?: unknown }>
 >("kanji_structures.json");
@@ -309,8 +317,10 @@ describe("components.json", () => {
   it("keeps component_keyword entries that sylhare did not replace", () => {
     for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
       if (main[char] != null) continue;
-      // Sylhare bushu names (the radicals with popover info) replace these.
+      // Sylhare bushu names (the radicals with popover info) replace these,
+      // and an alias's target name beats them.
       if (radicalInfo[char] != null) continue;
+      if (char in aliases) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });
@@ -336,7 +346,10 @@ describe("components.json", () => {
       pos: "へん",
       cn: "water",
     });
-    expect(radicalInfo["氵"]).toEqual(radicalInfo["⺡"]);
+    // Stored once on ⺡; 氵 reaches it through its alias.
+    expect(radicalInfo["氵"]).toBeUndefined();
+    expect(infoFor("氵", v2Radicals)).toEqual(radicalInfo["⺡"]);
+    expect(keywordOf("氵")).toBe("three water");
     expect(components["⻏"]?.k).toBe("large village");
     expect(components["⻖"]?.k).toBe("small hill left");
     expect(components["𠂉"]?.k).toBe("no plus one");
@@ -364,9 +377,9 @@ describe("components.json", () => {
   });
 
   it("fills a keywordless lookalike from its alias", () => {
-    expect(components["艹"]?.k).toBe("grass crown");
-    expect(components["⺾"]?.k).toBe("grass crown");
-    expect(components["艸"]?.k).toBe("grass crown");
+    expect(keywordOf("艹")).toBe("grass crown");
+    expect(keywordOf("⺾")).toBe("grass crown");
+    expect(keywordOf("艸")).toBe("grass crown");
   });
 
   it("keeps the pig-head radical family on one keyword", () => {
@@ -384,8 +397,10 @@ describe("components.json", () => {
   });
 
   it("does not duplicate kanji keywords that kanji_main already provides", () => {
+    // Kept only where an alias reads its radical name from the kanji (飠 → 食).
+    const aliasTargets = new Set(Object.values(aliases));
     for (const char of Object.keys(components)) {
-      if (main[char] != null) {
+      if (main[char] != null && !aliasTargets.has(char)) {
         expect(components[char].k, char).toBeUndefined();
       }
     }

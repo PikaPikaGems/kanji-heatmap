@@ -10,6 +10,7 @@ import {
   KanjiHoverInfo,
   KanjiMainInfo,
 } from "@/lib/kanji/kanji-worker-types";
+import { componentKeyword } from "@/lib/radicals";
 
 // Pure assembly of the per-kanji payloads behind the hover card and the
 // details "general" section. All data comes in as plain caches, so these
@@ -19,19 +20,22 @@ import {
 
 type MainInfoMap = Record<string, KanjiMainInfo>;
 
+type Aliases = Record<string, string>;
+
 /**
  * Keyword for a single component: a kanji's own keyword wins, otherwise the
- * component registry answers. `isKanji` drives whether the UI links to a kanji
- * page or a component page.
+ * component registry answers, following aliases (氵 → ⺡). `isKanji` drives
+ * whether the UI links to a kanji page or a component page.
  */
 const lookupPart = (
   part: string,
   mainInfoMap: MainInfoMap,
-  components: ComponentsMap
+  components: ComponentsMap,
+  aliases: Aliases
 ) => {
   const kanjiKeyword = mainInfoMap[part]?.keyword;
   return {
-    keyword: kanjiKeyword ?? components[part]?.k,
+    keyword: kanjiKeyword ?? componentKeyword(part, components, aliases),
     isKanji: kanjiKeyword != null,
   };
 };
@@ -40,7 +44,8 @@ export const extractKanjiHoverData = (
   main: KanjiMainInfo,
   hoverInfo: KanjiHoverInfo & VocabExtendedInfo,
   mainInfoMap: MainInfoMap,
-  components: ComponentsMap
+  components: ComponentsMap,
+  aliases: Aliases
 ) => {
   const getPhonetic = () => {
     const phoneticPart = hoverInfo.phonetic;
@@ -50,7 +55,7 @@ export const extractKanjiHoverData = (
     return {
       phonetic: phoneticPart,
       sound: components[phoneticPart]?.s,
-      ...lookupPart(phoneticPart, mainInfoMap, components),
+      ...lookupPart(phoneticPart, mainInfoMap, components, aliases),
     };
   };
 
@@ -61,7 +66,12 @@ export const extractKanjiHoverData = (
     const isKanjiCache: Record<string, boolean> = {};
 
     word.split("").forEach((part) => {
-      const { keyword, isKanji } = lookupPart(part, mainInfoMap, components);
+      const { keyword, isKanji } = lookupPart(
+        part,
+        mainInfoMap,
+        components,
+        aliases
+      );
       if (keyword) {
         partCache[part] = keyword;
         isKanjiCache[part] = isKanji;
@@ -94,7 +104,7 @@ export const extractKanjiHoverData = (
     },
     parts: hoverInfo.parts.map((part) => ({
       part,
-      ...lookupPart(part, mainInfoMap, components),
+      ...lookupPart(part, mainInfoMap, components, aliases),
     })),
     frequency: main.frequency,
     phonetic,

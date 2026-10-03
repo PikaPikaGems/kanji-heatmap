@@ -15,6 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
+import { followAlias } from "../src/lib/radicals.ts";
 import {
   buildBushuEntries,
   mergeSylhareBushuAliases,
@@ -284,7 +285,10 @@ const setKeyword = (char, keyword, source) => {
   keywordOrigin[char] = source;
 };
 
+// Release keywords rank last: an alias's target name beats them (氵 reads
+// "three water" from ⺡, not the release's "water drops").
 for (const [char, keyword] of Object.entries(componentKeywords)) {
+  if (char in allAliases) continue;
   setKeyword(char, keyword, "component_keyword.json");
 }
 
@@ -312,29 +316,9 @@ for (const [char, entry] of Object.entries(sylhareKeywords)) {
   radicalInfo[char] = info;
 }
 
-// Alias resolution: a lookalike inherits its target's keyword. Aliases may
-// chain (⺕ -> 彐 -> ヨ), so follow to the end of the chain. Targets that are
-// themselves kanji are left alone — the runtime already reads kanji keywords
-// from kanji_main, and copying them here would duplicate the data.
-// Stops at the first hop that actually has a keyword.
-const resolveAlias = (start) => {
-  const seen = [start];
-  let current = allAliases[start];
-
-  while (current != null) {
-    if (seen.includes(current)) {
-      fail(`components: alias cycle ${[...seen, current].join(" -> ")}`);
-      return null;
-    }
-    seen.push(current);
-
-    if (components[current]?.k != null || isKanji(current)) return current;
-    current = allAliases[current];
-  }
-
-  return seen[seen.length - 1] === start ? null : seen[seen.length - 1];
-};
-
+// Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
+// onto the alias: the app follows it (followAlias in src/lib/radicals.ts), so
+// every fact is stored once. Here we only check each alias leads somewhere.
 for (const [char, alias] of Object.entries(allAliases)) {
   if (alias !== alias.trim() || alias.length === 0) {
     fail(`components: alias for ${char} is not a clean value ("${alias}")`);
@@ -344,36 +328,33 @@ for (const [char, alias] of Object.entries(allAliases)) {
     fail(`components: ${char} aliases itself`);
     continue;
   }
-  if (keywordOrigin[char] === "sylhare") continue;
-
-  const target = resolveAlias(char);
-  if (target == null) continue;
-
-  if (components[target]?.k != null) {
-    components[char] = { ...components[char], k: components[target].k };
-    keywordOrigin[char] = `alias of ${target}`;
-    if (radicalInfo[target]) radicalInfo[char] = radicalInfo[target];
-  } else if (!isKanji(target)) {
-    fail(
-      `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
-    );
+  const target = followAlias(
+    char,
+    allAliases,
+    (g) => components[g]?.k != null || isKanji(g)
+  );
+  if (target == null) {
+    fail(`components: ${char} never reaches a keyword or a kanji`);
   }
 }
 
 // A keyword for a character that is itself a kanji is unreachable: every call
 // site reads kanji_main first and only falls back to the component registry.
-// Drop it so the keyword has exactly one home. Sounds and stroke counts stay —
-// kanji_main carries neither.
+// Drop it so the keyword has exactly one home — unless an alias points at the
+// kanji (飠 → 食), since the alias reads its radical name from there. Sounds
+// and stroke counts stay; kanji_main carries neither.
+const aliasTargets = new Set(Object.values(allAliases));
 let droppedKanjiKeywords = 0;
 for (const char of Object.keys(components)) {
   if (!isKanji(char) || components[char].k == null) continue;
+  if (aliasTargets.has(char)) continue;
   delete components[char].k;
   droppedKanjiKeywords += 1;
   if (Object.keys(components[char]).length === 0) delete components[char];
 }
-// Same for radical info: a kanji never opens the radical popover.
+// Same for radical info: a kanji never opens the radical popover itself.
 for (const char of Object.keys(radicalInfo)) {
-  if (isKanji(char)) delete radicalInfo[char];
+  if (isKanji(char) && !aliasTargets.has(char)) delete radicalInfo[char];
 }
 
 // Manual curation wins over everything the algorithm produced.
@@ -491,7 +472,10 @@ for (const list of Object.values(radicals.radicalsGroupedByStrokeCount)) {
 }
 
 const missing = [...references.entries()]
-  .filter(([char]) => components[char]?.k == null)
+  .filter(
+    ([char]) =>
+      followAlias(char, allAliases, (g) => components[g]?.k != null) == null
+  )
   .map(([char, entry]) => ({
     char,
     refs: entry.refs,

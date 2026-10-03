@@ -78,26 +78,61 @@ export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
 });
 
 /**
+ * Follow aliases from `char` (itself first) to the first glyph where `has` is
+ * true. Each fact is stored once, on the alias target, so every lookup goes
+ * through here: 氵 → ⺡ finds ⺡'s keyword. Alias tables can cycle (艹 ↔ ⺾),
+ * so a repeat ends the walk. Returns null if nothing on the way matches.
+ */
+export const followAlias = (
+  char: string,
+  aliases: Record<string, string>,
+  has: (glyph: string) => boolean
+): string | null => {
+  const seen = new Set<string>();
+  let current: string | undefined = char;
+  while (current != null && !seen.has(current)) {
+    if (has(current)) return current;
+    seen.add(current);
+    current = aliases[current];
+  }
+  return null;
+};
+
+/** Component keyword for a glyph, following aliases (氵 → "three water"). */
+export const componentKeyword = (
+  char: string,
+  components: Record<string, { k?: string }>,
+  aliases: Record<string, string>
+): string | undefined => {
+  const glyph = followAlias(char, aliases, (g) => components[g]?.k != null);
+  return glyph == null ? undefined : components[glyph].k;
+};
+
+/** Radical popover facts for a glyph, following aliases. */
+export const radicalInfo = (
+  char: string,
+  radicals: RadicalsRuntime | null | undefined
+): RadicalInfo | undefined => {
+  if (radicals == null) return undefined;
+  const glyph = followAlias(char, radicals.aliases, (g) => g in radicals.info);
+  return glyph == null ? undefined : radicals.info[glyph];
+};
+
+/**
  * Map a displayed component to the codepoint the radical drawer / decomposition
- * index actually uses. Alias tables can point at a prettier glyph (艸 → 艹) or
- * cycle (艹 ↔ ⺾); walk until we hit a selectable radical.
+ * index actually uses (艸 → 艹 → ⺾).
  */
 export const resolveRadicalForSearch = (
   radical: string,
   radicals: RadicalsRuntime | null | undefined
-): string => {
-  if (radicals == null) return radical;
-  const seen = new Set<string>();
-  let current = radical;
-  while (current && !seen.has(current)) {
-    seen.add(current);
-    if (current in radicals.strokeCountMap) return current;
-    const next = radicals.aliases[current];
-    if (!next) return current;
-    current = next;
-  }
-  return radical;
-};
+): string =>
+  radicals == null
+    ? radical
+    : (followAlias(
+        radical,
+        radicals.aliases,
+        (g) => g in radicals.strokeCountMap
+      ) ?? radical);
 
 /**
  * A radical is anything that leads to a drawer radical, directly or through

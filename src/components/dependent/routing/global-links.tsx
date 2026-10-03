@@ -8,7 +8,7 @@ import {
   useRadicals,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { Link } from "./router-adapter";
-import { resolveRadicalForSearch } from "@/lib/radicals";
+import { radicalInfo, resolveRadicalForSearch } from "@/lib/radicals";
 
 export const ComponentLink = ({
   component,
@@ -138,7 +138,7 @@ const POSITION_EN: Record<string, string> = {
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
   const radicals = useRadicals();
-  const info = radicals?.info[radical];
+  const info = radicalInfo(radical, radicals);
   const keyword = getKanjiInfo?.(radical)?.keyword;
   return (
     <div className="p-1" data-vaul-no-drag>
