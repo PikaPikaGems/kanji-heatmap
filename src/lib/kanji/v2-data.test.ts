@@ -48,9 +48,6 @@ const v1Extended = release<Record<string, V1ExtendedEntry>>(
 const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
-const sylhareKeywords = raw<Record<string, { k: string; desc: string }>>(
-  "radicals/sylhare-component-keywords.json"
-);
 const v1ComponentKeywords = release<Record<string, string>>(
   "component_keyword.json"
 );
@@ -63,9 +60,8 @@ const v1Radicals = {
   radicalsGroupedByStrokeCount: raw<Record<string, string[]>>(
     "radicals/external/rewhowe-drawer.json"
   ),
-  ...raw<{ aliases: Record<string, string> }>("radicals/aliases.json"),
+  ...raw<{ aliases: Record<string, string> }>("radicals/ours.json"),
 };
-const allAliases = v1Radicals.aliases;
 
 type V2MainEntry = [
   string,
@@ -310,9 +306,8 @@ describe("components.json", () => {
   it("keeps component_keyword entries that sylhare did not replace", () => {
     for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
       if (main[char] != null) continue;
-      if (sylhareKeywords[char] != null) continue;
-      const alias = allAliases[char];
-      if (alias && sylhareKeywords[alias] != null) continue;
+      // Sylhare bushu names (the entries with a desc) replace these.
+      if (components[char]?.desc != null) continue;
       expect(components[char]?.k, char).toBe(keyword);
     }
   });

@@ -15,7 +15,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
-import { mergeSylhareBushuAliases } from "./sylhare-bushu-aliases.mjs";
+import {
+  buildBushuEntries,
+  mergeSylhareBushuAliases,
+  readRadicalSources,
+} from "./radicals.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -48,25 +52,20 @@ const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
 const similarKanjis = readRelease("similar-kanjis.json");
 const readingDetails = readRaw("misc/kanji-readings-details.json");
 const cumUse = readRelease("cum_use.json");
-// Drawer grouping comes from rewhowe/kanji; aliases and skip/extra maps are ours.
-const radicals = {
-  radicalsGroupedByStrokeCount: readRaw(
-    "radicals/external/rewhowe-drawer.json"
-  ),
-  ...readRaw("radicals/aliases.json"),
-};
-const sylhareKeywords = readRaw("radicals/sylhare-component-keywords.json");
-const allAliases = { ...(radicals.aliases ?? {}) };
-const drawerRadicals = new Set(
-  Object.values(radicals.radicalsGroupedByStrokeCount ?? {}).flat()
-);
+// Drawer grouping comes from rewhowe/kanji; everything else radical-related
+// that we decided ourselves is in raw-data/radicals/ours.json.
+const { drawer, ours, sylhareRows } = readRadicalSources(RAW_DIR);
+const radicals = { radicalsGroupedByStrokeCount: drawer };
+const sylhareKeywords = buildBushuEntries({ sylhareRows, ours });
+const allAliases = { ...(ours.aliases ?? {}) };
+const drawerRadicals = new Set(Object.values(drawer).flat());
 mergeSylhareBushuAliases({
-  csvText: readRawText("radicals/external/sylhare-radicals.csv"),
+  sylhareRows,
   drawerRadicals,
   aliases: allAliases,
   isKanji: (char) => main[char] != null,
-  skipAlts: radicals.sylhareSkipAlts,
-  extraAliases: radicals.sylhareExtraAliases,
+  skipAlts: ours.sylhareSkipAlts,
+  extraAliases: ours.sylhareExtraAliases,
 });
 const manualOverrides = readRaw("components_manual_overrides.json");
 
@@ -306,7 +305,7 @@ for (const [strokes, list] of Object.entries(
 for (const [char, entry] of Object.entries(sylhareKeywords)) {
   if (entry?.k) {
     components[char] = { ...components[char], k: String(entry.k).trim() };
-    keywordOrigin[char] = "sylhare-component-keywords.json";
+    keywordOrigin[char] = "sylhare";
   }
   if (entry?.desc) {
     components[char] = {
@@ -348,7 +347,7 @@ for (const [char, alias] of Object.entries(allAliases)) {
     fail(`components: ${char} aliases itself`);
     continue;
   }
-  if (keywordOrigin[char] === "sylhare-component-keywords.json") continue;
+  if (keywordOrigin[char] === "sylhare") continue;
 
   const target = resolveAlias(char);
   if (target == null) continue;

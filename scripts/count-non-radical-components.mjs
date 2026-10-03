@@ -3,7 +3,7 @@
  *
  * Reads public/json/v2 (the same files the details tab uses). Positional
  * bushu forms such as 訁 are treated as their kanji/radical (言) via
- * sylhare alternates and raw-data/radicals/aliases.json, so they are dropped.
+ * sylhare alternates and raw-data/radicals/ours.json aliases, so they are dropped.
  *
  * Writes docs/data/non-radical-component-count.json.
  *
@@ -14,7 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { mergeSylhareBushuAliases } from "./sylhare-bushu-aliases.mjs";
+import { mergeSylhareBushuAliases, readRadicalSources } from "./radicals.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const V2 = path.join(ROOT, "public", "json", "v2");
@@ -27,7 +27,7 @@ const main = readJson(V2, "kanji_main.json");
 const hover = readJson(V2, "kanji_extended_hover.json");
 const structures = readJson(V2, "kanji_structures.json");
 const radicals = readJson(V2, "radicals.json");
-const rawRadicals = readJson(ROOT, "raw-data", "radicals", "aliases.json");
+const { ours, sylhareRows } = readRadicalSources(path.join(ROOT, "raw-data"));
 const components = readJson(V2, "components.json");
 
 const kanjiList = Object.keys(main);
@@ -38,15 +38,12 @@ const drawerRadicals = new Set(
 );
 const aliases = { ...(radicals.aliases ?? {}) };
 mergeSylhareBushuAliases({
-  csvText: fs.readFileSync(
-    path.join(ROOT, "raw-data", "radicals", "external", "sylhare-radicals.csv"),
-    "utf8"
-  ),
+  sylhareRows,
   drawerRadicals,
   aliases,
   isKanji,
-  skipAlts: rawRadicals.sylhareSkipAlts,
-  extraAliases: rawRadicals.sylhareExtraAliases,
+  skipAlts: ours.sylhareSkipAlts,
+  extraAliases: ours.sylhareExtraAliases,
 });
 
 const radicalOrKanji = new Set(drawerRadicals);

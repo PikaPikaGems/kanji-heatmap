@@ -20,8 +20,6 @@ regenerate with `pnpm run generate-json`.
 | `misc/katakana-kore.txt`           | Word list for the Speed Katakana game (`scripts/generate-speed-katakana.mjs`), from [Anki shared deck 1723626457](https://ankiweb.net/shared/info/1723626457)                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `components_manual_overrides.json` | Ours, hand-curated component keywords. See below                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
-`sylhareSkipAlts` (in `radicals/aliases.json`) blocks CSV Alternate → drawer aliases that are wrong (e.g. **⺈** is listed under 刀 but is the ク-crown in 魚). `sylhareExtraAliases` fills gaps after CSV (⺍ → ⺌, ⾡ → ⻌, 𧾷 → 足). Neither field is served.
-
 ## components_manual_overrides.json
 
 The component registry (`public/json/v2/components.json`) is built by merging
