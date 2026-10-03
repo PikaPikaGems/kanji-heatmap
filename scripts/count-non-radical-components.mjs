@@ -3,7 +3,7 @@
  *
  * Reads public/json/v2 (the same files the details tab uses). Positional
  * bushu forms such as 訁 are treated as their kanji/radical (言) via
- * sylhare alternates and radicals.json aliases, so they are dropped.
+ * sylhare alternates and raw-data/radicals/aliases.json, so they are dropped.
  *
  * Writes docs/data/non-radical-component-count.json.
  *
@@ -27,7 +27,7 @@ const main = readJson(V2, "kanji_main.json");
 const hover = readJson(V2, "kanji_extended_hover.json");
 const structures = readJson(V2, "kanji_structures.json");
 const radicals = readJson(V2, "radicals.json");
-const rawRadicals = readJson(ROOT, "raw-data", "radicals.json");
+const rawRadicals = readJson(ROOT, "raw-data", "radicals", "aliases.json");
 const components = readJson(V2, "components.json");
 
 const kanjiList = Object.keys(main);
@@ -39,7 +39,7 @@ const drawerRadicals = new Set(
 const aliases = { ...(radicals.aliases ?? {}) };
 mergeSylhareBushuAliases({
   csvText: fs.readFileSync(
-    path.join(ROOT, "raw-data", "sylhare", "kanji-radicals.csv"),
+    path.join(ROOT, "raw-data", "radicals", "external", "sylhare-radicals.csv"),
     "utf8"
   ),
   drawerRadicals,

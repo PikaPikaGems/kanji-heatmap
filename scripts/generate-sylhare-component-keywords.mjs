@@ -1,6 +1,6 @@
 /**
- * Builds raw-data/sylhare-component-keywords.json from
- * sylhare/kanji-radicals.csv + bushu-literal-en.json.
+ * Builds raw-data/radicals/sylhare-component-keywords.json from
+ * radicals/external/sylhare-radicals.csv + radicals/bushu-literal-en.json.
  *
  * Run via `pnpm run generate-json` (called first).
  */
@@ -10,7 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const RAW = path.join(ROOT, "raw-data");
+const RAW = path.join(ROOT, "raw-data", "radicals");
 const OUT = path.join(RAW, "sylhare-component-keywords.json");
 
 const isPua = (ch) => {
@@ -68,7 +68,7 @@ const literals = JSON.parse(
   fs.readFileSync(path.join(RAW, "bushu-literal-en.json"), "utf8")
 );
 const radicalsMeta = JSON.parse(
-  fs.readFileSync(path.join(RAW, "radicals.json"), "utf8")
+  fs.readFileSync(path.join(RAW, "aliases.json"), "utf8")
 );
 const skipAsAlternate = new Set([
   ...Object.keys(radicalsMeta.aliases ?? {}),
@@ -76,7 +76,7 @@ const skipAsAlternate = new Set([
 ]);
 
 const csvText = fs
-  .readFileSync(path.join(RAW, "sylhare", "kanji-radicals.csv"), "utf8")
+  .readFileSync(path.join(RAW, "external", "sylhare-radicals.csv"), "utf8")
   .replace(/^\uFEFF/, "");
 const table = parseCsv(csvText);
 const header = table[0];

@@ -9,18 +9,18 @@ regenerate with `pnpm run generate-json`.
 
 ## What lives here
 
-| Source                                                    | Where it comes from                                                                                                                                |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `kanji-heatmap-data/`                                     | The [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) release, copied in unchanged — see the README's "Updating kanji data" |
-| `kanji_decomposition.json`, `kanji-readings-details.json` | Source not recorded. Not produced by Kanji Heatmap Data                                                                                            |
-| `kanji-structure-*.json` (4 files)                        | Maintained in this repository                                                                                                                      |
-| `radicals.json`                                           | Drawer groupings, lookalike aliases, and Sylhare skip/extra maps. Only grouping + merged aliases go to `public/json/v2/radicals.json`.             |
-| `components_manual_overrides.json`                        | Hand-curated. See below                                                                                                                            |
-| `katakana-kore.txt`                                       | Word list for the Speed Katakana game (`scripts/generate-speed-katakana.mjs`)                                                                      |
-| `topokanji_index_twitter.txt`                             | [TopoKanji](https://github.com/scriptin/topokanji) Twitter list (`lists/twitter.txt`) — one character per line, 1-based index                      |
-| `jouyou_kanji.txt`                                        | Official jōyō list (2,136), one kanji per line. Only these get a school grade; everything else is "Not in Jouyou"                                  |
+| Source                             | Where it comes from                                                                                                                                |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kanji-heatmap-data/`              | The [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) release, copied in unchanged — see the README's "Updating kanji data" |
+| `kanji-readings-details.json`      | Source not recorded. Not produced by Kanji Heatmap Data                                                                                            |
+| `kanji-structure-*.json` (4 files) | Maintained in this repository                                                                                                                      |
+| `radicals/`                        | Everything radical-related, with sources — see `radicals/README.md`                                                                                |
+| `components_manual_overrides.json` | Hand-curated. See below                                                                                                                            |
+| `katakana-kore.txt`                | Word list for the Speed Katakana game (`scripts/generate-speed-katakana.mjs`)                                                                      |
+| `topokanji_index_twitter.txt`      | [TopoKanji](https://github.com/scriptin/topokanji) Twitter list (`lists/twitter.txt`) — one character per line, 1-based index                      |
+| `jouyou_kanji.txt`                 | Official jōyō list (2,136), one kanji per line. Only these get a school grade; everything else is "Not in Jouyou"                                  |
 
-`sylhareSkipAlts` blocks CSV Alternate → drawer aliases that are wrong (e.g. **⺈** is listed under 刀 but is the ク-crown in 魚). `sylhareExtraAliases` fills gaps after CSV (⺍ → ⺌, ⾡ → ⻌, 𧾷 → 足). Neither field is served.
+`sylhareSkipAlts` (in `radicals/aliases.json`) blocks CSV Alternate → drawer aliases that are wrong (e.g. **⺈** is listed under 刀 but is the ク-crown in 魚). `sylhareExtraAliases` fills gaps after CSV (⺍ → ⺌, ⾡ → ⻌, 𧾷 → 足). Neither field is served.
 
 ## components_manual_overrides.json
 

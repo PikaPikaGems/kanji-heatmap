@@ -1,8 +1,8 @@
 /**
  * Positional bushu forms (訁, 衤, ⺼, …) listed as Alternate in
- * sylhare/kanji-radicals.csv, mapped onto a drawer radical.
+ * raw-data/radicals/external/sylhare-radicals.csv, mapped onto a drawer radical.
  *
- * Skip / extra maps live on raw-data/radicals.json
+ * Skip / extra maps live on raw-data/radicals/aliases.json
  * (`sylhareSkipAlts`, `sylhareExtraAliases`). They are not copied into
  * public/json/v2/radicals.json.
  */

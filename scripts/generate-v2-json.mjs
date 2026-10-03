@@ -44,18 +44,24 @@ const componentKeywords = readRelease("component_keyword.json");
 const phonetic = readRelease("phonetic.json");
 const vocabFurigana = readRelease("vocab_furigana.json");
 const vocabMeaning = readRelease("vocab_meaning.json");
-const decomposition = readRaw("kanji_decomposition.json");
+const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
 const similarKanjis = readRelease("similar-kanjis.json");
 const readingDetails = readRaw("kanji-readings-details.json");
 const cumUse = readRelease("cum_use.json");
-const radicals = readRaw("radicals.json");
-const sylhareKeywords = readRaw("sylhare-component-keywords.json");
+// Drawer grouping comes from rewhowe/kanji; aliases and skip/extra maps are ours.
+const radicals = {
+  radicalsGroupedByStrokeCount: readRaw(
+    "radicals/external/rewhowe-drawer.json"
+  ),
+  ...readRaw("radicals/aliases.json"),
+};
+const sylhareKeywords = readRaw("radicals/sylhare-component-keywords.json");
 const allAliases = { ...(radicals.aliases ?? {}) };
 const drawerRadicals = new Set(
   Object.values(radicals.radicalsGroupedByStrokeCount ?? {}).flat()
 );
 mergeSylhareBushuAliases({
-  csvText: readRawText("sylhare/kanji-radicals.csv"),
+  csvText: readRawText("radicals/external/sylhare-radicals.csv"),
   drawerRadicals,
   aliases: allAliases,
   isKanji: (char) => main[char] != null,
@@ -253,7 +259,7 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 
 // ---------------------------------------------------------------------------
 // components.json — one registry replacing component_keyword.json,
-// phonetic.json and the keyword tables in raw-data/radicals.json.
+// phonetic.json and the keyword tables in raw-data/radicals/.
 //
 // Keywords are resolved through the lookalike-alias table at build time, so
 // the runtime never has to chase an alias or consult five sources.

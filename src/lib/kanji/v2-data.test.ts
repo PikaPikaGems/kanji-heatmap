@@ -49,7 +49,7 @@ const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
 const sylhareKeywords = raw<Record<string, { k: string; desc: string }>>(
-  "sylhare-component-keywords.json"
+  "radicals/sylhare-component-keywords.json"
 );
 const v1ComponentKeywords = release<Record<string, string>>(
   "component_keyword.json"
@@ -59,10 +59,12 @@ const v1Furigana = release<Record<string, WordPartDetail[]>>(
   "vocab_furigana.json"
 );
 const v1Meaning = release<Record<string, string>>("vocab_meaning.json");
-const v1Radicals = raw<{
-  radicalsGroupedByStrokeCount: Record<string, string[]>;
-  aliases: Record<string, string>;
-}>("radicals.json");
+const v1Radicals = {
+  radicalsGroupedByStrokeCount: raw<Record<string, string[]>>(
+    "radicals/external/rewhowe-drawer.json"
+  ),
+  ...raw<{ aliases: Record<string, string> }>("radicals/aliases.json"),
+};
 const allAliases = v1Radicals.aliases;
 
 type V2MainEntry = [
@@ -420,7 +422,7 @@ describe("kanji_structures.json", () => {
 describe("pass-through files", () => {
   it("are byte-identical in content to their v1 sources", () => {
     expect(v2("kanji_decomposition.json")).toEqual(
-      raw("kanji_decomposition.json")
+      raw("radicals/external/rewhowe-decomposition.json")
     );
     expect(v2("similar_kanjis.json")).toEqual(release("similar-kanjis.json"));
     expect(v2("kanji_reading_details.json")).toEqual(
