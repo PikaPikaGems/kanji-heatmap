@@ -3,7 +3,7 @@
     "一": "one",
     "丨": "vertical stick",
     "丶": "dot",
-    "丿": "no",
+    "丿": "katakana no",
     "乙": "otsu",
     "亅": "hook stick",
     "二": "two",
@@ -273,7 +273,7 @@
     "ユ": "katakana yu",
     "丷": "eight head",
     "｜": "vertical stick",
-    "ノ": "no",
+    "ノ": "katakana no",
     "ヨ": "pig head",
     "⺩": "king left"
   },
@@ -308,7 +308,8 @@
     "爫": "爪",
     "飠": "食",
     "𩙿": "食",
-    "⺩": "王"
+    "⺩": "王",
+    "𤣩": "⺩"
   },
   "sylhareSkipAlts": [
     "⺈",

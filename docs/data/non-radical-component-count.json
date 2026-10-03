@@ -3,9 +3,9 @@
     "selectedKanji": 2426,
     "selection": "all",
     "kind": "not-radical-not-kanji",
-    "components": 383,
+    "components": 382,
     "withKeyword": 24,
-    "withoutKeyword": 359,
+    "withoutKeyword": 358,
     "componentsWithKeyword": [
       {
         "cmp": "乂",
@@ -75,7 +75,7 @@
       {
         "cmp": "龶",
         "cnt": 5,
-        "kw": "growing"
+        "kw": "the blue crown"
       },
       {
         "cmp": "兀",
@@ -174,7 +174,7 @@
       },
       {
         "count": 3,
-        "components": 49
+        "components": 48
       },
       {
         "count": 2,
@@ -622,7 +622,7 @@
     {
       "char": "龶",
       "count": 5,
-      "keyword": "growing",
+      "keyword": "the blue crown",
       "exampleKanji": [
         "麦",
         "表",
@@ -1503,16 +1503,6 @@
         "栄",
         "営",
         "蛍"
-      ]
-    },
-    {
-      "char": "𤣩",
-      "count": 3,
-      "keyword": "",
-      "exampleKanji": [
-        "珍",
-        "瑠",
-        "璃"
       ]
     },
     {
