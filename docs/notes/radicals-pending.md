@@ -124,9 +124,10 @@ kanji containing it, at any depth). Finds things radical search can't
 ### 4. Review the radical translations
 
 `literalEn` in `raw-data/radicals/ours.json` is meant to be a **literal**
-translation of each Japanese radical name. Only the clearly wrong ones were
-fixed (火, 黄/⿈, 革, 示/⺭, 酉, 禸). The other ~270 were never reviewed one by
-one. Ones that look off:
+translation of each Japanese radical name. There are 276: the 214 classic
+radicals, 54 positional forms with their own name (⺅ にんべん, ⻏ おおざと, …)
+and 8 `extras`. Only the clearly wrong ones were fixed (火, 黄/⿈, 革, 示/⺭,
+酉, 禸); about 260 were never reviewed one by one. Ones that look off:
 
 | Glyph | Name       | Current           | Note                             |
 | ----- | ---------- | ----------------- | -------------------------------- |
