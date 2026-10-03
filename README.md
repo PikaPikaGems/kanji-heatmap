@@ -125,7 +125,8 @@ pnpm run generate-json
 ```
 
 `generate-json` reads `./raw-data` and writes `./public/json/v2` plus
-`docs/data/component-coverage.json`. It fails instead of writing if the data
+`docs/data/component-coverage.json` and
+`docs/data/non-radical-component-count.json`. It fails instead of writing if the data
 breaks an invariant (missing kanji, conflicting component keywords, furigana
 that does not round-trip, a sort field that is not a number).
 

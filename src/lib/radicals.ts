@@ -99,9 +99,14 @@ export const resolveRadicalForSearch = (
   return radical;
 };
 
+/**
+ * A radical is anything that leads to a drawer radical, directly or through
+ * aliases. An alias that never reaches the drawer (龺 → 𠦝) is just a
+ * component: it has no radical info and nothing to search for.
+ */
 export const isKnownRadical = (
   char: string,
   radicals: RadicalsRuntime | null | undefined
 ): boolean =>
   radicals != null &&
-  (char in radicals.strokeCountMap || char in radicals.aliases);
+  resolveRadicalForSearch(char, radicals) in radicals.strokeCountMap;

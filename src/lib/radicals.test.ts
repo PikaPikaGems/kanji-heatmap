@@ -81,6 +81,8 @@ describe("radicals.json (fetched at runtime)", () => {
     expect(isKnownRadical("艹", radicals)).toBe(true);
     expect(isKnownRadical("飠", radicals)).toBe(true);
     expect(isKnownRadical("猫", radicals)).toBe(false);
+    // Has an alias, but it never reaches a drawer radical.
+    expect(isKnownRadical("龺", radicals)).toBe(false);
   });
 
   it("resolves aliases onto a drawer radical", () => {
