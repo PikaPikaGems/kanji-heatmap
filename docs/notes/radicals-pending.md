@@ -203,7 +203,10 @@ right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
 "tripod kettle", 鹵 "chemical salt", 龠 "pan flute".
 
 Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana no",
-厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone".
+厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone". Radicals whose Japanese
+name is just a reading keep a meaning instead: 彡 "bristle right", 冂 "border
+enclosure", 凵 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook
+stick".
 
 ### 5. Before and after merging this work
 
