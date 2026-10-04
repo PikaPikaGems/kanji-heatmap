@@ -146,9 +146,8 @@ The user decides each rename. Kept on purpose: のまた "no + mata", るまた
 
 ### 5. Before and after merging this work
 
-- Run the end-to-end suite (`pnpm run test:e2e`). It was not run during the
-  cleanup; only unit tests and manual browser checks were.
-- Open a pull request for `claude/intelligent-babbage-buyv9k` and merge it.
+- Merge PikaPikaGems/kanji-heatmap#301 (`claude/intelligent-babbage-buyv9k`).
+  CI, including the end-to-end suite, passed on it.
 - The remote `radicals-cleanup` branch is then obsolete. Four of its files
   were imported into `raw-data/radicals/external/` and `raw-data/misc/`. Left
   out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
