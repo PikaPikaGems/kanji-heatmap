@@ -25,30 +25,48 @@ export const splitList = (value?: string) =>
     .filter((part) => part.length > 0 && part !== "-");
 
 // Word-list tags in display priority order (first = shown first).
-export const BOOK_TAGS: { id: string; label: string; jlpt?: JLTPTtypes }[] = [
+// Tags in the same `series` are levels of one list; lower `level` = more basic.
+export const BOOK_TAGS: {
+  id: string;
+  label: string;
+  jlpt?: JLTPTtypes;
+  series?: string;
+  level?: number;
+}[] = [
   { id: "genki", label: "📔 Genki" },
-  { id: "minna1", label: "📕 Minna 1" },
-  { id: "minna2", label: "📗 Minna 2" },
+  { id: "minna1", label: "📕 Minna 1", series: "minna", level: 1 },
+  { id: "minna2", label: "📗 Minna 2", series: "minna", level: 2 },
   { id: "quartet", label: "📘 Quartet" },
   { id: "tobira", label: "📒 Tobira" },
-  { id: "shin1", label: "Shin N1", jlpt: "n1" },
-  { id: "klvl1", label: "🌑 K Lvl 1" },
-  { id: "shin2", label: "Shin N2", jlpt: "n2" },
-  { id: "klvl2", label: "🌒 K Lvl 2" },
-  { id: "shin3", label: "Shin N3", jlpt: "n3" },
-  { id: "klvl3", label: "🌓 K Lvl 3" },
-  { id: "shin4", label: "Shin N4", jlpt: "n4" },
-  { id: "klvl4", label: "🌔 K Lvl 4" },
-  { id: "klvl5", label: "🌕 K Lvl 5" },
-  { id: "core1", label: "🥚 Core 1" },
-  { id: "core2", label: "🐣 Core 2" },
-  { id: "core3", label: "🐥 Core 3" },
+  { id: "shin1", label: "Shin N1", jlpt: "n1", series: "shin", level: 4 },
+  { id: "klvl1", label: "🌑 K Lvl 1", series: "klvl", level: 1 },
+  { id: "shin2", label: "Shin N2", jlpt: "n2", series: "shin", level: 3 },
+  { id: "klvl2", label: "🌒 K Lvl 2", series: "klvl", level: 2 },
+  { id: "shin3", label: "Shin N3", jlpt: "n3", series: "shin", level: 2 },
+  { id: "klvl3", label: "🌓 K Lvl 3", series: "klvl", level: 3 },
+  { id: "shin4", label: "Shin N4", jlpt: "n4", series: "shin", level: 1 },
+  { id: "klvl4", label: "🌔 K Lvl 4", series: "klvl", level: 4 },
+  { id: "klvl5", label: "🌕 K Lvl 5", series: "klvl", level: 5 },
+  { id: "core1", label: "🥚 Core 1", series: "core", level: 1 },
+  { id: "core2", label: "🐣 Core 2", series: "core", level: 2 },
+  { id: "core3", label: "🐥 Core 3", series: "core", level: 3 },
 ];
 
-/** Known word-list tags of an entry, sorted by BOOK_TAGS priority; unknown tags are dropped. */
+/**
+ * Known word-list tags of an entry, sorted by BOOK_TAGS priority; unknown tags
+ * are dropped, and only the most basic level of each series is kept.
+ */
 export const getBookTags = (entry: CommonWordEntry) => {
-  const tags = new Set(splitList(entry.o));
-  return BOOK_TAGS.filter((tag) => tags.has(tag.id));
+  const ids = new Set(splitList(entry.o));
+  const tags = BOOK_TAGS.filter((tag) => ids.has(tag.id));
+  return tags.filter(
+    (tag) =>
+      tag.series == null ||
+      !tags.some(
+        (other) =>
+          other.series === tag.series && (other.level ?? 0) < (tag.level ?? 0)
+      )
+  );
 };
 
 export const FreqCategoryMap: Record<string, string> = {
