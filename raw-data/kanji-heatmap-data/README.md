@@ -38,3 +38,7 @@ now; the user will handle them later.
   into the release's `overrides/component_keyword.json`.
 - **金 keyword.** The user may rename 金 "gold" to "gold metal". 釒 follows it
   automatically once the new release is copied in.
+- **Sound parts.** This repo will merge the release's `phonetic.json` and
+  per-kanji `phonetic` field with
+  `raw-data/radicals/external/anki-phonetic-components.tsv` in its own build.
+  The merged data should move into Kanji Heatmap Data later.

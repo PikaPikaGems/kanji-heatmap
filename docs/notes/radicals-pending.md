@@ -61,6 +61,19 @@ if it leads to a drawer radical (`isKnownRadical`).
 
 ### 1. Sound info feature
 
+Split in two (user, October 2026):
+
+- **1A — sound part coverage (next).** Merge the release's sound parts with
+  the Anki deck in this repo's build and write the result to
+  `public/json/v2/`. The Anki deck adds about 50 families (加, 果, 門, 共,
+  兆, 羊, …) and roughly 100 kanji gain a sound part. Moving the merged data
+  to Kanji Heatmap Data later is listed under "Pending" in
+  `raw-data/kanji-heatmap-data/README.md`.
+- **1B — sound examples in the radical popover.** Part of item 2 (radical
+  popover extras).
+
+Original notes:
+
 Show sound families with **real words**, not bare kanji:
 
 ```
