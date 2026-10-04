@@ -106,7 +106,7 @@ purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 | 亅            | 28 kanji    | はねぼう       | hook stick          | はね = the upward flick at the end of a stroke. "flick stick" would be more literal                  |          |
 | ⺣ (灬)       | 27 kanji    | れっか         | lined fire          |                                                                                                      |          |
 | 广            | 26 kanji    | まだれ         | ma hanging          |                                                                                                      |          |
-| 卩 (㔾)       | 24 kanji    | ふしづくり     | seal right          | ふし = joint (節), not seal. Suggest "joint right"                                                   |          |
+| 卩 (㔾)       | 24 kanji    | ふしづくり     | seal right          | Renamed to "joint right"                                                                             |          |
 | 艮            | 22 kanji    | こん           | stopping            | Decided October 2026                                                                                 |          |
 | 彳            | 21 kanji    | ぎょうにんべん | going person left   |                                                                                                      |          |
 | 罒 (网 ⺲)    | 21 kanji    | あみがしら     | net head            |                                                                                                      |          |
@@ -140,13 +140,13 @@ purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 | 韋            | 6 kanji     | なめしがわ     | tanned leather      |                                                                                                      |          |
 | 舛            | 6 kanji     | まいあし       | dancing legs        |                                                                                                      |          |
 | 耂 (⺹)       | 5 kanji     | おいかんむり   | old crown           |                                                                                                      |          |
-| 弋            | 5 kanji     | いぐるみ       | javelin             | いぐるみ = an arrow with a cord tied on, for hunting birds. Suggest "corded arrow"                   |          |
+| 弋            | 5 kanji     | いぐるみ       | javelin             | Renamed to "corded arrow"                                                                            |          |
 | 匸            | 5 kanji     | かくしがまえ   | hide enclosure      |                                                                                                      |          |
 | 爿 (丬)       | 5 kanji     | しょうへん     | split wood left     | しょう is a reading; "split wood" is the meaning                                                     |          |
 | ⻊            | 5 kanji     | あしへん       | foot left           |                                                                                                      |          |
 | 毋            | 4 kanji     | なかれ         | do not              |                                                                                                      |          |
 | 廴            | 4 kanji     | えんにょう     | stretch wrap        |                                                                                                      |          |
-| 隶            | 4 kanji     | れいづくり     | capture right       | れい = 隷 (servant). Suggest "servant right"                                                         |          |
+| 隶            | 4 kanji     | れいづくり     | capture right       | Renamed to "servant right"                                                                           |          |
 | 尢 (尤)       | 4 kanji     | だいのまげあし | big bent legs       |                                                                                                      |          |
 | 而            | 4 kanji     | しこうして     | and then            |                                                                                                      |          |
 | 癶            | 3 kanji     | はつがしら     | departure head      |                                                                                                      |          |
