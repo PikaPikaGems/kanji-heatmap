@@ -15,7 +15,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
-import { mergeSylhareBushuAliases } from "./sylhare-bushu-aliases.mjs";
+import { followAlias } from "../src/lib/radicals.ts";
+import {
+  buildBushuEntries,
+  mergeSylhareBushuAliases,
+  readRadicalSources,
+} from "./radicals.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -27,6 +32,9 @@ const readRaw = (name) =>
 
 const readRawText = (name) => fs.readFileSync(path.join(RAW_DIR, name), "utf8");
 
+// Kanji Heatmap Data release files live in their own folder, untouched.
+const readRelease = (name) => readRaw(path.join("kanji-heatmap-data", name));
+
 const problems = [];
 const fail = (message) => problems.push(message);
 
@@ -34,49 +42,67 @@ const fail = (message) => problems.push(message);
 // Inputs
 // ---------------------------------------------------------------------------
 
-const main = readRaw("kanji_main.json");
-const extended = readRaw("kanji_extended.json");
-const repWords = readRaw("kanji_representative_words.json");
-const componentKeywords = readRaw("component_keyword.json");
-const phonetic = readRaw("phonetic.json");
-const vocabFurigana = readRaw("vocab_furigana.json");
-const vocabMeaning = readRaw("vocab_meaning.json");
-const decomposition = readRaw("kanji_decomposition.json");
-const similarKanjis = readRaw("similar-kanjis.json");
-const readingDetails = readRaw("kanji-readings-details.json");
-const cumUse = readRaw("cum_use.json");
-const radicals = readRaw("radicals.json");
-const sylhareKeywords = readRaw("sylhare-component-keywords.json");
-const allAliases = { ...(radicals.aliases ?? {}) };
-const drawerRadicals = new Set(
-  Object.values(radicals.radicalsGroupedByStrokeCount ?? {}).flat()
-);
+const main = readRelease("kanji_main.json");
+const extended = readRelease("kanji_extended.json");
+const repWords = readRelease("kanji_representative_words.json");
+const phonetic = readRelease("phonetic.json");
+const vocabFurigana = readRelease("vocab_furigana.json");
+const vocabMeaning = readRelease("vocab_meaning.json");
+const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
+const similarKanjis = readRelease("similar-kanjis.json");
+const readingDetails = readRaw("misc/kanji-readings-details.json");
+const cumUse = readRelease("cum_use.json");
+// Drawer grouping comes from rewhowe/kanji; everything else radical-related
+// that we decided ourselves is in raw-data/radicals/ours.json.
+const { drawer, ours, sylhareRows } = readRadicalSources(RAW_DIR);
+const radicals = { radicalsGroupedByStrokeCount: drawer };
+const sylhareKeywords = buildBushuEntries({ sylhareRows, ours });
+const allAliases = { ...(ours.aliases ?? {}) };
+const drawerRadicals = new Set(Object.values(drawer).flat());
 mergeSylhareBushuAliases({
-  csvText: readRawText("sylhare/kanji-radicals.csv"),
+  sylhareRows,
   drawerRadicals,
   aliases: allAliases,
   isKanji: (char) => main[char] != null,
-  skipAlts: radicals.sylhareSkipAlts,
-  extraAliases: radicals.sylhareExtraAliases,
+  skipAlts: ours.sylhareSkipAlts,
+  extraAliases: ours.sylhareExtraAliases,
 });
-const manualOverrides = readRaw("components_manual_overrides.json");
+const manualOverrides = readRaw("components/ours.json");
 
 const structureSources = {
-  hl: readRaw("kanji-structure-hlorenzi.json"),
-  ka: readRaw("kanji-structure-kanjium.json"),
-  sc: readRaw("kanji-structure-scott.json"),
-  ya: readRaw("kanji-structure-yagays.json"),
+  hl: readRaw("kanji-structure/hlorenzi.json"),
+  ka: readRaw("kanji-structure/kanjium.json"),
+  sc: readRaw("kanji-structure/scott.json"),
+  ya: readRaw("kanji-structure/yagays.json"),
 };
 
 const kanjiList = Object.keys(main);
 const isKanji = (char) => main[char] != null;
+
+// Official jōyō list, one kanji per line. kanji_extended tags ~280 name kanji
+// (伊, 彦, 智, …) as grade 9, so the list decides who gets a grade at all.
+// The list uses the official 剝; we store the common form 剥.
+const JOUYOU_FORMS = { 剝: "剥" };
+const jouyou = new Set(
+  readRawText("misc/jouyou_kanji.txt")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((char) => JOUYOU_FORMS[char] ?? char)
+);
+if (jouyou.size !== 2136) {
+  fail(`jouyou_kanji.txt: expected 2136 kanji, got ${jouyou.size}`);
+}
+for (const char of jouyou) {
+  if (!isKanji(char)) fail(`jouyou_kanji.txt: ${char} is not in kanji_main`);
+}
 
 // TopoKanji Twitter: one character per line, 1-based index. Radicals that
 // are not in kanji_main are skipped for storage but do not compact later
 // indexes, so a kanji's number matches the published list.
 const topoTwitterIndex = new Map();
 {
-  const lines = readRawText("topokanji_index_twitter.txt")
+  const lines = readRawText("misc/topokanji_index_twitter.txt")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
@@ -136,6 +162,16 @@ const numberAt = (kanji, field) => {
   return value;
 };
 
+const JOUYOU_GRADES = new Set([1, 2, 3, 4, 5, 6, 9]);
+const jouyouGradeOf = (kanji) => {
+  const grade = numberAt(kanji, "jouyouGrade");
+  if (!jouyou.has(kanji)) return -1;
+  if (!JOUYOU_GRADES.has(grade)) {
+    fail(`kanji_main: jōyō kanji ${kanji} has grade ${grade}`);
+  }
+  return grade;
+};
+
 const outMain = {};
 for (const kanji of kanjiList) {
   const [keyword, on, kun, jlptRaw, freq] = main[kanji];
@@ -153,7 +189,7 @@ for (const kanji of kanjiList) {
     jlptRaw,
     freq,
     numberAt(kanji, "strokes"),
-    numberAt(kanji, "jouyouGrade"),
+    jouyouGradeOf(kanji),
     numberAt(kanji, "wk"),
     numberAt(kanji, "kklcIndex"),
     numberAt(kanji, "rtk"),
@@ -221,36 +257,15 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 }
 
 // ---------------------------------------------------------------------------
-// components.json — one registry replacing component_keyword.json,
-// phonetic.json and the keyword tables in raw-data/radicals.json.
+// components.json — keyword, sounds and stroke count per component.
 //
-// Keywords are resolved through the lookalike-alias table at build time, so
-// the runtime never has to chase an alias or consult five sources.
+// Keyword priority (first wins): raw-data/components/ours.json, then the
+// radical name, then the alias target's keyword (followed in the app).
+// The release's component_keyword.json is not read; the keywords we kept
+// from it live in components/ours.json.
 // ---------------------------------------------------------------------------
 
 const components = {};
-const keywordOrigin = {};
-
-const setKeyword = (char, keyword, source) => {
-  if (keyword == null || keyword.trim().length === 0) return;
-  const trimmed = keyword.trim();
-  const existing = components[char]?.k;
-
-  if (existing != null && existing.toLowerCase() !== trimmed.toLowerCase()) {
-    fail(
-      `components: conflicting keywords for ${char} — ` +
-        `"${existing}" (${keywordOrigin[char]}) vs "${trimmed}" (${source})`
-    );
-    return;
-  }
-
-  components[char] = { ...components[char], k: trimmed };
-  keywordOrigin[char] = source;
-};
-
-for (const [char, keyword] of Object.entries(componentKeywords)) {
-  setKeyword(char, keyword, "component_keyword.json");
-}
 
 for (const [char, sounds] of Object.entries(phonetic)) {
   if (!Array.isArray(sounds) || sounds.length === 0) continue;
@@ -266,42 +281,42 @@ for (const [strokes, list] of Object.entries(
 }
 
 // Sylhare bushu names win over the older Heisig/ad-hoc keyword tables.
+// The keyword goes to components.json; the rest of the bushu entry (Japanese
+// name, position, meaning) goes to radicals.json as `info`.
+const radicalInfo = {};
 for (const [char, entry] of Object.entries(sylhareKeywords)) {
-  if (entry?.k) {
-    components[char] = { ...components[char], k: String(entry.k).trim() };
-    keywordOrigin[char] = "sylhare-component-keywords.json";
-  }
-  if (entry?.desc) {
-    components[char] = {
-      ...components[char],
-      desc: String(entry.desc).trim(),
-    };
-  }
+  const { k, ...info } = entry;
+  components[char] = { ...components[char], k };
+  radicalInfo[char] = info;
 }
 
-// Alias resolution: a lookalike inherits its target's keyword. Aliases may
-// chain (⺕ -> 彐 -> ヨ), so follow to the end of the chain. Targets that are
-// themselves kanji are left alone — the runtime already reads kanji keywords
-// from kanji_main, and copying them here would duplicate the data.
-// Stops at the first hop that actually has a keyword.
-const resolveAlias = (start) => {
-  const seen = [start];
-  let current = allAliases[start];
+// A keyword for a character that is itself a kanji is unreachable: every call
+// site reads kanji_main first and only falls back to the component registry.
+// Drop it so the keyword has exactly one home — unless an alias points at the
+// kanji (飠 → 食), since the alias reads its radical name from there. Sounds
+// and stroke counts stay; kanji_main carries neither.
+const aliasTargets = new Set(Object.values(allAliases));
+let droppedKanjiKeywords = 0;
+for (const char of Object.keys(components)) {
+  if (!isKanji(char) || components[char].k == null) continue;
+  if (aliasTargets.has(char)) continue;
+  delete components[char].k;
+  droppedKanjiKeywords += 1;
+  if (Object.keys(components[char]).length === 0) delete components[char];
+}
+// Same for radical info: a kanji never opens the radical popover itself.
+for (const char of Object.keys(radicalInfo)) {
+  if (isKanji(char) && !aliasTargets.has(char)) delete radicalInfo[char];
+}
 
-  while (current != null) {
-    if (seen.includes(current)) {
-      fail(`components: alias cycle ${[...seen, current].join(" -> ")}`);
-      return null;
-    }
-    seen.push(current);
+// Manual curation wins over everything the algorithm produced.
+for (const [char, entry] of Object.entries(manualOverrides)) {
+  components[char] = { ...components[char], ...entry };
+}
 
-    if (components[current]?.k != null || isKanji(current)) return current;
-    current = allAliases[current];
-  }
-
-  return seen[seen.length - 1] === start ? null : seen[seen.length - 1];
-};
-
+// Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
+// onto the alias: the app follows it (followAlias in src/lib/radicals.ts), so
+// every fact is stored once. Here we only check each alias leads somewhere.
 for (const [char, alias] of Object.entries(allAliases)) {
   if (alias !== alias.trim() || alias.length === 0) {
     fail(`components: alias for ${char} is not a clean value ("${alias}")`);
@@ -311,79 +326,28 @@ for (const [char, alias] of Object.entries(allAliases)) {
     fail(`components: ${char} aliases itself`);
     continue;
   }
-  if (keywordOrigin[char] === "sylhare-component-keywords.json") continue;
-
-  const target = resolveAlias(char);
-  if (target == null) continue;
-
-  if (components[target]?.k != null) {
-    components[char] = { ...components[char], k: components[target].k };
-    keywordOrigin[char] = `alias of ${target}`;
-    if (components[target].desc) {
-      components[char] = {
-        ...components[char],
-        desc: components[target].desc,
-      };
-    }
-  } else if (!isKanji(target)) {
-    fail(
-      `components: ${char} resolves to ${target}, which has no keyword and is not a kanji`
-    );
+  const target = followAlias(
+    char,
+    allAliases,
+    (g) => components[g]?.k != null || isKanji(g)
+  );
+  if (target == null) {
+    fail(`components: ${char} never reaches a keyword or a kanji`);
   }
 }
 
-// A keyword for a character that is itself a kanji is unreachable: every call
-// site reads kanji_main first and only falls back to the component registry.
-// Drop it so the keyword has exactly one home. Sounds and stroke counts stay —
-// kanji_main carries neither.
-let droppedKanjiKeywords = 0;
-for (const char of Object.keys(components)) {
-  if (!isKanji(char) || components[char].k == null) continue;
-  delete components[char].k;
-  delete components[char].desc;
-  droppedKanjiKeywords += 1;
-  if (Object.keys(components[char]).length === 0) delete components[char];
-}
-
-// Manual curation wins over everything the algorithm produced.
-for (const [char, entry] of Object.entries(manualOverrides)) {
-  components[char] = { ...components[char], ...entry };
-  if (entry.k != null) keywordOrigin[char] = "components_manual_overrides.json";
-}
-
-const parent = {};
-const find = (ch) => {
-  if (parent[ch] == null) parent[ch] = ch;
-  if (parent[ch] !== ch) parent[ch] = find(parent[ch]);
-  return parent[ch];
-};
-for (const [from, to] of Object.entries(allAliases)) {
-  const a = find(from);
-  const b = find(to);
-  if (a !== b) parent[a] = b;
-}
-for (const [char, entry] of Object.entries(sylhareKeywords)) {
-  if (entry?.k == null) continue;
-  const key = `k:${String(entry.k).trim().toLowerCase()}`;
-  const a = find(char);
-  const b = find(key);
-  if (a !== b) parent[a] = b;
-}
-
+// A keyword we typed must not clash with another component's keyword.
+// Radical names may repeat on purpose (an alternate form shares its row).
 const charsByKeyword = {};
 for (const [char, entry] of Object.entries(components)) {
-  if (entry?.k == null) continue;
-  const kw = String(entry.k).trim().toLowerCase();
-  if (!kw) continue;
-  (charsByKeyword[kw] ??= []).push(char);
+  if (entry.k == null) continue;
+  (charsByKeyword[entry.k.trim().toLowerCase()] ??= []).push(char);
 }
-
-for (const [kw, chars] of Object.entries(charsByKeyword)) {
-  const roots = new Set(chars.map((ch) => find(ch)));
-  if (roots.size > 1) {
-    fail(
-      `components: keyword "${kw}" is shared by unrelated glyphs ${chars.join(" ")}`
-    );
+for (const [char, entry] of Object.entries(manualOverrides)) {
+  if (entry.k == null) continue;
+  const chars = charsByKeyword[entry.k.trim().toLowerCase()];
+  if (chars.length > 1) {
+    fail(`components: "${entry.k}" (${char}) is shared by ${chars.join(" ")}`);
   }
 }
 
@@ -408,7 +372,7 @@ for (const kanji of structureKanji) {
 // ---------------------------------------------------------------------------
 // Coverage report: every component referenced anywhere that still has no
 // keyword, ordered by how often it is referenced. This is the worklist for
-// raw-data/components_manual_overrides.json.
+// raw-data/components/ours.json.
 // ---------------------------------------------------------------------------
 
 const references = new Map();
@@ -460,7 +424,10 @@ for (const list of Object.values(radicals.radicalsGroupedByStrokeCount)) {
 }
 
 const missing = [...references.entries()]
-  .filter(([char]) => components[char]?.k == null)
+  .filter(
+    ([char]) =>
+      followAlias(char, allAliases, (g) => components[g]?.k != null) == null
+  )
   .map(([char, entry]) => ({
     char,
     refs: entry.refs,
@@ -557,6 +524,7 @@ write("components.json", components);
 write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
+  info: radicalInfo,
 });
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.

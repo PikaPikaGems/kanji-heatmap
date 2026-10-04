@@ -1,8 +1,8 @@
 {
   "summary": {
     "referenced": 540,
-    "withKeyword": 181,
-    "missing": 359
+    "withKeyword": 182,
+    "missing": 358
   },
   "missing": [
     {
@@ -1405,13 +1405,6 @@
       "refs": 3,
       "sources": [
         "hl"
-      ]
-    },
-    {
-      "char": "𤣩",
-      "refs": 3,
-      "sources": [
-        "sc"
       ]
     },
     {

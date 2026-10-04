@@ -1,6 +1,6 @@
 /**
  * Downloads stroke-order SVGs for the ~2426 kanji in
- * raw-data/filtered_kanji.json and writes them to public/svg/, so the
+ * raw-data/kanji-heatmap-data/filtered_kanji.json and writes them to public/svg/, so the
  * app can serve them same-origin instead of hitting assets.pikapikagems.com
  * for every kanji drawer view. Kanji outside this set (e.g. 唸) still
  * lazy-load from the CDN at runtime — see src/lib/kanji-svg-url.ts.
@@ -53,7 +53,10 @@ function kanjiSvgCode(kanji) {
 }
 
 const kanjiList = JSON.parse(
-  readFileSync(resolve(root, "raw-data/filtered_kanji.json"), "utf-8")
+  readFileSync(
+    resolve(root, "raw-data/kanji-heatmap-data/filtered_kanji.json"),
+    "utf-8"
+  )
 );
 
 const outDir = resolve(root, "public/svg");

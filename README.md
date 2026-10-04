@@ -71,13 +71,13 @@ Configure the visualizer settings in `vite.config.ts` if you want.
 ## Updating kanji data
 
 Upstream data is an **input**, not something the app serves directly: it goes
-into `./raw-data`, and `scripts/generate-v2-json.mjs` turns it into the files
+into `./raw-data/kanji-heatmap-data`, and `scripts/generate-v2-json.mjs` turns it into the files
 the app fetches from `./public/json/v2`. See `raw-data/README.md`.
 
 If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same parent directory, you can copy its output files directly:
 
 ```bash
-cp ../kanji-heatmap-data/output/*.json ./raw-data
+cp ../kanji-heatmap-data/output/*.json ./raw-data/kanji-heatmap-data
 ```
 
 Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) repository:
@@ -86,16 +86,16 @@ Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/Pika
 curl -OL https://github.com/PikaPikaGems/kanji-heatmap-data/releases/latest/download/kanji-heatmap-data.tar.gz
 ```
 
-Uncompress and store the JSON files in `./raw-data`:
+Uncompress and store the JSON files in `./raw-data/kanji-heatmap-data`:
 
 ```bash
-tar -xzf ./kanji-heatmap-data.tar.gz -C ./raw-data/
+tar -xzf ./kanji-heatmap-data.tar.gz -C ./raw-data/kanji-heatmap-data/
 ```
 
 You should have the following files updated (among others from the release):
 
 ```bash
-ls -la raw-data
+ls -la raw-data/kanji-heatmap-data
 ```
 
 ```text
@@ -125,7 +125,8 @@ pnpm run generate-json
 ```
 
 `generate-json` reads `./raw-data` and writes `./public/json/v2` plus
-`docs/data/component-coverage.json`. It fails instead of writing if the data
+`docs/data/component-coverage.json` and
+`docs/data/non-radical-component-count.json`. It fails instead of writing if the data
 breaks an invariant (missing kanji, conflicting component keywords, furigana
 that does not round-trip, a sort field that is not a number).
 
@@ -151,7 +152,7 @@ entry count of every generated file.
 node scripts/generate-speed-katakana.mjs && tsc -b && vite build
 ```
 
-The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/katakana-kore.txt` (48 words per set, ordered by frequency).
+The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/misc/katakana-kore.txt` (48 words per set, ordered by frequency).
 
 #### Other required data
 
@@ -170,7 +171,7 @@ populate the two directories.
 
 #### Kanji stroke-order SVGs
 
-Stroke-order SVGs for the kanji in `raw-data/filtered_kanji.json` (the
+Stroke-order SVGs for the kanji in `raw-data/kanji-heatmap-data/filtered_kanji.json` (the
 ~2426-kanji core set) are committed under `public/svg/` and served
 same-origin,
 Kanji outside that set (e.g. 唸) still lazy-load from a CDN cloudstorage on demand; see `src/lib/kanji-svg-url.ts` for the local-first/CDN-fallback lookup.

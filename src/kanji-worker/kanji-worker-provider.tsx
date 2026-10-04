@@ -9,6 +9,7 @@ import {
   IsReadyContext,
   RadicalsContext,
 } from "./kanji-worker-hooks";
+import { componentKeyword } from "@/lib/radicals";
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
@@ -68,14 +69,12 @@ export function KanjiWorkerProvider({
       return main;
     }
 
-    const component =
-      snapshot.componentsMap[kanji] ??
-      snapshot.componentsMap[snapshot.radicals.aliases[kanji]];
-    if (component?.k) {
-      return { keyword: component.k, desc: component.desc };
-    }
-
-    return null;
+    const keyword = componentKeyword(
+      kanji,
+      snapshot.componentsMap,
+      snapshot.radicals.aliases
+    );
+    return keyword ? { keyword } : null;
   }, []);
 
   if (workerError) {

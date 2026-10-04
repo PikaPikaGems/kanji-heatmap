@@ -39,6 +39,9 @@ const rawGeneral = readV2<GeneralInfoResponseType>(
 );
 const rawHover = readV2<HoverInfoResponseType>("kanji_extended_hover.json");
 const components = readV2<ComponentsMap>("components.json");
+const { aliases } = readV2<{ aliases: Record<string, string> }>(
+  "radicals.json"
+);
 const rawVocab = readV2<VocabResponseType>("vocab.json");
 
 const mainInfoMap: Record<string, KanjiMainInfo> = {};
@@ -74,7 +77,8 @@ const hoverDataFor = (kanji: string) => {
     mainInfoMap[kanji],
     withVocab,
     mainInfoMap,
-    components
+    components,
+    aliases
   );
 };
 

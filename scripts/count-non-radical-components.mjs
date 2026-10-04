@@ -2,8 +2,8 @@
  * Counts Character Structure parts that are neither radicals nor kanji.
  *
  * Reads public/json/v2 (the same files the details tab uses). Positional
- * bushu forms such as 訁 are treated as their kanji/radical (言) via
- * sylhare alternates and radicals.json aliases, so they are dropped.
+ * bushu forms such as 訁 are treated as their kanji/radical (言) via the
+ * aliases in radicals.json, so they are dropped.
  *
  * Writes docs/data/non-radical-component-count.json.
  *
@@ -14,7 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { mergeSylhareBushuAliases } from "./sylhare-bushu-aliases.mjs";
+import { componentKeyword } from "../src/lib/radicals.ts";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const V2 = path.join(ROOT, "public", "json", "v2");
@@ -27,7 +27,6 @@ const main = readJson(V2, "kanji_main.json");
 const hover = readJson(V2, "kanji_extended_hover.json");
 const structures = readJson(V2, "kanji_structures.json");
 const radicals = readJson(V2, "radicals.json");
-const rawRadicals = readJson(ROOT, "raw-data", "radicals.json");
 const components = readJson(V2, "components.json");
 
 const kanjiList = Object.keys(main);
@@ -36,18 +35,7 @@ const isKanji = (ch) => main[ch] != null;
 const drawerRadicals = new Set(
   Object.values(radicals.groupedByStrokeCount).flat()
 );
-const aliases = { ...(radicals.aliases ?? {}) };
-mergeSylhareBushuAliases({
-  csvText: fs.readFileSync(
-    path.join(ROOT, "raw-data", "sylhare", "kanji-radicals.csv"),
-    "utf8"
-  ),
-  drawerRadicals,
-  aliases,
-  isKanji,
-  skipAlts: rawRadicals.sylhareSkipAlts,
-  extraAliases: rawRadicals.sylhareExtraAliases,
-});
+const aliases = radicals.aliases;
 
 const radicalOrKanji = new Set(drawerRadicals);
 for (const [from, to] of Object.entries(aliases)) {
@@ -113,7 +101,7 @@ const componentRows = [...counts.entries()]
   .map(([char, entry]) => ({
     char,
     count: entry.count,
-    keyword: components[char]?.k ?? "",
+    keyword: componentKeyword(char, components, aliases) ?? "",
     exampleKanji: entry.exampleKanji,
   }))
   .sort((a, b) => b.count - a.count || a.char.localeCompare(b.char));

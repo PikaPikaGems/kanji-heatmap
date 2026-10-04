@@ -37,10 +37,21 @@ B or Ｂ (full-width B)	                        ⻏, ⻖
 囗 (※) or 口 (※) or ロ (katakana 'ro')	         囗, 口
 */
 
+/** Radical popover facts. The English name is the component keyword. */
+export type RadicalInfo = {
+  /** Japanese name, e.g. さんずい. */
+  ja: string;
+  /** Position: へん, つくり, かんむり, あし, たれ, にょう or かまえ. */
+  pos?: string;
+  /** Meaning, e.g. "water". */
+  cn?: string;
+};
+
 /** public/json/v2/radicals.json — fetched at runtime, never imported. */
 export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
+  info: Record<string, RadicalInfo>;
 };
 
 export type RadicalsRuntime = RadicalsFile & {
@@ -62,34 +73,75 @@ export const strokeCountMapFromGrouped = (
 export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
   groupedByStrokeCount: file.groupedByStrokeCount,
   aliases: file.aliases ?? {},
+  info: file.info ?? {},
   strokeCountMap: strokeCountMapFromGrouped(file.groupedByStrokeCount),
 });
 
 /**
+ * Follow aliases from `char` (itself first) to the first glyph where `has` is
+ * true. Each fact is stored once, on the alias target, so every lookup goes
+ * through here: 氵 → ⺡ finds ⺡'s keyword. Alias tables can cycle (艹 ↔ ⺾),
+ * so a repeat ends the walk. Returns null if nothing on the way matches.
+ */
+export const followAlias = (
+  char: string,
+  aliases: Record<string, string>,
+  has: (glyph: string) => boolean
+): string | null => {
+  const seen = new Set<string>();
+  let current: string | undefined = char;
+  while (current != null && !seen.has(current)) {
+    if (has(current)) return current;
+    seen.add(current);
+    current = aliases[current];
+  }
+  return null;
+};
+
+/** Component keyword for a glyph, following aliases (氵 → "three water"). */
+export const componentKeyword = (
+  char: string,
+  components: Record<string, { k?: string }>,
+  aliases: Record<string, string>
+): string | undefined => {
+  const glyph = followAlias(char, aliases, (g) => components[g]?.k != null);
+  return glyph == null ? undefined : components[glyph].k;
+};
+
+/** Radical popover facts for a glyph, following aliases. */
+export const radicalInfo = (
+  char: string,
+  radicals: RadicalsRuntime | null | undefined
+): RadicalInfo | undefined => {
+  if (radicals == null) return undefined;
+  const glyph = followAlias(char, radicals.aliases, (g) => g in radicals.info);
+  return glyph == null ? undefined : radicals.info[glyph];
+};
+
+/**
  * Map a displayed component to the codepoint the radical drawer / decomposition
- * index actually uses. Alias tables can point at a prettier glyph (艸 → 艹) or
- * cycle (艹 ↔ ⺾); walk until we hit a selectable radical.
+ * index actually uses (艸 → 艹 → ⺾).
  */
 export const resolveRadicalForSearch = (
   radical: string,
   radicals: RadicalsRuntime | null | undefined
-): string => {
-  if (radicals == null) return radical;
-  const seen = new Set<string>();
-  let current = radical;
-  while (current && !seen.has(current)) {
-    seen.add(current);
-    if (current in radicals.strokeCountMap) return current;
-    const next = radicals.aliases[current];
-    if (!next) return current;
-    current = next;
-  }
-  return radical;
-};
+): string =>
+  radicals == null
+    ? radical
+    : (followAlias(
+        radical,
+        radicals.aliases,
+        (g) => g in radicals.strokeCountMap
+      ) ?? radical);
 
+/**
+ * A radical is anything that leads to a drawer radical, directly or through
+ * aliases. An alias that never reaches the drawer (龺 → 𠦝) is just a
+ * component: it has no radical info and nothing to search for.
+ */
 export const isKnownRadical = (
   char: string,
   radicals: RadicalsRuntime | null | undefined
 ): boolean =>
   radicals != null &&
-  (char in radicals.strokeCountMap || char in radicals.aliases);
+  resolveRadicalForSearch(char, radicals) in radicals.strokeCountMap;

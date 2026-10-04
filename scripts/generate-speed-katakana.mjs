@@ -2,7 +2,7 @@
  * Generates the katakana word lists used by the /speed-katakana typing game.
  *
  * Source → Outputs:
- *   raw-data/katakana-kore.txt → public/json/katakana/challenge-set-<N>.json
+ *   raw-data/misc/katakana-kore.txt → public/json/katakana/challenge-set-<N>.json
  *
  * The source is tab-separated (katakana, english gloss, frequency rank) and is
  * already sorted by frequency. It is split into challenge sets of WORDS_PER_SET
@@ -21,7 +21,10 @@ const root = resolve(__dirname, "..");
 
 const WORDS_PER_SET = 48;
 
-const raw = readFileSync(resolve(root, "raw-data/katakana-kore.txt"), "utf-8");
+const raw = readFileSync(
+  resolve(root, "raw-data/misc/katakana-kore.txt"),
+  "utf-8"
+);
 
 const words = [];
 for (const line of raw.split("\n")) {

@@ -3,6 +3,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { decodeFurigana, WordPartDetail } from "@/lib/furigana";
+import {
+  componentKeyword,
+  prepareRadicals,
+  radicalInfo as infoFor,
+  type RadicalsFile,
+} from "@/lib/radicals";
 
 /**
  * Parity tests for scripts/generate-v2-json.mjs.
@@ -19,6 +25,8 @@ const readJson = <T>(...segments: string[]): T =>
   ) as T;
 
 const raw = <T>(name: string) => readJson<T>("raw-data", name);
+const release = <T>(name: string) =>
+  readJson<T>("raw-data", "kanji-heatmap-data", name);
 const v2 = <T>(name: string) => readJson<T>("public", "json", "v2", name);
 
 type FreqList = number[];
@@ -39,25 +47,27 @@ type V1ExtendedEntry = [
 ];
 type V1RepEntry = [string, string, string, string] | null;
 
-const v1Main = raw<Record<string, V1MainEntry>>("kanji_main.json");
-const v1Extended = raw<Record<string, V1ExtendedEntry>>("kanji_extended.json");
-const v1Rep = raw<Record<string, V1RepEntry>>(
+const v1Main = release<Record<string, V1MainEntry>>("kanji_main.json");
+const v1Extended = release<Record<string, V1ExtendedEntry>>(
+  "kanji_extended.json"
+);
+const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
-const sylhareKeywords = raw<Record<string, { k: string; desc: string }>>(
-  "sylhare-component-keywords.json"
+const ourComponents = raw<Record<string, { k?: string }>>(
+  "components/ours.json"
 );
-const v1ComponentKeywords = raw<Record<string, string>>(
-  "component_keyword.json"
+const v1Phonetic = release<Record<string, string[]>>("phonetic.json");
+const v1Furigana = release<Record<string, WordPartDetail[]>>(
+  "vocab_furigana.json"
 );
-const v1Phonetic = raw<Record<string, string[]>>("phonetic.json");
-const v1Furigana = raw<Record<string, WordPartDetail[]>>("vocab_furigana.json");
-const v1Meaning = raw<Record<string, string>>("vocab_meaning.json");
-const v1Radicals = raw<{
-  radicalsGroupedByStrokeCount: Record<string, string[]>;
-  aliases: Record<string, string>;
-}>("radicals.json");
-const allAliases = v1Radicals.aliases;
+const v1Meaning = release<Record<string, string>>("vocab_meaning.json");
+const v1Radicals = {
+  radicalsGroupedByStrokeCount: raw<Record<string, string[]>>(
+    "radicals/external/rewhowe-drawer.json"
+  ),
+  ...raw<{ aliases: Record<string, string> }>("radicals/ours.json"),
+};
 
 type V2MainEntry = [
   string,
@@ -74,7 +84,7 @@ type V2MainEntry = [
   string | null,
   string | null,
 ];
-type ComponentEntry = { k?: string; desc?: string; s?: string[]; n?: number };
+type ComponentEntry = { k?: string; s?: string[]; n?: number };
 
 const main = v2<Record<string, V2MainEntry>>("kanji_main.json");
 const general = v2<Record<string, [string[], string[], string[]]>>(
@@ -88,11 +98,29 @@ const repDetails = v2<Record<string, [string, string]>>(
 );
 const vocab = v2<Record<string, [string, string]>>("vocab.json");
 const components = v2<Record<string, ComponentEntry>>("components.json");
+const v2Radicals = prepareRadicals(v2<RadicalsFile>("radicals.json"));
+const radicalInfo = v2Radicals.info;
+const aliases = v2Radicals.aliases;
+// What the app shows: follow aliases to the glyph that holds the keyword.
+const keywordOf = (char: string) => componentKeyword(char, components, aliases);
 const structures = v2<
   Record<string, { hl?: unknown; ka?: unknown; sc?: unknown; ya?: unknown }>
 >("kanji_structures.json");
 
 const kanjiList = Object.keys(v1Main);
+
+// Official list uses 剝; we store the common form 剥.
+const jouyou = new Set(
+  fs
+    .readFileSync(
+      path.join(process.cwd(), "raw-data", "misc", "jouyou_kanji.txt"),
+      "utf8"
+    )
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((char) => (char === "剝" ? "剥" : char))
+);
 
 describe("kanji_main.json", () => {
   it("covers exactly the v1 kanji set", () => {
@@ -114,14 +142,21 @@ describe("kanji_main.json", () => {
     for (const kanji of kanjiList) {
       const source = v1Extended[kanji];
       // v1 slots: 1 strokes, 3 wk, 4 jouyouGrade, 10 kklc, 11 rtk
+      // Grade is kept only for kanji on the official jōyō list.
       expect(main[kanji].slice(5, 10), kanji).toEqual([
         source[1],
-        source[4],
+        jouyou.has(kanji) ? source[4] : -1,
         source[3],
         source[10],
         source[11],
       ]);
     }
+  });
+
+  it("grades exactly the 2,136 jōyō kanji", () => {
+    const graded = kanjiList.filter((kanji) => main[kanji][6] !== -1);
+    expect(graded).toHaveLength(2136);
+    expect(graded.every((kanji) => jouyou.has(kanji))).toBe(true);
   });
 
   it("carries the representative word and reading, null when absent", () => {
@@ -164,7 +199,12 @@ describe("kanji_main.json", () => {
   it("carries the TopoKanji Twitter index from the source list", () => {
     const lines = fs
       .readFileSync(
-        path.join(process.cwd(), "raw-data", "topokanji_index_twitter.txt"),
+        path.join(
+          process.cwd(),
+          "raw-data",
+          "misc",
+          "topokanji_index_twitter.txt"
+        ),
         "utf8"
       )
       .split(/\r?\n/)
@@ -274,32 +314,25 @@ describe("vocab.json", () => {
 });
 
 describe("components.json", () => {
-  it("keeps component_keyword entries that sylhare did not replace", () => {
-    for (const [char, keyword] of Object.entries(v1ComponentKeywords)) {
-      if (main[char] != null) continue;
-      if (sylhareKeywords[char] != null) continue;
-      const alias = allAliases[char];
-      if (alias && sylhareKeywords[alias] != null) continue;
-      expect(components[char]?.k, char).toBe(keyword);
-    }
-  });
-
-  it("drops the handful of component keywords that describe a kanji", () => {
-    const kanjiEntries = Object.keys(v1ComponentKeywords).filter(
-      (char) => main[char] != null
-    );
-
-    expect(kanjiEntries.length).toBeGreaterThan(0);
-    for (const char of kanjiEntries) {
-      // Unreachable at runtime: every lookup reads kanji_main first.
-      expect(components[char]?.k, char).toBeUndefined();
-      expect(main[char][0], char).toBeTruthy();
+  it("shows every keyword from components/ours.json", () => {
+    for (const [char, entry] of Object.entries(ourComponents)) {
+      if (entry.k == null) continue;
+      expect(components[char]?.k, char).toBe(entry.k);
     }
   });
 
   it("applies sylhare bushu keywords over the older radical tables", () => {
     expect(components["⺡"]?.k).toBe("three water");
-    expect(components["⺡"]?.desc).toContain("さんずい");
+    expect(components["⺡"]).not.toHaveProperty("desc");
+    expect(radicalInfo["⺡"]).toEqual({
+      ja: "さんずい",
+      pos: "へん",
+      cn: "water",
+    });
+    // Stored once on ⺡; 氵 reaches it through its alias.
+    expect(radicalInfo["氵"]).toBeUndefined();
+    expect(infoFor("氵", v2Radicals)).toEqual(radicalInfo["⺡"]);
+    expect(keywordOf("氵")).toBe("three water");
     expect(components["⻏"]?.k).toBe("large village");
     expect(components["⻖"]?.k).toBe("small hill left");
     expect(components["𠂉"]?.k).toBe("no plus one");
@@ -327,9 +360,9 @@ describe("components.json", () => {
   });
 
   it("fills a keywordless lookalike from its alias", () => {
-    expect(components["艹"]?.k).toBe("grass crown");
-    expect(components["⺾"]?.k).toBe("grass crown");
-    expect(components["艸"]?.k).toBe("grass crown");
+    expect(keywordOf("艹")).toBe("grass crown");
+    expect(keywordOf("⺾")).toBe("grass crown");
+    expect(keywordOf("艸")).toBe("grass crown");
   });
 
   it("keeps the pig-head radical family on one keyword", () => {
@@ -347,8 +380,10 @@ describe("components.json", () => {
   });
 
   it("does not duplicate kanji keywords that kanji_main already provides", () => {
+    // Kept only where an alias reads its radical name from the kanji (飠 → 食).
+    const aliasTargets = new Set(Object.values(aliases));
     for (const char of Object.keys(components)) {
-      if (main[char] != null) {
+      if (main[char] != null && !aliasTargets.has(char)) {
         expect(components[char].k, char).toBeUndefined();
       }
     }
@@ -357,10 +392,10 @@ describe("components.json", () => {
 
 describe("kanji_structures.json", () => {
   const sources = {
-    hl: raw<Record<string, unknown>>("kanji-structure-hlorenzi.json"),
-    ka: raw<Record<string, unknown>>("kanji-structure-kanjium.json"),
-    sc: raw<Record<string, unknown>>("kanji-structure-scott.json"),
-    ya: raw<Record<string, unknown>>("kanji-structure-yagays.json"),
+    hl: raw<Record<string, unknown>>("kanji-structure/hlorenzi.json"),
+    ka: raw<Record<string, unknown>>("kanji-structure/kanjium.json"),
+    sc: raw<Record<string, unknown>>("kanji-structure/scott.json"),
+    ya: raw<Record<string, unknown>>("kanji-structure/yagays.json"),
   };
 
   it("reproduces each source's value verbatim under its short key", () => {
@@ -394,13 +429,13 @@ describe("kanji_structures.json", () => {
 describe("pass-through files", () => {
   it("are byte-identical in content to their v1 sources", () => {
     expect(v2("kanji_decomposition.json")).toEqual(
-      raw("kanji_decomposition.json")
+      raw("radicals/external/rewhowe-decomposition.json")
     );
-    expect(v2("similar_kanjis.json")).toEqual(raw("similar-kanjis.json"));
+    expect(v2("similar_kanjis.json")).toEqual(release("similar-kanjis.json"));
     expect(v2("kanji_reading_details.json")).toEqual(
-      raw("kanji-readings-details.json")
+      raw("misc/kanji-readings-details.json")
     );
-    expect(v2("cum_use.json")).toEqual(raw("cum_use.json"));
+    expect(v2("cum_use.json")).toEqual(release("cum_use.json"));
   });
 });
 
@@ -438,7 +473,7 @@ describe("component coverage report", () => {
   });
 
   it("does not regress past the known gap count", () => {
-    // Ratchet: filling gaps in components_manual_overrides.json lowers this,
+    // Ratchet: filling gaps in raw-data/components/ours.json lowers this,
     // a bad data drop raises it. Lower the number when you improve coverage.
     expect(report.summary.missing).toBeLessThanOrEqual(364);
   });

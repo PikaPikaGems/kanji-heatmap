@@ -3,14 +3,14 @@
     "selectedKanji": 2426,
     "selection": "all",
     "kind": "not-radical-not-kanji",
-    "components": 383,
+    "components": 382,
     "withKeyword": 24,
-    "withoutKeyword": 359,
+    "withoutKeyword": 358,
     "componentsWithKeyword": [
       {
         "cmp": "乂",
         "cnt": 18,
-        "kw": "regulate"
+        "kw": "mow"
       },
       {
         "cmp": "廿",
@@ -25,7 +25,7 @@
       {
         "cmp": "莫",
         "cnt": 8,
-        "kw": "shalt"
+        "kw": "none"
       },
       {
         "cmp": "𠂇",
@@ -60,7 +60,7 @@
       {
         "cmp": "乍",
         "cnt": 5,
-        "kw": "while"
+        "kw": "suddenly"
       },
       {
         "cmp": "㑒",
@@ -75,7 +75,7 @@
       {
         "cmp": "龶",
         "cnt": 5,
-        "kw": "growing"
+        "kw": "the blue crown"
       },
       {
         "cmp": "兀",
@@ -95,7 +95,7 @@
       {
         "cmp": "夬",
         "cnt": 2,
-        "kw": "certain"
+        "kw": "decisive"
       },
       {
         "cmp": "兔",
@@ -120,7 +120,7 @@
       {
         "cmp": "昏",
         "cnt": 1,
-        "kw": "dusk"
+        "kw": "twilight"
       },
       {
         "cmp": "洛",
@@ -174,7 +174,7 @@
       },
       {
         "count": 3,
-        "components": 49
+        "components": 48
       },
       {
         "count": 2,
@@ -190,7 +190,7 @@
     {
       "char": "乂",
       "count": 18,
-      "keyword": "regulate",
+      "keyword": "mow",
       "exampleKanji": [
         "気",
         "父",
@@ -273,7 +273,7 @@
     {
       "char": "莫",
       "count": 8,
-      "keyword": "shalt",
+      "keyword": "none",
       "exampleKanji": [
         "暮",
         "募",
@@ -514,7 +514,7 @@
     {
       "char": "乍",
       "count": 5,
-      "keyword": "while",
+      "keyword": "suddenly",
       "exampleKanji": [
         "作",
         "昨",
@@ -622,7 +622,7 @@
     {
       "char": "龶",
       "count": 5,
-      "keyword": "growing",
+      "keyword": "the blue crown",
       "exampleKanji": [
         "麦",
         "表",
@@ -1506,16 +1506,6 @@
       ]
     },
     {
-      "char": "𤣩",
-      "count": 3,
-      "keyword": "",
-      "exampleKanji": [
-        "珍",
-        "瑠",
-        "璃"
-      ]
-    },
-    {
       "char": "𥫗",
       "count": 3,
       "keyword": "",
@@ -1879,7 +1869,7 @@
     {
       "char": "夬",
       "count": 2,
-      "keyword": "certain",
+      "keyword": "decisive",
       "exampleKanji": [
         "決",
         "快"
@@ -3136,7 +3126,7 @@
     {
       "char": "昏",
       "count": 1,
-      "keyword": "dusk",
+      "keyword": "twilight",
       "exampleKanji": [
         "婚"
       ]

@@ -241,13 +241,15 @@ const requireKanji = async (kanji: string) => {
 };
 
 const handleKanjiHover = requirePayload(async (kanji: string) => {
-  const [main, mainInfoMap, hoverMap, components, vocab] = await Promise.all([
-    requireKanji(kanji),
-    CORE,
-    loadHoverInfo(),
-    loadComponents(),
-    loadVocab(),
-  ]);
+  const [main, mainInfoMap, hoverMap, components, radicals, vocab] =
+    await Promise.all([
+      requireKanji(kanji),
+      CORE,
+      loadHoverInfo(),
+      loadComponents(),
+      loadRadicals(),
+      loadVocab(),
+    ]);
 
   const hoverInfo = hoverMap[kanji];
   if (hoverInfo == null) {
@@ -264,7 +266,8 @@ const handleKanjiHover = requirePayload(async (kanji: string) => {
       },
     },
     mainInfoMap,
-    components
+    components,
+    radicals.aliases
   );
 });
 
