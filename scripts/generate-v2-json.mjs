@@ -372,8 +372,9 @@ for (const [char, entry] of Object.entries(manualOverrides)) {
 
 // A component keyword must not be a kanji keyword either, or two different
 // characters look like the same thing (戈 and 槍 were both "spear"). Listed
-// here: the same character at a Kangxi-radical codepoint, plus look-alikes
-// nobody has decided to rename yet.
+// here: the same character at a Kangxi-radical codepoint, and the glyphs the
+// radical drawer uses for a radical that is also a kanji (ハ for 八, 已 for
+// 己) — the same radical, so the same keyword.
 const KANJI_KEYWORD_SHARED_OK = {
   "⼊": "入",
   "⾋": "草",
@@ -382,7 +383,6 @@ const KANJI_KEYWORD_SHARED_OK = {
   "⿔": "亀",
   ハ: "八",
   已: "己",
-  阝: "村",
 };
 const kanjiByKeyword = {};
 for (const kanji of kanjiList) {
