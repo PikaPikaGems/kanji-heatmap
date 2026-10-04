@@ -23,3 +23,18 @@ and copy the new release in (see "Updating kanji data" in the root README).
 The unused files are still copied in with the release so the folder matches
 it exactly. If a new release adds component keywords you want, copy them into
 `raw-data/components/ours.json` by hand.
+
+## Pending
+
+Fixes that belong upstream in Kanji Heatmap Data, not here. All parked for
+now; the user will handle them later.
+
+- **Grade bug.** The release tags 279 name kanji (伊, 彦, 智, …) as grade 9.
+  This repo works around it in `scripts/generate-v2-json.mjs` using
+  `raw-data/misc/jouyou_kanji.txt`; remove the workaround once the release is
+  fixed.
+- **Component keyword fixes.** Corrections made in
+  `raw-data/components/ours.json` (乂 "mow", 昏 "twilight", …) could go back
+  into the release's `overrides/component_keyword.json`.
+- **金 keyword.** The user may rename 金 "gold" to "gold metal". 釒 follows it
+  automatically once the new release is copied in.

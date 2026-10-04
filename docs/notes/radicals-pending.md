@@ -157,9 +157,9 @@ Decided: **a shape that leads to a kanji is named by the kanji keyword.**
   out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
   `components-kc.csv` (the same data as `components-ck.csv`, flipped) and
   `kanji-composition-map.txt` (already in `raw-data/kanji-structure/scott.json`).
-- **Parked — report the grade bug upstream:** Kanji Heatmap Data tags 279 name kanji
-  (伊, 彦, 智, …) as grade 9. This repo works around it in the build using
-  `raw-data/misc/jouyou_kanji.txt`, but the release itself is still wrong.
+- **Pending upstream — grade bug.** Listed under "Pending" in
+  `raw-data/kanji-heatmap-data/README.md`, with every other Kanji Heatmap
+  Data fix.
 
 ### 6. Small open questions
 
@@ -170,8 +170,8 @@ Decided: **a shape that leads to a kanji is named by the kanji keyword.**
   (豚), 鬲 cauldron (釜), 鹵 salt (塩), 龠 flute (笛), 阝 village (村, unused),
   已 oneself (己), ハ eight (八), and the Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔
   (same character as their kanji). The user decides which to rename.
-- **Parked — push keyword fixes upstream** to Kanji Heatmap Data
-  (`overrides/component_keyword.json`) at some point.
+- **Pending upstream — keyword fixes.** See "Pending" in
+  `raw-data/kanji-heatmap-data/README.md`.
 - **Unnamed parts:** 358 parts show "...". None is used by 10+ kanji; 28 are
   used by 5+ (the shortlist if names are ever wanted). Fine to leave.
 
