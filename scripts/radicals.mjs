@@ -121,8 +121,65 @@ const entryOf = (literal, nameJa, positionJ, meaning) => {
  * never by reading, since readings collide (日 and 火 are both ひ).
  * Throws if a radical has no translation or a translation is unused.
  */
+/**
+ * Which glyph holds the translation for each named radical glyph. Glyphs with
+ * the same Japanese name are the same radical (⿊ くろ = 黒 くろ), so they
+ * share one translation:
+ *
+ * - A classic radical (rows 1–214) holds its own.
+ * - A variant or extra uses the classic radical with its name. A few names
+ *   belong to two classic radicals (ひ: 日 and 火, き: 木 and 黄); then it uses
+ *   the one whose Alternate column lists it (⿈ → 黄).
+ * - A name with no classic radical is held by the first glyph with that name
+ *   (⺤ for つめかんむり, shared with 爫).
+ */
+const translationOwners = (sylhareRows, extras) => {
+  const named = [
+    ...sylhareRows
+      .filter((row) => isGlyph(row.Radical))
+      .map((row) => ({
+        glyph: row.Radical,
+        name: (row["Reading-J"] ?? "").trim(),
+        classic: Number(row.Number) <= 214,
+        alternates: [...(row.Alternate ?? "")],
+      })),
+    ...Object.entries(extras).map(([glyph, extra]) => ({
+      glyph,
+      name: extra.nameJa,
+      classic: false,
+      alternates: [],
+    })),
+  ].filter((n) => n.name && n.name !== "n/a");
+
+  const byName = {};
+  for (const n of named) (byName[n.name] ??= []).push(n);
+
+  const owners = {};
+  for (const n of named) {
+    const classics = byName[n.name].filter((m) => m.classic);
+    if (n.classic) {
+      owners[n.glyph] = n.glyph;
+    } else if (classics.length === 0) {
+      owners[n.glyph] = byName[n.name][0].glyph;
+    } else if (classics.length === 1) {
+      owners[n.glyph] = classics[0].glyph;
+    } else {
+      const listed = classics.find((c) => c.alternates.includes(n.glyph));
+      if (listed == null) {
+        throw new Error(
+          `radicals: ${n.glyph} (${n.name}) matches ${classics.map((c) => c.glyph).join(", ")}; ` +
+            `list it in one Alternate column to pick`
+        );
+      }
+      owners[n.glyph] = listed.glyph;
+    }
+  }
+  return owners;
+};
+
 export const buildBushuEntries = ({ sylhareRows, ours }) => {
   const literals = ours.literalEn;
+  const owners = translationOwners(sylhareRows, ours.extras ?? {});
   const skipAsAlternate = new Set([
     ...Object.keys(ours.aliases ?? {}),
     ...(ours.sylhareSkipAlts ?? []),
@@ -130,8 +187,9 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
 
   const usedLiterals = new Set();
   const literalFor = (glyph) => {
-    usedLiterals.add(glyph);
-    return (literals[glyph] ?? "").toString().trim();
+    const owner = owners[glyph];
+    usedLiterals.add(owner);
+    return (literals[owner] ?? "").toString().trim();
   };
 
   // Rows without a usable glyph (private-use codepoints, 々's "n/a") are
@@ -146,7 +204,7 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
     .filter(Boolean);
 
   const missingLiterals = new Set(
-    named.filter((n) => !n.literal).map((n) => n.row.Radical)
+    named.filter((n) => !n.literal).map((n) => owners[n.row.Radical])
   );
   const radicalSeen = new Set(
     sylhareRows
@@ -176,7 +234,7 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
   for (const [ch, extra] of Object.entries(ours.extras ?? {})) {
     const literal = literalFor(ch);
     if (!literal) {
-      missingLiterals.add(ch);
+      missingLiterals.add(owners[ch]);
       continue;
     }
     out[ch] = entryOf(literal, extra.nameJa, extra.position, extra.meaning);

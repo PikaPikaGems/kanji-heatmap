@@ -27,7 +27,7 @@ is named or matched, edit this file, never `external/`.
 
 ```jsonc
 "literalEn": {
-  "氵": "three water", // さんずい
+  "⺡": "three water", // さんずい
   "⺩": "king left", // おうへん
 }
 ```
@@ -36,8 +36,18 @@ is named or matched, edit this file, never `external/`.
   ひ), which once made 火 "sun".
 - A literal translation of the name, not its meaning. The meaning comes from
   the sylhare CSV.
-- Every radical in the sylhare CSV (and in `extras`) needs one, and every
-  entry must belong to one of them. The build fails otherwise.
+- **One translation per Japanese name.** Glyphs with the same name are the
+  same radical, so only one of them has an entry:
+  - A classic radical (sylhare rows 1–214) holds its own: 黒 has "black",
+    and ⿊ (also くろ) uses it.
+  - A few names belong to two classic radicals (ひ: 日 sun and 火 fire,
+    き: 木 tree and 黄 yellow). A glyph sharing such a name uses the one
+    whose Alternate column lists it: ⿈ → 黄.
+  - A name with no classic radical is held by its first glyph (⺤ for
+    つめかんむり; 爫 uses it).
+- 245 entries: the 214 classic radicals, 26 positional forms with their own
+  name (⺅ にんべん, ⺡ さんずい, …) and 5 `extras`.
+- A missing or unused entry fails the build.
 
 ### `aliases` — glyphs we treat as the same radical
 
@@ -74,4 +84,5 @@ example, **⺈** is listed under 刀 but is the ク-shaped top of 魚.
 ```
 
 Same fields as a CSV row: Japanese name, position (へん, つくり, …) and
-meaning. Each one also needs a `literalEn` entry.
+meaning. Each one needs a `literalEn` entry, unless it shares its name with
+another radical (ヨ けいがしら uses 彐's).
