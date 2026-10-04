@@ -90,8 +90,9 @@ Show sound families with **real words**, not bare kanji:
 
 ### 2. Radical popover extras
 
-Each is one more field in `radicals.json` → `info`. The user is unsure about
-1 and 2.
+New features, not cleanup: each adds or changes what the radical popover
+shows, one more field in `radicals.json` → `info`. The user is unsure about
+1 and 2, and 3 would change the existing 🇨🇳 meaning line.
 
 1. **Alternate forms** — sylhare CSV "Alternate" column (王 → 玉 ⺩). Would also
    explain pairs like 攵/攴.
@@ -132,9 +133,8 @@ translation of each Japanese radical name. There are 245, one per name: the
 village left", 釆 "no + rice", 斗 "measuring box right", 幺 "thread head",
 缶 "water jar". The rest were never reviewed one by one.
 
-Still open: 歹 がつ is "bare bone" (copied from the release's component
-keyword). がつ is a reading, not a meaning; other names are かばねへん
-("corpse side") and いちたへん. The user hasn't decided.
+Decided: 歹 がつ stays "bare bone" (copied from the release's component
+keyword), even though がつ is a reading, not a meaning.
 
 The user decides each rename. Kept on purpose: のまた "no + mata", るまた
 "ru + mata", 丿/ノ "katakana no", 厶 "katakana mu", 乙/⺃ "second".
@@ -170,7 +170,7 @@ Decided: **a shape that leads to a kanji is named by the kanji keyword.**
   (豚), 鬲 cauldron (釜), 鹵 salt (塩), 龠 flute (笛), 阝 village (村, unused),
   已 oneself (己), ハ eight (八), and the Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔
   (same character as their kanji). The user decides which to rename.
-- **Push keyword fixes upstream** to Kanji Heatmap Data
+- **Parked — push keyword fixes upstream** to Kanji Heatmap Data
   (`overrides/component_keyword.json`) at some point.
 - **Unnamed parts:** 358 parts show "...". None is used by 10+ kanji; 28 are
   used by 5+ (the shortlist if names are ever wanted). Fine to leave.
