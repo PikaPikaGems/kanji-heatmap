@@ -12,175 +12,122 @@
 ```bash
 nvm use 22
 pnpm install
-pnpm run dev
+pnpm run generate-speed-katakana   # word lists for the Speed Katakana game (gitignored)
+pnpm run dev                       # http://localhost:5174
 ```
 
-> **Note:** When using `pnpm run dev`, features that require Cloudflare Functions — such as Jisho, Jotoba, KanjiAPI, and the Google Handwriting API — will not work. All other features work normally.
+`pnpm run dev:cf` is the same app on port 5173.
 
-### Running locally with Cloudflare Functions
+> **Note:** Jisho, Jotoba, KanjiAPI and Google Handwriting lookups go through
+> [Cloudflare Pages Functions](./functions/api/) (to get around CORS). Neither
+> dev script serves them, so they return 404 locally and only work on the
+> deployed site. Everything else works locally.
 
-API proxy requests through a [Cloudflare Pages Function](./functions/api/) to work around CORS restrictions. To run them locally you need [Wrangler](https://developers.cloudflare.com/workers/wrangler/):
+### Data that isn't in the repo
+
+The per-kanji vocabulary is one file per kanji, so it's gitignored. In
+production it comes from cloud storage; locally the vocabulary sections of the
+kanji drawer stay empty unless you fill these folders (paths are in
+`src/lib/assets-paths.ts`):
+
+- `public/kanji-words/v6/<KANJI>.json`
+- `public/kanji-textbook-words-min/<KANJI>.json`
+
+Everything else the app fetches is committed.
+
+## Checks
+
+These are what CI runs (`.github/workflows/ci.yml`):
 
 ```bash
-# Terminal 1
-pnpm run dev
-
-# Terminal 2
-pnpm run dev:cf
-```
-
-Then open `http://localhost:5173` (Wrangler's port, not Vite's).
-
-> **Note:** If you ever see a port bump to 5175, a stale Vite process is still holding 5174. Clear it with `lsof -ti:5174,5173 | xargs kill` and restart both.
-
-## Testing
-
-### Unit / component tests
-
-```bash
+pnpm run format:check   # fix with: pnpm exec prettier --write <file>
+pnpm run lint
+pnpm run typecheck
 pnpm test
+CF_PAGES=1 pnpm run build
 ```
+
+`CF_PAGES=1` turns off the Cloudflare Vite plugin, matching the real Cloudflare
+Pages build. `pnpm run build` does not run Prettier, so run `format:check`
+yourself.
 
 ### End-to-end tests (Playwright)
 
-`pnpm install` installs the Playwright npm package, but **not** the browser binaries. Download Chromium once (and again after Playwright upgrades):
+`pnpm install` doesn't download browsers. Install Chromium once, and again
+after Playwright upgrades:
 
 ```bash
 pnpm exec playwright install chromium
 pnpm test:e2e
-
-# Watching the test
-pnpm exec playwright test --headed
-pnpm exec playwright test --debug
-pnpm exec playwright test --ui
 ```
 
-If e2e fails with `browserType.launch: Executable doesn't exist` (often pointing at `~/Library/Caches/ms-playwright/chromium_headless_shell-…`), re-run `pnpm exec playwright install chromium`. That usually means Playwright was updated and the matching browser build is missing locally.
+To watch or debug a run, add `--headed`, `--debug` or `--ui` to
+`pnpm exec playwright test`. If a run fails with
+`browserType.launch: Executable doesn't exist`, install Chromium again.
 
-## Build analysis
+## Kanji data
 
-Analyze the build with:
+`raw-data/` holds the inputs; `pnpm run generate-json` turns them into the files
+the app fetches from `public/json/v2/`. Never edit `public/json/v2/` by hand.
+`raw-data/README.md` describes every input and where it came from.
 
-```bash
-ANALYZE=true ANALYZE_TEMPLATE=flamegraph pnpm run build
-# ANALYZE_TEMPLATE can be sunburst, treemap, network, raw-data, list, or flamegraph
-```
+`generate-json` also writes the reports in `docs/data/`, prints the size of
+every file it writes, and fails instead of writing if the data breaks a rule
+(missing kanji, clashing keywords, furigana that doesn't round-trip, …).
+Commit the regenerated files together with the change that caused them.
 
-Configure the visualizer settings in `vite.config.ts` if you want.
+### Updating from Kanji Heatmap Data
 
-## Updating kanji data
-
-Upstream data is an **input**, not something the app serves directly: it goes
-into `./raw-data/kanji-heatmap-data`, and `scripts/generate-v2-json.mjs` turns it into the files
-the app fetches from `./public/json/v2`. See `raw-data/README.md`.
-
-If you have both [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and this repository in the same parent directory, you can copy its output files directly:
+Most kanji data comes from
+[Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) and
+is copied unchanged into `raw-data/kanji-heatmap-data/`. To update it, either
+copy from a local checkout next to this repo:
 
 ```bash
 cp ../kanji-heatmap-data/output/*.json ./raw-data/kanji-heatmap-data
 ```
 
-Or get the latest `tar.gz` from the [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data) repository:
+or download the latest release:
 
 ```bash
 curl -OL https://github.com/PikaPikaGems/kanji-heatmap-data/releases/latest/download/kanji-heatmap-data.tar.gz
-```
-
-Uncompress and store the JSON files in `./raw-data/kanji-heatmap-data`:
-
-```bash
-tar -xzf ./kanji-heatmap-data.tar.gz -C ./raw-data/kanji-heatmap-data/
-```
-
-You should have the following files updated (among others from the release):
-
-```bash
-ls -la raw-data/kanji-heatmap-data
-```
-
-```text
-component_keyword.json
-cum_use.json
-extra_kanji_keyword.json
-filtered_kanji.json
-kanji_extended.json
-kanji_main.json
-kanji_representative_words.json
-phonetic.json
-similar-kanjis.json
-vocab_furigana.json
-vocab_meaning.json
-```
-
-Delete the `tar.gz` since it is no longer needed:
-
-```
+tar -xzf kanji-heatmap-data.tar.gz -C ./raw-data/kanji-heatmap-data/
 rm kanji-heatmap-data.tar.gz
 ```
 
-Regenerate the files the app actually serves
+Then regenerate:
 
 ```bash
 pnpm run generate-json
 ```
 
-`generate-json` reads `./raw-data` and writes `./public/json/v2` plus
-`docs/data/component-coverage.json` and
-`docs/data/non-radical-component-count.json`. It fails instead of writing if the data
-breaks an invariant (missing kanji, conflicting component keywords, furigana
-that does not round-trip, a sort field that is not a number).
+### Stroke-order SVGs
 
-#### Checking data sizes
+SVGs for the 2,426 kanji in `raw-data/kanji-heatmap-data/filtered_kanji.json`
+are committed in `public/svg/`. Other kanji (e.g. 唸) load from a CDN; see
+`src/lib/kanji-svg-url.ts`. To download them again:
 
-`generate-json` prints the size and entry count of everything it writes, so
-the quickest check is to run it and read the output.
+```bash
+pnpm run download-kanji-svgs
+```
 
-For raw and gzipped sizes (per file, plus v2 eager/lazy totals):
+### File sizes
 
 ```bash
 ./scripts/print-file-sizes.sh
 ```
 
-§5 of `docs/notes/kanji-worker-data-redesign.md` lists the expected size and
-entry count of every generated file.
+prints raw and gzipped sizes. §5 of `docs/notes/kanji-worker-data-redesign.md`
+lists the expected size of every generated file.
 
-### Regenerating derived JSON
-
-`pnpm run build` regenerates derived JSON before compiling and bundling:
+## Build analysis
 
 ```bash
-node scripts/generate-speed-katakana.mjs && tsc -b && vite build
+ANALYZE=true ANALYZE_TEMPLATE=flamegraph pnpm run build
+# ANALYZE_TEMPLATE: sunburst, treemap, network, raw-data, list or flamegraph
 ```
 
-The `/speed-katakana` game loads word lists from `public/json/katakana/challenge-set-<N>.json`, generated from `raw-data/misc/katakana-kore.txt` (48 words per set, ordered by frequency).
-
-#### Other required data
-
-Every JSON the app fetches from `public/` is committed, so a fresh clone plus
-`pnpm run generate-speed-katakana` is enough to run the site. The only data
-_not_ in the repo is the per-kanji vocabulary, which is gitignored because it
-is one file per kanji (see also `./src/lib/assets-paths.ts`):
-
-- `/kanji-textbook-words-min/<KANJI>.json`
-- `/kanji-words/v4/<KANJI>.json`
-
-These paths are used in development only. In production the same data is
-served from a cloud storage, so the site works without them;
-locally, the vocabulary sections of the kanji drawer stay empty until you
-populate the two directories.
-
-#### Kanji stroke-order SVGs
-
-Stroke-order SVGs for the kanji in `raw-data/kanji-heatmap-data/filtered_kanji.json` (the
-~2426-kanji core set) are committed under `public/svg/` and served
-same-origin,
-Kanji outside that set (e.g. 唸) still lazy-load from a CDN cloudstorage on demand; see `src/lib/kanji-svg-url.ts` for the local-first/CDN-fallback lookup.
-
-To (re)populate `public/svg/` from a machine with network access:
-
-```bash
-pnpm run download-kanji-svgs
-```
+The visualizer settings are in `vite.config.ts`.
 
 ## Talk to us
 
