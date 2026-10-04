@@ -40,8 +40,21 @@ onto alias glyphs; the app follows them with `followAlias` in
 2. Radical name (sylhare CSV + `literalEn` in `raw-data/radicals/ours.json`)
 3. Alias target's keyword
 
-A kanji always uses its `kanji_main` keyword. A glyph counts as a radical only
-if it leads to a drawer radical (`isKnownRadical`).
+A kanji always uses its `kanji_main` keyword, and so does any shape whose
+alias leads to a kanji (釒 → 金 shows "gold"); only forms with a name of their
+own keep it (⺩ "king left"). A glyph counts as a radical only if it leads to
+a drawer radical (`isKnownRadical`).
+
+**Build checks.** `generate-json` fails if a radical has no `literalEn`, a
+`literalEn` is unused, an alias leads nowhere, or a component keyword equals
+another component's keyword or any kanji keyword (`KANJI_KEYWORD_SHARED_OK`
+lists the allowed exceptions).
+
+**Where parts show.** Kanji breakdowns come from two places: the four
+Character Structure sources (`public/json/v2/kanji_structures.json`) and the
+release's per-kanji parts list (`kanji_extended.json` field 0 →
+`kanji_extended_hover.json`). Count both when asking "is this glyph used?" —
+阝 is in no structure source but in 43 parts lists.
 
 ## Decisions already made (don't reopen)
 
@@ -50,7 +63,21 @@ if it leads to a drawer radical (`isKnownRadical`).
 - Radical popover and component popover stay **separate**.
 - Radicals that are also kanji (王, 火, 車) keep their kanji link.
 - Only alias glyphs that are truly the same shape (𤣩 → ⺩). 䖝 (inside 風)
-  stays unaliased and shows "...". The 358 unnamed parts are not aliased.
+  stays unaliased and shows "...". Unnamed parts are not aliased unless the
+  user approves it (see `docs/notes/naming-review.md`).
+- **Show source data as is.** No rewriting of what a source says, even when
+  it looks fixable (the build will not turn 阝 into ⻖/⻏ by position). Users
+  are told where each breakdown comes from.
+- 阝 is a plain component named "hill or village", with no radical popover
+  (it's in `sylhareSkipAlts`). Sources use it for both ⻖ (left, 31 kanji) and
+  ⻏ (right, 12 kanji).
+- ハ and 已 are the drawer's own glyphs for the 八 and 己 radicals, so they
+  share the kanji keyword ("eight", "oneself") on purpose. No aliases.
+- 歹 stays "bare bone".
+- Replacing the 🇨🇳 meaning line is a feature (item 2.3), not cleanup.
+- Every Kanji Heatmap Data fix is listed under "Pending" in
+  `raw-data/kanji-heatmap-data/README.md` and is parked until the user picks
+  it up.
 - 𠘨 stays aliased to 風 (popover says かぜ, wind).
 - Positions in the sylhare CSV are fine as they are; the popover shows only
   the first value (かまえ for "かまえ, はこがまえ").
@@ -63,12 +90,39 @@ if it leads to a drawer radical (`isKnownRadical`).
 
 Split in two (user, October 2026):
 
-- **1A — sound part coverage (next).** Merge the release's sound parts with
-  the Anki deck in this repo's build and write the result to
-  `public/json/v2/`. The Anki deck adds about 50 families (加, 果, 門, 共,
-  兆, 羊, …) and roughly 100 kanji gain a sound part. Moving the merged data
-  to Kanji Heatmap Data later is listed under "Pending" in
+- **1A — sound part coverage. Start after
+  PikaPikaGems/kanji-heatmap#302 is merged**, on a new branch from `main`.
+  Merge the release's sound data with the Anki deck in this repo's build and
+  write the result to `public/json/v2/`. Moving the merged data to Kanji
+  Heatmap Data later is listed under "Pending" in
   `raw-data/kanji-heatmap-data/README.md`.
+
+  How it works today: each kanji's sound part is the release's
+  `kanji_extended.json` field 8 (`phonetic`), copied to
+  `kanji_extended_hover.json`; its readings are `components.json` → `s`, from
+  the release's `phonetic.json`. The app reads them in `getPhonetic`
+  (`src/kanji-worker/kanji-assembly.ts`) and `SingleKanjiPart` draws the lime
+  border and reading badge. 509 of 2,426 kanji have a sound part, using 122
+  parts; all 122 have readings.
+
+  What the Anki deck adds (measured October 2026, R rows dropped): 50
+  families the release doesn't have (加 カ, 果 カ, 牙 ガ, 門 カン, 兄 キョウ,
+  竟 キョウ, 共 キョウ, 区 ク, 糸 ケイ, 圭 ケイ, 券 ケン, 犬 ケン, 県 ケン,
+  臤 ケン, ⺹ コウ, 洪 コウ, 高 コウ, 左 サ, 少 サ, 才 ザイ, 斉 ザイ, 参 サン,
+  次 シ, 匕 シ, 直 ショク, 昔 シャク, 十 ジュウ, 旬 ジュン, 小 ショウ, 㐱 シン,
+  亲 シン, 㦮 セン, 相 ソウ, 弟 ダイ, 単 タン, 竹 チク, 主 チュウ, 兆 チョウ,
+  甬 ツウ, 丁 テイ, 疋 テイ, 童 ドウ, 忍 ニン, 必 ヒ, 宓 ミツ, 名 メイ,
+  明 メイ, 面 メン, 予 ヨ, 羊 ヨウ), and roughly 100 kanji that have no sound
+  part today would get one (架 賀, 課 菓, 間 関 簡, 洋 養, 挑 眺 跳, …). That
+  count still includes family heads (加 in 加's family) and the bad rows below.
+
+  For the user to decide before shipping (it changes what users see):
+
+  - Whether a kanji that already has a release sound part can get a
+    different one from Anki (or the release always wins).
+  - 祭: release さい vs Anki サツ (below).
+  - Show the user a list of every kanji that gains or changes a sound part.
+
 - **1B — sound examples in the radical popover.** Part of item 2 (radical
   popover extras).
 
@@ -138,29 +192,19 @@ kanji containing it, at any depth). Finds things radical search can't
 ### 4. Review the radical translations
 
 `literalEn` in `raw-data/radicals/ours.json` is meant to be a **literal**
-translation of each Japanese radical name. There are 245, one per name: the
-214 classic radicals, 26 positional forms with their own name (⺅ にんべん,
-⻏ おおざと, …) and 5 `extras`. Glyphs sharing a name share the translation
-(see `raw-data/radicals/README.md`). Only the clearly wrong ones were fixed
-(火, 黄, 革, 示, ⺭, 酉, 禸), then 辛 "spicy", 阜 "small village", ⻖ "small
-village left", 釆 "no + rice", 斗 "measuring box right", 幺 "thread head",
-缶 "water jar". The rest were never reviewed one by one.
+translation of each Japanese radical name (245 entries; see
+`raw-data/radicals/README.md`). Only 107 ever show on screen. They are listed,
+with notes on the ones that look off, in section 2 of
+`docs/notes/naming-review.md`, waiting for the user's decisions.
 
-Decided: 歹 がつ stays "bare bone" (copied from the release's component
-keyword), even though がつ is a reading, not a meaning.
+Already fixed: 火, 黄, 革, 示, ⺭, 酉, 禸, then (October 2026) 辛 "spicy", 阜
+"small village", ⻖ "small village left", 釆 "no + rice", 斗 "measuring box
+right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
+"dagger-axe", 艮 "stopping", 豕 "wild pig", 爻 "intersecting lines", 鬲
+"tripod kettle", 鹵 "chemical salt", 龠 "pan flute".
 
-The user decides each rename. Kept on purpose: のまた "no + mata", るまた
-"ru + mata", 丿/ノ "katakana no", 厶 "katakana mu", 乙/⺃ "second".
-
-**Most translations never show.** When the radical is itself a kanji, the
-build drops its name and the app shows the kanji keyword instead
-(`scripts/generate-v2-json.mjs`). 104 names are dropped this way, 46 of them
-different from the kanji keyword (玉 "jewel" vs "ball", 日 "sun" vs "day").
-
-Decided: **a shape that leads to a kanji is named by the kanji keyword.**
-釒 → 金 shows "gold" (not かね "metal") and 衤 → 衣 shows "garment" (not
-ころも "clothing"). Forms with a name of their own keep it (⺩ おうへん
-"king left", ⺮ "bamboo crown"). The user may rename 金 to "gold metal".
+Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana no",
+厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone".
 
 ### 5. Before and after merging this work
 
@@ -176,16 +220,12 @@ Decided: **a shape that leads to a kanji is named by the kanji keyword.**
 
 ### 6. Small open questions
 
-- Done: the build now fails if a component keyword is also a kanji keyword.
-  Renamed for it: 戈 dagger-axe, 艮 stopping, 豕 wild pig, 爻 intersecting
-  lines, 鬲 tripod kettle, 鹵 chemical salt, 龠 pan flute. Allowed on purpose
-  (`KANJI_KEYWORD_SHARED_OK` in `scripts/generate-v2-json.mjs`): the
-  Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔. Not yet decided, allowed for now:
-  ハ eight (八), 已 oneself (己), 阝 village (村, in no kanji).
-- **Pending upstream — keyword fixes.** See "Pending" in
-  `raw-data/kanji-heatmap-data/README.md`.
-- **Unnamed parts:** 358 parts show "...". None is used by 10+ kanji; 28 are
-  used by 5+ (the shortlist if names are ever wanted). Fine to leave.
+- Done: the build fails if a component keyword is also a kanji keyword (see
+  "Build checks").
+- **Unnamed parts:** 356 parts show "...". None is used by 10+ kanji; 28
+  glyphs (23 shapes) are used by 5+. The user wants the most used ones named:
+  suggestions are in section 1 of `docs/notes/naming-review.md`, waiting for
+  decisions.
 
 ## Working rules
 
