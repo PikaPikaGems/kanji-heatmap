@@ -334,8 +334,19 @@ describe("components.json", () => {
     expect(infoFor("氵", v2Radicals)).toEqual(radicalInfo["⺡"]);
     expect(keywordOf("氵")).toBe("three water");
     expect(components["⻏"]?.k).toBe("large village");
-    expect(components["⻖"]?.k).toBe("small hill left");
+    expect(components["⻖"]?.k).toBe("small village left");
     expect(components["𠂉"]?.k).toBe("no plus one");
+  });
+
+  it("names a shape that leads to a kanji by the kanji keyword", () => {
+    const kanjiKeyword = (char: string) => main[char][0];
+    // 釒 → 金 says "gold", not the radical name かね "metal".
+    expect(keywordOf("釒")).toBe(kanjiKeyword("金"));
+    // 衤 only had a copy of 衣's radical row, so it follows the alias too.
+    expect(components["衤"]?.k).toBeUndefined();
+    expect(keywordOf("衤")).toBe(kanjiKeyword("衣"));
+    // A form with its own name keeps it.
+    expect(keywordOf("⺩")).toBe("king left");
   });
 
   it("keeps every phonetic sound list", () => {
