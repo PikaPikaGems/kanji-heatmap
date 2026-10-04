@@ -76,7 +76,7 @@ release's per-kanji parts list (`kanji_extended.json` field 0 →
 - 歹 stays "bare bone".
 - Replacing the 🇨🇳 meaning line is a feature (item 2.3), not cleanup.
 - Every Kanji Heatmap Data fix is listed under "Pending" in
-  `raw-data/kanji-heatmap-data/README.md` and is parked until the user picks
+  `docs/notes/kanji-heatmap-data-pending.md` and is parked until the user picks
   it up.
 - 𠘨 stays aliased to 風 (popover says かぜ, wind).
 - Positions in the sylhare CSV are fine as they are; the popover shows only
@@ -94,8 +94,7 @@ Split in two (user, October 2026):
   PikaPikaGems/kanji-heatmap#302 is merged**, on a new branch from `main`.
   Merge the release's sound data with the Anki deck in this repo's build and
   write the result to `public/json/v2/`. Moving the merged data to Kanji
-  Heatmap Data later is listed under "Pending" in
-  `raw-data/kanji-heatmap-data/README.md`.
+  Heatmap Data later is listed in `docs/notes/kanji-heatmap-data-pending.md`.
 
   How it works today: each kanji's sound part is the release's
   `kanji_extended.json` field 8 (`phonetic`), copied to
@@ -214,8 +213,7 @@ Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana
   out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
   `components-kc.csv` (the same data as `components-ck.csv`, flipped) and
   `kanji-composition-map.txt` (already in `raw-data/kanji-structure/scott.json`).
-- **Pending upstream — grade bug.** Listed under "Pending" in
-  `raw-data/kanji-heatmap-data/README.md`, with every other Kanji Heatmap
+- **Pending upstream — grade bug.** Listed in `docs/notes/kanji-heatmap-data-pending.md`, with every other Kanji Heatmap
   Data fix.
 
 ### 6. Small open questions
