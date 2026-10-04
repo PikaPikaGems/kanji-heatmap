@@ -370,6 +370,31 @@ for (const [char, entry] of Object.entries(manualOverrides)) {
   }
 }
 
+// A component keyword must not be a kanji keyword either, or two different
+// characters look like the same thing (戈 and 槍 were both "spear"). Listed
+// here: the same character at a Kangxi-radical codepoint, plus look-alikes
+// nobody has decided to rename yet.
+const KANJI_KEYWORD_SHARED_OK = {
+  "⼊": "入",
+  "⾋": "草",
+  "⿊": "黒",
+  "⿒": "歯",
+  "⿔": "亀",
+  ハ: "八",
+  已: "己",
+  阝: "村",
+};
+const kanjiByKeyword = {};
+for (const kanji of kanjiList) {
+  kanjiByKeyword[main[kanji][0].trim().toLowerCase()] ??= kanji;
+}
+for (const [char, entry] of Object.entries(components)) {
+  if (entry.k == null || isKanji(char)) continue;
+  const kanji = kanjiByKeyword[entry.k.trim().toLowerCase()];
+  if (kanji == null || KANJI_KEYWORD_SHARED_OK[char] === kanji) continue;
+  fail(`components: "${entry.k}" (${char}) is also the keyword of ${kanji}`);
+}
+
 // ---------------------------------------------------------------------------
 // kanji_structures.json — the four interpretations in one file. Sources are
 // heterogeneous (object / 5-tuple / two component lists) and each covers a

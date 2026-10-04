@@ -163,13 +163,12 @@ Decided: **a shape that leads to a kanji is named by the kanji keyword.**
 
 ### 6. Small open questions
 
-- **Check component keywords against kanji keywords in the build?** Today it
-  only checks components against each other; 乂 "regulate" and 昏 "dusk"
-  slipped through (now renamed "mow" and "twilight"). A trial run of that
-  check finds 15 more: 戈 spear (槍), 艮 boundary (端), 爻 mix (混), 豕 pig
-  (豚), 鬲 cauldron (釜), 鹵 salt (塩), 龠 flute (笛), 阝 village (村, unused),
-  已 oneself (己), ハ eight (八), and the Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔
-  (same character as their kanji). The user decides which to rename.
+- Done: the build now fails if a component keyword is also a kanji keyword.
+  Renamed for it: 戈 dagger-axe, 艮 stopping, 豕 wild pig, 爻 intersecting
+  lines, 鬲 tripod kettle, 鹵 chemical salt, 龠 pan flute. Allowed on purpose
+  (`KANJI_KEYWORD_SHARED_OK` in `scripts/generate-v2-json.mjs`): the
+  Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔. Not yet decided, allowed for now:
+  ハ eight (八), 已 oneself (己), 阝 village (村, in no kanji).
 - **Pending upstream — keyword fixes.** See "Pending" in
   `raw-data/kanji-heatmap-data/README.md`.
 - **Unnamed parts:** 358 parts show "...". None is used by 10+ kanji; 28 are
