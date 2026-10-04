@@ -128,32 +128,36 @@ translation of each Japanese radical name. There are 245, one per name: the
 214 classic radicals, 26 positional forms with their own name (⺅ にんべん,
 ⻏ おおざと, …) and 5 `extras`. Glyphs sharing a name share the translation
 (see `raw-data/radicals/README.md`). Only the clearly wrong ones were fixed
-(火, 黄, 革, 示, ⺭, 酉, 禸); about 235 were never reviewed one by one. Ones
-that look off:
+(火, 黄, 革, 示, ⺭, 酉, 禸), then 辛 "spicy", 阜 "small village", ⻖ "small
+village left", 釆 "no + rice", 斗 "measuring box right", 幺 "thread head",
+缶 "water jar". The rest were never reviewed one by one.
 
-| Glyph | Name       | Current           | Note                             |
-| ----- | ---------- | ----------------- | -------------------------------- |
-| 辛    | からい     | bitter            | からい means spicy               |
-| 阜    | こざと     | small hill        | literally "small village" (小里) |
-| 釆    | のごめ     | divide            | literally ノ + 米                |
-| 斗    | ますづくり | ladle right       | ます is a measuring box          |
-| 幺    | いとがしら | short thread head | literally "thread head"          |
-| 缶    | みずがめ   | jar               | "water jar"                      |
-| 歹    | がつ       | bare bone         | がつ is a reading, not a meaning |
+Still open: 歹 がつ is "bare bone" (copied from the release's component
+keyword). がつ is a reading, not a meaning; other names are かばねへん
+("corpse side") and いちたへん. The user hasn't decided.
 
 The user decides each rename. Kept on purpose: のまた "no + mata", るまた
 "ru + mata", 丿/ノ "katakana no", 厶 "katakana mu", 乙/⺃ "second".
 
+**Most translations never show.** When the radical is itself a kanji, the
+build drops its name and the app shows the kanji keyword instead
+(`scripts/generate-v2-json.mjs`). 104 names are dropped this way, 46 of them
+different from the kanji keyword (玉 "jewel" vs "ball", 日 "sun" vs "day").
+
+Decided: **a shape that leads to a kanji is named by the kanji keyword.**
+釒 → 金 shows "gold" (not かね "metal") and 衤 → 衣 shows "garment" (not
+ころも "clothing"). Forms with a name of their own keep it (⺩ おうへん
+"king left", ⺮ "bamboo crown"). The user may rename 金 to "gold metal".
+
 ### 5. Before and after merging this work
 
-- Merge PikaPikaGems/kanji-heatmap#301 (`claude/intelligent-babbage-buyv9k`).
-  CI, including the end-to-end suite, passed on it.
-- The remote `radicals-cleanup` branch is then obsolete. Four of its files
-  were imported into `raw-data/radicals/external/` and `raw-data/misc/`. Left
+- Done: PikaPikaGems/kanji-heatmap#301 was merged, and the remote
+  `radicals-cleanup` and `improve-radicals` branches were deleted. Of
+  `radicals-cleanup`, four files were imported into `raw-data/radicals/external/` and `raw-data/misc/`. Left
   out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
   `components-kc.csv` (the same data as `components-ck.csv`, flipped) and
   `kanji-composition-map.txt` (already in `raw-data/kanji-structure/scott.json`).
-- **Report the grade bug upstream:** Kanji Heatmap Data tags 279 name kanji
+- **Parked — report the grade bug upstream:** Kanji Heatmap Data tags 279 name kanji
   (伊, 彦, 智, …) as grade 9. This repo works around it in the build using
   `raw-data/misc/jouyou_kanji.txt`, but the release itself is still wrong.
 
@@ -161,7 +165,11 @@ The user decides each rename. Kept on purpose: のまた "no + mata", るまた
 
 - **Check component keywords against kanji keywords in the build?** Today it
   only checks components against each other; 乂 "regulate" and 昏 "dusk"
-  slipped through (now renamed "mow" and "twilight").
+  slipped through (now renamed "mow" and "twilight"). A trial run of that
+  check finds 15 more: 戈 spear (槍), 艮 boundary (端), 爻 mix (混), 豕 pig
+  (豚), 鬲 cauldron (釜), 鹵 salt (塩), 龠 flute (笛), 阝 village (村, unused),
+  已 oneself (己), ハ eight (八), and the Kangxi-codepoint twins ⼊ ⾋ ⿊ ⿒ ⿔
+  (same character as their kanji). The user decides which to rename.
 - **Push keyword fixes upstream** to Kanji Heatmap Data
   (`overrides/component_keyword.json`) at some point.
 - **Unnamed parts:** 358 parts show "...". None is used by 10+ kanji; 28 are

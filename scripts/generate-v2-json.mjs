@@ -290,11 +290,12 @@ for (const [char, entry] of Object.entries(sylhareKeywords)) {
   radicalInfo[char] = info;
 }
 
-// A keyword for a character that is itself a kanji is unreachable: every call
-// site reads kanji_main first and only falls back to the component registry.
-// Drop it so the keyword has exactly one home — unless an alias points at the
-// kanji (飠 → 食), since the alias reads its radical name from there. Sounds
-// and stroke counts stay; kanji_main carries neither.
+// A shape that leads to a kanji is named by the kanji keyword, never by a
+// radical name: 釒 → 金 shows "gold", not かね's "metal". Every call site reads
+// kanji_main first, so a kanji's own component keyword is unreachable and is
+// dropped — except on an alias target, where it becomes the kanji_main
+// keyword for the alias to read. Sounds and stroke counts stay; kanji_main
+// carries neither.
 const aliasTargets = new Set(Object.values(allAliases));
 let droppedKanjiKeywords = 0;
 for (const char of Object.keys(components)) {
@@ -303,6 +304,24 @@ for (const char of Object.keys(components)) {
   delete components[char].k;
   droppedKanjiKeywords += 1;
   if (Object.keys(components[char]).length === 0) delete components[char];
+}
+for (const char of aliasTargets) {
+  if (!isKanji(char)) continue;
+  components[char] = { ...components[char], k: main[char][0] };
+}
+// An alternate form that only carries a copy of its kanji's radical row
+// (衤 ころも, copied from 衣 ころも) drops the copy and follows the alias to
+// the kanji keyword. A form with a name of its own keeps it (⺩ おうへん,
+// "king left").
+for (const [char, target] of Object.entries(allAliases)) {
+  if (!isKanji(target) || isKanji(char)) continue;
+  if (radicalInfo[char] == null) continue;
+  if (radicalInfo[char].ja !== radicalInfo[target]?.ja) continue;
+  delete radicalInfo[char];
+  if (components[char] != null) delete components[char].k;
+  if (components[char] && Object.keys(components[char]).length === 0) {
+    delete components[char];
+  }
 }
 // Same for radical info: a kanji never opens the radical popover itself.
 for (const char of Object.keys(radicalInfo)) {
