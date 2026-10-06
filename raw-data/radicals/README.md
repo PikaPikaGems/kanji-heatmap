@@ -85,8 +85,9 @@ radicals of their own.
 - **⺈** is listed under 刀 but is the ク-shaped top of 魚.
 - **阝** is used for both ⻖ (left, hill) and ⻏ (right, village); it is a plain
   component named "hill or village" (in `raw-data/components/ours.json`).
-- **玊** is listed under 王 ("king") but is a separate, rare variant of 玉
-  (jade); aliasing it to 王 would be wrong.
+- **玊** is listed under 王 ("king"), and has its own row, but it is not a
+  radical: it is a rare variant of 玉 (jade). Aliasing it to 王 would be
+  wrong, so it is a plain part with no name (shows "...").
 - **⺍** and **⾡** get the right alias from `sylhareExtraAliases` instead.
 - **甩** (reason not recorded) is a different character ("to fling") that the
   CSV lists under 用.
