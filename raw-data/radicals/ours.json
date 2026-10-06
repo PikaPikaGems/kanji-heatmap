@@ -1,13 +1,10 @@
 {
   "literalEn": {
-    "丨": "vertical stick",
     "丶": "dot",
-    "丿": "katakana no",
     "亅": "hook stick",
     "亠": "pot lid",
     "儿": "person legs",
     "⼊": "enter",
-    "八": "eight",
     "冂": "border enclosure",
     "冖": "katakana wa crown",
     "冫": "two water",
@@ -35,7 +32,6 @@
     "廴": "stretch wrap",
     "廾": "twenty legs",
     "弋": "corded arrow",
-    "彐": "pig head",
     "彡": "bristle right",
     "彳": "going person left",
     "戈": "dagger-axe",
@@ -48,14 +44,12 @@
     "气": "steam enclosure",
     "爻": "intersecting lines",
     "爿": "split wood left",
-    "王": "jewel",
     "瓜": "melon",
     "疋": "bolt of cloth",
     "疒": "sickness hanging",
     "癶": "departure head",
     "禸": "beast's feet",
     "禾": "grain left",
-    "罒": "net head",
     "耂": "old crown",
     "而": "and then",
     "耒": "plow",
@@ -114,7 +108,13 @@
     "マ": "katakana ma",
     "ユ": "katakana yu",
     "丷": "eight head",
-    "⺩": "king left"
+    "⺩": "king left",
+    "｜": "vertical stick",
+    "ノ": "katakana no",
+    "ヨ": "pig head",
+    "⺲": "net head",
+    "彑": "pig head",
+    "䒑": "grass crown"
   },
   "aliases": {
     "罒": "⺲",
@@ -144,14 +144,21 @@
     "釒": "金",
     "⺮": "竹",
     "⺤": "爪",
-    "爫": "爪",
+    "爫": "⺤",
     "飠": "食",
     "𩙿": "食",
     "⺩": "王",
     "𤣩": "⺩",
     "⿊": "黒",
     "⿒": "歯",
-    "⿔": "亀"
+    "⿔": "亀",
+    "ハ": "八",
+    "⽁": "攵",
+    "⺫": "罒",
+    "⺛": "无",
+    "⽼": "耂",
+    "⺹": "耂",
+    "尤": "尢"
   },
   "sylhareSkipAlts": [
     "⺈",
@@ -200,7 +207,7 @@
     "ヨ": {
       "nameJa": "けいがしら",
       "position": "",
-      "meaning": "pig's head"
+      "meaning": "pig’s head"
     },
     "⺩": {
       "nameJa": "おうへん",

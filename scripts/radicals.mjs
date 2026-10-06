@@ -2,7 +2,7 @@
  * Everything radical-related that the build derives from raw-data/radicals/.
  *
  *   external/sylhare-radicals.csv  ─┐
- *   ours.json                       ├─▶ buildBushuEntries, mergeSylhareBushuAliases
+ *   ours.json                       ├─▶ buildRadicalData → { aliases, keywords, info }
  *   external/rewhowe-drawer.json   ─┘
  *
  * Files in external/ are read, never written. Our own choices (English
@@ -105,167 +105,111 @@ const positionOf = (raw) => {
   return POSITIONS.has(first) ? first : "";
 };
 
-/** { k?, ja, pos?, cn? } — empty fields are left out. */
-const entryOf = (literal, nameJa, positionJ, meaning) => {
-  const entry = { ja: nameJa };
-  if (literal) entry.k = literal;
-  const pos = positionOf(positionJ);
+/** Popover facts { ja, pos?, cn? } — empty fields are left out. */
+const infoOf = ({ ja, position, meaning }) => {
+  const info = { ja };
+  const pos = positionOf(position);
   const cn = (meaning ?? "").trim();
-  if (pos) entry.pos = pos;
-  if (cn) entry.cn = cn;
-  return entry;
+  if (pos) info.pos = pos;
+  if (cn) info.cn = cn;
+  return info;
 };
 
 /**
- * Which glyph holds the translation for each named radical glyph. Glyphs with
- * the same Japanese name are the same radical (⿊ くろ = 黒 くろ), so they
- * share one translation:
+ * Every radical fact the app needs, from the sylhare CSV, the rewhowe drawer
+ * and ours.json:
  *
- * - A classic radical (rows 1–214) holds its own.
- * - A variant or extra uses the classic radical with its name. A few names
- *   belong to two classic radicals (ひ: 日 and 火, き: 木 and 黄); then it uses
- *   the one whose Alternate column lists it (⿈ → 黄).
- * - A name with no classic radical is held by the first glyph with that name
- *   (⺤ for つめかんむり, shared with 爫).
- */
-const translationOwners = (sylhareRows, extras) => {
-  const named = [
-    ...sylhareRows
-      .filter((row) => isGlyph(row.Radical))
-      .map((row) => ({
-        glyph: row.Radical,
-        name: (row["Reading-J"] ?? "").trim(),
-        classic: Number(row.Number) <= 214,
-        alternates: [...(row.Alternate ?? "")],
-      })),
-    ...Object.entries(extras).map(([glyph, extra]) => ({
-      glyph,
-      name: extra.nameJa,
-      classic: false,
-      alternates: [],
-    })),
-  ].filter((n) => n.name && n.name !== "n/a");
-
-  const byName = {};
-  for (const n of named) (byName[n.name] ??= []).push(n);
-
-  const owners = {};
-  for (const n of named) {
-    const classics = byName[n.name].filter((m) => m.classic);
-    if (n.classic) {
-      owners[n.glyph] = n.glyph;
-    } else if (classics.length === 0) {
-      owners[n.glyph] = byName[n.name][0].glyph;
-    } else if (classics.length === 1) {
-      owners[n.glyph] = classics[0].glyph;
-    } else {
-      const listed = classics.find((c) => c.alternates.includes(n.glyph));
-      if (listed == null) {
-        throw new Error(
-          `radicals: ${n.glyph} (${n.name}) matches ${classics.map((c) => c.glyph).join(", ")}; ` +
-            `list it in one Alternate column to pick`
-        );
-      }
-      owners[n.glyph] = listed.glyph;
-    }
-  }
-  return owners;
-};
-
-/**
- * Bushu entries ({ k?, ja, pos, cn }) per glyph, from the sylhare CSV plus our
- * translations and missing forms. Translations are keyed by glyph only —
- * never by reading, since readings collide (日 and 火 are both ひ).
+ * - `aliases`: glyph → the glyph to read from, or to search with (氵 → ⺡).
+ * - `keywords`: English name per glyph (`literalEn`).
+ * - `info`: radical popover facts { ja, pos?, cn? } per glyph.
  *
- * A radical that is a kanji shows its kanji keyword, so it needs no
- * translation; it still gets an entry, for its popover info. Throws if a
- * radical that isn't a kanji has no translation, if a translation is unused,
- * or if a kanji has one that no non-kanji form shows (ハ shows 八's "eight").
- * Pass the finished alias table: alternates aliased to their radical get no
- * copy of its row.
+ * A glyph shows its own name and info if it has them, and otherwise the app
+ * follows its alias, so each fact is stored once:
+ *
+ * - A named glyph (a CSV row, an `extras` entry, or an alternate form with no
+ *   alias of its own) needs a `literalEn` entry, unless it has an alias to
+ *   read through. ⺤ "claw crown" has both: its own name, and an alias to 爪
+ *   for radical search.
+ * - A kanji shows its kanji keyword, so it never has a `literalEn` entry.
+ *   Its info is kept only when an alias points at it (衤 → 衣).
+ *
+ * Throws on a missing, misplaced or unused `literalEn` entry.
  */
-export const buildBushuEntries = ({ sylhareRows, ours, aliases, isKanji }) => {
-  const literals = ours.literalEn;
-  const owners = translationOwners(sylhareRows, ours.extras ?? {});
-  const skipAsAlternate = new Set([
-    ...Object.keys(ours.aliases ?? {}),
-    ...(ours.sylhareSkipAlts ?? []),
-  ]);
-
-  const usedLiterals = new Set();
-  // Kanji owners whose translation some non-kanji glyph actually shows.
-  const shownKanjiLiterals = new Set();
-  const literalFor = (glyph, shownOn = glyph) => {
-    const owner = owners[glyph];
-    usedLiterals.add(owner);
-    if (isKanji(owner) && !isKanji(shownOn)) shownKanjiLiterals.add(owner);
-    return (literals[owner] ?? "").toString().trim();
-  };
+export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
+  const drawerRadicals = new Set(Object.values(drawer).flat());
+  const aliases = { ...(ours.aliases ?? {}) };
+  mergeSylhareAliases({
+    sylhareRows,
+    drawerRadicals,
+    aliases,
+    isKanji,
+    skipAlts: ours.sylhareSkipAlts,
+    extraAliases: ours.sylhareExtraAliases,
+  });
+  const aliasTargets = new Set(Object.values(aliases));
+  const skipAlts = new Set(ours.sylhareSkipAlts ?? []);
 
   // Rows without a usable glyph (private-use codepoints, 々's "n/a") are
-  // skipped: nothing in the app can show them.
-  const named = sylhareRows
-    .map((row) => {
-      const readingJ = (row["Reading-J"] ?? "").trim();
-      if (!readingJ || readingJ === "n/a") return null;
-      if (!isGlyph(row.Radical)) return null;
-      // A row aliased to the glyph that holds its name (⽻ → 羽, both はね)
-      // reads everything through the alias, like an alternate form.
-      if (aliases[row.Radical] === owners[row.Radical]) return null;
-      return { row, readingJ, literal: literalFor(row.Radical) };
-    })
-    .filter(Boolean);
-
-  const missingLiterals = new Set(
-    named
-      .filter((n) => !n.literal && !isKanji(owners[n.row.Radical]))
-      .map((n) => owners[n.row.Radical])
-  );
-  const radicalSeen = new Set(
-    sylhareRows
-      .map((row) => row.Radical)
-      .filter((radical) => radical && [...radical].length === 1)
-      .filter((radical) => !isPua(radical))
-  );
-
-  const out = {};
-  const rowEntry = ({ row, readingJ, literal }) =>
-    entryOf(literal, readingJ, row["Position-J"], row.Meaning);
-
-  // Main glyphs first, so an alternate never shadows a real radical.
-  for (const n of named) {
-    out[n.row.Radical] = rowEntry(n);
-  }
-  for (const n of named) {
-    for (const ch of [...(n.row.Alternate ?? "")].filter(isGlyph)) {
-      if (radicalSeen.has(ch) || out[ch] != null) continue;
-      if (skipAsAlternate.has(ch)) continue;
-      // An alternate aliased to this radical (衤 → 衣) reads its data through
-      // the alias; copying the row onto it would store it twice.
-      if (aliases[ch] === n.row.Radical) continue;
-      literalFor(n.row.Radical, ch);
-      out[ch] = rowEntry(n);
+  // skipped: nothing in the app can show them. Extras win over CSV rows.
+  const named = new Map();
+  const rows = sylhareRows
+    .map((row) => ({
+      glyph: row.Radical,
+      ja: (row["Reading-J"] ?? "").trim(),
+      position: row["Position-J"],
+      meaning: row.Meaning,
+      alternates: [...(row.Alternate ?? "")].filter(isGlyph),
+    }))
+    .filter((row) => isGlyph(row.glyph) && row.ja && row.ja !== "n/a")
+    // A skipped glyph is not this radical at all, not even as its own row
+    // (玊 is a variant of 玉 that the CSV files under 王).
+    .filter((row) => !skipAlts.has(row.glyph));
+  for (const row of rows) named.set(row.glyph, row);
+  // An alternate form with no alias has nowhere else to read from, so it is
+  // named in its own right, with its row's facts (ハ under 八 is the drawer's
+  // own button). Rows come first, so an alternate never shadows a radical.
+  for (const row of rows) {
+    for (const alt of row.alternates) {
+      if (named.has(alt) || skipAlts.has(alt) || aliases[alt] != null) continue;
+      named.set(alt, { ...row, glyph: alt });
     }
   }
-
-  for (const [ch, extra] of Object.entries(ours.extras ?? {})) {
-    const literal = literalFor(ch);
-    if (!literal && !isKanji(owners[ch])) missingLiterals.add(owners[ch]);
-    out[ch] = entryOf(literal, extra.nameJa, extra.position, extra.meaning);
+  for (const [glyph, extra] of Object.entries(ours.extras ?? {})) {
+    named.set(glyph, {
+      glyph,
+      ja: extra.nameJa,
+      position: extra.position,
+      meaning: extra.meaning,
+    });
   }
 
-  if (missingLiterals.size > 0) {
-    throw new Error(
-      `radicals: missing literalEn for ${[...missingLiterals].join(", ")}`
-    );
+  const literals = ours.literalEn ?? {};
+  const keywords = {};
+  const info = {};
+  const problems = [];
+  for (const [glyph, entry] of named) {
+    const literal = (literals[glyph] ?? "").toString().trim();
+    if (isKanji(glyph)) {
+      if (literal) problems.push(`${glyph} is a kanji; remove its literalEn`);
+      if (aliasTargets.has(glyph)) info[glyph] = infoOf(entry);
+      continue;
+    }
+    if (!literal) {
+      if (aliases[glyph] == null) {
+        problems.push(`${glyph} (${entry.ja}) needs a literalEn or an alias`);
+      }
+      continue;
+    }
+    keywords[glyph] = literal;
+    info[glyph] = infoOf(entry);
   }
-  const unused = Object.keys(literals).filter(
-    (g) => !usedLiterals.has(g) || (isKanji(g) && !shownKanjiLiterals.has(g))
-  );
-  if (unused.length > 0) {
-    throw new Error(`radicals: unused literalEn for ${unused.join(", ")}`);
+  for (const glyph of Object.keys(literals)) {
+    if (!named.has(glyph)) problems.push(`unused literalEn for ${glyph}`);
   }
-  return out;
+  if (problems.length > 0) {
+    throw new Error(`radicals:\n  - ${problems.join("\n  - ")}`);
+  }
+  return { aliases, keywords, info };
 };
 
 /**
@@ -273,7 +217,7 @@ export const buildBushuEntries = ({ sylhareRows, ours, aliases, isKanji }) => {
  * overwrite existing aliases, drawer glyphs, or kanji (those already have
  * their own UI).
  */
-export const mergeSylhareBushuAliases = ({
+const mergeSylhareAliases = ({
   sylhareRows,
   drawerRadicals,
   aliases,

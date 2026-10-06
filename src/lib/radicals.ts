@@ -98,14 +98,24 @@ export const followAlias = (
   return null;
 };
 
-/** Component keyword for a glyph, following aliases (氵 → "three water"). */
+/**
+ * Component keyword for a glyph, following aliases (氵 → "three water"). An
+ * alias that reaches a kanji shows its kanji keyword (衤 → 衣 → "garment"):
+ * kanji keywords live only in kanji_main, never in components.json.
+ */
 export const componentKeyword = (
   char: string,
   components: Record<string, { k?: string }>,
-  aliases: Record<string, string>
+  aliases: Record<string, string>,
+  kanjiKeyword: (kanji: string) => string | undefined
 ): string | undefined => {
-  const glyph = followAlias(char, aliases, (g) => components[g]?.k != null);
-  return glyph == null ? undefined : components[glyph].k;
+  const glyph = followAlias(
+    char,
+    aliases,
+    (g) => components[g]?.k != null || kanjiKeyword(g) != null
+  );
+  if (glyph == null) return undefined;
+  return components[glyph]?.k ?? kanjiKeyword(glyph);
 };
 
 /** Radical popover facts for a glyph, following aliases. */
