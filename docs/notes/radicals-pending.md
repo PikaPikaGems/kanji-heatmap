@@ -168,7 +168,7 @@ names one by one (`docs/notes/naming-review.md`, section 2) stalled, because:
 - **There is no single rule.** Today's names mix literal translations
   ("three water" さんずい), meanings ("bare bone" 歹, "stopping" 艮,
   "bristle right" 彡) and spelled-out kana ("katakana no" 丿, "no + mata"
-  夂). Every name became its own debate.
+  夂, since renamed). Every name became its own debate.
 - **Literal names are opaque where most people see them.** A chip in a kanji
   breakdown, the parts list or the radical drawer shows only the glyph and
   the English name. "u crown" (宀 うかんむり, named after the katakana ウ), "wa
@@ -207,10 +207,13 @@ Renamed (October 2026; may be renamed again in this overhaul): 宀 "katakana u c
 "katakana wa crown" (named after the katakana they look like, like 丿
 "katakana no"), and 广 "hemp hanging" (まだれ's ま comes from 麻, hemp). The
 user finds "hemp hanging" unintuitive; "slanting roof hanging" (its meaning)
-is the main alternative.
+is the main alternative. In the same spirit, the names made of a katakana
+plus a kanji now spell the katakana out: 釆 "katakana no + rice" (のごめ = ノ +
+米), 夂 "katakana no + again" (のまた = ノ + 又), 殳 "katakana ru + again"
+(るまた = ル + 又).
 
 Earlier choices were made under the literal rule and may be revisited here,
-only with the user: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana
+only with the user: 丿/ノ "katakana
 no", 厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone", and the sound-named
 radicals keeping a meaning (彡 "bristle right", 冂 "border enclosure", 凵
 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook stick").
@@ -219,9 +222,11 @@ Already fixed: 火, 黄, 革, 示, ⺭, 酉, 禸, then (October 2026) 辛 "spicy
 "small village", ⻖ "small village left", 釆 "katakana no + rice", 斗 "measuring box
 right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
 "dagger-axe", 艮 "stopping", 豕 "wild pig", 爻 "intersecting lines", 鬲
-"tripod kettle", 鹵 "chemical salt", 龠 "pan flute".
+"tripod kettle", 鹵 "chemical salt", 龠 "pan flute", then 卩 "joint right",
+隶 "servant right", 弋 "corded arrow", 夂 "katakana no + again", 殳
+"katakana ru + again".
 
-Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana no",
+Kept on purpose: 丿/ノ "katakana no",
 厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone". Radicals whose Japanese
 name is just a reading keep a meaning instead: 彡 "bristle right", 冂 "border
 enclosure", 凵 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook

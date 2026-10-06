@@ -77,8 +77,7 @@ The other 138 never show:
 - 邑 stopped showing when 阝 became a plain part ("hill or village").
 
 Glyphs in brackets are the other shapes that show the same name. Kept on
-purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
-"katakana no", 厶 "katakana mu", 乙/⺃ "second".
+purpose (don't reopen): 丿/ノ "katakana no", 厶 "katakana mu", 乙/⺃ "second".
 
 | Glyph         | Shown on    | Japanese name  | English now         | Note                                                                                                             | Decision |
 | ------------- | ----------- | -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------- | -------- |
@@ -105,7 +104,7 @@ purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 | 厶            | 36 kanji    | む             | katakana mu         |                                                                                                                  |          |
 | 戈            | 35 kanji    | ほこ           | dagger-axe          | Decided October 2026                                                                                             |          |
 | ⺉ (刂)       | 33 kanji    | りっとう       | standing sword      |                                                                                                                  |          |
-| 夂            | 33 kanji    | のまた         | no + mata           |                                                                                                                  |          |
+| 夂            | 33 kanji    | のまた         | katakana no + again | Decided October 2026: のまた = katakana ノ + 又 (again)                                                          |          |
 | 冫            | 32 kanji    | にすい         | two water           |                                                                                                                  |          |
 | 尸            | 32 kanji    | しかばね       | corpse              |                                                                                                                  |          |
 | 厂            | 32 kanji    | がんだれ       | cliff hanging       |                                                                                                                  |          |
@@ -123,7 +122,7 @@ purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 | 几            | 21 kanji    | きにょう       | table wrap          |                                                                                                                  |          |
 | ⺩ (𤣩)       | 20 kanji    | おうへん       | king left           |                                                                                                                  |          |
 | 彡            | 17 kanji    | さんづくり     | bristle right       | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
-| 殳            | 17 kanji    | るまた         | ru + mata           |                                                                                                                  |          |
+| 殳            | 17 kanji    | るまた         | katakana ru + again | Decided October 2026: るまた = katakana ル + 又 (again)                                                          |          |
 | 匕            | 16 kanji    | さじ           | spoon               |                                                                                                                  |          |
 | 幺            | 16 kanji    | いとがしら     | thread head         | Decided October 2026                                                                                             |          |
 | ⺌ (⺍)       | 16 kanji    | しょうかんむり | small crown         |                                                                                                                  |          |
