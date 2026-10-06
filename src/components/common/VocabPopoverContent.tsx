@@ -52,7 +52,7 @@ export const VocabPopoverContent = ({
               <>
                 <SeeMore
                   definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
-                  maxLen={60}
+                  maxLen={90}
                 />
               </>
             )}
