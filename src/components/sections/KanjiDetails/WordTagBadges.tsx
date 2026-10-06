@@ -13,7 +13,7 @@ import {
   getBookTags,
 } from "@/lib/sample-vocabulary";
 
-// Leveled word lists, shown in the word-list popover as easiest → hardest.
+// Leveled word lists, shown in the word-list popover as more basic → more advanced.
 const BOOK_LEVEL_RANGES = [
   ["🥚 Core 1", "🐥 Core 3"],
   ["Shin N4", "Shin N1"],
