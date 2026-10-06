@@ -173,7 +173,7 @@ names one by one (`docs/notes/naming-review.md`, section 2) stalled, because:
   breakdown, the parts list or the radical drawer shows only the glyph and
   the English name. "u crown" (宀 うかんむり, named after the katakana ウ), "wa
   crown" (冖 ワ) and "ma hanging" (广 まだれ, from 麻) meant nothing to a
-  learner there (renamed provisionally, below).
+  learner there (now renamed, below).
 - **Every other chip shows a meaning.** Kanji show their keyword ("king"),
   non-radical parts show a meaning ("mow"), and a shape that leads to a kanji
   now shows the kanji keyword (釒 "gold", not かね's "metal"). Radicals are
@@ -203,7 +203,7 @@ the name is a kana shape, spell the kana out ("katakana u crown", like
 This is close to "translate the name, fix opaque ones", but keeps the
 spelled-out katakana names.
 
-Provisional (user, October 2026; revisit here): 宀 "katakana u crown" and 冖
+Renamed (October 2026; may be renamed again in this overhaul): 宀 "katakana u crown" and 冖
 "katakana wa crown" (named after the katakana they look like, like 丿
 "katakana no"), and 广 "hemp hanging" (まだれ's ま comes from 麻, hemp). The
 user finds "hemp hanging" unintuitive; "slanting roof hanging" (its meaning)

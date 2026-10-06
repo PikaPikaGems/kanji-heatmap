@@ -80,112 +80,112 @@ Glyphs in brackets are the other shapes that show the same name. Kept on
 purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 "katakana no", 厶 "katakana mu", 乙/⺃ "second".
 
-| Glyph         | Shown on    | Japanese name  | English now         | Note                                                                                                                  | Decision |
-| ------------- | ----------- | -------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------- | -------- |
-| 囗            | 210 kanji   | くにがまえ     | country enclosure   |                                                                                                                       |          |
-| 丶            | 188 kanji   | てん           | dot                 |                                                                                                                       |          |
-| ⺡ (氵)       | 133 kanji   | さんずい       | three water         |                                                                                                                       |          |
-| 丨 (｜)       | 115 kanji   | たてぼう       | vertical stick      |                                                                                                                       |          |
-| ⺅ (亻)       | 110 kanji   | にんべん       | person left         |                                                                                                                       |          |
-| 廾            | 98 kanji    | にじゅうあし   | twenty legs         |                                                                                                                       |          |
-| ⺘ (扌)       | 94 kanji    | てへん         | hand left           |                                                                                                                       |          |
-| 丿 (ノ)       | 81 kanji    | の             | katakana no         |                                                                                                                       |          |
-| 艹 (⺾ 艸 䒑) | 79 kanji    | くさかんむり   | grass crown         |                                                                                                                       |          |
-| ⻌ (辶 辵 辶) | 59 kanji    | しんにょう     | movement wrap       |                                                                                                                       |          |
-| 宀            | 55 kanji    | うかんむり     | u crown             | Renamed to "katakana u crown" for now (shaped like ウ); revisit in the popover overhaul                               |          |
-| 儿            | 51 kanji    | ひとあし       | person legs         |                                                                                                                       |          |
-| 冂            | 51 kanji    | けいがまえ     | border enclosure    | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| 亠            | 50 kanji    | なべぶた       | pot lid             |                                                                                                                       |          |
-| 冖            | 47 kanji    | わかんむり     | wa crown            | Renamed to "katakana wa crown" for now (shaped like ワ); revisit in the popover overhaul                              |          |
-| 隹            | 40 kanji    | ふるとり       | old bird            |                                                                                                                       |          |
-| 勹            | 39 kanji    | つつみがまえ   | wrap enclosure      |                                                                                                                       |          |
-| 禾            | 38 kanji    | のぎへん       | grain left          |                                                                                                                       |          |
-| 攵 (攴)       | 38 kanji    | ぼくづくり     | strike right        |                                                                                                                       |          |
-| ⺖ (忄)       | 38 kanji    | りっしんべん   | standing heart left |                                                                                                                       |          |
-| 厶            | 36 kanji    | む             | katakana mu         |                                                                                                                       |          |
-| 戈            | 35 kanji    | ほこ           | dagger-axe          | Decided October 2026                                                                                                  |          |
-| ⺉ (刂)       | 33 kanji    | りっとう       | standing sword      |                                                                                                                       |          |
-| 夂            | 33 kanji    | のまた         | no + mata           |                                                                                                                       |          |
-| 冫            | 32 kanji    | にすい         | two water           |                                                                                                                       |          |
-| 尸            | 32 kanji    | しかばね       | corpse              |                                                                                                                       |          |
-| 厂            | 32 kanji    | がんだれ       | cliff hanging       |                                                                                                                       |          |
-| 頁            | 31 kanji    | おおがい       | big shell           |                                                                                                                       |          |
-| ⻖            | 31 kanji    | こざとへん     | small village left  | Decided October 2026                                                                                                  |          |
-| 彐 (彑 ヨ ⺕) | 30 kanji    | けいがしら     | pig head            |                                                                                                                       |          |
-| ⺮            | 29 kanji    | たけかんむり   | bamboo crown        |                                                                                                                       |          |
-| 亅            | 28 kanji    | はねぼう       | hook stick          | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| ⺣ (灬)       | 27 kanji    | れっか         | lined fire          |                                                                                                                       |          |
-| 广            | 26 kanji    | まだれ         | ma hanging          | Renamed to "hemp hanging" for now (ま is from 麻); revisit in the popover overhaul. Leaning: "slanting roof hanging"? |          |
-| 卩 (㔾)       | 24 kanji    | ふしづくり     | seal right          | Renamed to "joint right"                                                                                              |          |
-| 艮            | 22 kanji    | こん           | stopping            | Decided October 2026                                                                                                  |          |
-| 彳            | 21 kanji    | ぎょうにんべん | going person left   |                                                                                                                       |          |
-| 罒 (网 ⺲)    | 21 kanji    | あみがしら     | net head            |                                                                                                                       |          |
-| 几            | 21 kanji    | きにょう       | table wrap          |                                                                                                                       |          |
-| ⺩ (𤣩)       | 20 kanji    | おうへん       | king left           |                                                                                                                       |          |
-| 彡            | 17 kanji    | さんづくり     | bristle right       | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| 殳            | 17 kanji    | るまた         | ru + mata           |                                                                                                                       |          |
-| 匕            | 16 kanji    | さじ           | spoon               |                                                                                                                       |          |
-| 幺            | 16 kanji    | いとがしら     | thread head         | Decided October 2026                                                                                                  |          |
-| ⺌ (⺍)       | 16 kanji    | しょうかんむり | small crown         |                                                                                                                       |          |
-| ⺭ (礻)       | 15 kanji    | しめすへん     | show left           |                                                                                                                       |          |
-| 疒            | 15 kanji    | やまいだれ     | sickness hanging    |                                                                                                                       |          |
-| ⺨ (犭)       | 15 kanji    | けものへん     | beast left          |                                                                                                                       |          |
-| 凵            | 14 kanji    | かんにょう     | open box wrap       | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| 豕            | 14 kanji    | いのこ         | wild pig            | Decided October 2026                                                                                                  |          |
-| ⻏            | 14 kanji    | おおざと       | large village       |                                                                                                                       |          |
-| ⻗            | 13 kanji    | あめかんむり   | rain crown          |                                                                                                                       |          |
-| ⺤ (爫)       | 13 kanji    | つめかんむり   | claw crown          |                                                                                                                       |          |
-| 卜 (⺊)       | 12 kanji    | ぼく           | divination          |                                                                                                                       |          |
-| 𠆢            | 12 kanji    | ひとやね       | person roof         |                                                                                                                       |          |
-| 氺            | 11 kanji    | したみず       | bottom water        |                                                                                                                       |          |
-| 𠂉            | 11 kanji    | のいち         | no plus one         |                                                                                                                       |          |
-| 匚            | 10 kanji    | はこがまえ     | box enclosure       |                                                                                                                       |          |
-| 聿            | 8 kanji     | ふでづくり     | brush right         |                                                                                                                       |          |
-| 虍            | 8 kanji     | とらがしら     | tiger head          |                                                                                                                       |          |
-| 疋            | 8 kanji     | ひき           | bolt of cloth       |                                                                                                                       |          |
-| 巛            | 8 kanji     | まがりがわ     | bent river          |                                                                                                                       |          |
-| 丷            | 8 kanji     | はちがしら     | eight head          |                                                                                                                       |          |
-| 曰            | 8 kanji     | ひらび         | flat sun            |                                                                                                                       |          |
-| 歹            | 6 kanji     | がつ           | bare bone           | Decided October 2026                                                                                                  |          |
-| 韋            | 6 kanji     | なめしがわ     | tanned leather      |                                                                                                                       |          |
-| 舛            | 6 kanji     | まいあし       | dancing legs        |                                                                                                                       |          |
-| 耂 (⺹)       | 5 kanji     | おいかんむり   | old crown           |                                                                                                                       |          |
-| 弋            | 5 kanji     | いぐるみ       | javelin             | Renamed to "corded arrow"                                                                                             |          |
-| 匸            | 5 kanji     | かくしがまえ   | hide enclosure      |                                                                                                                       |          |
-| 爿 (丬)       | 5 kanji     | しょうへん     | split wood left     | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| ⻊            | 5 kanji     | あしへん       | foot left           |                                                                                                                       |          |
-| 毋            | 4 kanji     | なかれ         | do not              |                                                                                                                       |          |
-| 廴            | 4 kanji     | えんにょう     | stretch wrap        |                                                                                                                       |          |
-| 隶            | 4 kanji     | れいづくり     | capture right       | Renamed to "servant right"                                                                                            |          |
-| 尢 (尤)       | 4 kanji     | だいのまげあし | big bent legs       |                                                                                                                       |          |
-| 而            | 4 kanji     | しこうして     | and then            |                                                                                                                       |          |
-| 癶            | 3 kanji     | はつがしら     | departure head      |                                                                                                                       |          |
-| 耒            | 3 kanji     | らいすき       | plow                |                                                                                                                       |          |
-| 屮            | 3 kanji     | くさのめ       | grass sprout        |                                                                                                                       |          |
-| 豸            | 3 kanji     | むじなへん     | badger left         |                                                                                                                       |          |
-| マ            | 3 kanji     | ま             | katakana ma         |                                                                                                                       |          |
-| 八 (ハ)       | 3 kanji     | はち           | eight               |                                                                                                                       |          |
-| 气            | 2 kanji     | きがまえ       | steam enclosure     |                                                                                                                       |          |
-| 釆            | 2 kanji     | のごめ         | no + rice           | Decided October 2026                                                                                                  |          |
-| 瓜            | 2 kanji     | うり           | melon               |                                                                                                                       |          |
-| 齊            | 2 kanji     | せい           | even                | Decided: keep the meaning (the Japanese name is just its reading)                                                     |          |
-| ⺗            | 2 kanji     | したごころ     | bottom heart        |                                                                                                                       |          |
-| 鬲            | 2 kanji     | れき           | tripod kettle       | Decided October 2026                                                                                                  |          |
-| 爻            | 2 kanji     | こう           | intersecting lines  | Decided October 2026                                                                                                  |          |
-| 无 (旡)       | 1 kanji     | むにょう       | nothing wrap        |                                                                                                                       |          |
-| 夊            | 1 kanji     | なつあし       | summer legs         |                                                                                                                       |          |
-| 已            | 1 kanji     | おのれ         | oneself             |                                                                                                                       |          |
-| ユ            | 1 kanji     | ゆ             | katakana yu         |                                                                                                                       |          |
-| 髟            | 1 kanji     | かみかんむり   | hair crown          |                                                                                                                       |          |
-| 鬯            | 1 kanji     | においざけ     | fragrant wine       |                                                                                                                       |          |
-| 禸            | 1 kanji     | じゅうのあし   | beast's feet        |                                                                                                                       |          |
-| 黍            | 1 kanji     | きび           | millet              |                                                                                                                       |          |
-| ⻂            | drawer only | ころもへん     | clothing left       |                                                                                                                       |          |
-| 韭            | drawer only | にら           | leek                |                                                                                                                       |          |
-| 鬥            | drawer only | たたかいがまえ | fight enclosure     |                                                                                                                       |          |
-| 鹵            | drawer only | しお           | chemical salt       | Decided October 2026                                                                                                  |          |
-| 黹            | drawer only | ぬいとり       | embroidery          |                                                                                                                       |          |
-| 黽            | drawer only | かえる         | frog                |                                                                                                                       |          |
-| 鼎            | drawer only | かなえ         | tripod              |                                                                                                                       |          |
-| 鼠            | drawer only | ねずみ         | rat                 |                                                                                                                       |          |
-| 龠            | drawer only | やく           | pan flute           | Decided October 2026                                                                                                  |          |
+| Glyph         | Shown on    | Japanese name  | English now         | Note                                                                                                             | Decision |
+| ------------- | ----------- | -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------- | -------- |
+| 囗            | 210 kanji   | くにがまえ     | country enclosure   |                                                                                                                  |          |
+| 丶            | 188 kanji   | てん           | dot                 |                                                                                                                  |          |
+| ⺡ (氵)       | 133 kanji   | さんずい       | three water         |                                                                                                                  |          |
+| 丨 (｜)       | 115 kanji   | たてぼう       | vertical stick      |                                                                                                                  |          |
+| ⺅ (亻)       | 110 kanji   | にんべん       | person left         |                                                                                                                  |          |
+| 廾            | 98 kanji    | にじゅうあし   | twenty legs         |                                                                                                                  |          |
+| ⺘ (扌)       | 94 kanji    | てへん         | hand left           |                                                                                                                  |          |
+| 丿 (ノ)       | 81 kanji    | の             | katakana no         |                                                                                                                  |          |
+| 艹 (⺾ 艸 䒑) | 79 kanji    | くさかんむり   | grass crown         |                                                                                                                  |          |
+| ⻌ (辶 辵 辶) | 59 kanji    | しんにょう     | movement wrap       |                                                                                                                  |          |
+| 宀            | 55 kanji    | うかんむり     | u crown             | Renamed to "katakana u crown" (shaped like ウ); may change in the popover overhaul                               |          |
+| 儿            | 51 kanji    | ひとあし       | person legs         |                                                                                                                  |          |
+| 冂            | 51 kanji    | けいがまえ     | border enclosure    | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| 亠            | 50 kanji    | なべぶた       | pot lid             |                                                                                                                  |          |
+| 冖            | 47 kanji    | わかんむり     | wa crown            | Renamed to "katakana wa crown" (shaped like ワ); may change in the popover overhaul                              |          |
+| 隹            | 40 kanji    | ふるとり       | old bird            |                                                                                                                  |          |
+| 勹            | 39 kanji    | つつみがまえ   | wrap enclosure      |                                                                                                                  |          |
+| 禾            | 38 kanji    | のぎへん       | grain left          |                                                                                                                  |          |
+| 攵 (攴)       | 38 kanji    | ぼくづくり     | strike right        |                                                                                                                  |          |
+| ⺖ (忄)       | 38 kanji    | りっしんべん   | standing heart left |                                                                                                                  |          |
+| 厶            | 36 kanji    | む             | katakana mu         |                                                                                                                  |          |
+| 戈            | 35 kanji    | ほこ           | dagger-axe          | Decided October 2026                                                                                             |          |
+| ⺉ (刂)       | 33 kanji    | りっとう       | standing sword      |                                                                                                                  |          |
+| 夂            | 33 kanji    | のまた         | no + mata           |                                                                                                                  |          |
+| 冫            | 32 kanji    | にすい         | two water           |                                                                                                                  |          |
+| 尸            | 32 kanji    | しかばね       | corpse              |                                                                                                                  |          |
+| 厂            | 32 kanji    | がんだれ       | cliff hanging       |                                                                                                                  |          |
+| 頁            | 31 kanji    | おおがい       | big shell           |                                                                                                                  |          |
+| ⻖            | 31 kanji    | こざとへん     | small village left  | Decided October 2026                                                                                             |          |
+| 彐 (彑 ヨ ⺕) | 30 kanji    | けいがしら     | pig head            |                                                                                                                  |          |
+| ⺮            | 29 kanji    | たけかんむり   | bamboo crown        |                                                                                                                  |          |
+| 亅            | 28 kanji    | はねぼう       | hook stick          | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| ⺣ (灬)       | 27 kanji    | れっか         | lined fire          |                                                                                                                  |          |
+| 广            | 26 kanji    | まだれ         | ma hanging          | Renamed to "hemp hanging" (ま is from 麻); may change in the popover overhaul. Leaning: "slanting roof hanging"? |          |
+| 卩 (㔾)       | 24 kanji    | ふしづくり     | seal right          | Renamed to "joint right"                                                                                         |          |
+| 艮            | 22 kanji    | こん           | stopping            | Decided October 2026                                                                                             |          |
+| 彳            | 21 kanji    | ぎょうにんべん | going person left   |                                                                                                                  |          |
+| 罒 (网 ⺲)    | 21 kanji    | あみがしら     | net head            |                                                                                                                  |          |
+| 几            | 21 kanji    | きにょう       | table wrap          |                                                                                                                  |          |
+| ⺩ (𤣩)       | 20 kanji    | おうへん       | king left           |                                                                                                                  |          |
+| 彡            | 17 kanji    | さんづくり     | bristle right       | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| 殳            | 17 kanji    | るまた         | ru + mata           |                                                                                                                  |          |
+| 匕            | 16 kanji    | さじ           | spoon               |                                                                                                                  |          |
+| 幺            | 16 kanji    | いとがしら     | thread head         | Decided October 2026                                                                                             |          |
+| ⺌ (⺍)       | 16 kanji    | しょうかんむり | small crown         |                                                                                                                  |          |
+| ⺭ (礻)       | 15 kanji    | しめすへん     | show left           |                                                                                                                  |          |
+| 疒            | 15 kanji    | やまいだれ     | sickness hanging    |                                                                                                                  |          |
+| ⺨ (犭)       | 15 kanji    | けものへん     | beast left          |                                                                                                                  |          |
+| 凵            | 14 kanji    | かんにょう     | open box wrap       | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| 豕            | 14 kanji    | いのこ         | wild pig            | Decided October 2026                                                                                             |          |
+| ⻏            | 14 kanji    | おおざと       | large village       |                                                                                                                  |          |
+| ⻗            | 13 kanji    | あめかんむり   | rain crown          |                                                                                                                  |          |
+| ⺤ (爫)       | 13 kanji    | つめかんむり   | claw crown          |                                                                                                                  |          |
+| 卜 (⺊)       | 12 kanji    | ぼく           | divination          |                                                                                                                  |          |
+| 𠆢            | 12 kanji    | ひとやね       | person roof         |                                                                                                                  |          |
+| 氺            | 11 kanji    | したみず       | bottom water        |                                                                                                                  |          |
+| 𠂉            | 11 kanji    | のいち         | no plus one         |                                                                                                                  |          |
+| 匚            | 10 kanji    | はこがまえ     | box enclosure       |                                                                                                                  |          |
+| 聿            | 8 kanji     | ふでづくり     | brush right         |                                                                                                                  |          |
+| 虍            | 8 kanji     | とらがしら     | tiger head          |                                                                                                                  |          |
+| 疋            | 8 kanji     | ひき           | bolt of cloth       |                                                                                                                  |          |
+| 巛            | 8 kanji     | まがりがわ     | bent river          |                                                                                                                  |          |
+| 丷            | 8 kanji     | はちがしら     | eight head          |                                                                                                                  |          |
+| 曰            | 8 kanji     | ひらび         | flat sun            |                                                                                                                  |          |
+| 歹            | 6 kanji     | がつ           | bare bone           | Decided October 2026                                                                                             |          |
+| 韋            | 6 kanji     | なめしがわ     | tanned leather      |                                                                                                                  |          |
+| 舛            | 6 kanji     | まいあし       | dancing legs        |                                                                                                                  |          |
+| 耂 (⺹)       | 5 kanji     | おいかんむり   | old crown           |                                                                                                                  |          |
+| 弋            | 5 kanji     | いぐるみ       | javelin             | Renamed to "corded arrow"                                                                                        |          |
+| 匸            | 5 kanji     | かくしがまえ   | hide enclosure      |                                                                                                                  |          |
+| 爿 (丬)       | 5 kanji     | しょうへん     | split wood left     | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| ⻊            | 5 kanji     | あしへん       | foot left           |                                                                                                                  |          |
+| 毋            | 4 kanji     | なかれ         | do not              |                                                                                                                  |          |
+| 廴            | 4 kanji     | えんにょう     | stretch wrap        |                                                                                                                  |          |
+| 隶            | 4 kanji     | れいづくり     | capture right       | Renamed to "servant right"                                                                                       |          |
+| 尢 (尤)       | 4 kanji     | だいのまげあし | big bent legs       |                                                                                                                  |          |
+| 而            | 4 kanji     | しこうして     | and then            |                                                                                                                  |          |
+| 癶            | 3 kanji     | はつがしら     | departure head      |                                                                                                                  |          |
+| 耒            | 3 kanji     | らいすき       | plow                |                                                                                                                  |          |
+| 屮            | 3 kanji     | くさのめ       | grass sprout        |                                                                                                                  |          |
+| 豸            | 3 kanji     | むじなへん     | badger left         |                                                                                                                  |          |
+| マ            | 3 kanji     | ま             | katakana ma         |                                                                                                                  |          |
+| 八 (ハ)       | 3 kanji     | はち           | eight               |                                                                                                                  |          |
+| 气            | 2 kanji     | きがまえ       | steam enclosure     |                                                                                                                  |          |
+| 釆            | 2 kanji     | のごめ         | no + rice           | Decided October 2026                                                                                             |          |
+| 瓜            | 2 kanji     | うり           | melon               |                                                                                                                  |          |
+| 齊            | 2 kanji     | せい           | even                | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
+| ⺗            | 2 kanji     | したごころ     | bottom heart        |                                                                                                                  |          |
+| 鬲            | 2 kanji     | れき           | tripod kettle       | Decided October 2026                                                                                             |          |
+| 爻            | 2 kanji     | こう           | intersecting lines  | Decided October 2026                                                                                             |          |
+| 无 (旡)       | 1 kanji     | むにょう       | nothing wrap        |                                                                                                                  |          |
+| 夊            | 1 kanji     | なつあし       | summer legs         |                                                                                                                  |          |
+| 已            | 1 kanji     | おのれ         | oneself             |                                                                                                                  |          |
+| ユ            | 1 kanji     | ゆ             | katakana yu         |                                                                                                                  |          |
+| 髟            | 1 kanji     | かみかんむり   | hair crown          |                                                                                                                  |          |
+| 鬯            | 1 kanji     | においざけ     | fragrant wine       |                                                                                                                  |          |
+| 禸            | 1 kanji     | じゅうのあし   | beast's feet        |                                                                                                                  |          |
+| 黍            | 1 kanji     | きび           | millet              |                                                                                                                  |          |
+| ⻂            | drawer only | ころもへん     | clothing left       |                                                                                                                  |          |
+| 韭            | drawer only | にら           | leek                |                                                                                                                  |          |
+| 鬥            | drawer only | たたかいがまえ | fight enclosure     |                                                                                                                  |          |
+| 鹵            | drawer only | しお           | chemical salt       | Decided October 2026                                                                                             |          |
+| 黹            | drawer only | ぬいとり       | embroidery          |                                                                                                                  |          |
+| 黽            | drawer only | かえる         | frog                |                                                                                                                  |          |
+| 鼎            | drawer only | かなえ         | tripod              |                                                                                                                  |          |
+| 鼠            | drawer only | ねずみ         | rat                 |                                                                                                                  |          |
+| 龠            | drawer only | やく           | pan flute           | Decided October 2026                                                                                             |          |
