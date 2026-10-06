@@ -33,34 +33,10 @@ const DashedCross = ({ size }: { size: number }) => (
   </svg>
 );
 
-/** Sized empty state when the kanji stroke SVG cannot be fetched. Click retries. */
-export const StrokeOrderUnavailable = ({
-  size,
-  onRetry,
-}: {
-  size: number;
-  onRetry: () => void;
-}) => {
+const SnailPlaceholder = ({ size }: { size: number }) => {
   const icon = iconSize(size);
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        // StrokeOrderReplay wraps the drawing in its own click-to-replay control.
-        e.stopPropagation();
-        onRetry();
-      }}
-      title="Retry loading stroke order"
-      aria-label="Stroke order unavailable. Click to retry."
-      className={cn(
-        "relative flex items-center justify-center overflow-hidden",
-        "rounded-3xl bg-transparent",
-        "text-foreground transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2",
-        "focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-muted-foreground/5"
-      )}
-      style={{ width: size, height: size }}
-    >
+    <>
       <DashedCross size={size} />
       <SnailIcon
         className="relative z-[1] animate-pulse "
@@ -68,6 +44,48 @@ export const StrokeOrderUnavailable = ({
         strokeWidth={1.75}
         aria-hidden
       />
-    </button>
+    </>
   );
 };
+
+/** Sized placeholder while the kanji stroke SVG is still loading. */
+export const StrokeOrderLoading = ({ size }: { size: number }) => (
+  <div
+    role="status"
+    aria-label="Loading stroke order"
+    className="relative flex items-center justify-center overflow-hidden rounded-3xl text-foreground"
+    style={{ width: size, height: size }}
+  >
+    <SnailPlaceholder size={size} />
+  </div>
+);
+
+/** Sized empty state when the kanji stroke SVG cannot be fetched. Click retries. */
+export const StrokeOrderUnavailable = ({
+  size,
+  onRetry,
+}: {
+  size: number;
+  onRetry: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={(e) => {
+      // StrokeOrderReplay wraps the drawing in its own click-to-replay control.
+      e.stopPropagation();
+      onRetry();
+    }}
+    title="Retry loading stroke order"
+    aria-label="Stroke order unavailable. Click to retry."
+    className={cn(
+      "relative flex items-center justify-center overflow-hidden",
+      "rounded-3xl bg-transparent",
+      "text-foreground transition-colors",
+      "focus-visible:outline-none focus-visible:ring-2",
+      "focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-muted-foreground/5"
+    )}
+    style={{ width: size, height: size }}
+  >
+    <SnailPlaceholder size={size} />
+  </button>
+);

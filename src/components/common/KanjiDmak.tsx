@@ -6,7 +6,10 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { PlayCircle, Snail } from "@/components/icons";
 import { abandonDmak, installSafeDmakLoader } from "@/lib/dmak-safe-loader";
 import { resolveKanjiSvgBaseUri } from "@/lib/kanji-svg-url";
-import { StrokeOrderUnavailable } from "@/components/common/StrokeOrderUnavailable";
+import {
+  StrokeOrderLoading,
+  StrokeOrderUnavailable,
+} from "@/components/common/StrokeOrderUnavailable";
 import { StrokeAnimationSettingsPopover } from "./StrokeAnimationSettingsPopover";
 import { useStrokeAnimationSettings } from "@/hooks/use-stroke-animation-settings";
 import { AnimationSpeed, dmakStepForSpeed } from "./kanji-dmak-speeds";
@@ -14,6 +17,8 @@ import { AnimationSpeed, dmakStepForSpeed } from "./kanji-dmak-speeds";
 // Stock dmak crashes on null kvg: root — install our guarded loader once.
 installSafeDmakLoader();
 
+// "loading" lasts until dmak has fetched and parsed the strokes, not just
+// until the probe finds a reachable SVG: dmak fetches it again itself.
 type SvgLoadStatus = "loading" | "ready" | "error";
 
 export const KanjiDMAK = ({
@@ -44,14 +49,18 @@ export const KanjiDMAK = ({
   useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
+    // Reset so a retry re-creates dmak even when the uri comes back the same.
+    setSvgBaseUri(null);
     onUnavailableChange?.(false);
 
     resolveKanjiSvgBaseUri(kanji, controller.signal)
       .then((baseUri) => {
         if (controller.signal.aborted) return;
         setSvgBaseUri(baseUri);
-        setStatus(baseUri ? "ready" : "error");
-        onUnavailableChange?.(!baseUri);
+        if (baseUri == null) {
+          setStatus("error");
+          onUnavailableChange?.(true);
+        }
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
@@ -65,7 +74,8 @@ export const KanjiDMAK = ({
 
   // Needed: dmak + Raphael mount into a DOM node; no declarative equivalent.
   useEffect(() => {
-    if (status !== "ready" || !svgBaseUri) return;
+    if (!svgBaseUri) return;
+    let cancelled = false;
 
     (window as any).Raphael = Raphael;
 
@@ -84,17 +94,26 @@ export const KanjiDMAK = ({
       },
 
       grid: { show: gridShow },
+      // Runs after dmak's own fetch. No strokes means that fetch failed or
+      // the SVG had no kvg root; show the retry state instead of a blank box.
+      loaded: (strokes: unknown[]) => {
+        if (cancelled) return;
+        const ok = strokes.length > 0;
+        setStatus(ok ? "ready" : "error");
+        if (!ok) onUnavailableChange?.(true);
+      },
     });
 
     return () => {
+      cancelled = true;
       abandonDmak(dmak);
       // Strict Mode re-runs this effect on the same host — clear leftover SVG.
       document.getElementById(kanjiId)?.replaceChildren();
       // Keep window.Raphael set; other KanjiDMAK instances may still need it.
     };
   }, [
-    status,
     svgBaseUri,
+    onUnavailableChange,
     kanji,
     kanjiId,
     step,
@@ -113,8 +132,18 @@ export const KanjiDMAK = ({
     );
   }
 
-  // Sized host while loading / ready — avoids layout shift vs the drawn SVG.
-  return <div id={kanjiId} style={{ width: size, height: size }} />;
+  // The host stays mounted while loading: dmak draws into it, and the snail
+  // sits on top until the strokes are ready. Sized to avoid layout shift.
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <div id={kanjiId} style={{ width: size, height: size }} />
+      {status === "loading" && (
+        <div className="absolute inset-0">
+          <StrokeOrderLoading size={size} />
+        </div>
+      )}
+    </div>
+  );
 };
 
 /**
