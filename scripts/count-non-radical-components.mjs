@@ -101,7 +101,8 @@ const componentRows = [...counts.entries()]
   .map(([char, entry]) => ({
     char,
     count: entry.count,
-    keyword: componentKeyword(char, components, aliases) ?? "",
+    keyword:
+      componentKeyword(char, components, aliases, (k) => main[k]?.[0]) ?? "",
     exampleKanji: entry.exampleKanji,
   }))
   .sort((a, b) => b.count - a.count || a.char.localeCompare(b.char));

@@ -15,12 +15,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
-import { followAlias } from "../src/lib/radicals.ts";
-import {
-  buildBushuEntries,
-  mergeSylhareBushuAliases,
-  readRadicalSources,
-} from "./radicals.mjs";
+import { componentKeyword, followAlias } from "../src/lib/radicals.ts";
+import { buildRadicalData, readRadicalSources } from "./radicals.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -56,16 +52,15 @@ const cumUse = readRelease("cum_use.json");
 // that we decided ourselves is in raw-data/radicals/ours.json.
 const { drawer, ours, sylhareRows } = readRadicalSources(RAW_DIR);
 const radicals = { radicalsGroupedByStrokeCount: drawer };
-const sylhareKeywords = buildBushuEntries({ sylhareRows, ours });
-const allAliases = { ...(ours.aliases ?? {}) };
-const drawerRadicals = new Set(Object.values(drawer).flat());
-mergeSylhareBushuAliases({
-  sylhareRows,
-  drawerRadicals,
+const {
   aliases: allAliases,
+  keywords: radicalKeywords,
+  info: radicalInfo,
+} = buildRadicalData({
+  sylhareRows,
+  ours,
+  drawer,
   isKanji: (char) => main[char] != null,
-  skipAlts: ours.sylhareSkipAlts,
-  extraAliases: ours.sylhareExtraAliases,
 });
 const manualOverrides = readRaw("components/ours.json");
 
@@ -280,57 +275,21 @@ for (const [strokes, list] of Object.entries(
   }
 }
 
-// Sylhare bushu names win over the older Heisig/ad-hoc keyword tables.
-// The keyword goes to components.json; the rest of the bushu entry (Japanese
-// name, position, meaning) goes to radicals.json as `info`.
-const radicalInfo = {};
-for (const [char, entry] of Object.entries(sylhareKeywords)) {
-  const { k, ...info } = entry;
+// Radical names (scripts/radicals.mjs). Never on a kanji: every call site
+// reads kanji_main first, and an alias that reaches a kanji shows its kanji
+// keyword (componentKeyword in src/lib/radicals.ts).
+for (const [char, k] of Object.entries(radicalKeywords)) {
   components[char] = { ...components[char], k };
-  radicalInfo[char] = info;
-}
-
-// A shape that leads to a kanji is named by the kanji keyword, never by a
-// radical name: 釒 → 金 shows "gold", not かね's "metal". Every call site reads
-// kanji_main first, so a kanji's own component keyword is unreachable and is
-// dropped — except on an alias target, where it becomes the kanji_main
-// keyword for the alias to read. Sounds and stroke counts stay; kanji_main
-// carries neither.
-const aliasTargets = new Set(Object.values(allAliases));
-let droppedKanjiKeywords = 0;
-for (const char of Object.keys(components)) {
-  if (!isKanji(char) || components[char].k == null) continue;
-  if (aliasTargets.has(char)) continue;
-  delete components[char].k;
-  droppedKanjiKeywords += 1;
-  if (Object.keys(components[char]).length === 0) delete components[char];
-}
-for (const char of aliasTargets) {
-  if (!isKanji(char)) continue;
-  components[char] = { ...components[char], k: main[char][0] };
-}
-// An alternate form that only carries a copy of its kanji's radical row
-// (衤 ころも, copied from 衣 ころも) drops the copy and follows the alias to
-// the kanji keyword. A form with a name of its own keeps it (⺩ おうへん,
-// "king left").
-for (const [char, target] of Object.entries(allAliases)) {
-  if (!isKanji(target) || isKanji(char)) continue;
-  if (radicalInfo[char] == null) continue;
-  if (radicalInfo[char].ja !== radicalInfo[target]?.ja) continue;
-  delete radicalInfo[char];
-  if (components[char] != null) delete components[char].k;
-  if (components[char] && Object.keys(components[char]).length === 0) {
-    delete components[char];
-  }
-}
-// Same for radical info: a kanji never opens the radical popover itself.
-for (const char of Object.keys(radicalInfo)) {
-  if (isKanji(char) && !aliasTargets.has(char)) delete radicalInfo[char];
 }
 
 // Manual curation wins over everything the algorithm produced.
 for (const [char, entry] of Object.entries(manualOverrides)) {
   components[char] = { ...components[char], ...entry };
+}
+for (const [char, entry] of Object.entries(components)) {
+  if (isKanji(char) && entry.k != null) {
+    fail(`components: ${char} is a kanji; it shows its kanji_main keyword`);
+  }
 }
 
 // Aliases point at the glyph that holds the data (氵 → ⺡). Nothing is copied
@@ -372,16 +331,11 @@ for (const [char, entry] of Object.entries(manualOverrides)) {
 
 // A component keyword must not be a kanji keyword either, or two different
 // characters look like the same thing (戈 and 槍 were both "spear"). Listed
-// here: the same character at a Kangxi-radical codepoint, and the glyphs the
-// radical drawer uses for a radical that is also a kanji (ハ for 八, 已 for
-// 己) — the same radical, so the same keyword.
+// here: the same character at a Kangxi-radical codepoint, and 已, the glyph
+// the radical drawer uses for 己 — the same radical, so the same keyword.
 const KANJI_KEYWORD_SHARED_OK = {
   "⼊": "入",
   "⾋": "草",
-  "⿊": "黒",
-  "⿒": "歯",
-  "⿔": "亀",
-  ハ: "八",
   已: "己",
 };
 const kanjiByKeyword = {};
@@ -467,10 +421,12 @@ for (const list of Object.values(radicals.radicalsGroupedByStrokeCount)) {
   for (const char of list) noteReference(char, "radical-drawer");
 }
 
+// Same lookup as the app, so an alias that reaches a kanji counts (衤 → 衣).
+const kanjiKeyword = (char) => main[char]?.[0];
 const missing = [...references.entries()]
   .filter(
     ([char]) =>
-      followAlias(char, allAliases, (g) => components[g]?.k != null) == null
+      componentKeyword(char, components, allAliases, kanjiKeyword) == null
   )
   .map(([char, entry]) => ({
     char,
@@ -590,7 +546,4 @@ console.log(
   `\nComponent coverage: ${coverageReport.summary.withKeyword}/${coverageReport.summary.referenced} ` +
     `have a keyword, ${coverageReport.summary.missing} missing ` +
     `(see docs/data/component-coverage.json)`
-);
-console.log(
-  `Dropped ${droppedKanjiKeywords} component keywords that kanji_main already answers`
 );

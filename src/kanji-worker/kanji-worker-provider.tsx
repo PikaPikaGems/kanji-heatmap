@@ -72,7 +72,8 @@ export function KanjiWorkerProvider({
     const keyword = componentKeyword(
       kanji,
       snapshot.componentsMap,
-      snapshot.radicals.aliases
+      snapshot.radicals.aliases,
+      (other) => snapshot.mainInfoMap[other]?.keyword
     );
     return keyword ? { keyword } : null;
   }, []);

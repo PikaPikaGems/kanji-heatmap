@@ -102,7 +102,8 @@ const v2Radicals = prepareRadicals(v2<RadicalsFile>("radicals.json"));
 const radicalInfo = v2Radicals.info;
 const aliases = v2Radicals.aliases;
 // What the app shows: follow aliases to the glyph that holds the keyword.
-const keywordOf = (char: string) => componentKeyword(char, components, aliases);
+const keywordOf = (char: string) =>
+  componentKeyword(char, components, aliases, (kanji) => main[kanji]?.[0]);
 const structures = v2<
   Record<string, { hl?: unknown; ka?: unknown; sc?: unknown; ya?: unknown }>
 >("kanji_structures.json");
@@ -366,8 +367,10 @@ describe("components.json", () => {
   });
 
   it("gives a component with its own keyword precedence over its alias", () => {
-    expect(components["罒"]?.k).toBe("net head");
-    expect(components["⺲"]?.k).toBe("net head");
+    // ⺤ aliases to 爪 (for radical search) but keeps its own name.
+    expect(aliases["⺤"]).toBe("爪");
+    expect(keywordOf("⺤")).toBe("claw crown");
+    expect(keywordOf("爪")).toBe("claw");
   });
 
   it("fills a keywordless lookalike from its alias", () => {
@@ -377,9 +380,10 @@ describe("components.json", () => {
   });
 
   it("keeps the pig-head radical family on one keyword", () => {
-    expect(components["彐"]?.k).toBe("pig head");
-    expect(components["ヨ"]?.k).toBe("pig head");
-    expect(components["⺕"]?.k).toBe("pig head");
+    // What shows on screen; ⺕ stores nothing and follows its alias to 彐.
+    expect(keywordOf("彐")).toBe("pig head");
+    expect(keywordOf("ヨ")).toBe("pig head");
+    expect(keywordOf("⺕")).toBe("pig head");
   });
 
   it("never stores an empty or untrimmed keyword", () => {

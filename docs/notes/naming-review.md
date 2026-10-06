@@ -61,7 +61,9 @@ overlaps with item 1A in `radicals-pending.md`.
 ## 2. Radical names that show on screen
 
 `literalEn` is meant to be a literal translation of the Japanese name. Of the
-245 entries, only these 107 ever show:
+245 entries, only these 107 ever showed. (Since then the unused entries were
+deleted and some names moved to the drawer's glyphs, e.g. 丨's "vertical
+stick" now lives on ｜; what users see is the same.)
 
 - In a kanji breakdown (Character Structure, parts list) and its popover.
 - Or, for "drawer only", as the keyword of a radical picked in the radical

@@ -29,26 +29,30 @@ uses `scripts/radicals.mjs`) and then `scripts/count-non-radical-components.mjs`
   `info` (`{ ja, pos, cn }` per radical: Japanese name, position, meaning).
   The radical's English name is its component keyword.
 
-**Each fact is stored once.** Aliases (氵 → ⺡) are pointers. Nothing is copied
-onto alias glyphs; the app follows them with `followAlias` in
-`src/lib/radicals.ts` (`componentKeyword`, `radicalInfo`,
-`resolveRadicalForSearch` all use it).
+**Each fact is stored once.** `scripts/radicals.mjs` (`buildRadicalData`)
+returns finished aliases, names and popover info; `generate-v2-json.mjs` only
+writes them out. Aliases (氵 → ⺡) are pointers, and they are the only link
+between glyphs that are the same radical (no matching by Japanese name, no
+copies). The app follows them with `followAlias` in `src/lib/radicals.ts`
+(`componentKeyword`, `radicalInfo`, `resolveRadicalForSearch` all use it).
+`raw-data/radicals/README.md` has the full rules.
 
-**Card keyword priority** (first wins):
+**Card keyword** (first wins):
 
-1. `raw-data/components/ours.json`
-2. Radical name (sylhare CSV + `literalEn` in `raw-data/radicals/ours.json`)
-3. Alias target's keyword
+1. A kanji's `kanji_main` keyword.
+2. The glyph's own keyword: `raw-data/components/ours.json`, else its radical
+   name (`literalEn`).
+3. Follow the alias and repeat; reaching a kanji gives its `kanji_main`
+   keyword (衤 → 衣 "garment"). Kanji keywords live only in `kanji_main`.
 
-A kanji always uses its `kanji_main` keyword, and so does any shape whose
-alias leads to a kanji (釒 → 金 shows "gold"); only forms with a name of their
-own keep it (⺩ "king left"). A glyph counts as a radical only if it leads to
-a drawer radical (`isKnownRadical`).
+A glyph counts as a radical only if it leads to a drawer radical
+(`isKnownRadical`).
 
-**Build checks.** `generate-json` fails if a radical has no `literalEn`, a
-`literalEn` is unused, an alias leads nowhere, or a component keyword equals
-another component's keyword or any kanji keyword (`KANJI_KEYWORD_SHARED_OK`
-lists the allowed exceptions).
+**Build checks.** `generate-json` fails on a `literalEn` for a kanji, an
+unused `literalEn`, a named radical glyph with neither a name nor an alias,
+an alias that leads nowhere, a keyword on a kanji, or a component keyword
+that equals another component's keyword or any kanji keyword
+(`KANJI_KEYWORD_SHARED_OK` lists the allowed exceptions).
 
 **Where parts show.** Kanji breakdowns come from two places: the four
 Character Structure sources (`public/json/v2/kanji_structures.json`) and the
@@ -183,8 +187,9 @@ names one by one (`docs/notes/naming-review.md`, section 2) stalled, because:
   meaning, the meaning line may repeat it; if a new meaning source is used
   (popover extra 4 below), the name should match it. So the name can't be settled
   without designing the popover, and vice versa.
-- Only 107 of the 245 names ever show (the rest belong to radicals that are
-  kanji, which show the kanji keyword). Those 107 are the ones to decide.
+- Only 107 of the 245 names ever showed; the rest belonged to radicals that
+  are kanji, which show the kanji keyword. Those were deleted in the pipeline
+  cleanup (October 2026), leaving 115 entries, all of which show somewhere.
 
 Candidate naming rules (the user hasn't chosen):
 

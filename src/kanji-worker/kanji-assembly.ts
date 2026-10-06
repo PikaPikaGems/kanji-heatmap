@@ -35,7 +35,14 @@ const lookupPart = (
 ) => {
   const kanjiKeyword = mainInfoMap[part]?.keyword;
   return {
-    keyword: kanjiKeyword ?? componentKeyword(part, components, aliases),
+    keyword:
+      kanjiKeyword ??
+      componentKeyword(
+        part,
+        components,
+        aliases,
+        (kanji) => mainInfoMap[kanji]?.keyword
+      ),
     isKanji: kanjiKeyword != null,
   };
 };

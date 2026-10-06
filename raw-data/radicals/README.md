@@ -23,6 +23,26 @@ Our own choices, all in one file. `scripts/radicals.mjs` reads it together
 with `external/` on every `pnpm run generate-json`. To change how a radical
 is named or matched, edit this file, never `external/`.
 
+### How a glyph gets its name and popover info
+
+`scripts/radicals.mjs` (`buildRadicalData`) turns the CSV and this file into
+three things: **aliases**, **names** (`literalEn`) and **popover info**
+(Japanese name, position, meaning). Each fact is stored once:
+
+- A glyph shows **its own** name and info if it has them; otherwise the app
+  follows its **alias** (衤 → 衣). ⺤ has both: its own name "claw crown", and
+  an alias to 爪 so radical search uses the drawer's 爪 button.
+- A **kanji** always shows its kanji keyword, also when reached through an
+  alias (衤 → 衣 shows "garment"). So a kanji never has a `literalEn` entry;
+  its popover info is kept only when an alias points at it.
+- Glyphs that are the same radical are linked **only by aliases**. Two glyphs
+  with the same Japanese name don't share anything unless one aliases to the
+  other.
+
+The build fails on a `literalEn` entry for a kanji, an unused entry, or a
+named glyph (a CSV row, an `extras` entry, or an alternate form without an
+alias) that has neither a name nor an alias.
+
 ### `literalEn` — English translation of each radical's Japanese name
 
 ```jsonc
@@ -35,39 +55,42 @@ is named or matched, edit this file, never `external/`.
 - Keyed by **glyph**, never by reading. Readings collide (日 and 火 are both
   ひ), which once made 火 "sun".
 - A literal translation of the name, not its meaning. The meaning comes from
-  the sylhare CSV.
-- **One translation per Japanese name.** Glyphs with the same name are the
-  same radical, so only one of them has an entry:
-  - A classic radical (sylhare rows 1–214) holds its own: 黒 has "black",
-    and ⿊ (also くろ) uses it.
-  - A few names belong to two classic radicals (ひ: 日 sun and 火 fire,
-    き: 木 tree and 黄 yellow). A glyph sharing such a name uses the one
-    whose Alternate column lists it: ⿈ → 黄.
-  - A name with no classic radical is held by its first glyph (⺤ for
-    つめかんむり; 爫 uses it).
-- 245 entries: the 214 classic radicals, 26 positional forms with their own
-  name (⺅ にんべん, ⺡ さんずい, …) and 5 `extras`.
-- A missing or unused entry fails the build.
+  the sylhare CSV. (How radicals are named is being revisited; see the radical
+  popover overhaul in `docs/notes/radicals-pending.md`.)
+- Only for radicals that aren't kanji: 115 entries. The radical drawer's own
+  glyphs hold the name when the classic glyph aliases to them (｜ "vertical
+  stick", ノ "katakana no", ヨ "pig head", ⺲ "net head").
 
 ### `aliases` — glyphs we treat as the same radical
 
 ```jsonc
-"aliases": { "龺": "𠦝", "艸": "艹" }
+"aliases": { "龺": "𠦝", "艸": "艹", "⿊": "黒" }
 ```
 
-The left glyph borrows the right glyph's name and, in radical search,
-searches for it. Alternate forms from the sylhare CSV are added
-automatically on top of these. Only add an alias when both glyphs really are
-the same component.
+The left glyph reads the right glyph's name and info (unless it has its own)
+and, in radical search, searches for it. Alternate forms from the sylhare CSV
+are added automatically on top of these. Only add an alias when both glyphs
+really are the same radical: a different codepoint for the same character
+(⿊ → 黒), or a squeezed positional form (衤 → 衣).
 
-### `sylhareSkipAlts` — sylhare alternate forms to ignore
+### `sylhareSkipAlts` — sylhare glyphs to ignore
 
 ```jsonc
-"sylhareSkipAlts": ["⺈"]
+"sylhareSkipAlts": ["⺈", "阝", "⺍", "甩", "玊", "⾡"]
 ```
 
-Alternate forms in the CSV that are wrong and must not become aliases. For
-example, **⺈** is listed under 刀 but is the ク-shaped top of 魚.
+Glyphs the CSV gets wrong: they never become aliases, alternate forms or
+radicals of their own.
+
+- **⺈** is listed under 刀 but is the ク-shaped top of 魚.
+- **阝** is used for both ⻖ (left, hill) and ⻏ (right, village); it is a plain
+  component named "hill or village" (in `raw-data/components/ours.json`).
+- **玊** is listed under 王 ("king"), and has its own row, but it is not a
+  radical: it is a rare variant of 玉 (jade). Aliasing it to 王 would be
+  wrong, so it is a plain part with no name (shows "...").
+- **⺍** and **⾡** get the right alias from `sylhareExtraAliases` instead.
+- **甩** (reason not recorded) is a different character ("to fling") that the
+  CSV lists under 用.
 
 ### `sylhareExtraAliases` — aliases the CSV is missing
 
@@ -84,5 +107,4 @@ example, **⺈** is listed under 刀 but is the ク-shaped top of 魚.
 ```
 
 Same fields as a CSV row: Japanese name, position (へん, つくり, …) and
-meaning. Each one needs a `literalEn` entry, unless it shares its name with
-another radical (ヨ けいがしら uses 彐's).
+meaning. Each one needs a `literalEn` entry or an alias.
