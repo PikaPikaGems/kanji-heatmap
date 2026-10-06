@@ -105,9 +105,10 @@ const positionOf = (raw) => {
   return POSITIONS.has(first) ? first : "";
 };
 
-/** { k, ja, pos?, cn? } — empty fields are left out. */
+/** { k?, ja, pos?, cn? } — empty fields are left out. */
 const entryOf = (literal, nameJa, positionJ, meaning) => {
-  const entry = { k: literal, ja: nameJa };
+  const entry = { ja: nameJa };
+  if (literal) entry.k = literal;
   const pos = positionOf(positionJ);
   const cn = (meaning ?? "").trim();
   if (pos) entry.pos = pos;
@@ -115,12 +116,6 @@ const entryOf = (literal, nameJa, positionJ, meaning) => {
   return entry;
 };
 
-/**
- * Bushu entries ({ k, ja, pos, cn }) per glyph, from the sylhare CSV plus our
- * translations and missing forms. Translations are keyed by glyph only —
- * never by reading, since readings collide (日 and 火 are both ひ).
- * Throws if a radical has no translation or a translation is unused.
- */
 /**
  * Which glyph holds the translation for each named radical glyph. Glyphs with
  * the same Japanese name are the same radical (⿊ くろ = 黒 くろ), so they
@@ -177,7 +172,19 @@ const translationOwners = (sylhareRows, extras) => {
   return owners;
 };
 
-export const buildBushuEntries = ({ sylhareRows, ours }) => {
+/**
+ * Bushu entries ({ k?, ja, pos, cn }) per glyph, from the sylhare CSV plus our
+ * translations and missing forms. Translations are keyed by glyph only —
+ * never by reading, since readings collide (日 and 火 are both ひ).
+ *
+ * A radical that is a kanji shows its kanji keyword, so it needs no
+ * translation; it still gets an entry, for its popover info. Throws if a
+ * radical that isn't a kanji has no translation, if a translation is unused,
+ * or if a kanji has one that no non-kanji form shows (ハ shows 八's "eight").
+ * Pass the finished alias table: alternates aliased to their radical get no
+ * copy of its row.
+ */
+export const buildBushuEntries = ({ sylhareRows, ours, aliases, isKanji }) => {
   const literals = ours.literalEn;
   const owners = translationOwners(sylhareRows, ours.extras ?? {});
   const skipAsAlternate = new Set([
@@ -186,9 +193,12 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
   ]);
 
   const usedLiterals = new Set();
-  const literalFor = (glyph) => {
+  // Kanji owners whose translation some non-kanji glyph actually shows.
+  const shownKanjiLiterals = new Set();
+  const literalFor = (glyph, shownOn = glyph) => {
     const owner = owners[glyph];
     usedLiterals.add(owner);
+    if (isKanji(owner) && !isKanji(shownOn)) shownKanjiLiterals.add(owner);
     return (literals[owner] ?? "").toString().trim();
   };
 
@@ -199,12 +209,17 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
       const readingJ = (row["Reading-J"] ?? "").trim();
       if (!readingJ || readingJ === "n/a") return null;
       if (!isGlyph(row.Radical)) return null;
+      // A row aliased to the glyph that holds its name (⽻ → 羽, both はね)
+      // reads everything through the alias, like an alternate form.
+      if (aliases[row.Radical] === owners[row.Radical]) return null;
       return { row, readingJ, literal: literalFor(row.Radical) };
     })
     .filter(Boolean);
 
   const missingLiterals = new Set(
-    named.filter((n) => !n.literal).map((n) => owners[n.row.Radical])
+    named
+      .filter((n) => !n.literal && !isKanji(owners[n.row.Radical]))
+      .map((n) => owners[n.row.Radical])
   );
   const radicalSeen = new Set(
     sylhareRows
@@ -219,24 +234,23 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
 
   // Main glyphs first, so an alternate never shadows a real radical.
   for (const n of named) {
-    if (!n.literal) continue;
     out[n.row.Radical] = rowEntry(n);
   }
   for (const n of named) {
-    if (!n.literal) continue;
     for (const ch of [...(n.row.Alternate ?? "")].filter(isGlyph)) {
       if (radicalSeen.has(ch) || out[ch] != null) continue;
       if (skipAsAlternate.has(ch)) continue;
+      // An alternate aliased to this radical (衤 → 衣) reads its data through
+      // the alias; copying the row onto it would store it twice.
+      if (aliases[ch] === n.row.Radical) continue;
+      literalFor(n.row.Radical, ch);
       out[ch] = rowEntry(n);
     }
   }
 
   for (const [ch, extra] of Object.entries(ours.extras ?? {})) {
     const literal = literalFor(ch);
-    if (!literal) {
-      missingLiterals.add(owners[ch]);
-      continue;
-    }
+    if (!literal && !isKanji(owners[ch])) missingLiterals.add(owners[ch]);
     out[ch] = entryOf(literal, extra.nameJa, extra.position, extra.meaning);
   }
 
@@ -245,7 +259,9 @@ export const buildBushuEntries = ({ sylhareRows, ours }) => {
       `radicals: missing literalEn for ${[...missingLiterals].join(", ")}`
     );
   }
-  const unused = Object.keys(literals).filter((g) => !usedLiterals.has(g));
+  const unused = Object.keys(literals).filter(
+    (g) => !usedLiterals.has(g) || (isKanji(g) && !shownKanjiLiterals.has(g))
+  );
   if (unused.length > 0) {
     throw new Error(`radicals: unused literalEn for ${unused.join(", ")}`);
   }

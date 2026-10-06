@@ -377,9 +377,10 @@ describe("components.json", () => {
   });
 
   it("keeps the pig-head radical family on one keyword", () => {
-    expect(components["彐"]?.k).toBe("pig head");
-    expect(components["ヨ"]?.k).toBe("pig head");
-    expect(components["⺕"]?.k).toBe("pig head");
+    // What shows on screen; ⺕ stores nothing and follows its alias to 彐.
+    expect(keywordOf("彐")).toBe("pig head");
+    expect(keywordOf("ヨ")).toBe("pig head");
+    expect(keywordOf("⺕")).toBe("pig head");
   });
 
   it("never stores an empty or untrimmed keyword", () => {
