@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Trash2, Download, Loader2, CircleX } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
-import { useHighlightVocabKanji } from "@/hooks/use-highlight-vocab-kanji";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
@@ -267,26 +266,6 @@ const LightDarkRow = () => {
   );
 };
 
-const HighlightVocabRow = () => {
-  const [highlight, setHighlight] = useHighlightVocabKanji();
-
-  return (
-    <div className="flex items-center py-2">
-      <Switch
-        checked={highlight}
-        onCheckedChange={setHighlight}
-        aria-label="Highlight kanji in study notes"
-      />
-      <div className="flex flex-col px-2 text-left">
-        <span className="text-sm font-semibold">Highlight Kanji</span>
-        <span className="text-xs text-muted-foreground">
-          Make vocabulary stand out in study notes
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export const SettingsModalTrigger = ({
   onClick,
   ...props
@@ -363,7 +342,6 @@ export const SettingsModal = ({
           </div>
 
           <LightDarkRow />
-          <HighlightVocabRow />
         </section>
 
         <section className="mt-6">
