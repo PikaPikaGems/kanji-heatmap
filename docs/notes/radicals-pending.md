@@ -216,7 +216,7 @@ radicals keeping a meaning (彡 "bristle right", 冂 "border enclosure", 凵
 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook stick").
 
 Already fixed: 火, 黄, 革, 示, ⺭, 酉, 禸, then (October 2026) 辛 "spicy", 阜
-"small village", ⻖ "small village left", 釆 "no + rice", 斗 "measuring box
+"small village", ⻖ "small village left", 釆 "katakana no + rice", 斗 "measuring box
 right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
 "dagger-axe", 艮 "stopping", 豕 "wild pig", 爻 "intersecting lines", 鬲
 "tripod kettle", 鹵 "chemical salt", 龠 "pan flute".

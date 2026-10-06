@@ -166,7 +166,7 @@ purpose (don't reopen): のまた "no + mata", るまた "ru + mata", 丿/ノ
 | マ            | 3 kanji     | ま             | katakana ma         |                                                                                                                  |          |
 | 八 (ハ)       | 3 kanji     | はち           | eight               |                                                                                                                  |          |
 | 气            | 2 kanji     | きがまえ       | steam enclosure     |                                                                                                                  |          |
-| 釆            | 2 kanji     | のごめ         | no + rice           | Decided October 2026                                                                                             |          |
+| 釆            | 2 kanji     | のごめ         | katakana no + rice  | Decided October 2026: の = katakana ノ (shape), ごめ = 米 rice                                                   |          |
 | 瓜            | 2 kanji     | うり           | melon               |                                                                                                                  |          |
 | 齊            | 2 kanji     | せい           | even                | Decided: keep the meaning (the Japanese name is just its reading)                                                |          |
 | ⺗            | 2 kanji     | したごころ     | bottom heart        |                                                                                                                  |          |
