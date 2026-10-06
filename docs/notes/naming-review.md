@@ -12,25 +12,15 @@ Two lists for the user to decide on. Fill in the **Decision** column
 "Kanji" counts how many kanji show the glyph in the Character Structure
 accordion or the parts list, from all sources.
 
-## Start here: how to name radicals (open)
+## Start here
 
-The review got hard because there is no single naming rule. Today's names mix
-literal translations ("three water"), meanings ("bare bone", "stopping") and
-spelled-out kana ("katakana no", "no + mata"), and 广 "ma hanging", 宀 "u
-crown" and 冖 "wa crown" are still undecided. Pick one rule first, then apply
-it mechanically and review only the names it changes. Candidates:
+**Radical names (section 2) are on hold.** They are now part of the radical
+popover overhaul, item 2 in `docs/notes/radicals-pending.md`, which explains
+why the names are being revisited and lists the candidate naming rules.
+Don't apply section 2 until that is decided.
 
-- **A. Literal, but sounds and kana shapes become the meaning.** 宀 roof
-  crown, 冖 cover crown, 广 hemp hanging; about 10 names change. Would flip
-  the earlier "keep" choices 丿 katakana no, 厶 katakana mu, 夂 no + mata,
-  殳 ru + mata, unless they stay as exceptions.
-- **B. Meaning plus position for everything** ("water left", "roof crown").
-  Clearest for learners, but most of the 107 visible names change and they
-  stop being translations of the Japanese name.
-- Or something else. The user hasn't chosen; discuss before changing
-  anything.
-
-The same rule should guide the part names in section 1.
+**Part names (section 1) don't depend on it.** Parts have no Japanese name or
+radical popover, so their names are meanings either way.
 
 ## 1. Unnamed parts used by 5 or more kanji
 

@@ -74,7 +74,7 @@ release's per-kanji parts list (`kanji_extended.json` field 0 →
 - ハ and 已 are the drawer's own glyphs for the 八 and 己 radicals, so they
   share the kanji keyword ("eight", "oneself") on purpose. No aliases.
 - 歹 stays "bare bone".
-- Replacing the 🇨🇳 meaning line is a feature (item 2.3), not cleanup.
+- Replacing the 🇨🇳 meaning line is a feature (item 2, popover extra 4), not cleanup.
 - Every Kanji Heatmap Data fix is listed under "Pending" in
   `docs/notes/kanji-heatmap-data-pending.md` and is parked until the user picks
   it up.
@@ -123,7 +123,7 @@ Split in two (user, October 2026):
   - Show the user a list of every kanji that gains or changes a sound part.
 
 - **1B — sound examples in the radical popover.** Part of item 2 (radical
-  popover extras).
+  popover overhaul).
 
 Original notes:
 
@@ -154,24 +154,87 @@ Show sound families with **real words**, not bare kanji:
   border + reading badge in `SingleKanjiPart`). Radicals that are sound parts
   (門, 几, 羊, …) could show it in the radical popover too.
 
-### 2. Radical popover extras
+### 2. Radical popover overhaul: names + extras
 
-New features, not cleanup: each adds or changes what the radical popover
-shows, one more field in `radicals.json` → `info`. The user is unsure about
-1 and 2, and 3 would change the existing 🇨🇳 meaning line.
+One project (user, October 2026): settle how radicals are named **and**
+what the radical popover shows, together. Nothing here is decided yet.
 
-1. **Alternate forms** — sylhare CSV "Alternate" column (王 → 玉 ⺩). Would also
+#### Why we're revisiting the radical names
+
+Each radical's English name (`literalEn` in `raw-data/radicals/ours.json`)
+was meant to be a literal translation of its Japanese name. Reviewing those
+names one by one (`docs/notes/naming-review.md`, section 2) stalled, because:
+
+- **There is no single rule.** Today's names mix literal translations
+  ("three water" さんずい), meanings ("bare bone" 歹, "stopping" 艮,
+  "bristle right" 彡) and spelled-out kana ("katakana no" 丿, "no + mata"
+  夂). Every name became its own debate.
+- **Literal names are opaque where most people see them.** A chip in a kanji
+  breakdown, the parts list or the radical drawer shows only the glyph and
+  the English name. "u crown" (宀 うかんむり, named after the katakana ウ), "wa
+  crown" (冖 ワ) and "ma hanging" (广 まだれ, from 麻) mean nothing to a
+  learner there.
+- **Every other chip shows a meaning.** Kanji show their keyword ("king"),
+  non-radical parts show a meaning ("mow"), and a shape that leads to a kanji
+  now shows the kanji keyword (釒 "gold", not かね's "metal"). Radicals are
+  the only chips that translate a Japanese _name_.
+- **The name is part of the popover.** Its title line is "うかんむり, u crown",
+  followed by the position and the 🇨🇳 meaning line. If the name becomes a
+  meaning, the meaning line may repeat it; if a new meaning source is used
+  (popover extra 4 below), the name should match it. So the name can't be settled
+  without designing the popover, and vice versa.
+- Only 107 of the 245 names ever show (the rest belong to radicals that are
+  kanji, which show the kanji keyword). Those 107 are the ones to decide.
+
+Candidate naming rules (the user hasn't chosen):
+
+- **Describe the part:** meaning + position for everything ("water left",
+  "roof crown", "slanting roof hanging"). One rule, no exceptions except
+  kana-only shapes (マ "katakana ma"). Most names change; the Japanese name
+  stays visible in the popover.
+- **Translate the name, fix opaque ones:** keep literal translations, but
+  where the name is only a sound or a kana shape, use the meaning ("roof
+  crown", "cover crown", "hemp hanging"). About 10 names change.
+
+Earlier choices were made under the literal rule and may be revisited here,
+only with the user: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana
+no", 厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone", and the sound-named
+radicals keeping a meaning (彡 "bristle right", 冂 "border enclosure", 凵
+"open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook stick").
+
+Already fixed: 火, 黄, 革, 示, ⺭, 酉, 禸, then (October 2026) 辛 "spicy", 阜
+"small village", ⻖ "small village left", 釆 "no + rice", 斗 "measuring box
+right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
+"dagger-axe", 艮 "stopping", 豕 "wild pig", 爻 "intersecting lines", 鬲
+"tripod kettle", 鹵 "chemical salt", 龠 "pan flute".
+
+Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana no",
+厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone". Radicals whose Japanese
+name is just a reading keep a meaning instead: 彡 "bristle right", 冂 "border
+enclosure", 凵 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook
+stick".
+
+#### Popover extras
+
+Each adds or changes what the radical popover shows (one more field in
+`radicals.json` → `info`). The user was unsure about 2 and 3; 4 would change
+the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
+
+1. **The name** — see above. Decide first; it shapes the title line.
+2. **Alternate forms** — sylhare CSV "Alternate" column (王 → 玉 ⺩). Would also
    explain pairs like 攵/攴.
-2. **Example kanji with this radical** — e.g. the 3 most common, from the radical
+3. **Example kanji with this radical** — e.g. the 3 most common, from the radical
    search index (`raw-data/radicals/external/rewhowe-decomposition.json`).
-3. **Meaning** — `info.cn` (sylhare) overlaps
+4. **Meaning** — `info.cn` (sylhare) overlaps
    `raw-data/radicals/external/anki-semantic-radicals.tsv`, which is shorter and
    cleaner ("Insect / Bug" vs "worm, insect, bug"). Pick or merge. The Anki file
    has ~20 simplified-Chinese rows (讠 纟 贝 …) to drop, and
    `阝(Left side)` / `阝(Right side)` must become ⻖ / ⻏.
-4. **Kanji where the radical carries the meaning** — kanjium's first slot is
+5. **Kanji where the radical carries the meaning** — kanjium's first slot is
    the dictionary radical (`raw-data/kanji-structure/kanjium.json`), usually
    the meaning part: 虫 → 蚊 蛍 蚕 蛇 蝶 蜂. Not perfect (虹 is filed under 虫).
+6. **Sound examples (1B)** — for radicals that are also sound parts (門, 几,
+   羊, …): the reading and a few words, as in item 1.
 
 ### 3. Component search
 
@@ -188,27 +251,7 @@ kanji containing it, at any depth). Finds things radical search can't
 - 981 buttons is fine on phones without virtualization; just avoid
   re-rendering every button on each tap.
 
-### 4. Review the radical translations
-
-`literalEn` in `raw-data/radicals/ours.json` is meant to be a **literal**
-translation of each Japanese radical name (245 entries; see
-`raw-data/radicals/README.md`). Only 107 ever show on screen. They are listed,
-with notes on the ones that look off, in section 2 of
-`docs/notes/naming-review.md`, waiting for the user's decisions.
-
-Already fixed: 火, 黄, 革, 示, ⺭, 酉, 禸, then (October 2026) 辛 "spicy", 阜
-"small village", ⻖ "small village left", 釆 "no + rice", 斗 "measuring box
-right", 幺 "thread head", 缶 "water jar", and for the clash check 戈
-"dagger-axe", 艮 "stopping", 豕 "wild pig", 爻 "intersecting lines", 鬲
-"tripod kettle", 鹵 "chemical salt", 龠 "pan flute".
-
-Kept on purpose: のまた "no + mata", るまた "ru + mata", 丿/ノ "katakana no",
-厶 "katakana mu", 乙/⺃ "second", 歹 "bare bone". Radicals whose Japanese
-name is just a reading keep a meaning instead: 彡 "bristle right", 冂 "border
-enclosure", 凵 "open box wrap", 爿 "split wood left", 齊 "even", 亅 "hook
-stick".
-
-### 5. Before and after merging this work
+### 4. Before and after merging this work
 
 - Done: PikaPikaGems/kanji-heatmap#301 was merged, and the remote
   `radicals-cleanup` and `improve-radicals` branches were deleted. Of
@@ -219,7 +262,7 @@ stick".
 - **Pending upstream — grade bug.** Listed in `docs/notes/kanji-heatmap-data-pending.md`, with every other Kanji Heatmap
   Data fix.
 
-### 6. Small open questions
+### 5. Small open questions
 
 - Done: the build fails if a component keyword is also a kanji keyword (see
   "Build checks").
