@@ -196,6 +196,13 @@ Candidate naming rules (the user hasn't chosen):
   where the name is only a sound or a kana shape, use the meaning ("roof
   crown", "cover crown", "hemp hanging"). About 10 names change.
 
+**User's current leaning (not decided):** translate the name literally; when
+the name is a kana shape, spell the kana out ("katakana u crown", like
+"katakana no"); when the name comes from something a learner can't see (广
+まだれ's ま is from 麻), use the meaning instead ("slanting roof hanging").
+This is close to "translate the name, fix opaque ones", but keeps the
+spelled-out katakana names.
+
 Provisional (user, October 2026; revisit here): 宀 "katakana u crown" and 冖
 "katakana wa crown" (named after the katakana they look like, like 丿
 "katakana no"), and 广 "hemp hanging" (まだれ's ま comes from 麻, hemp). The
