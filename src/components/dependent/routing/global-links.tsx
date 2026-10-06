@@ -146,6 +146,15 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
         <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
         </div>
+        {/* Drawer parts that aren't classic radicals (啇, 奄) have no radical
+            info; show their keyword alone. */}
+        {!info && keyword && (
+          <div className="min-w-0 text-left">
+            <p className="text-sm font-bold whitespace-normal text-foreground">
+              {keyword}
+            </p>
+          </div>
+        )}
         {info && (
           <div className="min-w-0 text-left">
             <p className="text-sm font-bold whitespace-normal text-foreground">
