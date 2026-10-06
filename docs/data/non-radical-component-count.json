@@ -3,10 +3,15 @@
     "selectedKanji": 2426,
     "selection": "all",
     "kind": "not-radical-not-kanji",
-    "components": 382,
-    "withKeyword": 24,
+    "components": 383,
+    "withKeyword": 25,
     "withoutKeyword": 358,
     "componentsWithKeyword": [
+      {
+        "cmp": "阝",
+        "cnt": 43,
+        "kw": "hill or village"
+      },
       {
         "cmp": "乂",
         "cnt": 18,
@@ -137,6 +142,10 @@
     ],
     "byCount": [
       {
+        "count": 43,
+        "components": 1
+      },
+      {
         "count": 18,
         "components": 1
       },
@@ -187,6 +196,56 @@
     ]
   },
   "components": [
+    {
+      "char": "阝",
+      "count": 43,
+      "keyword": "hill or village",
+      "exampleKanji": [
+        "都",
+        "院",
+        "部",
+        "陽",
+        "階",
+        "郡",
+        "陸",
+        "隊",
+        "防",
+        "限",
+        "険",
+        "際",
+        "郵",
+        "降",
+        "除",
+        "郊",
+        "隅",
+        "郷",
+        "陛",
+        "障",
+        "郎",
+        "邦",
+        "陣",
+        "邸",
+        "隣",
+        "隠",
+        "隆",
+        "阿",
+        "陥",
+        "阻",
+        "陳",
+        "隔",
+        "陰",
+        "随",
+        "邪",
+        "那",
+        "郭",
+        "陶",
+        "陵",
+        "堕",
+        "附",
+        "阪",
+        "隙"
+      ]
+    },
     {
       "char": "乂",
       "count": 18,
