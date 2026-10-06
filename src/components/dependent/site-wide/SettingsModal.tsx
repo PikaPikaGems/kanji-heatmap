@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Trash2, Download, Loader2, CircleX } from "@/components/icons";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
-import { useHighlightVocabKanji } from "@/hooks/use-highlight-vocab-kanji";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
@@ -267,26 +266,6 @@ const LightDarkRow = () => {
   );
 };
 
-const HighlightVocabRow = () => {
-  const [highlight, setHighlight] = useHighlightVocabKanji();
-
-  return (
-    <div className="flex items-center py-2">
-      <Switch
-        checked={highlight}
-        onCheckedChange={setHighlight}
-        aria-label="Highlight kanji in study notes"
-      />
-      <div className="flex flex-col px-2 text-left">
-        <span className="text-sm font-semibold">Highlight Kanji</span>
-        <span className="text-xs text-muted-foreground">
-          Make vocabulary stand out in study notes
-        </span>
-      </div>
-    </div>
-  );
-};
-
 export const SettingsModalTrigger = ({
   onClick,
   ...props
@@ -324,7 +303,7 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Offline data caching, stroke animation, and presentation preferences"
+        description="Offline data caching, presentation, Japanese voice, and stroke animation preferences"
         titleClassName="text-left"
       >
         <section>
@@ -362,24 +341,23 @@ export const SettingsModal = ({
             <ColorGrid />
           </div>
 
-          <div className="mb-4 text-left">
-            <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
-              Japanese Voice{" "}
-              <SpeakButton word={"こんにちは"} iconType="volume-2" />
-            </div>
-            <JpVoiceSelect />
-          </div>
-
           <LightDarkRow />
-          <HighlightVocabRow />
+        </section>
 
-          <section className="mt-6">
-            <h3 className={sectionHeadingCn}>Stroke order</h3>
-            <p className="mb-3 text-xs text-left text-muted-foreground">
-              Used for kanji details, writing practice, and production practice.
-            </p>
-            <StrokeAnimationSettingsFields />
-          </section>
+        <section className="mt-6">
+          <h3 className={sectionHeadingCn}>Japanese Voice</h3>
+          <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-left">
+            Voice <SpeakButton word={"こんにちは"} iconType="volume-2" />
+          </div>
+          <JpVoiceSelect />
+        </section>
+
+        <section className="mt-6">
+          <h3 className={sectionHeadingCn}>Stroke order</h3>
+          <p className="mb-3 text-xs text-left text-muted-foreground">
+            Used for kanji details, writing practice, and production practice.
+          </p>
+          <StrokeAnimationSettingsFields />
         </section>
       </ScrollableDialogContent>
     </Dialog>

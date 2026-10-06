@@ -52,7 +52,7 @@ export const VocabPopoverContent = ({
               <>
                 <SeeMore
                   definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
-                  maxLen={150}
+                  maxLen={120}
                 />
               </>
             )}
@@ -75,7 +75,7 @@ export const VocabPopoverContent = ({
         ))}
         {!canSeeAllLinks && (
           <button
-            className="px-1 py-1 mx-1 font-bold underline rounded-lg hover:bg-neon-accent"
+            className="px-1 py-1 mx-1 font-bold underline rounded-lg hover:bg-neon-accent hover:text-black"
             onClick={() => {
               setShowAllLinks((prev) => !prev);
             }}

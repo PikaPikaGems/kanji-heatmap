@@ -58,33 +58,29 @@ const isExternalHref = (href: string) => /^https?:\/\//i.test(href);
 
 const components: Components = {
   h1: ({ children }) => (
-    <h1 className="pb-1 mt-6 text-xl font-extrabold leading-tight tracking-tight border-b border-dotted sm:text-3xl border-muted-foreground/50 first:mt-0">
+    <h1 className="pb-1 mt-6 text-lg font-extrabold leading-tight tracking-tight border-b border-dotted border-muted-foreground/50 first:mt-0">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="pb-1 mt-8 mb-4 text-lg font-bold leading-snug tracking-tight border-b border-dotted sm:text-2xl border-muted-foreground/50 first:mt-0">
+    <h2 className="pb-1 mt-8 mb-4 font-bold leading-snug tracking-tight uppercase border-b border-dotted text-muted-foreground border-muted-foreground/50 first:mt-0">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="mt-3 mb-3 text-xl font-semibold leading-snug tracking-tight sm:text-2xl first:mt-0">
+    <h3 className="font-semibold leading-snug tracking-tight first:mt-0">
       {children}
     </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="mt-5 mb-2 text-lg font-semibold leading-snug first:mt-0">
-      {children}
-    </h4>
+    <h4 className="font-semibold leading-snug first:mt-0">{children}</h4>
   ),
-  p: ({ children }) => <p className="my-4 leading-7">{children}</p>,
+  p: ({ children }) => <p className="my-2">{children}</p>,
   ul: ({ children }) => (
-    <ul className="pl-8 my-4 space-y-2 list-disc list-outside sm:pl-10">
-      {children}
-    </ul>
+    <ul className="pl-8 my-4 list-disc list-outside sm:pl-10">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="pl-8 my-4 ml-2 space-y-2 list-decimal list-outside sm:pl-10">
+    <ol className="pl-8 my-4 ml-2 list-decimal list-outside sm:pl-10">
       {children}
     </ol>
   ),

@@ -20,7 +20,7 @@ export const SeeMore = ({
       <br />
       {!canSeeAll && (
         <button
-          className="px-1 py-1 mx-1 font-bold underline rounded-lg hover:bg-neon-accent"
+          className="px-1 py-1 mx-1 font-bold underline rounded-lg hover:bg-neon-accent hover:text-black"
           onClick={() => {
             setShowMore((prev) => !prev);
           }}

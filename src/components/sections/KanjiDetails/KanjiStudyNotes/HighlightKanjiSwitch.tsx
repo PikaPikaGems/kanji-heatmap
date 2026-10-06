@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useHighlightVocabKanji } from "@/hooks/use-highlight-vocab-kanji";
 
-/** Same preference as User Preferences > Highlight Kanji. */
+/** One shared preference: the same switch in study notes and the kanji essay. */
 export const HighlightKanjiSwitch = ({ className }: { className?: string }) => {
   const id = useId();
   const [highlight, setHighlight] = useHighlightVocabKanji();
