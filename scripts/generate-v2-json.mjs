@@ -48,7 +48,7 @@ const vocabFurigana = readRelease("vocab_furigana.json");
 const vocabMeaning = readRelease("vocab_meaning.json");
 const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
 const similarKanjis = readRelease("similar-kanjis.json");
-const readingDetails = readRaw("misc/kanji-readings-details.json");
+const readingDetails = readRaw("misc/external/kanji-readings-details.json");
 const cumUse = readRelease("cum_use.json");
 // Drawer grouping comes from rewhowe/kanji; everything else radical-related
 // that we decided ourselves is in raw-data/radicals/ours.json.
@@ -84,7 +84,7 @@ const isKanji = (char) => main[char] != null;
 // are `jouyouForms` in misc/ours.json.
 const { jouyouForms } = readRaw("misc/ours.json");
 const jouyou = new Set(
-  readRawText("misc/jouyou_kanji.txt")
+  readRawText("misc/external/jouyou_kanji.txt")
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
@@ -102,7 +102,7 @@ for (const char of jouyou) {
 // indexes, so a kanji's number matches the published list.
 const topoTwitterIndex = new Map();
 {
-  const lines = readRawText("misc/topokanji_index_twitter.txt")
+  const lines = readRawText("misc/external/topokanji_index_twitter.txt")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);

@@ -17,7 +17,7 @@ describe every input file and where it came from.
 | `raw-data/radicals/ours.json`   | Our radical choices: `literalEn`, `aliases`, sylhare skip/extra lists, `extras`  |
 | `raw-data/components/ours.json` | Our component keywords — the only source of non-radical keywords                 |
 | `raw-data/kanji-structure/`     | The four Character Structure sources                                             |
-| `raw-data/misc/`                | jōyō list, TopoKanji, reading frequencies, katakana words                        |
+| `raw-data/misc/external/`       | jōyō list, TopoKanji, reading frequencies, katakana words                        |
 
 **Build.** `pnpm run generate-json` runs `scripts/generate-v2-json.mjs` (which
 uses `scripts/radicals.mjs`) and then `scripts/count-non-radical-components.mjs`.

@@ -5,7 +5,7 @@ now; the user will handle them later.
 
 - **Grade bug.** The release tags 279 name kanji (伊, 彦, 智, …) as grade 9.
   This repo works around it in `scripts/generate-v2-json.mjs` using
-  `raw-data/misc/jouyou_kanji.txt`; remove the workaround once the release is
+  `raw-data/misc/external/jouyou_kanji.txt`; remove the workaround once the release is
   fixed.
 - **Component keyword fixes.** Corrections made in
   `raw-data/components/ours.json` (乂 "mow", 昏 "twilight", …) could go back

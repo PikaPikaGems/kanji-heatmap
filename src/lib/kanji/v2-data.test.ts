@@ -177,7 +177,13 @@ const ankiPartsFor = (kanji: string) =>
 const jouyou = new Set(
   fs
     .readFileSync(
-      path.join(process.cwd(), "raw-data", "misc", "jouyou_kanji.txt"),
+      path.join(
+        process.cwd(),
+        "raw-data",
+        "misc",
+        "external",
+        "jouyou_kanji.txt"
+      ),
       "utf8"
     )
     .split("\n")
@@ -267,6 +273,7 @@ describe("kanji_main.json", () => {
           process.cwd(),
           "raw-data",
           "misc",
+          "external",
           "topokanji_index_twitter.txt"
         ),
         "utf8"
@@ -547,7 +554,7 @@ describe("pass-through files", () => {
     );
     expect(v2("similar_kanjis.json")).toEqual(release("similar-kanjis.json"));
     expect(v2("kanji_reading_details.json")).toEqual(
-      raw("misc/kanji-readings-details.json")
+      raw("misc/external/kanji-readings-details.json")
     );
     expect(v2("cum_use.json")).toEqual(release("cum_use.json"));
   });
