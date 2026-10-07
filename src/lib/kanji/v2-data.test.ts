@@ -513,10 +513,10 @@ describe("components.json", () => {
 
 describe("kanji_structures.json", () => {
   const sources = {
-    hl: raw<Record<string, unknown>>("kanji-structure/hlorenzi.json"),
-    ka: raw<Record<string, unknown>>("kanji-structure/kanjium.json"),
-    sc: raw<Record<string, unknown>>("kanji-structure/scott.json"),
-    ya: raw<Record<string, unknown>>("kanji-structure/yagays.json"),
+    hl: raw<Record<string, unknown>>("kanji-structure/external/hlorenzi.json"),
+    ka: raw<Record<string, unknown>>("kanji-structure/external/kanjium.json"),
+    sc: raw<Record<string, unknown>>("kanji-structure/external/scott.json"),
+    ya: raw<Record<string, unknown>>("kanji-structure/external/yagays.json"),
   };
 
   it("reproduces each source's value verbatim under its short key", () => {

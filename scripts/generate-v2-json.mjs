@@ -69,10 +69,10 @@ const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
 );
 
 const structureSources = {
-  hl: readRaw("kanji-structure/hlorenzi.json"),
-  ka: readRaw("kanji-structure/kanjium.json"),
-  sc: readRaw("kanji-structure/scott.json"),
-  ya: readRaw("kanji-structure/yagays.json"),
+  hl: readRaw("kanji-structure/external/hlorenzi.json"),
+  ka: readRaw("kanji-structure/external/kanjium.json"),
+  sc: readRaw("kanji-structure/external/scott.json"),
+  ya: readRaw("kanji-structure/external/yagays.json"),
 };
 
 const kanjiList = Object.keys(main);
