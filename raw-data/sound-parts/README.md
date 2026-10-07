@@ -8,12 +8,12 @@ edited. Anything we decide ourselves lives in `ours.json`.
 
 ## Inputs
 
-| File                                                  | What we use it for                                              | Source                                                                  |
-| ----------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `../kanji-heatmap-data/kanji_extended.json` (field 8) | The release's sound part per kanji                              | Kanji Heatmap Data release                                              |
-| `../kanji-heatmap-data/phonetic.json`                 | The release's readings per sound part                           | Kanji Heatmap Data release                                              |
-| `external/anki-phonetic-components.tsv`               | Sound families: part, on reading, example kanji                 | [Anki shared deck 470563167](https://ankiweb.net/shared/info/470563167) |
-| `ours.json`                                           | Our choices: families to skip, sound part and reading overrides | This repo                                                               |
+| File                                                  | What we use it for                                                               | Source                                                                  |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `../kanji-heatmap-data/kanji_extended.json` (field 8) | The release's sound part per kanji                                               | Kanji Heatmap Data release                                              |
+| `../kanji-heatmap-data/phonetic.json`                 | The release's readings per sound part                                            | Kanji Heatmap Data release                                              |
+| `external/anki-phonetic-components.tsv`               | Sound families: part, on reading, example kanji                                  | [Anki shared deck 470563167](https://ankiweb.net/shared/info/470563167) |
+| `ours.json`                                           | Our choices: codepoint fixes, families to skip, sound part and reading overrides | This repo                                                               |
 
 ## What a sound part means
 
@@ -50,8 +50,9 @@ How the Anki file is read (the file itself is untouched):
 
 - Rows R01–R20 are rhyme groups, not sound families, and are skipped.
 - Kangxi and radical-supplement codepoints are read as the ordinary
-  character: ⼰ ⽦ ⽄ → 己 疋 斤, and ⺹ → 耂 (the glyph every parts list
-  uses, so a breakdown never shows the same shape twice).
+  character, using `codepointFixes` in `ours.json`: ⼰ ⽦ ⽄ → 己 疋 斤, and
+  ⺹ → 耂 (the glyph every parts list uses, so a breakdown never shows the
+  same shape twice).
 - Example kanji outside our kanji set (駕, 蝙, …) are ignored.
 
 `docs/data/sound-parts.json` is regenerated on every build and lists what

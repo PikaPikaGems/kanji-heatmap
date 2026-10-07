@@ -48,7 +48,7 @@ const vocabFurigana = readRelease("vocab_furigana.json");
 const vocabMeaning = readRelease("vocab_meaning.json");
 const decomposition = readRaw("radicals/external/rewhowe-decomposition.json");
 const similarKanjis = readRelease("similar-kanjis.json");
-const readingDetails = readRaw("misc/kanji-readings-details.json");
+const readingDetails = readRaw("misc/external/kanji-readings-details.json");
 const cumUse = readRelease("cum_use.json");
 // Drawer grouping comes from rewhowe/kanji; everything else radical-related
 // that we decided ourselves is in raw-data/radicals/ours.json.
@@ -64,13 +64,15 @@ const {
   drawer,
   isKanji: (char) => main[char] != null,
 });
-const manualOverrides = readRaw("components/ours.json");
+const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
+  "components/ours.json"
+);
 
 const structureSources = {
-  hl: readRaw("kanji-structure/hlorenzi.json"),
-  ka: readRaw("kanji-structure/kanjium.json"),
-  sc: readRaw("kanji-structure/scott.json"),
-  ya: readRaw("kanji-structure/yagays.json"),
+  hl: readRaw("kanji-structure/external/hlorenzi.json"),
+  ka: readRaw("kanji-structure/external/kanjium.json"),
+  sc: readRaw("kanji-structure/external/scott.json"),
+  ya: readRaw("kanji-structure/external/yagays.json"),
 };
 
 const kanjiList = Object.keys(main);
@@ -78,14 +80,15 @@ const isKanji = (char) => main[char] != null;
 
 // Official jōyō list, one kanji per line. kanji_extended tags ~280 name kanji
 // (伊, 彦, 智, …) as grade 9, so the list decides who gets a grade at all.
-// The list uses the official 剝; we store the common form 剥.
-const JOUYOU_FORMS = { 剝: "剥" };
+// The list uses some official forms we store differently (剝 → 剥); the pairs
+// are `jouyouForms` in misc/ours.json.
+const { jouyouForms } = readRaw("misc/ours.json");
 const jouyou = new Set(
-  readRawText("misc/jouyou_kanji.txt")
+  readRawText("misc/external/jouyou_kanji.txt")
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((char) => JOUYOU_FORMS[char] ?? char)
+    .map((char) => jouyouForms[char] ?? char)
 );
 if (jouyou.size !== 2136) {
   fail(`jouyou_kanji.txt: expected 2136 kanji, got ${jouyou.size}`);
@@ -99,7 +102,7 @@ for (const char of jouyou) {
 // indexes, so a kanji's number matches the published list.
 const topoTwitterIndex = new Map();
 {
-  const lines = readRawText("misc/topokanji_index_twitter.txt")
+  const lines = readRawText("misc/external/topokanji_index_twitter.txt")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
@@ -357,14 +360,10 @@ for (const [char, entry] of Object.entries(manualOverrides)) {
 }
 
 // A component keyword must not be a kanji keyword either, or two different
-// characters look like the same thing (戈 and 槍 were both "spear"). Listed
-// here: the same character at a Kangxi-radical codepoint, and 已, the glyph
-// the radical drawer uses for 己 — the same radical, so the same keyword.
-const KANJI_KEYWORD_SHARED_OK = {
-  "⼊": "入",
-  "⾋": "草",
-  已: "己",
-};
+// characters look like the same thing (戈 and 槍 were both "spear"). The
+// allowed pairs are `sharedKanjiKeywords` in components/ours.json: the same
+// character at a Kangxi-radical codepoint, and 已, the glyph the radical
+// drawer uses for 己 — the same radical, so the same keyword.
 const kanjiByKeyword = {};
 for (const kanji of kanjiList) {
   kanjiByKeyword[main[kanji][0].trim().toLowerCase()] ??= kanji;
@@ -372,7 +371,7 @@ for (const kanji of kanjiList) {
 for (const [char, entry] of Object.entries(components)) {
   if (entry.k == null || isKanji(char)) continue;
   const kanji = kanjiByKeyword[entry.k.trim().toLowerCase()];
-  if (kanji == null || KANJI_KEYWORD_SHARED_OK[char] === kanji) continue;
+  if (kanji == null || sharedKanjiKeywords[char] === kanji) continue;
   fail(`components: "${entry.k}" (${char}) is also the keyword of ${kanji}`);
 }
 

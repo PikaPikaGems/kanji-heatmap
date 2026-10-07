@@ -4,3 +4,8 @@
   `pnpm run format:check`) and fix any reported files with
   `pnpm exec prettier --write <file>`. CI/build fails on formatting issues,
   and it's easy to forget since `pnpm run build` doesn't run prettier itself.
+- Never hardcode data fixes in code: per-character mappings, exception
+  lists, keyword overrides and the like (e.g. `{ 剝: "剥" }`). Put them in a
+  data file, normally `raw-data/<area>/ours.json`, and have the script read
+  it. Hardcoding is allowed only when the user explicitly says so for that
+  specific case.

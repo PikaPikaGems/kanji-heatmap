@@ -10,14 +10,14 @@ describe every input file and where it came from.
 
 **Data layout.** `raw-data/` has one folder per source:
 
-| Folder                          | What                                                                             |
-| ------------------------------- | -------------------------------------------------------------------------------- |
-| `raw-data/kanji-heatmap-data/`  | Kanji Heatmap Data release, copied in unchanged                                  |
-| `raw-data/radicals/external/`   | Outside radical sources (sylhare, rewhowe, two Anki decks, sph-mn). Never edited |
-| `raw-data/radicals/ours.json`   | Our radical choices: `literalEn`, `aliases`, sylhare skip/extra lists, `extras`  |
-| `raw-data/components/ours.json` | Our component keywords — the only source of non-radical keywords                 |
-| `raw-data/kanji-structure/`     | The four Character Structure sources                                             |
-| `raw-data/misc/`                | jōyō list, TopoKanji, reading frequencies, katakana words                        |
+| Folder                               | What                                                                             |
+| ------------------------------------ | -------------------------------------------------------------------------------- |
+| `raw-data/kanji-heatmap-data/`       | Kanji Heatmap Data release, copied in unchanged                                  |
+| `raw-data/radicals/external/`        | Outside radical sources (sylhare, rewhowe, two Anki decks, sph-mn). Never edited |
+| `raw-data/radicals/ours.json`        | Our radical choices: `literalEn`, `aliases`, sylhare skip/extra lists, `extras`  |
+| `raw-data/components/ours.json`      | Our component keywords — the only source of non-radical keywords                 |
+| `raw-data/kanji-structure/external/` | The four Character Structure sources                                             |
+| `raw-data/misc/external/`            | jōyō list, TopoKanji, reading frequencies, katakana words                        |
 
 **Build.** `pnpm run generate-json` runs `scripts/generate-v2-json.mjs` (which
 uses `scripts/radicals.mjs`) and then `scripts/count-non-radical-components.mjs`.
@@ -260,7 +260,7 @@ the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
    has ~20 simplified-Chinese rows (讠 纟 贝 …) to drop, and
    `阝(Left side)` / `阝(Right side)` must become ⻖ / ⻏.
 5. **Kanji where the radical carries the meaning** — kanjium's first slot is
-   the dictionary radical (`raw-data/kanji-structure/kanjium.json`), usually
+   the dictionary radical (`raw-data/kanji-structure/external/kanjium.json`), usually
    the meaning part: 虫 → 蚊 蛍 蚕 蛇 蝶 蜂. Not perfect (虹 is filed under 虫).
 6. **Sound examples (1B)** — for radicals that are also sound parts (門, 几,
    羊, …): the reading and a few words, as in item 1.
@@ -287,7 +287,7 @@ kanji containing it, at any depth). Finds things radical search can't
   `radicals-cleanup`, four files were imported into `raw-data/radicals/external/` and `raw-data/misc/`. Left
   out on purpose: `Phonetic_Component.tsv` (near-copy of the phonetic deck),
   `components-kc.csv` (the same data as `components-ck.csv`, flipped) and
-  `kanji-composition-map.txt` (already in `raw-data/kanji-structure/scott.json`).
+  `kanji-composition-map.txt` (already in `raw-data/kanji-structure/external/scott.json`).
 - **Pending upstream — grade bug.** Listed in `docs/notes/kanji-heatmap-data-pending.md`, with every other Kanji Heatmap
   Data fix.
 

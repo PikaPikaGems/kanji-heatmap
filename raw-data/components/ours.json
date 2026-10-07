@@ -1,86 +1,93 @@
 {
-  "阝": {
-    "k": "hill or village"
+  "components": {
+    "阝": {
+      "k": "hill or village"
+    },
+    "𠂊": {
+      "k": "katakana ku"
+    },
+    "⺈": {
+      "k": "katakana ku variant"
+    },
+    "𠂇": {
+      "k": "katakana na"
+    },
+    "㐅": {
+      "k": "katakana me"
+    },
+    "龶": {
+      "k": "the blue crown"
+    },
+    "乂": {
+      "k": "mow"
+    },
+    "廿": {
+      "k": "twenty"
+    },
+    "咅": {
+      "k": "spit out"
+    },
+    "㑒": {
+      "k": "consensus"
+    },
+    "壬": {
+      "k": "9th in rank"
+    },
+    "于": {
+      "k": "out of"
+    },
+    "兀": {
+      "k": "towering"
+    },
+    "尹": {
+      "k": "official rank"
+    },
+    "洛": {
+      "k": "old Kyoto"
+    },
+    "吊": {
+      "k": "dangle"
+    },
+    "昏": {
+      "k": "twilight"
+    },
+    "巷": {
+      "k": "alley"
+    },
+    "奄": {
+      "k": "encompassing"
+    },
+    "屏": {
+      "k": "folding screen"
+    },
+    "兔": {
+      "k": "hare"
+    },
+    "ヨ冖又": {
+      "k": "resting cat"
+    },
+    "矢隹": {
+      "k": "yakitori"
+    },
+    "啇": {
+      "k": "stalk"
+    },
+    "莫": {
+      "k": "sundown"
+    },
+    "乍": {
+      "k": "suddenly"
+    },
+    "𠦝": {
+      "k": "sunrise"
+    },
+    "夬": {
+      "k": "decisive"
+    }
   },
-  "𠂊": {
-    "k": "katakana ku"
-  },
-  "⺈": {
-    "k": "katakana ku variant"
-  },
-  "𠂇": {
-    "k": "katakana na"
-  },
-  "㐅": {
-    "k": "katakana me"
-  },
-  "龶": {
-    "k": "the blue crown"
-  },
-  "乂": {
-    "k": "mow"
-  },
-  "廿": {
-    "k": "twenty"
-  },
-  "咅": {
-    "k": "spit out"
-  },
-  "㑒": {
-    "k": "consensus"
-  },
-  "壬": {
-    "k": "9th in rank"
-  },
-  "于": {
-    "k": "out of"
-  },
-  "兀": {
-    "k": "towering"
-  },
-  "尹": {
-    "k": "official rank"
-  },
-  "洛": {
-    "k": "old Kyoto"
-  },
-  "吊": {
-    "k": "dangle"
-  },
-  "昏": {
-    "k": "twilight"
-  },
-  "巷": {
-    "k": "alley"
-  },
-  "奄": {
-    "k": "encompassing"
-  },
-  "屏": {
-    "k": "folding screen"
-  },
-  "兔": {
-    "k": "hare"
-  },
-  "ヨ冖又": {
-    "k": "resting cat"
-  },
-  "矢隹": {
-    "k": "yakitori"
-  },
-  "啇": {
-    "k": "stalk"
-  },
-  "莫": {
-    "k": "sundown"
-  },
-  "乍": {
-    "k": "suddenly"
-  },
-  "𠦝": {
-    "k": "sunrise"
-  },
-  "夬": {
-    "k": "decisive"
+  "sharedKanjiKeywords": {
+    "⼊": "入",
+    "⾋": "草",
+    "已": "己"
   }
 }
