@@ -58,6 +58,12 @@ spellings is enough — but only alias glyphs that are truly the same shape
 Many of these are sound parts (昜 ヨウ, 尞 リョウ, 戔 セン, 曷 カツ…), which
 overlaps with item 1A in `radicals-pending.md`.
 
+## 1b. Temporary names (decided for now, revisit here)
+
+| Part | Kanji          | Sound              | Name now | Was  | Note                                                                                                                                                                                              | Decision |
+| ---- | -------------- | ------------------ | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| 莫   | 暮 募 墓 幕 模 | も, ぼ, まく, ばく | sundown  | none | "none" looked like a missing name. Original meaning: the sun sinking into grass, the original form of 暮 "dusk" (Wiktionary). The later meaning "not / do not" is the alternative ("not" is free) |          |
+
 ## 2. Radical names that show on screen
 
 `literalEn` is meant to be a literal translation of the Japanese name. Of the
