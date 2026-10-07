@@ -1,0 +1,161 @@
+/**
+ * Each kanji's sound part and each sound part's readings, from
+ * raw-data/sound-parts/ and the Kanji Heatmap Data release.
+ *
+ *   ours.json                            ─┐
+ *   release phonetic.json + kanji field 8 ├─▶ buildSoundParts → { soundPartOf, readings, report }
+ *   external/anki-phonetic-components.tsv ─┘
+ *
+ * Precedence: ours.json > release > Anki. Anki only fills kanji that have no
+ * sound part. Files in external/ and the release are read, never written.
+ * See raw-data/sound-parts/README.md for the rules.
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+
+// The Anki deck writes a few parts at Kangxi-radical or radical-supplement
+// codepoints. Read them as the ordinary character the rest of our data uses
+// (⺹ is 耂 in every parts list), so the breakdown never shows one shape twice.
+const CODEPOINT_FIXES = { "⼰": "己", "⽦": "疋", "⽄": "斤", "⺹": "耂" };
+const fixCodepoint = (char) => CODEPOINT_FIXES[char] ?? char;
+
+const toHiragana = (text) =>
+  text.replace(/[ァ-ヶ]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) - 0x60)
+  );
+
+/**
+ * Reads raw-data/sound-parts/. Each Anki row becomes { part, reading, kanji }.
+ * Rows R01–R20 are rhyme groups, not sound families, and are skipped.
+ */
+export const readSoundPartSources = (rawDir) => {
+  const dir = path.join(rawDir, "sound-parts");
+  const read = (name) => fs.readFileSync(path.join(dir, name), "utf8");
+
+  const [, ...lines] = read("external/anki-phonetic-components.tsv")
+    .split(/\r?\n/)
+    .filter((line) => line.trim().length > 0);
+  const ankiRows = lines
+    .map((line) => line.split("\t"))
+    .filter(([serial]) => !serial.startsWith("R"))
+    .map(([, part, reading, , , ...cells]) => ({
+      part: fixCodepoint(part.trim()),
+      // "エイ (EI)" → "えい"
+      reading: toHiragana(reading.split("(")[0].trim()),
+      // "泳 to swim" → "泳". The last column is Audio, always empty.
+      kanji: cells
+        .map((cell) => [...cell.trim()][0])
+        .filter(Boolean)
+        .map(fixCodepoint),
+    }));
+
+  return { ankiRows, ours: JSON.parse(read("ours.json")) };
+};
+
+/**
+ * - `soundPartOf`: kanji → its sound part (one per kanji).
+ * - `readings`: sound part → readings, for every part some kanji uses.
+ * - `report`: what Anki and ours.json changed, for docs/data/.
+ *
+ * Throws when an ours.json entry matches nothing or repeats what the sources
+ * already say, or when a sound part ends up with no readings.
+ */
+export const buildSoundParts = ({
+  releaseSoundPartOf,
+  releaseReadings,
+  ankiRows,
+  ours,
+  isKanji,
+}) => {
+  const dropFamilies = ours.dropFamilies ?? {};
+  const soundPartOverrides = ours.soundPart ?? {};
+  const readingOverrides = ours.readings ?? {};
+  const problems = [];
+
+  const ankiParts = new Set(ankiRows.map((row) => row.part));
+  for (const part of Object.keys(dropFamilies)) {
+    if (!ankiParts.has(part)) {
+      problems.push(`dropFamilies: ${part} is not an Anki family`);
+    }
+  }
+
+  // 1. Release. 2. Anki fills kanji with no sound part. A family head is not
+  // given itself as a sound part (that is the release's convention for its
+  // own heads, not something Anki says).
+  const soundPartOf = { ...releaseSoundPartOf };
+  const ankiReadings = {};
+  const added = [];
+  const keptRelease = [];
+  for (const { part, reading, kanji } of ankiRows) {
+    if (dropFamilies[part] != null) continue;
+    ankiReadings[part] ??= reading;
+    for (const char of kanji) {
+      if (char === part || !isKanji(char)) continue;
+      const current = soundPartOf[char];
+      if (current == null) {
+        soundPartOf[char] = part;
+        added.push({ kanji: char, part });
+      } else if (current !== part) {
+        keptRelease.push({ kanji: char, release: current, anki: part });
+      }
+    }
+  }
+
+  // 3. ours.json soundPart wins over both.
+  const overridden = [];
+  for (const [kanji, part] of Object.entries(soundPartOverrides)) {
+    if (!isKanji(kanji)) {
+      problems.push(`soundPart: ${kanji} is not a kanji in our set`);
+      continue;
+    }
+    if (soundPartOf[kanji] === part) {
+      problems.push(`soundPart: ${kanji} already has ${part}; remove it`);
+      continue;
+    }
+    overridden.push({ kanji, from: soundPartOf[kanji] ?? "", to: part });
+    soundPartOf[kanji] = part;
+  }
+
+  // Readings: ours.json, else the release (every entry, as before), else
+  // Anki for a part some kanji now uses.
+  const used = new Set(Object.values(soundPartOf));
+  const readings = { ...releaseReadings };
+  for (const part of used) {
+    if (readings[part] == null && ankiReadings[part] != null) {
+      readings[part] = [ankiReadings[part]];
+    }
+  }
+  for (const [part, value] of Object.entries(readingOverrides)) {
+    if (!used.has(part)) {
+      problems.push(`readings: ${part} is not anyone's sound part`);
+      continue;
+    }
+    if (JSON.stringify(readings[part]) === JSON.stringify(value)) {
+      problems.push(`readings: ${part} already reads ${value}; remove it`);
+      continue;
+    }
+    readings[part] = value;
+  }
+  for (const part of used) {
+    if (readings[part] == null) {
+      problems.push(`${part} is a sound part but has no readings`);
+    }
+  }
+
+  if (problems.length > 0) {
+    throw new Error(`sound parts:\n  - ${problems.join("\n  - ")}`);
+  }
+  return {
+    soundPartOf,
+    readings,
+    report: {
+      added,
+      overridden,
+      // Anki disagrees and the release wins (not shown when ours.json decided).
+      keptRelease: keptRelease.filter(
+        ({ kanji }) => soundPartOverrides[kanji] == null
+      ),
+    },
+  };
+};

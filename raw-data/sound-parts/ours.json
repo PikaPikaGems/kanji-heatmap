@@ -1,0 +1,18 @@
+{
+  "dropFamilies": {
+    "祭": "サツ would show on 祭 and 際, read さい; 察/擦 already have 察 (さつ)",
+    "券": "拳 and 圏 share only 龹 with 券; no 刀",
+    "疋": "定 and 是 end in 龰 (一 + 止), not 疋; only part of the shape is there",
+    "士": "支 is 十 + 又, no 士; 枝 and 肢 contain 支, not 士. The release's own 士 family is kept"
+  },
+  "soundPart": {
+    "浅": "㦮",
+    "銭": "㦮",
+    "践": "㦮"
+  },
+  "readings": {
+    "斉": [
+      "さい"
+    ]
+  }
+}

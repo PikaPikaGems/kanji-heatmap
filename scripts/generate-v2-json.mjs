@@ -17,11 +17,13 @@ import { fileURLToPath } from "node:url";
 import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
 import { componentKeyword, followAlias } from "../src/lib/radicals.ts";
 import { buildRadicalData, readRadicalSources } from "./radicals.mjs";
+import { buildSoundParts, readSoundPartSources } from "./sound-parts.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
 const OUT_DIR = path.join(ROOT, "public", "json", "v2");
 const REPORT_PATH = path.join(ROOT, "docs", "data", "component-coverage.json");
+const SOUND_REPORT_PATH = path.join(ROOT, "docs", "data", "sound-parts.json");
 
 const readRaw = (name) =>
   JSON.parse(fs.readFileSync(path.join(RAW_DIR, name), "utf8"));
@@ -200,6 +202,34 @@ for (const kanji of kanjiList) {
 // downloads the meanings/readings blob, and vice versa.
 // ---------------------------------------------------------------------------
 
+// Sound parts: the release's, filled in from the Anki deck, with our own
+// choices on top (scripts/sound-parts.mjs, raw-data/sound-parts/). The source
+// uses "" for most kanji without a phonetic component but an empty array for
+// some; both mean "none".
+const releaseSoundPartOf = {};
+for (const kanji of kanjiList) {
+  const ref = extended[kanji][EXT.phonetic];
+  if (typeof ref === "string" && ref.length > 0)
+    releaseSoundPartOf[kanji] = ref;
+}
+const releaseReadings = {};
+for (const [char, sounds] of Object.entries(phonetic)) {
+  if (Array.isArray(sounds) && sounds.length > 0)
+    releaseReadings[char] = sounds;
+}
+let soundParts;
+try {
+  soundParts = buildSoundParts({
+    releaseSoundPartOf,
+    releaseReadings,
+    ...readSoundPartSources(RAW_DIR),
+    isKanji,
+  });
+} catch (error) {
+  fail(error.message);
+  soundParts = { soundPartOf: {}, readings: {}, report: {} };
+}
+
 const outGeneral = {};
 const outHover = {};
 for (const kanji of kanjiList) {
@@ -209,12 +239,9 @@ for (const kanji of kanjiList) {
     entry[EXT.allOn] ?? [],
     entry[EXT.allKun] ?? [],
   ];
-  // The source uses "" for most kanji without a phonetic component but an
-  // empty array for some; normalise so the field is always a string.
-  const phoneticRef = entry[EXT.phonetic];
   outHover[kanji] = [
     entry[EXT.parts] ?? [],
-    typeof phoneticRef === "string" ? phoneticRef : "",
+    soundParts.soundPartOf[kanji] ?? "",
     entry[EXT.mainVocab] ?? [],
   ];
 }
@@ -262,8 +289,7 @@ for (const [word, parts] of Object.entries(vocabFurigana)) {
 
 const components = {};
 
-for (const [char, sounds] of Object.entries(phonetic)) {
-  if (!Array.isArray(sounds) || sounds.length === 0) continue;
+for (const [char, sounds] of Object.entries(soundParts.readings)) {
   components[char] = { ...components[char], s: sounds };
 }
 
@@ -396,7 +422,7 @@ for (const kanji of kanjiList) {
   for (const part of extended[kanji][EXT.parts] ?? []) {
     noteReference(part, "parts");
   }
-  noteReference(extended[kanji][EXT.phonetic], "phonetic-ref");
+  noteReference(outHover[kanji][1], "phonetic-ref");
 }
 for (const chars of Object.values(decomposition)) {
   for (const char of chars) noteReference(char, "decomposition");
@@ -534,6 +560,10 @@ write("kanji_reading_details.json", readingDetails);
 write("cum_use.json", cumUse);
 
 fs.writeFileSync(REPORT_PATH, JSON.stringify(coverageReport, null, 2) + "\n");
+fs.writeFileSync(
+  SOUND_REPORT_PATH,
+  JSON.stringify(soundParts.report, null, 2) + "\n"
+);
 
 const kb = (bytes) => `${(bytes / 1024).toFixed(0)} KB`;
 console.log("Wrote public/json/v2:");

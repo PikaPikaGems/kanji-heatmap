@@ -110,6 +110,53 @@ const structures = v2<
 
 const kanjiList = Object.keys(v1Main);
 
+// Sound parts: ours.json > release > Anki (scripts/sound-parts.mjs). Parsed
+// here on its own, so the test does not trust the code it checks.
+type SoundPartsOurs = {
+  dropFamilies: Record<string, string>;
+  soundPart: Record<string, string>;
+  readings: Record<string, string[]>;
+};
+const soundOurs = raw<SoundPartsOurs>("sound-parts/ours.json");
+const CODEPOINT_FIXES: Record<string, string> = {
+  "⼰": "己",
+  "⽦": "疋",
+  "⽄": "斤",
+  "⺹": "耂",
+};
+const ankiFamilies = fs
+  .readFileSync(
+    path.join(
+      process.cwd(),
+      "raw-data",
+      "sound-parts",
+      "external",
+      "anki-phonetic-components.tsv"
+    ),
+    "utf8"
+  )
+  .split(/\r?\n/)
+  .slice(1)
+  .map((line) => line.split("\t"))
+  .filter(([serial]) => serial && !serial.startsWith("R"))
+  .map(([, part, , , , ...cells]) => ({
+    part: CODEPOINT_FIXES[part.trim()] ?? part.trim(),
+    kanji: cells
+      .map((cell) => [...cell.trim()][0])
+      .filter(Boolean)
+      .map((char) => CODEPOINT_FIXES[char] ?? char),
+  }));
+const releaseSoundPart = (kanji: string) => {
+  const ref = v1Extended[kanji][8];
+  return typeof ref === "string" ? ref : "";
+};
+// Every part a kept Anki row offers this kanji (a family head never gets itself).
+const ankiPartsFor = (kanji: string) =>
+  ankiFamilies
+    .filter(({ part }) => soundOurs.dropFamilies[part] == null)
+    .filter(({ part, kanji: list }) => part !== kanji && list.includes(kanji))
+    .map(({ part }) => part);
+
 // Official list uses 剝; we store the common form 剥.
 const jouyou = new Set(
   fs
@@ -229,14 +276,34 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
       const source = v1Extended[kanji];
 
       expect(general[kanji], kanji).toEqual([source[5], source[6], source[7]]);
-      expect(hover[kanji], kanji).toEqual([
-        source[0],
-        // The source is inconsistent here: most kanji without a phonetic
-        // component store "", a few store []. Both mean "none" and both
-        // normalise to "".
-        typeof source[8] === "string" ? source[8] : "",
-        source[9],
-      ]);
+      expect(hover[kanji][0], kanji).toEqual(source[0]);
+      expect(hover[kanji][2], kanji).toEqual(source[9]);
+    }
+  });
+
+  it("takes each sound part from ours.json, else the release, else Anki", () => {
+    for (const kanji of kanjiList) {
+      const soundPart = hover[kanji][1];
+      const ours = soundOurs.soundPart[kanji];
+      // The source is inconsistent here: most kanji without a phonetic
+      // component store "", a few store []. Both mean "none".
+      const release = releaseSoundPart(kanji);
+      if (ours != null) {
+        expect(soundPart, kanji).toBe(ours);
+      } else if (release !== "") {
+        expect(soundPart, kanji).toBe(release);
+      } else if (soundPart !== "") {
+        expect(ankiPartsFor(kanji), kanji).toContain(soundPart);
+      } else {
+        expect(ankiPartsFor(kanji), kanji).toEqual([]);
+      }
+    }
+  });
+
+  it("never takes a sound part from a dropped Anki family", () => {
+    for (const kanji of kanjiList) {
+      if (releaseSoundPart(kanji) !== "") continue;
+      expect(soundOurs.dropFamilies[hover[kanji][1]], kanji).toBeUndefined();
     }
   });
 
@@ -257,7 +324,10 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
 
   it("uses an empty string for kanji with no phonetic component", () => {
     const withoutPhonetic = kanjiList.filter(
-      (kanji) => (v1Extended[kanji][8] ?? "").length === 0
+      (kanji) =>
+        releaseSoundPart(kanji) === "" &&
+        ankiPartsFor(kanji).length === 0 &&
+        soundOurs.soundPart[kanji] == null
     );
 
     expect(withoutPhonetic.length).toBeGreaterThan(0);
@@ -352,6 +422,19 @@ describe("components.json", () => {
 
   it("keeps every phonetic sound list", () => {
     for (const [char, sounds] of Object.entries(v1Phonetic)) {
+      expect(components[char]?.s, char).toEqual(
+        soundOurs.readings[char] ?? sounds
+      );
+    }
+  });
+
+  it("gives every sound part a reading, with ours.json winning", () => {
+    for (const kanji of kanjiList) {
+      const soundPart = hover[kanji][1];
+      if (soundPart === "") continue;
+      expect(components[soundPart]?.s?.length, kanji).toBeGreaterThan(0);
+    }
+    for (const [char, sounds] of Object.entries(soundOurs.readings)) {
       expect(components[char]?.s, char).toEqual(sounds);
     }
   });

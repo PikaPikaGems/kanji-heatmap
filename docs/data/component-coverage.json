@@ -16,7 +16,7 @@
       ]
     },
     {
-      "char": "尞",
+      "char": "圣",
       "refs": 23,
       "sources": [
         "hl",
@@ -27,8 +27,8 @@
       ]
     },
     {
-      "char": "圣",
-      "refs": 22,
+      "char": "尞",
+      "refs": 23,
       "sources": [
         "hl",
         "ka",
@@ -270,6 +270,17 @@
       ]
     },
     {
+      "char": "甬",
+      "refs": 14,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc",
+        "ya"
+      ]
+    },
+    {
       "char": "龹",
       "refs": 12,
       "sources": [
@@ -310,6 +321,15 @@
       ]
     },
     {
+      "char": "㦮",
+      "refs": 12,
+      "sources": [
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
       "char": "戠",
       "refs": 12,
       "sources": [
@@ -320,13 +340,13 @@
       ]
     },
     {
-      "char": "甬",
+      "char": "臤",
       "refs": 12,
       "sources": [
         "hl",
         "ka",
-        "sc",
-        "ya"
+        "phonetic-ref",
+        "sc"
       ]
     },
     {
@@ -387,12 +407,14 @@
       ]
     },
     {
-      "char": "臤",
+      "char": "竟",
       "refs": 10,
       "sources": [
         "hl",
         "ka",
-        "sc"
+        "phonetic-ref",
+        "sc",
+        "ya"
       ]
     },
     {
@@ -442,14 +464,6 @@
       ]
     },
     {
-      "char": "㦮",
-      "refs": 9,
-      "sources": [
-        "ka",
-        "sc"
-      ]
-    },
-    {
       "char": "攸",
       "refs": 9,
       "sources": [
@@ -494,6 +508,16 @@
       ]
     },
     {
+      "char": "亲",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
+      ]
+    },
+    {
       "char": "俞",
       "refs": 8,
       "sources": [
@@ -518,6 +542,16 @@
         "ka",
         "sc",
         "ya"
+      ]
+    },
+    {
+      "char": "宓",
+      "refs": 8,
+      "sources": [
+        "hl",
+        "ka",
+        "phonetic-ref",
+        "sc"
       ]
     },
     {
@@ -607,16 +641,6 @@
       ]
     },
     {
-      "char": "竟",
-      "refs": 8,
-      "sources": [
-        "hl",
-        "ka",
-        "sc",
-        "ya"
-      ]
-    },
-    {
       "char": "丩",
       "refs": 7,
       "sources": [
@@ -671,15 +695,6 @@
       ]
     },
     {
-      "char": "亲",
-      "refs": 6,
-      "sources": [
-        "hl",
-        "ka",
-        "sc"
-      ]
-    },
-    {
       "char": "兌",
       "refs": 6,
       "sources": [
@@ -727,15 +742,6 @@
       "refs": 6,
       "sources": [
         "hl",
-        "sc"
-      ]
-    },
-    {
-      "char": "宓",
-      "refs": 6,
-      "sources": [
-        "hl",
-        "ka",
         "sc"
       ]
     },
@@ -820,6 +826,15 @@
       "sources": [
         "sc",
         "ya"
+      ]
+    },
+    {
+      "char": "㐱",
+      "refs": 5,
+      "sources": [
+        "hl",
+        "phonetic-ref",
+        "sc"
       ]
     },
     {
@@ -996,14 +1011,6 @@
       "sources": [
         "sc",
         "ya"
-      ]
-    },
-    {
-      "char": "㐱",
-      "refs": 4,
-      "sources": [
-        "hl",
-        "sc"
       ]
     },
     {
