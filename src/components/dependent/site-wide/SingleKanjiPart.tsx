@@ -40,22 +40,23 @@ export const SingleKanjiPart = ({
           {/* The reading is the family's, not necessarily this kanji's: 門
               is もん, but kanji with 門 (間 簡 閑) are read かん. */}
           {phonetics.length > 0 && (
-            <div className="flex items-center gap-2 px-2 py-1.5 mb-2 text-left border rounded-xl border-lime-400/70 bg-lime-400/10">
-              <div className="flex flex-wrap shrink-0">
+            // Text first, readings below: up to four readings (各) wrap inside
+            // the box instead of stretching the whole popover.
+            <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/70 bg-lime-400/10">
+              <p className="font-normal leading-snug whitespace-normal text-muted-foreground">
+                <span className="font-bold text-foreground">Sound hint:</span>{" "}
+                kanji with <span className="kanji-font">{kanji}</span> are often
+                read
+              </p>
+              <div className="flex flex-wrap -mx-0.5">
                 {phonetics.map((phonetic) => (
                   <RomajiBadge
                     key={phonetic}
                     kana={phonetic}
-                    className="m-0.5 text-md"
+                    className="m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base"
                   />
                 ))}
               </div>
-              <p className="max-w-40 whitespace-normal font-normal leading-snug text-muted-foreground">
-                <span className="font-bold text-foreground">Sound hint</span>
-                <br />
-                kanji with <span className="kanji-font">{kanji}</span> are often
-                read this way
-              </p>
             </div>
           )}
 
