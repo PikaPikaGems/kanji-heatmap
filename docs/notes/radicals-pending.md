@@ -265,6 +265,115 @@ the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
 6. **Sound examples (1B)** — for radicals that are also sound parts (門, 几,
    羊, …): the reading and a few words, as in item 1.
 
+#### Radical popover text (decided with the user, October 2026)
+
+Shape of the popover, per radical:
+
+    宀
+    - 🇯🇵 うかんむり, because it looks like katakana ウ (u) and sits
+      on top as a crown (かんむり).
+    - 🇨🇳 "roof": began as a picture of a house.
+    - Meaning: roof, house
+      - 客: guest, visitor. Someone received under your roof.
+      - 宿: lodging, inn. It began as a person resting on a mat; the
+        roof marks it as indoors.
+      - 安: peace, ease. It first meant sitting at ease, settled at home.
+    - (no sound section: 宀 isn't a sound part)
+
+    Sound section, for radicals that are sound parts (e.g. 青):
+    - Sound: せい
+      - 清, 清潔, せいけつ, clean
+      - 精, 精神, せいしん, spirit, mind
+      - 晴, 晴天, せいてん, clear weather
+
+Rules:
+
+- 🇯🇵 line: why Japanese speakers use the Japanese name, described from
+  how it's written (夂 のまた: written like katakana ノ (no) followed by
+  又 (mata, "again")).
+- 🇨🇳 line: the Chinese origin of the glyph behind its English name.
+- Meaning examples: 2–3 kanji, each with its concepts and a short line on
+  how it links to the radical's meaning.
+- Sound section only if the radical is a sound part. Each row: kanji,
+  word, reading in kana, English gloss.
+- Sections that don't apply are left out. Both the meaning and the sound
+  section are optional: shape-only radicals (丶 丿 亅 亠) have no meaning
+  of their own, and most radicals aren't sound parts.
+- No source is a source of truth (user, October 2026). Wiktionary,
+  kanjium, sylhare, Anki and the rest are all references. We check
+  claims against them, cite the ones we used, and write our own wording,
+  never copied.
+- Origins are stated plainly when references agree, and with "Some
+  believe…" when they disagree (冬).
+- No mnemonics, no outdated folk explanations (字 "a child under a roof"),
+  no commentary.
+- Plain and short.
+
+Data catches:
+
+- Every origin claim must be checked against cited references. Drafts
+  written from memory were wrong 3 times out of 8 checks: in 客 and 字
+  the 各/子 part gives the sound, not the meaning; 冬's origin is
+  unclear; 降 is 阝 for meaning + 夅 for sound, so it isn't a 夂 example.
+- Sound words must be read with the family sound. A kanji's sample word
+  may not be (晴 → 晴れる はれる), so 晴天 せいてん is needed instead.
+- A meaning example must be a kanji where the radical really is the
+  meaning part. Being the kanji's dictionary radical isn't enough:
+  kanji are often filed by shape (舍, the traditional form of 舎, is
+  under 舌 "tongue" in Kangxi, but its meaning part is 口; 来 is under
+  木 in Japanese, but began as a picture of wheat; per Wiktionary).
+- kanjium's radical, sound-part and formation-type fields may suggest
+  candidate kanji to check, but are visibly unreliable: it gives 舎 the
+  radical 人 and the sound part 舎 (itself).
+- A radical is never its own sound example. The sound-parts data points
+  family heads to themselves (加 → 加), so the build must filter the
+  radical out.
+
+Decided (user, October 2026):
+
+- The text lives in its own file,
+  `raw-data/radicals/ours-popover-text.json`, keyed by glyph (everything
+  that is ours is prefixed `ours`). Not in `ours.json`, which stays a
+  small config file. Sound words (word, reading, gloss) are stored there
+  too: words like 晴天 aren't in `vocab.json`.
+- The popover is designed by building one, looking at it in the dev
+  server and iterating.
+
+Proposed, not decided:
+
+- Field format, e.g.
+
+  ```jsonc
+  "宀": {
+    "ja": "…", "cn": "…", "source": "https://en.wiktionary.org/wiki/宀",
+    "meaning": "roof, house",
+    "semantic": [{ "kanji": "客", "concepts": "guest, visitor", "why": "…", "source": "…" }],
+    "sound": [{ "kanji": "晴", "word": "晴天", "reading": "せいてん", "gloss": "clear weather" }]
+  }
+  ```
+
+- The app gets the text as its own generated file, loaded when a popover
+  opens, so `radicals.json` (loaded for the drawer) stays small.
+- Every radical gets text, in batches, most used first. 40 was only a
+  first batch. Radicals without text show the popover as today.
+- Popover extras: drop 3 (the popover already links to "Find kanji that
+  include …"); 4 becomes the "Meaning:" line, written by us with sylhare
+  and Anki as references, and the 🇨🇳 flag moves to the origin line; 5 is
+  not shown, only used to suggest meaning examples; 6 becomes the sound
+  section.
+- Variants (extra 2): not the raw sylhare column (private-use glyphs that
+  show as boxes, duplicate Kangxi codepoints like ⽻ for 羽, wrong ones like
+  甩). Show "Also written: 氵 氺" from our `aliases` instead, if it's
+  worth the space once the popover is built.
+
+Open:
+
+- Naming: if the 🇯🇵 line explains the Japanese name, chip names could
+  become meanings ("roof" instead of "katakana u crown"). The user isn't
+  sure; revisit once the popover exists.
+- How many references must agree before a line is stated plainly: one
+  (unless another disagrees) or at least two. Claude leans toward two.
+
 ### 3. Component search
 
 A new search type, like radical search, built from
