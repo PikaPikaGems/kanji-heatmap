@@ -116,8 +116,8 @@ Split in two (user, October 2026):
     its own reading (少 → 小 しょう).
   - **The sound chip popover says it's a hint:** "Sound hint: kanji with 門
     are often read かん" (`SingleKanjiPart`).
-  - **Dropped Anki families:** 祭, 券, 疋, 士 (reasons in `ours.json`).
-  - **浅 銭 践 → 㦮**, **枝 肢 → 支 し** (and 支 → 支), and **斉 and 才
+  - **Dropped Anki families:** 祭, 券, 疋, 士, 糸 (reasons in `ours.json`).
+  - **浅 銭 践 → 㦮**, **係 → 系 けい** (and 系 → 系), **枝 肢 → 支 し** (and 支 → 支), and **斉 and 才
     read さい**, through `ours.json`.
   - ⺹ is read as 耂, like the Kangxi codepoints ⼰ ⽦ ⽄ → 己 疋 斤.
   - 孝 keeps the release's 孝 (family heads point to themselves).

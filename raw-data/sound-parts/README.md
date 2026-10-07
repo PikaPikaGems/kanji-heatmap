@@ -81,10 +81,13 @@ against the hint test (and against Wiktionary's "Glyph origin" for
 background):
 
 - **Dropped:** 祭 (a サツ badge would show on 祭 and 際), 券 and 疋 (only
-  part of the shape is in the kanji), 士 (支 is 十 + 又; 枝 and 肢 get 支
+  part of the shape is in the kanji), 糸 (see 係 below), 士 (支 is 十 + 又; 枝 and 肢 get 支
   instead, below).
 - **浅 銭 践 → 㦮:** the shared shape, the old 戔 (セン). The release gives
   浅, which is not in 銭 or 践.
+- **係 → 系 けい** (and 系 → 系, as a head), and 糸 dropped: 系 is what's in
+  係 and carries けい (hlorenzi, kanjium, Wiktionary); 糸 is し and appears in
+  hundreds of kanji as "thread", so a 糸 けい chip would mislead.
 - **枝 肢 → 支 し** (and 支 → 支, as a head): 枝 = 木 + 支 and 肢 = 肉 + 支,
   with 支 as the sound part (Wiktionary). Anki files them under 士, which
   is not in them; the release has no part for them.
