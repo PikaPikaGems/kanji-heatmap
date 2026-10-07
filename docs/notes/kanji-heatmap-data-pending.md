@@ -12,7 +12,13 @@ now; the user will handle them later.
   into the release's `overrides/component_keyword.json`.
 - **金 keyword.** The user may rename 金 "gold" to "gold metal". 釒 follows it
   automatically once the new release is copied in.
-- **Sound parts.** This repo will merge the release's `phonetic.json` and
+- **Sound parts.** This repo merges the release's `phonetic.json` and
   per-kanji `phonetic` field with
-  `raw-data/radicals/external/anki-phonetic-components.tsv` in its own build.
-  The merged data should move into Kanji Heatmap Data later.
+  `raw-data/sound-parts/external/anki-phonetic-components.tsv` in its own
+  build (`scripts/sound-parts.mjs`, rules in `raw-data/sound-parts/README.md`).
+  The merged result (`docs/data/sound-parts.json` lists what Anki added) and
+  our choices in `raw-data/sound-parts/ours.json` should move into Kanji
+  Heatmap Data later, in particular:
+  - 浅 銭 践 → 㦮 (the release gives 浅, which is not in 銭 or 践).
+  - Possible gaps where the release has the right part but doesn't use it:
+    省 ← 生, 定 ← 正 (Wiktionary).

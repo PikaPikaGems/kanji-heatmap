@@ -94,37 +94,40 @@ release's per-kanji parts list (`kanji_extended.json` field 0 →
 
 Split in two (user, October 2026):
 
-- **1A — sound part coverage. Start after
-  PikaPikaGems/kanji-heatmap#302 is merged**, on a new branch from `main`.
-  Merge the release's sound data with the Anki deck in this repo's build and
-  write the result to `public/json/v2/`. Moving the merged data to Kanji
-  Heatmap Data later is listed in `docs/notes/kanji-heatmap-data-pending.md`.
+- **1A — sound part coverage. Done on branch `sound-parts-merge`**
+  (October 2026), waiting for the user's review before merge. The build
+  merges the release's sound parts with the Anki deck:
+  `scripts/sound-parts.mjs`, inputs and rules in
+  `raw-data/sound-parts/README.md`, our choices in
+  `raw-data/sound-parts/ours.json`. `docs/data/sound-parts.json` lists every
+  kanji Anki filled in. Moving the merged data to Kanji Heatmap Data later is
+  listed in `docs/notes/kanji-heatmap-data-pending.md`.
 
-  How it works today: each kanji's sound part is the release's
-  `kanji_extended.json` field 8 (`phonetic`), copied to
-  `kanji_extended_hover.json`; its readings are `components.json` → `s`, from
-  the release's `phonetic.json`. The app reads them in `getPhonetic`
-  (`src/kanji-worker/kanji-assembly.ts`) and `SingleKanjiPart` draws the lime
-  border and reading badge. 509 of 2,426 kanji have a sound part, using 122
-  parts; all 122 have readings.
+  Decided with the user:
 
-  What the Anki deck adds (measured October 2026, R rows dropped): 50
-  families the release doesn't have (加 カ, 果 カ, 牙 ガ, 門 カン, 兄 キョウ,
-  竟 キョウ, 共 キョウ, 区 ク, 糸 ケイ, 圭 ケイ, 券 ケン, 犬 ケン, 県 ケン,
-  臤 ケン, ⺹ コウ, 洪 コウ, 高 コウ, 左 サ, 少 サ, 才 ザイ, 斉 ザイ, 参 サン,
-  次 シ, 匕 シ, 直 ショク, 昔 シャク, 十 ジュウ, 旬 ジュン, 小 ショウ, 㐱 シン,
-  亲 シン, 㦮 セン, 相 ソウ, 弟 ダイ, 単 タン, 竹 チク, 主 チュウ, 兆 チョウ,
-  甬 ツウ, 丁 テイ, 疋 テイ, 童 ドウ, 忍 ニン, 必 ヒ, 宓 ミツ, 名 メイ,
-  明 メイ, 面 メン, 予 ヨ, 羊 ヨウ), and roughly 100 kanji that have no sound
-  part today would get one (架 賀, 課 菓, 間 関 簡, 洋 養, 挑 眺 跳, …). That
-  count still includes family heads (加 in 加's family) and the bad rows below.
+  - **A sound part is a learner hint:** visible in the kanji, and the kanji
+    is read with the family sound. Not a claim about the kanji's history
+    (the release already shows 央 えい).
+  - **Precedence: ours.json > release > Anki.** Anki only fills kanji with
+    no sound part, and only kanji read with the family sound.
+  - **Family heads get themselves** (加 → 加), like the release's 旨 → 旨,
+    also when the head isn't read with the family sound (門 もん, family
+    かん). A kanji in one family and at the head of another keeps the hint for
+    its own reading (少 → 小 しょう).
+  - **The sound chip popover says it's a hint:** "Sound hint: kanji with 門
+    are often read かん" (`SingleKanjiPart`).
+  - **Dropped Anki families:** 祭, 券, 疋, 士, 糸 (reasons in `ours.json`).
+  - **浅 銭 践 → 㦮**, **係 → 系 けい** (and 系 → 系), **枝 肢 → 支 し** (and 支 → 支), and **斉 and 才
+    read さい**, through `ours.json`.
+  - ⺹ is read as 耂, like the Kangxi codepoints ⼰ ⽦ ⽄ → 己 疋 斤.
+  - 孝 keeps the release's 孝 (family heads point to themselves).
 
-  For the user to decide before shipping (it changes what users see):
-
-  - Whether a kanji that already has a release sound part can get a
-    different one from Anki (or the release always wins).
-  - 祭: release さい vs Anki サツ (below).
-  - Show the user a list of every kanji that gains or changes a sound part.
+  Result: 133 more kanji have a sound part (642 instead of 509; 49 of them
+  are family heads), and 浅 銭 践 switch to 㦮. 49 parts gain readings (170
+  sound parts in use, was 122).
+  Seven of the new ones have no name and show "..." (㦮 亲 甬 竟 臤 宓 㐱);
+  31 sound parts are unnamed in all. They belong in the naming worklist
+  (`docs/notes/naming-review.md`).
 
 - **1B — sound examples in the radical popover.** Part of item 2 (radical
   popover overhaul).
@@ -140,10 +143,13 @@ Show sound families with **real words**, not bare kanji:
 ```
 
 - **Merge, don't pick:** sounds come from the release `phonetic.json`
-  (122 components) and `raw-data/radicals/external/anki-phonetic-components.tsv`
-  (130 families). 79 overlap (78 agree), the Anki file adds 51 → about 173.
-- **祭 conflict:** release さい, Anki サツ (the sound in 察/擦). Both are right
-  in their own way; decide whether to keep both.
+  (122 components) and `raw-data/sound-parts/external/anki-phonetic-components.tsv`
+  (130 families). 80 overlap (79 agree, once ⼰ is read as 己), the Anki file
+  adds 51 → about 173.
+- **祭 (decided, user, October 2026):** drop the Anki 祭 row; 祭 keeps only the
+  release's さい. Anki's サツ comes from 察/擦, which the release already gives
+  their own sound part 察 (さつ). Adding サツ to 祭 would put a wrong badge on
+  祭 and 際, the only kanji whose sound part is 祭.
 - **Example kanji** per family come from the Anki file. For the word, reading
   and meaning, use each kanji's existing sample word (the representative word
   in `kanji_main` / `rep_word_details.json`, e.g. 泳 → 泳ぐ, およぐ, "to swim").

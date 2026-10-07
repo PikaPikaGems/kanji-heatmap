@@ -30,7 +30,7 @@
       {
         "cmp": "莫",
         "cnt": 8,
-        "kw": "none"
+        "kw": "sundown"
       },
       {
         "cmp": "𠂇",
@@ -332,7 +332,7 @@
     {
       "char": "莫",
       "count": 8,
-      "keyword": "none",
+      "keyword": "sundown",
       "exampleKanji": [
         "暮",
         "募",

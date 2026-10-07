@@ -8,14 +8,13 @@ edited. Anything we decide ourselves lives next to this README.
 
 ## external/ — from outside sources
 
-| File                           | What we use it for                                                                           | Source                                                                             |
-| ------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `sylhare-radicals.csv`         | Japanese radical name (おうへん), position (へん), meaning, alternate forms. One-time import | [sylhare/kanji](https://github.com/sylhare/kanji) (`resources/kanji-radicals.csv`) |
-| `rewhowe-drawer.json`          | The radicals shown in the radical drawer, grouped by stroke count                            | [rewhowe/kanji](https://github.com/rewhowe/kanji)                                  |
-| `rewhowe-decomposition.json`   | Radical search index: kanji → the drawer radicals it contains                                | [rewhowe/kanji](https://github.com/rewhowe/kanji) (very likely; added April 2025)  |
-| `anki-semantic-radicals.tsv`   | Short meaning per radical. Not used yet                                                      | [Anki shared deck 1589855678](https://ankiweb.net/shared/info/1589855678)          |
-| `anki-phonetic-components.tsv` | Sound families: component, on reading, example kanji. Not used yet                           | [Anki shared deck 470563167](https://ankiweb.net/shared/info/470563167)            |
-| `sphmn-components-ck.csv`      | Component → every jōyō kanji that contains it. For a future component search. Not used yet   | [sph-mn/nihongo](https://github.com/sph-mn/nihongo)                                |
+| File                         | What we use it for                                                                           | Source                                                                             |
+| ---------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `sylhare-radicals.csv`       | Japanese radical name (おうへん), position (へん), meaning, alternate forms. One-time import | [sylhare/kanji](https://github.com/sylhare/kanji) (`resources/kanji-radicals.csv`) |
+| `rewhowe-drawer.json`        | The radicals shown in the radical drawer, grouped by stroke count                            | [rewhowe/kanji](https://github.com/rewhowe/kanji)                                  |
+| `rewhowe-decomposition.json` | Radical search index: kanji → the drawer radicals it contains                                | [rewhowe/kanji](https://github.com/rewhowe/kanji) (very likely; added April 2025)  |
+| `anki-semantic-radicals.tsv` | Short meaning per radical. Not used yet                                                      | [Anki shared deck 1589855678](https://ankiweb.net/shared/info/1589855678)          |
+| `sphmn-components-ck.csv`    | Component → every jōyō kanji that contains it. For a future component search. Not used yet   | [sph-mn/nihongo](https://github.com/sph-mn/nihongo)                                |
 
 ## Ours — `ours.json`
 
