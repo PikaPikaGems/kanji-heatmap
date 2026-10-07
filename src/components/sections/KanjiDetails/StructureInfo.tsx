@@ -16,7 +16,8 @@ import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
 import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
 import { dedupe } from "@/lib/utils";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { PartComponentLink } from "./PartComponentLink";
+import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
+import { useResolvedComponent } from "./use-resolved-component";
 
 const TableCellFixed = ({
   children,
@@ -33,6 +34,13 @@ const TableCellFixed = ({
 const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell>{children}</TableCell>
 );
+
+// Every similar kanji is a kanji, even one outside the main set (which
+// PartComponentLink would show as an unlinked part), so always link it.
+const SimilarKanjiLink = ({ kanji }: { kanji: string }) => {
+  const resolved = useResolvedComponent(kanji);
+  return <GlobalKanjiLink kanji={kanji} keyword={resolved?.keyword ?? "..."} />;
+};
 
 const SimilarKanjis = ({ kanji }: { kanji: string }) => {
   const similar = useSimilarKanjis(kanji);
@@ -57,7 +65,7 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
                 }
                 content={
                   <div className="p-2">
-                    <PartComponentLink part={similarKanji} />
+                    <SimilarKanjiLink kanji={similarKanji} />
                   </div>
                 }
               />

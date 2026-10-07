@@ -88,6 +88,12 @@ export const Game = ({
     () => (k: string) => similarMap?.[k] ?? [],
     [similarMap]
   );
+  // Every kanji in the similar map comes from a kanji dictionary, so it is a
+  // real kanji even when it is outside kanji_main.
+  const similarMapKanji = useMemo(
+    () => new Set(Object.values(similarMap ?? {}).flat()),
+    [similarMap]
+  );
   const speak = useSpeak(current?.word ?? "");
   const playCorrect = useCorrectSound();
 
@@ -160,9 +166,11 @@ export const Game = ({
     modelGuesses: string[],
     recognitionSkipped = false
   ) => {
-    // Require a kanji_main entry (jlpt). getKanjiInfo also returns radical
-    // part-keywords (e.g. 囗 → "closed box"), which must not count.
-    const isRealKanji = (k: string) => getKanjiInfo?.(k)?.jlpt != null;
+    // Require a kanji_main entry (jlpt) or a place in the similar map.
+    // getKanjiInfo also returns radical part-keywords (e.g. 囗 → "closed
+    // box"), which must not count.
+    const isRealKanji = (k: string) =>
+      getKanjiInfo?.(k)?.jlpt != null || similarMapKanji.has(k);
     const grid = buildCandidateGrid({
       target: current.kanji,
       modelGuesses,
