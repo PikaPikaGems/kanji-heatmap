@@ -1,4 +1,10 @@
 {
+  "codepointFixes": {
+    "⼰": "己",
+    "⽦": "疋",
+    "⽄": "斤",
+    "⺹": "耂"
+  },
   "dropFamilies": {
     "祭": "サツ would show on 祭 and 際, read さい; 察/擦 already have 察 (さつ)",
     "券": "拳 and 圏 share only 龹 with 券; no 刀",

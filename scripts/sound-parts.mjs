@@ -14,12 +14,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// The Anki deck writes a few parts at Kangxi-radical or radical-supplement
-// codepoints. Read them as the ordinary character the rest of our data uses
-// (⺹ is 耂 in every parts list), so the breakdown never shows one shape twice.
-const CODEPOINT_FIXES = { "⼰": "己", "⽦": "疋", "⽄": "斤", "⺹": "耂" };
-const fixCodepoint = (char) => CODEPOINT_FIXES[char] ?? char;
-
 // Voicing doesn't break a family: 賀 が is in 加's か family.
 const UNVOICED = Object.fromEntries(
   [..."がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ"].map((ch, i) => [
@@ -41,6 +35,14 @@ const toHiragana = (text) =>
 export const readSoundPartSources = (rawDir) => {
   const dir = path.join(rawDir, "sound-parts");
   const read = (name) => fs.readFileSync(path.join(dir, name), "utf8");
+  const ours = JSON.parse(read("ours.json"));
+
+  // The Anki deck writes a few parts at Kangxi-radical or radical-supplement
+  // codepoints. Read them as the ordinary character the rest of our data uses
+  // (⺹ is 耂 in every parts list), so the breakdown never shows one shape
+  // twice. The pairs live in ours.json `codepointFixes`.
+  const codepointFixes = ours.codepointFixes ?? {};
+  const fixCodepoint = (char) => codepointFixes[char] ?? char;
 
   const [, ...lines] = read("external/anki-phonetic-components.tsv")
     .split(/\r?\n/)
@@ -59,7 +61,7 @@ export const readSoundPartSources = (rawDir) => {
         .map(fixCodepoint),
     }));
 
-  return { ankiRows, ours: JSON.parse(read("ours.json")) };
+  return { ankiRows, ours };
 };
 
 /**
