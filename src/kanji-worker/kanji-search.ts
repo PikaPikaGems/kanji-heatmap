@@ -21,6 +21,7 @@ import { FREQ_RANK_OPTIONS_NONE_REMOVED } from "@/lib/options/options-arr";
 import { getFrequency } from "@/lib/options/options-label-maps";
 import { SortKey } from "@/lib/options/options-types";
 import { isKanji } from "@/lib/utils";
+import { hasNoFilters } from "@/lib/results-utils";
 
 type DataPool = {
   main: Record<string, KanjiMainInfo>;
@@ -226,7 +227,18 @@ export const filterKanji = (
     }
 
     const inPool = ordered.filter((kanji) => kanjiPool.main[kanji] != null);
-    return filterByKanjiSimple(inPool, settings, kanjiPool);
+    const filtered = filterByKanjiSimple(inPool, settings, kanjiPool);
+
+    // Kanji outside the main set have nothing to filter or sort by, so —
+    // like multi-kanji — they only show with the default settings, after
+    // the kanji we know.
+    if (!hasNoFilters(settings) || settings.sortSettings.primary !== "none") {
+      return filtered;
+    }
+    const outsidePool = ordered.filter(
+      (kanji) => kanjiPool.main[kanji] == null
+    );
+    return [...filtered, ...outsidePool];
   }
 
   // TODO: add logic early exit (return all)

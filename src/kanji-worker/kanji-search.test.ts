@@ -79,7 +79,7 @@ const pool = {
       allKunStripped: ["やま"],
     }),
   },
-  similar: { 水: ["氷"] },
+  similar: { 水: ["氷", "火"] },
 };
 
 const allKanji = Object.keys(pool.main);
@@ -170,8 +170,18 @@ describe("filterKanji", () => {
       settings({ type: "similar", text: "水" }),
       pool
     );
-    // 氷 is similar but not in the pool, so only 水 survives.
-    expect(result).toEqual(["水"]);
+    // 氷 is not in the pool, so it comes after the kanji we know.
+    expect(result).toEqual(["水", "火", "氷"]);
+  });
+
+  it("similar: drops kanji outside the pool once a filter or sort is set", () => {
+    const similar = { type: "similar" as const, text: "水" };
+    expect(
+      filterKanji(allKanji, settings({ ...similar, jlpt: ["n5", "n4"] }), pool)
+    ).toEqual(["水", "火"]);
+    expect(
+      filterKanji(allKanji, settings({ ...similar, primary: "strokes" }), pool)
+    ).toEqual(["水", "火"]);
   });
 
   it("filters by one or more Jouyou grades", () => {

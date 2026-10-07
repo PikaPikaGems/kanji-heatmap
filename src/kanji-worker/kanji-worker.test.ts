@@ -284,17 +284,25 @@ describe("data handlers", () => {
     expect(fetched.filter((f) => f === "similar_kanjis.json")).toHaveLength(
       fetchesBefore
     );
-    // The map is unfiltered; the per-kanji request drops unknown kanji.
-    expect(map["五"]).toEqual(expect.arrayContaining(single));
+    // The per-kanji request returns the same kanji, only reordered.
+    expect([...single].sort()).toEqual([...map["五"]].sort());
   });
 
-  it("filters similar kanji down to ones the app knows", async () => {
-    send(110, "kanji-similar", "五");
+  it("lists similar kanji outside kanji_main after the ones it knows", async () => {
+    send(110, "kanji-similar", "伽");
     await settle();
 
-    const data = replyFor(110)?.response.data as string[];
-    expect(data.length).toBeGreaterThan(0);
-    expect(data).toContain("玉");
+    // 珈, 迦 and 駕 are not in kanji_main.
+    expect(replyFor(110)?.response.data).toEqual([
+      "茄",
+      "加",
+      "架",
+      "賀",
+      "嘉",
+      "珈",
+      "迦",
+      "駕",
+    ]);
   });
 
   const searchSettings = (text: string) => ({
