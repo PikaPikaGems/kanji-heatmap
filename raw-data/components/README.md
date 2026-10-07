@@ -11,12 +11,16 @@ fill a missing keyword or correct a wrong one.
 
 ```jsonc
 {
-  "𠂊": { "k": "katakana ku" }, // fill a gap
-  "龶": { "k": "the blue crown" }, // replace a keyword from another source
+  "components": {
+    "𠂊": { "k": "katakana ku" }, // fill a gap
+    "龶": { "k": "the blue crown" }, // replace a keyword from another source
+  },
+  "sharedKanjiKeywords": { "⼊": "入" }, // see below
 }
 ```
 
-Fields (all optional, same shape as a generated entry):
+Fields of each `components` entry (all optional, same shape as a generated
+entry):
 
 - `k` — keyword shown on the component card
 - `s` — phonetic sounds, e.g. `["ちょう", "かん"]`
@@ -26,10 +30,10 @@ Fields (all optional, same shape as a generated entry):
 and lists every component still missing a keyword, most-referenced first —
 that is the worklist for this file.
 
-## `shared-kanji-keywords.json` — allowed keyword clashes
+## `sharedKanjiKeywords` — allowed keyword clashes
 
 The build fails when a component's keyword is also a kanji's keyword, since
-the two would look like the same thing. This file lists the exceptions:
-component → the kanji it may share a keyword with. Each is the same
-character at another codepoint (⼊ → 入, ⾋ → 草), or 已, the glyph the
+the two would look like the same thing. This section of `ours.json` lists the
+exceptions: component → the kanji it may share a keyword with. Each is the
+same character at another codepoint (⼊ → 入, ⾋ → 草), or 已, the glyph the
 radical drawer uses for 己.

@@ -54,9 +54,9 @@ const v1Extended = release<Record<string, V1ExtendedEntry>>(
 const v1Rep = release<Record<string, V1RepEntry>>(
   "kanji_representative_words.json"
 );
-const ourComponents = raw<Record<string, { k?: string }>>(
+const ourComponents = raw<{ components: Record<string, { k?: string }> }>(
   "components/ours.json"
-);
+).components;
 const v1Phonetic = release<Record<string, string[]>>("phonetic.json");
 const v1Furigana = release<Record<string, WordPartDetail[]>>(
   "vocab_furigana.json"

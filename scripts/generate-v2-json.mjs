@@ -64,7 +64,9 @@ const {
   drawer,
   isKanji: (char) => main[char] != null,
 });
-const manualOverrides = readRaw("components/ours.json");
+const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
+  "components/ours.json"
+);
 
 const structureSources = {
   hl: readRaw("kanji-structure/hlorenzi.json"),
@@ -79,8 +81,8 @@ const isKanji = (char) => main[char] != null;
 // Official jōyō list, one kanji per line. kanji_extended tags ~280 name kanji
 // (伊, 彦, 智, …) as grade 9, so the list decides who gets a grade at all.
 // The list uses some official forms we store differently (剝 → 剥); the pairs
-// live in misc/jouyou-forms.json.
-const jouyouForms = readRaw("misc/jouyou-forms.json");
+// are `jouyouForms` in misc/ours.json.
+const { jouyouForms } = readRaw("misc/ours.json");
 const jouyou = new Set(
   readRawText("misc/jouyou_kanji.txt")
     .split("\n")
@@ -359,10 +361,9 @@ for (const [char, entry] of Object.entries(manualOverrides)) {
 
 // A component keyword must not be a kanji keyword either, or two different
 // characters look like the same thing (戈 and 槍 were both "spear"). The
-// allowed pairs live in components/shared-kanji-keywords.json: the same
+// allowed pairs are `sharedKanjiKeywords` in components/ours.json: the same
 // character at a Kangxi-radical codepoint, and 已, the glyph the radical
 // drawer uses for 己 — the same radical, so the same keyword.
-const sharedKanjiKeywords = readRaw("components/shared-kanji-keywords.json");
 const kanjiByKeyword = {};
 for (const kanji of kanjiList) {
   kanjiByKeyword[main[kanji][0].trim().toLowerCase()] ??= kanji;
