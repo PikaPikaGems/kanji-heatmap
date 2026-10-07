@@ -40,15 +40,24 @@ export const SingleKanjiPart = ({
           {/* The reading is the family's, not necessarily this kanji's: 門
               is もん, but kanji with 門 (間 簡 閑) are read かん. */}
           {phonetics.length > 0 && (
-            <div className="mb-1 max-w-44 font-normal">
-              Sound hint: kanji with{" "}
-              <span className="kanji-font font-bold">{kanji}</span> are often
-              read
+            <div className="flex items-center gap-2 px-2 py-1.5 mb-2 text-left border rounded-xl border-lime-400/70 bg-lime-400/10">
+              <div className="flex flex-wrap shrink-0">
+                {phonetics.map((phonetic) => (
+                  <RomajiBadge
+                    key={phonetic}
+                    kana={phonetic}
+                    className="m-0.5 text-md"
+                  />
+                ))}
+              </div>
+              <p className="max-w-40 whitespace-normal font-normal leading-snug text-muted-foreground">
+                <span className="font-bold text-foreground">Sound hint</span>
+                <br />
+                kanji with <span className="kanji-font">{kanji}</span> are often
+                read this way
+              </p>
             </div>
           )}
-          {phonetics.map((phonetic) => (
-            <RomajiBadge key={phonetic} kana={phonetic} className="text-md" />
-          ))}
 
           {isKanji && keyword != null ? (
             <>
