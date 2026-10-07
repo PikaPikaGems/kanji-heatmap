@@ -160,14 +160,16 @@ const releaseSoundPart = (kanji: string) => {
 // Voicing doesn't break a family (賀 が is in 加's か family).
 const unvoiced = (kana: string) =>
   kana.normalize("NFD").replace(/[\u3099\u309a]/g, "");
-// Every part a kept Anki row offers this kanji, if the kanji is read with the
-// family sound. A head is in its own family.
+// Every part a kept Anki row offers this kanji: as a member read with the
+// family sound, or as the family's head (a head gets itself).
 const ankiPartsFor = (kanji: string) =>
   ankiFamilies
     .filter(({ part }) => soundOurs.dropFamilies[part] == null)
-    .filter(({ part, kanji: list }) => part === kanji || list.includes(kanji))
-    .filter(({ reading }) =>
-      v1Extended[kanji][6].some((on) => unvoiced(on) === unvoiced(reading))
+    .filter(
+      ({ part, kanji: list, reading }) =>
+        part === kanji ||
+        (list.includes(kanji) &&
+          v1Extended[kanji][6].some((on) => unvoiced(on) === unvoiced(reading)))
     )
     .map(({ part }) => part);
 

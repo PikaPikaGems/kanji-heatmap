@@ -36,11 +36,11 @@ The part's own reading doesn't have to match: the release already shows
 2. **Anki only fills gaps:** a kanji with no sound part gets the part of an
    Anki row that lists it, unless the family is in `dropFamilies`, and only
    if the kanji is **read with the family sound** (its on readings, voicing
-   ignored). A family head that is a kanji gets itself (加 → 加), as the
-   release does for its heads (旨 → 旨): the chip says it lends its sound to
-   other kanji. The reading test keeps a head out when it isn't read that
-   way (門 is もん, so no 門 かん chip on 門 itself; 少 is しょう, so it
-   gets 小 instead of 少 さ).
+   ignored). Then each family head that is a kanji gets itself (加 → 加), as
+   the release does for its heads (旨 → 旨), even when the head isn't read
+   that way: its chip says kanji with it are often read so (門 もん, family
+   かん). Members go first, so a kanji in one family and at the head of
+   another keeps the hint for its own reading (少 → 小 しょう, not 少 さ).
 3. `soundPart` in `ours.json` sets a kanji's sound part, whatever the
    sources say.
 4. Readings: `readings` in `ours.json`, else the release's, else Anki's
@@ -89,3 +89,5 @@ background):
   with 支 as the sound part (Wiktionary). Anki files them under 士, which
   is not in them; the release has no part for them.
 - **斉 さい:** Anki says ザイ (from 剤), but 斎, 済 and 斉 itself are さい.
+- **才 さい:** Anki says ザイ (from 材, 財), but 才 itself is さい; 材 ざい is
+  the voiced form, and 財 is also さい.

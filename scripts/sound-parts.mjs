@@ -93,37 +93,45 @@ export const buildSoundParts = ({
     }
   }
 
-  // 1. Release. 2. Anki fills kanji with no sound part, if the kanji is read
-  // with the family sound. A family head that is a kanji is a member of its
-  // own family (加 → 加), as the release does for its heads (旨 → 旨): its
-  // chip says it lends its sound to other kanji. 門 is read もん, so it gets
-  // no かん chip of its own.
+  // 1. Release. 2. Anki fills kanji with no sound part:
+  //    a. members, if the kanji is read with the family sound;
+  //    b. then each family head that is a kanji gets itself (加 → 加), as the
+  //       release does for its heads (旨 → 旨). Its chip says kanji with it
+  //       are often read so, even when the head isn't (門 もん, family かん).
+  //       Members go first, so a kanji in one family and at the head of
+  //       another keeps the hint for its own reading (少 → 小 しょう, not 少 さ).
   const soundPartOf = { ...releaseSoundPartOf };
   const ankiReadings = {};
   const added = [];
   const kept = [];
   const notReadSo = [];
-  for (const { part, reading, kanji } of ankiRows) {
-    if (dropFamilies[part] != null) continue;
+  const keptRows = ankiRows.filter(({ part }) => dropFamilies[part] == null);
+  const fill = (char, part) => {
+    const current = soundPartOf[char];
+    if (current === part) return false;
+    if (current != null) {
+      kept.push({ kanji: char, kept: current, anki: part });
+      return false;
+    }
+    soundPartOf[char] = part;
+    added.push({ kanji: char, part });
+    return true;
+  };
+  for (const { part, reading, kanji } of keptRows) {
     ankiReadings[part] ??= reading;
-    for (const char of new Set([part, ...kanji])) {
-      if (!isKanji(char)) continue;
-      const current = soundPartOf[char];
-      if (current === part) continue;
-      if (current != null) {
-        kept.push({ kanji: char, kept: current, anki: part });
-        continue;
-      }
+    for (const char of new Set(kanji)) {
+      if (char === part || !isKanji(char)) continue;
       const readsSo = onReadingsOf(char).some(
         (on) => unvoiced(on) === unvoiced(reading)
       );
-      if (!readsSo) {
-        notReadSo.push({ kanji: char, part, reading });
-        continue;
-      }
-      soundPartOf[char] = part;
-      added.push({ kanji: char, part });
+      if (readsSo) fill(char, part);
+      else notReadSo.push({ kanji: char, part, reading });
     }
+  }
+  for (const { part } of new Map(
+    keptRows.map((row) => [row.part, row])
+  ).values()) {
+    if (isKanji(part)) fill(part, part);
   }
 
   // 3. ours.json soundPart wins over both.

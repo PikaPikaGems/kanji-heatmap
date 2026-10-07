@@ -37,6 +37,15 @@ export const SingleKanjiPart = ({
       }
       content={
         <div className="p-2 text-xs font-bold">
+          {/* The reading is the family's, not necessarily this kanji's: 門
+              is もん, but kanji with 門 (間 簡 閑) are read かん. */}
+          {phonetics.length > 0 && (
+            <div className="mb-1 max-w-44 font-normal">
+              Sound hint: kanji with{" "}
+              <span className="kanji-font font-bold">{kanji}</span> are often
+              read
+            </div>
+          )}
           {phonetics.map((phonetic) => (
             <RomajiBadge key={phonetic} kana={phonetic} className="text-md" />
           ))}
