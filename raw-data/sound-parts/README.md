@@ -34,8 +34,13 @@ The part's own reading doesn't have to match: the release already shows
 
 1. Start from the release's sound parts and readings.
 2. **Anki only fills gaps:** a kanji with no sound part gets the part of an
-   Anki row that lists it, unless the family is in `dropFamilies`. A family
-   head is not given itself as its sound part.
+   Anki row that lists it, unless the family is in `dropFamilies`, and only
+   if the kanji is **read with the family sound** (its on readings, voicing
+   ignored). A family head that is a kanji gets itself (加 → 加), as the
+   release does for its heads (旨 → 旨): the chip says it lends its sound to
+   other kanji. The reading test keeps a head out when it isn't read that
+   way (門 is もん, so no 門 かん chip on 門 itself; 少 is しょう, so it
+   gets 小 instead of 少 さ).
 3. `soundPart` in `ours.json` sets a kanji's sound part, whatever the
    sources say.
 4. Readings: `readings` in `ours.json`, else the release's, else Anki's
@@ -50,8 +55,9 @@ How the Anki file is read (the file itself is untouched):
 - Example kanji outside our kanji set (駕, 蝙, …) are ignored.
 
 `docs/data/sound-parts.json` is regenerated on every build and lists what
-Anki added, what `soundPart` overrode, and where Anki disagreed with the
-release (the release won).
+Anki added, what `soundPart` overrode, where Anki offered another part
+(the kanji kept the one it had), and which Anki kanji failed the reading
+test.
 
 The build fails if a `dropFamilies` key is not an Anki family, a `soundPart`
 or `readings` entry repeats what the sources already give or matches
@@ -75,7 +81,11 @@ against the hint test (and against Wiktionary's "Glyph origin" for
 background):
 
 - **Dropped:** 祭 (a サツ badge would show on 祭 and 際), 券 and 疋 (only
-  part of the shape is in the kanji), 士 (支 is 十 + 又).
+  part of the shape is in the kanji), 士 (支 is 十 + 又; 枝 and 肢 get 支
+  instead, below).
 - **浅 銭 践 → 㦮:** the shared shape, the old 戔 (セン). The release gives
   浅, which is not in 銭 or 践.
+- **枝 肢 → 支 し** (and 支 → 支, as a head): 枝 = 木 + 支 and 肢 = 肉 + 支,
+  with 支 as the sound part (Wiktionary). Anki files them under 士, which
+  is not in them; the release has no part for them.
 - **斉 さい:** Anki says ザイ (from 剤), but 斎, 済 and 斉 itself are さい.

@@ -1,6 +1,10 @@
 {
   "added": [
     {
+      "kanji": "加",
+      "part": "加"
+    },
+    {
       "kanji": "架",
       "part": "加"
     },
@@ -13,12 +17,20 @@
       "part": "加"
     },
     {
+      "kanji": "果",
+      "part": "果"
+    },
+    {
       "kanji": "課",
       "part": "果"
     },
     {
       "kanji": "菓",
       "part": "果"
+    },
+    {
+      "kanji": "牙",
+      "part": "牙"
     },
     {
       "kanji": "雅",
@@ -45,6 +57,14 @@
       "part": "門"
     },
     {
+      "kanji": "己",
+      "part": "己"
+    },
+    {
+      "kanji": "兄",
+      "part": "兄"
+    },
+    {
       "kanji": "況",
       "part": "兄"
     },
@@ -61,8 +81,16 @@
       "part": "竟"
     },
     {
+      "kanji": "共",
+      "part": "共"
+    },
+    {
       "kanji": "供",
       "part": "共"
+    },
+    {
+      "kanji": "区",
+      "part": "区"
     },
     {
       "kanji": "駆",
@@ -73,6 +101,10 @@
       "part": "糸"
     },
     {
+      "kanji": "圭",
+      "part": "圭"
+    },
+    {
       "kanji": "桂",
       "part": "圭"
     },
@@ -81,8 +113,16 @@
       "part": "圣"
     },
     {
+      "kanji": "犬",
+      "part": "犬"
+    },
+    {
       "kanji": "献",
       "part": "犬"
+    },
+    {
+      "kanji": "県",
+      "part": "県"
     },
     {
       "kanji": "懸",
@@ -97,6 +137,10 @@
       "part": "臤"
     },
     {
+      "kanji": "古",
+      "part": "古"
+    },
+    {
       "kanji": "固",
       "part": "古"
     },
@@ -109,12 +153,24 @@
       "part": "耂"
     },
     {
+      "kanji": "洪",
+      "part": "洪"
+    },
+    {
       "kanji": "港",
       "part": "洪"
     },
     {
+      "kanji": "高",
+      "part": "高"
+    },
+    {
       "kanji": "稿",
       "part": "高"
+    },
+    {
+      "kanji": "左",
+      "part": "左"
     },
     {
       "kanji": "佐",
@@ -133,12 +189,20 @@
       "part": "少"
     },
     {
+      "kanji": "才",
+      "part": "才"
+    },
+    {
       "kanji": "材",
       "part": "才"
     },
     {
       "kanji": "財",
       "part": "才"
+    },
+    {
+      "kanji": "斉",
+      "part": "斉"
     },
     {
       "kanji": "斎",
@@ -153,8 +217,16 @@
       "part": "斉"
     },
     {
+      "kanji": "参",
+      "part": "参"
+    },
+    {
       "kanji": "惨",
       "part": "参"
+    },
+    {
+      "kanji": "次",
+      "part": "次"
     },
     {
       "kanji": "姿",
@@ -185,16 +257,36 @@
       "part": "直"
     },
     {
+      "kanji": "昔",
+      "part": "昔"
+    },
+    {
       "kanji": "借",
       "part": "昔"
+    },
+    {
+      "kanji": "朱",
+      "part": "朱"
+    },
+    {
+      "kanji": "十",
+      "part": "十"
     },
     {
       "kanji": "汁",
       "part": "十"
     },
     {
+      "kanji": "旬",
+      "part": "旬"
+    },
+    {
       "kanji": "殉",
       "part": "旬"
+    },
+    {
+      "kanji": "小",
+      "part": "小"
     },
     {
       "kanji": "少",
@@ -203,6 +295,10 @@
     {
       "kanji": "省",
       "part": "小"
+    },
+    {
+      "kanji": "辰",
+      "part": "辰"
     },
     {
       "kanji": "診",
@@ -217,16 +313,36 @@
       "part": "亲"
     },
     {
+      "kanji": "且",
+      "part": "且"
+    },
+    {
       "kanji": "租",
       "part": "且"
+    },
+    {
+      "kanji": "相",
+      "part": "相"
     },
     {
       "kanji": "想",
       "part": "相"
     },
     {
+      "kanji": "弟",
+      "part": "弟"
+    },
+    {
       "kanji": "第",
       "part": "弟"
+    },
+    {
+      "kanji": "単",
+      "part": "単"
+    },
+    {
+      "kanji": "竹",
+      "part": "竹"
     },
     {
       "kanji": "築",
@@ -239,6 +355,10 @@
     {
       "kanji": "駐",
       "part": "主"
+    },
+    {
+      "kanji": "兆",
+      "part": "兆"
     },
     {
       "kanji": "挑",
@@ -261,6 +381,10 @@
       "part": "甬"
     },
     {
+      "kanji": "丁",
+      "part": "丁"
+    },
+    {
       "kanji": "訂",
       "part": "丁"
     },
@@ -277,12 +401,24 @@
       "part": "同"
     },
     {
+      "kanji": "童",
+      "part": "童"
+    },
+    {
       "kanji": "瞳",
       "part": "童"
     },
     {
+      "kanji": "忍",
+      "part": "忍"
+    },
+    {
       "kanji": "認",
       "part": "忍"
+    },
+    {
+      "kanji": "白",
+      "part": "白"
     },
     {
       "kanji": "泌",
@@ -293,8 +429,20 @@
       "part": "必"
     },
     {
+      "kanji": "皮",
+      "part": "皮"
+    },
+    {
+      "kanji": "甫",
+      "part": "甫"
+    },
+    {
       "kanji": "暮",
       "part": "莫"
+    },
+    {
+      "kanji": "包",
+      "part": "包"
     },
     {
       "kanji": "密",
@@ -305,20 +453,40 @@
       "part": "宓"
     },
     {
+      "kanji": "名",
+      "part": "名"
+    },
+    {
       "kanji": "銘",
       "part": "名"
+    },
+    {
+      "kanji": "明",
+      "part": "明"
     },
     {
       "kanji": "盟",
       "part": "明"
     },
     {
+      "kanji": "面",
+      "part": "面"
+    },
+    {
       "kanji": "麺",
       "part": "面"
     },
     {
+      "kanji": "予",
+      "part": "予"
+    },
+    {
       "kanji": "預",
       "part": "予"
+    },
+    {
+      "kanji": "羊",
+      "part": "羊"
     },
     {
       "kanji": "洋",
@@ -344,23 +512,75 @@
       "kanji": "践",
       "from": "浅",
       "to": "㦮"
+    },
+    {
+      "kanji": "支",
+      "from": "",
+      "to": "支"
+    },
+    {
+      "kanji": "枝",
+      "from": "",
+      "to": "支"
+    },
+    {
+      "kanji": "肢",
+      "from": "",
+      "to": "支"
     }
   ],
-  "keptRelease": [
+  "kept": [
     {
       "kanji": "孝",
-      "release": "孝",
+      "kept": "孝",
       "anki": "耂"
     },
     {
       "kanji": "指",
-      "release": "旨",
+      "kept": "旨",
       "anki": "匕"
     },
     {
       "kanji": "脂",
-      "release": "旨",
+      "kept": "旨",
       "anki": "匕"
+    }
+  ],
+  "notReadSo": [
+    {
+      "kanji": "門",
+      "part": "門",
+      "reading": "かん"
+    },
+    {
+      "kanji": "糸",
+      "part": "糸",
+      "reading": "けい"
+    },
+    {
+      "kanji": "少",
+      "part": "少",
+      "reading": "さ"
+    },
+    {
+      "kanji": "直",
+      "part": "直",
+      "reading": "しょく"
+    },
+    {
+      "kanji": "主",
+      "part": "主",
+      "reading": "ちゅう"
+    },
+    {
+      "kanji": "必",
+      "part": "必",
+      "reading": "ひ"
+    },
+    {
+      "kanji": "良",
+      "part": "良",
+      "reading": "ろう"
     }
   ]
 }

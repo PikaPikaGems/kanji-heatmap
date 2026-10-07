@@ -224,6 +224,7 @@ try {
     releaseReadings,
     ...readSoundPartSources(RAW_DIR),
     isKanji,
+    onReadingsOf: (kanji) => extended[kanji][EXT.allOn] ?? [],
   });
 } catch (error) {
   fail(error.message);

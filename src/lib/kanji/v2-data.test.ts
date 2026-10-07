@@ -139,8 +139,15 @@ const ankiFamilies = fs
   .slice(1)
   .map((line) => line.split("\t"))
   .filter(([serial]) => serial && !serial.startsWith("R"))
-  .map(([, part, , , , ...cells]) => ({
+  .map(([, part, reading, , , ...cells]) => ({
     part: CODEPOINT_FIXES[part.trim()] ?? part.trim(),
+    // "カ (KA)" → "か"
+    reading: reading
+      .split("(")[0]
+      .trim()
+      .replace(/[\u30a1-\u30f6]/g, (ch) =>
+        String.fromCharCode(ch.charCodeAt(0) - 0x60)
+      ),
     kanji: cells
       .map((cell) => [...cell.trim()][0])
       .filter(Boolean)
@@ -150,11 +157,18 @@ const releaseSoundPart = (kanji: string) => {
   const ref = v1Extended[kanji][8];
   return typeof ref === "string" ? ref : "";
 };
-// Every part a kept Anki row offers this kanji (a family head never gets itself).
+// Voicing doesn't break a family (賀 が is in 加's か family).
+const unvoiced = (kana: string) =>
+  kana.normalize("NFD").replace(/[\u3099\u309a]/g, "");
+// Every part a kept Anki row offers this kanji, if the kanji is read with the
+// family sound. A head is in its own family.
 const ankiPartsFor = (kanji: string) =>
   ankiFamilies
     .filter(({ part }) => soundOurs.dropFamilies[part] == null)
-    .filter(({ part, kanji: list }) => part !== kanji && list.includes(kanji))
+    .filter(({ part, kanji: list }) => part === kanji || list.includes(kanji))
+    .filter(({ reading }) =>
+      v1Extended[kanji][6].some((on) => unvoiced(on) === unvoiced(reading))
+    )
     .map(({ part }) => part);
 
 // Official list uses 剝; we store the common form 剥.

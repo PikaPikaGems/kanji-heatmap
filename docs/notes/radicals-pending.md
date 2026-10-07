@@ -109,14 +109,18 @@ Split in two (user, October 2026):
     is read with the family sound. Not a claim about the kanji's history
     (the release already shows 央 えい).
   - **Precedence: ours.json > release > Anki.** Anki only fills kanji with
-    no sound part.
+    no sound part, and only kanji read with the family sound.
+  - **Family heads get themselves** (加 → 加), like the release's 旨 → 旨,
+    unless the head isn't read with the family sound (門 もん, 少 しょう).
   - **Dropped Anki families:** 祭, 券, 疋, 士 (reasons in `ours.json`).
-  - **浅 銭 践 → 㦮**, and **斉 reads さい**, through `ours.json`.
+  - **浅 銭 践 → 㦮**, **枝 肢 → 支 し** (and 支 → 支), and **斉 reads
+    さい**, through `ours.json`.
   - ⺹ is read as 耂, like the Kangxi codepoints ⼰ ⽦ ⽄ → 己 疋 斤.
   - 孝 keeps the release's 孝 (family heads point to themselves).
 
-  Result: 82 more kanji have a sound part (591 instead of 509), and 浅 銭 践
-  switch to 㦮. 47 parts gain readings (168 sound parts in use, was 122).
+  Result: 127 more kanji have a sound part (636 instead of 509; 43 of them
+  are family heads), and 浅 銭 践 switch to 㦮. 49 parts gain readings (170
+  sound parts in use, was 122).
   Seven of the new ones have no name and show "..." (㦮 亲 甬 竟 臤 宓 㐱);
   31 sound parts are unnamed in all. They belong in the naming worklist
   (`docs/notes/naming-review.md`).

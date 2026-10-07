@@ -20,6 +20,15 @@ import path from "node:path";
 const CODEPOINT_FIXES = { "⼰": "己", "⽦": "疋", "⽄": "斤", "⺹": "耂" };
 const fixCodepoint = (char) => CODEPOINT_FIXES[char] ?? char;
 
+// Voicing doesn't break a family: 賀 が is in 加's か family.
+const UNVOICED = Object.fromEntries(
+  [..."がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ"].map((ch, i) => [
+    ch,
+    "かきくけこさしすせそたちつてとはひふへほはひふへほ"[i],
+  ])
+);
+const unvoiced = (kana) => [...kana].map((ch) => UNVOICED[ch] ?? ch).join("");
+
 const toHiragana = (text) =>
   text.replace(/[ァ-ヶ]/g, (ch) =>
     String.fromCharCode(ch.charCodeAt(0) - 0x60)
@@ -58,6 +67,9 @@ export const readSoundPartSources = (rawDir) => {
  * - `readings`: sound part → readings, for every part some kanji uses.
  * - `report`: what Anki and ours.json changed, for docs/data/.
  *
+ * `onReadingsOf(kanji)` gives a kanji's on readings: Anki fills a kanji only
+ * if it is read with the family sound (the hint test; see the README).
+ *
  * Throws when an ours.json entry matches nothing or repeats what the sources
  * already say, or when a sound part ends up with no readings.
  */
@@ -67,6 +79,7 @@ export const buildSoundParts = ({
   ankiRows,
   ours,
   isKanji,
+  onReadingsOf,
 }) => {
   const dropFamilies = ours.dropFamilies ?? {};
   const soundPartOverrides = ours.soundPart ?? {};
@@ -80,25 +93,36 @@ export const buildSoundParts = ({
     }
   }
 
-  // 1. Release. 2. Anki fills kanji with no sound part. A family head is not
-  // given itself as a sound part (that is the release's convention for its
-  // own heads, not something Anki says).
+  // 1. Release. 2. Anki fills kanji with no sound part, if the kanji is read
+  // with the family sound. A family head that is a kanji is a member of its
+  // own family (加 → 加), as the release does for its heads (旨 → 旨): its
+  // chip says it lends its sound to other kanji. 門 is read もん, so it gets
+  // no かん chip of its own.
   const soundPartOf = { ...releaseSoundPartOf };
   const ankiReadings = {};
   const added = [];
-  const keptRelease = [];
+  const kept = [];
+  const notReadSo = [];
   for (const { part, reading, kanji } of ankiRows) {
     if (dropFamilies[part] != null) continue;
     ankiReadings[part] ??= reading;
-    for (const char of kanji) {
-      if (char === part || !isKanji(char)) continue;
+    for (const char of new Set([part, ...kanji])) {
+      if (!isKanji(char)) continue;
       const current = soundPartOf[char];
-      if (current == null) {
-        soundPartOf[char] = part;
-        added.push({ kanji: char, part });
-      } else if (current !== part) {
-        keptRelease.push({ kanji: char, release: current, anki: part });
+      if (current === part) continue;
+      if (current != null) {
+        kept.push({ kanji: char, kept: current, anki: part });
+        continue;
       }
+      const readsSo = onReadingsOf(char).some(
+        (on) => unvoiced(on) === unvoiced(reading)
+      );
+      if (!readsSo) {
+        notReadSo.push({ kanji: char, part, reading });
+        continue;
+      }
+      soundPartOf[char] = part;
+      added.push({ kanji: char, part });
     }
   }
 
@@ -152,10 +176,11 @@ export const buildSoundParts = ({
     report: {
       added,
       overridden,
-      // Anki disagrees and the release wins (not shown when ours.json decided).
-      keptRelease: keptRelease.filter(
-        ({ kanji }) => soundPartOverrides[kanji] == null
-      ),
+      // Anki offers another part; the one the kanji already had stays (from the
+      // release, or an earlier Anki row). Not shown when ours.json decided.
+      kept: kept.filter(({ kanji }) => soundPartOverrides[kanji] == null),
+      // Anki lists the kanji, but it isn't read with the family sound.
+      notReadSo,
     },
   };
 };
