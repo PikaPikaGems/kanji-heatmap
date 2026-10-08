@@ -102,7 +102,9 @@ unchecked step.
   - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
         popover in the dev server with 3–5 checked
         entries and iterate on the design (also try variants).
-  - [ ] 1c. Fill in every radical, in batches, most used first. In the same
+  - [ ] 1c. Fill in every radical, in batches, most used first. Done so
+        far: 36 (the first 6, batch 1: 15 non-kanji radicals, batch 2: 15
+        kanji radicals). In the same
         PR as 1b (PikaPikaGems/kanji-heatmap#311), one commit per batch;
         the PR merges only when it's complete.
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
@@ -415,6 +417,14 @@ Data catches:
   はれる), so sound words are picked by hand (晴天 せいてん).
 - The sound-parts data points family heads to themselves (加 → 加), so
   the build must filter the radical out of its own sound examples.
+
+Sound-parts data to check (found while writing the popover text; not
+changed, since sound parts are learner hints, see item 1):
+
+- 省 is listed under 小 (しょう). Wiktionary: its sound part was 生, which
+  became 少 over time; 小 isn't part of it. Not used as a 小 example.
+- 裁 載 栽 are listed under 戈 (さい). Claude believes (unchecked) that
+  Wiktionary gives 𢦏 as their sound part. Check before writing 戈.
 
 Revisit later (user, October 2026; redundant on purpose for now):
 

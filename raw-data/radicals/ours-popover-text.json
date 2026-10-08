@@ -456,5 +456,397 @@
     "refs": [
       "https://en.wiktionary.org/wiki/丶"
     ]
+  },
+  "一": {
+    "ja": "いち (一, one).",
+    "cn": "A single horizontal stroke for the number one.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/一"
+    ]
+  },
+  "口": {
+    "ja": "くち (口, mouth).",
+    "cn": "A picture of an open mouth.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/口"
+    ],
+    "semantic": [
+      {
+        "kanji": "味",
+        "concepts": "taste, flavor",
+        "why": "Tasted with the mouth.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/味"
+        ]
+      },
+      {
+        "kanji": "吸",
+        "concepts": "inhale, suck",
+        "why": "Taking in through the mouth.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/吸"
+        ]
+      },
+      {
+        "kanji": "呼",
+        "concepts": "call, breathe out",
+        "why": "Sending out through the mouth.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/呼"
+        ]
+      }
+    ]
+  },
+  "日": {
+    "ja": "ひ (日, sun).",
+    "cn": "A picture of the sun; the stroke in the middle sets it apart from 口.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/日"
+    ],
+    "semantic": [
+      {
+        "kanji": "晴",
+        "concepts": "clear weather",
+        "why": "The sun is out.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/晴"
+        ]
+      },
+      {
+        "kanji": "暗",
+        "concepts": "dark",
+        "why": "Without the sun.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/暗"
+        ]
+      },
+      {
+        "kanji": "昨",
+        "concepts": "yesterday",
+        "why": "A day that has passed.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/昨"
+        ]
+      }
+    ]
+  },
+  "木": {
+    "ja": "き (木, tree).",
+    "cn": "A picture of a tree: branches on top, roots at the bottom.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/木"
+    ],
+    "semantic": [
+      {
+        "kanji": "林",
+        "concepts": "woods, grove",
+        "why": "Two trees: many trees together.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/林"
+        ]
+      },
+      {
+        "kanji": "板",
+        "concepts": "board, plank",
+        "why": "Made of wood.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/板"
+        ]
+      },
+      {
+        "kanji": "柱",
+        "concepts": "pillar, post",
+        "why": "A wooden post.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/柱"
+        ]
+      }
+    ]
+  },
+  "土": {
+    "ja": "つち (土, earth).",
+    "cn": "A picture of a mound of earth.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/土"
+    ],
+    "semantic": [
+      {
+        "kanji": "地",
+        "concepts": "ground, land",
+        "why": "The earth underfoot.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/地"
+        ]
+      },
+      {
+        "kanji": "場",
+        "concepts": "place, spot",
+        "why": "A piece of ground.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/場"
+        ]
+      },
+      {
+        "kanji": "坂",
+        "concepts": "slope, hill",
+        "why": "Sloping ground.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/坂"
+        ]
+      }
+    ]
+  },
+  "十": {
+    "ja": "じゅう (十, ten).",
+    "cn": "Some believe a single vertical stroke, the next step above one; others see the original form of 針 (needle), borrowed for ten.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/十"
+    ],
+    "sound": [
+      {
+        "kanji": "汁",
+        "word": "果汁",
+        "reading": "かじゅう",
+        "gloss": "fruit juice",
+        "refs": [
+          "https://en.wiktionary.org/wiki/汁"
+        ]
+      }
+    ]
+  },
+  "目": {
+    "ja": "め (目, eye).",
+    "cn": "A picture of an eye, turned on its side.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/目"
+    ],
+    "semantic": [
+      {
+        "kanji": "眼",
+        "concepts": "eye, eyeball",
+        "why": "The eye itself.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/眼"
+        ]
+      },
+      {
+        "kanji": "睡",
+        "concepts": "sleep, doze",
+        "why": "With the eyes closed.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/睡"
+        ]
+      },
+      {
+        "kanji": "看",
+        "concepts": "watch, look after",
+        "why": "A hand (手) over the eyes, gazing far away.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/看"
+        ]
+      }
+    ]
+  },
+  "小": {
+    "ja": "しょう (小, small).",
+    "cn": "Some believe three small dots, meaning small; others see three grains of sand, the original form of 沙.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/小"
+    ],
+    "sound": [
+      {
+        "kanji": "少",
+        "word": "少年",
+        "reading": "しょうねん",
+        "gloss": "boy, youth",
+        "refs": [
+          "https://en.wiktionary.org/wiki/少"
+        ]
+      }
+    ]
+  },
+  "田": {
+    "ja": "た (田, rice field).",
+    "cn": "A picture of a field divided into sections.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/田"
+    ],
+    "semantic": [
+      {
+        "kanji": "界",
+        "concepts": "boundary, world",
+        "why": "The edge of a field.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/界"
+        ]
+      }
+    ]
+  },
+  "月": {
+    "ja": "つき (月, moon).",
+    "cn": "A picture of a crescent moon. A look-alike part, ⺼, is a squeezed 肉 (meat), not the moon.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/月",
+      "https://en.wiktionary.org/wiki/⺼"
+    ],
+    "semantic": [
+      {
+        "kanji": "朗",
+        "concepts": "bright, clear",
+        "why": "Bright like the moon.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/朗"
+        ]
+      },
+      {
+        "kanji": "望",
+        "concepts": "gaze, hope",
+        "why": "The moon (月) was added to a picture of a person looking up.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/望"
+        ]
+      }
+    ]
+  },
+  "大": {
+    "ja": "だい (大, big).",
+    "cn": "A picture of a person standing, seen from the front.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/大"
+    ],
+    "semantic": [
+      {
+        "kanji": "天",
+        "concepts": "heaven, sky",
+        "why": "A standing person (大) with the head marked: the top, then the sky.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/天"
+        ]
+      },
+      {
+        "kanji": "夫",
+        "concepts": "husband, man",
+        "why": "Began as a variant of 大, a standing person.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/夫"
+        ]
+      }
+    ]
+  },
+  "貝": {
+    "ja": "かい (貝, shell).",
+    "cn": "A picture of a cowrie shell, once used as money.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/貝"
+    ],
+    "semantic": [
+      {
+        "kanji": "財",
+        "concepts": "wealth, assets",
+        "why": "Shells (貝) were money.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/財"
+        ]
+      },
+      {
+        "kanji": "貨",
+        "concepts": "goods, money",
+        "why": "Things worth shells (貝), that is, money.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/貨"
+        ]
+      }
+    ]
+  },
+  "糸": {
+    "ja": "いと (糸, thread).",
+    "cn": "A picture of a skein of silk.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/糸"
+    ],
+    "semantic": [
+      {
+        "kanji": "線",
+        "concepts": "line",
+        "why": "A thread.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/線"
+        ]
+      },
+      {
+        "kanji": "結",
+        "concepts": "tie, bind",
+        "why": "Tying thread.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/結"
+        ]
+      },
+      {
+        "kanji": "紙",
+        "concepts": "paper",
+        "why": "Silk (糸) marks it as a material.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/紙"
+        ]
+      }
+    ]
+  },
+  "言": {
+    "ja": "げん (言, words).",
+    "cn": "Built on 口 (mouth); what the mark above it shows is uncertain.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/言"
+    ],
+    "semantic": [
+      {
+        "kanji": "話",
+        "concepts": "talk, story",
+        "why": "Using words.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/話"
+        ]
+      },
+      {
+        "kanji": "語",
+        "concepts": "language, word",
+        "why": "Words.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/語"
+        ]
+      },
+      {
+        "kanji": "読",
+        "concepts": "read",
+        "why": "Reading words.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/讀"
+        ]
+      }
+    ]
+  },
+  "心": {
+    "ja": "こころ (心, heart).",
+    "cn": "A picture of a heart, now highly stylized.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/心"
+    ],
+    "semantic": [
+      {
+        "kanji": "思",
+        "concepts": "think",
+        "why": "The heart was seen as the seat of thought.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/思"
+        ]
+      },
+      {
+        "kanji": "忘",
+        "concepts": "forget",
+        "why": "A matter of the mind (心).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/忘"
+        ]
+      }
+    ]
   }
 }
