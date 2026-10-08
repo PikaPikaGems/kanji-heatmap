@@ -102,7 +102,9 @@ unchecked step.
   - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
         popover in the dev server with 3–5 checked
         entries and iterate on the design (also try variants).
-  - [ ] 1c. Fill in every radical, in batches, most used first.
+  - [ ] 1c. Fill in every radical, in batches, most used first. In the same
+        PR as 1b (PikaPikaGems/kanji-heatmap#311), one commit per batch;
+        the PR merges only when it's complete.
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
       the radical names" below). Decided once the popover exists.
 - [ ] **Step 3 — every radical opens the radical popover**, also
@@ -355,8 +357,12 @@ Rules:
 - 🇯🇵: only the reason, without repeating the name. Shape reasons
   (looks like ウ; のまた is written ノ + 又) need no reference. History
   reasons (まだれ's ま from 麻; ふるとり from 舊) need references.
-- Radicals that are kanji whose name is just the kanji's reading
-  (青 あお) show the name only, with no reason.
+- Every radical gets a 🇯🇵 reason, also when the name is just a word or
+  the kanji's own reading (ほこ, あお): say what the word means ("ほこ: the
+  word for spear"). A non-native reader can't tell otherwise (user,
+  October 2026; replaces "name only"). Whether a word's meaning needs a
+  reference is open (proposal: no, it's a dictionary meaning like the
+  glosses we already show).
 - 🇨🇳: the Chinese origin of the glyph.
 - No source is a source of truth. Wiktionary, kanjium, sylhare, Anki and
   the rest are all references. One reputable reference, linked, is
@@ -400,6 +406,17 @@ Data catches:
   はれる), so sound words are picked by hand (晴天 せいてん).
 - The sound-parts data points family heads to themselves (加 → 加), so
   the build must filter the radical out of its own sound examples.
+
+Revisit later (user, October 2026; redundant on purpose for now):
+
+- When the radical is the sound part of the kanji on screen (戈 in 裁),
+  its popover shows the "Sound hint" box and the 🔊 line.
+- The dialog's "🧠 Semantic:" heading repeats the 🇨🇳 words. An optional
+  `semanticMeaning` field ("weapon") could replace it.
+
+Settled: with sounds but no example words, the summary shows 🔊 and the
+dialog leaves out the Phonetic section. The dialog heading is the radical
+alone.
 
 Open:
 
