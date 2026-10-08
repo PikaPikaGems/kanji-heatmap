@@ -490,10 +490,34 @@ exceptions. Per field:
   (きへん under 木); the dialog switches to a form when it is tapped. A
   radical in no family shows one row, so its position has a place.
 
-Open:
+老 is named おい (an `extras` entry in ours.json); it used to inherit
+おいかんむり from 耂's CSV row.
 
-- 老 shows the name おいかんむり, inherited from 耂's CSV row (sylhare has
-  no row for 老), and its 🇯🇵 line was written to match.
+#### "Why" lines and example counts (October 2026)
+
+Rule: a meaning example's line names the radical in parentheses and how it
+links: "Silver is a metal (金).", "Hearing is done with the ear (耳)."
+Naming the sound part is only for when it explains something (視).
+
+Wiktionary's shinjitai pages (状, 献, 獣, 触) often have no glyph origin;
+it is on the traditional form (狀, 獻, 獸, 觸). Checking those found more
+examples. Radicals still at one meaning example, and why:
+
+- Their other kanji use the radical as the sound part or by shape only:
+  匚 片 瓦 癶 耒 臣 至 舛 首 骨 肉 (肉's kanji are written ⺼/月).
+- Wiktionary marks the role but doesn't say how the meaning links, so no
+  line can be backed: 勹 (陶) 几 (殻 凱) 卜 (外) 工 (式 左) 毛 (毬) 行
+  (術 衛 衝) 角 (触) 辰 (辱) 革 (覇).
+- 人: its kanji are written with ⺅ or 𠆢.
+
+Sound parts with 0 or 1 examples, and why:
+
+- Only one other kanji in the family: 十 (汁), 比 (批), 高 (稿), 小 (少).
+- 里: 鯉 is rarely read り.
+- Our sound-parts data names a part Wiktionary doesn't: 匕 (死), 戈 (裁 載
+  栽 哉: 𢦏), 犬 (献: 鬳), 竹 (築: 筑), 耂 (考), 門 (間 閑: meaning; 関:
+  𢇅; 簡: 閒), 士 (志: 之), 小 (省: 生). Not changed (sound parts are
+  learner hints, item 1), but none of these is used as an example.
 
 ### 3. Component search
 

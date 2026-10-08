@@ -9,7 +9,7 @@
       {
         "kanji": "客",
         "concepts": "guest, visitor",
-        "why": "Someone received under your roof.",
+        "why": "Someone received under your roof (宀).",
         "refs": [
           "https://en.wiktionary.org/wiki/客"
         ]
@@ -17,7 +17,7 @@
       {
         "kanji": "宿",
         "concepts": "lodging, inn",
-        "why": "Began as a person resting on a mat; the roof marks it as indoors.",
+        "why": "Began as a person resting on a mat; the roof (宀) marks it as indoors.",
         "refs": [
           "https://en.wiktionary.org/wiki/宿"
         ]
@@ -25,7 +25,7 @@
       {
         "kanji": "安",
         "concepts": "peace, ease",
-        "why": "First meant to sit at ease, settled at home.",
+        "why": "First meant to sit at ease, settled at home (宀).",
         "refs": [
           "https://en.wiktionary.org/wiki/安"
         ]
@@ -43,9 +43,17 @@
       {
         "kanji": "各",
         "concepts": "each, every",
-        "why": "A foot coming to a place; it first meant to arrive.",
+        "why": "A foot (夂) coming to a place; it first meant to arrive.",
         "refs": [
           "https://en.wiktionary.org/wiki/各"
+        ]
+      },
+      {
+        "kanji": "後",
+        "concepts": "behind, after, later",
+        "why": "A foot (夂) held back by a thread (幺), lagging behind.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/後"
         ]
       }
     ]
@@ -60,7 +68,7 @@
       {
         "kanji": "冷",
         "concepts": "cold, chill",
-        "why": "Cold like ice.",
+        "why": "Cold, like ice (冫).",
         "refs": [
           "https://en.wiktionary.org/wiki/冷"
         ]
@@ -68,7 +76,7 @@
       {
         "kanji": "凍",
         "concepts": "freeze",
-        "why": "Turning to ice.",
+        "why": "Freezing turns water to ice (冫).",
         "refs": [
           "https://en.wiktionary.org/wiki/凍"
         ]
@@ -88,7 +96,7 @@
       {
         "kanji": "店",
         "concepts": "shop, store",
-        "why": "A building where goods are sold.",
+        "why": "A shop is a building (广).",
         "refs": [
           "https://en.wiktionary.org/wiki/店"
         ]
@@ -96,7 +104,7 @@
       {
         "kanji": "庫",
         "concepts": "storehouse, garage",
-        "why": "A building for keeping things.",
+        "why": "A storehouse is a building (广).",
         "refs": [
           "https://en.wiktionary.org/wiki/庫"
         ]
@@ -116,7 +124,7 @@
       {
         "kanji": "雄",
         "concepts": "male, brave",
-        "why": "First meant a male bird.",
+        "why": "First meant a male bird (隹).",
         "refs": [
           "https://en.wiktionary.org/wiki/雄"
         ]
@@ -124,7 +132,7 @@
       {
         "kanji": "雌",
         "concepts": "female",
-        "why": "First meant a female bird.",
+        "why": "First meant a female bird (隹).",
         "refs": [
           "https://en.wiktionary.org/wiki/雌"
         ]
@@ -178,7 +186,7 @@
       {
         "kanji": "泳",
         "concepts": "swim",
-        "why": "Moving through water.",
+        "why": "Swimming is done in water (氵).",
         "refs": [
           "https://en.wiktionary.org/wiki/泳"
         ]
@@ -186,7 +194,7 @@
       {
         "kanji": "海",
         "concepts": "sea, ocean",
-        "why": "A great body of water.",
+        "why": "A sea is a great body of water (氵).",
         "refs": [
           "https://en.wiktionary.org/wiki/海"
         ]
@@ -194,7 +202,7 @@
       {
         "kanji": "洗",
         "concepts": "wash",
-        "why": "Cleaning with water.",
+        "why": "Washing is done with water (氵).",
         "refs": [
           "https://en.wiktionary.org/wiki/洗"
         ]
@@ -220,7 +228,7 @@
       {
         "kanji": "住",
         "concepts": "live, dwell",
-        "why": "Where a person lives.",
+        "why": "Where a person (亻) lives.",
         "refs": [
           "https://en.wiktionary.org/wiki/住"
         ]
@@ -228,7 +236,7 @@
       {
         "kanji": "作",
         "concepts": "make, create",
-        "why": "Something a person does.",
+        "why": "Something a person (亻) does.",
         "refs": [
           "https://en.wiktionary.org/wiki/作"
         ]
@@ -246,7 +254,7 @@
       {
         "kanji": "持",
         "concepts": "hold, have",
-        "why": "Holding something in the hand.",
+        "why": "Holding is done with the hand (扌).",
         "refs": [
           "https://en.wiktionary.org/wiki/持"
         ]
@@ -254,7 +262,7 @@
       {
         "kanji": "打",
         "concepts": "hit, strike",
-        "why": "Striking with the hand.",
+        "why": "Hitting is done with the hand (扌).",
         "refs": [
           "https://en.wiktionary.org/wiki/打"
         ]
@@ -262,7 +270,7 @@
       {
         "kanji": "投",
         "concepts": "throw",
-        "why": "Throwing with the hand.",
+        "why": "Throwing is done with the hand (扌).",
         "refs": [
           "https://en.wiktionary.org/wiki/投"
         ]
@@ -279,7 +287,7 @@
       {
         "kanji": "花",
         "concepts": "flower",
-        "why": "A part of a plant.",
+        "why": "A flower is a plant (艹).",
         "refs": [
           "https://en.wiktionary.org/wiki/花"
         ]
@@ -287,7 +295,7 @@
       {
         "kanji": "草",
         "concepts": "grass",
-        "why": "Grass (艹) itself.",
+        "why": "Grass is a plant (艹).",
         "refs": [
           "https://en.wiktionary.org/wiki/草"
         ]
@@ -295,7 +303,7 @@
       {
         "kanji": "茶",
         "concepts": "tea",
-        "why": "A plant whose leaves are brewed.",
+        "why": "Tea is made from a plant's (艹) leaves.",
         "refs": [
           "https://en.wiktionary.org/wiki/茶"
         ]
@@ -316,7 +324,7 @@
       {
         "kanji": "送",
         "concepts": "send, see off",
-        "why": "Going along with someone.",
+        "why": "Going along (辶) with someone to see them off.",
         "refs": [
           "https://en.wiktionary.org/wiki/送"
         ]
@@ -324,7 +332,7 @@
       {
         "kanji": "進",
         "concepts": "advance, progress",
-        "why": "Walking forward; the bird (隹) is part of the picture.",
+        "why": "Moving forward (辶).",
         "refs": [
           "https://en.wiktionary.org/wiki/進"
         ]
@@ -360,6 +368,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/冠"
         ]
+      },
+      {
+        "kanji": "冥",
+        "concepts": "dark, gloomy, the afterlife",
+        "why": "A cloth cover (冖) over the sun (日): dark.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/冥"
+        ]
       }
     ]
   },
@@ -381,7 +397,7 @@
       {
         "kanji": "見",
         "concepts": "see, look",
-        "why": "A person with a big eye (目) on top.",
+        "why": "A person (儿) with a big eye (目) on top.",
         "refs": [
           "https://en.wiktionary.org/wiki/見"
         ]
@@ -455,6 +471,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/幼"
         ]
+      },
+      {
+        "kanji": "後",
+        "concepts": "behind, after, later",
+        "why": "Thread (幺) tying a foot (夂), so it lags behind.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/後"
+        ]
       }
     ]
   },
@@ -492,7 +516,7 @@
       {
         "kanji": "味",
         "concepts": "taste, flavor",
-        "why": "Tasted with the mouth.",
+        "why": "Tasting is done with the mouth (口).",
         "refs": [
           "https://en.wiktionary.org/wiki/味"
         ]
@@ -500,7 +524,7 @@
       {
         "kanji": "吸",
         "concepts": "inhale, suck",
-        "why": "Taking in through the mouth.",
+        "why": "Breathing in is done through the mouth (口).",
         "refs": [
           "https://en.wiktionary.org/wiki/吸"
         ]
@@ -508,7 +532,7 @@
       {
         "kanji": "呼",
         "concepts": "call, breathe out",
-        "why": "Sending out through the mouth.",
+        "why": "Calling out comes from the mouth (口).",
         "refs": [
           "https://en.wiktionary.org/wiki/呼"
         ]
@@ -525,7 +549,7 @@
       {
         "kanji": "晴",
         "concepts": "clear weather",
-        "why": "The sun is out.",
+        "why": "Clear weather: the sun (日) is out.",
         "refs": [
           "https://en.wiktionary.org/wiki/晴"
         ]
@@ -533,7 +557,7 @@
       {
         "kanji": "暗",
         "concepts": "dark",
-        "why": "Without the sun.",
+        "why": "Dark: without the sun (日).",
         "refs": [
           "https://en.wiktionary.org/wiki/暗"
         ]
@@ -541,7 +565,7 @@
       {
         "kanji": "昨",
         "concepts": "yesterday",
-        "why": "A day that has passed.",
+        "why": "Yesterday is a day (日) that has passed.",
         "refs": [
           "https://en.wiktionary.org/wiki/昨"
         ]
@@ -558,7 +582,7 @@
       {
         "kanji": "林",
         "concepts": "woods, grove",
-        "why": "Two trees: many trees together.",
+        "why": "Two trees (木): many trees together.",
         "refs": [
           "https://en.wiktionary.org/wiki/林"
         ]
@@ -566,7 +590,7 @@
       {
         "kanji": "板",
         "concepts": "board, plank",
-        "why": "Made of wood.",
+        "why": "A board is made of wood (木).",
         "refs": [
           "https://en.wiktionary.org/wiki/板"
         ]
@@ -574,7 +598,7 @@
       {
         "kanji": "柱",
         "concepts": "pillar, post",
-        "why": "A wooden post.",
+        "why": "A pillar is a wooden (木) post.",
         "refs": [
           "https://en.wiktionary.org/wiki/柱"
         ]
@@ -591,7 +615,7 @@
       {
         "kanji": "地",
         "concepts": "ground, land",
-        "why": "The earth underfoot.",
+        "why": "Land is the earth (土) underfoot.",
         "refs": [
           "https://en.wiktionary.org/wiki/地"
         ]
@@ -599,7 +623,7 @@
       {
         "kanji": "場",
         "concepts": "place, spot",
-        "why": "A piece of ground.",
+        "why": "A place is a piece of ground (土).",
         "refs": [
           "https://en.wiktionary.org/wiki/場"
         ]
@@ -607,7 +631,7 @@
       {
         "kanji": "坂",
         "concepts": "slope, hill",
-        "why": "Sloping ground.",
+        "why": "A slope is sloping ground (土).",
         "refs": [
           "https://en.wiktionary.org/wiki/坂"
         ]
@@ -642,7 +666,7 @@
       {
         "kanji": "眼",
         "concepts": "eye, eyeball",
-        "why": "The eye (目) itself.",
+        "why": "An eyeball is part of the eye (目).",
         "refs": [
           "https://en.wiktionary.org/wiki/眼"
         ]
@@ -650,7 +674,7 @@
       {
         "kanji": "睡",
         "concepts": "sleep, doze",
-        "why": "With the eyes closed.",
+        "why": "Sleeping is done with the eyes (目) closed.",
         "refs": [
           "https://en.wiktionary.org/wiki/睡"
         ]
@@ -693,7 +717,7 @@
       {
         "kanji": "界",
         "concepts": "boundary, world",
-        "why": "The edge of a field.",
+        "why": "A boundary is the edge of a field (田).",
         "refs": [
           "https://en.wiktionary.org/wiki/界"
         ]
@@ -727,7 +751,7 @@
       {
         "kanji": "朗",
         "concepts": "bright, clear",
-        "why": "Bright like the moon.",
+        "why": "Bright, like the moon (月).",
         "refs": [
           "https://en.wiktionary.org/wiki/朗"
         ]
@@ -802,7 +826,7 @@
       {
         "kanji": "線",
         "concepts": "line",
-        "why": "A thread (糸): a line.",
+        "why": "A line is like a thread (糸).",
         "refs": [
           "https://en.wiktionary.org/wiki/線"
         ]
@@ -810,7 +834,7 @@
       {
         "kanji": "結",
         "concepts": "tie, bind",
-        "why": "Tying thread.",
+        "why": "Tying is done with thread (糸).",
         "refs": [
           "https://en.wiktionary.org/wiki/結"
         ]
@@ -835,7 +859,7 @@
       {
         "kanji": "話",
         "concepts": "talk, story",
-        "why": "Using words.",
+        "why": "Talking is done with words (言).",
         "refs": [
           "https://en.wiktionary.org/wiki/話"
         ]
@@ -851,7 +875,7 @@
       {
         "kanji": "読",
         "concepts": "read",
-        "why": "Reading words.",
+        "why": "Reading is done with words (言).",
         "refs": [
           "https://en.wiktionary.org/wiki/讀"
         ]
@@ -868,7 +892,7 @@
       {
         "kanji": "思",
         "concepts": "think",
-        "why": "The heart was seen as the seat of thought.",
+        "why": "The heart (心) was seen as the seat of thought.",
         "refs": [
           "https://en.wiktionary.org/wiki/思"
         ]
@@ -876,7 +900,7 @@
       {
         "kanji": "忘",
         "concepts": "forget",
-        "why": "A matter of the mind (心).",
+        "why": "Forgetting happens in the mind (心).",
         "refs": [
           "https://en.wiktionary.org/wiki/忘"
         ]
@@ -986,7 +1010,7 @@
       {
         "kanji": "切",
         "concepts": "cut, cutoff, be sharp",
-        "why": "Cutting with a knife.",
+        "why": "Cutting is done with a knife (刀).",
         "refs": [
           "https://en.wiktionary.org/wiki/切"
         ]
@@ -994,7 +1018,7 @@
       {
         "kanji": "券",
         "concepts": "ticket, certificate",
-        "why": "Cut from something with a knife.",
+        "why": "Cut from something with a knife (刀).",
         "refs": [
           "https://en.wiktionary.org/wiki/券"
         ]
@@ -1011,7 +1035,7 @@
       {
         "kanji": "動",
         "concepts": "move, motion, change",
-        "why": "Moving with force.",
+        "why": "Moving takes force (力).",
         "refs": [
           "https://en.wiktionary.org/wiki/動"
         ]
@@ -1027,7 +1051,7 @@
       {
         "kanji": "加",
         "concepts": "add, addition, increase",
-        "why": "Adding force.",
+        "why": "Adding force (力).",
         "refs": [
           "https://en.wiktionary.org/wiki/加"
         ]
@@ -1133,7 +1157,7 @@
       {
         "kanji": "厚",
         "concepts": "thick, kind, heavy",
-        "why": "Thick like a cliff.",
+        "why": "Thick, like a cliff (厂).",
         "refs": [
           "https://en.wiktionary.org/wiki/厚"
         ]
@@ -1158,7 +1182,7 @@
       {
         "kanji": "受",
         "concepts": "accept, receive, undergo",
-        "why": "Hands passing something from one to another.",
+        "why": "Hands (爪 and 又) passing something from one to another.",
         "refs": [
           "https://en.wiktionary.org/wiki/受"
         ]
@@ -1175,7 +1199,7 @@
       {
         "kanji": "園",
         "concepts": "park, garden, yard",
-        "why": "An enclosed garden.",
+        "why": "A garden is an enclosed (囗) area.",
         "refs": [
           "https://en.wiktionary.org/wiki/園"
         ]
@@ -1183,7 +1207,7 @@
       {
         "kanji": "固",
         "concepts": "harden, solid, firm",
-        "why": "Firmly enclosed.",
+        "why": "Firm: enclosed (囗) on all sides.",
         "refs": [
           "https://en.wiktionary.org/wiki/固"
         ]
@@ -1233,9 +1257,17 @@
       {
         "kanji": "夜",
         "concepts": "night, evening",
-        "why": "Night, when the moon is out.",
+        "why": "Night is when the moon (夕) is out.",
         "refs": [
           "https://en.wiktionary.org/wiki/夜"
+        ]
+      },
+      {
+        "kanji": "名",
+        "concepts": "name, fame, reputation",
+        "why": "Some believe: saying your name (口) so you are known in the dark of evening (夕).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/名"
         ]
       }
     ]
@@ -1250,7 +1282,7 @@
       {
         "kanji": "妻",
         "concepts": "wife, spouse",
-        "why": "A woman (女) as wife.",
+        "why": "A wife is a woman (女).",
         "refs": [
           "https://en.wiktionary.org/wiki/妻"
         ]
@@ -1258,7 +1290,7 @@
       {
         "kanji": "婚",
         "concepts": "marriage, marry",
-        "why": "Taking a wife.",
+        "why": "Marriage is taking a wife (女).",
         "refs": [
           "https://en.wiktionary.org/wiki/婚"
         ]
@@ -1316,7 +1348,7 @@
       {
         "kanji": "導",
         "concepts": "guidance, guide, leading",
-        "why": "Leading by the hand.",
+        "why": "Leading by the hand (寸).",
         "refs": [
           "https://en.wiktionary.org/wiki/導"
         ]
@@ -1340,7 +1372,7 @@
       {
         "kanji": "尾",
         "concepts": "tail, end",
-        "why": "The tail at the end of a body.",
+        "why": "The tail at the end of a body (尸).",
         "refs": [
           "https://en.wiktionary.org/wiki/尾"
         ]
@@ -1380,7 +1412,7 @@
       {
         "kanji": "岩",
         "concepts": "boulder, rock, cliff",
-        "why": "Rock of a mountain.",
+        "why": "Rock from a mountain (山).",
         "refs": [
           "https://en.wiktionary.org/wiki/岩"
         ]
@@ -1388,7 +1420,7 @@
       {
         "kanji": "崎",
         "concepts": "promontory, cape, spit",
-        "why": "A mountain jutting into the sea.",
+        "why": "A mountain (山) jutting into the sea.",
         "refs": [
           "https://en.wiktionary.org/wiki/崎"
         ]
@@ -1412,7 +1444,7 @@
       {
         "kanji": "巧",
         "concepts": "adroit, skillful, skilled",
-        "why": "Skilled work (工).",
+        "why": "Skill is good work (工).",
         "refs": [
           "https://en.wiktionary.org/wiki/巧"
         ]
@@ -1464,7 +1496,7 @@
       {
         "kanji": "布",
         "concepts": "linen, cloth, spread",
-        "why": "Cloth (巾).",
+        "why": "Linen is a cloth (巾).",
         "refs": [
           "https://en.wiktionary.org/wiki/布"
         ]
@@ -1472,7 +1504,7 @@
       {
         "kanji": "幕",
         "concepts": "curtain, shogunate, bunting",
-        "why": "A hanging cloth: a curtain.",
+        "why": "A curtain is a hanging cloth (巾).",
         "refs": [
           "https://en.wiktionary.org/wiki/幕"
         ]
@@ -1480,7 +1512,7 @@
       {
         "kanji": "席",
         "concepts": "seat, mat, occasion",
-        "why": "A cloth mat to sit on.",
+        "why": "A seat was a cloth (巾) mat.",
         "refs": [
           "https://en.wiktionary.org/wiki/席"
         ]
@@ -1548,7 +1580,7 @@
       {
         "kanji": "弄",
         "concepts": "tinker with, tamper with, play with",
-        "why": "Two hands playing with jade.",
+        "why": "Two hands (廾) playing with jade (王).",
         "refs": [
           "https://en.wiktionary.org/wiki/弄"
         ]
@@ -1572,7 +1604,7 @@
       {
         "kanji": "引",
         "concepts": "pull, draw, tug",
-        "why": "Drawing a bow.",
+        "why": "Drawing a bow (弓): pull.",
         "refs": [
           "https://en.wiktionary.org/wiki/引"
         ]
@@ -1580,7 +1612,7 @@
       {
         "kanji": "張",
         "concepts": "lengthen, spread, strain",
-        "why": "Stretching a bowstring.",
+        "why": "Stretching a bowstring (弓): stretch.",
         "refs": [
           "https://en.wiktionary.org/wiki/張"
         ]
@@ -1622,7 +1654,7 @@
       {
         "kanji": "待",
         "concepts": "wait, depend on",
-        "why": "Waiting on the road.",
+        "why": "Waiting on the road (彳).",
         "refs": [
           "https://en.wiktionary.org/wiki/待"
         ]
@@ -1630,7 +1662,7 @@
       {
         "kanji": "復",
         "concepts": "restore, return to, again",
-        "why": "Going back along the road.",
+        "why": "Going back along the road (彳).",
         "refs": [
           "https://en.wiktionary.org/wiki/復"
         ]
@@ -1672,7 +1704,7 @@
       {
         "kanji": "扉",
         "concepts": "front door, hinged door, title page",
-        "why": "A door (戸).",
+        "why": "A hinged door, a kind of door (戸).",
         "refs": [
           "https://en.wiktionary.org/wiki/扉"
         ]
@@ -1680,7 +1712,7 @@
       {
         "kanji": "房",
         "concepts": "tassel, chamber, tuft",
-        "why": "A room behind a door.",
+        "why": "A room behind a door (戸).",
         "refs": [
           "https://en.wiktionary.org/wiki/房"
         ]
@@ -1697,7 +1729,7 @@
       {
         "kanji": "拳",
         "concepts": "fist",
-        "why": "A closed hand.",
+        "why": "A fist is a closed hand (手).",
         "refs": [
           "https://en.wiktionary.org/wiki/拳"
         ]
@@ -1705,7 +1737,7 @@
       {
         "kanji": "掌",
         "concepts": "manipulate, palm, take charge of",
-        "why": "The flat of the hand.",
+        "why": "The palm is the flat of the hand (手).",
         "refs": [
           "https://en.wiktionary.org/wiki/掌"
         ]
@@ -1735,6 +1767,15 @@
         "refs": [
           "https://en.wiktionary.org/wiki/肢"
         ]
+      },
+      {
+        "kanji": "枝",
+        "word": "枝葉",
+        "reading": "しよう",
+        "gloss": "branches and leaves; minor details",
+        "refs": [
+          "https://en.wiktionary.org/wiki/枝"
+        ]
       }
     ]
   },
@@ -1748,7 +1789,7 @@
       {
         "kanji": "放",
         "concepts": "set free, let go, release",
-        "why": "Driving away: letting go.",
+        "why": "Driving away (攵): let go.",
         "refs": [
           "https://en.wiktionary.org/wiki/放"
         ]
@@ -1756,7 +1797,7 @@
       {
         "kanji": "改",
         "concepts": "reformation, reform, change",
-        "why": "Striking to make change.",
+        "why": "Striking (攵) to make change.",
         "refs": [
           "https://en.wiktionary.org/wiki/改"
         ]
@@ -1764,7 +1805,7 @@
       {
         "kanji": "政",
         "concepts": "politics, political administration, government",
-        "why": "Making things right by force.",
+        "why": "Making things right by force (攵).",
         "refs": [
           "https://en.wiktionary.org/wiki/政"
         ]
@@ -1821,7 +1862,7 @@
       {
         "kanji": "折",
         "concepts": "fold, break off, break",
-        "why": "Breaking off with an axe.",
+        "why": "Breaking off with an axe (斤).",
         "refs": [
           "https://en.wiktionary.org/wiki/折"
         ]
@@ -1887,7 +1928,7 @@
       {
         "kanji": "歌",
         "concepts": "song, sing",
-        "why": "Singing with an open mouth.",
+        "why": "Singing with an open mouth (欠).",
         "refs": [
           "https://en.wiktionary.org/wiki/歌"
         ]
@@ -1895,7 +1936,7 @@
       {
         "kanji": "吹",
         "concepts": "blow, breathe, puff",
-        "why": "Blowing with an open mouth.",
+        "why": "Blowing with an open mouth (欠).",
         "refs": [
           "https://en.wiktionary.org/wiki/吹"
         ]
@@ -1903,7 +1944,7 @@
       {
         "kanji": "飲",
         "concepts": "drink, smoke, take",
-        "why": "Drinking with an open mouth.",
+        "why": "Drinking with an open mouth (欠).",
         "refs": [
           "https://en.wiktionary.org/wiki/飲"
         ]
@@ -1923,6 +1964,22 @@
         "why": "A foot (止) marching with a dagger-axe (戈).",
         "refs": [
           "https://en.wiktionary.org/wiki/武"
+        ]
+      },
+      {
+        "kanji": "歩",
+        "concepts": "walk, step",
+        "why": "One foot (止) in front of the other.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/步"
+        ]
+      },
+      {
+        "kanji": "此",
+        "concepts": "this, here",
+        "why": "Feet (止) by a person (匕): where one stops, here.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/此"
         ]
       }
     ]
@@ -1962,7 +2019,7 @@
       {
         "kanji": "殺",
         "concepts": "kill, murder, butcher",
-        "why": "Striking down.",
+        "why": "Striking (殳) down.",
         "refs": [
           "https://en.wiktionary.org/wiki/殺"
         ]
@@ -1970,7 +2027,7 @@
       {
         "kanji": "役",
         "concepts": "duty, service, war",
-        "why": "Work done by hand.",
+        "why": "Work done by hand (殳).",
         "refs": [
           "https://en.wiktionary.org/wiki/役"
         ]
@@ -2043,9 +2100,25 @@
       {
         "kanji": "泉",
         "concepts": "spring, fountain",
-        "why": "Water coming out of the ground.",
+        "why": "Water (水) coming out of the ground.",
         "refs": [
           "https://en.wiktionary.org/wiki/泉"
+        ]
+      },
+      {
+        "kanji": "氷",
+        "concepts": "ice, freeze",
+        "why": "Ice is frozen water (水).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/冰"
+        ]
+      },
+      {
+        "kanji": "尿",
+        "concepts": "urine",
+        "why": "Water (水) from the body (尸).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/尿"
         ]
       }
     ]
@@ -2060,7 +2133,7 @@
       {
         "kanji": "燃",
         "concepts": "burn, blaze, glow",
-        "why": "Burning.",
+        "why": "Burning is what fire (火) does.",
         "refs": [
           "https://en.wiktionary.org/wiki/燃"
         ]
@@ -2068,7 +2141,7 @@
       {
         "kanji": "煙",
         "concepts": "smoke",
-        "why": "What a fire gives off.",
+        "why": "Smoke is what a fire (火) gives off.",
         "refs": [
           "https://en.wiktionary.org/wiki/煙"
         ]
@@ -2076,7 +2149,7 @@
       {
         "kanji": "爆",
         "concepts": "bomb, explode, burst open",
-        "why": "Bursting with fire.",
+        "why": "Bursting with fire (火).",
         "refs": [
           "https://en.wiktionary.org/wiki/爆"
         ]
@@ -2093,7 +2166,7 @@
       {
         "kanji": "受",
         "concepts": "accept, receive, undergo",
-        "why": "Hands passing something from one to another.",
+        "why": "Hands (爪 and 又) passing something from one to another.",
         "refs": [
           "https://en.wiktionary.org/wiki/受"
         ]
@@ -2220,6 +2293,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/伏"
         ]
+      },
+      {
+        "kanji": "獣",
+        "concepts": "beast, animal",
+        "why": "First \"hunting\": a weapon (單) and a dog (犬).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/獸"
+        ]
       }
     ]
   },
@@ -2339,7 +2420,7 @@
       {
         "kanji": "病",
         "concepts": "ill, illness, sick",
-        "why": "Being sick in bed.",
+        "why": "Being sick (疒) in bed.",
         "refs": [
           "https://en.wiktionary.org/wiki/病"
         ]
@@ -2347,7 +2428,7 @@
       {
         "kanji": "痛",
         "concepts": "pain, hurt, damage",
-        "why": "Pain, a sickness (疒).",
+        "why": "Pain, a kind of sickness (疒).",
         "refs": [
           "https://en.wiktionary.org/wiki/痛"
         ]
@@ -2355,7 +2436,7 @@
       {
         "kanji": "疲",
         "concepts": "tired, exhausted",
-        "why": "Being worn out.",
+        "why": "Being worn out, a kind of sickness (疒).",
         "refs": [
           "https://en.wiktionary.org/wiki/疲"
         ]
@@ -2518,7 +2599,7 @@
       {
         "kanji": "砂",
         "concepts": "sand",
-        "why": "Tiny stones.",
+        "why": "Sand is tiny stones (石).",
         "refs": [
           "https://en.wiktionary.org/wiki/砂"
         ]
@@ -2526,7 +2607,7 @@
       {
         "kanji": "破",
         "concepts": "rend, break, rip",
-        "why": "Breaking stone.",
+        "why": "Breaking stone (石).",
         "refs": [
           "https://en.wiktionary.org/wiki/破"
         ]
@@ -2534,7 +2615,7 @@
       {
         "kanji": "研",
         "concepts": "polish, grind, research",
-        "why": "Grinding with a stone.",
+        "why": "Grinding with a stone (石).",
         "refs": [
           "https://en.wiktionary.org/wiki/研"
         ]
@@ -2607,7 +2688,7 @@
       {
         "kanji": "空",
         "concepts": "empty, sky, air",
-        "why": "A hole: empty space.",
+        "why": "Empty space, like a hole (穴).",
         "refs": [
           "https://en.wiktionary.org/wiki/空"
         ]
@@ -2646,7 +2727,7 @@
       {
         "kanji": "粉",
         "concepts": "flour, powder, dust",
-        "why": "Ground rice: flour.",
+        "why": "Flour is ground rice (米).",
         "refs": [
           "https://en.wiktionary.org/wiki/粉"
         ]
@@ -2662,7 +2743,7 @@
       {
         "kanji": "糖",
         "concepts": "sugar",
-        "why": "Sweetness made from grain.",
+        "why": "Sugar is sweetness made from grain (米).",
         "refs": [
           "https://en.wiktionary.org/wiki/糖"
         ]
@@ -2686,9 +2767,25 @@
       {
         "kanji": "群",
         "concepts": "flock, group, crowd",
-        "why": "A flock of sheep.",
+        "why": "A flock of sheep (羊).",
         "refs": [
           "https://en.wiktionary.org/wiki/群"
+        ]
+      },
+      {
+        "kanji": "美",
+        "concepts": "beauty, beautiful",
+        "why": "A person (大) wearing a headdress of ram's horns or feathers (羊).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/美"
+        ]
+      },
+      {
+        "kanji": "義",
+        "concepts": "righteousness, justice, meaning",
+        "why": "羊 here stands for \"good, auspicious\", not sheep.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/義"
         ]
       }
     ],
@@ -2731,7 +2828,7 @@
       {
         "kanji": "翔",
         "concepts": "soar, fly",
-        "why": "Flying on wings.",
+        "why": "Flying on wings (羽).",
         "refs": [
           "https://en.wiktionary.org/wiki/翔"
         ]
@@ -2758,7 +2855,7 @@
       {
         "kanji": "耕",
         "concepts": "till, plow, cultivate",
-        "why": "Working the field with a plough.",
+        "why": "Working the field with a plough (耒).",
         "refs": [
           "https://en.wiktionary.org/wiki/耕"
         ]
@@ -2775,7 +2872,7 @@
       {
         "kanji": "聞",
         "concepts": "hear, ask, listen",
-        "why": "Hearing with the ear.",
+        "why": "Hearing is done with the ear (耳).",
         "refs": [
           "https://en.wiktionary.org/wiki/聞"
         ]
@@ -2804,6 +2901,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/書"
         ]
+      },
+      {
+        "kanji": "建",
+        "concepts": "build, construct",
+        "why": "A hand (聿) setting a pole into a base: build.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/建"
+        ]
       }
     ]
   },
@@ -2817,7 +2922,7 @@
       {
         "kanji": "腐",
         "concepts": "rot, decay, sour",
-        "why": "Meat going bad.",
+        "why": "Meat (肉) going bad.",
         "refs": [
           "https://en.wiktionary.org/wiki/腐"
         ]
@@ -2834,7 +2939,7 @@
       {
         "kanji": "臨",
         "concepts": "look to, be present at, face",
-        "why": "Looking down over things.",
+        "why": "An eye (臣) looking down over things.",
         "refs": [
           "https://en.wiktionary.org/wiki/臨"
         ]
@@ -2859,7 +2964,7 @@
       {
         "kanji": "息",
         "concepts": "breath, respiration, son",
-        "why": "Breathing through the nose.",
+        "why": "Breathing through the nose (自).",
         "refs": [
           "https://en.wiktionary.org/wiki/息"
         ]
@@ -2867,7 +2972,7 @@
       {
         "kanji": "臭",
         "concepts": "stinking, bad smell, ill-smelling",
-        "why": "What the nose notices: a smell.",
+        "why": "A smell is what the nose (自) notices.",
         "refs": [
           "https://en.wiktionary.org/wiki/臭"
         ]
@@ -2884,7 +2989,7 @@
       {
         "kanji": "到",
         "concepts": "arrival, arrive, proceed",
-        "why": "Arriving.",
+        "why": "Arriving (至) at a place.",
         "refs": [
           "https://en.wiktionary.org/wiki/到"
         ]
@@ -2940,7 +3045,7 @@
       {
         "kanji": "航",
         "concepts": "navigate, cruise, sail",
-        "why": "Sailing a boat.",
+        "why": "Sailing a boat (舟).",
         "refs": [
           "https://en.wiktionary.org/wiki/航"
         ]
@@ -2948,7 +3053,7 @@
       {
         "kanji": "艦",
         "concepts": "warship",
-        "why": "A war boat.",
+        "why": "A warship is a boat (舟).",
         "refs": [
           "https://en.wiktionary.org/wiki/艦"
         ]
@@ -3055,7 +3160,7 @@
       {
         "kanji": "街",
         "concepts": "boulevard, city quarter, street",
-        "why": "Streets: a town.",
+        "why": "A street (行) in a town.",
         "refs": [
           "https://en.wiktionary.org/wiki/街"
         ]
@@ -3072,7 +3177,7 @@
       {
         "kanji": "裏",
         "concepts": "back, rear, amidst",
-        "why": "The inside of clothing.",
+        "why": "The inside of clothing (衣).",
         "refs": [
           "https://en.wiktionary.org/wiki/裏"
         ]
@@ -3080,7 +3185,7 @@
       {
         "kanji": "裁",
         "concepts": "tailor, cut out, judge",
-        "why": "Cutting cloth.",
+        "why": "Cutting cloth (衣).",
         "refs": [
           "https://en.wiktionary.org/wiki/裁"
         ]
@@ -3088,7 +3193,7 @@
       {
         "kanji": "製",
         "concepts": "made in…, manufacture, made in...",
-        "why": "Making clothes.",
+        "why": "Making clothes (衣).",
         "refs": [
           "https://en.wiktionary.org/wiki/製"
         ]
@@ -3174,6 +3279,15 @@
         "refs": [
           "https://en.wiktionary.org/wiki/頭"
         ]
+      },
+      {
+        "kanji": "痘",
+        "word": "天然痘",
+        "reading": "てんねんとう",
+        "gloss": "smallpox",
+        "refs": [
+          "https://en.wiktionary.org/wiki/痘"
+        ]
       }
     ]
   },
@@ -3190,6 +3304,14 @@
         "why": "A pig (豕) raised for meat (⺼).",
         "refs": [
           "https://en.wiktionary.org/wiki/豚"
+        ]
+      },
+      {
+        "kanji": "逐",
+        "concepts": "chase, pursue, one by one",
+        "why": "Walking (辶) after a pig (豕): chase.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/逐"
         ]
       }
     ]
@@ -3218,7 +3340,7 @@
       {
         "kanji": "起",
         "concepts": "rouse, rise, wake up",
-        "why": "Getting up and going.",
+        "why": "Getting up and going (走).",
         "refs": [
           "https://en.wiktionary.org/wiki/起"
         ]
@@ -3226,7 +3348,7 @@
       {
         "kanji": "越",
         "concepts": "surpass, go beyond, cross over",
-        "why": "Running past.",
+        "why": "Running (走) past.",
         "refs": [
           "https://en.wiktionary.org/wiki/越"
         ]
@@ -3234,7 +3356,7 @@
       {
         "kanji": "超",
         "concepts": "transcend, surpass, super-",
-        "why": "Running beyond.",
+        "why": "Running (走) beyond.",
         "refs": [
           "https://en.wiktionary.org/wiki/超"
         ]
@@ -3273,7 +3395,7 @@
       {
         "kanji": "輸",
         "concepts": "transport, send, be inferior",
-        "why": "Carrying by cart.",
+        "why": "Carrying by cart (車).",
         "refs": [
           "https://en.wiktionary.org/wiki/輸"
         ]
@@ -3349,7 +3471,7 @@
       {
         "kanji": "酸",
         "concepts": "acid, oxygen, bitterness",
-        "why": "Sour, like fermented drink.",
+        "why": "Sour, like a fermented drink (酉).",
         "refs": [
           "https://en.wiktionary.org/wiki/酸"
         ]
@@ -3357,7 +3479,7 @@
       {
         "kanji": "醒",
         "concepts": "awakening, be disillusioned, awake",
-        "why": "Sobering up after drinking.",
+        "why": "Sobering up after drinking (酉).",
         "refs": [
           "https://en.wiktionary.org/wiki/醒"
         ]
@@ -3399,7 +3521,7 @@
       {
         "kanji": "銀",
         "concepts": "silver",
-        "why": "Silver, a metal (金).",
+        "why": "Silver is a metal (金).",
         "refs": [
           "https://en.wiktionary.org/wiki/銀"
         ]
@@ -3407,7 +3529,7 @@
       {
         "kanji": "鉄",
         "concepts": "iron",
-        "why": "Iron, a metal (金).",
+        "why": "Iron is a metal (金).",
         "refs": [
           "https://en.wiktionary.org/wiki/鉄"
         ]
@@ -3459,7 +3581,7 @@
       {
         "kanji": "開",
         "concepts": "open, unfold, unseal",
-        "why": "Opening a gate.",
+        "why": "Opening a gate (門).",
         "refs": [
           "https://en.wiktionary.org/wiki/開"
         ]
@@ -3467,7 +3589,7 @@
       {
         "kanji": "閉",
         "concepts": "closed, close, shut",
-        "why": "Closing a gate.",
+        "why": "Closing a gate (門).",
         "refs": [
           "https://en.wiktionary.org/wiki/閉"
         ]
@@ -3530,6 +3652,17 @@
     "cn": "A face with an exaggerated eye.",
     "refs": [
       "https://en.wiktionary.org/wiki/面"
+    ],
+    "sound": [
+      {
+        "kanji": "麺",
+        "word": "麺類",
+        "reading": "めんるい",
+        "gloss": "noodles",
+        "refs": [
+          "https://en.wiktionary.org/wiki/麺"
+        ]
+      }
     ]
   },
   "革": {
@@ -3542,7 +3675,7 @@
       {
         "kanji": "靴",
         "concepts": "shoes",
-        "why": "Made of leather.",
+        "why": "Shoes made of leather (革).",
         "refs": [
           "https://en.wiktionary.org/wiki/靴"
         ]
@@ -3573,9 +3706,17 @@
       {
         "kanji": "響",
         "concepts": "echo, reverberate, also n5116",
-        "why": "A sound that echoes.",
+        "why": "An echo is a sound (音).",
         "refs": [
           "https://en.wiktionary.org/wiki/響"
+        ]
+      },
+      {
+        "kanji": "韻",
+        "concepts": "rhyme, tone, elegance",
+        "why": "Rhyme is a matter of sound (音).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/韻"
         ]
       }
     ]
@@ -3598,7 +3739,7 @@
       {
         "kanji": "題",
         "concepts": "topic, title, problem",
-        "why": "The head: the top part.",
+        "why": "A title is the head (頁) of a piece of writing.",
         "refs": [
           "https://en.wiktionary.org/wiki/題"
         ]
@@ -3637,7 +3778,7 @@
       {
         "kanji": "飼",
         "concepts": "domesticate, raise animals, raise",
-        "why": "Feeding animals.",
+        "why": "Feeding (食) animals.",
         "refs": [
           "https://en.wiktionary.org/wiki/飼"
         ]
@@ -3645,7 +3786,7 @@
       {
         "kanji": "飽",
         "concepts": "sated, satiated, tired of",
-        "why": "Having eaten enough.",
+        "why": "Having eaten (食) enough.",
         "refs": [
           "https://en.wiktionary.org/wiki/飽"
         ]
@@ -3686,7 +3827,7 @@
       {
         "kanji": "騎",
         "concepts": "equestrian, ride on horseback, riding on horses",
-        "why": "Riding a horse.",
+        "why": "Riding a horse (馬).",
         "refs": [
           "https://en.wiktionary.org/wiki/騎"
         ]
@@ -3694,7 +3835,7 @@
       {
         "kanji": "駐",
         "concepts": "stationed, stop over",
-        "why": "A horse standing still.",
+        "why": "A horse (馬) standing still.",
         "refs": [
           "https://en.wiktionary.org/wiki/駐"
         ]
@@ -3711,7 +3852,7 @@
       {
         "kanji": "骸",
         "concepts": "remains, dead remains, bone",
-        "why": "Bones: remains.",
+        "why": "Remains are bones (骨).",
         "refs": [
           "https://en.wiktionary.org/wiki/骸"
         ]
@@ -3799,7 +3940,7 @@
       {
         "kanji": "鯨",
         "concepts": "whale",
-        "why": "A sea creature counted as a fish.",
+        "why": "A sea creature counted as a fish (魚).",
         "refs": [
           "https://en.wiktionary.org/wiki/鯨"
         ]
@@ -3807,7 +3948,7 @@
       {
         "kanji": "漁",
         "concepts": "fishing, fish, fishery",
-        "why": "Catching fish.",
+        "why": "Catching fish (魚).",
         "refs": [
           "https://en.wiktionary.org/wiki/漁"
         ]
@@ -3815,7 +3956,7 @@
       {
         "kanji": "鮮",
         "concepts": "fresh, vivid, clear",
-        "why": "Fresh, like just-caught fish.",
+        "why": "Fresh, like just-caught fish (魚).",
         "refs": [
           "https://en.wiktionary.org/wiki/鮮"
         ]
@@ -3990,7 +4131,7 @@
       {
         "kanji": "別",
         "concepts": "separate, another, branch off",
-        "why": "Cutting apart.",
+        "why": "Cutting (刂) apart.",
         "refs": [
           "https://en.wiktionary.org/wiki/別"
         ]
@@ -3998,7 +4139,7 @@
       {
         "kanji": "割",
         "concepts": "proportion, divide, comparatively",
-        "why": "Cutting into parts.",
+        "why": "Cutting (刂) into parts.",
         "refs": [
           "https://en.wiktionary.org/wiki/割"
         ]
@@ -4006,7 +4147,7 @@
       {
         "kanji": "判",
         "concepts": "judgement, judge, judgment",
-        "why": "Cutting in two: deciding.",
+        "why": "Cutting (刂) in two: deciding.",
         "refs": [
           "https://en.wiktionary.org/wiki/判"
         ]
@@ -4074,7 +4215,7 @@
       {
         "kanji": "都",
         "concepts": "metropolis, metropolis of tokyo, capital",
-        "why": "A town: the capital.",
+        "why": "A town (阝): the capital.",
         "refs": [
           "https://en.wiktionary.org/wiki/都"
         ]
@@ -4082,7 +4223,7 @@
       {
         "kanji": "部",
         "concepts": "section, part, bureau",
-        "why": "A part of a town or region.",
+        "why": "A part of a town (阝) or region.",
         "refs": [
           "https://en.wiktionary.org/wiki/部"
         ]
@@ -4102,7 +4243,7 @@
       {
         "kanji": "階",
         "concepts": "storey, floor, rank",
-        "why": "Steps up a hill.",
+        "why": "Steps up a hill (阝).",
         "refs": [
           "https://en.wiktionary.org/wiki/階"
         ]
@@ -4110,7 +4251,7 @@
       {
         "kanji": "降",
         "concepts": "descend, precipitate, fall",
-        "why": "Going down a hill.",
+        "why": "Going down a hill (阝).",
         "refs": [
           "https://en.wiktionary.org/wiki/降"
         ]
@@ -4126,7 +4267,7 @@
       {
         "kanji": "情",
         "concepts": "feelings, emotion, actual conditions",
-        "why": "Feelings of the heart.",
+        "why": "Feelings of the heart (忄).",
         "refs": [
           "https://en.wiktionary.org/wiki/情"
         ]
@@ -4134,7 +4275,7 @@
       {
         "kanji": "快",
         "concepts": "cheerful, pleasant, agreeable",
-        "why": "A pleasant heart.",
+        "why": "A pleasant heart (忄).",
         "refs": [
           "https://en.wiktionary.org/wiki/快"
         ]
@@ -4142,7 +4283,7 @@
       {
         "kanji": "怖",
         "concepts": "dreadful, fearful, be frightened",
-        "why": "Fear in the heart.",
+        "why": "Fear in the heart (忄).",
         "refs": [
           "https://en.wiktionary.org/wiki/怖"
         ]
@@ -4159,7 +4300,7 @@
       {
         "kanji": "猫",
         "concepts": "cat",
-        "why": "A cat, an animal (犭).",
+        "why": "A cat is an animal (犭).",
         "refs": [
           "https://en.wiktionary.org/wiki/猫"
         ]
@@ -4167,7 +4308,7 @@
       {
         "kanji": "獲",
         "concepts": "seize, catch game, get",
-        "why": "Catching game.",
+        "why": "Hunting game with a dog (犭).",
         "refs": [
           "https://en.wiktionary.org/wiki/獲"
         ]
@@ -4212,7 +4353,7 @@
       {
         "kanji": "熱",
         "concepts": "heat, hot, temperature",
-        "why": "Heat from fire.",
+        "why": "Heat from fire (灬).",
         "refs": [
           "https://en.wiktionary.org/wiki/熱"
         ]
@@ -4220,7 +4361,7 @@
       {
         "kanji": "照",
         "concepts": "illuminate, shine, compare",
-        "why": "Shining like fire.",
+        "why": "Shining like fire (灬).",
         "refs": [
           "https://en.wiktionary.org/wiki/照"
         ]
@@ -4240,7 +4381,7 @@
       {
         "kanji": "神",
         "concepts": "gods, god, mind",
-        "why": "Gods, worshipped at an altar.",
+        "why": "Gods, worshipped at an altar (礻).",
         "refs": [
           "https://en.wiktionary.org/wiki/神"
         ]
@@ -4248,7 +4389,7 @@
       {
         "kanji": "社",
         "concepts": "company, society, firm",
-        "why": "An altar (示) to the earth (土): a shrine.",
+        "why": "An altar (礻) to the earth (土): a shrine.",
         "refs": [
           "https://en.wiktionary.org/wiki/社"
         ]
@@ -4256,7 +4397,7 @@
       {
         "kanji": "祖",
         "concepts": "ancestor, pioneer, founder",
-        "why": "Ancestors, honored at an altar.",
+        "why": "Ancestors, honored at an altar (礻).",
         "refs": [
           "https://en.wiktionary.org/wiki/祖"
         ]
@@ -4287,7 +4428,7 @@
       {
         "kanji": "補",
         "concepts": "supplement, supply, make good",
-        "why": "Mending clothes.",
+        "why": "Mending clothes (衤).",
         "refs": [
           "https://en.wiktionary.org/wiki/補"
         ]
@@ -4295,7 +4436,7 @@
       {
         "kanji": "複",
         "concepts": "duplicate, compound, double",
-        "why": "Layered clothes.",
+        "why": "Layered clothes (衤).",
         "refs": [
           "https://en.wiktionary.org/wiki/複"
         ]
@@ -4308,7 +4449,7 @@
       {
         "kanji": "管",
         "concepts": "pipe, exercise control, tube",
-        "why": "A bamboo tube.",
+        "why": "A tube of bamboo (⺮).",
         "refs": [
           "https://en.wiktionary.org/wiki/管"
         ]
@@ -4316,7 +4457,7 @@
       {
         "kanji": "節",
         "concepts": "joint, section, season",
-        "why": "The joints of a bamboo (竹) stem → section.",
+        "why": "The joints of a bamboo (⺮) stem → section.",
         "refs": [
           "https://en.wiktionary.org/wiki/節"
         ]
@@ -4324,7 +4465,7 @@
       {
         "kanji": "等",
         "concepts": "class, rank, equal",
-        "why": "Bamboo (竹) slips for writing, sorted by grade → rank, equal.",
+        "why": "Bamboo (⺮) slips for writing, sorted by grade → rank, equal.",
         "refs": [
           "https://en.wiktionary.org/wiki/等"
         ]
@@ -4341,7 +4482,7 @@
       {
         "kanji": "路",
         "concepts": "path, road, route",
-        "why": "Where the feet go: a road.",
+        "why": "Where the feet (⻊) go: a road.",
         "refs": [
           "https://en.wiktionary.org/wiki/路"
         ]
@@ -4349,7 +4490,7 @@
       {
         "kanji": "跡",
         "concepts": "tracks, trace, mark",
-        "why": "Footprints.",
+        "why": "Footprints left by feet (⻊).",
         "refs": [
           "https://en.wiktionary.org/wiki/跡"
         ]
@@ -4357,7 +4498,7 @@
       {
         "kanji": "踏",
         "concepts": "step, tread, trample",
-        "why": "Stepping.",
+        "why": "Stepping with the feet (⻊).",
         "refs": [
           "https://en.wiktionary.org/wiki/踏"
         ]
@@ -4370,7 +4511,7 @@
       {
         "kanji": "雪",
         "concepts": "snow",
-        "why": "Snow falls like rain.",
+        "why": "Snow falls like rain (⻗).",
         "refs": [
           "https://en.wiktionary.org/wiki/雪"
         ]
@@ -4378,7 +4519,7 @@
       {
         "kanji": "雲",
         "concepts": "cloud",
-        "why": "Clouds bring rain.",
+        "why": "Clouds bring rain (⻗).",
         "refs": [
           "https://en.wiktionary.org/wiki/雲"
         ]
@@ -4386,7 +4527,7 @@
       {
         "kanji": "電",
         "concepts": "electricity",
-        "why": "Lightning from the clouds.",
+        "why": "Lightning comes with rain (⻗).",
         "refs": [
           "https://en.wiktionary.org/wiki/電"
         ]
@@ -4407,7 +4548,7 @@
     ]
   },
   "老": {
-    "ja": "おい (老い, old age) + かんむり (top).",
+    "ja": "おい (老い, old age).",
     "cn": "A person with long hair (毛) leaning on a cane (匕): old.",
     "refs": [
       "https://en.wiktionary.org/wiki/老"
@@ -4448,7 +4589,7 @@
       {
         "kanji": "球",
         "concepts": "ball, sphere",
-        "why": "Jade (王, here standing for 玉) shaped into a ball.",
+        "why": "Jade (⺩, a form of 玉) shaped into a ball.",
         "refs": [
           "https://en.wiktionary.org/wiki/球"
         ]
@@ -4456,7 +4597,7 @@
       {
         "kanji": "理",
         "concepts": "reason, logic, arrange",
-        "why": "First \"to polish jade (王)\"; \"put in order, reason\" likely grew from that.",
+        "why": "First \"to polish jade (⺩)\"; \"put in order, reason\" likely grew from that.",
         "refs": [
           "https://en.wiktionary.org/wiki/理"
         ]
@@ -4464,7 +4605,7 @@
       {
         "kanji": "珠",
         "concepts": "pearl, gem",
-        "why": "A precious stone (王, jade): a pearl.",
+        "why": "A precious stone (⺩, jade): a pearl.",
         "refs": [
           "https://en.wiktionary.org/wiki/珠"
         ]

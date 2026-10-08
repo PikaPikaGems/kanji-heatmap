@@ -355,7 +355,13 @@ const buildFamilies = ({
     const kept = [];
     for (const member of members) {
       if (typeof member === "string") {
-        if (!kept.includes(member)) kept.push(member);
+        // A drawer glyph with no name of its own that aliases to another
+        // form is that form under another code (⺹ → 耂, ハ → 八).
+        const aliasOfMember =
+          !(member in info) &&
+          member !== head &&
+          members.includes(aliases[member] ?? "");
+        if (!aliasOfMember && !kept.includes(member)) kept.push(member);
         continue;
       }
       const key = keyOf(member);
