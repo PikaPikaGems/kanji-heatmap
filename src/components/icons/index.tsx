@@ -38,6 +38,7 @@ import {
   Download,
   Loader2,
   Share2,
+  BookOpen,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -78,4 +79,5 @@ export {
   Download,
   Loader2,
   Share2,
+  BookOpen,
 };

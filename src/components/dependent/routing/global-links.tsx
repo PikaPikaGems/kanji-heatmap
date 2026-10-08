@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { Search } from "@/components/icons";
+import { BookOpen, Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
   useGetKanjiInfoFn,
@@ -116,19 +117,37 @@ const RadicalJpCard = ({
   />
 );
 
+/** One link at the bottom of the radical popover: icon, then underlined text. */
+const PopoverAction = ({
+  to,
+  icon,
+  children,
+}: {
+  to: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) => (
+  <Link
+    to={to}
+    className="inline-flex items-center gap-1.5 py-1 text-xs font-bold text-left w-fit hover:text-neon-accent"
+  >
+    {icon}
+    <span className="underline decoration-dotted underline-offset-4">
+      {children}
+    </span>
+  </Link>
+);
+
 export const RadicalSearchAction = ({ radical }: { radical: string }) => {
   const radicals = useRadicals();
   const searchText = resolveRadicalForSearch(radical, radicals);
   return (
-    <Link
+    <PopoverAction
       to={radicalSearchHref(searchText)}
-      className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
+      icon={<Search size={14} />}
     >
-      <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
-        <Search size={14} />
-        <strong>Find kanji that include {searchText}</strong>
-      </span>
-    </Link>
+      Find kanji that include {searchText}
+    </PopoverAction>
   );
 };
 
@@ -153,17 +172,9 @@ const OpenKanjiAction = ({
   const pathname = useUrlLocation();
   const urlState = useKanjiFromUrl(kanji);
   return (
-    <Link
-      to={`${pathname}?${urlState}`}
-      className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
-    >
-      <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
-        📖{" "}
-        <strong>
-          Open kanji {kanji} ({keyword})
-        </strong>
-      </span>
-    </Link>
+    <PopoverAction to={`${pathname}?${urlState}`} icon={<BookOpen size={14} />}>
+      Open kanji {kanji} ({keyword})
+    </PopoverAction>
   );
 };
 
@@ -234,10 +245,12 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           </div>
         )}
       </div>
-      <RadicalSearchAction radical={radical} />
-      {isKanji && keyword && (
-        <OpenKanjiAction kanji={radical} keyword={keyword} />
-      )}
+      <div className="flex flex-col px-1 pt-3">
+        <RadicalSearchAction radical={radical} />
+        {isKanji && keyword && (
+          <OpenKanjiAction kanji={radical} keyword={keyword} />
+        )}
+      </div>
     </div>
   );
 };
