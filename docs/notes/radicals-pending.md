@@ -436,14 +436,11 @@ Concepts come from our kanji meanings. Origins and reasons were written by
 hand from the glyph-origin text. The review pass rewrote "why" lines that
 only restated the meaning, fixed odd concepts and long glosses.
 
-Gaps, left out because no reference explains them (fill in later if one
-is found):
-
-- No 🇯🇵 reason: 巾 (はば), 禸, 酉 (ひよみのとり), 巳, ⺉ (りっとう), ⺖
-  (りっしんべん). Japanese Wikipedia gives these names but not why.
-- No 🇨🇳 origin: 亅 耒 麦 黄 歯 ⺇ ⺝ 龍 彑, and the shapes 𠂉 マ ユ ｜ ノ ヨ.
-- 戈: Wiktionary marks no kanji with 戈 as its sound part, so 戈 has no
-  sound examples although our sound-parts data lists 裁 載 栽 under it.
+Gaps: filled in October 2026 from Japanese Wikipedia's radical pages
+(巾部, 酉部, 刀部, 心部, 己部, 亅部, 丿部, 耒部; the 🇯🇵 reasons and the
+shape-stroke origins), Wiktionary (麥, 黃, 齒, 丨, 彐) and 漢字ペディア (龍).
+Left: no 🇨🇳 origin for 𠂉 マ ユ, katakana-like shapes with no history as
+characters of their own.
 
 Sound-parts data to check (found while writing the popover text; not
 changed, since sound parts are learner hints, see item 1):

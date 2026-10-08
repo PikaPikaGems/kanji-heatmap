@@ -933,7 +933,11 @@
     ]
   },
   "亅": {
-    "ja": "はね (跳ね, flick) + ぼう (棒, stick): a stick with a hook."
+    "ja": "はね (跳ね, flick) + ぼう (棒, stick): a stick with a hook.",
+    "cn": "A hook stroke; few kanji use it for meaning, and 予 and 事 are filed under it by shape.",
+    "refs": [
+      "https://ja.wikipedia.org/wiki/亅部"
+    ]
   },
   "二": {
     "ja": "に (二, two).",
@@ -1483,6 +1487,10 @@
     ]
   },
   "巾": {
+    "ja": "はば (幅, width): 巾 was used as a short form of 幅.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/巾部"
+    ],
     "cn": "A hanging piece of cloth.",
     "refs": [
       "https://en.wiktionary.org/wiki/巾"
@@ -2648,6 +2656,7 @@
     ]
   },
   "禸": {
+    "ja": "じゅう (禸, its reading) + の + あし (bottom).",
     "cn": "The Shuowen sees the print of an animal's paw; others link it to the bottoms of 萬, 禽 and 禹.",
     "refs": [
       "https://en.wiktionary.org/wiki/禸"
@@ -2850,7 +2859,11 @@
     ]
   },
   "耒": {
-    "ja": "らい (耒, its reading) + すき (鋤, plough)."
+    "ja": "らい (耒, its reading) + すき (鋤, plough).",
+    "cn": "A plough for turning the soil, or its handle.",
+    "refs": [
+      "https://ja.wikipedia.org/wiki/耒部"
+    ]
   },
   "耳": {
     "ja": "みみ (耳, ear).",
@@ -3481,6 +3494,10 @@
     ]
   },
   "酉": {
+    "ja": "ひよみ (日読み, the twelve zodiac animals) + の + とり (bird): 酉's zodiac animal is the rooster.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/酉部"
+    ],
     "cn": "A wine jar with a pointed bottom.",
     "refs": [
       "https://en.wiktionary.org/wiki/酉"
@@ -4032,7 +4049,11 @@
     ]
   },
   "麦": {
-    "ja": "むぎ (麦, wheat)."
+    "ja": "むぎ (麦, wheat).",
+    "cn": "Some believe 來 first drew wheat; when 來 was borrowed for \"come\", 麥 added a foot (夊) below to mean wheat.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/麥"
+    ]
   },
   "麻": {
     "ja": "あさ (麻, hemp).",
@@ -4062,7 +4083,11 @@
     ]
   },
   "黄": {
-    "ja": "き (黄, yellow)."
+    "ja": "き (黄, yellow).",
+    "cn": "Some believe it first drew a person with a swollen chest or belly; it was borrowed for \"yellow\" very early.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/黃"
+    ]
   },
   "黍": {
     "ja": "きび (黍, millet).",
@@ -4128,7 +4153,11 @@
     ]
   },
   "歯": {
-    "ja": "は (歯, tooth)."
+    "ja": "は (歯, tooth).",
+    "cn": "A mouth full of teeth; 止 was added later for the sound.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/齒"
+    ]
   },
   "竜": {
     "ja": "りゅう (竜, dragon).",
@@ -4152,6 +4181,10 @@
     ]
   },
   "⺉": {
+    "ja": "りっ (立, standing) + とう (刀, knife): a knife standing on the right.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/刀部"
+    ],
     "cnNote": "Changed in shape to fit the right side.",
     "refs": [
       "https://en.wiktionary.org/wiki/刀"
@@ -4190,6 +4223,10 @@
     "ja": "さんぼん (三本, three lines) + がわ (かわ, river)."
   },
   "巳": {
+    "ja": "おのれ (己, oneself): 巳 is filed under the radical 己.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/己部"
+    ],
     "cn": "Two theories: a fetus, or a snake (the Shuowen).",
     "refs": [
       "https://en.wiktionary.org/wiki/巳"
@@ -4288,6 +4325,10 @@
     ]
   },
   "⺖": {
+    "ja": "りっ (立, standing) + しん (心, heart) + べん (へん, left side): 心 standing upright on the left.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/心部"
+    ],
     "cnNote": "Squeezed to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/心"
@@ -4564,7 +4605,11 @@
     ]
   },
   "龍": {
-    "ja": "りゅう (龍, dragon)."
+    "ja": "りゅう (龍, dragon).",
+    "cn": "A long, winding reptile with a crest and an open mouth: a dragon.",
+    "refs": [
+      "https://www.kanjipedia.jp/kanji/0007128700"
+    ]
   },
   "彑": {
     "ja": "けい (彑, its reading) + がしら (top)."
@@ -4626,13 +4671,25 @@
     "ja": "Written like katakana ユ (yu)."
   },
   "｜": {
-    "ja": "たて (縦, vertical) + ぼう (棒, stick)."
+    "ja": "たて (縦, vertical) + ぼう (棒, stick).",
+    "cn": "The Shuowen describes it as a vertical wooden stick.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/丨"
+    ]
   },
   "ノ": {
-    "ja": "Written like katakana ノ (no)."
+    "ja": "Written like katakana ノ (no).",
+    "cn": "A stroke sweeping down to the left, not a picture; katakana ノ was made from 乃.",
+    "refs": [
+      "https://ja.wikipedia.org/wiki/丿部"
+    ]
   },
   "ヨ": {
-    "ja": "けい (彑, its reading) + がしら (top): the shape of 彑 on top."
+    "ja": "けい (彑, its reading) + がしら (top): the shape of 彑 on top.",
+    "cn": "A pig's snout (彑); in many kanji, such as 事 and 雪, the same shape is a hand.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/彐"
+    ]
   },
   "⺩": {
     "ja": "おう (王, king) + へん (left side).",
