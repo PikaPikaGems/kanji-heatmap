@@ -174,6 +174,12 @@ const RadicalForms = ({
   );
 };
 
+const ExamplesFootnote = () => (
+  <p className="mt-2 text-xs text-muted-foreground">
+    * Examples only. This list is not complete.
+  </p>
+);
+
 const RadicalDetailsBody = ({
   radical,
   onSelectForm,
@@ -188,9 +194,6 @@ const RadicalDetailsBody = ({
   const english = info?.cn;
   const { forms, names } = familyParts(radical, radicals);
   const sources = refsBySite(text);
-  const hasHints =
-    (text.semantic ?? []).length > 0 ||
-    (text.sounds != null && (text.sound ?? []).length > 0);
   return (
     <div className="space-y-5 text-sm text-left">
       {info && (
@@ -237,6 +240,7 @@ const RadicalDetailsBody = ({
               </li>
             ))}
           </ul>
+          <ExamplesFootnote />
         </section>
       )}
       {text.sounds != null && (text.sound ?? []).length > 0 && (
@@ -266,6 +270,7 @@ const RadicalDetailsBody = ({
               </li>
             ))}
           </ul>
+          <ExamplesFootnote />
         </section>
       )}
       {forms.length > 0 && (
@@ -279,11 +284,6 @@ const RadicalDetailsBody = ({
           <h3 className={sectionHeadingCn}>📚 References</h3>
           <RadicalSources bySite={sources} />
         </section>
-      )}
-      {hasHints && (
-        <p className="text-xs text-muted-foreground">
-          * Examples only. These lists are not complete.
-        </p>
       )}
     </div>
   );
