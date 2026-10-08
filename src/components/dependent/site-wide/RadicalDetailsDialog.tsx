@@ -14,6 +14,16 @@ const INNER_POPOVER_CN = "z-[80] w-auto p-0 m-0";
 const sectionHeadingCn =
   "mb-2 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
 
+const POSITION_EN: Record<string, string> = {
+  へん: "left side",
+  つくり: "right side",
+  かんむり: "top",
+  あし: "bottom",
+  たれ: "top-left",
+  にょう: "bottom-left",
+  かまえ: "enclosure",
+};
+
 const SITE_NAMES: Record<string, string> = {
   "en.wiktionary.org": "Wiktionary",
   "ja.wikipedia.org": "Wikipedia (ja)",
@@ -21,7 +31,7 @@ const SITE_NAMES: Record<string, string> = {
 };
 
 /** Every linked reference, grouped by site: "Wiktionary: 宀 客 宿". */
-const RadicalSources = ({ text }: { text: RadicalPopoverText }) => {
+const refsBySite = (text: RadicalPopoverText) => {
   const refs = new Set([
     ...(text.jaRefs ?? []),
     ...(text.refs ?? []),
@@ -35,28 +45,33 @@ const RadicalSources = ({ text }: { text: RadicalPopoverText }) => {
     const page = decodeURIComponent(url.pathname.split("/").pop() ?? "");
     bySite.set(site, [...(bySite.get(site) ?? []), { href, page }]);
   }
-  if (bySite.size === 0) return null;
-  return (
-    <div className="text-xs text-muted-foreground">
-      {[...bySite].map(([site, links]) => (
-        <p key={site}>
-          {site}:{" "}
-          {links.map(({ href, page }) => (
-            <a
-              key={href}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className="mr-1 underline decoration-dotted"
-            >
-              {page}
-            </a>
-          ))}
-        </p>
-      ))}
-    </div>
-  );
+  return bySite;
 };
+
+const RadicalSources = ({
+  bySite,
+}: {
+  bySite: ReturnType<typeof refsBySite>;
+}) => (
+  <div className="text-xs text-muted-foreground">
+    {[...bySite].map(([site, links]) => (
+      <p key={site}>
+        {site}:{" "}
+        {links.map(({ href, page }) => (
+          <a
+            key={href}
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="mr-1 underline decoration-dotted"
+          >
+            {page}
+          </a>
+        ))}
+      </p>
+    ))}
+  </div>
+);
 
 /** An example kanji; tapping it offers the link to its kanji page. */
 const ExampleKanji = ({ kanji }: { kanji: string }) => {
@@ -95,85 +110,102 @@ export const RadicalDetailsDialogContent = ({
   text,
   name,
   english,
+  pos,
 }: {
   radical: string;
   text: RadicalPopoverDetails;
   name: string;
   english?: string;
-}) => (
-  <ScrollableDialogContent
-    size="md"
-    className={DIALOG_Z}
-    overlayClassName={DIALOG_Z}
-    headerClassName="text-left"
-    title={<span className="text-4xl kanji-font">{radical}</span>}
-    description={`Details for the radical ${radical}`}
-  >
-    <div className="space-y-5 text-sm text-left">
-      {text.ja && (
-        <section>
-          <h3 className={sectionHeadingCn}>🇯🇵 Japanese name</h3>
-          <p className="font-bold">{name}</p>
-          <p className="text-muted-foreground">{text.ja}</p>
-        </section>
-      )}
-      {text.cn && (
-        <section>
-          <h3 className={sectionHeadingCn}>🇨🇳 Origin</h3>
-          <p className="font-bold">{english}</p>
-          <p className="text-muted-foreground">{text.cn}</p>
-        </section>
-      )}
-      {(text.semantic ?? []).length > 0 && (
-        <section>
-          <h3 className={sectionHeadingCn}>🧠 Semantic: {english}</h3>
-          <ul className="space-y-2">
-            {text.semantic?.map((example) => (
-              <li key={example.kanji} className="flex items-center gap-3">
-                <ExampleKanji kanji={example.kanji} />
-                <span>
-                  <span className="font-bold">{example.concepts}</span>
-                  <br />
-                  <span className="text-muted-foreground">{example.why}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-      {text.sounds != null && (text.sound ?? []).length > 0 && (
-        <section>
-          <h3 className={sectionHeadingCn}>
-            🔊 Phonetic: {text.sounds.join("・")}
-          </h3>
-          <ul className="space-y-2">
-            {text.sound?.map((example) => (
-              <li key={example.kanji} className="flex items-center gap-3">
-                <ExampleKanji kanji={example.kanji} />
-                <ExampleWordPopover
-                  word={example.word}
-                  readingOverride={example.reading}
-                  wordTranslationOverride={example.gloss}
-                  contentClassName={INNER_POPOVER_CN}
-                  className="px-3 py-2.5 text-xl"
-                />
-                <span className="min-w-0">
-                  <RomajiBadge
-                    kana={example.reading}
-                    className="m-0 px-2 py-0.5 sm:py-0.5 text-sm sm:text-sm"
+  pos?: string;
+}) => {
+  const sources = refsBySite(text);
+  return (
+    <ScrollableDialogContent
+      size="md"
+      className={DIALOG_Z}
+      overlayClassName={DIALOG_Z}
+      headerClassName="text-left"
+      title={<span className="text-4xl kanji-font">{radical}</span>}
+      description={`Details for the radical ${radical}`}
+    >
+      <div className="space-y-5 text-sm text-left">
+        {text.ja && (
+          <section>
+            <h3 className={sectionHeadingCn}>🇯🇵 Japanese name</h3>
+            <p className="font-bold">{name}</p>
+            <p className="text-muted-foreground">{text.ja}</p>
+          </section>
+        )}
+        {pos && (
+          <section>
+            <h3 className={sectionHeadingCn}>📍 Position</h3>
+            <p className="font-bold">
+              {pos} ({POSITION_EN[pos]})
+            </p>
+          </section>
+        )}
+        {text.cn && (
+          <section>
+            <h3 className={sectionHeadingCn}>🇨🇳 Origin</h3>
+            <p className="font-bold">{english}</p>
+            <p className="text-muted-foreground">{text.cn}</p>
+          </section>
+        )}
+        {(text.semantic ?? []).length > 0 && (
+          <section>
+            <h3 className={sectionHeadingCn}>🧠 Semantic: {english}</h3>
+            <ul className="space-y-2">
+              {text.semantic?.map((example) => (
+                <li key={example.kanji} className="flex items-center gap-3">
+                  <ExampleKanji kanji={example.kanji} />
+                  <span>
+                    <span className="font-bold">{example.concepts}</span>
+                    <br />
+                    <span className="text-muted-foreground">{example.why}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {text.sounds != null && (text.sound ?? []).length > 0 && (
+          <section>
+            <h3 className={sectionHeadingCn}>
+              🔊 Phonetic: {text.sounds.join("・")}
+            </h3>
+            <ul className="space-y-2">
+              {text.sound?.map((example) => (
+                <li key={example.kanji} className="flex items-center gap-3">
+                  <ExampleKanji kanji={example.kanji} />
+                  <ExampleWordPopover
+                    word={example.word}
+                    readingOverride={example.reading}
+                    wordTranslationOverride={example.gloss}
+                    contentClassName={INNER_POPOVER_CN}
+                    className="px-3 py-2.5 text-xl"
                   />
-                  <br />
-                  <span className="text-muted-foreground">{example.gloss}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-      <section>
-        <h3 className={sectionHeadingCn}>Sources</h3>
-        <RadicalSources text={text} />
-      </section>
-    </div>
-  </ScrollableDialogContent>
-);
+                  <span className="min-w-0">
+                    <RomajiBadge
+                      kana={example.reading}
+                      className="m-0 px-2 py-0.5 sm:py-0.5 text-sm sm:text-sm"
+                    />
+                    <br />
+                    <span className="text-muted-foreground">
+                      {example.gloss}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {sources.size > 0 && (
+          <section>
+            <h3 className={sectionHeadingCn}>📚 Sources</h3>
+            <RadicalSources bySite={sources} />
+          </section>
+        )}
+      </div>
+    </ScrollableDialogContent>
+  );
+};

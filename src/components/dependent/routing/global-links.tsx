@@ -3,7 +3,7 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { BookOpen, Search } from "@/components/icons";
+import { BookOpen, InfoIcon, Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
   useGetKanjiInfoFn,
@@ -118,6 +118,15 @@ const RadicalJpCard = ({
   />
 );
 
+const popoverActionCn =
+  "inline-flex items-center gap-1.5 py-1 text-xs font-bold text-left w-fit hover:text-neon-accent";
+
+const PopoverActionText = ({ children }: { children: ReactNode }) => (
+  <span className="underline decoration-dotted underline-offset-4">
+    {children}
+  </span>
+);
+
 /** One link at the bottom of the radical popover: icon, then underlined text. */
 const PopoverAction = ({
   to,
@@ -128,14 +137,9 @@ const PopoverAction = ({
   icon: ReactNode;
   children: ReactNode;
 }) => (
-  <Link
-    to={to}
-    className="inline-flex items-center gap-1.5 py-1 text-xs font-bold text-left w-fit hover:text-neon-accent"
-  >
+  <Link to={to} className={popoverActionCn}>
     {icon}
-    <span className="underline decoration-dotted underline-offset-4">
-      {children}
-    </span>
+    <PopoverActionText>{children}</PopoverActionText>
   </Link>
 );
 
@@ -150,16 +154,6 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
       Find kanji that include {searchText}
     </PopoverAction>
   );
-};
-
-const POSITION_EN: Record<string, string> = {
-  へん: "left side",
-  つくり: "right side",
-  かんむり: "top",
-  あし: "bottom",
-  たれ: "top-left",
-  にょう: "bottom-left",
-  かまえ: "enclosure",
 };
 
 /** Opens the kanji page of a radical that is also a kanji (夕). */
@@ -179,9 +173,10 @@ const OpenKanjiAction = ({
   );
 };
 
-const hasDetails = (text: RadicalPopoverDetails | null) =>
+const hasDetails = (text: RadicalPopoverDetails | null, pos?: string) =>
   text != null &&
-  (text.ja != null ||
+  (pos != null ||
+    text.ja != null ||
     text.cn != null ||
     (text.semantic ?? []).length > 0 ||
     (text.sound ?? []).length > 0);
@@ -219,35 +214,31 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
                 {info.cn}
               </p>
             )}
-            {info.pos && (
-              <p>
-                📍 {info.pos} ({POSITION_EN[info.pos]})
-              </p>
-            )}
             {text?.sounds != null && <p>🔊 {text.sounds.join("・")}</p>}
-            {text != null && hasDetails(text) && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    className="text-xs font-normal underline decoration-dotted underline-offset-4 hover:text-neon-accent"
-                  >
-                    view radical details →
-                  </button>
-                </DialogTrigger>
-                <RadicalDetailsDialogContent
-                  radical={radical}
-                  text={text}
-                  name={name}
-                  english={info.cn}
-                />
-              </Dialog>
-            )}
           </div>
         )}
       </div>
       <DottedSeparator className="mx-1 mt-3" />
       <div className="flex flex-col px-1 pt-2">
+        {info && text != null && hasDetails(text, info.pos) && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <button type="button" className={popoverActionCn}>
+                <InfoIcon size={14} />
+                <PopoverActionText>
+                  Learn more about radical {radical}
+                </PopoverActionText>
+              </button>
+            </DialogTrigger>
+            <RadicalDetailsDialogContent
+              radical={radical}
+              text={text}
+              name={name}
+              english={info.cn}
+              pos={info.pos}
+            />
+          </Dialog>
+        )}
         <RadicalSearchAction radical={radical} />
         {isKanji && keyword && (
           <OpenKanjiAction kanji={radical} keyword={keyword} />

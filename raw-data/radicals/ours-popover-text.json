@@ -679,6 +679,22 @@
         "refs": [
           "https://en.wiktionary.org/wiki/界"
         ]
+      },
+      {
+        "kanji": "男",
+        "concepts": "man, male",
+        "why": "Strength (力) for work in the fields (田).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/男"
+        ]
+      },
+      {
+        "kanji": "略",
+        "concepts": "outline, abbreviation, omit",
+        "why": "Walking around a field (田) to trace its edge → outline, shorten.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/略"
+        ]
       }
     ]
   },
@@ -1077,6 +1093,22 @@
         "refs": [
           "https://en.wiktionary.org/wiki/令"
         ]
+      },
+      {
+        "kanji": "印",
+        "concepts": "stamp, seal, mark",
+        "why": "First \"to press down\": a hand (爪) over a kneeling person (卩).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/印"
+        ]
+      },
+      {
+        "kanji": "危",
+        "concepts": "dangerous, fear",
+        "why": "A person on a cliff (厃) above a kneeling person (卩).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/危"
+        ]
       }
     ]
   },
@@ -1368,7 +1400,7 @@
     ]
   },
   "工": {
-    "ja": "たくみ (工, craftsman).",
+    "ja": "工 can be read たくみ (craftsman).",
     "cn": "Some believe a bladed tool for marking borders; others see a carpenter's square.",
     "refs": [
       "https://en.wiktionary.org/wiki/工"
@@ -1906,6 +1938,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/死"
         ]
+      },
+      {
+        "kanji": "殉",
+        "concepts": "martyrdom, follow in death",
+        "why": "Dying (歹) for a lord or a cause.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/殉"
+        ]
       }
     ]
   },
@@ -2062,6 +2102,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/受"
         ]
+      },
+      {
+        "kanji": "妥",
+        "concepts": "gentle, peaceful, settle",
+        "why": "A hand (爪) calming a woman (女) → calm, settle.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/妥"
+        ]
       }
     ]
   },
@@ -2144,6 +2192,22 @@
         "refs": [
           "https://en.wiktionary.org/wiki/牧"
         ]
+      },
+      {
+        "kanji": "特",
+        "concepts": "special, unique",
+        "why": "First a prize bull (牛) → special.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/特"
+        ]
+      },
+      {
+        "kanji": "牲",
+        "concepts": "sacrificial animal",
+        "why": "An animal (牛) offered as a sacrifice.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/牲"
+        ]
       }
     ]
   },
@@ -2204,6 +2268,22 @@
         "why": "Jade (王, here standing for 玉) shaped into a ball.",
         "refs": [
           "https://en.wiktionary.org/wiki/球"
+        ]
+      },
+      {
+        "kanji": "理",
+        "concepts": "reason, logic, arrange",
+        "why": "First \"to polish jade (王)\"; \"put in order, reason\" likely grew from that.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/理"
+        ]
+      },
+      {
+        "kanji": "珠",
+        "concepts": "pearl, gem",
+        "why": "A precious stone (王, jade): a pearl.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/珠"
         ]
       }
     ]
@@ -2448,6 +2528,14 @@
         "refs": [
           "https://en.wiktionary.org/wiki/短"
         ]
+      },
+      {
+        "kanji": "矯",
+        "concepts": "straighten, correct, reform",
+        "why": "Making something as straight as an arrow (矢) shaft → correct.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/矯"
+        ]
       }
     ]
   },
@@ -2585,6 +2673,22 @@
         "why": "A bamboo tube.",
         "refs": [
           "https://en.wiktionary.org/wiki/管"
+        ]
+      },
+      {
+        "kanji": "節",
+        "concepts": "joint, section, season",
+        "why": "The joints of a bamboo (竹) stem → section.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/節"
+        ]
+      },
+      {
+        "kanji": "等",
+        "concepts": "class, rank, equal",
+        "why": "Bamboo (竹) slips for writing, sorted by grade → rank, equal.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/等"
         ]
       }
     ]
@@ -2885,7 +2989,7 @@
       {
         "kanji": "船",
         "concepts": "ship, boat, vessel",
-        "why": "A boat (舟).",
+        "why": "A boat (舟); 㕣 gives the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/船"
         ]
@@ -3057,7 +3161,7 @@
   },
   "見": {
     "ja": "みる (見る, see).",
-    "cn": "A kneeling person with a big eye for a head.",
+    "cn": "An eye (目) on top of a kneeling person (卩).",
     "refs": [
       "https://en.wiktionary.org/wiki/見"
     ],
@@ -3065,9 +3169,25 @@
       {
         "kanji": "視",
         "concepts": "inspection, regard, look at",
-        "why": "Seeing (見).",
+        "why": "Early forms were nearly the same as 見 (see); 示 was added for the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/視"
+        ]
+      },
+      {
+        "kanji": "観",
+        "concepts": "observe, view, outlook",
+        "why": "Watching (見) closely → observe.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/觀"
+        ]
+      },
+      {
+        "kanji": "覧",
+        "concepts": "look over, view, perusal",
+        "why": "Looking (見) over something → view, read through.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/覽"
         ]
       }
     ]
@@ -3124,7 +3244,7 @@
       {
         "kanji": "豚",
         "concepts": "pork, pig",
-        "why": "A pig (豕).",
+        "why": "A pig (豕) raised for meat (⺼).",
         "refs": [
           "https://en.wiktionary.org/wiki/豚"
         ]
@@ -3579,7 +3699,7 @@
       {
         "kanji": "頭",
         "concepts": "head",
-        "why": "The head (頁) itself.",
+        "why": "頁 already drew a head; 豆 was added for the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/頭"
         ]
@@ -3618,7 +3738,7 @@
       {
         "kanji": "飯",
         "concepts": "meal, cooked rice, boiled rice",
-        "why": "A meal: food (食).",
+        "why": "Food (食); 反 gives the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/飯"
         ]
@@ -3771,7 +3891,7 @@
       {
         "kanji": "魔",
         "concepts": "witch, demon, evil spirit",
-        "why": "A demon (鬼).",
+        "why": "A demon (鬼); 麻 gives the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/魔"
         ]
