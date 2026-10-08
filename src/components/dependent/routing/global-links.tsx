@@ -196,7 +196,11 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
                 {info.cn}
               </p>
             )}
-            {text?.sounds != null && <p>🔊 {text.sounds.join("・")}</p>}
+            {/* Only with checked sound examples: the sound-parts data alone is
+                a learner hint, and some families in it are wrong (戈 さい). */}
+            {text?.sounds != null && (text.sound ?? []).length > 0 && (
+              <p>🔊 {text.sounds.join("・")}</p>
+            )}
           </div>
         )}
       </div>
