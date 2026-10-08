@@ -35,9 +35,9 @@ three things: **aliases**, **names** (`literalEn`) and **popover info**
   alias (衤 → 衣 shows "garment"). So a kanji never has a `literalEn` entry;
   its popover info (Japanese name, position, meaning) is always kept, since
   a kanji radical (夕) opens the radical popover too.
-- Glyphs that are the same radical are linked **only by aliases**. Two glyphs
-  with the same Japanese name don't share anything unless one aliases to the
-  other.
+- Names and info are shared **only through aliases**. Two glyphs with the
+  same Japanese name don't share anything unless one aliases to the other.
+  Families (below) link the forms of a radical but share nothing.
 
 The build fails on a `literalEn` entry for a kanji, an unused entry, or a
 named glyph (a CSV row, an `extras` entry, or an alternate form without an
@@ -108,6 +108,35 @@ radicals of their own.
 
 Same fields as a CSV row: Japanese name, position (へん, つくり, …) and
 meaning. Each one needs a `literalEn` entry or an alias.
+
+### Glyphs the app never shows are dropped
+
+A glyph that appears in no drawer, kanji list, decomposition or structure
+data (⿊, 靣, ⺝) is dropped from the radical data: it gets no alias, no
+keyword and no popover info. An alias stays if a shown glyph's alias chain
+passes through it. A dropped glyph that has a CSV row keeps only its name,
+as a row in its family's forms (つきへん under 月). The build fails on a
+`literalEn` entry for a dropped glyph.
+
+### Families — the forms of one radical
+
+The build writes `families` to radicals.json: head → [head, ...forms], from
+the CSV's Alternate column (水 → 水, ⺡, 氺). A form is a glyph with radical
+info or a drawer glyph, or a name-only row `{ ja, pos? }` for a CSV row with
+no glyph the app can show: a private-use codepoint (きへん under 木) or a
+dropped glyph. Alternates without a name of their own (氵, a second code for
+⺡) and repeated names are left out. A family only links its forms; each
+form keeps its own name, position and popover text.
+
+```jsonc
+"familySkips": { "𠆢": "Listed under both 人 and 入; …" },
+"familyHeads": { "丿": "ノ", "彐": "ヨ", "罒": "⺲" }
+```
+
+- `familySkips`: keeps a glyph out of every family but its own, with the
+  reason. The build fails when a glyph lands in two families.
+- `familyHeads`: the head when it isn't the CSV's Radical column, normally
+  the drawer glyph that holds the popover text.
 
 ## Ours — `ours-popover-text.json`
 

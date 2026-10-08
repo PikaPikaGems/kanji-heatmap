@@ -2,7 +2,7 @@
  * Everything radical-related that the build derives from raw-data/radicals/.
  *
  *   external/sylhare-radicals.csv  ─┐
- *   ours.json                       ├─▶ buildRadicalData → { aliases, keywords, info }
+ *   ours.json                       ├─▶ buildRadicalData → { aliases, keywords, info, families }
  *   external/rewhowe-drawer.json   ─┘
  *
  * Files in external/ are read, never written. Our own choices (English
@@ -135,17 +135,26 @@ const infoOf = ({ ja, position, meaning }) => {
  *
  * Throws on a missing, misplaced or unused `literalEn` entry.
  */
-export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
+export const buildRadicalData = ({
+  sylhareRows,
+  ours,
+  drawer,
+  isKanji,
+  isUsed,
+}) => {
   const drawerRadicals = new Set(Object.values(drawer).flat());
-  const aliases = { ...(ours.aliases ?? {}) };
+  const mergedAliases = { ...(ours.aliases ?? {}) };
   mergeSylhareAliases({
     sylhareRows,
     drawerRadicals,
-    aliases,
+    aliases: mergedAliases,
     isKanji,
     skipAlts: ours.sylhareSkipAlts,
     extraAliases: ours.sylhareExtraAliases,
   });
+  // Glyphs the app never shows (⿊, 靣) are dropped: an alias stays only if
+  // a shown glyph's alias chain passes through it.
+  const aliases = pruneAliases(mergedAliases, isUsed);
   const skipAlts = new Set(ours.sylhareSkipAlts ?? []);
 
   // Rows without a usable glyph (private-use codepoints, 々's "n/a") are
@@ -187,6 +196,14 @@ export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
   const info = {};
   const problems = [];
   for (const [glyph, entry] of named) {
+    // A glyph the app never shows (⺝) keeps only its name, as a row in its
+    // family's forms; see buildFamilies.
+    if (!isUsed(glyph)) {
+      if (literals[glyph] != null) {
+        problems.push(`${glyph} is never shown; remove its literalEn`);
+      }
+      continue;
+    }
     const literal = (literals[glyph] ?? "").toString().trim();
     if (isKanji(glyph)) {
       if (literal) problems.push(`${glyph} is a kanji; remove its literalEn`);
@@ -207,10 +224,143 @@ export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
   for (const glyph of Object.keys(literals)) {
     if (!named.has(glyph)) problems.push(`unused literalEn for ${glyph}`);
   }
+  const families = buildFamilies({
+    sylhareRows,
+    ours,
+    skipAlts,
+    info,
+    drawerRadicals,
+    problems,
+  });
   if (problems.length > 0) {
     throw new Error(`radicals:\n  - ${problems.join("\n  - ")}`);
   }
-  return { aliases, keywords, info };
+  return { aliases, keywords, info, families };
+};
+
+/** Keeps the aliases of shown glyphs, and every alias on their chains. */
+const pruneAliases = (aliases, isUsed) => {
+  const keep = new Set();
+  for (const from of Object.keys(aliases)) {
+    if (!isUsed(from)) continue;
+    const seen = new Set();
+    let current = from;
+    while (aliases[current] != null && !seen.has(current)) {
+      seen.add(current);
+      keep.add(current);
+      current = aliases[current];
+    }
+  }
+  return Object.fromEntries(
+    Object.entries(aliases).filter(([from]) => keep.has(from))
+  );
+};
+
+/**
+ * The forms of each radical, from the sylhare CSV's Alternate column:
+ * head glyph → [head, ...forms]. A form is either
+ *
+ * - a glyph with its own radical info, or a drawer glyph (⺡ under 水), or
+ * - a name-only row `{ ja, pos? }` for a form that has a CSV row but no
+ *   glyph the app can show: a private-use codepoint (きへん under 木) or a
+ *   glyph that appears in no kanji (つきへん, ⺝, under 月).
+ *
+ * Alternates without a name of their own (氵, a second codepoint for ⺡)
+ * are the same shape as another form and are left out, as are repeats of a
+ * name already in the family. Families are only linked forms: each form
+ * keeps its own text. ours.json's `familySkips` keeps a glyph out of every
+ * family but its own (𠆢 is listed under both 人 and 入), and `familyHeads`
+ * picks the head when it isn't the CSV's Radical column.
+ */
+const buildFamilies = ({
+  sylhareRows,
+  ours,
+  skipAlts,
+  info,
+  drawerRadicals,
+  problems,
+}) => {
+  const familySkips = ours.familySkips ?? {};
+  const familyHeads = ours.familyHeads ?? {};
+  const rowOf = new Map();
+  for (const row of sylhareRows) {
+    const ja = (row["Reading-J"] ?? "").trim();
+    if (ja && ja !== "n/a" && !rowOf.has(row.Radical))
+      rowOf.set(row.Radical, row);
+  }
+  const isForm = (glyph) => glyph in info || drawerRadicals.has(glyph);
+  const nameOf = (glyph) =>
+    info[glyph]?.ja ?? (rowOf.get(glyph)?.["Reading-J"] ?? "").trim();
+
+  const families = new Map();
+  for (const row of sylhareRows) {
+    const alternates = [...(row.Alternate ?? "")].filter(
+      (ch) => ch.trim().length > 0
+    );
+    if (alternates.length === 0 || skipAlts.has(row.Radical)) continue;
+    const head = familyHeads[row.Radical] ?? row.Radical;
+    const members = families.get(head) ?? [head];
+    for (const glyph of [row.Radical, ...alternates]) {
+      if (glyph === head || skipAlts.has(glyph)) continue;
+      if (glyph !== row.Radical && familySkips[glyph] != null) continue;
+      if (isForm(glyph)) {
+        members.push(glyph);
+      } else if (rowOf.has(glyph)) {
+        const pos = positionOf(rowOf.get(glyph)["Position-J"]);
+        members.push({ ja: nameOf(glyph), ...(pos ? { pos } : {}) });
+      }
+    }
+    families.set(head, members);
+  }
+
+  const out = {};
+  const familyOf = new Map();
+  for (const [head, members] of families) {
+    const keyOf = (member) =>
+      typeof member === "string"
+        ? `${nameOf(member)}|${info[member]?.pos ?? ""}`
+        : `${member.ja}|${member.pos ?? ""}`;
+    // A name-only row is dropped when a glyph form has the same name (⺤
+    // つめかんむり), so check the glyphs first.
+    const glyphKeys = new Set(
+      members.filter((member) => typeof member === "string").map(keyOf)
+    );
+    const names = new Set();
+    const kept = [];
+    for (const member of members) {
+      if (typeof member === "string") {
+        if (!kept.includes(member)) kept.push(member);
+        continue;
+      }
+      const key = keyOf(member);
+      if (glyphKeys.has(key) || names.has(key)) continue;
+      names.add(key);
+      kept.push(member);
+    }
+    if (kept.length < 2) continue;
+    for (const member of kept) {
+      if (typeof member !== "string") continue;
+      if (familyOf.has(member)) {
+        problems.push(
+          `${member} is in the families of both ${familyOf.get(member)} and ${head}; add it to familySkips`
+        );
+      }
+      familyOf.set(member, head);
+    }
+    out[head] = kept;
+  }
+  for (const glyph of [
+    ...Object.keys(familySkips),
+    ...Object.keys(familyHeads),
+  ]) {
+    if (
+      !rowOf.has(glyph) &&
+      !sylhareRows.some((row) => row.Alternate?.includes(glyph))
+    ) {
+      problems.push(`familySkips/familyHeads: ${glyph} is not in the CSV`);
+    }
+  }
+  return out;
 };
 
 /**

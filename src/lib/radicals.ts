@@ -79,7 +79,14 @@ export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
   info: Record<string, RadicalInfo>;
+  /**
+   * Head → [head, ...forms] (水 → 水, ⺡, 氺). A form is a glyph, or a
+   * name-only row for a form with no glyph the app can show (きへん).
+   */
+  families?: Record<string, RadicalFamilyMember[]>;
 };
+
+export type RadicalFamilyMember = string | { ja: string; pos?: string };
 
 export type RadicalsRuntime = RadicalsFile & {
   strokeCountMap: Record<string, string>;

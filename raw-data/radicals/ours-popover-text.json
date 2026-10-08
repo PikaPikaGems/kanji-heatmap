@@ -907,13 +907,6 @@
       }
     ]
   },
-  "⼊": {
-    "ja": "いる (入る, enter).",
-    "cn": "An arrowhead, meaning to enter.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/入"
-    ]
-  },
   "八": {
     "ja": "はち (八, eight).",
     "cn": "Two lines bending apart, first meaning to divide; it was borrowed for eight because the words sounded alike.",
@@ -4090,9 +4083,6 @@
       "https://en.wiktionary.org/wiki/龠"
     ]
   },
-  "⺇": {
-    "ja": "かぜ (風, wind) + かんむり (top): the top part of 風."
-  },
   "⺉": {
     "cn": "The squeezed form of 刀, a knife.",
     "refs": [
@@ -4301,9 +4291,6 @@
       "https://en.wiktionary.org/wiki/心"
     ]
   },
-  "⺝": {
-    "ja": "つき (月, moon) + へん (left side)."
-  },
   "⺣": {
     "ja": "れっ (列, row) + か (火, fire): fire written as a row of dots.",
     "jaRefs": [
@@ -4379,13 +4366,6 @@
       "https://en.wiktionary.org/wiki/玉"
     ]
   },
-  "⺪": {
-    "ja": "ひき (疋, its reading) + へん (left side).",
-    "cn": "The form of 疋 on the left.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/疋"
-    ]
-  },
   "氺": {
     "ja": "した (下, below) + みず (水, water): 水 at the bottom.",
     "cn": "A variant of 水 used in some kanji (泰, 录).",
@@ -4425,20 +4405,6 @@
       "https://en.wiktionary.org/wiki/竹"
     ]
   },
-  "⽹": {
-    "ja": "あみめ (網目, mesh).",
-    "cn": "A net.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/⺲"
-    ]
-  },
-  "⾋": {
-    "ja": "くさ (草, grass).",
-    "cn": "Blades of grass.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/艸"
-    ]
-  },
   "⻊": {
     "ja": "あし (足, foot) + へん (left side).",
     "cn": "The form of 足 (foot) on the left.",
@@ -4451,13 +4417,6 @@
     "cn": "雨 (rain) written on top.",
     "refs": [
       "https://en.wiktionary.org/wiki/雨"
-    ]
-  },
-  "⻟": {
-    "ja": "しょく (食, food) + へん (left side).",
-    "cn": "The squeezed form of 食 (food).",
-    "refs": [
-      "https://en.wiktionary.org/wiki/食"
     ]
   },
   "龍": {

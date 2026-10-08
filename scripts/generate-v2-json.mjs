@@ -57,27 +57,44 @@ const cumUse = readRelease("cum_use.json");
 // Drawer grouping comes from rewhowe/kanji; everything else radical-related
 // that we decided ourselves is in raw-data/radicals/ours.json.
 const { drawer, ours, sylhareRows } = readRadicalSources(RAW_DIR);
-const radicals = { radicalsGroupedByStrokeCount: drawer };
-const {
-  aliases: allAliases,
-  keywords: radicalKeywords,
-  info: radicalInfo,
-} = buildRadicalData({
-  sylhareRows,
-  ours,
-  drawer,
-  isKanji: (char) => main[char] != null,
-});
-const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
-  "components/ours.json"
-);
-
 const structureSources = {
   hl: readRaw("kanji-structure/external/hlorenzi.json"),
   ka: readRaw("kanji-structure/external/kanjium.json"),
   sc: readRaw("kanji-structure/external/scott.json"),
   ya: readRaw("kanji-structure/external/yagays.json"),
 };
+
+// Every glyph the app can show: drawer radicals, kanji, and the parts in the
+// decomposition and structure data. Radical glyphs outside this set (⿊, 靣)
+// are dropped from the radical data.
+const shownGlyphs = new Set([
+  ...Object.values(drawer).flat(),
+  ...Object.keys(main),
+]);
+const addShown = (value) => {
+  if (typeof value === "string") for (const ch of value) shownGlyphs.add(ch);
+  else if (value != null && typeof value === "object")
+    Object.values(value).forEach(addShown);
+};
+addShown(decomposition);
+Object.values(structureSources).forEach(addShown);
+
+const radicals = { radicalsGroupedByStrokeCount: drawer };
+const {
+  aliases: allAliases,
+  keywords: radicalKeywords,
+  info: radicalInfo,
+  families: radicalFamilies,
+} = buildRadicalData({
+  sylhareRows,
+  ours,
+  drawer,
+  isKanji: (char) => main[char] != null,
+  isUsed: (char) => shownGlyphs.has(char),
+});
+const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
+  "components/ours.json"
+);
 
 const kanjiList = Object.keys(main);
 const isKanji = (char) => main[char] != null;
@@ -582,6 +599,7 @@ write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
   info: radicalPopover.info,
+  families: radicalFamilies,
 });
 write("radical_popover_text.json", radicalPopover.text);
 write("kanji_structures.json", outStructures);

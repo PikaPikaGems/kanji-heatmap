@@ -4,7 +4,6 @@
     "亅": "hook stick",
     "亠": "pot lid",
     "儿": "person legs",
-    "⼊": "enter",
     "冂": "border enclosure",
     "冖": "katakana wa crown",
     "冫": "two water",
@@ -81,7 +80,6 @@
     "龠": "pan flute",
     "⺅": "person left",
     "𠆢": "person roof",
-    "⺇": "wind crown",
     "⺉": "standing sword",
     "⺌": "small crown",
     "⻏": "large village",
@@ -91,19 +89,14 @@
     "⺡": "three water",
     "⺨": "beast left",
     "⺗": "bottom heart",
-    "⺝": "moon left",
     "⺣": "lined fire",
     "⺤": "claw crown",
     "⺭": "show left",
-    "⺪": "bolt left",
     "氺": "bottom water",
     "⻂": "clothing left",
     "⺮": "bamboo crown",
-    "⽹": "net mesh",
-    "⾋": "grass",
     "⻊": "foot left",
     "⻗": "rain crown",
-    "⻟": "eat left",
     "𠂉": "no plus one",
     "マ": "katakana ma",
     "ユ": "katakana yu",
@@ -172,6 +165,17 @@
     "⾡": "⻌",
     "𧾷": "足",
     "⺍": "⺌"
+  },
+  "familySkips": {
+    "𠆢": "Listed under both 人 and 入; in many kanji (今, 会) it is neither, so it has its own entry",
+    "月": "Listed under 肉 because ⺼ looks like 月; 月 (moon) is its own radical",
+    "己": "Listed under 已, but 已, 己 and 巳 are different characters",
+    "巳": "Listed under 已, but 已, 己 and 巳 are different characters"
+  },
+  "familyHeads": {
+    "丿": "ノ",
+    "彐": "ヨ",
+    "罒": "⺲"
   },
   "extras": {
     "𠂉": {
