@@ -107,11 +107,13 @@ unchecked step.
         the PR merges only when it's complete.
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
       the radical names" below). Decided once the popover exists.
-- [ ] **Step 3 — every radical opens the radical popover**, also
+- [x] **Step 3 — every radical opens the radical popover**, also
       radicals that are kanji (夕), with "Find kanji that include 夕" and
-      "Open kanji 夕 (evening)". Waits for 1c, so no popover is empty.
-      This replaces the earlier decision that kanji radicals keep their
-      kanji link; the extra tap is fine (user).
+      "📖 Open kanji 夕 (evening)". Done in PikaPikaGems/kanji-heatmap#311
+      (moved ahead of 1c): the build keeps radical info for every kanji
+      radical (149 → 252 glyphs), and chips check "is it a radical?"
+      before "is it a kanji?". This replaces the earlier decision that
+      kanji radicals keep their kanji link; the extra tap is fine (user).
 - [ ] **Step 4 — component search** (item 3 below).
 
 ### 1. Sound info feature
@@ -427,8 +429,6 @@ alone.
 
 Open:
 
-- 青's sound examples only show once kanji radicals open the radical
-  popover (step 3); today 青 opens its kanji link.
 - Naming (step 2): if the 🇯🇵 line explains the Japanese name, chip
   names could become meanings ("roof" instead of "katakana u crown").
   Revisit once the popover exists.

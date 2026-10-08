@@ -33,7 +33,8 @@ three things: **aliases**, **names** (`literalEn`) and **popover info**
   an alias to 爪 so radical search uses the drawer's 爪 button.
 - A **kanji** always shows its kanji keyword, also when reached through an
   alias (衤 → 衣 shows "garment"). So a kanji never has a `literalEn` entry;
-  its popover info is kept only when an alias points at it.
+  its popover info (Japanese name, position, meaning) is always kept, since
+  a kanji radical (夕) opens the radical popover too.
 - Glyphs that are the same radical are linked **only by aliases**. Two glyphs
   with the same Japanese name don't share anything unless one aliases to the
   other.

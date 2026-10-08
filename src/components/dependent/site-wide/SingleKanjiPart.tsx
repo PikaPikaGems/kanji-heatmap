@@ -60,13 +60,15 @@ export const SingleKanjiPart = ({
             </div>
           )}
 
-          {isKanji && keyword != null ? (
+          {/* A radical opens the radical popover even when it is also a
+              kanji (夕); the popover links to the kanji. */}
+          {isKnownRadical(kanji, radicals) ? (
+            <RadicalPopoverContent radical={kanji} />
+          ) : isKanji && keyword != null ? (
             <>
               <GlobalKanjiLink keyword={keyword} kanji={kanji} />
               <span className="italic font-normal">{"(Kanji)"}</span>
             </>
-          ) : isKnownRadical(kanji, radicals) ? (
-            <RadicalPopoverContent radical={kanji} />
           ) : (
             <>
               <FakeComponentLink radical={kanji} keyword={componentKeyword} />

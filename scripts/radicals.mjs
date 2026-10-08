@@ -131,7 +131,7 @@ const infoOf = ({ ja, position, meaning }) => {
  *   read through. ⺤ "claw crown" has both: its own name, and an alias to 爪
  *   for radical search.
  * - A kanji shows its kanji keyword, so it never has a `literalEn` entry.
- *   Its info is kept only when an alias points at it (衤 → 衣).
+ *   Its info is always kept: kanji radicals open the radical popover too.
  *
  * Throws on a missing, misplaced or unused `literalEn` entry.
  */
@@ -146,7 +146,6 @@ export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
     skipAlts: ours.sylhareSkipAlts,
     extraAliases: ours.sylhareExtraAliases,
   });
-  const aliasTargets = new Set(Object.values(aliases));
   const skipAlts = new Set(ours.sylhareSkipAlts ?? []);
 
   // Rows without a usable glyph (private-use codepoints, 々's "n/a") are
@@ -191,7 +190,9 @@ export const buildRadicalData = ({ sylhareRows, ours, drawer, isKanji }) => {
     const literal = (literals[glyph] ?? "").toString().trim();
     if (isKanji(glyph)) {
       if (literal) problems.push(`${glyph} is a kanji; remove its literalEn`);
-      if (aliasTargets.has(glyph)) info[glyph] = infoOf(entry);
+      // Every radical opens the radical popover, kanji too (夕), so a kanji
+      // keeps its Japanese name, position and meaning.
+      info[glyph] = infoOf(entry);
       continue;
     }
     if (!literal) {
