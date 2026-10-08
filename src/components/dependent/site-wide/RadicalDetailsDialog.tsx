@@ -3,7 +3,6 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
-import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { positionText, useRadicalSummary } from "./use-radical-summary";
 import {
@@ -156,16 +155,14 @@ const RadicalForms = ({
             <button
               type="button"
               onClick={() => onSelect(glyph)}
-              className="flex items-center w-full gap-3 p-1 text-left border-2 border-dotted rounded-lg hover:border-solid hover:border-neon-accent"
+              className="flex items-center w-full gap-3 p-1 text-left rounded-lg hover:bg-foreground/5"
             >
               <span className="flex items-center justify-center text-2xl leading-none size-10 shrink-0 rounded-lg bg-foreground/5 kanji-font">
                 {glyph}
               </span>
-              <span>{label}</span>
-              <ChevronRight
-                size={16}
-                className="ml-auto shrink-0 text-muted-foreground"
-              />
+              <span className="border-b border-dotted border-muted-foreground">
+                {label}
+              </span>
             </button>
           </li>
         );
@@ -175,7 +172,7 @@ const RadicalForms = ({
 };
 
 const ExamplesFootnote = () => (
-  <p className="mt-2 text-xs text-muted-foreground">
+  <p className="mt-2 text-[0.625rem] text-muted-foreground">
     * Examples only. This list is not complete.
   </p>
 );
@@ -211,6 +208,11 @@ const RadicalDetailsBody = ({
                   .filter(Boolean)
                   .join(" · ")}
               </span>
+              {text.nameNotes?.[other.ja] && (
+                <span className="text-muted-foreground">
+                  : {text.nameNotes[other.ja]}
+                </span>
+              )}
             </p>
           ))}
         </section>

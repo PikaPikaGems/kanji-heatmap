@@ -314,6 +314,10 @@ try {
         followAlias(glyph, allAliases, (g) => familyHeadOf.has(g)) ?? glyph
       );
     },
+    otherNamesOf: (glyph) =>
+      (radicalFamilies[glyph] ?? [])
+        .filter((member) => typeof member !== "string")
+        .map((member) => member.ja),
     soundPartOf: soundParts.soundPartOf,
     readings: soundParts.readings,
   });

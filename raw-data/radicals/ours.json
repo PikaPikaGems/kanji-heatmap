@@ -172,7 +172,8 @@
     "月": "Listed under 肉 because ⺼ looks like 月; 月 (moon) is its own radical",
     "己": "Listed under 已, but 已, 己 and 巳 are different characters",
     "巳": "Listed under 已, but 已, 己 and 巳 are different characters",
-    "龍": "竜 and 龍 each have their own origin text (竜's says it is an old form of 龍), so 龍 must not show 竜's"
+    "龍": "竜 and 龍 each have their own origin text (竜's says it is an old form of 龍), so 龍 must not show 竜's",
+    "⺇": "Listed under 風, but かぜかんむり is a name of the 几 radical (風's outside looks like 几; ja.wikipedia 几部), not a form of 風"
   },
   "familyHeads": {
     "丿": "ノ",

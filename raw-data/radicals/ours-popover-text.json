@@ -656,7 +656,13 @@
   },
   "目": {
     "ja": "め (目, eye).",
-    "cn": "A picture of an eye, turned on its side.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/目部"
+    ],
+    "nameNotes": {
+      "よこめ": "目 turned on its side, written 罒. In most kanji, though, 罒 is a net (⺲)."
+    },
+    "cn": "A picture of an eye, later stood upright.",
     "refs": [
       "https://en.wiktionary.org/wiki/目"
     ],
@@ -2462,10 +2468,17 @@
     ]
   },
   "疋": {
-    "ja": "ひき (疋, its reading).",
-    "cn": "A foot (止) with the leg above it, like 足.",
+    "ja": "ひき (匹's reading): 疋 was also written for 匹.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/疋部"
+    ],
+    "nameNotes": {
+      "ひきへん": "On the left side 疋 changes shape, as in 疎."
+    },
+    "cn": "A leg below the knee, with the foot (止) at the bottom, like 足. It was also written for 匹, which in the Han dynasty measured a length of woven cloth: hence “bolt of cloth”.",
     "refs": [
-      "https://en.wiktionary.org/wiki/疋"
+      "https://en.wiktionary.org/wiki/疋",
+      "https://ja.wikipedia.org/wiki/疋部"
     ]
   },
   "疒": {

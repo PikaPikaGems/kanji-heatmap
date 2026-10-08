@@ -28,6 +28,7 @@ const ENTRY_FIELDS = new Set([
   "addEn",
   "cn",
   "cnNote",
+  "nameNotes",
   "refs",
   "semantic",
   "sound",
@@ -66,6 +67,12 @@ const splitWords = (text) =>
  * glyph in no family), and `formIn(kanji)` the form a kanji is written with
  * (雪 → ⻗), when known, so an example sits under the form it really uses.
  *
+ * `nameNotes` explains a family's name-only rows (よこめ under 目: "目
+ * turned sideways…") when the shape differs from the head's; the dialog
+ * shows it after "Also called よこめ". `otherNamesOf(glyph)` lists the
+ * name-only rows of the family `glyph` heads. The note's reference goes in
+ * `jaRefs`.
+ *
  * Throws on anything malformed, so a bad entry fails the build.
  */
 export const buildRadicalPopoverText = ({
@@ -78,6 +85,7 @@ export const buildRadicalPopoverText = ({
   readings,
   headOf = () => null,
   formIn = () => null,
+  otherNamesOf = () => [],
 }) => {
   const problems = [];
   const text = {};
@@ -117,6 +125,18 @@ export const buildRadicalPopoverText = ({
         problems.push(`${where}: cnNote, but neither it nor ${head} has cn`);
       if (!isRefs(entry.refs))
         problems.push(`${where}: cnNote needs refs (https links)`);
+    }
+
+    if (entry.nameNotes != null) {
+      const names = new Set(otherNamesOf(glyph));
+      for (const [name, note] of Object.entries(entry.nameNotes)) {
+        if (!names.has(name))
+          problems.push(`${where}: nameNotes ${name} is not one of its names`);
+        if (!isText(note))
+          problems.push(`${where}: nameNotes ${name} must be text`);
+      }
+      if (!isRefs(entry.jaRefs))
+        problems.push(`${where}: nameNotes needs jaRefs (https links)`);
     }
 
     if (entry.addEn != null) {

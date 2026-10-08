@@ -60,6 +60,8 @@ export type RadicalPopoverText = {
   cn?: string;
   /** What is different about this form (⺡ "Written as three strokes…"). */
   cnNote?: string;
+  /** Name-only forms whose shape differs (よこめ: "目 turned on its side…"). */
+  nameNotes?: Record<string, string>;
   refs?: string[];
   /** Kanji where the radical is the meaning part. */
   semantic?: { kanji: string; concepts: string; why: string; refs: string[] }[];
