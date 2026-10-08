@@ -350,10 +350,13 @@ Rules:
   (青 あお) show the name only, with no reason.
 - 🇨🇳: the Chinese origin of the glyph.
 - No source is a source of truth. Wiktionary, kanjium, sylhare, Anki and
-  the rest are all references. A claim is stated plainly only when two
-  references agree; with one, it is hedged or left out. "Some believe…"
-  when references disagree (冬). Cite the references used; our own
-  wording, never copied.
+  the rest are all references. One reputable reference, linked, is
+  enough (user, October 2026): the link lets readers check it. Hedge
+  ("Some believe…") when that reference shows disagreement (青, 冬); add
+  a second reference only when a claim looks surprising. Our own
+  wording, never copied. Reputable for 🇨🇳 lines and examples:
+  Wiktionary's "Glyph origin" sections. For 🇯🇵 history reasons:
+  Kanjipedia (漢字ペディア) or Japanese Wikipedia.
 - Meaning examples: 2–3 kanji where the radical really is the meaning
   part, each with concepts and how it links. One is fine when only one is
   checked. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
