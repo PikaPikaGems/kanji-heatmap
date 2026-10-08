@@ -45,8 +45,8 @@ export const SingleKanjiPart = ({
             <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
               <p className="font-normal leading-snug whitespace-normal text-muted-foreground">
                 <span className="font-bold text-foreground">Sound hint:</span>{" "}
-                kanji with <span className="kanji-font">{kanji}</span> are often
-                read
+                kanji with <span className="kanji-font">{kanji}</span> are
+                sometimes read
               </p>
               <div className="flex flex-wrap justify-center">
                 {phonetics.map((phonetic) => (

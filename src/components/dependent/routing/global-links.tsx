@@ -170,7 +170,7 @@ const OpenKanjiAction = ({
 };
 
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
-  const { info, keyword, isKanji, name, position } = useRadicalSummary(radical);
+  const { info, keyword, isKanji, name } = useRadicalSummary(radical);
   const { data: text } = useRadicalPopoverText(radical);
   return (
     <div className="p-1 max-w-xs" data-vaul-no-drag>
@@ -189,7 +189,7 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
         )}
         {info && (
           <div className="min-w-0 text-sm font-bold text-left whitespace-normal text-foreground">
-            <p>🇯🇵 {[name, position].filter(Boolean).join(" · ")}</p>
+            <p>🇯🇵 {name}</p>
             {info.cn && (
               <p>
                 {"🇨🇳"} {(text?.semantic ?? []).length > 0 && "🧠 "}

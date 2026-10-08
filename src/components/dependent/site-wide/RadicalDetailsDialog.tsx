@@ -190,6 +190,9 @@ const RadicalDetailsBody = ({
   const forms = otherForms(radical, radicals);
   const head = radicalFamily(radical, radicals)?.head ?? radical;
   const sources = refsBySite(text);
+  const hasHints =
+    (text.semantic ?? []).length > 0 ||
+    (text.sounds != null && (text.sound ?? []).length > 0);
   return (
     <div className="space-y-5 text-sm text-left">
       {info && (
@@ -213,11 +216,7 @@ const RadicalDetailsBody = ({
       )}
       {(text.semantic ?? []).length > 0 && (
         <section>
-          <h3 className={sectionHeadingCn}>🧠 Meaning hint</h3>
-          <p className="mb-2 text-muted-foreground">
-            A few kanji where <span className="kanji-font">{radical}</span>{" "}
-            brings the meaning “{english}”:
-          </p>
+          <h3 className={sectionHeadingCn}>🧠 Meaning hint: {english}*</h3>
           <ul className="space-y-2">
             {text.semantic?.map((example) => (
               <li key={example.kanji} className="flex items-center gap-3">
@@ -234,11 +233,9 @@ const RadicalDetailsBody = ({
       )}
       {text.sounds != null && (text.sound ?? []).length > 0 && (
         <section>
-          <h3 className={sectionHeadingCn}>🔊 Sound hint</h3>
-          <p className="mb-2 text-muted-foreground">
-            A few kanji with <span className="kanji-font">{radical}</span> that
-            are read {text.sounds.join(" or ")}:
-          </p>
+          <h3 className={sectionHeadingCn}>
+            🔊 Sound hint: {text.sounds.join("・")}*
+          </h3>
           <ul className="space-y-2">
             {text.sound?.map((example) => (
               <li key={example.kanji} className="flex items-center gap-3">
@@ -274,6 +271,11 @@ const RadicalDetailsBody = ({
           <h3 className={sectionHeadingCn}>📚 References</h3>
           <RadicalSources bySite={sources} />
         </section>
+      )}
+      {hasHints && (
+        <p className="text-xs text-muted-foreground">
+          * Examples only. These lists are not complete.
+        </p>
       )}
     </div>
   );
