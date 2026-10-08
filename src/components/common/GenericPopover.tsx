@@ -36,15 +36,21 @@ export const GenericPopover = ({
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent className={contentClassName} collisionPadding={16}>
         {showArrow && <PopoverCardArrow />}
-        <ErrorBoundary
-          fallback={
-            <div className="p-4">
-              <SmallUnexpectedErrorFallback />
-            </div>
-          }
-        >
-          {content}
-        </ErrorBoundary>
+        {/* A long popover (the radical popover's text) can be taller than the
+            space beside its trigger; scroll inside it instead of running off
+            the screen. Radix sets the available height on the content; 1rem
+            leaves room for the content's own padding. */}
+        <div className="max-h-[calc(var(--radix-popover-content-available-height)-1rem)] overflow-y-auto">
+          <ErrorBoundary
+            fallback={
+              <div className="p-4">
+                <SmallUnexpectedErrorFallback />
+              </div>
+            }
+          >
+            {content}
+          </ErrorBoundary>
+        </div>
       </PopoverContent>
     </Popover>
   );

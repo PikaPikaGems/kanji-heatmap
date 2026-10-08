@@ -395,8 +395,6 @@ Data catches:
 
 Open:
 
-- 冫 にすい has no 🇯🇵 reason yet: Japanese Wikipedia only gives the name,
-  not why (に + すい is likely 二 + 水, but no reference found).
 - 青's sound examples only show once kanji radicals open the radical
   popover (step 3); today 青 opens its kanji link.
 - Naming (step 2): if the 🇯🇵 line explains the Japanese name, chip
