@@ -289,6 +289,13 @@ the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
 
 #### Radical popover text (decided with the user, October 2026)
 
+Popover layout (user, October 2026; supersedes the one-block shape below):
+a bold summary (🇯🇵 name, 🇨🇳 English words with 🧠 when it has meaning
+examples, 📍, 🔊 sounds), then "view more details →" opens the muted
+details: 🇯🇵 and 🇨🇳 lines with their reasons, "🧠 semantic" examples,
+"🔊 phonetic" examples, and "Sources:". Then "Find kanji that include …"
+and, for kanji radicals, "📖 Open kanji 夕 (evening)". Long popovers scroll.
+
 Shape, per radical (every section only when it applies):
 
     <RADICAL>

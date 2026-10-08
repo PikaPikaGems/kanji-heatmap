@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -165,6 +166,7 @@ const RadicalSources = ({ text }: { text: RadicalPopoverText }) => {
   if (bySite.size === 0) return null;
   return (
     <div className="text-[10px] text-muted-foreground">
+      <p>Sources:</p>
       {[...bySite].map(([site, links]) => (
         <p key={site}>
           {site}:{" "}
@@ -185,22 +187,72 @@ const RadicalSources = ({ text }: { text: RadicalPopoverText }) => {
   );
 };
 
-/** Our own text: the reasons, meaning examples and sound examples. */
-const RadicalPopoverExamples = ({ text }: { text: RadicalPopoverDetails }) => (
-  <>
-    {(text.semantic ?? []).length > 0 && (
-      <ul className="space-y-1">
-        {text.semantic?.map((example) => (
-          <li key={example.kanji} className="text-xs">
-            <span className="text-base kanji-font">{example.kanji}</span> ·{" "}
-            <strong>{example.concepts}</strong> · {example.why}
-          </li>
-        ))}
-      </ul>
+/** Opens the kanji page of a radical that is also a kanji (夕). */
+const OpenKanjiAction = ({
+  kanji,
+  keyword,
+}: {
+  kanji: string;
+  keyword: string;
+}) => {
+  const pathname = useUrlLocation();
+  const urlState = useKanjiFromUrl(kanji);
+  return (
+    <Link
+      to={`${pathname}?${urlState}`}
+      className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
+    >
+      <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
+        📖{" "}
+        <strong>
+          Open kanji {kanji} ({keyword})
+        </strong>
+      </span>
+    </Link>
+  );
+};
+
+/**
+ * Everything behind "view more details": the reasons behind the names, the
+ * meaning and sound examples, and the references. Muted, not bold, so the
+ * summary above stays the first thing read.
+ */
+const RadicalPopoverDetailsSection = ({
+  text,
+  name,
+  english,
+}: {
+  text: RadicalPopoverDetails;
+  name: string;
+  english?: string;
+}) => (
+  <div className="px-1 pt-2 space-y-2 text-xs text-left text-muted-foreground">
+    {text.ja && (
+      <p>
+        🇯🇵 {name} · {text.ja}
+      </p>
     )}
-    {text.sounds != null && (text.sound ?? []).length > 0 && (
-      <div className="text-xs">
-        <p className="font-bold">🔊 {text.sounds.join("・")}</p>
+    {text.cn && (
+      <p>
+        🇨🇳 {english} · {text.cn}
+      </p>
+    )}
+    {(text.semantic ?? []).length > 0 && (
+      <div>
+        <p>🧠 semantic: {english}</p>
+        <ul className="space-y-1">
+          {text.semantic?.map((example) => (
+            <li key={example.kanji}>
+              <span className="text-base kanji-font">{example.kanji}</span> ·{" "}
+              {example.concepts} · {example.why}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {text.sounds != null && (
+      <div>
+        <p>🔊 phonetic: {text.sounds.join("・")}</p>
         <ul className="space-y-1">
           {text.sound?.map((example) => (
             <li key={example.kanji}>
@@ -212,15 +264,27 @@ const RadicalPopoverExamples = ({ text }: { text: RadicalPopoverDetails }) => (
         </ul>
       </div>
     )}
-  </>
+    <RadicalSources text={text} />
+  </div>
 );
+
+const hasDetails = (text: RadicalPopoverDetails | null) =>
+  text != null &&
+  (text.ja != null ||
+    text.cn != null ||
+    (text.semantic ?? []).length > 0 ||
+    (text.sound ?? []).length > 0);
 
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
   const radicals = useRadicals();
   const info = radicalInfo(radical, radicals);
-  const keyword = getKanjiInfo?.(radical)?.keyword;
+  const kanjiInfo = getKanjiInfo?.(radical);
+  const keyword = kanjiInfo?.keyword;
+  const isKanji = kanjiInfo != null && "on" in kanjiInfo;
   const { data: text } = useRadicalPopoverText(radical);
+  const [expanded, setExpanded] = useState(false);
+  const name = info == null ? "" : keyword ? `${info.ja}, ${keyword}` : info.ja;
   return (
     <div className="p-1 max-w-xs" data-vaul-no-drag>
       <div className="flex gap-3 px-1">
@@ -237,34 +301,43 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           </div>
         )}
         {info && (
-          <div className="min-w-0 text-left">
-            <p className="text-sm whitespace-normal text-foreground">
-              <strong>🇯🇵 {keyword ? `${info.ja}, ${keyword}` : info.ja}</strong>
-              {text?.ja && <> · {text.ja}</>}
-            </p>
+          <div className="min-w-0 text-sm font-bold text-left whitespace-normal text-foreground">
+            <p>🇯🇵 {name}</p>
+            {info.cn && (
+              <p>
+                {"🇨🇳"} {(text?.semantic ?? []).length > 0 && "🧠 "}
+                {info.cn}
+              </p>
+            )}
             {info.pos && (
-              <p className="text-xs whitespace-normal text-muted-foreground">
+              <p>
                 📍 {info.pos} ({POSITION_EN[info.pos]})
               </p>
             )}
-            {info.cn && (
-              <p className="text-sm whitespace-normal text-foreground">
-                <strong>
-                  {"🇨🇳"} {info.cn}
-                </strong>
-                {text?.cn && <> · {text.cn}</>}
-              </p>
+            {text?.sounds != null && <p>🔊 {text.sounds.join("・")}</p>}
+            {hasDetails(text) && (
+              <button
+                type="button"
+                onClick={() => setExpanded((value) => !value)}
+                className="text-xs font-normal underline decoration-dotted underline-offset-4 hover:text-neon-accent"
+              >
+                {expanded ? "hide details" : "view more details →"}
+              </button>
             )}
           </div>
         )}
       </div>
-      {text && (
-        <div className="px-1 pt-2 space-y-2 text-left">
-          <RadicalPopoverExamples text={text} />
-          <RadicalSources text={text} />
-        </div>
+      {expanded && text != null && (
+        <RadicalPopoverDetailsSection
+          text={text}
+          name={name}
+          english={info?.cn}
+        />
       )}
       <RadicalSearchAction radical={radical} />
+      {isKanji && keyword && (
+        <OpenKanjiAction kanji={radical} keyword={keyword} />
+      )}
     </div>
   );
 };
