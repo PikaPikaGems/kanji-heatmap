@@ -1896,10 +1896,14 @@
     ]
   },
   "斗": {
-    "ja": "ます (枡, measuring box) + づくり (つくり, right side).",
-    "cn": "A ladle-shaped dipper for measuring grain.",
+    "ja": "ます (斗's own Japanese reading: a measure) + づくり (つくり, right side).",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/斗部"
+    ],
+    "cn": "A ladle-shaped dipper used to measure grain. Later measures were boxes (枡); in Japanese, both 斗 and 枡 are read ます.",
     "refs": [
-      "https://en.wiktionary.org/wiki/斗"
+      "https://en.wiktionary.org/wiki/斗",
+      "https://ja.wikipedia.org/wiki/斗部"
     ],
     "semantic": [
       {
