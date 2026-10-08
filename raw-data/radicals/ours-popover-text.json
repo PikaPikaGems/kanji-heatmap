@@ -287,7 +287,7 @@
       {
         "kanji": "草",
         "concepts": "grass",
-        "why": "Grass itself.",
+        "why": "Grass (艹) itself.",
         "refs": [
           "https://en.wiktionary.org/wiki/草"
         ]
@@ -624,7 +624,7 @@
       {
         "kanji": "眼",
         "concepts": "eye, eyeball",
-        "why": "The eye itself.",
+        "why": "The eye (目) itself.",
         "refs": [
           "https://en.wiktionary.org/wiki/眼"
         ]
@@ -768,7 +768,7 @@
       {
         "kanji": "線",
         "concepts": "line",
-        "why": "A thread.",
+        "why": "A thread (糸): a line.",
         "refs": [
           "https://en.wiktionary.org/wiki/線"
         ]
@@ -809,7 +809,7 @@
       {
         "kanji": "語",
         "concepts": "language, word",
-        "why": "Words.",
+        "why": "Words (言) in use: language.",
         "refs": [
           "https://en.wiktionary.org/wiki/語"
         ]
@@ -999,7 +999,7 @@
       },
       {
         "kanji": "男",
-        "concepts": "male / man, man, male",
+        "concepts": "man, male",
         "why": "A field (田) and strength or a plough (力): a man working the field.",
         "refs": [
           "https://en.wiktionary.org/wiki/男"
@@ -1215,7 +1215,7 @@
       {
         "kanji": "妻",
         "concepts": "wife, spouse",
-        "why": "A woman (女).",
+        "why": "A woman (女) as wife.",
         "refs": [
           "https://en.wiktionary.org/wiki/妻"
         ]
@@ -1304,7 +1304,7 @@
     "semantic": [
       {
         "kanji": "尾",
-        "concepts": "tail, end, counter for fish",
+        "concepts": "tail, end",
         "why": "The tail at the end of a body.",
         "refs": [
           "https://en.wiktionary.org/wiki/尾"
@@ -1429,7 +1429,7 @@
       {
         "kanji": "布",
         "concepts": "linen, cloth, spread",
-        "why": "Cloth.",
+        "why": "Cloth (巾).",
         "refs": [
           "https://en.wiktionary.org/wiki/布"
         ]
@@ -1463,7 +1463,7 @@
         "kanji": "刊",
         "word": "増刊",
         "reading": "ぞうかん",
-        "gloss": "special issue (of a magazine, etc.)",
+        "gloss": "special issue",
         "refs": [
           "https://en.wiktionary.org/wiki/刊"
         ]
@@ -1637,7 +1637,7 @@
       {
         "kanji": "扉",
         "concepts": "front door, hinged door, title page",
-        "why": "A door.",
+        "why": "A door (戸).",
         "refs": [
           "https://en.wiktionary.org/wiki/扉"
         ]
@@ -1696,7 +1696,7 @@
         "kanji": "肢",
         "word": "四肢",
         "reading": "しし",
-        "gloss": "the (four) limbs, arms and legs",
+        "gloss": "the four limbs",
         "refs": [
           "https://en.wiktionary.org/wiki/肢"
         ]
@@ -1821,7 +1821,7 @@
         "kanji": "防",
         "word": "予防",
         "reading": "よぼう",
-        "gloss": "prevention, protection (against)",
+        "gloss": "prevention",
         "refs": [
           "https://en.wiktionary.org/wiki/防"
         ]
@@ -1968,7 +1968,7 @@
     "semantic": [
       {
         "kanji": "尾",
-        "concepts": "tail, end, counter for fish",
+        "concepts": "tail, end",
         "why": "Hair (毛) at the end of a body (尸): a tail.",
         "refs": [
           "https://en.wiktionary.org/wiki/尾"
@@ -2259,7 +2259,7 @@
         "kanji": "牲",
         "word": "犠牲",
         "reading": "ぎせい",
-        "gloss": "sacrifice, victim (esp. someone killed)",
+        "gloss": "sacrifice, victim",
         "refs": [
           "https://en.wiktionary.org/wiki/牲"
         ]
@@ -2298,14 +2298,14 @@
       {
         "kanji": "痛",
         "concepts": "pain, hurt, damage",
-        "why": "Pain.",
+        "why": "Pain, a sickness (疒).",
         "refs": [
           "https://en.wiktionary.org/wiki/痛"
         ]
       },
       {
         "kanji": "疲",
-        "concepts": "exhausted / tired, tired, exhausted",
+        "concepts": "tired, exhausted",
         "why": "Being worn out.",
         "refs": [
           "https://en.wiktionary.org/wiki/疲"
@@ -2377,7 +2377,7 @@
         "kanji": "被",
         "word": "被害",
         "reading": "ひがい",
-        "gloss": "(suffering) damage, injury",
+        "gloss": "damage, injury",
         "refs": [
           "https://en.wiktionary.org/wiki/被"
         ]
@@ -2412,7 +2412,7 @@
       {
         "kanji": "盤",
         "concepts": "tray, disk, board",
-        "why": "A large dish.",
+        "why": "A large dish (皿).",
         "refs": [
           "https://en.wiktionary.org/wiki/盤"
         ]
@@ -2558,7 +2558,7 @@
       {
         "kanji": "窟",
         "concepts": "cavern",
-        "why": "A cave.",
+        "why": "A cave, a hole (穴) in rock.",
         "refs": [
           "https://en.wiktionary.org/wiki/窟"
         ]
@@ -2607,7 +2607,7 @@
       {
         "kanji": "粒",
         "concepts": "grains, grain, drop",
-        "why": "A grain.",
+        "why": "A grain, like rice (米).",
         "refs": [
           "https://en.wiktionary.org/wiki/粒"
         ]
@@ -2650,7 +2650,7 @@
         "kanji": "洋",
         "word": "洋服",
         "reading": "ようふく",
-        "gloss": "Western-style clothes (cf. traditional Japanese clothes)",
+        "gloss": "Western-style clothes",
         "refs": [
           "https://en.wiktionary.org/wiki/洋"
         ]
@@ -2659,7 +2659,7 @@
         "kanji": "養",
         "word": "扶養",
         "reading": "ふよう",
-        "gloss": "support (e.g. of one's dependents), maintenance",
+        "gloss": "supporting one's family",
         "refs": [
           "https://en.wiktionary.org/wiki/養"
         ]
@@ -2676,7 +2676,7 @@
       {
         "kanji": "翼",
         "concepts": "wing, plane, flank",
-        "why": "A wing.",
+        "why": "A wing, made of feathers (羽).",
         "refs": [
           "https://en.wiktionary.org/wiki/翼"
         ]
@@ -2804,7 +2804,7 @@
       {
         "kanji": "鼻",
         "concepts": "nose, snout",
-        "why": "The nose.",
+        "why": "The nose (自, first a picture of a nose).",
         "refs": [
           "https://en.wiktionary.org/wiki/鼻"
         ]
@@ -2885,7 +2885,7 @@
       {
         "kanji": "船",
         "concepts": "ship, boat, vessel",
-        "why": "A boat.",
+        "why": "A boat (舟).",
         "refs": [
           "https://en.wiktionary.org/wiki/船"
         ]
@@ -2968,7 +2968,7 @@
       {
         "kanji": "蛇",
         "concepts": "snake, serpent, hard drinker",
-        "why": "A snake.",
+        "why": "A snake: what 虫 first showed.",
         "refs": [
           "https://en.wiktionary.org/wiki/蛇"
         ]
@@ -2976,7 +2976,7 @@
       {
         "kanji": "蚊",
         "concepts": "mosquito",
-        "why": "An insect.",
+        "why": "A mosquito, a small creature counted with insects (虫).",
         "refs": [
           "https://en.wiktionary.org/wiki/蚊"
         ]
@@ -2984,7 +2984,7 @@
       {
         "kanji": "蜂",
         "concepts": "bee, wasp, hornet",
-        "why": "An insect.",
+        "why": "A bee, an insect (虫).",
         "refs": [
           "https://en.wiktionary.org/wiki/蜂"
         ]
@@ -3065,7 +3065,7 @@
       {
         "kanji": "視",
         "concepts": "inspection, regard, look at",
-        "why": "Seeing.",
+        "why": "Seeing (見).",
         "refs": [
           "https://en.wiktionary.org/wiki/視"
         ]
@@ -3124,7 +3124,7 @@
       {
         "kanji": "豚",
         "concepts": "pork, pig",
-        "why": "A pig.",
+        "why": "A pig (豕).",
         "refs": [
           "https://en.wiktionary.org/wiki/豚"
         ]
@@ -3228,7 +3228,7 @@
       {
         "kanji": "輪",
         "concepts": "wheel, ring, circle",
-        "why": "A wheel.",
+        "why": "A wheel of a cart (車).",
         "refs": [
           "https://en.wiktionary.org/wiki/輪"
         ]
@@ -3362,7 +3362,7 @@
       {
         "kanji": "銀",
         "concepts": "silver",
-        "why": "A metal.",
+        "why": "Silver, a metal (金).",
         "refs": [
           "https://en.wiktionary.org/wiki/銀"
         ]
@@ -3370,7 +3370,7 @@
       {
         "kanji": "鉄",
         "concepts": "iron",
-        "why": "A metal.",
+        "why": "Iron, a metal (金).",
         "refs": [
           "https://en.wiktionary.org/wiki/鉄"
         ]
@@ -3378,7 +3378,7 @@
       {
         "kanji": "針",
         "concepts": "needle, pin, staple",
-        "why": "A metal needle.",
+        "why": "A needle made of metal (金).",
         "refs": [
           "https://en.wiktionary.org/wiki/針"
         ]
@@ -3578,8 +3578,8 @@
     "semantic": [
       {
         "kanji": "頭",
-        "concepts": "head, counter for large animals",
-        "why": "The head itself.",
+        "concepts": "head",
+        "why": "The head (頁) itself.",
         "refs": [
           "https://en.wiktionary.org/wiki/頭"
         ]
@@ -3618,7 +3618,7 @@
       {
         "kanji": "飯",
         "concepts": "meal, cooked rice, boiled rice",
-        "why": "A meal.",
+        "why": "A meal: food (食).",
         "refs": [
           "https://en.wiktionary.org/wiki/飯"
         ]
@@ -3682,7 +3682,7 @@
       },
       {
         "kanji": "駐",
-        "concepts": "stop-over / parking, stationed, stop-over",
+        "concepts": "stationed, stop over",
         "why": "A horse standing still.",
         "refs": [
           "https://en.wiktionary.org/wiki/駐"
@@ -3763,7 +3763,7 @@
       {
         "kanji": "魂",
         "concepts": "soul, spirit",
-        "why": "A spirit.",
+        "why": "A spirit of the dead (鬼).",
         "refs": [
           "https://en.wiktionary.org/wiki/魂"
         ]
@@ -3771,7 +3771,7 @@
       {
         "kanji": "魔",
         "concepts": "witch, demon, evil spirit",
-        "why": "A demon.",
+        "why": "A demon (鬼).",
         "refs": [
           "https://en.wiktionary.org/wiki/魔"
         ]
@@ -3829,7 +3829,7 @@
       {
         "kanji": "鶴",
         "concepts": "crane, stork",
-        "why": "A bird.",
+        "why": "A crane, a kind of bird (鳥).",
         "refs": [
           "https://en.wiktionary.org/wiki/鶴"
         ]
@@ -4054,7 +4054,7 @@
         "kanji": "忌",
         "word": "周忌",
         "reading": "しゅうき",
-        "gloss": "death anniversary, anniversary of a person's death",
+        "gloss": "death anniversary",
         "refs": [
           "https://en.wiktionary.org/wiki/忌"
         ]
@@ -4159,7 +4159,7 @@
       {
         "kanji": "猫",
         "concepts": "cat",
-        "why": "An animal.",
+        "why": "A cat, an animal (犭).",
         "refs": [
           "https://en.wiktionary.org/wiki/猫"
         ]

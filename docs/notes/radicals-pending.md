@@ -102,11 +102,10 @@ unchecked step.
   - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
         popover in the dev server with 3–5 checked
         entries and iterate on the design (also try variants).
-  - [ ] 1c. Fill in every radical, in batches, most used first. Done so
-        far: 36 (the first 6, batch 1: 15 non-kanji radicals, batch 2: 15
-        kanji radicals). In the same
-        PR as 1b (PikaPikaGems/kanji-heatmap#311), one commit per batch;
-        the PR merges only when it's complete.
+  - [x] 1c. Fill in every radical (252, every glyph with radical info), in
+        PikaPikaGems/kanji-heatmap#311, followed by one review pass.
+        Meaning and sound examples were picked by code from Wiktionary's
+        glyph-origin role markers (see "How 1c was done" below).
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
       the radical names" below). Decided once the popover exists.
 - [x] **Step 3 — every radical opens the radical popover**, also
@@ -418,13 +417,34 @@ Data catches:
 - The sound-parts data points family heads to themselves (加 → 加), so
   the build must filter the radical out of its own sound examples.
 
+How 1c was done: Wiktionary pages for all our kanji and radicals were
+downloaded once (MediaWiki API) and each kanji's `{{Han compound}}`
+template read: in a phono-semantic compound (`ls=psc`) each part is marked
+semantic (`s`) or phonetic (`p`); in an ideogrammic compound (`ls=ic`)
+every part carries meaning. A meaning example had to be marked that way
+for the radical (or its full form, 氵 → 水) and contain the radical in our
+radical-search index; a sound example had to be marked phonetic for the
+radical and have a word in our vocab data read with the family sound.
+Concepts come from our kanji meanings. Origins and reasons were written by
+hand from the glyph-origin text. The review pass rewrote "why" lines that
+only restated the meaning, fixed odd concepts and long glosses.
+
+Gaps, left out because no reference explains them (fill in later if one
+is found):
+
+- No 🇯🇵 reason: 巾 (はば), 禸, 酉 (ひよみのとり), 巳, ⺉ (りっとう), ⺖
+  (りっしんべん). Japanese Wikipedia gives these names but not why.
+- No 🇨🇳 origin: 亅 耒 麦 黄 歯 ⺇ ⺝ 龍 彑, and the shapes 𠂉 マ ユ ｜ ノ ヨ.
+- 戈: Wiktionary marks no kanji with 戈 as its sound part, so 戈 has no
+  sound examples although our sound-parts data lists 裁 載 栽 under it.
+
 Sound-parts data to check (found while writing the popover text; not
 changed, since sound parts are learner hints, see item 1):
 
 - 省 is listed under 小 (しょう). Wiktionary: its sound part was 生, which
   became 少 over time; 小 isn't part of it. Not used as a 小 example.
-- 裁 載 栽 are listed under 戈 (さい). Claude believes (unchecked) that
-  Wiktionary gives 𢦏 as their sound part. Check before writing 戈.
+- 裁 載 栽 are listed under 戈 (さい). Wiktionary marks none of them with
+  戈 as the sound part (it is 𢦏).
 
 Revisit later (user, October 2026; redundant on purpose for now):
 
