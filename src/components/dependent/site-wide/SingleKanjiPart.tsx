@@ -43,7 +43,7 @@ export const SingleKanjiPart = ({
             // Text first, readings below: up to four readings (各) wrap inside
             // the box instead of stretching the whole popover.
             <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
-              <p className="font-normal leading-snug whitespace-normal text-muted-foreground">
+              <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
                 Kanji with <span className="kanji-font">{kanji}</span> are
                 sometimes read
               </p>

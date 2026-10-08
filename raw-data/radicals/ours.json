@@ -94,6 +94,10 @@
     "⺭": "show left",
     "氺": "bottom water",
     "⻂": "clothing left",
+    "牜": "cow left",
+    "糹": "thread left",
+    "訁": "words left",
+    "釒": "metal left",
     "⺮": "bamboo crown",
     "⻊": "foot left",
     "⻗": "rain crown",
@@ -166,6 +170,12 @@
     "⾡": "⻌",
     "𧾷": "⻊",
     "⺍": "⺌"
+  },
+  "sylhareRowGlyphs": {
+    "うしへん": "牜",
+    "いとへん": "糹",
+    "ごんべん": "訁",
+    "かねへん": "釒"
   },
   "familySkips": {
     "𠆢": "Listed under both 人 and 入; in many kanji (今, 会) it is neither, so it has its own entry",

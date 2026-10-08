@@ -116,6 +116,30 @@ const infoOf = ({ ja, position, meaning }) => {
 };
 
 /**
+ * The CSV draws some positional forms in its own private-use font (うしへん
+ * is U+E748) though Unicode has the glyph (牜). ours.json
+ * `sylhareRowGlyphs` maps such a row's Japanese name to the real glyph, so
+ * the row names that glyph and it becomes a form of its own. Throws on a
+ * name with no private-use row.
+ */
+const withRowGlyphs = (rows, rowGlyphs) => {
+  const isPrivateUse = (glyph) => /^[\uE000-\uF8FF]$/u.test(glyph ?? "");
+  const unused = new Set(Object.keys(rowGlyphs));
+  const out = rows.map((row) => {
+    const glyph = rowGlyphs[(row["Reading-J"] ?? "").trim()];
+    if (glyph == null || !isPrivateUse(row.Radical)) return row;
+    unused.delete(row["Reading-J"].trim());
+    return { ...row, Radical: glyph };
+  });
+  if (unused.size > 0) {
+    throw new Error(
+      `sylhareRowGlyphs: no private-use row named ${[...unused].join(", ")}`
+    );
+  }
+  return out;
+};
+
+/**
  * Every radical fact the app needs, from the sylhare CSV, the rewhowe drawer
  * and ours.json:
  *
@@ -136,12 +160,13 @@ const infoOf = ({ ja, position, meaning }) => {
  * Throws on a missing, misplaced or unused `literalEn` entry.
  */
 export const buildRadicalData = ({
-  sylhareRows,
+  sylhareRows: csvRows,
   ours,
   drawer,
   isKanji,
   isUsed,
 }) => {
+  const sylhareRows = withRowGlyphs(csvRows, ours.sylhareRowGlyphs ?? {});
   const drawerRadicals = new Set(Object.values(drawer).flat());
   const mergedAliases = { ...(ours.aliases ?? {}) };
   mergeSylhareAliases({

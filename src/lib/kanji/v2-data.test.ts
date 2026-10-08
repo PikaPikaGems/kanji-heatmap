@@ -434,14 +434,16 @@ describe("components.json", () => {
 
   it("names a shape that leads to a kanji by the kanji keyword", () => {
     const kanjiKeyword = (char: string) => main[char][0];
-    // 釒 → 金 says "gold", not the radical name かね "metal".
-    expect(keywordOf("釒")).toBe(kanjiKeyword("金"));
+    // 戶 → 戸 says the kanji keyword, not the radical name と.
+    expect(keywordOf("戶")).toBe(kanjiKeyword("戸"));
     // 衤 is a second code for the drawer's ⻂ (ころもへん), so it reads ⻂'s
     // name, and searches ⻂ (補 is filed under ⻂, not 衣).
     expect(components["衤"]?.k).toBeUndefined();
     expect(keywordOf("衤")).toBe("clothing left");
-    // A form with its own name keeps it.
+    // A form with its own name keeps it, also when its CSV row was drawn
+    // in a private-use font (釒 かねへん, ours.json sylhareRowGlyphs).
     expect(keywordOf("⺩")).toBe("king left");
+    expect(keywordOf("釒")).toBe("metal left");
   });
 
   it("keeps every phonetic sound list", () => {

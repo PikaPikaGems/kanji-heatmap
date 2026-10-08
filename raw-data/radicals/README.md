@@ -98,6 +98,18 @@ radicals of their own.
 "sylhareExtraAliases": { "⺍": "⺌", "⾡": "⻌", "𧾷": "足" }
 ```
 
+### `sylhareRowGlyphs` — real glyphs for private-use rows
+
+```jsonc
+"sylhareRowGlyphs": { "うしへん": "牜", "いとへん": "糹" }
+```
+
+The CSV draws some positional forms in its own private-use font (うしへん
+is U+E748). When Unicode has the glyph, map the row's Japanese name to it:
+the row then names that glyph, which becomes a form of its own (牛 → 牛,
+牜) with a `literalEn` entry ("cow left"). The build fails on a name with
+no private-use row.
+
 ### `extras` — radical forms the CSV doesn't list
 
 ```jsonc

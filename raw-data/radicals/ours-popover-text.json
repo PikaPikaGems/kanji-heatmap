@@ -861,32 +861,6 @@
     "cn": "Built on 口 (mouth); what the mark above it shows is uncertain.",
     "refs": [
       "https://en.wiktionary.org/wiki/言"
-    ],
-    "semantic": [
-      {
-        "kanji": "話",
-        "concepts": "talk, story",
-        "why": "Talking is done with words (言).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/話"
-        ]
-      },
-      {
-        "kanji": "語",
-        "concepts": "language, word",
-        "why": "Words (言) in use: language.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/語"
-        ]
-      },
-      {
-        "kanji": "読",
-        "concepts": "read",
-        "why": "Saying words (言) aloud from a text: to read.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/讀"
-        ]
-      }
     ]
   },
   "心": {
@@ -2306,32 +2280,6 @@
     "cn": "A bull's head with two horns and two ears.",
     "refs": [
       "https://en.wiktionary.org/wiki/牛"
-    ],
-    "semantic": [
-      {
-        "kanji": "牧",
-        "concepts": "breed, pasture, care for",
-        "why": "Herding cattle (牛).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/牧"
-        ]
-      },
-      {
-        "kanji": "特",
-        "concepts": "special, unique",
-        "why": "First a prize bull (牛), then anything special.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/特"
-        ]
-      },
-      {
-        "kanji": "牲",
-        "concepts": "sacrificial animal",
-        "why": "An animal (牛) offered as a sacrifice.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/牲"
-        ]
-      }
     ]
   },
   "犬": {
@@ -3632,32 +3580,6 @@
     "cn": "Blocks of metal, with 亼 giving the sound; the Shuowen saw metal buried in the earth.",
     "refs": [
       "https://en.wiktionary.org/wiki/金"
-    ],
-    "semantic": [
-      {
-        "kanji": "銀",
-        "concepts": "silver",
-        "why": "Silver is a metal (金).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/銀"
-        ]
-      },
-      {
-        "kanji": "鉄",
-        "concepts": "iron",
-        "why": "Iron is a metal (金).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/鉄"
-        ]
-      },
-      {
-        "kanji": "針",
-        "concepts": "needle, pin, staple",
-        "why": "A needle made of metal (金).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/針"
-        ]
-      }
     ]
   },
   "長": {
@@ -4816,5 +4738,95 @@
         ]
       }
     ]
+  },
+  "訁": {
+    "ja": "ごん (言, its reading) + べん (へん, left side).",
+    "semantic": [
+      {
+        "kanji": "話",
+        "concepts": "talk, story",
+        "why": "Talking is done with words (訁).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/話"
+        ]
+      },
+      {
+        "kanji": "語",
+        "concepts": "language, word",
+        "why": "Words (訁) in use: language.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/語"
+        ]
+      },
+      {
+        "kanji": "読",
+        "concepts": "read",
+        "why": "Saying words (訁) aloud from a text: to read.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/讀"
+        ]
+      }
+    ]
+  },
+  "牜": {
+    "ja": "うし (牛, cow) + へん (left side).",
+    "semantic": [
+      {
+        "kanji": "牧",
+        "concepts": "breed, pasture, care for",
+        "why": "Herding cattle (牜).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/牧"
+        ]
+      },
+      {
+        "kanji": "特",
+        "concepts": "special, unique",
+        "why": "First a prize bull (牜), then anything special.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/特"
+        ]
+      },
+      {
+        "kanji": "牲",
+        "concepts": "sacrificial animal",
+        "why": "An animal (牜) offered as a sacrifice.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/牲"
+        ]
+      }
+    ]
+  },
+  "釒": {
+    "ja": "かね (金, metal) + へん (left side).",
+    "semantic": [
+      {
+        "kanji": "銀",
+        "concepts": "silver",
+        "why": "Silver is a metal (釒).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/銀"
+        ]
+      },
+      {
+        "kanji": "鉄",
+        "concepts": "iron",
+        "why": "Iron is a metal (釒).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/鉄"
+        ]
+      },
+      {
+        "kanji": "針",
+        "concepts": "needle, pin, staple",
+        "why": "A needle made of metal (釒).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/針"
+        ]
+      }
+    ]
+  },
+  "糹": {
+    "ja": "いと (糸, thread) + へん (left side)."
   }
 }
