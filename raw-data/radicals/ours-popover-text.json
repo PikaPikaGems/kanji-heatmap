@@ -166,5 +166,295 @@
         ]
       }
     ]
+  },
+  "⺡": {
+    "ja": "さん (three) + すい (water): the water radical written with three strokes.",
+    "cn": "The squeezed form of 水, a picture of flowing water.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/氵",
+      "https://en.wiktionary.org/wiki/水"
+    ],
+    "semantic": [
+      {
+        "kanji": "泳",
+        "concepts": "swim",
+        "why": "Moving through water.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/泳"
+        ]
+      },
+      {
+        "kanji": "海",
+        "concepts": "sea, ocean",
+        "why": "A great body of water.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/海"
+        ]
+      },
+      {
+        "kanji": "洗",
+        "concepts": "wash",
+        "why": "Cleaning with water.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/洗"
+        ]
+      }
+    ]
+  },
+  "⺅": {
+    "ja": "にん (人, person) + べん (へん, left side).",
+    "cn": "The squeezed form of 人, a side view of a standing person.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/亻",
+      "https://en.wiktionary.org/wiki/人"
+    ],
+    "semantic": [
+      {
+        "kanji": "休",
+        "concepts": "rest, day off",
+        "why": "A person leaning against a tree (木), resting.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/休"
+        ]
+      },
+      {
+        "kanji": "住",
+        "concepts": "live, dwell",
+        "why": "Where a person lives.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/住"
+        ]
+      },
+      {
+        "kanji": "作",
+        "concepts": "make, create",
+        "why": "Something a person does.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/作"
+        ]
+      }
+    ]
+  },
+  "⺘": {
+    "ja": "て (手, hand) + へん (left side).",
+    "cn": "The squeezed form of 手, a picture of a hand and its fingers.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/扌",
+      "https://en.wiktionary.org/wiki/手"
+    ],
+    "semantic": [
+      {
+        "kanji": "持",
+        "concepts": "hold, have",
+        "why": "Holding something in the hand.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/持"
+        ]
+      },
+      {
+        "kanji": "打",
+        "concepts": "hit, strike",
+        "why": "Striking with the hand.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/打"
+        ]
+      },
+      {
+        "kanji": "投",
+        "concepts": "throw",
+        "why": "Throwing with the hand.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/投"
+        ]
+      }
+    ]
+  },
+  "⺾": {
+    "ja": "くさ (草, grass) + かんむり (crown, on top).",
+    "cn": "The top form of 艸, a picture of blades of grass.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/艸"
+    ],
+    "semantic": [
+      {
+        "kanji": "花",
+        "concepts": "flower",
+        "why": "A part of a plant.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/花"
+        ]
+      },
+      {
+        "kanji": "草",
+        "concepts": "grass",
+        "why": "Grass itself.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/草"
+        ]
+      },
+      {
+        "kanji": "茶",
+        "concepts": "tea",
+        "why": "A plant whose leaves are brewed.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/茶"
+        ]
+      }
+    ]
+  },
+  "⻌": {
+    "ja": "A changed pronunciation of しにょう (之繞): it looks like 之, wrapped around the bottom-left (にょう).",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/辵部"
+    ],
+    "cn": "The combining form of 辵: 彳 (walk) + 止 (foot), walking along.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/辶",
+      "https://en.wiktionary.org/wiki/辵"
+    ],
+    "semantic": [
+      {
+        "kanji": "送",
+        "concepts": "send, see off",
+        "why": "Going along with someone.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/送"
+        ]
+      },
+      {
+        "kanji": "進",
+        "concepts": "advance, progress",
+        "why": "Walking forward; the bird (隹) is part of the picture.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/進"
+        ]
+      },
+      {
+        "kanji": "道",
+        "concepts": "road, way",
+        "why": "Some believe walking (辶) with the head (首) leading the way.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/道"
+        ]
+      }
+    ]
+  },
+  "亠": {
+    "ja": "なべ (pot) + ぶた (ふた, lid): it looks like the lid of a pot.",
+    "cn": "A lid with a handle on top. In many kanji the shape stands for other things, like a roof (高, 京) or a head (交).",
+    "refs": [
+      "https://en.wiktionary.org/wiki/亠"
+    ]
+  },
+  "冖": {
+    "ja": "It looks like katakana ワ (wa) and sits on top as a crown (かんむり).",
+    "cn": "A cloth used to cover something.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/冖"
+    ],
+    "semantic": [
+      {
+        "kanji": "冠",
+        "concepts": "crown, cap",
+        "why": "A hand (寸) placing a cap (冖) on a head (元).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/冠"
+        ]
+      }
+    ]
+  },
+  "儿": {
+    "ja": "ひと (人, person) + あし (legs, at the bottom): 人 written as legs.",
+    "cn": "A picture of a standing person, the form of 人 used at the bottom.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/儿"
+    ],
+    "semantic": [
+      {
+        "kanji": "兄",
+        "concepts": "older brother",
+        "why": "A mouth (口) over a person: the one giving orders.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/兄"
+        ]
+      },
+      {
+        "kanji": "見",
+        "concepts": "see, look",
+        "why": "A person with a big eye (目) on top.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/見"
+        ]
+      }
+    ]
+  },
+  "𠆢": {
+    "ja": "ひと (人, person) + やね (roof): 人 spread over the top like a roof.",
+    "cn": "A variant form of 人 (person).",
+    "refs": [
+      "https://en.wiktionary.org/wiki/𠆢"
+    ]
+  },
+  "冂": {
+    "ja": "けい (its reading) + がまえ (かまえ, enclosure).",
+    "cn": "Some believe it shows the land outside a city's walls; others see the side view of a building, an early form of 堂.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/冂"
+    ]
+  },
+  "勹": {
+    "ja": "つつみ (包, wrap) + がまえ (かまえ, enclosure).",
+    "cn": "A picture of a person bending over, an ancient form of 包 (wrap).",
+    "refs": [
+      "https://en.wiktionary.org/wiki/勹"
+    ],
+    "semantic": [
+      {
+        "kanji": "包",
+        "concepts": "wrap, package",
+        "why": "Some believe a womb (勹) around a fetus (巳); others see a swaddled baby.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/包"
+        ]
+      }
+    ]
+  },
+  "幺": {
+    "ja": "いと (糸, thread) + がしら (かしら, top): it looks like the top of 糸.",
+    "cn": "A picture of a silk thread, which came to mean tiny.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/幺"
+    ],
+    "semantic": [
+      {
+        "kanji": "幼",
+        "concepts": "infant, young",
+        "why": "Tiny (幺) + strength (力): having little strength.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/幼"
+        ]
+      }
+    ]
+  },
+  "厶": {
+    "ja": "It looks like katakana ム (mu).",
+    "cn": "Some believe it shows something circling around oneself, the original form of 私 (private); others see a simplified 牟.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/厶"
+    ]
+  },
+  "丷": {
+    "ja": "はち (八, eight) + がしら (かしら, top): 八 written on top.",
+    "cn": "A variant of 八 used as a part of kanji.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/丷"
+    ]
+  },
+  "丶": {
+    "ja": "The word for dot.",
+    "cn": "A small flame on a torch, the original form of 主.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/丶"
+    ]
   }
 }
