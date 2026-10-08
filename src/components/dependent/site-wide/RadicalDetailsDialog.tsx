@@ -61,7 +61,7 @@ const ExampleKanji = ({ kanji }: { kanji: string }) => {
       trigger={
         <button
           type="button"
-          className="p-1 text-3xl leading-none border-2 border-dotted shrink-0 kanji-font rounded-xl hover:border-solid hover:border-neon-accent"
+          className="p-2.5 text-3xl leading-none border-2 border-dotted shrink-0 kanji-font rounded-xl hover:border-solid hover:border-neon-accent"
         >
           {kanji}
         </button>
@@ -97,12 +97,7 @@ export const RadicalDetailsDialogContent = ({
 }) => (
   <ScrollableDialogContent
     size="md"
-    title={
-      <span className="flex items-center gap-3">
-        <span className="text-4xl kanji-font">{radical}</span>
-        <span className="text-base">{name}</span>
-      </span>
-    }
+    title={<span className="text-4xl kanji-font">{radical}</span>}
     description={`Details for the radical ${radical}`}
   >
     <div className="space-y-5 text-sm text-left">
@@ -150,7 +145,7 @@ export const RadicalDetailsDialogContent = ({
                   word={example.word}
                   readingOverride={example.reading}
                   wordTranslationOverride={example.gloss}
-                  className="px-2 py-1 text-xl"
+                  className="px-3 py-2.5 text-xl"
                 />
                 <span className="min-w-0">
                   <RomajiBadge
