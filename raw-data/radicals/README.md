@@ -107,3 +107,30 @@ radicals of their own.
 
 Same fields as a CSV row: Japanese name, position (へん, つくり, …) and
 meaning. Each one needs a `literalEn` entry or an alias.
+
+## Ours — `ours-popover-text.json`
+
+Our own text for the radical popover, keyed by glyph.
+`scripts/radical-popover-text.mjs` reads it on every `pnpm run generate-json`
+and writes `public/json/v2/radical_popover_text.json`, which the popover
+loads when it opens. The rules for what goes in it (one linked reference per
+claim, our own wording, which kanji may be examples) are in
+`docs/notes/radicals-pending.md`, "Radical popover text".
+
+```jsonc
+"隹": {
+  "ja": "…",          // 🇯🇵 why the Japanese name is what it is
+  "jaRefs": ["…"],    // only for history reasons, not shape reasons
+  "addEn": "…",       // English words added after sylhare's (comma string)
+  "cn": "…",          // 🇨🇳 Chinese origin of the glyph
+  "refs": ["…"],      // reference for cn
+  "semantic": [{ "kanji": "雄", "concepts": "…", "why": "…", "refs": ["…"] }],
+  "sound": [{ "kanji": "推", "word": "…", "reading": "…", "gloss": "…", "refs": ["…"] }]
+}
+```
+
+Every field is optional. `addEn` is merged into the radical info in
+`radicals.json` (sylhare's words first, no duplicates). The build fails on an
+unknown field, a claim without refs, an example kanji that doesn't contain
+the radical, a sound example whose sound part isn't the radical (or is the
+radical itself), or a sound word not read with the radical's sound.

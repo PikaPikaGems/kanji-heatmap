@@ -99,7 +99,8 @@ unchecked step.
 - [ ] **Step 1 — radical popover information** (item 2 below,
       "Radical popover text").
   - [x] 1a. Settle the popover rules (October 2026).
-  - [ ] 1b. Build the popover in the dev server with 3–5 checked
+  - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
+        popover in the dev server with 3–5 checked
         entries and iterate on the design (also try variants).
   - [ ] 1c. Fill in every radical, in batches, most used first.
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
@@ -394,6 +395,10 @@ Data catches:
 
 Open:
 
+- 冫 にすい has no 🇯🇵 reason yet: Japanese Wikipedia only gives the name,
+  not why (に + すい is likely 二 + 水, but no reference found).
+- 青's sound examples only show once kanji radicals open the radical
+  popover (step 3); today 青 opens its kanji link.
 - Naming (step 2): if the 🇯🇵 line explains the Japanese name, chip
   names could become meanings ("roof" instead of "katakana u crown").
   Revisit once the popover exists.

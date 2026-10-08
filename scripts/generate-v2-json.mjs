@@ -18,6 +18,10 @@ import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
 import { componentKeyword, followAlias } from "../src/lib/radicals.ts";
 import { buildRadicalData, readRadicalSources } from "./radicals.mjs";
 import { buildSoundParts, readSoundPartSources } from "./sound-parts.mjs";
+import {
+  buildRadicalPopoverText,
+  readRadicalPopoverText,
+} from "./radical-popover-text.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -248,6 +252,33 @@ for (const kanji of kanjiList) {
     soundParts.soundPartOf[kanji] ?? "",
     entry[EXT.mainVocab] ?? [],
   ];
+}
+
+// ---------------------------------------------------------------------------
+// radical_popover_text.json — our own popover text per radical
+// (scripts/radical-popover-text.mjs). Loaded only when a radical popover
+// opens. Its `addEn` words are merged into the radical info instead.
+// ---------------------------------------------------------------------------
+
+const drawerGlyphs = new Set(
+  Object.values(radicals.radicalsGroupedByStrokeCount).flat()
+);
+let radicalPopover;
+try {
+  radicalPopover = buildRadicalPopoverText({
+    entries: readRadicalPopoverText(RAW_DIR),
+    info: radicalInfo,
+    isRadical: (glyph) => drawerGlyphs.has(glyph) || glyph in radicalInfo,
+    isKanji,
+    // The radical-search index: the drawer radicals each kanji contains.
+    containsRadical: (kanji, glyph) =>
+      [...(decomposition[kanji] ?? "")].includes(glyph),
+    soundPartOf: soundParts.soundPartOf,
+    readings: soundParts.readings,
+  });
+} catch (error) {
+  fail(error.message);
+  radicalPopover = { text: {}, info: radicalInfo };
 }
 
 // ---------------------------------------------------------------------------
@@ -550,8 +581,9 @@ write("components.json", components);
 write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
-  info: radicalInfo,
+  info: radicalPopover.info,
 });
+write("radical_popover_text.json", radicalPopover.text);
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.
 write("kanji_decomposition.json", decomposition);

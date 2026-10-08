@@ -14,7 +14,7 @@ import {
   GetBasicKanjiInfo,
   SearchResponse,
 } from "@/lib/kanji/kanji-worker-types";
-import type { RadicalsRuntime } from "@/lib/radicals";
+import type { RadicalPopoverDetails, RadicalsRuntime } from "@/lib/radicals";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
@@ -299,6 +299,23 @@ export const useSimilarKanjiMap = () => {
   );
 
   return state.data;
+};
+
+/**
+ * A radical's popover text and sounds. Fetched the first time a radical
+ * popover opens; the worker keeps the file.
+ */
+export const useRadicalPopoverText = (radical: string) => {
+  const ready = useIsKanjiWorkerReady();
+  const state = useWorkerQuery<RadicalPopoverDetails | null>(
+    ready && radical
+      ? () => requestWorker({ type: "radical-popover-text", payload: radical })
+      : null,
+    [ready, radical],
+    // Never show one radical's text in another radical's popover.
+    false
+  );
+  return { status: state.status, data: state.data ?? null };
 };
 
 export const useSimilarKanjis = (kanji: string) => {

@@ -47,6 +47,33 @@ export type RadicalInfo = {
   cn?: string;
 };
 
+/**
+ * Our own radical popover text (raw-data/radicals/ours-popover-text.json),
+ * public/json/v2/radical_popover_text.json. Every field is optional; refs
+ * are the links each line was checked against.
+ */
+export type RadicalPopoverText = {
+  /** Why the Japanese name is what it is (🇯🇵 line). */
+  ja?: string;
+  jaRefs?: string[];
+  /** Chinese origin of the glyph (🇨🇳 line). */
+  cn?: string;
+  refs?: string[];
+  /** Kanji where the radical is the meaning part. */
+  semantic?: { kanji: string; concepts: string; why: string; refs: string[] }[];
+  /** Kanji where the radical is the sound part. */
+  sound?: {
+    kanji: string;
+    word: string;
+    reading: string;
+    gloss: string;
+    refs: string[];
+  }[];
+};
+
+/** The popover text plus the radical's sounds from the sound-parts data. */
+export type RadicalPopoverDetails = RadicalPopoverText & { sounds?: string[] };
+
 /** public/json/v2/radicals.json — fetched at runtime, never imported. */
 export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
