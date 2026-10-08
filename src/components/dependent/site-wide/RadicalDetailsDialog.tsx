@@ -3,6 +3,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { positionText, useRadicalSummary } from "./use-radical-summary";
 import {
@@ -159,12 +160,16 @@ const RadicalForms = ({
               <button
                 type="button"
                 onClick={() => onSelect(glyph)}
-                className="flex items-center w-full gap-3 p-1 text-left rounded-lg hover:bg-foreground/5"
+                className="flex items-center w-full gap-3 p-1 text-left border-2 border-dotted rounded-lg hover:border-solid hover:border-neon-accent"
               >
                 {row}
+                <ChevronRight
+                  size={16}
+                  className="ml-auto shrink-0 text-muted-foreground"
+                />
               </button>
             ) : (
-              <div className="flex items-center gap-3 p-1 opacity-60">
+              <div className="flex items-center gap-3 p-1 border-2 border-transparent opacity-60">
                 {row}
               </div>
             )}
