@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { BookOpen, Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
@@ -245,7 +246,8 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           </div>
         )}
       </div>
-      <div className="flex flex-col px-1 pt-3">
+      <DottedSeparator className="mx-1 mt-3" />
+      <div className="flex flex-col px-1 pt-2">
         <RadicalSearchAction radical={radical} />
         {isKanji && keyword && (
           <OpenKanjiAction kanji={radical} keyword={keyword} />
