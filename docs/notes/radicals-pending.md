@@ -464,6 +464,17 @@ Decided (user, October 2026):
 - Non-radical parts (寺 in 時) could later open a popover with "Find kanji
   that include 寺" through component search, matching step 3.
 
+### 3b. Which parts list the reference card shows
+
+Open (user, October 2026). The reference card at the top of a kanji page
+shows the TopoKanji parts list (the release's `kanji_extended.json` field 0,
+the same data as the `(TopoKanji)` row in Component Breakdown). It writes
+some parts differently from the Character Structure sources: grass (艹) is
+written 廾, so on 茶 and 花 the chip opens 廾 にじゅうあし ("twenty legs")
+instead of くさかんむり. That is correct under "show source data as is";
+the question is which source the reference card should feature (one of
+the Character Structure sources, or our own list).
+
 ### 4. Before and after merging this work
 
 - Done: PikaPikaGems/kanji-heatmap#301 was merged, and the remote
