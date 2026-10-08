@@ -594,6 +594,17 @@ the Character Structure sources, or our own list).
   glyphs (23 shapes) are used by 5+. The user wants the most used ones named:
   suggestions are in section 1 of `docs/notes/naming-review.md`, waiting for
   decisions.
+- **Radical info for drawer-only parts (e.g. 勿).** 勿 is in the radical
+  drawer (`rewhowe-drawer.json`) but not in `sylhare-radicals.csv`, which
+  lists only the 214 Kangxi radicals (dictionaries file 勿 under 勹). So it
+  has no radical info: its popover shows only the keyword "must not", with no
+  🇯🇵 name, no 🇨🇳 line and no "Learn more" dialog. Option: add our own info
+  for it in `raw-data/radicals/ours.json` (a Japanese name, plus popover text
+  in `ours-popover-text.json`). Origin, checked October 2026: Wiktionary says
+  blood on a knife (the original 刎), borrowed for "do not" since oracle-bone
+  times; 漢字ペディア (新字源) says a snapped bowstring, plucked to ward off
+  evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary). Same
+  question applies to other drawer-only parts (啇, 奄, …).
 
 ## Working rules
 
