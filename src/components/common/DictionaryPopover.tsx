@@ -12,7 +12,7 @@ export const DictLoading = () => (
 /** Service-unreachable state (network/API error). */
 export const DictError = ({ service }: { service: string }) => (
   <div className="py-2 text-xs">
-    すみません. {service} cannot be accessed right now. Try again later.
+    🙇‍♀️ 🙇 すみません. {service} cannot be accessed right now. Try again later.
   </div>
 );
 
