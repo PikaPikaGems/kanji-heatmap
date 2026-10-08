@@ -39,21 +39,30 @@ const SITE_NAMES: Record<string, string> = {
   "en.wiktionary.org": "Wiktionary",
   "ja.wikipedia.org": "Wikipedia (ja)",
   "en.wikipedia.org": "Wikipedia",
+  "www.kanjipedia.jp": "漢字ペディア",
 };
 
-/** Every linked reference, grouped by site: "Wiktionary: 宀 客 宿". */
+/**
+ * Every linked reference, grouped by site: "Wiktionary: 宀 客 宿". A link is
+ * labeled with its example kanji when it has one (漢字ペディア's links end
+ * in a page number), else with the last part of its path.
+ */
 const refsBySite = (text: RadicalPopoverText) => {
-  const refs = new Set([
-    ...(text.jaRefs ?? []),
-    ...(text.refs ?? []),
-    ...(text.semantic ?? []).flatMap((example) => example.refs),
-    ...(text.sound ?? []).flatMap((example) => example.refs ?? []),
-  ]);
+  const labels = new Map<string, string>();
+  const add = (href: string, label?: string) => {
+    if (labels.has(href)) return;
+    labels.set(
+      href,
+      label ?? decodeURIComponent(new URL(href).pathname.split("/").pop() ?? "")
+    );
+  };
+  for (const href of [...(text.jaRefs ?? []), ...(text.refs ?? [])]) add(href);
+  for (const example of [...(text.semantic ?? []), ...(text.sound ?? [])]) {
+    for (const href of example.refs ?? []) add(href, example.kanji);
+  }
   const bySite = new Map<string, { href: string; page: string }[]>();
-  for (const href of refs) {
-    const url = new URL(href);
-    const site = SITE_NAMES[url.hostname] ?? url.hostname;
-    const page = decodeURIComponent(url.pathname.split("/").pop() ?? "");
+  for (const [href, page] of labels) {
+    const site = SITE_NAMES[new URL(href).hostname] ?? new URL(href).hostname;
     bySite.set(site, [...(bySite.get(site) ?? []), { href, page }]);
   }
   return bySite;

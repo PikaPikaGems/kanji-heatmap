@@ -508,15 +508,21 @@ Naming the sound part is only for when it explains something (視).
 
 Wiktionary's shinjitai pages (状, 献, 獣, 触) often have no glyph origin;
 it is on the traditional form (狀, 獻, 獸, 觸). Checking those found more
-examples. Radicals that had only one meaning example, and why there are no more
-(the single example was then removed):
+examples.
 
-- Their other kanji use the radical as the sound part or by shape only:
-  匚 片 瓦 癶 耒 臣 至 舛 首 骨 肉 (肉's kanji are written ⺼/月).
-- Wiktionary marks the role but doesn't say how the meaning links, so no
-  line can be backed: 勹 (陶) 几 (殻 凱) 卜 (外) 工 (式 左) 毛 (毬) 行
-  (術 衛 衝) 角 (触) 辰 (辱) 革 (覇).
-- 人: its kanji are written with ⺅ or 𠆢.
+漢字ペディア (kanjipedia.jp, by the 日本漢字能力検定協会) is a second source
+(user, October 2026: any reputable source we can link to; Japanese is
+fine). Its origin text (成り立ち) is from 『角川新字源 改訂新版』, one page
+per kanji, linked as https://www.kanjipedia.jp/kanji/<page number>. It
+explains links Wiktionary only marks (術: a village lane, "technique"
+borrowed), and brought 乙 白 十 工 辰 ⺲ 行 角 革 虍 骨 鹿 文 至 to two or three
+examples. The dialog labels its links by kanji.
+
+Radicals still without meaning examples though they have kanji in our
+list: neither source names the radical as the meaning part with a link we
+can state (片 版, 瓦 瓶, 舛 舞, 耒 耕, 毛 尾/毬 and 卜 占 have one each; 匚
+匠: 漢字ペディア says 匚 there is a changed 矩, not "box"; 臣 臨: 漢字ペディア
+says 臥). The other 39 have no kanji filed under them (鼎 鼠 竜 …).
 
 Sound parts with no examples, and why: only one other kanji in the
 family (十 汁, 比 批, 高 稿, 匕 死, 犬 献, 竹 築, 耂 考, 面 麺), or the

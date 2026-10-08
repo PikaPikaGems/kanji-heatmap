@@ -633,6 +633,24 @@
     "cn": "Some believe a single vertical stroke, the next step above one; others see the original form of 針 (needle), borrowed for ten.",
     "refs": [
       "https://en.wiktionary.org/wiki/十"
+    ],
+    "semantic": [
+      {
+        "kanji": "千",
+        "concepts": "thousand",
+        "why": "十 marks it as a number: ten hundreds.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0004026200"
+        ]
+      },
+      {
+        "kanji": "協",
+        "concepts": "cooperate, unite",
+        "why": "Many (十) forces (劦) pulled together.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0001493300"
+        ]
+      }
     ]
   },
   "目": {
@@ -894,6 +912,24 @@
     "cn": "Origin unclear: some believe a sprouting plant, others a fish's gut or a flow of water.",
     "refs": [
       "https://en.wiktionary.org/wiki/乙"
+    ],
+    "semantic": [
+      {
+        "kanji": "乱",
+        "concepts": "disorder, riot, chaos",
+        "why": "乙 here is the tangled end of a thread: disorder.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0007046500"
+        ]
+      },
+      {
+        "kanji": "乾",
+        "concepts": "dry, drought",
+        "why": "乙 here means rising up high; the meaning shifted to \"dry\".",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0001056200"
+        ]
+      }
     ]
   },
   "亅": {
@@ -1391,6 +1427,24 @@
     "refs": [
       "https://en.wiktionary.org/wiki/工"
     ],
+    "semantic": [
+      {
+        "kanji": "巧",
+        "concepts": "skillful, clever",
+        "why": "Fine work (工): skillful.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0002141400"
+        ]
+      },
+      {
+        "kanji": "左",
+        "concepts": "left",
+        "why": "A left hand holding a tool (工).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0002452500"
+        ]
+      }
+    ],
     "sound": [
       {
         "kanji": "攻",
@@ -1778,6 +1832,24 @@
     "cn": "A person with a painted or tattooed chest; the tattoo later disappeared from the shape.",
     "refs": [
       "https://en.wiktionary.org/wiki/文"
+    ],
+    "semantic": [
+      {
+        "kanji": "斐",
+        "concepts": "beautiful, patterned",
+        "why": "Beautiful patterns (文).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0005836200"
+        ]
+      },
+      {
+        "kanji": "斑",
+        "concepts": "spot, speckled",
+        "why": "A spotted pattern (文).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0005753100"
+        ]
+      }
     ]
   },
   "斗": {
@@ -2376,6 +2448,24 @@
     "refs": [
       "https://en.wiktionary.org/wiki/白"
     ],
+    "semantic": [
+      {
+        "kanji": "的",
+        "concepts": "target, clear, -like",
+        "why": "First \"strikingly white (白)\", then \"clear\"; \"target\" is a borrowed meaning.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0004998500"
+        ]
+      },
+      {
+        "kanji": "皆",
+        "concepts": "all, everyone",
+        "why": "白 here means \"to say\": people (比) all saying the same thing.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000796100"
+        ]
+      }
+    ],
     "sound": [
       {
         "kanji": "泊",
@@ -2864,6 +2954,24 @@
     "cn": "An arrow stuck in the ground: arriving.",
     "refs": [
       "https://en.wiktionary.org/wiki/至"
+    ],
+    "semantic": [
+      {
+        "kanji": "到",
+        "concepts": "arrive, reach",
+        "why": "Arriving (至) at a place.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/到"
+        ]
+      },
+      {
+        "kanji": "致",
+        "concepts": "send, deliver, do",
+        "why": "Seeing someone all the way there (至): send, deliver.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0004677800"
+        ]
+      }
     ]
   },
   "臼": {
@@ -2968,6 +3076,24 @@
     "cn": "A tiger's head.",
     "refs": [
       "https://en.wiktionary.org/wiki/虍"
+    ],
+    "semantic": [
+      {
+        "kanji": "虐",
+        "concepts": "cruel, tyrannize",
+        "why": "A tiger (虍) tearing at prey with its claws: cruel.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0001354000"
+        ]
+      },
+      {
+        "kanji": "虞",
+        "concepts": "fear, worry",
+        "why": "First a tiger-like (虍) animal; \"fear\" is a borrowed meaning.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000573100"
+        ]
+      }
     ]
   },
   "虫": {
@@ -3015,6 +3141,32 @@
     "cn": "A street crossing.",
     "refs": [
       "https://en.wiktionary.org/wiki/行"
+    ],
+    "semantic": [
+      {
+        "kanji": "街",
+        "concepts": "street, town",
+        "why": "A crossroads (行): a street, a town.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000858200"
+        ]
+      },
+      {
+        "kanji": "術",
+        "concepts": "technique, means, art",
+        "why": "First a lane (行) in a village; \"technique\" is a borrowed meaning.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003226800"
+        ]
+      },
+      {
+        "kanji": "衛",
+        "concepts": "defend, protect",
+        "why": "Going around (行) a village on guard: protect.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000403800"
+        ]
+      }
     ]
   },
   "衣": {
@@ -3095,6 +3247,24 @@
     "cn": "A picture of a horn.",
     "refs": [
       "https://en.wiktionary.org/wiki/角"
+    ],
+    "semantic": [
+      {
+        "kanji": "解",
+        "concepts": "untie, solve, take apart",
+        "why": "Holding the horn (角) and cutting an ox (牛) apart with a knife (刀).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000815300"
+        ]
+      },
+      {
+        "kanji": "触",
+        "concepts": "touch, contact",
+        "why": "Butting with horns (角), then \"touch\".",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003550000"
+        ]
+      }
     ]
   },
   "谷": {
@@ -3254,6 +3424,24 @@
     "cn": "Some believe a farming tool, perhaps made of a clam shell; others see a person holding onto a cliff.",
     "refs": [
       "https://en.wiktionary.org/wiki/辰"
+    ],
+    "semantic": [
+      {
+        "kanji": "農",
+        "concepts": "farming, agriculture",
+        "why": "Clearing weeds in a field (田) with a shell blade (辰): farming.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0005503400"
+        ]
+      },
+      {
+        "kanji": "辱",
+        "concepts": "disgrace, shame",
+        "why": "A hand (寸) cutting grass with a shell blade (辰); \"shame\" is a borrowed meaning.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003561600"
+        ]
+      }
     ],
     "sound": [
       {
@@ -3498,6 +3686,24 @@
     "cn": "A stretched animal hide: head at the top, tail and legs below.",
     "refs": [
       "https://en.wiktionary.org/wiki/革"
+    ],
+    "semantic": [
+      {
+        "kanji": "靴",
+        "concepts": "shoes",
+        "why": "Shoes made of leather (革).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000707300"
+        ]
+      },
+      {
+        "kanji": "鞠",
+        "concepts": "ball",
+        "why": "A ball made of leather (革).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0001328200"
+        ]
+      }
     ]
   },
   "韋": {
@@ -3655,6 +3861,24 @@
     "cn": "A picture of bones, with 肉 (flesh) added later.",
     "refs": [
       "https://en.wiktionary.org/wiki/骨"
+    ],
+    "semantic": [
+      {
+        "kanji": "骸",
+        "concepts": "remains, skeleton",
+        "why": "Remains are bones (骨).",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0000868600"
+        ]
+      },
+      {
+        "kanji": "髄",
+        "concepts": "marrow, essence",
+        "why": "The center of a bone (骨): marrow, then the core of something.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003775900"
+        ]
+      }
     ]
   },
   "高": {
@@ -3787,6 +4011,24 @@
     "cn": "A deer; its antlers, head and legs became highly abstract.",
     "refs": [
       "https://en.wiktionary.org/wiki/鹿"
+    ],
+    "semantic": [
+      {
+        "kanji": "麗",
+        "concepts": "beautiful, lovely",
+        "why": "Two deer (鹿) walking side by side; then \"beautiful\".",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0007271500"
+        ]
+      },
+      {
+        "kanji": "麟",
+        "concepts": "kirin (mythical beast)",
+        "why": "A mythical deer-like (鹿) animal.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0007221600"
+        ]
+      }
     ]
   },
   "麦": {
@@ -4332,6 +4574,32 @@
     "cn": "A net; on top it is often written 罒, which is not an eye (目).",
     "refs": [
       "https://en.wiktionary.org/wiki/⺲"
+    ],
+    "semantic": [
+      {
+        "kanji": "置",
+        "concepts": "put, place, leave",
+        "why": "Setting up a net (罒), then \"put, place\".",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0004687500"
+        ]
+      },
+      {
+        "kanji": "羅",
+        "concepts": "net, spread out",
+        "why": "Spreading a net (罒) all around.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0007016300"
+        ]
+      },
+      {
+        "kanji": "署",
+        "concepts": "office, signature, role",
+        "why": "First a net (罒) laid out, then \"role, office\".",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003299000"
+        ]
+      }
     ]
   },
   "老": {
