@@ -1,6 +1,6 @@
 {
   "宀": {
-    "ja": "It looks like katakana ウ (u) and sits on top as a crown (かんむり).",
+    "ja": "Written like katakana ウ (u) + かんむり (top).",
     "cn": "Began as a picture of a house.",
     "refs": [
       "https://en.wiktionary.org/wiki/宀"
@@ -33,7 +33,7 @@
     ]
   },
   "夂": {
-    "ja": "Written like katakana ノ (no) followed by 又 (mata, \"again\").",
+    "ja": "Written like katakana ノ (no) + 又 (また, again).",
     "addEn": "go",
     "cn": "Began as a picture of a footprint pointing down. The same shape was also an old picture of a knot at the end of a rope, the early form of 終 (end).",
     "refs": [
@@ -51,7 +51,7 @@
     ]
   },
   "冫": {
-    "ja": "に (two) + すい (water): it looks like 氵 (さんずい, three water) with two strokes instead of three.",
+    "ja": "に (二, two) + すい (水, water): 氵 with two strokes instead of three.",
     "cn": "The squeezed form of 仌, a picture of two blocks of ice.",
     "refs": [
       "https://en.wiktionary.org/wiki/冫"
@@ -76,7 +76,7 @@
     ]
   },
   "广": {
-    "ja": "The hanging part (たれ) of 麻 (ま, hemp).",
+    "ja": "ま (麻, hemp) + だれ (たれ, top-left): the hanging part of 麻.",
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/广部"
     ],
@@ -104,7 +104,7 @@
     ]
   },
   "隹": {
-    "ja": "ふる (old) + とり (bird): the bird used in 舊 (旧, old), told apart from 鳥.",
+    "ja": "ふる (古, old) + とり (鳥, bird): the bird part of 舊, the old form of 旧 (old).",
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/隹部"
     ],
@@ -132,7 +132,7 @@
     ]
   },
   "青": {
-    "ja": "The Japanese word for blue.",
+    "ja": "あお (青, blue).",
     "cn": "Some believe it combines 生 (growing plants) and 丹 (cinnabar red), the color of young plants. Others see 生 and 井, both giving the sound.",
     "refs": [
       "https://en.wiktionary.org/wiki/青"
@@ -168,7 +168,7 @@
     ]
   },
   "⺡": {
-    "ja": "さん (three) + すい (water): the water radical written with three strokes.",
+    "ja": "さん (三, three) + すい (水, water).",
     "cn": "The squeezed form of 水, a picture of flowing water.",
     "refs": [
       "https://en.wiktionary.org/wiki/氵",
@@ -270,7 +270,7 @@
     ]
   },
   "⺾": {
-    "ja": "くさ (草, grass) + かんむり (crown, on top).",
+    "ja": "くさ (草, grass) + かんむり (top).",
     "cn": "The top form of 艸, a picture of blades of grass.",
     "refs": [
       "https://en.wiktionary.org/wiki/艸"
@@ -303,7 +303,7 @@
     ]
   },
   "⻌": {
-    "ja": "A changed pronunciation of しにょう (之繞): it looks like 之, wrapped around the bottom-left (にょう).",
+    "ja": "し (之, which it looks like) + にょう (bottom-left). しにょう later became しんにょう.",
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/辵部"
     ],
@@ -340,14 +340,14 @@
     ]
   },
   "亠": {
-    "ja": "なべ (pot) + ぶた (ふた, lid): it looks like the lid of a pot.",
+    "ja": "なべ (鍋, pot) + ぶた (蓋, lid): it looks like a pot lid.",
     "cn": "A lid with a handle on top. In many kanji the shape stands for other things, like a roof (高, 京) or a head (交).",
     "refs": [
       "https://en.wiktionary.org/wiki/亠"
     ]
   },
   "冖": {
-    "ja": "It looks like katakana ワ (wa) and sits on top as a crown (かんむり).",
+    "ja": "Written like katakana ワ (wa) + かんむり (top).",
     "cn": "A cloth used to cover something.",
     "refs": [
       "https://en.wiktionary.org/wiki/冖"
@@ -364,7 +364,7 @@
     ]
   },
   "儿": {
-    "ja": "ひと (人, person) + あし (legs, at the bottom): 人 written as legs.",
+    "ja": "ひと (人, person) + あし (bottom).",
     "cn": "A picture of a standing person, the form of 人 used at the bottom.",
     "refs": [
       "https://en.wiktionary.org/wiki/儿"
@@ -389,14 +389,14 @@
     ]
   },
   "𠆢": {
-    "ja": "ひと (人, person) + やね (roof): 人 spread over the top like a roof.",
+    "ja": "ひと (人, person) + やね (屋根, roof).",
     "cn": "A variant form of 人 (person).",
     "refs": [
       "https://en.wiktionary.org/wiki/𠆢"
     ]
   },
   "冂": {
-    "ja": "けい (its reading) + がまえ (かまえ, enclosure).",
+    "ja": "けい (冂, its own reading) + がまえ (かまえ, enclosure).",
     "cn": "Some believe it shows the land outside a city's walls; others see the side view of a building, an early form of 堂.",
     "refs": [
       "https://en.wiktionary.org/wiki/冂"
@@ -420,7 +420,7 @@
     ]
   },
   "幺": {
-    "ja": "いと (糸, thread) + がしら (かしら, top): it looks like the top of 糸.",
+    "ja": "いと (糸, thread) + がしら (top): the top of 糸.",
     "cn": "A picture of a silk thread, which came to mean tiny.",
     "refs": [
       "https://en.wiktionary.org/wiki/幺"
@@ -437,21 +437,21 @@
     ]
   },
   "厶": {
-    "ja": "It looks like katakana ム (mu).",
+    "ja": "Written like katakana ム (mu).",
     "cn": "Some believe it shows something circling around oneself, the original form of 私 (private); others see a simplified 牟.",
     "refs": [
       "https://en.wiktionary.org/wiki/厶"
     ]
   },
   "丷": {
-    "ja": "はち (八, eight) + がしら (かしら, top): 八 written on top.",
+    "ja": "はち (八, eight) + がしら (top).",
     "cn": "A variant of 八 used as a part of kanji.",
     "refs": [
       "https://en.wiktionary.org/wiki/丷"
     ]
   },
   "丶": {
-    "ja": "The word for dot.",
+    "ja": "てん (点, dot).",
     "cn": "A small flame on a torch, the original form of 主.",
     "refs": [
       "https://en.wiktionary.org/wiki/丶"

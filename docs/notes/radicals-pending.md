@@ -354,6 +354,13 @@ Data:
 
 Rules:
 
+- 🇯🇵 format (user, October 2026): each part as kana (kanji, English),
+  joined with +; a position part as kana (position in English): "さん (三,
+  three) + すい (水, water)", "て (手, hand) + へん (left side)". Shape
+  names: "Written like katakana ワ (wa) + かんむり (top)". A short
+  explanation may follow a colon. Positions in English match the 📍 line:
+  へん left side, つくり right side, かんむり top, あし bottom, たれ
+  top-left, にょう bottom-left, かまえ enclosure, がしら top.
 - 🇯🇵: only the reason, without repeating the name. Shape reasons
   (looks like ウ; のまた is written ノ + 又) need no reference. History
   reasons (まだれ's ま from 麻; ふるとり from 舊) need references.
