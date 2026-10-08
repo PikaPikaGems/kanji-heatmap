@@ -603,8 +603,14 @@ the Character Structure sources, or our own list).
   in `ours-popover-text.json`). Origin, checked October 2026: Wiktionary says
   blood on a knife (the original 刎), borrowed for "do not" since oracle-bone
   times; 漢字ペディア (新字源) says a snapped bowstring, plucked to ward off
-  evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary). Same
-  question applies to other drawer-only parts (啇, 奄, …).
+  evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary).
+- **Revisit: info for every drawer-only part.** Of the 253 glyphs in the
+  radical drawer, 24 have no radical info (counted October 2026, following
+  aliases): 入 九 乃 也 亡 及 久 元 井 勿 五 屯 巴 世 巨 冊 母 奄 岡 免 斉 品
+  啇 無. Each shows only its keyword. Some of these are themselves Kangxi
+  radicals under another glyph, so check for a missing alias before writing
+  new entries: sylhare lists 入 as ⼊ (U+2F0A, the Kangxi radical code point),
+  and 母 only as ⺟, the alternate of 毋 (なかれ).
 
 ## Working rules
 
