@@ -47,7 +47,7 @@ const refsBySite = (text: RadicalPopoverText) => {
     ...(text.jaRefs ?? []),
     ...(text.refs ?? []),
     ...(text.semantic ?? []).flatMap((example) => example.refs),
-    ...(text.sound ?? []).flatMap((example) => example.refs),
+    ...(text.sound ?? []).flatMap((example) => example.refs ?? []),
   ]);
   const bySite = new Map<string, { href: string; page: string }[]>();
   for (const href of refs) {
@@ -239,7 +239,7 @@ const RadicalDetailsBody = ({
       {text.sounds != null && (text.sound ?? []).length > 0 && (
         <section>
           <h3 className={sectionHeadingCn}>
-            🔊 Phonetic: {text.sounds.join("・")}
+            🔊 Read like: {text.sounds.join("・")}
           </h3>
           <ul className="space-y-2">
             {text.sound?.map((example) => (

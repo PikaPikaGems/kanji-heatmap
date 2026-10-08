@@ -63,13 +63,16 @@ export type RadicalPopoverText = {
   refs?: string[];
   /** Kanji where the radical is the meaning part. */
   semantic?: { kanji: string; concepts: string; why: string; refs: string[] }[];
-  /** Kanji where the radical is the sound part. */
+  /**
+   * Kanji whose sound part (a learner hint, as on the sound-part chips) is
+   * the radical, each with a word read with the family sound.
+   */
   sound?: {
     kanji: string;
     word: string;
     reading: string;
     gloss: string;
-    refs: string[];
+    refs?: string[];
   }[];
 };
 

@@ -170,11 +170,17 @@ export const buildRadicalPopoverText = ({
       }
     }
 
+    // Sound examples are learner hints, like the sound-part chips: the
+    // kanji's sound part in our sound-parts data is the radical and the word
+    // is read with the family sound (raw-data/sound-parts/README.md). They
+    // don't claim history, so `refs` is optional.
     for (const example of entry.sound ?? []) {
       const label = `${where} sound ${example.kanji}`;
       for (const field of SOUND_FIELDS) {
         const ok =
-          field === "refs" ? isRefs(example[field]) : isText(example[field]);
+          field === "refs"
+            ? example.refs == null || isRefs(example.refs)
+            : isText(example[field]);
         if (!ok) problems.push(`${label}: bad or missing ${field}`);
       }
       // A radical is never its own sound example (family heads point to

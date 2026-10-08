@@ -387,7 +387,13 @@ Rules:
   example shows no pattern (user, October 2026), so a radical with only
   one gets none. Same for sound examples. The build enforces it. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
 - Sound examples: 2–3, never the radical itself, and the word must be
-  read with the family sound.
+  read with the family sound. They are learner hints, the same as the
+  sound-part chips (user, October 2026: what matters is that it helps
+  learners): the kanji's sound part in our sound-parts data is the radical,
+  whatever its history (戈 in 裁 さい, though Wiktionary gives 𢦏). No
+  reference needed. The dialog section is "🔊 Read like:", not
+  "Phonetic", so it claims no history; the popover shows 🔊 only when the
+  dialog has examples.
 - Both example sections are optional: shape-only radicals (丶 丿 亅 亠)
   have no meaning of their own, and most radicals aren't sound parts.
 - No mnemonics, no outdated folk explanations (字 "a child under a
@@ -512,14 +518,9 @@ examples. Radicals that had only one meaning example, and why there are no more
   (術 衛 衝) 角 (触) 辰 (辱) 革 (覇).
 - 人: its kanji are written with ⺅ or 𠆢.
 
-Sound parts that had 0 or 1 examples, and why (single ones removed):
-
-- Only one other kanji in the family: 十 (汁), 比 (批), 高 (稿), 小 (少).
-- 里: 鯉 is rarely read り.
-- Our sound-parts data names a part Wiktionary doesn't: 匕 (死), 戈 (裁 載
-  栽 哉: 𢦏), 犬 (献: 鬳), 竹 (築: 筑), 耂 (考), 門 (間 閑: meaning; 関:
-  𢇅; 簡: 閒), 士 (志: 之), 小 (省: 生). Not changed (sound parts are
-  learner hints, item 1), but none of these is used as an example.
+Sound parts with no examples, and why: only one other kanji in the
+family (十 汁, 比 批, 高 稿, 匕 死, 犬 献, 竹 築, 耂 考, 面 麺), or the
+other one is rarely read with the sound (里: 鯉 り).
 
 ### 3. Component search
 

@@ -673,6 +673,20 @@
     "cn": "Some believe three small dots, meaning small; others see three grains of sand, the original form of 沙.",
     "refs": [
       "https://en.wiktionary.org/wiki/小"
+    ],
+    "sound": [
+      {
+        "kanji": "少",
+        "word": "少年",
+        "reading": "しょうねん",
+        "gloss": "boy"
+      },
+      {
+        "kanji": "省",
+        "word": "省略",
+        "reading": "しょうりゃく",
+        "gloss": "omission, abbreviation"
+      }
     ]
   },
   "田": {
@@ -1155,6 +1169,26 @@
     "cn": "A picture of a war axe; it came to mean soldier, then officer.",
     "refs": [
       "https://en.wiktionary.org/wiki/士"
+    ],
+    "sound": [
+      {
+        "kanji": "仕",
+        "word": "仕事",
+        "reading": "しごと",
+        "gloss": "work, job"
+      },
+      {
+        "kanji": "志",
+        "word": "意志",
+        "reading": "いし",
+        "gloss": "will, intention"
+      },
+      {
+        "kanji": "誌",
+        "word": "雑誌",
+        "reading": "ざっし",
+        "gloss": "magazine"
+      }
     ]
   },
   "夊": {
@@ -1598,6 +1632,26 @@
         "refs": [
           "https://en.wiktionary.org/wiki/伐"
         ]
+      }
+    ],
+    "sound": [
+      {
+        "kanji": "裁",
+        "word": "裁判",
+        "reading": "さいばん",
+        "gloss": "trial, judgment"
+      },
+      {
+        "kanji": "載",
+        "word": "記載",
+        "reading": "きさい",
+        "gloss": "entry, mention in writing"
+      },
+      {
+        "kanji": "栽",
+        "word": "栽培",
+        "reading": "さいばい",
+        "gloss": "cultivation"
       }
     ]
   },
@@ -3358,6 +3412,26 @@
         "refs": [
           "https://en.wiktionary.org/wiki/閉"
         ]
+      }
+    ],
+    "sound": [
+      {
+        "kanji": "間",
+        "word": "時間",
+        "reading": "じかん",
+        "gloss": "time, hour"
+      },
+      {
+        "kanji": "関",
+        "word": "関係",
+        "reading": "かんけい",
+        "gloss": "relation, connection"
+      },
+      {
+        "kanji": "簡",
+        "word": "簡単",
+        "reading": "かんたん",
+        "gloss": "simple, easy"
       }
     ]
   },
