@@ -436,9 +436,10 @@ describe("components.json", () => {
     const kanjiKeyword = (char: string) => main[char][0];
     // 釒 → 金 says "gold", not the radical name かね "metal".
     expect(keywordOf("釒")).toBe(kanjiKeyword("金"));
-    // 衤 only had a copy of 衣's radical row, so it follows the alias too.
+    // 衤 is a second code for the drawer's ⻂ (ころもへん), so it reads ⻂'s
+    // name, and searches ⻂ (補 is filed under ⻂, not 衣).
     expect(components["衤"]?.k).toBeUndefined();
-    expect(keywordOf("衤")).toBe(kanjiKeyword("衣"));
+    expect(keywordOf("衤")).toBe("clothing left");
     // A form with its own name keeps it.
     expect(keywordOf("⺩")).toBe("king left");
   });

@@ -308,8 +308,7 @@ try {
     // Its mistakes are fixed in radicals/ours.json (kanjiumFormFixes).
     formIn: (kanji) => {
       const [radical, variant] = structureSources.ka[kanji] ?? [];
-      const glyph =
-        ours.kanjiumFormFixes?.[kanji]?.form ?? variant ?? radical;
+      const glyph = ours.kanjiumFormFixes?.[kanji]?.form ?? variant ?? radical;
       if (glyph == null) return null;
       return (
         followAlias(glyph, allAliases, (g) => familyHeadOf.has(g)) ?? glyph

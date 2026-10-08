@@ -111,7 +111,8 @@ export const buildRadicalPopoverText = ({
     if (entry.cnNote != null) {
       const head = headOf(glyph);
       if (!isText(entry.cnNote)) problems.push(`${where}: cnNote must be text`);
-      if (head == null) problems.push(`${where}: cnNote on a glyph that is not a form`);
+      if (head == null)
+        problems.push(`${where}: cnNote on a glyph that is not a form`);
       else if (entry.cn == null && entries[head]?.cn == null)
         problems.push(`${where}: cnNote, but neither it nor ${head} has cn`);
       if (!isRefs(entry.refs))
