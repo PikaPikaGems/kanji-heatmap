@@ -445,16 +445,6 @@
     "cn": "A picture of a person bending over, an ancient form of 包 (wrap).",
     "refs": [
       "https://en.wiktionary.org/wiki/勹"
-    ],
-    "semantic": [
-      {
-        "kanji": "包",
-        "concepts": "wrap, package",
-        "why": "Some believe a womb (勹) around a fetus (巳); others see a swaddled baby.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/包"
-        ]
-      }
     ]
   },
   "幺": {
@@ -643,17 +633,6 @@
     "cn": "Some believe a single vertical stroke, the next step above one; others see the original form of 針 (needle), borrowed for ten.",
     "refs": [
       "https://en.wiktionary.org/wiki/十"
-    ],
-    "sound": [
-      {
-        "kanji": "汁",
-        "word": "果汁",
-        "reading": "かじゅう",
-        "gloss": "fruit juice",
-        "refs": [
-          "https://en.wiktionary.org/wiki/汁"
-        ]
-      }
     ]
   },
   "目": {
@@ -694,17 +673,6 @@
     "cn": "Some believe three small dots, meaning small; others see three grains of sand, the original form of 沙.",
     "refs": [
       "https://en.wiktionary.org/wiki/小"
-    ],
-    "sound": [
-      {
-        "kanji": "少",
-        "word": "少年",
-        "reading": "しょうねん",
-        "gloss": "boy, youth",
-        "refs": [
-          "https://en.wiktionary.org/wiki/少"
-        ]
-      }
     ]
   },
   "田": {
@@ -929,16 +897,6 @@
     "cn": "A side view of a standing person, showing an arm and a leg.",
     "refs": [
       "https://en.wiktionary.org/wiki/人"
-    ],
-    "semantic": [
-      {
-        "kanji": "囚",
-        "concepts": "captured, prisoner, criminal",
-        "why": "A person inside an enclosure (囗).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/囚"
-        ]
-      }
     ]
   },
   "八": {
@@ -953,16 +911,6 @@
     "cn": "A small stool seen from the side.",
     "refs": [
       "https://en.wiktionary.org/wiki/几"
-    ],
-    "semantic": [
-      {
-        "kanji": "処",
-        "concepts": "dispose, deal with, manage",
-        "why": "Stopping to rest on a stool (几).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/処"
-        ]
-      }
     ],
     "sound": [
       {
@@ -1070,16 +1018,6 @@
     "cn": "A picture of a container.",
     "refs": [
       "https://en.wiktionary.org/wiki/匚"
-    ],
-    "semantic": [
-      {
-        "kanji": "匠",
-        "concepts": "artisan, craftsman, workman",
-        "why": "An axe (斤) in a box (匚): a craftsman's tools.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/匠"
-        ]
-      }
     ]
   },
   "匸": {
@@ -1094,16 +1032,6 @@
     "cn": "Perhaps a crack in an oracle bone, read to tell the future.",
     "refs": [
       "https://en.wiktionary.org/wiki/卜"
-    ],
-    "semantic": [
-      {
-        "kanji": "占",
-        "concepts": "fortune-telling, occupy, divine",
-        "why": "Divination (卜) spoken by the mouth (口).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/占"
-        ]
-      }
     ]
   },
   "卩": {
@@ -1227,17 +1155,6 @@
     "cn": "A picture of a war axe; it came to mean soldier, then officer.",
     "refs": [
       "https://en.wiktionary.org/wiki/士"
-    ],
-    "sound": [
-      {
-        "kanji": "仕",
-        "word": "仕事",
-        "reading": "しごと",
-        "gloss": "work, job",
-        "refs": [
-          "https://en.wiktionary.org/wiki/仕"
-        ]
-      }
     ]
   },
   "夊": {
@@ -1439,16 +1356,6 @@
     "cn": "Some believe a bladed tool for marking borders; others see a carpenter's square.",
     "refs": [
       "https://en.wiktionary.org/wiki/工"
-    ],
-    "semantic": [
-      {
-        "kanji": "巧",
-        "concepts": "adroit, skillful, skilled",
-        "why": "Skill is good work (工).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/巧"
-        ]
-      }
     ],
     "sound": [
       {
@@ -2046,17 +1953,6 @@
     "cn": "Some read it as two spoons (匕); the Shuowen sees two people side by side.",
     "refs": [
       "https://en.wiktionary.org/wiki/比"
-    ],
-    "sound": [
-      {
-        "kanji": "批",
-        "word": "批准",
-        "reading": "ひじゅん",
-        "gloss": "ratification",
-        "refs": [
-          "https://en.wiktionary.org/wiki/批"
-        ]
-      }
     ]
   },
   "毛": {
@@ -2064,16 +1960,6 @@
     "cn": "A feather or a hair.",
     "refs": [
       "https://en.wiktionary.org/wiki/毛"
-    ],
-    "semantic": [
-      {
-        "kanji": "尾",
-        "concepts": "tail, end",
-        "why": "Hair (毛) at the end of a body (尸): a tail.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/尾"
-        ]
-      }
     ]
   },
   "氏": {
@@ -2207,16 +2093,6 @@
     "cn": "A mirror image of 爿 (a bed); the Shuowen reads it as half a tree.",
     "refs": [
       "https://en.wiktionary.org/wiki/片"
-    ],
-    "semantic": [
-      {
-        "kanji": "版",
-        "concepts": "printing block, printing plate, publishing",
-        "why": "A slab of wood (片) for printing.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/版"
-        ]
-      }
     ]
   },
   "牙": {
@@ -2350,16 +2226,6 @@
     "cn": "Fired pottery, or a roof tile.",
     "refs": [
       "https://en.wiktionary.org/wiki/瓦"
-    ],
-    "semantic": [
-      {
-        "kanji": "瓶",
-        "concepts": "flower pot, bottle, vial",
-        "why": "A vessel made of pottery (瓦).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/瓶"
-        ]
-      }
     ]
   },
   "甘": {
@@ -2448,16 +2314,6 @@
     "cn": "A left and a right foot pointing apart.",
     "refs": [
       "https://en.wiktionary.org/wiki/癶"
-    ],
-    "semantic": [
-      {
-        "kanji": "登",
-        "concepts": "ascend, climb, climb up",
-        "why": "Feet (癶) going up.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/登"
-        ]
-      }
     ]
   },
   "白": {
@@ -2850,17 +2706,7 @@
     ]
   },
   "耒": {
-    "ja": "らい (耒, its reading) + すき (鋤, plough).",
-    "semantic": [
-      {
-        "kanji": "耕",
-        "concepts": "till, plow, cultivate",
-        "why": "Working the field with a plough (耒).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/耕"
-        ]
-      }
-    ]
+    "ja": "らい (耒, its reading) + すき (鋤, plough)."
   },
   "耳": {
     "ja": "みみ (耳, ear).",
@@ -2917,16 +2763,6 @@
     "cn": "An animal's ribs, or a slice of meat; beside other parts it is written 月.",
     "refs": [
       "https://en.wiktionary.org/wiki/肉"
-    ],
-    "semantic": [
-      {
-        "kanji": "腐",
-        "concepts": "rot, decay, sour",
-        "why": "Meat (肉) going bad.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/腐"
-        ]
-      }
     ]
   },
   "臣": {
@@ -2934,16 +2770,6 @@
     "cn": "An eye looking down; it came to mean servant, then minister.",
     "refs": [
       "https://en.wiktionary.org/wiki/臣"
-    ],
-    "semantic": [
-      {
-        "kanji": "臨",
-        "concepts": "look to, be present at, face",
-        "why": "An eye (臣) looking down over things.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/臨"
-        ]
-      }
     ]
   },
   "自": {
@@ -2984,16 +2810,6 @@
     "cn": "An arrow stuck in the ground: arriving.",
     "refs": [
       "https://en.wiktionary.org/wiki/至"
-    ],
-    "semantic": [
-      {
-        "kanji": "到",
-        "concepts": "arrival, arrive, proceed",
-        "why": "Arriving (至) at a place.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/到"
-        ]
-      }
     ]
   },
   "臼": {
@@ -3015,16 +2831,6 @@
     "cn": "Two feet facing the same way.",
     "refs": [
       "https://en.wiktionary.org/wiki/舛"
-    ],
-    "semantic": [
-      {
-        "kanji": "舞",
-        "concepts": "dance, flit, circle",
-        "why": "Dancing feet (舛).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/舞"
-        ]
-      }
     ]
   },
   "舟": {
@@ -3155,16 +2961,6 @@
     "cn": "A street crossing.",
     "refs": [
       "https://en.wiktionary.org/wiki/行"
-    ],
-    "semantic": [
-      {
-        "kanji": "街",
-        "concepts": "boulevard, city quarter, street",
-        "why": "A street (行) in a town.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/街"
-        ]
-      }
     ]
   },
   "衣": {
@@ -3245,16 +3041,6 @@
     "cn": "A picture of a horn.",
     "refs": [
       "https://en.wiktionary.org/wiki/角"
-    ],
-    "semantic": [
-      {
-        "kanji": "解",
-        "concepts": "unravel, take apart, dissolve",
-        "why": "A knife (刀) cutting the horn (角) from an ox (牛).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/解"
-        ]
-      }
     ]
   },
   "谷": {
@@ -3415,16 +3201,6 @@
     "refs": [
       "https://en.wiktionary.org/wiki/辰"
     ],
-    "semantic": [
-      {
-        "kanji": "農",
-        "concepts": "agriculture, farming, farmers",
-        "why": "Farming with a tool (辰).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/農"
-        ]
-      }
-    ],
     "sound": [
       {
         "kanji": "振",
@@ -3498,17 +3274,6 @@
     "cn": "A field (田) and earth (土): a measure of land, a place.",
     "refs": [
       "https://en.wiktionary.org/wiki/里"
-    ],
-    "sound": [
-      {
-        "kanji": "理",
-        "word": "修理",
-        "reading": "しゅうり",
-        "gloss": "repair, mending",
-        "refs": [
-          "https://en.wiktionary.org/wiki/理"
-        ]
-      }
     ]
   },
   "金": {
@@ -3652,17 +3417,6 @@
     "cn": "A face with an exaggerated eye.",
     "refs": [
       "https://en.wiktionary.org/wiki/面"
-    ],
-    "sound": [
-      {
-        "kanji": "麺",
-        "word": "麺類",
-        "reading": "めんるい",
-        "gloss": "noodles",
-        "refs": [
-          "https://en.wiktionary.org/wiki/麺"
-        ]
-      }
     ]
   },
   "革": {
@@ -3670,16 +3424,6 @@
     "cn": "A stretched animal hide: head at the top, tail and legs below.",
     "refs": [
       "https://en.wiktionary.org/wiki/革"
-    ],
-    "semantic": [
-      {
-        "kanji": "靴",
-        "concepts": "shoes",
-        "why": "Shoes made of leather (革).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/靴"
-        ]
-      }
     ]
   },
   "韋": {
@@ -3798,16 +3542,6 @@
     "cn": "The head of an animal with a long mouth and horns.",
     "refs": [
       "https://en.wiktionary.org/wiki/首"
-    ],
-    "semantic": [
-      {
-        "kanji": "道",
-        "concepts": "road-way, way, road",
-        "why": "Some believe walking (辶) with the head (首) leading the way.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/道"
-        ]
-      }
     ]
   },
   "香": {
@@ -3847,16 +3581,6 @@
     "cn": "A picture of bones, with 肉 (flesh) added later.",
     "refs": [
       "https://en.wiktionary.org/wiki/骨"
-    ],
-    "semantic": [
-      {
-        "kanji": "骸",
-        "concepts": "remains, dead remains, bone",
-        "why": "Remains are bones (骨).",
-        "refs": [
-          "https://en.wiktionary.org/wiki/骸"
-        ]
-      }
     ]
   },
   "高": {
@@ -3864,17 +3588,6 @@
     "cn": "A tall building.",
     "refs": [
       "https://en.wiktionary.org/wiki/高"
-    ],
-    "sound": [
-      {
-        "kanji": "稿",
-        "word": "原稿",
-        "reading": "げんこう",
-        "gloss": "manuscript, copy",
-        "refs": [
-          "https://en.wiktionary.org/wiki/稿"
-        ]
-      }
     ]
   },
   "髟": {

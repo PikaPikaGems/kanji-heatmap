@@ -383,8 +383,9 @@ Rules:
   Wiktionary's "Glyph origin" sections. For 🇯🇵 history reasons:
   Kanjipedia (漢字ペディア) or Japanese Wikipedia.
 - Meaning examples: 2–3 kanji where the radical really is the meaning
-  part, each with concepts and how it links. One is fine when only one is
-  checked. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
+  part, each with concepts and how it links. Never just one: a single
+  example shows no pattern (user, October 2026), so a radical with only
+  one gets none. Same for sound examples. The build enforces it. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
 - Sound examples: 2–3, never the radical itself, and the word must be
   read with the family sound.
 - Both example sections are optional: shape-only radicals (丶 丿 亅 亠)
@@ -501,7 +502,8 @@ Naming the sound part is only for when it explains something (視).
 
 Wiktionary's shinjitai pages (状, 献, 獣, 触) often have no glyph origin;
 it is on the traditional form (狀, 獻, 獸, 觸). Checking those found more
-examples. Radicals still at one meaning example, and why:
+examples. Radicals that had only one meaning example, and why there are no more
+(the single example was then removed):
 
 - Their other kanji use the radical as the sound part or by shape only:
   匚 片 瓦 癶 耒 臣 至 舛 首 骨 肉 (肉's kanji are written ⺼/月).
@@ -510,7 +512,7 @@ examples. Radicals still at one meaning example, and why:
   (術 衛 衝) 角 (触) 辰 (辱) 革 (覇).
 - 人: its kanji are written with ⺅ or 𠆢.
 
-Sound parts with 0 or 1 examples, and why:
+Sound parts that had 0 or 1 examples, and why (single ones removed):
 
 - Only one other kanji in the family: 十 (汁), 比 (批), 高 (稿), 小 (少).
 - 里: 鯉 is rarely read り.

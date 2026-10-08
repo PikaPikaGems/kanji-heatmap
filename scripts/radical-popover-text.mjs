@@ -141,6 +141,15 @@ export const buildRadicalPopoverText = ({
       }
     }
 
+    // One example shows no pattern, so it doesn't help a learner: a section
+    // has two or more examples, or none.
+    for (const field of ["semantic", "sound"]) {
+      if (entry[field]?.length === 1)
+        problems.push(
+          `${where}: ${field} has one example; add one or remove it`
+        );
+    }
+
     for (const example of entry.semantic ?? []) {
       const label = `${where} semantic ${example.kanji}`;
       for (const field of SEMANTIC_FIELDS) {
