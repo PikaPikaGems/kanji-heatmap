@@ -227,6 +227,7 @@ export const buildRadicalData = ({
   const families = buildFamilies({
     sylhareRows,
     ours,
+    aliases,
     skipAlts,
     info,
     drawerRadicals,
@@ -275,6 +276,7 @@ const pruneAliases = (aliases, isUsed) => {
 const buildFamilies = ({
   sylhareRows,
   ours,
+  aliases,
   skipAlts,
   info,
   drawerRadicals,
@@ -308,9 +310,33 @@ const buildFamilies = ({
       } else if (rowOf.has(glyph)) {
         const pos = positionOf(rowOf.get(glyph)["Position-J"]);
         members.push({ ja: nameOf(glyph), ...(pos ? { pos } : {}) });
+      } else if (isForm(aliases[glyph]) && aliases[glyph] !== head) {
+        // A second code for another form (忄 for the drawer's ⺖).
+        members.push(aliases[glyph]);
       }
     }
     families.set(head, members);
+  }
+  // A named glyph whose alias leads into a family is one of its forms too,
+  // even when the CSV doesn't list it there (丷 はちがしら → ハ, under 八).
+  const memberOf = new Map();
+  for (const [head, members] of families) {
+    for (const member of members) {
+      if (typeof member === "string") memberOf.set(member, head);
+    }
+  }
+  for (const glyph of Object.keys(info)) {
+    if (memberOf.has(glyph) || familySkips[glyph] != null) continue;
+    const seen = new Set();
+    let current = aliases[glyph];
+    while (current != null && !seen.has(current) && !memberOf.has(current)) {
+      seen.add(current);
+      current = aliases[current];
+    }
+    if (current != null && memberOf.has(current)) {
+      families.get(memberOf.get(current)).push(glyph);
+      memberOf.set(glyph, memberOf.get(current));
+    }
   }
 
   const out = {};

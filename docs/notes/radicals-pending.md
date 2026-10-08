@@ -463,6 +463,38 @@ Open:
   names could become meanings ("roof" instead of "katakana u crown").
   Revisit once the popover exists.
 
+#### Forms and families (decided with the user, October 2026)
+
+Three kinds of "same radical":
+
+- **Alias**: the same shape under another character code (⿊ = 黒,
+  氵 = ⺡). Merged; never shown on its own.
+- **Form**: a different shape of the same radical (水, ⺡ さんずい, 氺
+  したみず). Its own entry, linked in the dialog's 🧩 Forms section.
+- Old forms (黑 艸 戶 齒 龜) are not labeled: no source says which
+  alternates are old forms. They work through their alias (tapping 黑
+  shows 黒). Glyphs the app never shows (户 靣 髙 ⿊ …) are dropped.
+
+Families come from sylhare's Alternate column (raw-data/radicals/README.md,
+"Families"); `familySkips` and `familyHeads` in ours.json hold the
+exceptions. Per field:
+
+- Japanese name, position, meaning and sound examples: **per form**. An
+  example sits under the form it is written with (泳 under ⺡, 雪 under ⻗);
+  the build checks this with kanjium's radical slot
+  (`kanjiumFormFixes` corrects it, e.g. 燃).
+- Origin: **shared**. A form shows its head's `cn`, then its own
+  `cnNote` ("Written as three strokes on the left side."). A form whose
+  story differs has its own `cn` (𠆢, ⺩).
+- 🧩 Forms lists every form, also name-only ones with no showable glyph
+  (きへん under 木); the dialog switches to a form when it is tapped. A
+  radical in no family shows one row, so its position has a place.
+
+Open:
+
+- 老 shows the name おいかんむり, inherited from 耂's CSV row (sylhare has
+  no row for 老), and its 🇯🇵 line was written to match.
+
 ### 3. Component search
 
 A new search type, like radical search, built from

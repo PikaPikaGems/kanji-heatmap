@@ -6,18 +6,14 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { BookOpen, InfoIcon, Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
-  useGetKanjiInfoFn,
   useRadicalPopoverText,
   useRadicals,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { Link } from "./router-adapter";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { RadicalDetailsDialogContent } from "@/components/dependent/site-wide/RadicalDetailsDialog";
-import {
-  radicalInfo,
-  RadicalPopoverDetails,
-  resolveRadicalForSearch,
-} from "@/lib/radicals";
+import { useRadicalSummary } from "@/components/dependent/site-wide/use-radical-summary";
+import { resolveRadicalForSearch } from "@/lib/radicals";
 
 export const ComponentLink = ({
   component,
@@ -173,23 +169,9 @@ const OpenKanjiAction = ({
   );
 };
 
-const hasDetails = (text: RadicalPopoverDetails | null, pos?: string) =>
-  text != null &&
-  (pos != null ||
-    text.ja != null ||
-    text.cn != null ||
-    (text.semantic ?? []).length > 0 ||
-    (text.sound ?? []).length > 0);
-
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
-  const getKanjiInfo = useGetKanjiInfoFn();
-  const radicals = useRadicals();
-  const info = radicalInfo(radical, radicals);
-  const kanjiInfo = getKanjiInfo?.(radical);
-  const keyword = kanjiInfo?.keyword;
-  const isKanji = kanjiInfo != null && "on" in kanjiInfo;
+  const { info, keyword, isKanji, name } = useRadicalSummary(radical);
   const { data: text } = useRadicalPopoverText(radical);
-  const name = info == null ? "" : keyword ? `${info.ja}, ${keyword}` : info.ja;
   return (
     <div className="p-1 max-w-xs" data-vaul-no-drag>
       <div className="flex gap-3 px-1">
@@ -220,7 +202,7 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
       </div>
       <DottedSeparator className="mx-1 mt-3" />
       <div className="flex flex-col px-1 pt-2">
-        {info && text != null && hasDetails(text, info.pos) && (
+        {info && (
           <Dialog>
             <DialogTrigger asChild>
               <button type="button" className={popoverActionCn}>
@@ -230,13 +212,7 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
                 </PopoverActionText>
               </button>
             </DialogTrigger>
-            <RadicalDetailsDialogContent
-              radical={radical}
-              text={text}
-              name={name}
-              english={info.cn}
-              pos={info.pos}
-            />
+            <RadicalDetailsDialogContent radical={radical} />
           </Dialog>
         )}
         <RadicalSearchAction radical={radical} />

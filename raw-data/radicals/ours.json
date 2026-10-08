@@ -151,7 +151,8 @@
     "⺛": "无",
     "⽼": "耂",
     "⺹": "耂",
-    "尤": "尢"
+    "尤": "尢",
+    "衤": "⻂"
   },
   "sylhareSkipAlts": [
     "⺈",
@@ -163,19 +164,26 @@
   ],
   "sylhareExtraAliases": {
     "⾡": "⻌",
-    "𧾷": "足",
+    "𧾷": "⻊",
     "⺍": "⺌"
   },
   "familySkips": {
     "𠆢": "Listed under both 人 and 入; in many kanji (今, 会) it is neither, so it has its own entry",
     "月": "Listed under 肉 because ⺼ looks like 月; 月 (moon) is its own radical",
     "己": "Listed under 已, but 已, 己 and 巳 are different characters",
-    "巳": "Listed under 已, but 已, 己 and 巳 are different characters"
+    "巳": "Listed under 已, but 已, 己 and 巳 are different characters",
+    "龍": "竜 and 龍 each have their own origin text (竜's says it is an old form of 龍), so 龍 must not show 竜's"
   },
   "familyHeads": {
     "丿": "ノ",
     "彐": "ヨ",
     "罒": "⺲"
+  },
+  "kanjiumFormFixes": {
+    "燃": {
+      "form": "火",
+      "why": "kanjium gives 灬, but that is the bottom of 然 (the sound part); the meaning part is 火 on the left"
+    }
   },
   "extras": {
     "𠂉": {

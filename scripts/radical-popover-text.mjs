@@ -27,6 +27,7 @@ const ENTRY_FIELDS = new Set([
   "jaRefs",
   "addEn",
   "cn",
+  "cnNote",
   "refs",
   "semantic",
   "sound",
@@ -58,6 +59,13 @@ const splitWords = (text) =>
  * `containsRadical(kanji, glyph)` says whether a kanji is built with the
  * radical; `soundPartOf` and `readings` are the sound-parts data.
  *
+ * Families (radicals.json) link the forms of a radical (水 ⺡ 氺). Each form
+ * has its own text, except the origin: a form shows its family head's `cn`
+ * unless it has its own, plus its `cnNote` (⺡ "Squeezed to fit the left
+ * side."). `headOf(glyph)` gives a form's family head (null for a head or a
+ * glyph in no family), and `formIn(kanji)` the form a kanji is written with
+ * (雪 → ⻗), when known, so an example sits under the form it really uses.
+ *
  * Throws on anything malformed, so a bad entry fails the build.
  */
 export const buildRadicalPopoverText = ({
@@ -68,6 +76,8 @@ export const buildRadicalPopoverText = ({
   containsRadical,
   soundPartOf,
   readings,
+  headOf = () => null,
+  formIn = () => null,
 }) => {
   const problems = [];
   const text = {};
@@ -95,8 +105,17 @@ export const buildRadicalPopoverText = ({
       if (!isText(entry.cn)) problems.push(`${where}: cn must be text`);
       if (!isRefs(entry.refs))
         problems.push(`${where}: cn needs refs (https links)`);
-    } else if (entry.refs != null) {
-      problems.push(`${where}: refs without cn`);
+    } else if (entry.refs != null && entry.cnNote == null) {
+      problems.push(`${where}: refs without cn or cnNote`);
+    }
+    if (entry.cnNote != null) {
+      const head = headOf(glyph);
+      if (!isText(entry.cnNote)) problems.push(`${where}: cnNote must be text`);
+      if (head == null) problems.push(`${where}: cnNote on a glyph that is not a form`);
+      else if (entry.cn == null && entries[head]?.cn == null)
+        problems.push(`${where}: cnNote, but neither it nor ${head} has cn`);
+      if (!isRefs(entry.refs))
+        problems.push(`${where}: cnNote needs refs (https links)`);
     }
 
     if (entry.addEn != null) {
@@ -132,6 +151,12 @@ export const buildRadicalPopoverText = ({
         problems.push(`${label}: not one of our kanji`);
       else if (!containsRadical(example.kanji, glyph)) {
         problems.push(`${label}: kanji doesn't contain ${glyph}`);
+      } else {
+        const form = formIn(example.kanji);
+        const family = (g) => headOf(g) ?? g;
+        if (form != null && form !== glyph && family(form) === family(glyph)) {
+          problems.push(`${label}: written with ${form}, not ${glyph}`);
+        }
       }
     }
 

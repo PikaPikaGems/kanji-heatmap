@@ -280,6 +280,12 @@ for (const kanji of kanjiList) {
 const drawerGlyphs = new Set(
   Object.values(radicals.radicalsGroupedByStrokeCount).flat()
 );
+const familyHeadOf = new Map();
+for (const [head, members] of Object.entries(radicalFamilies)) {
+  for (const member of members) {
+    if (typeof member === "string") familyHeadOf.set(member, head);
+  }
+}
 let radicalPopover;
 try {
   radicalPopover = buildRadicalPopoverText({
@@ -287,9 +293,28 @@ try {
     info: radicalInfo,
     isRadical: (glyph) => drawerGlyphs.has(glyph) || glyph in radicalInfo,
     isKanji,
-    // The radical-search index: the drawer radicals each kanji contains.
+    // The radical-search index: the drawer radicals each kanji contains. A
+    // form outside the drawer is searched as its alias (⻗ → 雨).
     containsRadical: (kanji, glyph) =>
-      [...(decomposition[kanji] ?? "")].includes(glyph),
+      [...(decomposition[kanji] ?? "")].includes(
+        followAlias(glyph, allAliases, (g) => drawerGlyphs.has(g)) ?? glyph
+      ),
+    headOf: (glyph) => {
+      const head = familyHeadOf.get(glyph);
+      return head == null || head === glyph ? null : head;
+    },
+    // kanjium names the radical form a kanji is written with: [radical,
+    // variant, …] (雪: 雨, ⻗). Other codes for a form count as that form.
+    // Its mistakes are fixed in radicals/ours.json (kanjiumFormFixes).
+    formIn: (kanji) => {
+      const [radical, variant] = structureSources.ka[kanji] ?? [];
+      const glyph =
+        ours.kanjiumFormFixes?.[kanji]?.form ?? variant ?? radical;
+      if (glyph == null) return null;
+      return (
+        followAlias(glyph, allAliases, (g) => familyHeadOf.has(g)) ?? glyph
+      );
+    },
     soundPartOf: soundParts.soundPartOf,
     readings: soundParts.readings,
   });

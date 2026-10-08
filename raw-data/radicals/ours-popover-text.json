@@ -169,7 +169,7 @@
   },
   "⺡": {
     "ja": "さん (三, three) + すい (水, water).",
-    "cn": "The squeezed form of 水, a picture of flowing water.",
+    "cnNote": "Written as three strokes on the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/氵",
       "https://en.wiktionary.org/wiki/水"
@@ -203,7 +203,7 @@
   },
   "⺅": {
     "ja": "にん (人, person) + べん (へん, left side).",
-    "cn": "The squeezed form of 人, a side view of a standing person.",
+    "cnNote": "Squeezed to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/亻",
       "https://en.wiktionary.org/wiki/人"
@@ -232,12 +232,20 @@
         "refs": [
           "https://en.wiktionary.org/wiki/作"
         ]
+      },
+      {
+        "kanji": "傷",
+        "concepts": "wound, hurt, injure",
+        "why": "Something that happens to a person.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/傷"
+        ]
       }
     ]
   },
   "⺘": {
     "ja": "て (手, hand) + へん (left side).",
-    "cn": "The squeezed form of 手, a picture of a hand and its fingers.",
+    "cnNote": "Changed in shape to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/扌",
       "https://en.wiktionary.org/wiki/手"
@@ -390,9 +398,31 @@
   },
   "𠆢": {
     "ja": "ひと (人, person) + やね (屋根, roof).",
-    "cn": "A variant form of 人 (person).",
+    "cn": "Not one thing: a person (人) in 介 and 企, but a mouth turned down (亼) in 今, 合 and 令, and a roof in 余.",
     "refs": [
-      "https://en.wiktionary.org/wiki/𠆢"
+      "https://en.wiktionary.org/wiki/介",
+      "https://en.wiktionary.org/wiki/今",
+      "https://en.wiktionary.org/wiki/合",
+      "https://en.wiktionary.org/wiki/令",
+      "https://en.wiktionary.org/wiki/余"
+    ],
+    "semantic": [
+      {
+        "kanji": "介",
+        "concepts": "between, mediate, shellfish",
+        "why": "A person (𠆢) with a mark on each side: in between.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/介"
+        ]
+      },
+      {
+        "kanji": "企",
+        "concepts": "undertake, plan, scheme",
+        "why": "A person (𠆢) standing on tiptoe (止) to look ahead.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/企"
+        ]
+      }
     ]
   },
   "冂": {
@@ -444,11 +474,7 @@
     ]
   },
   "丷": {
-    "ja": "はち (八, eight) + がしら (top).",
-    "cn": "A variant of 八 used as a part of kanji.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/丷"
-    ]
+    "ja": "はち (八, eight) + がしら (top)."
   },
   "丶": {
     "ja": "てん (点, dot).",
@@ -895,14 +921,6 @@
         "why": "A person inside an enclosure (囗).",
         "refs": [
           "https://en.wiktionary.org/wiki/囚"
-        ]
-      },
-      {
-        "kanji": "傷",
-        "concepts": "wound, hurt, injure",
-        "why": "Something that happens to a person.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/傷"
         ]
       }
     ]
@@ -2025,7 +2043,7 @@
   },
   "水": {
     "ja": "みず (水, water).",
-    "cn": "A picture of flowing water; at the left of a kanji it is written 氵.",
+    "cn": "A picture of flowing water.",
     "refs": [
       "https://en.wiktionary.org/wiki/水"
     ],
@@ -2037,20 +2055,12 @@
         "refs": [
           "https://en.wiktionary.org/wiki/泉"
         ]
-      },
-      {
-        "kanji": "泳",
-        "concepts": "swim",
-        "why": "Moving through water.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/泳"
-        ]
       }
     ]
   },
   "火": {
     "ja": "ひ (火, fire).",
-    "cn": "A picture of fire; at the bottom of a kanji it is written 灬.",
+    "cn": "A picture of fire.",
     "refs": [
       "https://en.wiktionary.org/wiki/火"
     ],
@@ -2253,32 +2263,6 @@
     "cn": "A ritual axe, perhaps of jade, a sign of the king's power.",
     "refs": [
       "https://en.wiktionary.org/wiki/王"
-    ],
-    "semantic": [
-      {
-        "kanji": "球",
-        "concepts": "ball, sphere",
-        "why": "Jade (王, here standing for 玉) shaped into a ball.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/球"
-        ]
-      },
-      {
-        "kanji": "理",
-        "concepts": "reason, logic, arrange",
-        "why": "First \"to polish jade (王)\"; \"put in order, reason\" likely grew from that.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/理"
-        ]
-      },
-      {
-        "kanji": "珠",
-        "concepts": "pearl, gem",
-        "why": "A precious stone (王, jade): a pearl.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/珠"
-        ]
-      }
     ]
   },
   "瓜": {
@@ -2658,32 +2642,6 @@
     "cn": "Two bamboo stalks with leaves.",
     "refs": [
       "https://en.wiktionary.org/wiki/竹"
-    ],
-    "semantic": [
-      {
-        "kanji": "管",
-        "concepts": "pipe, exercise control, tube",
-        "why": "A bamboo tube.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/管"
-        ]
-      },
-      {
-        "kanji": "節",
-        "concepts": "joint, section, season",
-        "why": "The joints of a bamboo (竹) stem → section.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/節"
-        ]
-      },
-      {
-        "kanji": "等",
-        "concepts": "class, rank, equal",
-        "why": "Bamboo (竹) slips for writing, sorted by grade → rank, equal.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/等"
-        ]
-      }
     ]
   },
   "米": {
@@ -3296,32 +3254,6 @@
     "cn": "A picture of a leg.",
     "refs": [
       "https://en.wiktionary.org/wiki/足"
-    ],
-    "semantic": [
-      {
-        "kanji": "路",
-        "concepts": "path, road, route",
-        "why": "Where the feet go: a road.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/路"
-        ]
-      },
-      {
-        "kanji": "跡",
-        "concepts": "tracks, trace, mark",
-        "why": "Footprints.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/跡"
-        ]
-      },
-      {
-        "kanji": "踏",
-        "concepts": "step, tread, trample",
-        "why": "Stepping.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/踏"
-        ]
-      }
     ]
   },
   "身": {
@@ -3572,32 +3504,6 @@
     "cn": "A cloud with raindrops falling from it.",
     "refs": [
       "https://en.wiktionary.org/wiki/雨"
-    ],
-    "semantic": [
-      {
-        "kanji": "雪",
-        "concepts": "snow",
-        "why": "Snow falls like rain.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/雪"
-        ]
-      },
-      {
-        "kanji": "雲",
-        "concepts": "cloud",
-        "why": "Clouds bring rain.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/雲"
-        ]
-      },
-      {
-        "kanji": "電",
-        "concepts": "electricity",
-        "why": "Lightning from the clouds.",
-        "refs": [
-          "https://en.wiktionary.org/wiki/電"
-        ]
-      }
     ]
   },
   "非": {
@@ -4084,7 +3990,7 @@
     ]
   },
   "⺉": {
-    "cn": "The squeezed form of 刀, a knife.",
+    "cnNote": "Changed in shape to fit the right side.",
     "refs": [
       "https://en.wiktionary.org/wiki/刀"
     ],
@@ -4116,18 +4022,10 @@
     ]
   },
   "⺌": {
-    "ja": "しょう (小, small) + かんむり (top): 小 written on top.",
-    "cn": "From 小: some believe three small dots, others three grains of sand.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/小"
-    ]
+    "ja": "しょう (小, small) + かんむり (top): 小 written on top."
   },
   "川": {
-    "ja": "さんぼん (三本, three lines) + がわ (かわ, river).",
-    "cn": "Flowing water.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/川"
-    ]
+    "ja": "さんぼん (三本, three lines) + がわ (かわ, river)."
   },
   "巳": {
     "cn": "Two theories: a fetus, or a snake (the Shuowen).",
@@ -4176,7 +4074,7 @@
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/邑部"
     ],
-    "cn": "The form of 邑 (town) on the right.",
+    "cnNote": "Shrunk to 阝 on the right side.",
     "refs": [
       "https://en.wiktionary.org/wiki/邑"
     ],
@@ -4204,7 +4102,7 @@
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/阜部"
     ],
-    "cn": "The form of 阜 (steps on a hill) on the left.",
+    "cnNote": "Shrunk to 阝 on the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/阜"
     ],
@@ -4228,7 +4126,7 @@
     ]
   },
   "⺖": {
-    "cn": "The squeezed form of 心 (heart).",
+    "cnNote": "Squeezed to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/心"
     ],
@@ -4261,7 +4159,7 @@
   },
   "⺨": {
     "ja": "けもの (獣, beast) + へん (left side).",
-    "cn": "The squeezed form of 犬 (dog).",
+    "cnNote": "Changed in shape to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/犬"
     ],
@@ -4286,9 +4184,27 @@
   },
   "⺗": {
     "ja": "した (下, below) + ごころ (こころ, 心, heart): 心 at the bottom.",
-    "cn": "A form of 心 (heart) used at the bottom.",
+    "cnNote": "A changed shape of 心 used at the bottom of some kanji.",
     "refs": [
       "https://en.wiktionary.org/wiki/心"
+    ],
+    "semantic": [
+      {
+        "kanji": "恭",
+        "concepts": "respect, reverent",
+        "why": "Respect is a feeling of the heart (⺗).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/恭"
+        ]
+      },
+      {
+        "kanji": "慕",
+        "concepts": "yearn for, adore",
+        "why": "Longing is a feeling of the heart (⺗).",
+        "refs": [
+          "https://en.wiktionary.org/wiki/慕"
+        ]
+      }
     ]
   },
   "⺣": {
@@ -4296,7 +4212,7 @@
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/火部"
     ],
-    "cn": "Fire (火) written as four dots at the bottom.",
+    "cnNote": "Written as four dots at the bottom.",
     "refs": [
       "https://en.wiktionary.org/wiki/火"
     ],
@@ -4320,15 +4236,11 @@
     ]
   },
   "⺤": {
-    "ja": "つめ (爪, claw) + かんむり (top).",
-    "cn": "The form of 爪 (a grabbing hand) on top.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/爪"
-    ]
+    "ja": "つめ (爪, claw) + かんむり (top)."
   },
   "⺭": {
     "ja": "しめす (示, altar) + へん (left side).",
-    "cn": "The squeezed form of 示, an altar.",
+    "cnNote": "Changed in shape to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/示"
     ],
@@ -4368,14 +4280,14 @@
   },
   "氺": {
     "ja": "した (下, below) + みず (水, water): 水 at the bottom.",
-    "cn": "A variant of 水 used in some kanji (泰, 录).",
+    "cnNote": "A changed shape of 水 used at the bottom of some kanji (泰, 录).",
     "refs": [
       "https://en.wiktionary.org/wiki/水"
     ]
   },
   "⻂": {
     "ja": "ころも (衣, garment) + へん (left side).",
-    "cn": "The squeezed form of 衣 (garment).",
+    "cnNote": "Changed in shape to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/衣"
     ],
@@ -4400,23 +4312,93 @@
   },
   "⺮": {
     "ja": "たけ (竹, bamboo) + かんむり (top).",
-    "cn": "竹 (bamboo) written on top.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/竹"
+    "semantic": [
+      {
+        "kanji": "管",
+        "concepts": "pipe, exercise control, tube",
+        "why": "A bamboo tube.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/管"
+        ]
+      },
+      {
+        "kanji": "節",
+        "concepts": "joint, section, season",
+        "why": "The joints of a bamboo (竹) stem → section.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/節"
+        ]
+      },
+      {
+        "kanji": "等",
+        "concepts": "class, rank, equal",
+        "why": "Bamboo (竹) slips for writing, sorted by grade → rank, equal.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/等"
+        ]
+      }
     ]
   },
   "⻊": {
     "ja": "あし (足, foot) + へん (left side).",
-    "cn": "The form of 足 (foot) on the left.",
+    "cnNote": "Changed in shape to fit the left side.",
     "refs": [
       "https://en.wiktionary.org/wiki/足"
+    ],
+    "semantic": [
+      {
+        "kanji": "路",
+        "concepts": "path, road, route",
+        "why": "Where the feet go: a road.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/路"
+        ]
+      },
+      {
+        "kanji": "跡",
+        "concepts": "tracks, trace, mark",
+        "why": "Footprints.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/跡"
+        ]
+      },
+      {
+        "kanji": "踏",
+        "concepts": "step, tread, trample",
+        "why": "Stepping.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/踏"
+        ]
+      }
     ]
   },
   "⻗": {
     "ja": "あめ (雨, rain) + かんむり (top).",
-    "cn": "雨 (rain) written on top.",
-    "refs": [
-      "https://en.wiktionary.org/wiki/雨"
+    "semantic": [
+      {
+        "kanji": "雪",
+        "concepts": "snow",
+        "why": "Snow falls like rain.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/雪"
+        ]
+      },
+      {
+        "kanji": "雲",
+        "concepts": "cloud",
+        "why": "Clouds bring rain.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/雲"
+        ]
+      },
+      {
+        "kanji": "電",
+        "concepts": "electricity",
+        "why": "Lightning from the clouds.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/電"
+        ]
+      }
     ]
   },
   "龍": {
@@ -4469,6 +4451,32 @@
     "cn": "The form of 玉 (jade) on the left, written like 王.",
     "refs": [
       "https://en.wiktionary.org/wiki/玉"
+    ],
+    "semantic": [
+      {
+        "kanji": "球",
+        "concepts": "ball, sphere",
+        "why": "Jade (王, here standing for 玉) shaped into a ball.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/球"
+        ]
+      },
+      {
+        "kanji": "理",
+        "concepts": "reason, logic, arrange",
+        "why": "First \"to polish jade (王)\"; \"put in order, reason\" likely grew from that.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/理"
+        ]
+      },
+      {
+        "kanji": "珠",
+        "concepts": "pearl, gem",
+        "why": "A precious stone (王, jade): a pearl.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/珠"
+        ]
+      }
     ]
   }
 }

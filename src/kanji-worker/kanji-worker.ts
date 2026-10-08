@@ -45,6 +45,7 @@ import { SearchSettings } from "@/lib/settings/settings";
 import {
   followAlias,
   prepareRadicals,
+  radicalFamily,
   RadicalPopoverDetails,
   RadicalPopoverText,
   resolveRadicalForSearch,
@@ -341,10 +342,28 @@ const handleRadicalPopoverText = requirePayload(
       loadRadicals(),
       loadComponents(),
     ]);
+    const textOf = (char: string) => {
+      const glyph = followAlias(char, radicals.aliases, (g) => g in texts);
+      return glyph == null ? null : texts[glyph];
+    };
     const glyph = followAlias(radical, radicals.aliases, (g) => g in texts);
-    const text = glyph == null ? {} : texts[glyph];
+    let text: RadicalPopoverDetails = glyph == null ? {} : texts[glyph];
+    // A form without its own origin shows its family head's (⺡ → 水),
+    // followed by its own note.
+    const family = radicalFamily(radical, radicals);
+    const headText =
+      family != null && family.head !== family.current
+        ? textOf(family.head)
+        : null;
+    if (text.cn == null && headText?.cn != null) {
+      text = {
+        ...text,
+        cn: headText.cn,
+        refs: [...(headText.refs ?? []), ...(text.refs ?? [])],
+      };
+    }
     const sounds = components[glyph ?? radical]?.s;
-    if (glyph == null && sounds == null) return null;
+    if (glyph == null && sounds == null && text.cn == null) return null;
     return sounds == null ? text : { ...text, sounds };
   }
 );
