@@ -360,9 +360,9 @@ Rules:
 - Every radical gets a 🇯🇵 reason, also when the name is just a word or
   the kanji's own reading (ほこ, あお): say what the word means ("ほこ: the
   word for spear"). A non-native reader can't tell otherwise (user,
-  October 2026; replaces "name only"). Whether a word's meaning needs a
-  reference is open (proposal: no, it's a dictionary meaning like the
-  glosses we already show).
+  October 2026; replaces "name only"). A word's meaning needs no
+  reference: it's a dictionary meaning, like the word glosses we already
+  show (user).
 - 🇨🇳: the Chinese origin of the glyph.
 - No source is a source of truth. Wiktionary, kanjium, sylhare, Anki and
   the rest are all references. One reputable reference, linked, is

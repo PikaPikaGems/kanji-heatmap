@@ -97,6 +97,7 @@ export const RadicalDetailsDialogContent = ({
 }) => (
   <ScrollableDialogContent
     size="md"
+    headerClassName="text-left"
     title={<span className="text-4xl kanji-font">{radical}</span>}
     description={`Details for the radical ${radical}`}
   >
