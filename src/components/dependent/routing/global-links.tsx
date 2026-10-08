@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -10,6 +9,8 @@ import {
   useRadicals,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { Link } from "./router-adapter";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import {
   radicalInfo,
   RadicalPopoverDetails,
@@ -165,8 +166,7 @@ const RadicalSources = ({ text }: { text: RadicalPopoverText }) => {
   }
   if (bySite.size === 0) return null;
   return (
-    <div className="text-[10px] text-muted-foreground">
-      <p>Sources:</p>
+    <div className="text-xs text-muted-foreground">
       {[...bySite].map(([site, links]) => (
         <p key={site}>
           {site}:{" "}
@@ -212,60 +212,97 @@ const OpenKanjiAction = ({
   );
 };
 
+const sectionHeadingCn =
+  "mb-2 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
+
 /**
- * Everything behind "view more details": the reasons behind the names, the
- * meaning and sound examples, and the references. Muted, not bold, so the
- * summary above stays the first thing read.
+ * Everything behind "view radical details": the reasons behind the names,
+ * the meaning and sound examples, and the references. A dialog rather than
+ * more popover, so each part gets its own heading and room.
  */
-const RadicalPopoverDetailsSection = ({
+const RadicalDetailsDialogContent = ({
+  radical,
   text,
   name,
   english,
 }: {
+  radical: string;
   text: RadicalPopoverDetails;
   name: string;
   english?: string;
 }) => (
-  <div className="px-1 pt-2 space-y-2 text-xs text-left text-muted-foreground">
-    {text.ja && (
-      <p>
-        🇯🇵 {name} · {text.ja}
-      </p>
-    )}
-    {text.cn && (
-      <p>
-        🇨🇳 {english} · {text.cn}
-      </p>
-    )}
-    {(text.semantic ?? []).length > 0 && (
-      <div>
-        <p>🧠 semantic: {english}</p>
-        <ul className="space-y-1">
-          {text.semantic?.map((example) => (
-            <li key={example.kanji}>
-              <span className="text-base kanji-font">{example.kanji}</span> ·{" "}
-              {example.concepts} · {example.why}
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-    {text.sounds != null && (
-      <div>
-        <p>🔊 phonetic: {text.sounds.join("・")}</p>
-        <ul className="space-y-1">
-          {text.sound?.map((example) => (
-            <li key={example.kanji}>
-              <span className="text-base kanji-font">{example.kanji}</span>,{" "}
-              <span className="kanji-font">{example.word}</span>,{" "}
-              {example.reading}, {example.gloss}
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-    <RadicalSources text={text} />
-  </div>
+  <ScrollableDialogContent
+    size="md"
+    title={
+      <span className="flex items-center gap-3">
+        <span className="text-4xl kanji-font">{radical}</span>
+        <span className="text-base">{name}</span>
+      </span>
+    }
+    description={`Details for the radical ${radical}`}
+  >
+    <div className="space-y-5 text-sm text-left">
+      {text.ja && (
+        <section>
+          <h3 className={sectionHeadingCn}>🇯🇵 Japanese name</h3>
+          <p className="font-bold">{name}</p>
+          <p className="text-muted-foreground">{text.ja}</p>
+        </section>
+      )}
+      {text.cn && (
+        <section>
+          <h3 className={sectionHeadingCn}>🇨🇳 Origin</h3>
+          <p className="font-bold">{english}</p>
+          <p className="text-muted-foreground">{text.cn}</p>
+        </section>
+      )}
+      {(text.semantic ?? []).length > 0 && (
+        <section>
+          <h3 className={sectionHeadingCn}>🧠 Semantic: {english}</h3>
+          <ul className="space-y-2">
+            {text.semantic?.map((example) => (
+              <li key={example.kanji} className="flex gap-3">
+                <span className="text-3xl leading-none kanji-font">
+                  {example.kanji}
+                </span>
+                <span>
+                  <span className="font-bold">{example.concepts}</span>
+                  <br />
+                  <span className="text-muted-foreground">{example.why}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {text.sounds != null && (text.sound ?? []).length > 0 && (
+        <section>
+          <h3 className={sectionHeadingCn}>
+            🔊 Phonetic: {text.sounds.join("・")}
+          </h3>
+          <ul className="space-y-2">
+            {text.sound?.map((example) => (
+              <li key={example.kanji} className="flex gap-3">
+                <span className="text-3xl leading-none kanji-font">
+                  {example.kanji}
+                </span>
+                <span>
+                  <span className="font-bold kanji-font">{example.word}</span>{" "}
+                  {example.reading}
+                  <br />
+                  <span className="text-muted-foreground">{example.gloss}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <section>
+        <h3 className={sectionHeadingCn}>Sources</h3>
+        <RadicalSources text={text} />
+      </section>
+    </div>
+  </ScrollableDialogContent>
 );
 
 const hasDetails = (text: RadicalPopoverDetails | null) =>
@@ -283,7 +320,6 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
   const keyword = kanjiInfo?.keyword;
   const isKanji = kanjiInfo != null && "on" in kanjiInfo;
   const { data: text } = useRadicalPopoverText(radical);
-  const [expanded, setExpanded] = useState(false);
   const name = info == null ? "" : keyword ? `${info.ja}, ${keyword}` : info.ja;
   return (
     <div className="p-1 max-w-xs" data-vaul-no-drag>
@@ -315,25 +351,27 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
               </p>
             )}
             {text?.sounds != null && <p>🔊 {text.sounds.join("・")}</p>}
-            {hasDetails(text) && (
-              <button
-                type="button"
-                onClick={() => setExpanded((value) => !value)}
-                className="text-xs font-normal underline decoration-dotted underline-offset-4 hover:text-neon-accent"
-              >
-                {expanded ? "hide details" : "view more details →"}
-              </button>
+            {text != null && hasDetails(text) && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-xs font-normal underline decoration-dotted underline-offset-4 hover:text-neon-accent"
+                  >
+                    view radical details →
+                  </button>
+                </DialogTrigger>
+                <RadicalDetailsDialogContent
+                  radical={radical}
+                  text={text}
+                  name={name}
+                  english={info.cn}
+                />
+              </Dialog>
             )}
           </div>
         )}
       </div>
-      {expanded && text != null && (
-        <RadicalPopoverDetailsSection
-          text={text}
-          name={name}
-          english={info?.cn}
-        />
-      )}
       <RadicalSearchAction radical={radical} />
       {isKanji && keyword && (
         <OpenKanjiAction kanji={radical} keyword={keyword} />
