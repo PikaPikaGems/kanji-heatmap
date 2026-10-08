@@ -496,9 +496,10 @@ exceptions. Per field:
 - Origin: **shared**. A form shows its head's `cn`, then its own
   `cnNote` ("Written as three strokes on the left side."). A form whose
   story differs has its own `cn` (𠆢, ⺩).
-- 🧩 Other forms lists the family's other forms, also name-only ones with
-  no showable glyph (きへん under 木); the dialog switches to a form when
-  it is tapped. A radical with no other forms has no section; its
+- 🧩 Other forms lists the family's other glyphs; the dialog switches to
+  a form when it is tapped. Name-only rows (方 on the left is ほうへん, 木
+  is きへん) have no glyph of their own, so they are not forms: the head's
+  🇯🇵 section shows them as "Also called ほうへん · へん (left side)". A radical with no other forms has no section; its
   position is on the 🇯🇵 line.
 
 老 is named おい (an `extras` entry in ours.json); it used to inherit

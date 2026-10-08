@@ -14,7 +14,6 @@ import {
 import {
   radicalFamily,
   radicalInfo,
-  type RadicalFamilyMember,
   type RadicalPopoverDetails,
   type RadicalPopoverText,
 } from "@/lib/radicals";
@@ -112,67 +111,62 @@ const ExampleKanji = ({ kanji }: { kanji: string }) => {
 };
 
 /**
- * The radical's other forms (水 shows ⺡ さんずい · へん and 氺 したみず). A
- * form with no glyph of its own (きへん) is shown with the head glyph and
- * can't be opened. Empty for a radical with one form.
+ * The radical's family, split in two. Other forms are the other glyphs (水
+ * shows ⺡ and 氺), each opening its own entry. Other names belong to the
+ * head glyph in a position, with no glyph of their own (方 on the left is
+ * ほうへん); they are shown only on the head, since they share its glyph.
  */
-const otherForms = (
+const familyParts = (
   radical: string,
   radicals: ReturnType<typeof useRadicals>
-): RadicalFamilyMember[] => {
+): { forms: string[]; names: { ja: string; pos?: string }[] } => {
   const family = radicalFamily(radical, radicals);
-  if (family == null) return [];
-  return family.members.filter((member) => member !== family.current);
+  if (family == null) return { forms: [], names: [] };
+  const forms = family.members.filter(
+    (member): member is string =>
+      typeof member === "string" && member !== family.current
+  );
+  const names =
+    family.current === family.head
+      ? family.members.filter(
+          (member): member is { ja: string; pos?: string } =>
+            typeof member !== "string"
+        )
+      : [];
+  return { forms, names };
 };
 
 const RadicalForms = ({
-  head,
   forms,
   onSelect,
 }: {
-  head: string;
-  forms: RadicalFamilyMember[];
+  forms: string[];
   onSelect: (glyph: string) => void;
 }) => {
   const radicals = useRadicals();
   return (
     <ul className="space-y-1">
-      {forms.map((member) => {
-        const glyph = typeof member === "string" ? member : null;
-        const info =
-          typeof member === "string"
-            ? radicalInfo(member, radicals)
-            : { ja: member.ja, pos: member.pos };
+      {forms.map((glyph) => {
+        const info = radicalInfo(glyph, radicals);
         const label = [info?.ja, positionText(info?.pos)]
           .filter(Boolean)
           .join(" · ");
-        const row = (
-          <>
-            <span className="flex items-center justify-center text-2xl leading-none size-10 shrink-0 rounded-lg bg-foreground/5 kanji-font">
-              {glyph ?? head}
-            </span>
-            <span>{label}</span>
-          </>
-        );
         return (
-          <li key={glyph ?? info?.ja}>
-            {glyph != null ? (
-              <button
-                type="button"
-                onClick={() => onSelect(glyph)}
-                className="flex items-center w-full gap-3 p-1 text-left border-2 border-dotted rounded-lg hover:border-solid hover:border-neon-accent"
-              >
-                {row}
-                <ChevronRight
-                  size={16}
-                  className="ml-auto shrink-0 text-muted-foreground"
-                />
-              </button>
-            ) : (
-              <div className="flex items-center gap-3 p-1 border-2 border-transparent opacity-60">
-                {row}
-              </div>
-            )}
+          <li key={glyph}>
+            <button
+              type="button"
+              onClick={() => onSelect(glyph)}
+              className="flex items-center w-full gap-3 p-1 text-left border-2 border-dotted rounded-lg hover:border-solid hover:border-neon-accent"
+            >
+              <span className="flex items-center justify-center text-2xl leading-none size-10 shrink-0 rounded-lg bg-foreground/5 kanji-font">
+                {glyph}
+              </span>
+              <span>{label}</span>
+              <ChevronRight
+                size={16}
+                className="ml-auto shrink-0 text-muted-foreground"
+              />
+            </button>
           </li>
         );
       })}
@@ -192,8 +186,7 @@ const RadicalDetailsBody = ({
   const { data } = useRadicalPopoverText(radical);
   const text: RadicalPopoverDetails = data ?? {};
   const english = info?.cn;
-  const forms = otherForms(radical, radicals);
-  const head = radicalFamily(radical, radicals)?.head ?? radical;
+  const { forms, names } = familyParts(radical, radicals);
   const sources = refsBySite(text);
   const hasHints =
     (text.semantic ?? []).length > 0 ||
@@ -207,6 +200,16 @@ const RadicalDetailsBody = ({
             {[name, position].filter(Boolean).join(" · ")}
           </p>
           {text.ja && <p className="text-muted-foreground">{text.ja}</p>}
+          {names.map((other) => (
+            <p key={other.ja}>
+              Also called{" "}
+              <span className="font-bold">
+                {[other.ja, positionText(other.pos)]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </p>
+          ))}
         </section>
       )}
       {(text.cn || text.cnNote) && (
@@ -268,7 +271,7 @@ const RadicalDetailsBody = ({
       {forms.length > 0 && (
         <section>
           <h3 className={sectionHeadingCn}>🧩 Other forms</h3>
-          <RadicalForms head={head} forms={forms} onSelect={onSelectForm} />
+          <RadicalForms forms={forms} onSelect={onSelectForm} />
         </section>
       )}
       {sources.size > 0 && (
