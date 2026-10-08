@@ -44,6 +44,8 @@ interface ExampleWordPopoverProps {
   readingOverride?: string;
   className?: string;
   optionalSection?: ReactNode;
+  /** Passed to the popover, e.g. a z-index to sit above a dialog. */
+  contentClassName?: string;
 }
 
 export const ExampleWordPopover = ({
@@ -52,6 +54,7 @@ export const ExampleWordPopover = ({
   readingOverride,
   className = "text-4xl",
   optionalSection,
+  contentClassName,
 }: ExampleWordPopoverProps) => {
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
@@ -76,6 +79,7 @@ export const ExampleWordPopover = ({
 
   return (
     <GenericPopover
+      contentClassName={contentClassName}
       trigger={
         <Button
           variant="outline"

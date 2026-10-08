@@ -6,6 +6,11 @@ import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import type { RadicalPopoverDetails, RadicalPopoverText } from "@/lib/radicals";
 
+// The radical popover can sit at z-[60] (GlobalRadicalLink), so the
+// dialog goes above it, and popovers opened inside the dialog above that.
+const DIALOG_Z = "z-[70]";
+const INNER_POPOVER_CN = "z-[80] w-auto p-0 m-0";
+
 const sectionHeadingCn =
   "mb-2 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
 
@@ -58,6 +63,7 @@ const ExampleKanji = ({ kanji }: { kanji: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
   return (
     <GenericPopover
+      contentClassName={INNER_POPOVER_CN}
       trigger={
         <button
           type="button"
@@ -97,6 +103,8 @@ export const RadicalDetailsDialogContent = ({
 }) => (
   <ScrollableDialogContent
     size="md"
+    className={DIALOG_Z}
+    overlayClassName={DIALOG_Z}
     headerClassName="text-left"
     title={<span className="text-4xl kanji-font">{radical}</span>}
     description={`Details for the radical ${radical}`}
@@ -146,6 +154,7 @@ export const RadicalDetailsDialogContent = ({
                   word={example.word}
                   readingOverride={example.reading}
                   wordTranslationOverride={example.gloss}
+                  contentClassName={INNER_POPOVER_CN}
                   className="px-3 py-2.5 text-xl"
                 />
                 <span className="min-w-0">
