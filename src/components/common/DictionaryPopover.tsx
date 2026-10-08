@@ -45,6 +45,9 @@ export const DictionaryPopoverShell = ({
   children: ReactNode;
 }) => (
   <GenericPopover
+    // Opened from the vocab popover, which can itself sit at z-[80] inside
+    // the radical dialog (RadicalDetailsDialog), so go above both.
+    contentClassName="z-[90] w-auto p-0 m-0"
     trigger={
       <Button variant="outline" size="iconXl" className="relative">
         {icon}

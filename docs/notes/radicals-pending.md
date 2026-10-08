@@ -302,6 +302,12 @@ then "Find kanji that include …" and, for kanji radicals, "📖 Open kanji 夕
 🇯🇵 Japanese name, 🇨🇳 Origin, 🧠 Semantic, 🔊 Phonetic, Sources. (Showing
 the details inside the popover was too cluttered.)
 
+Dialog sections now (user, October 2026): 🇯🇵 Japanese name (with the
+position, also on the popover's 🇯🇵 line), 🇨🇳 Chinese meaning (the
+English words, then why the glyph means them), 🧠 Meaning hint and 🔊 Sound
+hint (each opens with "A few kanji…", since the examples are not a full
+list), 🧩 Other forms (only when there are other forms), 📚 References.
+
 Shape, per radical (every section only when it applies):
 
     <RADICAL>
@@ -391,7 +397,7 @@ Rules:
   sound-part chips (user, October 2026: what matters is that it helps
   learners): the kanji's sound part in our sound-parts data is the radical,
   whatever its history (戈 in 裁 さい, though Wiktionary gives 𢦏). No
-  reference needed. The dialog section is "🔊 Read like:", not
+  reference needed. The dialog section is "🔊 Sound hint", not
   "Phonetic", so it claims no history; the popover shows 🔊 only when the
   dialog has examples.
 - Both example sections are optional: shape-only radicals (丶 丿 亅 亠)
@@ -454,7 +460,7 @@ Revisit later (user, October 2026; redundant on purpose for now):
 
 - When the radical is the sound part of the kanji on screen (戈 in 裁),
   its popover shows the "Sound hint" box and the 🔊 line.
-- The dialog's "🧠 Semantic:" heading repeats the 🇨🇳 words. An optional
+- The dialog's "🧠 Meaning hint" line repeats the 🇨🇳 words. An optional
   `semanticMeaning` field ("weapon") could replace it.
 
 Settled: with sounds but no example words, the summary shows 🔊 and the
@@ -474,7 +480,7 @@ Three kinds of "same radical":
 - **Alias**: the same shape under another character code (⿊ = 黒,
   氵 = ⺡). Merged; never shown on its own.
 - **Form**: a different shape of the same radical (水, ⺡ さんずい, 氺
-  したみず). Its own entry, linked in the dialog's 🧩 Forms section.
+  したみず). Its own entry, linked in the dialog's 🧩 Other forms section.
 - Old forms (黑 艸 戶 齒 龜) are not labeled: no source says which
   alternates are old forms. They work through their alias (tapping 黑
   shows 黒). Glyphs the app never shows (户 靣 髙 ⿊ …) are dropped.
@@ -490,9 +496,10 @@ exceptions. Per field:
 - Origin: **shared**. A form shows its head's `cn`, then its own
   `cnNote` ("Written as three strokes on the left side."). A form whose
   story differs has its own `cn` (𠆢, ⺩).
-- 🧩 Forms lists every form, also name-only ones with no showable glyph
-  (きへん under 木); the dialog switches to a form when it is tapped. A
-  radical in no family shows one row, so its position has a place.
+- 🧩 Other forms lists the family's other forms, also name-only ones with
+  no showable glyph (きへん under 木); the dialog switches to a form when
+  it is tapped. A radical with no other forms has no section; its
+  position is on the 🇯🇵 line.
 
 老 is named おい (an `extras` entry in ours.json); it used to inherit
 おいかんむり from 耂's CSV row.

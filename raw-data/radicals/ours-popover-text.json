@@ -43,7 +43,7 @@
       {
         "kanji": "各",
         "concepts": "each, every",
-        "why": "A foot (夂) coming to a place; it first meant to arrive.",
+        "why": "A foot (夂) coming to an entrance (口): it first meant to arrive.",
         "refs": [
           "https://en.wiktionary.org/wiki/各"
         ]
@@ -124,7 +124,7 @@
       {
         "kanji": "雄",
         "concepts": "male, brave",
-        "why": "First meant a male bird (隹).",
+        "why": "First a male bird (隹), then any male.",
         "refs": [
           "https://en.wiktionary.org/wiki/雄"
         ]
@@ -132,7 +132,7 @@
       {
         "kanji": "雌",
         "concepts": "female",
-        "why": "First meant a female bird (隹).",
+        "why": "First a female bird (隹), then any female.",
         "refs": [
           "https://en.wiktionary.org/wiki/雌"
         ]
@@ -228,15 +228,16 @@
       {
         "kanji": "住",
         "concepts": "live, dwell",
-        "why": "Where a person (亻) lives.",
+        "why": "A person (亻) staying put in one place: to live there.",
         "refs": [
-          "https://en.wiktionary.org/wiki/住"
+          "https://en.wiktionary.org/wiki/住",
+          "https://www.kanjipedia.jp/kanji/0003170900"
         ]
       },
       {
         "kanji": "作",
         "concepts": "make, create",
-        "why": "Something a person (亻) does.",
+        "why": "A person (亻) at work: to make.",
         "refs": [
           "https://en.wiktionary.org/wiki/作"
         ]
@@ -332,7 +333,7 @@
       {
         "kanji": "進",
         "concepts": "advance, progress",
-        "why": "Moving forward (辶).",
+        "why": "A bird (隹) on the move (辶): a bird only goes forward, so advance.",
         "refs": [
           "https://en.wiktionary.org/wiki/進"
         ]
@@ -389,7 +390,7 @@
       {
         "kanji": "兄",
         "concepts": "older brother",
-        "why": "A mouth (口) over a person: the one giving orders.",
+        "why": "A mouth (口) over a person (儿): the one giving orders, the older brother.",
         "refs": [
           "https://en.wiktionary.org/wiki/兄"
         ]
@@ -457,7 +458,7 @@
       {
         "kanji": "幼",
         "concepts": "infant, young",
-        "why": "Tiny (幺) + strength (力): having little strength.",
+        "why": "Tiny (幺) strength (力): a young child.",
         "refs": [
           "https://en.wiktionary.org/wiki/幼"
         ]
@@ -646,7 +647,7 @@
       {
         "kanji": "協",
         "concepts": "cooperate, unite",
-        "why": "Many (十) forces (劦) pulled together.",
+        "why": "Many (十) forces (力) pulling together: cooperate.",
         "refs": [
           "https://www.kanjipedia.jp/kanji/0001493300"
         ]
@@ -679,7 +680,7 @@
       {
         "kanji": "看",
         "concepts": "watch, look after",
-        "why": "A hand (手) over the eyes, gazing far away.",
+        "why": "A hand (手) over the eyes (目), gazing far: to watch.",
         "refs": [
           "https://en.wiktionary.org/wiki/看"
         ]
@@ -759,7 +760,7 @@
       {
         "kanji": "望",
         "concepts": "gaze, hope",
-        "why": "The moon (月) was added to a picture of a person looking up.",
+        "why": "A person looking up at the moon (月): to gaze, then to hope.",
         "refs": [
           "https://en.wiktionary.org/wiki/望"
         ]
@@ -801,7 +802,7 @@
       {
         "kanji": "財",
         "concepts": "wealth, assets",
-        "why": "Shells (貝) were money.",
+        "why": "Shells (貝) were money: wealth.",
         "refs": [
           "https://en.wiktionary.org/wiki/財"
         ]
@@ -842,7 +843,7 @@
       {
         "kanji": "紙",
         "concepts": "paper",
-        "why": "Silk (糸) marks it as a material.",
+        "why": "Silk (糸) marks it as a fiber material: paper.",
         "refs": [
           "https://en.wiktionary.org/wiki/紙"
         ]
@@ -875,7 +876,7 @@
       {
         "kanji": "読",
         "concepts": "read",
-        "why": "Reading is done with words (言).",
+        "why": "Saying words (言) aloud from a text: to read.",
         "refs": [
           "https://en.wiktionary.org/wiki/讀"
         ]
@@ -951,13 +952,35 @@
     "cn": "A side view of a standing person, showing an arm and a leg.",
     "refs": [
       "https://en.wiktionary.org/wiki/人"
+    ],
+    "semantic": [
+      {
+        "kanji": "囚",
+        "concepts": "prisoner, captive",
+        "why": "A person (人) shut inside an enclosure (囗): a prisoner.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/囚",
+          "https://www.kanjipedia.jp/kanji/0003097000"
+        ]
+      },
+      {
+        "kanji": "座",
+        "concepts": "seat, sit",
+        "why": "Two people (人) sitting on the ground (土) inside a building (广): a seat.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/座",
+          "https://www.kanjipedia.jp/kanji/0002483300",
+          "https://www.kanjipedia.jp/kanji/0002481300"
+        ]
+      }
     ]
   },
   "八": {
     "ja": "はち (八, eight).",
-    "cn": "Two lines bending apart, first meaning to divide; it was borrowed for eight because the words sounded alike.",
+    "cn": "Two lines turning away from each other, first meaning “to split”. The Chinese word for eight (today bā) sounded the same, so it was written with this character, and “split” moved to 分 and 別.",
     "refs": [
-      "https://en.wiktionary.org/wiki/八"
+      "https://en.wiktionary.org/wiki/八",
+      "https://www.kanjipedia.jp/kanji/0005677700"
     ]
   },
   "几": {
@@ -1020,9 +1043,10 @@
       {
         "kanji": "券",
         "concepts": "ticket, certificate",
-        "why": "Cut from something with a knife (刀).",
+        "why": "Two wooden pieces were notched with a knife (刀); matching notches proved a deal. So: a ticket or certificate.",
         "refs": [
-          "https://en.wiktionary.org/wiki/券"
+          "https://en.wiktionary.org/wiki/券",
+          "https://www.kanjipedia.jp/kanji/0001902500"
         ]
       }
     ]
@@ -1037,7 +1061,7 @@
       {
         "kanji": "動",
         "concepts": "move, motion, change",
-        "why": "Moving takes force (力).",
+        "why": "Moving something takes force (力).",
         "refs": [
           "https://en.wiktionary.org/wiki/動"
         ]
@@ -1053,7 +1077,7 @@
       {
         "kanji": "加",
         "concepts": "add, addition, increase",
-        "why": "Adding force (力).",
+        "why": "Adding more force (力): add.",
         "refs": [
           "https://en.wiktionary.org/wiki/加"
         ]
@@ -1106,7 +1130,7 @@
       {
         "kanji": "印",
         "concepts": "stamp, seal, mark",
-        "why": "First \"to press down\": a hand (爪) over a kneeling person (卩).",
+        "why": "A hand (爪) pressing down on a kneeling person (卩): to press, then a seal pressed onto paper.",
         "refs": [
           "https://en.wiktionary.org/wiki/印"
         ]
@@ -1114,7 +1138,7 @@
       {
         "kanji": "危",
         "concepts": "dangerous, fear",
-        "why": "A person on a cliff (厃) above a kneeling person (卩).",
+        "why": "A person on a cliff (厃) above a kneeling person (卩): danger.",
         "refs": [
           "https://en.wiktionary.org/wiki/危"
         ]
@@ -1139,9 +1163,19 @@
       {
         "kanji": "厚",
         "concepts": "thick, kind, heavy",
-        "why": "Thick, like a cliff (厂).",
+        "why": "A cliff (厂) of thick, hard rock: thick.",
         "refs": [
-          "https://en.wiktionary.org/wiki/厚"
+          "https://en.wiktionary.org/wiki/厚",
+          "https://www.kanjipedia.jp/kanji/0002204400"
+        ]
+      },
+      {
+        "kanji": "岸",
+        "concepts": "shore, bank",
+        "why": "A mountain (山) cliff (厂), then the steep bank of a river: shore.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/岸",
+          "https://www.kanjipedia.jp/kanji/0001157500"
         ]
       }
     ]
@@ -1156,7 +1190,7 @@
       {
         "kanji": "取",
         "concepts": "take, fetch, take up",
-        "why": "A hand (又) taking an ear (耳).",
+        "why": "A hand (又) taking the ear (耳) of a hunted animal as proof of the kill: to take.",
         "refs": [
           "https://en.wiktionary.org/wiki/取"
         ]
@@ -1197,9 +1231,10 @@
       {
         "kanji": "囚",
         "concepts": "captured, prisoner, criminal",
-        "why": "A person (人) shut inside.",
+        "why": "A person (人) shut inside an enclosure (囗): a prisoner.",
         "refs": [
-          "https://en.wiktionary.org/wiki/囚"
+          "https://en.wiktionary.org/wiki/囚",
+          "https://www.kanjipedia.jp/kanji/0003097000"
         ]
       }
     ]
@@ -1289,7 +1324,7 @@
       {
         "kanji": "好",
         "concepts": "fond, like, favorable",
-        "why": "A woman (女) with a child (子).",
+        "why": "A woman (女) with a child (子): good, fond of.",
         "refs": [
           "https://en.wiktionary.org/wiki/好"
         ]
@@ -1314,7 +1349,7 @@
       {
         "kanji": "好",
         "concepts": "fond, like, favorable",
-        "why": "A woman (女) with a child (子).",
+        "why": "A woman (女) with a child (子): good, fond of.",
         "refs": [
           "https://en.wiktionary.org/wiki/好"
         ]
@@ -1331,7 +1366,7 @@
       {
         "kanji": "付",
         "concepts": "adhere, attach, refer to",
-        "why": "Handing something to a person; 寸 is a hand.",
+        "why": "A hand (寸) handing something to a person (亻): to attach, to give.",
         "refs": [
           "https://en.wiktionary.org/wiki/付"
         ]
@@ -1828,7 +1863,7 @@
       {
         "kanji": "政",
         "concepts": "politics, political administration, government",
-        "why": "Making things right by force (攵).",
+        "why": "Making things right (正) by force (攵): to govern.",
         "refs": [
           "https://en.wiktionary.org/wiki/政"
         ]
@@ -1870,7 +1905,7 @@
       {
         "kanji": "料",
         "concepts": "fee, materials, material",
-        "why": "Measuring (斗) rice (米).",
+        "why": "Measuring (斗) rice (米): materials, then fees.",
         "refs": [
           "https://en.wiktionary.org/wiki/料"
         ]
@@ -1895,7 +1930,7 @@
       {
         "kanji": "新",
         "concepts": "new",
-        "why": "Wood cut with an axe (斤): fresh-cut.",
+        "why": "Wood cut with an axe (斤): freshly cut, new.",
         "refs": [
           "https://en.wiktionary.org/wiki/新"
         ]
@@ -2068,7 +2103,7 @@
       {
         "kanji": "役",
         "concepts": "duty, service, war",
-        "why": "Work done by hand (殳).",
+        "why": "Going (彳) with a weapon (殳) in hand to guard the border: service, duty.",
         "refs": [
           "https://en.wiktionary.org/wiki/役"
         ]
@@ -2274,7 +2309,7 @@
       {
         "kanji": "特",
         "concepts": "special, unique",
-        "why": "First a prize bull (牛) → special.",
+        "why": "First a prize bull (牛), then anything special.",
         "refs": [
           "https://en.wiktionary.org/wiki/特"
         ]
@@ -2374,6 +2409,25 @@
     "cn": "A sprout (屮) coming out of the ground (一).",
     "refs": [
       "https://en.wiktionary.org/wiki/生"
+    ],
+    "semantic": [
+      {
+        "kanji": "産",
+        "concepts": "give birth, produce",
+        "why": "Being born (生): giving birth; 彦 gives the sound.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/産",
+          "https://www.kanjipedia.jp/kanji/0002656400"
+        ]
+      },
+      {
+        "kanji": "姓",
+        "concepts": "surname, family name",
+        "why": "Born (生) of a woman (女): the family line you are born into, a surname.",
+        "refs": [
+          "https://www.kanjipedia.jp/kanji/0003859600"
+        ]
+      }
     ],
     "sound": [
       {
@@ -2550,7 +2604,7 @@
       {
         "kanji": "盤",
         "concepts": "tray, disk, board",
-        "why": "A large dish (皿).",
+        "why": "A large dish (皿): a tray, a board.",
         "refs": [
           "https://en.wiktionary.org/wiki/盤"
         ]
@@ -2582,7 +2636,7 @@
       {
         "kanji": "短",
         "concepts": "short, brevity, fault",
-        "why": "Measured with arrows (矢).",
+        "why": "An arrow (矢) served as a measure of length: short.",
         "refs": [
           "https://en.wiktionary.org/wiki/短"
         ]
@@ -2680,9 +2734,10 @@
       {
         "kanji": "利",
         "concepts": "profit, advantage, benefit",
-        "why": "Cutting grain (禾) with a knife (刂).",
+        "why": "Grain (禾) worked with a sharp blade (刂): the crop it brings is a profit.",
         "refs": [
-          "https://en.wiktionary.org/wiki/利"
+          "https://en.wiktionary.org/wiki/利",
+          "https://www.kanjipedia.jp/kanji/0007071400"
         ]
       }
     ]
@@ -2717,6 +2772,26 @@
     "cn": "A person standing on the ground.",
     "refs": [
       "https://en.wiktionary.org/wiki/立"
+    ],
+    "semantic": [
+      {
+        "kanji": "位",
+        "concepts": "rank, position",
+        "why": "Where a person (亻) stands (立) at court: rank, position.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/位",
+          "https://www.kanjipedia.jp/kanji/0000126200"
+        ]
+      },
+      {
+        "kanji": "端",
+        "concepts": "edge, upright, proper",
+        "why": "Standing (立) up straight: proper; 耑 gives the sound, and 端 also came to mean edge.",
+        "refs": [
+          "https://en.wiktionary.org/wiki/端",
+          "https://www.kanjipedia.jp/kanji/0004617700"
+        ]
+      }
     ]
   },
   "竹": {
@@ -3207,7 +3282,7 @@
       },
       {
         "kanji": "製",
-        "concepts": "made in…, manufacture, made in...",
+        "concepts": "manufacture, made in…",
         "why": "Making clothes (衣).",
         "refs": [
           "https://en.wiktionary.org/wiki/製"
@@ -3645,9 +3720,10 @@
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/阜部"
     ],
-    "cn": "Steps cut into a hill.",
+    "cn": "A hill with steps going up its side.",
     "refs": [
-      "https://en.wiktionary.org/wiki/阜"
+      "https://en.wiktionary.org/wiki/阜",
+      "https://www.kanjipedia.jp/kanji/0006036300"
     ]
   },
   "隶": {
@@ -3746,7 +3822,7 @@
     "semantic": [
       {
         "kanji": "響",
-        "concepts": "echo, reverberate, also n5116",
+        "concepts": "echo, reverberate",
         "why": "An echo is a sound (音).",
         "refs": [
           "https://en.wiktionary.org/wiki/響"
@@ -3811,7 +3887,7 @@
       {
         "kanji": "飯",
         "concepts": "meal, cooked rice, boiled rice",
-        "why": "Food (食); 反 gives the sound.",
+        "why": "Food (食), a meal; 反 gives the sound.",
         "refs": [
           "https://en.wiktionary.org/wiki/飯"
         ]
@@ -3857,7 +3933,7 @@
     "semantic": [
       {
         "kanji": "騎",
-        "concepts": "equestrian, ride on horseback, riding on horses",
+        "concepts": "ride on horseback",
         "why": "Riding a horse (馬).",
         "refs": [
           "https://en.wiktionary.org/wiki/騎"
@@ -3866,7 +3942,7 @@
       {
         "kanji": "駐",
         "concepts": "stationed, stop over",
-        "why": "A horse (馬) standing still.",
+        "why": "A horse (馬) standing still: to stop and stay.",
         "refs": [
           "https://en.wiktionary.org/wiki/駐"
         ]
@@ -4193,7 +4269,7 @@
       {
         "kanji": "別",
         "concepts": "separate, another, branch off",
-        "why": "Cutting (刂) apart.",
+        "why": "Cutting (刂) apart: separate.",
         "refs": [
           "https://en.wiktionary.org/wiki/別"
         ]
@@ -4201,15 +4277,15 @@
       {
         "kanji": "割",
         "concepts": "proportion, divide, comparatively",
-        "why": "Cutting (刂) into parts.",
+        "why": "Cutting (刂) into parts: divide.",
         "refs": [
           "https://en.wiktionary.org/wiki/割"
         ]
       },
       {
         "kanji": "判",
-        "concepts": "judgement, judge, judgment",
-        "why": "Cutting (刂) in two: deciding.",
+        "concepts": "judgement, judge",
+        "why": "Cutting (刂) in two (半): judging between two sides.",
         "refs": [
           "https://en.wiktionary.org/wiki/判"
         ]
@@ -4280,8 +4356,8 @@
     "semantic": [
       {
         "kanji": "都",
-        "concepts": "metropolis, metropolis of tokyo, capital",
-        "why": "A town (阝): the capital.",
+        "concepts": "metropolis, capital",
+        "why": "A large town (阝): a capital.",
         "refs": [
           "https://en.wiktionary.org/wiki/都"
         ]
@@ -4301,7 +4377,7 @@
     "jaRefs": [
       "https://ja.wikipedia.org/wiki/阜部"
     ],
-    "cnNote": "Shrunk to 阝 on the left side.",
+    "cnNote": "On the left side of a kanji, 阜 is written as 阝.",
     "refs": [
       "https://en.wiktionary.org/wiki/阜"
     ],
@@ -4309,7 +4385,7 @@
       {
         "kanji": "階",
         "concepts": "storey, floor, rank",
-        "why": "Steps up a hill (阝).",
+        "why": "Steps going up a hill (阝): stairs, then floors.",
         "refs": [
           "https://en.wiktionary.org/wiki/階"
         ]
@@ -4317,7 +4393,7 @@
       {
         "kanji": "降",
         "concepts": "descend, precipitate, fall",
-        "why": "Going down a hill (阝).",
+        "why": "Going down a hill (阝): descend.",
         "refs": [
           "https://en.wiktionary.org/wiki/降"
         ]

@@ -4,7 +4,7 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
 import { useState } from "react";
-import { useRadicalSummary } from "./use-radical-summary";
+import { positionText, useRadicalSummary } from "./use-radical-summary";
 import {
   useGetKanjiInfoFn,
   useRadicalPopoverText,
@@ -13,6 +13,7 @@ import {
 import {
   radicalFamily,
   radicalInfo,
+  type RadicalFamilyMember,
   type RadicalPopoverDetails,
   type RadicalPopoverText,
 } from "@/lib/radicals";
@@ -24,16 +25,6 @@ const INNER_POPOVER_CN = "z-[80] w-auto p-0 m-0";
 
 const sectionHeadingCn =
   "mb-2 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
-
-const POSITION_EN: Record<string, string> = {
-  へん: "left side",
-  つくり: "right side",
-  かんむり: "top",
-  あし: "bottom",
-  たれ: "top-left",
-  にょう: "bottom-left",
-  かまえ: "enclosure",
-};
 
 const SITE_NAMES: Record<string, string> = {
   "en.wiktionary.org": "Wiktionary",
@@ -119,57 +110,52 @@ const ExampleKanji = ({ kanji }: { kanji: string }) => {
   );
 };
 
-const positionText = (pos?: string) =>
-  pos ? `${pos} (${POSITION_EN[pos]})` : null;
-
 /**
- * Every form of the radical (水 みず, ⺡ さんずい · へん, 氺 したみず), with the
- * one shown marked. A form with no glyph of its own (きへん) is shown with
- * the head glyph and can't be opened. A radical in no family shows one row,
- * so its position always has a place.
+ * The radical's other forms (水 shows ⺡ さんずい · へん and 氺 したみず). A
+ * form with no glyph of its own (きへん) is shown with the head glyph and
+ * can't be opened. Empty for a radical with one form.
  */
+const otherForms = (
+  radical: string,
+  radicals: ReturnType<typeof useRadicals>
+): RadicalFamilyMember[] => {
+  const family = radicalFamily(radical, radicals);
+  if (family == null) return [];
+  return family.members.filter((member) => member !== family.current);
+};
+
 const RadicalForms = ({
-  radical,
+  head,
+  forms,
   onSelect,
 }: {
-  radical: string;
+  head: string;
+  forms: RadicalFamilyMember[];
   onSelect: (glyph: string) => void;
 }) => {
   const radicals = useRadicals();
-  const family = radicalFamily(radical, radicals);
-  const members = family?.members ?? [radical];
-  const current = family?.current ?? radical;
   return (
     <ul className="space-y-1">
-      {members.map((member) => {
+      {forms.map((member) => {
         const glyph = typeof member === "string" ? member : null;
         const info =
           typeof member === "string"
             ? radicalInfo(member, radicals)
             : { ja: member.ja, pos: member.pos };
-        const isCurrent = glyph === current;
         const label = [info?.ja, positionText(info?.pos)]
           .filter(Boolean)
           .join(" · ");
-        const shown = glyph ?? family?.head ?? radical;
         const row = (
           <>
             <span className="flex items-center justify-center text-2xl leading-none size-10 shrink-0 rounded-lg bg-foreground/5 kanji-font">
-              {shown}
+              {glyph ?? head}
             </span>
-            <span className={isCurrent ? "font-bold" : undefined}>
-              {label}
-              {isCurrent && members.length > 1 && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  (this one)
-                </span>
-              )}
-            </span>
+            <span>{label}</span>
           </>
         );
         return (
           <li key={glyph ?? info?.ja}>
-            {glyph != null && !isCurrent ? (
+            {glyph != null ? (
               <button
                 type="button"
                 onClick={() => onSelect(glyph)}
@@ -178,9 +164,7 @@ const RadicalForms = ({
                 {row}
               </button>
             ) : (
-              <div
-                className={`flex items-center gap-3 p-1 ${glyph == null ? "opacity-60" : ""}`}
-              >
+              <div className="flex items-center gap-3 p-1 opacity-60">
                 {row}
               </div>
             )}
@@ -198,29 +182,28 @@ const RadicalDetailsBody = ({
   radical: string;
   onSelectForm: (glyph: string) => void;
 }) => {
-  const { info, name } = useRadicalSummary(radical);
+  const { info, name, position } = useRadicalSummary(radical);
+  const radicals = useRadicals();
   const { data } = useRadicalPopoverText(radical);
   const text: RadicalPopoverDetails = data ?? {};
   const english = info?.cn;
+  const forms = otherForms(radical, radicals);
+  const head = radicalFamily(radical, radicals)?.head ?? radical;
   const sources = refsBySite(text);
   return (
     <div className="space-y-5 text-sm text-left">
-      {text.ja && (
-        <section>
-          <h3 className={sectionHeadingCn}>🇯🇵 Japanese name</h3>
-          <p className="font-bold">{name}</p>
-          <p className="text-muted-foreground">{text.ja}</p>
-        </section>
-      )}
       {info && (
         <section>
-          <h3 className={sectionHeadingCn}>🧩 Forms</h3>
-          <RadicalForms radical={radical} onSelect={onSelectForm} />
+          <h3 className={sectionHeadingCn}>🇯🇵 Japanese name</h3>
+          <p className="font-bold">
+            {[name, position].filter(Boolean).join(" · ")}
+          </p>
+          {text.ja && <p className="text-muted-foreground">{text.ja}</p>}
         </section>
       )}
       {(text.cn || text.cnNote) && (
         <section>
-          <h3 className={sectionHeadingCn}>🇨🇳 Origin</h3>
+          <h3 className={sectionHeadingCn}>🇨🇳 Chinese meaning</h3>
           <p className="font-bold">{english}</p>
           {text.cn && <p className="text-muted-foreground">{text.cn}</p>}
           {text.cnNote && (
@@ -230,7 +213,11 @@ const RadicalDetailsBody = ({
       )}
       {(text.semantic ?? []).length > 0 && (
         <section>
-          <h3 className={sectionHeadingCn}>🧠 Semantic: {english}</h3>
+          <h3 className={sectionHeadingCn}>🧠 Meaning hint</h3>
+          <p className="mb-2 text-muted-foreground">
+            A few kanji where <span className="kanji-font">{radical}</span>{" "}
+            brings the meaning “{english}”:
+          </p>
           <ul className="space-y-2">
             {text.semantic?.map((example) => (
               <li key={example.kanji} className="flex items-center gap-3">
@@ -247,9 +234,11 @@ const RadicalDetailsBody = ({
       )}
       {text.sounds != null && (text.sound ?? []).length > 0 && (
         <section>
-          <h3 className={sectionHeadingCn}>
-            🔊 Read like: {text.sounds.join("・")}
-          </h3>
+          <h3 className={sectionHeadingCn}>🔊 Sound hint</h3>
+          <p className="mb-2 text-muted-foreground">
+            A few kanji with <span className="kanji-font">{radical}</span> that
+            are read {text.sounds.join(" or ")}:
+          </p>
           <ul className="space-y-2">
             {text.sound?.map((example) => (
               <li key={example.kanji} className="flex items-center gap-3">
@@ -274,9 +263,15 @@ const RadicalDetailsBody = ({
           </ul>
         </section>
       )}
+      {forms.length > 0 && (
+        <section>
+          <h3 className={sectionHeadingCn}>🧩 Other forms</h3>
+          <RadicalForms head={head} forms={forms} onSelect={onSelectForm} />
+        </section>
+      )}
       {sources.size > 0 && (
         <section>
-          <h3 className={sectionHeadingCn}>📚 Sources</h3>
+          <h3 className={sectionHeadingCn}>📚 References</h3>
           <RadicalSources bySite={sources} />
         </section>
       )}
@@ -285,8 +280,8 @@ const RadicalDetailsBody = ({
 };
 
 /**
- * The radical's details, opened from the radical popover: its forms, the
- * reasons behind its names, the meaning and sound examples, and the
+ * The radical's details, opened from the radical popover: the reasons
+ * behind its names, the meaning and sound hints, its other forms, and the
  * references. Tapping another form switches the dialog to it. Example kanji
  * open a kanji link, words open the vocab popover, and readings are kana
  * badges, as elsewhere in the app.
