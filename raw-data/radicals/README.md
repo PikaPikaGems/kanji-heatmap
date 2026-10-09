@@ -8,13 +8,13 @@ edited. Anything we decide ourselves lives next to this README.
 
 ## external/ — from outside sources
 
-| File                         | What we use it for                                                                           | Source                                                                             |
-| ---------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `sylhare-radicals.csv`       | Japanese radical name (おうへん), position (へん), meaning, alternate forms. One-time import | [sylhare/kanji](https://github.com/sylhare/kanji) (`resources/kanji-radicals.csv`) |
-| `rewhowe-drawer.json`        | The radicals shown in the radical drawer, grouped by stroke count                            | [rewhowe/kanji](https://github.com/rewhowe/kanji)                                  |
-| `rewhowe-decomposition.json` | Radical search index: kanji → the drawer radicals it contains                                | [rewhowe/kanji](https://github.com/rewhowe/kanji) (very likely; added April 2025)  |
-| `anki-semantic-radicals.tsv` | Short meaning per radical. Not used yet                                                      | [Anki shared deck 1589855678](https://ankiweb.net/shared/info/1589855678)          |
-| `sphmn-components-ck.csv`    | Component → every jōyō kanji that contains it. For a future component search. Not used yet   | [sph-mn/nihongo](https://github.com/sph-mn/nihongo)                                |
+| File                         | What we use it for                                                                             | Source                                                                             |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `sylhare-radicals.csv`       | Japanese radical name (おうへん), position (へん), meaning, alternate forms. One-time import   | [sylhare/kanji](https://github.com/sylhare/kanji) (`resources/kanji-radicals.csv`) |
+| `rewhowe-drawer.json`        | The radicals shown in the radical drawer, grouped by stroke count                              | [rewhowe/kanji](https://github.com/rewhowe/kanji)                                  |
+| `rewhowe-decomposition.json` | Radical search index: kanji → the drawer radicals it contains                                  | [rewhowe/kanji](https://github.com/rewhowe/kanji) (very likely; added April 2025)  |
+| `anki-semantic-radicals.tsv` | Short meaning per radical. Not used yet                                                        | [Anki shared deck 1589855678](https://ankiweb.net/shared/info/1589855678)          |
+| `sphmn-components-ck.csv`    | Component → every jōyō kanji that contains it. Component search, see "sph-mn components" below | [sph-mn/nihongo](https://github.com/sph-mn/nihongo)                                |
 
 ## Ours — `ours.json`
 
@@ -196,3 +196,65 @@ Every field is optional. `addEn` is merged into the radical info in
 unknown field, a claim without refs, an example kanji that doesn't contain
 the radical, a sound example whose sound part isn't the radical (or is the
 radical itself), or a sound word not read with the radical's sound.
+
+## sph-mn components — `external/sphmn-components-ck.csv`
+
+Component search and "Kanji that contain 寺" on the kanji page.
+`scripts/sphmn-components.mjs` reads the CSV on every
+`pnpm run generate-json` and writes `public/json/v2/sphmn_components.json`:
+`[[component, kanji], ...]`, where `kanji` is every shipped kanji that
+contains the component at any depth, in the CSV's order. The app flips it
+for the kanji → parts direction.
+
+sph-mn builds the CSV from ScottOglesby's kanji-bakuhatsu composition map
+(the same data as our `(ScottOglesby)` row, `kanji-structure/external/scott.json`),
+expanded to every depth by
+[`src/kanji-to-components.coffee`](https://github.com/sph-mn/nihongo/blob/HEAD/src/kanji-to-components.coffee).
+
+- Rows whose component isn't one character are dropped (`中一`, and one
+  with an empty component).
+- `sphmnCodepointFixes` in `ours.json` merges glyphs that Scott typed two
+  ways for one shape; see "Component merges vs radical aliases" below.
+- Kanji are written in the forms we ship, with `jouyouForms` from
+  `raw-data/misc/ours.json` (剝 → 剥). Kanji we don't ship are dropped, then
+  components with no kanji left.
+- The file is in drawer order: most matches first. A match is a kanji that
+  contains the component, plus the component itself when it's a kanji we
+  ship (search returns it too). Ties go to fewer strokes (the kanji's own
+  count, else the radical drawer's), then no stroke count, then code point.
+- sph-mn writes parts its own way (氵 八 ⺮ 灬 where the radical drawer has
+  ⺡ ハ 竹 ⺣). The data is shown as is and isn't linked to the radical
+  drawer.
+
+### Component merges vs radical aliases
+
+Two separate mechanisms, decided with the user (October 2026). They behave
+differently on purpose, and neither changes the other.
+
+**Component merges** (`sphmnCodepointFixes`, component search only). Scott's
+map was typed by hand and sometimes writes one shape with two characters
+(点 has 灬, 勲 has ⺣). The build reads the first as the second and joins
+the two rows, so the drawer has one button and the search finds both sets:
+
+| Merged             | Into | Why that glyph                             | Kanji after       |
+| ------------------ | ---- | ------------------------------------------ | ----------------- |
+| ⺣ (radical fire)  | 灬   | ordinary character                         | 34 (gains 勲 薫)  |
+| ⺡ (radical water) | 氵   | ordinary character                         | 121 (gains 滴 濃) |
+| ⻊ (radical foot)  | 𧾷   | ordinary character                         | 8                 |
+| ｜ (fullwidth bar) | 丨   | ｜ is punctuation, not a kanji part        | 56                |
+| 𥫗 (bamboo top)    | ⺮   | 𥫗 is missing from some of the app's fonts | 23                |
+
+Only pairs that look the same in the app's kanji font. Not merged:
+⻌/辶 (one dot vs two), ⺤/爫, 䖝/虫 (䖝 has an extra stroke; it is the
+inside of 風), ⻖/⻏ (same shape, different parts: 阜 "mound" on the left,
+邑 "village" on the right). The build fails if either glyph of a pair is
+not a component.
+
+**Radical aliases** (`aliases` in `ours.json` and the sylhare CSV, radical
+search and radical popovers only). They say "this glyph is that radical":
+氵 → ⺡, 灬 → ⺣, 辶 → ⻌, 爫 → ⺤, 丨 → ｜. Radical search and the radical
+popover follow them, so a chip written 氵 opens ⺡'s popover and searches
+⺡. They don't touch component search, and component merges don't touch
+them. The direction is often the opposite (radicals point to the drawer's
+radical form, components to the ordinary character): each side uses the
+glyph its own data and drawer show.

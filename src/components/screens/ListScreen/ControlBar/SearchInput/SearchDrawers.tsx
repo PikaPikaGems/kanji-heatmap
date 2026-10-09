@@ -7,6 +7,11 @@ const RadicalsControl = lazy(() =>
     default: m.RadicalsControl,
   }))
 );
+const ComponentsControl = lazy(() =>
+  import("./ComponentScreen/ComponentsControl").then((m) => ({
+    default: m.ComponentsControl,
+  }))
+);
 const HandwritingControl = lazy(() =>
   import("./HandwritingScreen/HandwritingControl").then((m) => ({
     default: m.HandwritingControl,
@@ -27,7 +32,7 @@ const DrawerChunkLoadingFallback = ({
 };
 
 /**
- * The lazily-loaded radical and handwriting drawers attached to the search
+ * The lazily-loaded radical, component and handwriting drawers attached to the search
  * input. Handwriting stays mounted while its search type is active (even
  * with the drawer closed) so drawn strokes survive close/reopen.
  */
@@ -63,6 +68,23 @@ export const SearchDrawers = ({
             onClose={onClose}
             value={value}
             onChange={(newStr) => onChange(newStr, "radicals")}
+          />
+        </Suspense>
+      )}
+
+      {(openDialogType === "components" || searchType === "components") && (
+        <Suspense
+          fallback={
+            <DrawerChunkLoadingFallback
+              onLoadingChange={onChunkLoadingChange}
+            />
+          }
+        >
+          <ComponentsControl
+            isOpen={openDialogType === "components"}
+            onClose={onClose}
+            value={value}
+            onChange={(newStr) => onChange(newStr, "components")}
           />
         </Suspense>
       )}

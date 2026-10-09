@@ -572,6 +572,61 @@ describe("kanji_structures.json", () => {
   });
 });
 
+describe("sphmn_components.json", () => {
+  const list = v2<[string, string][]>("sphmn_components.json");
+  const csv = fs
+    .readFileSync(
+      path.join(
+        process.cwd(),
+        "raw-data/radicals/external/sphmn-components-ck.csv"
+      ),
+      "utf8"
+    )
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => line.split(","));
+  const { jouyouForms } = raw<{ jouyouForms: Record<string, string> }>(
+    "misc/ours.json"
+  );
+  const shipped = (char: string) => v1Main[char] != null;
+
+  it("keeps every one-character row, with its shipped kanji in CSV order", () => {
+    const { sphmnCodepointFixes } = raw<{
+      sphmnCodepointFixes: Record<string, string>;
+    }>("radicals/ours.json");
+    // Radical code points join their ordinary twin's row (⺣ → 灬).
+    const merged = new Map<string, string[]>();
+    for (const [component, kanji] of csv) {
+      const glyph = sphmnCodepointFixes[component] ?? component;
+      merged.set(glyph, [...(merged.get(glyph) ?? []), ...kanji]);
+    }
+    const expected = new Map<string, string>(
+      [...merged]
+        .filter(([component]) => [...component].length === 1)
+        .map(([component, kanji]): [string, string] => [
+          component,
+          [...new Set(kanji.map((char) => jouyouForms[char] ?? char))]
+            .filter(shipped)
+            .join(""),
+        ])
+        .filter(([, kanji]) => kanji.length > 0)
+    );
+    expect(new Map(list)).toEqual(expected);
+    for (const from of Object.keys(sphmnCodepointFixes)) {
+      expect(expected.has(from)).toBe(false);
+    }
+  });
+
+  it("is ordered by match count, the component itself included", () => {
+    const matches = ([component, kanji]: [string, string]) =>
+      [...kanji].length + (shipped(component) ? 1 : 0);
+    for (let i = 1; i < list.length; i++) {
+      expect(matches(list[i - 1])).toBeGreaterThanOrEqual(matches(list[i]));
+    }
+    expect(list[0][0]).toBe("口");
+  });
+});
+
 describe("pass-through files", () => {
   it("are byte-identical in content to their v1 sources", () => {
     expect(v2("kanji_decomposition.json")).toEqual(

@@ -23,6 +23,7 @@ import {
   fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
+  fetchSphmnComponents,
   transformToGeneralKanjiInfo,
   transformToHoverKanjiInfo,
   transformToMainKanjiInfo,
@@ -38,10 +39,13 @@ import {
 import {
   filterKanji,
   getSortedByStrokeCount,
+  searchByParts,
   searchByRadical,
   searchKanji,
+  sortKanji,
 } from "./kanji-search";
-import { SearchSettings } from "@/lib/settings/settings";
+import { prepareSphmnComponents } from "@/lib/sphmn-components";
+import { SearchSettings, SortSettings } from "@/lib/settings/settings";
 import {
   followAlias,
   prepareRadicals,
@@ -137,6 +141,11 @@ const loadSimilar = lazyDataset(
 
 const loadRepWordDetails = lazyDataset(
   (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
+);
+
+/** Component search and the sph-mn rows of the kanji details. */
+const loadSphmnComponents = lazyDataset(() =>
+  fetchSphmnComponents().then(prepareSphmnComponents)
 );
 
 /** Read only by the radical popover. */
@@ -235,8 +244,46 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
     );
   }
 
+  if (
+    settings.textSearch.type === "components" &&
+    settings.textSearch.text !== ""
+  ) {
+    const sphmn = await loadSphmnComponents();
+    if (kanjiByStrokeOrder.length === 0) {
+      kanjiByStrokeOrder = getSortedByStrokeCount(pool);
+    }
+    return searchByParts(
+      kanjiByStrokeOrder,
+      [...settings.textSearch.text],
+      settings,
+      pool,
+      sphmn.searchIndex
+    );
+  }
+
   return { kanjis: searchKanji(settings, pool) };
 });
+
+/**
+ * The component drawer, in order, each with how many kanji component search
+ * returns for it (the kanji that contain it, plus itself when it's a kanji)
+ * and its stroke count when known: the kanji's own, else the radical
+ * drawer's, as in scripts/sphmn-components.mjs.
+ */
+const handleSphmnDrawer = async (): Promise<
+  [string, number, number | null][]
+> => {
+  const [sphmn, main, components] = await Promise.all([
+    loadSphmnComponents(),
+    CORE,
+    loadComponents(),
+  ]);
+  return sphmn.order.map((component) => [
+    component,
+    sphmn.kanjiOf[component].length + (main[component] != null ? 1 : 0),
+    main[component]?.strokes ?? components[component]?.n ?? null,
+  ]);
+};
 
 const handleSearchResultCount = requirePayload(
   async (settings: SearchSettings) => {
@@ -393,6 +440,7 @@ const HANDLERS: {
       loadRepWordDetails(),
       loadStructures(),
       loadReadingDetails(),
+      loadSphmnComponents(),
     ]);
     return null;
   },
@@ -402,6 +450,21 @@ const HANDLERS: {
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
   "radical-popover-text": handleRadicalPopoverText,
+  "sphmn-drawer": handleSphmnDrawer,
+  "sphmn-kanji-of": requirePayload(
+    async ({
+      component,
+      sortSettings,
+    }: {
+      component: string;
+      sortSettings: SortSettings;
+    }) => {
+      const [sphmn, main] = await Promise.all([loadSphmnComponents(), CORE]);
+      // sortKanji sorts in place; copy so the dataset keeps sph-mn's order.
+      const kanji = [...(sphmn.kanjiOf[component] ?? [])];
+      return sortKanji(kanji, { sortSettings }, { main, extended: {} });
+    }
+  ),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,

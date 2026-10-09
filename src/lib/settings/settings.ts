@@ -11,6 +11,7 @@ export const SEARCH_TYPE_ARR = [
   "multi-kanji",
   "similar",
   "radicals",
+  "components",
   "handwriting",
   "handwriting-alt",
   "handwriting-alt-2",

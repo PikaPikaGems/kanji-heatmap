@@ -139,8 +139,9 @@ const kanjiListSearch: SearchDescriptor = {
   match: (kanji, { kanjiSet }) => kanjiSet.has(kanji),
 };
 
-// similar has its own expansion path in filterKanji, and radicals is handled
-// by searchByRadical — inside plain text filtering both match everything.
+// similar has its own expansion path in filterKanji, and radicals and
+// components are handled by searchByRadical / searchByParts — inside plain
+// text filtering they all match everything.
 const matchEverything: SearchDescriptor = {
   normalize: keepRawText,
   match: () => true,
@@ -186,6 +187,7 @@ const SEARCH_DESCRIPTORS: Record<SearchType, SearchDescriptor> = {
   "handwriting-alt-2": kanjiListSearch,
   similar: matchEverything,
   radicals: matchEverything,
+  components: matchEverything,
 };
 
 const extractKanjiCharacters = (text: string) =>
@@ -295,7 +297,7 @@ const compareBy = (sortKey: SortKey, a: KanjiMainInfo, b: KanjiMainInfo) =>
 
 export const sortKanji = (
   kanjiList: string[],
-  settings: SearchSettings,
+  settings: Pick<SearchSettings, "sortSettings">,
   kanjiPool: DataPool
 ) => {
   const primarySort = settings.sortSettings.primary;
@@ -355,6 +357,28 @@ export const searchByRadical = (
   }, prevMin);
   settings.filterSettings.strokeRange.min = newMin;
 
+  return searchByParts(
+    initialKanjis,
+    radicalPayload,
+    settings,
+    kanjiPool,
+    kanjiDecompositionCache
+  );
+};
+
+/**
+ * Kanji that contain every part in `parts`, after the user's filters, plus
+ * every part found in those kanji (which parts can still narrow the result).
+ * Shared by radical search and component search; `partsOfKanji` is the index
+ * that decides what "contains" means.
+ */
+export const searchByParts = (
+  initialKanjis: string[],
+  parts: string[],
+  settings: SearchSettings,
+  kanjiPool: DataPool,
+  partsOfKanji: Record<string, Set<string>>
+) => {
   // apply user filter settings first
   const filteredKanjisSimple = filterByKanjiSimple(
     initialKanjis,
@@ -362,23 +386,20 @@ export const searchByRadical = (
     kanjiPool
   );
 
-  // if kanji has all the radicals in the set then include this in the search result
+  // if kanji has all the parts in the set then include this in the search result
   const filteredKanjis = filteredKanjisSimple.filter((kanji) => {
-    const kanjiRadicalSet = kanjiDecompositionCache[kanji];
-    if (kanjiRadicalSet == null) {
+    const kanjiParts = partsOfKanji[kanji];
+    if (kanjiParts == null) {
       return false;
     }
-    return radicalPayload.every((radical) => {
-      return kanjiRadicalSet.has(radical);
-    });
+    return parts.every((part) => kanjiParts.has(part));
   });
 
   const kanjis = sortKanji(filteredKanjis, settings, kanjiPool);
 
-  // get all radicals in all the remaining kanjis
+  // get all parts in all the remaining kanjis
   const possibleRadicals = kanjis.reduce((acc, kanji) => {
-    const kanjiRadicalSet = kanjiDecompositionCache[kanji];
-    kanjiRadicalSet?.forEach((item) => acc.add(item));
+    partsOfKanji[kanji]?.forEach((item) => acc.add(item));
     return acc;
   }, new Set<string>([]));
 

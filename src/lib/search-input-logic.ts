@@ -6,11 +6,13 @@ import wanakana, { translateValue, hasKanji } from "@/lib/wanakana-adapter";
 // Search types that open a drawer instead of accepting typed input.
 export type DialogType =
   | "radicals"
+  | "components"
   | "handwriting"
   | "handwriting-alt"
   | "handwriting-alt-2";
 const DIALOG_TYPES: DialogType[] = [
   "radicals",
+  "components",
   "handwriting",
   "handwriting-alt",
   "handwriting-alt-2",

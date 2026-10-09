@@ -115,7 +115,10 @@ unchecked step.
       radical (149 → 252 glyphs), and chips check "is it a radical?"
       before "is it a kanji?". This replaces the earlier decision that
       kanji radicals keep their kanji link; the extra tap is fine (user).
-- [ ] **Step 4 — component search** (item 3 below).
+- [x] **Step 4 — component search** (item 3 below), on the
+      `component-search` branch: drawer with bands, "Kanji that contain 寺",
+      component merges.
+- [ ] **Step 5 — component popover** (item 3 below, "Component popover").
 
 ### 1. Sound info feature
 
@@ -576,18 +579,12 @@ other one is rarely read with the sound (里: 鯉 り).
 
 ### 3. Component search
 
-A new search type, like radical search, built from
+A new search type next to radical search, built from
 `raw-data/radicals/external/sphmn-components-ck.csv` (component → every jōyō
 kanji containing it, at any depth). Finds things radical search can't
-(寺 → 侍 持 待 時 特 等 詩).
-
-- 981 components. Covers jōyō only, so our 291 non-jōyō kanji never match.
-- Junk rows to drop: `中一` and one with an empty component.
-- The drawer groups by stroke count; ~371 components have no stroke count —
-  put them in a "?" section.
-- No "selected items with keyword" bar (most components have no keyword).
-- 981 buttons is fine on phones without virtualization; just avoid
-  re-rendering every button on each tap.
+(寺 → 侍 持 待 時 特 等 詩). In progress on the `component-search` branch
+(step 4 of the plan). How the data is built: `raw-data/radicals/README.md`,
+"sph-mn components".
 
 Decided (user, October 2026):
 
@@ -596,14 +593,71 @@ Decided (user, October 2026):
   sph-mn components, only 55 return the same jōyō kanji. They also write
   parts differently (sph-mn uses 氵 八 ⺮ 灬 where the drawer has ⺡ ハ 竹 ⺣),
   so the component drawer shows sph-mn's own glyphs and the two searches
-  aren't linked by glyph without a mapping.
-- Missing keywords and stroke counts are simply not shown. Components
-  with no stroke count go in a "?" group. Jōyō-only coverage is fine.
-- Component Breakdown (Character Structure) gets one more row,
-  `(sph-mn)`, like the other sources: every part found inside the kanji,
-  at any depth, flat. Built by flipping the ck file.
-- Non-radical parts (寺 in 時) could later open a popover with "Find kanji
-  that include 寺" through component search, matching step 3.
+  aren't linked by glyph.
+- Junk rows are dropped (`中一`, and one with an empty component). Kanji are
+  written in the forms we ship (剝 → 剥, `jouyouForms` in
+  `raw-data/misc/ours.json`). Components left with no shipped kanji are
+  hidden; none today (彔 is in 剥 once the map is applied).
+- Same shape typed two ways in Scott's map is merged for component search
+  only (`sphmnCodepointFixes`): ⺣→灬, ⺡→氵, ⻊→𧾷, ｜→丨, 𥫗→⺮. Not
+  merged: ⻌/辶 (one vs two dots), ⺤/爫, 䖝/虫, ⻖/⻏ (same shape, different
+  parts: 阜 vs 邑). Radical aliases stay as they are; the two searches
+  behave differently on purpose. Table and reasons: `raw-data/radicals/README.md`,
+  "Component merges vs radical aliases".
+- A component that is a kanji also matches itself: 寺 finds 寺 plus the 7
+  kanji that contain it.
+- **Drawer order:** by match count (kanji containing the component, plus
+  itself), most first; ties go to fewer strokes, then no stroke count, then
+  code point. This replaces the earlier "group by stroke count, with a '?'
+  group" decision: 371 of the 979 components have no stroke count,
+  including 23 of the 100 most common.
+- **Selected bar:** kept, like radical search. A component with no keyword
+  shows only its glyph (no "..."). Missing keywords are simply not shown.
+- Jōyō-only coverage is fine. ~980 buttons, no virtualization; a tap
+  re-renders only the buttons that changed.
+- No `(sph-mn)` row in Component Breakdown (user, October 2026). It was
+  built, then dropped: sph-mn's file is ScottOglesby's map expanded to every
+  depth (identical for all 2025 kanji), so it repeated the `(ScottOglesby)`
+  row.
+- **"Kanji that contain 寺"**: a new section in Structure info, after
+  Visually Similar Kanji, with the same buttons (tap → popover with the
+  kanji link). Ordered by the user's current sort setting. Up to 30, then
+  "See all N", which opens component search with that component; N counts
+  the component itself, so it matches the search.
+
+- **Bands:** the drawer is split by match count (In 50+ / 20–49 / 10–19 /
+  6–9 / 4–5 / 3 / 2 / 1 kanji), each band fewest strokes first, unknown
+  last. A switch for everyone ("Group by how many kanji", on by default)
+  shows the plain most-matches-first list instead; the buttons fade in on
+  each flip.
+
+Component popover (next step; decided with the user, October 2026, not
+built yet):
+
+- **Where:** only the Character Structure rows (`StructuralCategory.tsx`,
+  chips from `ComponentLink` / `PartComponentLink` with
+  `useResolvedComponent`) and the reference card's parts
+  (`SingleKanjiPart.tsx`, from `OriginalComponentBreakdown.tsx`).
+- **Which parts:** a part whose glyph is in the component drawer
+  (`sphmn_components.json`, after the merges). Today such a part is either
+  a kanji (links straight to the kanji page) or "unknown" (a plain card
+  with no tap). Parts not in the drawer keep today's look; glyphs are not
+  mapped (a source writing ⻖ where sph-mn has another glyph gets nothing).
+- **Contents:** the glyph and its keyword (no "..." when there is none),
+  "Find kanji that include 寺 (N)" opening component search
+  (`/?search-type=components&search-text=寺`, N = search result count,
+  the kanji itself included), and "Open kanji 寺" when the part is a kanji.
+  Kanji parts lose their direct link: one extra tap is fine (as in step 3).
+- **Radicals** keep the radical popover (`RadicalPopoverContent` in
+  `global-links.tsx`), plus one new line opening component search, next to
+  `RadicalSearchAction`, when the glyph is in the component drawer.
+- **Sound box** (the lime-bordered "Sound hint for kanji with 寺" box in
+  `SingleKanjiPart`): include it in the component popover, kanji or not.
+  Open: show it only for this kanji's own sound part (what the reference
+  card does today; Claude's recommendation, since a hint on every part
+  with sound info would suggest 日 or 寸 give 時 its reading), or whenever
+  the part has sound info (166 drawer components have some). Ask the user.
+- Separate from the radical popover, as already decided.
 
 ### 3b. Which parts list the reference card shows
 

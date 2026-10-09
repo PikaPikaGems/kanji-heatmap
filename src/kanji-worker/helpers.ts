@@ -15,6 +15,7 @@ import {
   VocabResponseType,
 } from "@/lib/kanji/kanji-worker-types";
 import type { RadicalPopoverText, RadicalsFile } from "@/lib/radicals";
+import type { SphmnComponentsFile } from "@/lib/sphmn-components";
 import assetsPaths from "@/lib/assets-paths";
 import { decodeFurigana } from "@/lib/furigana";
 import type {
@@ -53,6 +54,10 @@ export const fetchRadicals = createFetch<RadicalsFile>(
 export const fetchRadicalPopoverText = createFetch<
   Record<string, RadicalPopoverText>
 >(assetsPaths.RADICAL_POPOVER_TEXT_FILE);
+
+export const fetchSphmnComponents = createFetch<SphmnComponentsFile>(
+  assetsPaths.SPHMN_COMPONENTS_FILE
+);
 
 export const fetchRepWordDetails = createFetch<
   Record<string, [string, string]>
