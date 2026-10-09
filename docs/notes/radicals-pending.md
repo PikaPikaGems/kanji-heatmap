@@ -576,18 +576,12 @@ other one is rarely read with the sound (里: 鯉 り).
 
 ### 3. Component search
 
-A new search type, like radical search, built from
+A new search type next to radical search, built from
 `raw-data/radicals/external/sphmn-components-ck.csv` (component → every jōyō
 kanji containing it, at any depth). Finds things radical search can't
-(寺 → 侍 持 待 時 特 等 詩).
-
-- 981 components. Covers jōyō only, so our 291 non-jōyō kanji never match.
-- Junk rows to drop: `中一` and one with an empty component.
-- The drawer groups by stroke count; ~371 components have no stroke count —
-  put them in a "?" section.
-- No "selected items with keyword" bar (most components have no keyword).
-- 981 buttons is fine on phones without virtualization; just avoid
-  re-rendering every button on each tap.
+(寺 → 侍 持 待 時 特 等 詩). In progress on the `component-search` branch
+(step 4 of the plan). How the data is built: `raw-data/radicals/README.md`,
+"sph-mn components".
 
 Decided (user, October 2026):
 
@@ -596,14 +590,41 @@ Decided (user, October 2026):
   sph-mn components, only 55 return the same jōyō kanji. They also write
   parts differently (sph-mn uses 氵 八 ⺮ 灬 where the drawer has ⺡ ハ 竹 ⺣),
   so the component drawer shows sph-mn's own glyphs and the two searches
-  aren't linked by glyph without a mapping.
-- Missing keywords and stroke counts are simply not shown. Components
-  with no stroke count go in a "?" group. Jōyō-only coverage is fine.
-- Component Breakdown (Character Structure) gets one more row,
-  `(sph-mn)`, like the other sources: every part found inside the kanji,
-  at any depth, flat. Built by flipping the ck file.
-- Non-radical parts (寺 in 時) could later open a popover with "Find kanji
-  that include 寺" through component search, matching step 3.
+  aren't linked by glyph.
+- Junk rows are dropped (`中一`, and one with an empty component). Kanji are
+  written in the forms we ship (剝 → 剥, `jouyouForms` in
+  `raw-data/misc/ours.json`). Components left with no shipped kanji are
+  hidden; none today (彔 is in 剥 once the map is applied).
+- A component that is a kanji also matches itself: 寺 finds 寺 plus the 7
+  kanji that contain it.
+- **Drawer order:** by match count (kanji containing the component, plus
+  itself), most first; ties go to fewer strokes, then no stroke count, then
+  code point. This replaces the earlier "group by stroke count, with a '?'
+  group" decision: 371 of the 979 components have no stroke count,
+  including 23 of the 100 most common.
+- **Selected bar:** kept, like radical search. A component with no keyword
+  shows only its glyph (no "..."). Missing keywords are simply not shown.
+- Jōyō-only coverage is fine. ~980 buttons, no virtualization; a tap
+  re-renders only the buttons that changed.
+- Component Breakdown (Character Structure) has a `(sph-mn)` row: every part
+  found inside the kanji, at any depth, flat, most-used first.
+- **"Kanji that contain 寺"**: a new section in Structure info, after
+  Visually Similar Kanji, with the same buttons (tap → popover with the
+  kanji link). Ordered by the user's current sort setting. Up to 30, then
+  "See all N", which opens component search with that component; N counts
+  the component itself, so it matches the search.
+
+Open:
+
+- **Bands or plain list.** Bands (In 50+ / 20–49 / 5–19 / 2–4 / 1 kanji,
+  each band fewest strokes first) are on in the drawer for comparison, with
+  a dev-only toggle. The user decides after trying both; the toggle and the
+  losing option go then.
+
+Later, not now:
+
+- Non-radical parts (寺 in 時) could open a popover with "Find kanji that
+  include 寺" through component search, matching step 3.
 
 ### 3b. Which parts list the reference card shows
 
