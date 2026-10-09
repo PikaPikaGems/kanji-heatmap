@@ -23,6 +23,7 @@ import {
   fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
+  fetchSphmnComponents,
   transformToGeneralKanjiInfo,
   transformToHoverKanjiInfo,
   transformToMainKanjiInfo,
@@ -38,9 +39,11 @@ import {
 import {
   filterKanji,
   getSortedByStrokeCount,
+  searchByParts,
   searchByRadical,
   searchKanji,
 } from "./kanji-search";
+import { prepareSphmnComponents, sphmnPartsOf } from "@/lib/sphmn-components";
 import { SearchSettings } from "@/lib/settings/settings";
 import {
   followAlias,
@@ -139,6 +142,11 @@ const loadRepWordDetails = lazyDataset(
   (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
 );
 
+/** Component search and the sph-mn rows of the kanji details. */
+const loadSphmnComponents = lazyDataset(() =>
+  fetchSphmnComponents().then(prepareSphmnComponents)
+);
+
 /** Read only by the radical popover. */
 const loadRadicalPopoverText = lazyDataset(
   (): Promise<Record<string, RadicalPopoverText>> => fetchRadicalPopoverText()
@@ -235,8 +243,37 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
     );
   }
 
+  if (
+    settings.textSearch.type === "components" &&
+    settings.textSearch.text !== ""
+  ) {
+    const sphmn = await loadSphmnComponents();
+    if (kanjiByStrokeOrder.length === 0) {
+      kanjiByStrokeOrder = getSortedByStrokeCount(pool);
+    }
+    return searchByParts(
+      kanjiByStrokeOrder,
+      [...settings.textSearch.text],
+      settings,
+      pool,
+      sphmn.searchIndex
+    );
+  }
+
   return { kanjis: searchKanji(settings, pool) };
 });
+
+/**
+ * The component drawer, in order, each with how many kanji component search
+ * returns for it (the kanji that contain it, plus itself when it's a kanji).
+ */
+const handleSphmnDrawer = async (): Promise<[string, number][]> => {
+  const [sphmn, main] = await Promise.all([loadSphmnComponents(), CORE]);
+  return sphmn.order.map((component) => [
+    component,
+    sphmn.kanjiOf[component].length + (main[component] != null ? 1 : 0),
+  ]);
+};
 
 const handleSearchResultCount = requirePayload(
   async (settings: SearchSettings) => {
@@ -393,6 +430,7 @@ const HANDLERS: {
       loadRepWordDetails(),
       loadStructures(),
       loadReadingDetails(),
+      loadSphmnComponents(),
     ]);
     return null;
   },
@@ -402,6 +440,14 @@ const HANDLERS: {
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
   "radical-popover-text": handleRadicalPopoverText,
+  "sphmn-drawer": handleSphmnDrawer,
+  "sphmn-parts": requirePayload(async (kanji: string) =>
+    sphmnPartsOf(kanji, await loadSphmnComponents())
+  ),
+  "sphmn-kanji-of": requirePayload(
+    async (component: string) =>
+      (await loadSphmnComponents()).kanjiOf[component] ?? []
+  ),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,

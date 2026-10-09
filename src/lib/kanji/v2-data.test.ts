@@ -591,10 +591,10 @@ describe("sphmn_components.json", () => {
   const shipped = (char: string) => v1Main[char] != null;
 
   it("keeps every one-character row, with its shipped kanji in CSV order", () => {
-    const expected = new Map(
+    const expected = new Map<string, string>(
       csv
         .filter(([component]) => [...component].length === 1)
-        .map(([component, kanji]) => [
+        .map(([component, kanji]): [string, string] => [
           component,
           [...kanji]
             .map((char) => jouyouForms[char] ?? char)

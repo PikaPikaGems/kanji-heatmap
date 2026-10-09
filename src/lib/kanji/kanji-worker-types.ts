@@ -264,6 +264,12 @@ export interface WorkerApi {
     payload: string;
     response: RadicalPopoverDetails | null;
   };
+  /** Component drawer: `[component, match count]` in drawer order. */
+  "sphmn-drawer": { payload: undefined; response: [string, number][] };
+  /** Every sph-mn component inside one kanji, most-used first. */
+  "sphmn-parts": { payload: string; response: string[] };
+  /** The kanji that contain one component, not counting itself. */
+  "sphmn-kanji-of": { payload: string; response: string[] };
   /** One kanji's reading breakdown; empty and absent both answer null. */
   "kanji-reading-details": {
     payload: string;

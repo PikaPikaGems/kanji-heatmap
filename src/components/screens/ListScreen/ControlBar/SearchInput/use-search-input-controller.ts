@@ -278,7 +278,10 @@ export const useSearchInputController = ({
     // Drop any pending typed settle before switching type.
     clearTimeout(timeoutRef.current);
     hasPendingSettleRef.current = false;
-    const baseText = searchType === "radicals" ? "" : parsedValue;
+    const baseText =
+      searchType === "radicals" || searchType === "components"
+        ? ""
+        : parsedValue;
     // Similar only wants kanji in the field — strip leftovers from prior types.
     const newParsedValue =
       newType === "similar"
