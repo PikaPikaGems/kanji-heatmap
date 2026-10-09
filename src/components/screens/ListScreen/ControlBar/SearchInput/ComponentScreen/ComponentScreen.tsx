@@ -16,8 +16,10 @@ const BANDS: { min: number; label: string }[] = [
   { min: 50, label: "In 50+ kanji" },
   { min: 20, label: "In 20–49 kanji" },
   { min: 10, label: "In 10–19 kanji" },
-  { min: 4, label: "In 4–9 kanji" },
-  { min: 2, label: "In 2–3 kanji" },
+  { min: 7, label: "In 7–9 kanji" },
+  { min: 4, label: "In 4–6 kanji" },
+  { min: 3, label: "In 3 kanji" },
+  { min: 2, label: "In 2 kanji" },
   { min: 1, label: "In 1 kanji" },
 ];
 const bandOf = (matches: number) =>

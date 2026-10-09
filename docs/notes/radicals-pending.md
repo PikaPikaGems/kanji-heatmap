@@ -615,9 +615,10 @@ Decided (user, October 2026):
   the component itself, so it matches the search.
 
 - **Bands:** the drawer is split by match count (In 50+ / 20–49 / 10–19 /
-  4–9 / 2–3 / 1 kanji), each band fewest strokes first, unknown last. A
-  switch for everyone ("Group by how many kanji", on by default) shows the
-  plain most-matches-first list instead; the buttons fade in on each flip.
+  7–9 / 4–6 / 3 / 2 / 1 kanji), each band fewest strokes first, unknown
+  last. A switch for everyone ("Group by how many kanji", on by default)
+  shows the plain most-matches-first list instead; the buttons fade in on
+  each flip.
 
 Later, not now:
 
