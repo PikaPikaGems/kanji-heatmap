@@ -91,8 +91,6 @@ export type ComponentInfo = {
   k?: string;
   /** Sounds this component signals. */
   s?: string[];
-  /** Kanji with this sound part, most common first (語悟伍梧吾 for 五). */
-  m?: string;
   /** Stroke count, present for radicals shown in the drawer. */
   n?: number;
 };

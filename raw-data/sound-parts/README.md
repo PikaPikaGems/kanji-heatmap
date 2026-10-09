@@ -19,9 +19,9 @@ edited. Anything we decide ourselves lives in `ours.json`.
 
 A **learner hint**, not a claim about a kanji's history. The chip means
 **kanji that contain this part tend to be read this way** (decided with the
-user, October 2026). It is about the part's family, not the kanji page it
-sits on: 門 is もん, but its chip says かん for 間 関 簡 閑. The popover
-lists the family: "🔊 Sound hint: 語 吾 悟 伍 梧", with the readings below. A part qualifies
+user, October 2026), and the popover says "Kanji with 五 tend to be read
+as" above the readings. It is about the part's family, not the kanji page
+it sits on: 門 is もん, but its chip says かん for 間 関 簡 閑. A part qualifies
 for a kanji if:
 
 1. it is **visible** in the kanji, and
