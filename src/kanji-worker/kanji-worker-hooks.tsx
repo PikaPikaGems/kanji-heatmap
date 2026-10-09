@@ -353,20 +353,6 @@ export const useSphmnDrawer = () => {
   return { status: state.status, data: state.data ?? null };
 };
 
-/** Every sph-mn component inside `kanji`, most-used first. */
-export const useSphmnParts = (kanji: string) => {
-  const ready = useIsKanjiWorkerReady();
-  const state = useWorkerQuery<string[]>(
-    ready && kanji
-      ? () => requestWorker({ type: "sphmn-parts", payload: kanji })
-      : null,
-    [ready, kanji],
-    // Never show one kanji's parts under another kanji.
-    false
-  );
-  return { status: state.status, data: state.data ?? null };
-};
-
 /**
  * The kanji that contain `component` (sph-mn), not counting itself, in the
  * user's current sort order.

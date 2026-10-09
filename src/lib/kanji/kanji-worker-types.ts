@@ -269,8 +269,6 @@ export interface WorkerApi {
     payload: undefined;
     response: [string, number, number | null][];
   };
-  /** Every sph-mn component inside one kanji, most-used first. */
-  "sphmn-parts": { payload: string; response: string[] };
   /**
    * The kanji that contain one component, not counting itself, in the
    * given sort order (sph-mn's order when the sort is "none").

@@ -37,13 +37,3 @@ export const prepareSphmnComponents = (
 
   return { order, kanjiOf, searchIndex };
 };
-
-/**
- * Every component inside `kanji`, most-used first (drawer order). Not the
- * kanji itself.
- */
-export const sphmnPartsOf = (kanji: string, data: SphmnComponents) =>
-  data.order.filter(
-    (component) =>
-      component !== kanji && data.searchIndex[kanji]?.has(component)
-  );

@@ -5,7 +5,6 @@ import {
   KanjiStructuralDataKanjium,
   KanjiStructuralDataYagays,
   KanjiStructuralDataScott,
-  KanjiStructuralDataSphmn,
 } from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
@@ -126,7 +125,13 @@ const KanjiThatContain = ({ kanji }: { kanji: string }) => {
         </div>
       </div>
       <PrimaryDataSources
-        links={[{ text: "sph-mn/nihongo", url: otherOutLinks.sphmnNihongo }]}
+        links={[
+          { text: "sph-mn/nihongo", url: otherOutLinks.sphmnNihongo },
+          {
+            text: "ScottOglesby/kanji-bakuhatsu",
+            url: otherOutLinks.scottKanjiBakuhatsu,
+          },
+        ]}
       />
     </>
   );
@@ -171,14 +176,6 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
             </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataScott kanji={kanji} />
-            </TableCellGrow>
-          </TableRow>
-          <TableRow className="text-left">
-            <TableCellFixed className="text-[10px] text-muted-foreground">
-              (sph-mn)
-            </TableCellFixed>
-            <TableCellGrow>
-              <KanjiStructuralDataSphmn kanji={kanji} />
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">

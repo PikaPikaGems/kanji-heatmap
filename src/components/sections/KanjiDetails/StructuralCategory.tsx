@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { PartComponentLink } from "./PartComponentLink";
 import { useResolvedComponent } from "./use-resolved-component";
-import { useSphmnParts } from "@/kanji-worker/kanji-worker-hooks";
 
 const ICON_SIZE = 15;
 
@@ -187,24 +186,7 @@ const KanjiStructuralDataScott = ({ kanji }: { kanji: string }) => {
   );
 };
 
-// Every part sph-mn finds inside the kanji, at any depth, most-used first.
-const KanjiStructuralDataSphmn = ({ kanji }: { kanji: string }) => {
-  const { data: parts, status } = useSphmnParts(kanji);
-
-  return (
-    <StructuralSection
-      status={status === "loading" ? "pending" : status}
-      hasData={parts != null && parts.length > 0}
-    >
-      {(parts ?? []).map((part) => (
-        <PartComponentLink part={part} key={part} />
-      ))}
-    </StructuralSection>
-  );
-};
-
 export {
-  KanjiStructuralDataSphmn,
   KanjiStructuralDataLorenzi,
   KanjiStructuralDataKanjium,
   KanjiStructuralDataYagays,

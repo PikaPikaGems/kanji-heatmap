@@ -44,7 +44,7 @@ import {
   searchKanji,
   sortKanji,
 } from "./kanji-search";
-import { prepareSphmnComponents, sphmnPartsOf } from "@/lib/sphmn-components";
+import { prepareSphmnComponents } from "@/lib/sphmn-components";
 import { SearchSettings, SortSettings } from "@/lib/settings/settings";
 import {
   followAlias,
@@ -451,9 +451,6 @@ const HANDLERS: {
   "kanji-reading-details": handleKanjiReadingDetails,
   "radical-popover-text": handleRadicalPopoverText,
   "sphmn-drawer": handleSphmnDrawer,
-  "sphmn-parts": requirePayload(async (kanji: string) =>
-    sphmnPartsOf(kanji, await loadSphmnComponents())
-  ),
   "sphmn-kanji-of": requirePayload(
     async ({
       component,

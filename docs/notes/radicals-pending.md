@@ -606,8 +606,10 @@ Decided (user, October 2026):
   shows only its glyph (no "..."). Missing keywords are simply not shown.
 - Jōyō-only coverage is fine. ~980 buttons, no virtualization; a tap
   re-renders only the buttons that changed.
-- Component Breakdown (Character Structure) has a `(sph-mn)` row: every part
-  found inside the kanji, at any depth, flat, most-used first.
+- No `(sph-mn)` row in Component Breakdown (user, October 2026). It was
+  built, then dropped: sph-mn's file is ScottOglesby's map expanded to every
+  depth (identical for all 2025 kanji), so it repeated the `(ScottOglesby)`
+  row.
 - **"Kanji that contain 寺"**: a new section in Structure info, after
   Visually Similar Kanji, with the same buttons (tap → popover with the
   kanji link). Ordered by the user's current sort setting. Up to 30, then
@@ -620,10 +622,15 @@ Decided (user, October 2026):
   shows the plain most-matches-first list instead; the buttons fade in on
   each flip.
 
-Later, not now:
+Component popover (discussed October 2026, not built yet):
 
-- Non-radical parts (寺 in 時) could open a popover with "Find kanji that
-  include 寺" through component search, matching step 3.
+- Only in Character Structure and the reference card, for parts that are in
+  the component drawer (sph-mn glyphs). Kanji parts (寺 in 時) get it too,
+  with "Open kanji 寺"; one extra tap to the kanji page is fine.
+- Radicals keep the radical popover, plus one line opening component search
+  (decided).
+- Open: the lime sound box — only for this kanji's own sound part (as the
+  reference card does today), or whenever the part has sound info.
 
 ### 3b. Which parts list the reference card shows
 

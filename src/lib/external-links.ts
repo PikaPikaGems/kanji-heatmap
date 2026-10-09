@@ -277,10 +277,6 @@ export const structureSourceLinks = [
     url: otherOutLinks.scottKanjiBakuhatsu,
   },
   {
-    text: "sph-mn/nihongo",
-    url: otherOutLinks.sphmnNihongo,
-  },
-  {
     text: "scriptin/topokanji",
     url: otherOutLinks.topoKanji,
   },
