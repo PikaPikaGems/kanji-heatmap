@@ -18,9 +18,10 @@ edited. Anything we decide ourselves lives in `ours.json`.
 ## What a sound part means
 
 A **learner hint**, not a claim about a kanji's history. The chip means
-**kanji that contain this part tend to be read this way** (decided with the
-user, October 2026), and the popover says "Kanji with 五 tend to be read
-as" above the readings. It is about the part's family, not the kanji page
+**a sound hint for kanji with this part** (decided with the user, October
+2026): the popover says "Sound hint for kanji with 五:" above the readings.
+It is a hint, not a rule: not every kanji with the part is read that way
+(問 and 開 contain 門 but are not かん). It is about the part's family, not the kanji page
 it sits on: 門 is もん, but its chip says かん for 間 関 簡 閑. A part qualifies
 for a kanji if:
 
