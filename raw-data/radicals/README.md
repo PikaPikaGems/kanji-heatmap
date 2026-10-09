@@ -206,8 +206,19 @@ Component search and the `(sph-mn)` row in Component Breakdown.
 contains the component at any depth, in the CSV's order. The app flips it
 for the kanji → parts direction.
 
+sph-mn builds the CSV from ScottOglesby's kanji-bakuhatsu composition map
+(the same data as our `(ScottOglesby)` row, `kanji-structure/external/scott.json`),
+expanded to every depth by
+[`src/kanji-to-components.coffee`](https://github.com/sph-mn/nihongo/blob/HEAD/src/kanji-to-components.coffee).
+
 - Rows whose component isn't one character are dropped (`中一`, and one
   with an empty component).
+- `sphmnCodepointFixes` in `ours.json` reads a radical code point as its
+  ordinary twin, merging the two rows: `{ "⺣": "灬", "⺡": "氵", "⻊": "𧾷" }`.
+  Scott's map was typed by hand and writes one shape both ways (点 has 灬,
+  勲 has ⺣), so without this the drawer shows two identical-looking
+  buttons and 灬 misses 勲 and 薫. Only pairs of the same shape, chosen with
+  the user. The build fails if either glyph of a pair is not a component.
 - Kanji are written in the forms we ship, with `jouyouForms` from
   `raw-data/misc/ours.json` (剝 → 剥). Kanji we don't ship are dropped, then
   components with no kanji left.

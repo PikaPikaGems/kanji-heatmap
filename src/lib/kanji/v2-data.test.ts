@@ -591,19 +591,30 @@ describe("sphmn_components.json", () => {
   const shipped = (char: string) => v1Main[char] != null;
 
   it("keeps every one-character row, with its shipped kanji in CSV order", () => {
+    const { sphmnCodepointFixes } = raw<{
+      sphmnCodepointFixes: Record<string, string>;
+    }>("radicals/ours.json");
+    // Radical code points join their ordinary twin's row (⺣ → 灬).
+    const merged = new Map<string, string[]>();
+    for (const [component, kanji] of csv) {
+      const glyph = sphmnCodepointFixes[component] ?? component;
+      merged.set(glyph, [...(merged.get(glyph) ?? []), ...kanji]);
+    }
     const expected = new Map<string, string>(
-      csv
+      [...merged]
         .filter(([component]) => [...component].length === 1)
         .map(([component, kanji]): [string, string] => [
           component,
-          [...kanji]
-            .map((char) => jouyouForms[char] ?? char)
+          [...new Set(kanji.map((char) => jouyouForms[char] ?? char))]
             .filter(shipped)
             .join(""),
         ])
         .filter(([, kanji]) => kanji.length > 0)
     );
     expect(new Map(list)).toEqual(expected);
+    for (const from of Object.keys(sphmnCodepointFixes)) {
+      expect(expected.has(from)).toBe(false);
+    }
   });
 
   it("is ordered by match count, the component itself included", () => {

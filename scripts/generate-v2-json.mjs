@@ -484,11 +484,13 @@ for (const [char, entry] of Object.entries(components)) {
 
 const sphmn = buildSphmnComponents({
   rows: readSphmnComponents(RAW_DIR),
+  codepointFixes: ours.sphmnCodepointFixes ?? {},
   jouyouForms,
   isKanji,
   strokesOf: (char) =>
     isKanji(char) ? Number(extended[char][EXT.strokes]) : components[char]?.n,
 });
+sphmn.problems.forEach(fail);
 
 // ---------------------------------------------------------------------------
 // kanji_structures.json — the four interpretations in one file. Sources are
