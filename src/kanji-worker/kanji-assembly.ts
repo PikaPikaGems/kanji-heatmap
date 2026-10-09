@@ -62,6 +62,7 @@ export const extractKanjiHoverData = (
     return {
       phonetic: phoneticPart,
       sound: components[phoneticPart]?.s,
+      members: [...(components[phoneticPart]?.m ?? "")],
       ...lookupPart(phoneticPart, mainInfoMap, components, aliases),
     };
   };

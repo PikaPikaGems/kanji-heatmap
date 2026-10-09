@@ -52,6 +52,8 @@ export type HoverItemReturnData = {
   phonetic?: {
     phonetic: string;
     sound: string[];
+    /** Kanji with this sound part, most common first. */
+    members: string[];
     keyword: string;
     isKanji: boolean;
   };

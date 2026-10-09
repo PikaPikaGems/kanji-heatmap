@@ -15,11 +15,14 @@ export const SingleKanjiPart = ({
   kanji,
   keyword,
   phonetics = [],
+  soundFamily = [],
   isKanji,
 }: {
   kanji: string;
   keyword?: string;
   phonetics?: string[];
+  /** Kanji with this sound part, most common first. */
+  soundFamily?: string[];
   isKanji: boolean;
 }) => {
   const radicals = useRadicals();
@@ -37,15 +40,17 @@ export const SingleKanjiPart = ({
       }
       content={
         <div className="p-2 text-xs font-bold">
-          {/* The reading is the family's, not necessarily this kanji's: 門
-              is もん, but kanji with 門 (間 簡 閑) are read かん. */}
+          {/* The hint is about kanji that contain the part, not about the
+              part itself: 門 is もん, but 間 関 簡 閑 are read かん. */}
           {phonetics.length > 0 && (
-            // Text first, readings below: up to four readings (各) wrap inside
-            // the box instead of stretching the whole popover.
+            // Kanji on one line, readings below: up to four readings (各)
+            // wrap inside the box instead of stretching the whole popover.
             <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
               <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
-                Kanji with <span className="kanji-font">{kanji}</span> are
-                sometimes read
+                🔊 Sound hint:{" "}
+                <span className="text-base kanji-font text-foreground">
+                  {soundFamily.join(" ")}
+                </span>
               </p>
               <div className="flex flex-wrap justify-center">
                 {phonetics.map((phonetic) => (

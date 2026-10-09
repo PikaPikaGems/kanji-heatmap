@@ -60,6 +60,7 @@ export const OriginalKanjiComponentBreakdown = ({
               kanji={info.phonetic.phonetic}
               keyword={info.phonetic.keyword}
               phonetics={info.phonetic.sound}
+              soundFamily={info.phonetic.members}
               isKanji={info.phonetic.isKanji}
             />
           )}

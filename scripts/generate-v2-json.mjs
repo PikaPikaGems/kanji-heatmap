@@ -373,6 +373,26 @@ for (const [char, sounds] of Object.entries(soundParts.readings)) {
   components[char] = { ...components[char], s: sounds };
 }
 
+// The kanji that have each sound part (語 悟 伍 梧 吾 for 五), most common
+// first (median frequency rank across sources), shown in the sound hint.
+// The part itself is left out: its chip is about kanji that contain it.
+const medianRank = (kanji) => {
+  const ranks = (main[kanji]?.[4] ?? []).filter((rank) => rank > 0);
+  if (ranks.length === 0) return Infinity;
+  const sorted = [...ranks].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)];
+};
+const membersOf = {};
+for (const kanji of kanjiList) {
+  const part = soundParts.soundPartOf[kanji];
+  if (part && part !== kanji) (membersOf[part] ??= []).push(kanji);
+}
+for (const [part, members] of Object.entries(membersOf)) {
+  if (components[part]?.s == null) continue;
+  members.sort((a, b) => medianRank(a) - medianRank(b));
+  components[part] = { ...components[part], m: members.join("") };
+}
+
 for (const [strokes, list] of Object.entries(
   radicals.radicalsGroupedByStrokeCount
 )) {

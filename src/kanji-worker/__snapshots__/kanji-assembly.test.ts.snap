@@ -234,6 +234,13 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
   "phonetic": {
     "isKanji": true,
     "keyword": "five",
+    "members": [
+      "語",
+      "吾",
+      "悟",
+      "伍",
+      "梧",
+    ],
     "phonetic": "五",
     "sound": [
       "ご",
@@ -455,6 +462,14 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
   "phonetic": {
     "isKanji": false,
     "keyword": "sunrise",
+    "members": [
+      "朝",
+      "幹",
+      "韓",
+      "乾",
+      "潮",
+      "嘲",
+    ],
     "phonetic": "𠦝",
     "sound": [
       "ちょう",
