@@ -199,7 +199,7 @@ radical itself), or a sound word not read with the radical's sound.
 
 ## sph-mn components — `external/sphmn-components-ck.csv`
 
-Component search and "Kanji that contain 寺" on the kanji page.
+Component search, and the "Search kanji by component" button on the kanji page.
 `scripts/sphmn-components.mjs` reads the CSV on every
 `pnpm run generate-json` and writes `public/json/v2/sphmn_components.json`:
 `[[component, kanji], ...]`, where `kanji` is every shipped kanji that
