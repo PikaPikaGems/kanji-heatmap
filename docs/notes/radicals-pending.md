@@ -502,6 +502,14 @@ exceptions. Per field:
   🇯🇵 section shows them as "Also called ほうへん · へん (left side)". A radical with no other forms has no section; its
   position is on the 🇯🇵 line.
 
+Open: **かぜかんむり belongs to no family.** sylhare lists ⺇ (かぜかんむり)
+as a form of 風, which is wrong: かぜかんむり is a name of 几 (風's outside
+looks like 几; ja.wikipedia 几部). `familySkips` in ours.json now drops ⺇
+from 風, but nothing adds the name to 几, because there is no data option
+yet to add a name-only row to another family. Add one (e.g. `familyAdds`
+in ours.json: 几 → {ja: かぜかんむり, pos: かまえ}) so 几's dialog says "Also
+called かぜかんむり".
+
 老 is named おい (an `extras` entry in ours.json); it used to inherit
 おいかんむり from 耂's CSV row.
 
