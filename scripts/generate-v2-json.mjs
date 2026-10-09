@@ -22,6 +22,10 @@ import {
   buildRadicalPopoverText,
   readRadicalPopoverText,
 } from "./radical-popover-text.mjs";
+import {
+  buildSphmnComponents,
+  readSphmnComponents,
+} from "./sphmn-components.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -473,6 +477,20 @@ for (const [char, entry] of Object.entries(components)) {
 }
 
 // ---------------------------------------------------------------------------
+// sphmn_components.json — component search (scripts/sphmn-components.mjs).
+// Stroke counts only order ties: a kanji's own count, else the radical
+// drawer's. 371 components have neither and sort after the rest.
+// ---------------------------------------------------------------------------
+
+const sphmn = buildSphmnComponents({
+  rows: readSphmnComponents(RAW_DIR),
+  jouyouForms,
+  isKanji,
+  strokesOf: (char) =>
+    isKanji(char) ? Number(extended[char][EXT.strokes]) : components[char]?.n,
+});
+
+// ---------------------------------------------------------------------------
 // kanji_structures.json — the four interpretations in one file. Sources are
 // heterogeneous (object / 5-tuple / two component lists) and each covers a
 // different subset of kanji, so absent sources are omitted rather than nulled.
@@ -652,6 +670,7 @@ write("radicals.json", {
 });
 write("radical_popover_text.json", radicalPopover.text);
 write("kanji_structures.json", outStructures);
+write("sphmn_components.json", sphmn.list);
 // Pass-throughs: reshaping nothing, only normalising the file names.
 write("kanji_decomposition.json", decomposition);
 write("similar_kanjis.json", similarKanjis);
@@ -671,6 +690,10 @@ for (const [name, bytes, entries] of written) {
     `  ${name.padEnd(30)} ${kb(bytes).padStart(8)}  ${entries} entries`
   );
 }
+console.log(
+  `\nsph-mn components: ${sphmn.list.length} kept, dropped ` +
+    JSON.stringify(sphmn.dropped)
+);
 console.log(
   `\nComponent coverage: ${coverageReport.summary.withKeyword}/${coverageReport.summary.referenced} ` +
     `have a keyword, ${coverageReport.summary.missing} missing ` +
