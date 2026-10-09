@@ -614,12 +614,10 @@ Decided (user, October 2026):
   "See all N", which opens component search with that component; N counts
   the component itself, so it matches the search.
 
-Open:
-
-- **Bands or plain list.** Bands (In 50+ / 20–49 / 5–19 / 2–4 / 1 kanji,
-  each band fewest strokes first) are on in the drawer for comparison, with
-  a dev-only toggle. The user decides after trying both; the toggle and the
-  losing option go then.
+- **Bands:** the drawer is split by match count (In 50+ / 20–49 / 10–19 /
+  4–9 / 2–3 / 1 kanji), each band fewest strokes first, unknown last. A
+  switch for everyone ("Group by how many kanji", on by default) shows the
+  plain most-matches-first list instead; the buttons fade in on each flip.
 
 Later, not now:
 

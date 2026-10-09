@@ -68,15 +68,15 @@ describe("ComponentScreenContent", () => {
     screen
       .getAllByRole("button")
       .map((b) => b.textContent)
-      // Skip the dev-only bands toggle.
-      .filter((text) => !text?.startsWith("Bands"));
+      // Skip the bands switch, which is a button with no text.
+      .filter((text) => text !== "");
 
   it("orders each band by stroke count, the plain list by matches", async () => {
     render(<Harness />);
     // Bands on: 口 and 一 share the 50+ band, so 一 (1 stroke) leads.
     expect(glyphs()).toEqual(["一", "口", "寺"]);
 
-    await userEvent.click(screen.getByRole("button", { name: /Bands/ }));
+    await userEvent.click(screen.getByRole("switch", { name: /Group by/ }));
     expect(glyphs()).toEqual(["口", "一", "寺"]);
   });
 

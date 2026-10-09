@@ -4,17 +4,20 @@ import {
   useKanjiSearchResult,
   useSphmnDrawer,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { Switch } from "@/components/ui/switch";
 import { RadicalBtn } from "../RadicalScreen/RadicalScreen";
 
 /**
- * Bands under trial (user, October 2026): the drawer is shown either as one
- * list or split by match count. Each band is the lowest count it holds.
+ * The drawer is shown split into bands by match count (the default) or as
+ * one list; a switch at the top flips between them. Each band is the lowest
+ * count it holds.
  */
 const BANDS: { min: number; label: string }[] = [
   { min: 50, label: "In 50+ kanji" },
   { min: 20, label: "In 20–49 kanji" },
-  { min: 5, label: "In 5–19 kanji" },
-  { min: 2, label: "In 2–4 kanji" },
+  { min: 10, label: "In 10–19 kanji" },
+  { min: 4, label: "In 4–9 kanji" },
+  { min: 2, label: "In 2–3 kanji" },
   { min: 1, label: "In 1 kanji" },
 ];
 const bandOf = (matches: number) =>
@@ -41,21 +44,25 @@ const BandHeading = ({ label }: { label: string }) => (
   </div>
 );
 
-/**
- * Temporary, dev server only: flips between the plain list and the bands so
- * the two can be compared. Remove once one is chosen.
- */
-const BandsToggle = ({
+const BandsSwitch = ({
   showBands,
-  onToggle,
+  onChange,
 }: {
   showBands: boolean;
-  onToggle: () => void;
+  onChange: (showBands: boolean) => void;
 }) => (
-  <div className="w-full px-1 pb-1 text-xs text-left">
-    <button className="underline" onClick={onToggle}>
-      {showBands ? "Bands: on (dev)" : "Bands: off (dev)"}
-    </button>
+  <div className="flex items-center w-full gap-2 px-1 pb-1">
+    <Switch
+      id="component-bands"
+      checked={showBands}
+      onCheckedChange={onChange}
+    />
+    <label
+      htmlFor="component-bands"
+      className="text-xs font-bold cursor-pointer select-none"
+    >
+      Group by how many kanji
+    </label>
   </div>
 );
 
@@ -108,34 +115,36 @@ export const ComponentScreenContent = ({
 
   return (
     <>
-      {import.meta.env.DEV && (
-        <BandsToggle
-          showBands={showBands}
-          onToggle={() => setShowBands((on) => !on)}
-        />
-      )}
-      {ordered.map(([component, matches], index) => {
-        const isSelected = value.has(component);
-        const isDisabled =
-          possibleComponents != null &&
-          !isSelected &&
-          !possibleComponents.has(component);
-        const band = bandOf(matches);
-        const startsBand =
-          showBands && (index === 0 || bandOf(ordered[index - 1][1]) !== band);
-        return (
-          <React.Fragment key={component}>
-            {startsBand && <BandHeading label={band.label} />}
-            <RadicalBtn
-              isDisabled={isDisabled}
-              onToggle={handleToggle}
-              radical={component}
-              isSelected={isSelected}
-              isTouchDevice={isTouchDevice}
-            />
-          </React.Fragment>
-        );
-      })}
+      <BandsSwitch showBands={showBands} onChange={setShowBands} />
+      {/* Keyed by mode so the buttons fade in again after each flip. */}
+      <div
+        key={showBands ? "bands" : "list"}
+        className="flex flex-wrap items-start justify-center w-full animate-fade-in"
+      >
+        {ordered.map(([component, matches], index) => {
+          const isSelected = value.has(component);
+          const isDisabled =
+            possibleComponents != null &&
+            !isSelected &&
+            !possibleComponents.has(component);
+          const band = bandOf(matches);
+          const startsBand =
+            showBands &&
+            (index === 0 || bandOf(ordered[index - 1][1]) !== band);
+          return (
+            <React.Fragment key={component}>
+              {startsBand && <BandHeading label={band.label} />}
+              <RadicalBtn
+                isDisabled={isDisabled}
+                onToggle={handleToggle}
+                radical={component}
+                isSelected={isSelected}
+                isTouchDevice={isTouchDevice}
+              />
+            </React.Fragment>
+          );
+        })}
+      </div>
     </>
   );
 };
