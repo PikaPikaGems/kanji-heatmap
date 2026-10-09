@@ -131,9 +131,9 @@ and stay. Proposed, waiting for the user's go:
   the part itself) is. Dry run: hides 22 (十→汁, 犬→献, 匕→死, 比→批, 単,
   乞, …). Not "more than 3": that would hide 丁 士 旦 干 几.
 - **Exceptions** (kept, each with its reason in `ours.json`): 果 (課 菓),
-  里 (理 鯉), 未 (味 魅), 分 (粉 紛), 羊 (洋 養).
-- **Revisit later:** 几 (机 肌 飢) passes but is weak: 机 is つくえ, 肌 is
-  はだ. Kept for now (user).
+  里 (理 鯉), 未 (味 魅), 分 (粉 紛), 羊 (洋 養), and 几 (机 肌 飢). 几
+  already passes the rule; it is listed so it stays even if the rule
+  changes. It is weak (机 is つくえ, 肌 is はだ): revisit later (user).
 - **Idea:** the Anki deck's rhyme rows (R01–R20, skipped today) as a
   different kind of hint ("rhymes with -an": 単 弾 戦 禅).
 
