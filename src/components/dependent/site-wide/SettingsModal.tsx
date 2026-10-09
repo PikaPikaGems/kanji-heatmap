@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from "react";
+import { forwardRef, useState, type ComponentProps } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
@@ -266,11 +266,12 @@ const LightDarkRow = () => {
   );
 };
 
-export const SettingsModalTrigger = ({
-  onClick,
-  ...props
-}: ComponentProps<typeof Button>) => (
+export const SettingsModalTrigger = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof Button>
+>(({ onClick, ...props }, ref) => (
   <Button
+    ref={ref}
     variant="outline"
     size="iconXl"
     aria-label="Open User Preferences"
@@ -279,7 +280,8 @@ export const SettingsModalTrigger = ({
   >
     <Settings className="w-[1.2rem] h-[1.2rem]" />
   </Button>
-);
+));
+SettingsModalTrigger.displayName = "SettingsModalTrigger";
 
 export const SettingsModal = ({
   open: openProp,

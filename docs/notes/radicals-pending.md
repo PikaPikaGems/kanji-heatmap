@@ -609,11 +609,11 @@ Decided (user, October 2026):
 - **Drawer order:** by match count (kanji containing the component, plus
   itself), most first; ties go to fewer strokes, then no stroke count, then
   code point. This replaces the earlier "group by stroke count, with a '?'
-  group" decision: 371 of the 979 components have no stroke count,
-  including 23 of the 100 most common.
+  group" decision: before one-result components were removed, 371 of 979
+  components had no stroke count, including 23 of the 100 most common.
 - **Selected bar:** kept, like radical search. A component with no keyword
   shows only its glyph (no "..."). Missing keywords are simply not shown.
-- Jōyō-only coverage is fine. ~980 buttons, no virtualization; a tap
+- Jōyō-only coverage is fine. 821 buttons after filtering, no virtualization; a tap
   re-renders only the buttons that changed.
 - No `(sph-mn)` row in Component Breakdown (user, October 2026). It was
   built, then dropped: sph-mn's file is ScottOglesby's map expanded to every
@@ -626,8 +626,10 @@ Decided (user, October 2026):
   the component itself, so it matches the search.
 
 - **Bands:** the drawer is split by match count (In 50+ / 20–49 / 10–19 /
-  6–9 / 4–5 / 3 / 2 / 1 kanji), each band fewest strokes first, unknown
-  last. A switch for everyone ("Group by how many kanji", on by default)
+  6–9 / 4–5 / 3 / 2 kanji), with each heading showing its number of components.
+  Components with only one search result are excluded from generated data.
+  Each band sorts fewest strokes first, unknown last. A switch for everyone
+  ("Group by how many kanji", on by default)
   shows the plain most-matches-first list instead; the buttons fade in on
   each flip.
 

@@ -143,6 +143,7 @@ const KanjiStructuralDataKanjium = ({ kanji }: { kanji: string }) => {
           title="Structure"
           keyword="..."
           type="unknown"
+          isClickable={false}
         />
       )}
       {structureType && (

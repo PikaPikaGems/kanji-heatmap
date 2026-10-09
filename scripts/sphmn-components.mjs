@@ -30,8 +30,8 @@ export const readSphmnComponents = (rawDir) =>
  * Keeps rows whose component is one character (drops `中一` and the empty
  * one), reads radical code points as the ordinary character (`codepointFixes`,
  * ⺣ → 灬, merging the two rows), writes kanji in the forms we ship
- * (`jouyouForms`, 剝 → 剥), keeps only shipped kanji and drops components left
- * with none.
+ * (`jouyouForms`, 剝 → 剥), keeps only shipped kanji and drops components
+ * with at most one search result.
  *
  * Order is the drawer order: most matches first, where a match is a kanji
  * that contains the component, plus the component itself when it is a kanji
@@ -76,14 +76,15 @@ export const buildSphmnComponents = ({
     const shipped = [
       ...new Set(kanji.map((char) => jouyouForms[char] ?? char)),
     ].filter((char) => isKanji(char));
-    if (shipped.length === 0) {
+    const matches = shipped.length + (isKanji(component) ? 1 : 0);
+    if (matches <= 1) {
       dropped.push(component);
       continue;
     }
     entries.push({
       component,
       kanji: shipped.join(""),
-      matches: shipped.length + (isKanji(component) ? 1 : 0),
+      matches,
       strokes: strokesOf(component),
     });
   }
