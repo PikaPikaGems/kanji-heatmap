@@ -352,24 +352,3 @@ export const useSphmnDrawer = () => {
   );
   return { status: state.status, data: state.data ?? null };
 };
-
-/**
- * The kanji that contain `component` (sph-mn), not counting itself, in the
- * user's current sort order.
- */
-export const useSphmnKanjiOf = (component: string) => {
-  const ready = useIsKanjiWorkerReady();
-  const { sortSettings } = useSearchSettings();
-  const state = useWorkerQuery<string[]>(
-    ready && component
-      ? () =>
-          requestWorker({
-            type: "sphmn-kanji-of",
-            payload: { component, sortSettings },
-          })
-      : null,
-    [ready, component, sortSettings.primary, sortSettings.secondary],
-    false
-  );
-  return { status: state.status, data: state.data ?? null };
-};

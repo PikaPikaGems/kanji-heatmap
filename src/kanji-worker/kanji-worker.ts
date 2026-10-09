@@ -42,10 +42,9 @@ import {
   searchByParts,
   searchByRadical,
   searchKanji,
-  sortKanji,
 } from "./kanji-search";
 import { prepareSphmnComponents } from "@/lib/sphmn-components";
-import { SearchSettings, SortSettings } from "@/lib/settings/settings";
+import { SearchSettings } from "@/lib/settings/settings";
 import {
   followAlias,
   prepareRadicals,
@@ -451,20 +450,6 @@ const HANDLERS: {
   "kanji-reading-details": handleKanjiReadingDetails,
   "radical-popover-text": handleRadicalPopoverText,
   "sphmn-drawer": handleSphmnDrawer,
-  "sphmn-kanji-of": requirePayload(
-    async ({
-      component,
-      sortSettings,
-    }: {
-      component: string;
-      sortSettings: SortSettings;
-    }) => {
-      const [sphmn, main] = await Promise.all([loadSphmnComponents(), CORE]);
-      // sortKanji sorts in place; copy so the dataset keeps sph-mn's order.
-      const kanji = [...(sphmn.kanjiOf[component] ?? [])];
-      return sortKanji(kanji, { sortSettings }, { main, extended: {} });
-    }
-  ),
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,

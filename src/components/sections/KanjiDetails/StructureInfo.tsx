@@ -9,17 +9,11 @@ import {
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import {
-  otherOutLinks,
   similarKanjiSourceLinks,
   structureSourceLinks,
 } from "@/lib/external-links";
-import { cnTextLink } from "@/lib/generic-cn";
-import { Link } from "@/components/dependent/routing/router-adapter";
 import { OriginalKanjiComponentBreakdown } from "./OriginalComponentBreakdown";
-import {
-  useSimilarKanjis,
-  useSphmnKanjiOf,
-} from "@/kanji-worker/kanji-worker-hooks";
+import { useSimilarKanjis } from "@/kanji-worker/kanji-worker-hooks";
 import { dedupe } from "@/lib/utils";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
@@ -89,54 +83,6 @@ const SimilarKanjis = ({ kanji }: { kanji: string }) => {
   );
 };
 
-const CONTAINED_IN_SHOWN = 30;
-
-const componentSearchHref = (component: string) =>
-  `/?search-type=components&search-text=${encodeURIComponent(component)}`;
-
-/**
- * The reverse of the breakdown (寺 → 侍 持 待 …), from sph-mn, in the user's
- * current sort order. "See all" opens component search, which also returns
- * the kanji itself, so the count includes it.
- */
-const KanjiThatContain = ({ kanji }: { kanji: string }) => {
-  const { data } = useSphmnKanjiOf(kanji);
-  const containing = data ?? [];
-  if (containing.length === 0) return null;
-
-  return (
-    <>
-      <div className="text-left animate-fade-in">
-        <h3 className="pt-3 pb-1 pl-3 mb-4 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">
-          Kanji that contain {kanji}
-        </h3>
-        <div className="flex items-center min-w-0 space-x-2 overflow-x-auto overflow-y-hidden">
-          {containing.slice(0, CONTAINED_IN_SHOWN).map((other) => (
-            <KanjiPopoverButton key={other} kanji={other} />
-          ))}
-          {containing.length > CONTAINED_IN_SHOWN && (
-            <Link
-              to={componentSearchHref(kanji)}
-              className={`${cnTextLink} shrink-0 px-2 text-sm whitespace-nowrap`}
-            >
-              See all {containing.length + 1}
-            </Link>
-          )}
-        </div>
-      </div>
-      <PrimaryDataSources
-        links={[
-          { text: "sph-mn/nihongo", url: otherOutLinks.sphmnNihongo },
-          {
-            text: "ScottOglesby/kanji-bakuhatsu",
-            url: otherOutLinks.scottKanjiBakuhatsu,
-          },
-        ]}
-      />
-    </>
-  );
-};
-
 export const StructureInfo = ({ kanji }: { kanji: string }) => {
   return (
     <>
@@ -195,8 +141,6 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
       <PrimaryDataSources links={structureSourceLinks} />
 
       <SimilarKanjis kanji={kanji} />
-
-      <KanjiThatContain kanji={kanji} />
     </>
   );
 };
