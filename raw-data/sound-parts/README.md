@@ -92,6 +92,10 @@ background):
 - **枝 肢 → 支 し** (and 支 → 支, as a head): 枝 = 木 + 支 and 肢 = 肉 + 支,
   with 支 as the sound part (Wiktionary). Anki files them under 士, which
   is not in them; the release has no part for them.
+- **洪 → 港 こう is kept: 洪 IS VISIBLE IN 港** (氵 + 共-shaped top of 巷).
+  Wiktionary gives 巷 as 港's historical sound part, but the hint only
+  needs the shape to be visible and the reading to match. Settled with the
+  user twice; don't flag it again.
 - **斉 さい:** Anki says ザイ (from 剤), but 斎, 済 and 斉 itself are さい.
 - **才 さい:** Anki says ザイ (from 材, 財), but 才 itself is さい; 材 ざい is
   the voiced form, and 財 is also さい.
