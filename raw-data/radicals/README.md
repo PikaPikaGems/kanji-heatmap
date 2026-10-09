@@ -213,14 +213,8 @@ expanded to every depth by
 
 - Rows whose component isn't one character are dropped (`中一`, and one
   with an empty component).
-- `sphmnCodepointFixes` in `ours.json` reads one character as another,
-  merging the two rows: `{ "⺣": "灬", "⺡": "氵", "⻊": "𧾷", "｜": "丨" }`.
-  Scott's map was typed by hand and writes one shape two ways (点 has 灬,
-  勲 has ⺣; 直 has the fullwidth bar ｜, 引 has 丨), so without this the
-  drawer shows two identical-looking buttons and 灬 misses 勲 and 薫. Only
-  pairs of the same shape, chosen with the user; ⻌/辶, ⺤/爫 and ⻖/⻏ stay
-  apart. Component search only: radical aliases are a separate thing and
-  don't change. The build fails if either glyph of a pair is not a component.
+- `sphmnCodepointFixes` in `ours.json` merges glyphs that Scott typed two
+  ways for one shape; see "Component merges vs radical aliases" below.
 - Kanji are written in the forms we ship, with `jouyouForms` from
   `raw-data/misc/ours.json` (剝 → 剥). Kanji we don't ship are dropped, then
   components with no kanji left.
@@ -231,3 +225,36 @@ expanded to every depth by
 - sph-mn writes parts its own way (氵 八 ⺮ 灬 where the radical drawer has
   ⺡ ハ 竹 ⺣). The data is shown as is and isn't linked to the radical
   drawer.
+
+### Component merges vs radical aliases
+
+Two separate mechanisms, decided with the user (October 2026). They behave
+differently on purpose, and neither changes the other.
+
+**Component merges** (`sphmnCodepointFixes`, component search only). Scott's
+map was typed by hand and sometimes writes one shape with two characters
+(点 has 灬, 勲 has ⺣). The build reads the first as the second and joins
+the two rows, so the drawer has one button and the search finds both sets:
+
+| Merged             | Into | Why that glyph                             | Kanji after       |
+| ------------------ | ---- | ------------------------------------------ | ----------------- |
+| ⺣ (radical fire)  | 灬   | ordinary character                         | 34 (gains 勲 薫)  |
+| ⺡ (radical water) | 氵   | ordinary character                         | 121 (gains 滴 濃) |
+| ⻊ (radical foot)  | 𧾷   | ordinary character                         | 8                 |
+| ｜ (fullwidth bar) | 丨   | ｜ is punctuation, not a kanji part        | 56                |
+| 𥫗 (bamboo top)    | ⺮   | 𥫗 is missing from some of the app's fonts | 23                |
+
+Only pairs that look the same in the app's kanji font. Not merged:
+⻌/辶 (one dot vs two), ⺤/爫, 䖝/虫 (䖝 has an extra stroke; it is the
+inside of 風), ⻖/⻏ (same shape, different parts: 阜 "mound" on the left,
+邑 "village" on the right). The build fails if either glyph of a pair is
+not a component.
+
+**Radical aliases** (`aliases` in `ours.json` and the sylhare CSV, radical
+search and radical popovers only). They say "this glyph is that radical":
+氵 → ⺡, 灬 → ⺣, 辶 → ⻌, 爫 → ⺤, 丨 → ｜. Radical search and the radical
+popover follow them, so a chip written 氵 opens ⺡'s popover and searches
+⺡. They don't touch component search, and component merges don't touch
+them. The direction is often the opposite (radicals point to the drawer's
+radical form, components to the ordinary character): each side uses the
+glyph its own data and drawer show.
