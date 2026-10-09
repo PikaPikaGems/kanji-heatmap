@@ -180,7 +180,7 @@ export const General = ({ kanji }: { kanji: string }) => {
     },
     {
       label: "Actions",
-      description: "Hear, copy, or share this kanji",
+      description: "Hear, copy, share, or search by this kanji",
       items: [<KanjiActions key={kanji} kanji={kanji} />],
     },
   ];

@@ -15,6 +15,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { RadicalDetailsDialogContent } from "@/components/dependent/site-wide/RadicalDetailsDialog";
 import { useRadicalSummary } from "@/components/dependent/site-wide/use-radical-summary";
 import { resolveRadicalForSearch } from "@/lib/radicals";
+import { componentSearchHref, radicalSearchHref } from "@/lib/search-hrefs";
 import { useComponentSearchEntry } from "@/components/sections/KanjiDetails/use-component-search-entry";
 
 export const ComponentLink = ({
@@ -108,9 +109,6 @@ export const GlobalHomeLink = () => {
   );
 };
 
-const radicalSearchHref = (searchText: string) =>
-  `/?search-type=radicals&search-text=${encodeURIComponent(searchText)}`;
-
 const RadicalJpCard = ({
   radical,
   keyword,
@@ -168,9 +166,6 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
     </PopoverAction>
   );
 };
-
-const componentSearchHref = (component: string) =>
-  `/?search-type=components&search-text=${encodeURIComponent(component)}`;
 
 const ComponentSearchAction = ({ component }: { component: string }) => (
   <PopoverAction
