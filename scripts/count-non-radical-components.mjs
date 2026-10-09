@@ -115,10 +115,12 @@ const byCount = [...bucketMap.entries()]
   .sort((a, b) => b[0] - a[0])
   .map(([count, components]) => ({ count, components }));
 
-const withKeyword = componentRows.filter((row) => row.keyword).length;
+// The full rows are in `components`; the summary only names the glyphs.
 const componentsWithKeyword = componentRows
   .filter((row) => row.keyword)
-  .map((row) => ({ cmp: row.char, cnt: row.count, kw: row.keyword }));
+  .map((row) => row.char)
+  .join("");
+const withKeyword = [...componentsWithKeyword].length;
 
 const report = {
   summary: {
