@@ -50,6 +50,13 @@ The part's own reading doesn't have to match: the release already shows
    sources say.
 4. Readings: `readings` in `ours.json`, else the release's, else Anki's
    (converted to hiragana).
+5. **Hide a family whose hint misleads more than it helps** (user, October
+   2026): most kanji with the part are not read with its sound, and no more
+   than 2 of its own kanji are. "Kanji with the part" means kanji where it
+   is a direct, top-level piece in yagays, ScottOglesby or hlorenzi (so 里
+   inside 重 doesn't count). `keepFamilies` in `ours.json` keeps a family
+   anyway. Hidden today: 十 汁, 犬 献, 比 批, 匕 死, 共 供, 区 駆, 圭 桂, 昔 借,
+   竹 築, 予 預, 兄 況競, 牙 雅芽, 少 沙砂, 単, 乞.
 
 How the Anki file is read (the file itself is untouched):
 
@@ -63,9 +70,10 @@ How the Anki file is read (the file itself is untouched):
 `docs/data/sound-parts.json` is regenerated on every build and lists what
 Anki added, what `soundPart` overrode, where Anki offered another part
 (the kanji kept the one it had), and which Anki kanji failed the reading
-test.
+test, and which families step 5 hid (with the kanji that fit and don't).
 
-The build fails if a `dropFamilies` key is not an Anki family, a `soundPart`
+The build fails if a `keepFamilies` key is not anyone's sound part, a
+`dropFamilies` key is not an Anki family, a `soundPart`
 or `readings` entry repeats what the sources already give or matches
 nothing, or a sound part ends up with no reading.
 
@@ -79,6 +87,8 @@ nothing, or a sound part ends up with no reading.
   "soundPart": { "銭": "㦮" },
   // sound part → readings, wins over the release and Anki.
   "readings": { "斉": ["さい"] },
+  // Families step 5 would hide, kept anyway. Each value is the reason.
+  "keepFamilies": { "果": "課 菓 are か, like 果 (結果); …" },
 }
 ```
 

@@ -101,14 +101,20 @@ radicals of their own.
 ### `sylhareCodepointFixes` — ordinary characters for radical code points
 
 ```jsonc
-"sylhareCodepointFixes": { "⼊": "入", "⺟": "母" }
+"sylhareCodepointFixes": { "⼊": "入", "⺟": "母", "⻫": "斉" }
 ```
 
 The CSV writes a few radicals with a Kangxi or radical-supplement code point
 where the drawer and every kanji list use the ordinary character. The build
-swaps them in the Radical and Alternate columns before anything else, so 入
-gets radical 11's row (いる) and 母 becomes a form of 毋 (Japanese Wikipedia
-毋部: the radical covers 毋, 毌 and 母). 母 has its own name in `extras`
+swaps them in the Radical and Alternate columns before anything else:
+
+- 入 gets radical 11's row (いる).
+- 母 becomes a form of 毋 (Japanese Wikipedia 毋部: the radical covers 毋,
+  毌 and 母).
+- 斉 becomes a form of 齊, radical 210 (Japanese Wikipedia 斉部). The CSV
+  writes it ⻫, Unicode's "J-simplified" 齊.
+
+母 has its own name in `extras`
 (はは), so it doesn't take 毋's なかれ. The build fails on a code point the CSV
 doesn't use.
 

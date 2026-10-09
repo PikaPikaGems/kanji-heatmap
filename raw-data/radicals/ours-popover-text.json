@@ -2253,26 +2253,6 @@
     "cn": "A pair of elephant tusks.",
     "refs": [
       "https://en.wiktionary.org/wiki/牙"
-    ],
-    "sound": [
-      {
-        "kanji": "雅",
-        "word": "優雅",
-        "reading": "ゆうが",
-        "gloss": "elegant, graceful",
-        "refs": [
-          "https://en.wiktionary.org/wiki/雅"
-        ]
-      },
-      {
-        "kanji": "芽",
-        "word": "発芽",
-        "reading": "はつが",
-        "gloss": "germination, sprouting",
-        "refs": [
-          "https://en.wiktionary.org/wiki/芽"
-        ]
-      }
     ]
   },
   "牛": {
@@ -4849,6 +4829,18 @@
       "https://www.kanjipedia.jp/kanji/0006317900",
       "https://en.wiktionary.org/wiki/毋",
       "https://ja.wikipedia.org/wiki/毋部"
+    ]
+  },
+  "斉": {
+    "ja": "せい (斉, its reading). The radical is filed under its old form 齊.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/斉部"
+    ],
+    "cn": "The shortened form of 齊 used in jōyō kanji. Sources differ on the old picture: neatly arranged fruits or thorns (Wiktionary), or ears of grain growing evenly side by side (漢字ペディア). Either way, it means even, alike.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/斉",
+      "https://en.wiktionary.org/wiki/齊",
+      "https://www.kanjipedia.jp/kanji/0003871800"
     ]
   }
 }

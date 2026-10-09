@@ -82,8 +82,10 @@ export const buildSoundParts = ({
   ours,
   isKanji,
   onReadingsOf,
+  kanjiWithPart = () => [],
 }) => {
   const dropFamilies = ours.dropFamilies ?? {};
+  const keepFamilies = ours.keepFamilies ?? {};
   const soundPartOverrides = ours.soundPart ?? {};
   const readingOverrides = ours.readings ?? {};
   const problems = [];
@@ -177,6 +179,49 @@ export const buildSoundParts = ({
     }
   }
 
+  // 4. Hide a family whose hint misleads more than it helps: most kanji
+  //    with the part (as a direct part, kanjiWithPart) are not read with
+  //    its sound, and no more than 2 of its own kanji are. A family where
+  //    every such kanji is read so never meets the first condition.
+  //    ours.json keepFamilies lists the families kept anyway (果: 課 菓).
+  const readsSo = (kanji, part) =>
+    onReadingsOf(kanji).some((on) =>
+      (readings[part] ?? []).some(
+        (reading) => unvoiced(on) === unvoiced(reading)
+      )
+    );
+  const membersOf = {};
+  for (const [kanji, part] of Object.entries(soundPartOf)) {
+    if (kanji !== part) (membersOf[part] ??= []).push(kanji);
+  }
+  const hidden = [];
+  for (const part of used) {
+    const members = membersOf[part] ?? [];
+    const withPart = new Set([
+      ...kanjiWithPart(part).filter((kanji) => kanji !== part),
+      ...members,
+    ]);
+    const right = [...withPart].filter((kanji) => readsSo(kanji, part));
+    const wrong = [...withPart].filter((kanji) => !readsSo(kanji, part));
+    const helps = members.filter((kanji) => readsSo(kanji, part)).length;
+    if (wrong.length <= right.length || helps > 2) continue;
+    if (keepFamilies[part] != null) continue;
+    hidden.push({
+      part,
+      members: members.join(""),
+      right: right.join(""),
+      wrong: wrong.join(""),
+    });
+    for (const kanji of [...members, part]) {
+      if (soundPartOf[kanji] === part) delete soundPartOf[kanji];
+    }
+  }
+  for (const part of Object.keys(keepFamilies)) {
+    if (!used.has(part)) {
+      problems.push(`keepFamilies: ${part} is not anyone's sound part`);
+    }
+  }
+
   if (problems.length > 0) {
     throw new Error(`sound parts:\n  - ${problems.join("\n  - ")}`);
   }
@@ -191,6 +236,8 @@ export const buildSoundParts = ({
       kept: kept.filter(({ kanji }) => soundPartOverrides[kanji] == null),
       // Anki lists the kanji, but it isn't read with the family sound.
       notReadSo,
+      // Families hidden by step 4, with the kanji that do and don't fit.
+      hidden,
     },
   };
 };

@@ -116,8 +116,18 @@ type SoundPartsOurs = {
   dropFamilies: Record<string, string>;
   soundPart: Record<string, string>;
   readings: Record<string, string[]>;
+  keepFamilies: Record<string, string>;
 };
 const soundOurs = raw<SoundPartsOurs>("sound-parts/ours.json");
+// Families the build hid because their hint misleads more than it helps
+// (step 5 in raw-data/sound-parts/README.md).
+const hiddenSoundParts = new Set(
+  readJson<{ hidden: { part: string }[] }>(
+    "docs",
+    "data",
+    "sound-parts.json"
+  ).hidden.map(({ part }) => part)
+);
 const CODEPOINT_FIXES: Record<string, string> = {
   "⼰": "己",
   "⽦": "疋",
@@ -304,6 +314,12 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
     }
   });
 
+  it("never hides a family listed in keepFamilies", () => {
+    for (const part of Object.keys(soundOurs.keepFamilies)) {
+      expect(hiddenSoundParts.has(part), part).toBe(false);
+    }
+  });
+
   it("takes each sound part from ours.json, else the release, else Anki", () => {
     for (const kanji of kanjiList) {
       const soundPart = hover[kanji][1];
@@ -314,12 +330,18 @@ describe("kanji_extended_general.json / kanji_extended_hover.json", () => {
       if (ours != null) {
         expect(soundPart, kanji).toBe(ours);
       } else if (release !== "") {
-        expect(soundPart, kanji).toBe(release);
+        expect(soundPart, kanji).toBe(
+          hiddenSoundParts.has(release) ? "" : release
+        );
       } else if (soundPart !== "") {
         expect(ankiPartsFor(kanji), kanji).toContain(soundPart);
       } else {
-        expect(ankiPartsFor(kanji), kanji).toEqual([]);
+        expect(
+          ankiPartsFor(kanji).filter((part) => !hiddenSoundParts.has(part)),
+          kanji
+        ).toEqual([]);
       }
+      expect(hiddenSoundParts.has(soundPart), kanji).toBe(false);
     }
   });
 

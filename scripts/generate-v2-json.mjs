@@ -241,6 +241,26 @@ for (const [char, sounds] of Object.entries(phonetic)) {
   if (Array.isArray(sounds) && sounds.length > 0)
     releaseReadings[char] = sounds;
 }
+// Kanji that have a part as a direct, top-level piece in a Character
+// Structure source (yagays and ScottOglesby list them; hlorenzi names the
+// meaning and sound parts). Used to judge whether a sound hint holds.
+const kanjiWithPartIndex = new Map();
+for (const kanji of kanjiList) {
+  const hl = structureSources.hl[kanji] ?? {};
+  const parts = new Set([
+    ...(structureSources.ya[kanji] ?? []),
+    ...(structureSources.sc[kanji] ?? []),
+    hl.semantic,
+    hl.phonetic,
+  ]);
+  for (const part of parts) {
+    if (typeof part !== "string" || part.length === 0) continue;
+    kanjiWithPartIndex.set(part, [
+      ...(kanjiWithPartIndex.get(part) ?? []),
+      kanji,
+    ]);
+  }
+}
 let soundParts;
 try {
   soundParts = buildSoundParts({
@@ -249,6 +269,7 @@ try {
     ...readSoundPartSources(RAW_DIR),
     isKanji,
     onReadingsOf: (kanji) => extended[kanji][EXT.allOn] ?? [],
+    kanjiWithPart: (part) => kanjiWithPartIndex.get(part) ?? [],
   });
 } catch (error) {
   fail(error.message);
