@@ -353,7 +353,7 @@ export const searchByRadical = (
   const radicalPayload = [...settings.textSearch.text];
   const newMin = radicalPayload.reduce((acc, current) => {
     const count = radicalStrokeCountMap[current];
-    return Math.max(acc, Number(count));
+    return count == null ? acc : Math.max(acc, Number(count));
   }, prevMin);
   settings.filterSettings.strokeRange.min = newMin;
 

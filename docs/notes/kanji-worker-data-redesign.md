@@ -2,7 +2,8 @@
 
 **Status:** implemented on `claude/kanji-worker-simplify-xgcr03`, except for
 the one item listed under "Still to do" at the end (as of 2026-07-25).
-**Supersedes:** the open question in `worker-main-thread-double-caching.md`.
+**Supersedes:** the open question in `worker-main-thread-double-caching.md`
+(since deleted; see git history).
 **Scope:** `src/kanji-worker/`, `public/json/`, `raw-data/`, the data
 generation pipeline, and the providers that feed kanji data to the UI.
 
@@ -15,7 +16,7 @@ someone who was not part of the discussion.
 
 ## 1. Where this started
 
-`docs/notes/worker-main-thread-double-caching.md` flagged that several kanji
+`docs/notes/worker-main-thread-double-caching.md` (since deleted) flagged that several kanji
 maps live both in the web worker (authoritative) and on the main thread
 (copies), and deferred the fix with the advice: **"measure first — if the
 maps are small in practice this may not be worth doing at all."**
