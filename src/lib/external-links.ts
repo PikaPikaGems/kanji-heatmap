@@ -240,6 +240,7 @@ export const otherOutLinks = {
   scottKanjiBakuhatsu:
     "https://github.com/ScottOglesby/kanji-bakuhatsu/blob/master/raw/kanji-composition-map.txt",
   topoKanji: "https://github.com/scriptin/topokanji",
+  sphmnNihongo: "https://github.com/sph-mn/nihongo",
   ankiDeck1564742924: "https://ankiweb.net/shared/info/1564742924",
   ankiDeck779483253: "https://ankiweb.net/shared/info/779483253",
   ankiDeck2106223612: "https://ankiweb.net/shared/info/2106223612",
@@ -274,6 +275,10 @@ export const structureSourceLinks = [
   {
     text: "ScottOglesby/kanji-bakuhatsu",
     url: otherOutLinks.scottKanjiBakuhatsu,
+  },
+  {
+    text: "sph-mn/nihongo",
+    url: otherOutLinks.sphmnNihongo,
   },
   {
     text: "scriptin/topokanji",

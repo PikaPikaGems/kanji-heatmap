@@ -5,6 +5,7 @@ import {
   KanjiStructuralDataKanjium,
   KanjiStructuralDataYagays,
   KanjiStructuralDataScott,
+  KanjiStructuralDataSphmn,
 } from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
@@ -117,6 +118,14 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
             </TableCellFixed>
             <TableCellGrow>
               <KanjiStructuralDataScott kanji={kanji} />
+            </TableCellGrow>
+          </TableRow>
+          <TableRow className="text-left">
+            <TableCellFixed className="text-[10px] text-muted-foreground">
+              (sph-mn)
+            </TableCellFixed>
+            <TableCellGrow>
+              <KanjiStructuralDataSphmn kanji={kanji} />
             </TableCellGrow>
           </TableRow>
           <TableRow className="text-left">
