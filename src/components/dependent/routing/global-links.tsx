@@ -1,14 +1,19 @@
+import type { ReactNode } from "react";
 import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { Search } from "@/components/icons";
+import { BookOpen, InfoIcon, Search } from "@/components/icons";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
-  useGetKanjiInfoFn,
+  useRadicalPopoverText,
   useRadicals,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { Link } from "./router-adapter";
-import { radicalInfo, resolveRadicalForSearch } from "@/lib/radicals";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { RadicalDetailsDialogContent } from "@/components/dependent/site-wide/RadicalDetailsDialog";
+import { useRadicalSummary } from "@/components/dependent/site-wide/use-radical-summary";
+import { resolveRadicalForSearch } from "@/lib/radicals";
 
 export const ComponentLink = ({
   component,
@@ -109,39 +114,66 @@ const RadicalJpCard = ({
   />
 );
 
+const popoverActionCn =
+  "inline-flex items-center gap-1.5 py-1 text-xs font-bold text-left w-fit hover:text-neon-accent";
+
+const PopoverActionText = ({ children }: { children: ReactNode }) => (
+  <span className="underline decoration-dotted underline-offset-4">
+    {children}
+  </span>
+);
+
+/** One link at the bottom of the radical popover: icon, then underlined text. */
+const PopoverAction = ({
+  to,
+  icon,
+  children,
+}: {
+  to: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) => (
+  <Link to={to} className={popoverActionCn}>
+    {icon}
+    <PopoverActionText>{children}</PopoverActionText>
+  </Link>
+);
+
 export const RadicalSearchAction = ({ radical }: { radical: string }) => {
   const radicals = useRadicals();
   const searchText = resolveRadicalForSearch(radical, radicals);
   return (
-    <Link
+    <PopoverAction
       to={radicalSearchHref(searchText)}
-      className="flex items-start gap-2 px-3 text-xs text-left transition-colors"
+      icon={<Search size={14} />}
     >
-      <span className="inline-flex items-center gap-1 p-2 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-8 hover:text-neon-accent whitespace-nowrap">
-        <Search size={14} />
-        <strong>Find kanji that include {searchText}</strong>
-      </span>
-    </Link>
+      Find kanji that include {searchText}
+    </PopoverAction>
   );
 };
 
-const POSITION_EN: Record<string, string> = {
-  へん: "left side",
-  つくり: "right side",
-  かんむり: "top",
-  あし: "bottom",
-  たれ: "top-left",
-  にょう: "bottom-left",
-  かまえ: "enclosure",
+/** Opens the kanji page of a radical that is also a kanji (夕). */
+const OpenKanjiAction = ({
+  kanji,
+  keyword,
+}: {
+  kanji: string;
+  keyword: string;
+}) => {
+  const pathname = useUrlLocation();
+  const urlState = useKanjiFromUrl(kanji);
+  return (
+    <PopoverAction to={`${pathname}?${urlState}`} icon={<BookOpen size={14} />}>
+      Open kanji {kanji} ({keyword})
+    </PopoverAction>
+  );
 };
 
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
-  const getKanjiInfo = useGetKanjiInfoFn();
-  const radicals = useRadicals();
-  const info = radicalInfo(radical, radicals);
-  const keyword = getKanjiInfo?.(radical)?.keyword;
+  const { info, keyword, isKanji, name } = useRadicalSummary(radical);
+  const { data: text } = useRadicalPopoverText(radical);
   return (
-    <div className="p-1" data-vaul-no-drag>
+    <div className="p-1 max-w-xs" data-vaul-no-drag>
       <div className="flex gap-3 px-1">
         <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
@@ -156,24 +188,42 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           </div>
         )}
         {info && (
-          <div className="min-w-0 text-left">
-            <p className="text-sm font-bold whitespace-normal text-foreground">
-              🇯🇵 {keyword ? `${info.ja}, ${keyword}` : info.ja}
-            </p>
-            {info.pos && (
-              <p className="text-xs whitespace-normal text-muted-foreground">
-                📍 {info.pos} ({POSITION_EN[info.pos]})
+          <div className="min-w-0 text-sm font-bold text-left whitespace-normal text-foreground">
+            <p>🇯🇵 {name}</p>
+            {info.cn && (
+              <p>
+                {"🇨🇳"} {(text?.semantic ?? []).length > 0 && "🧠 "}
+                {info.cn}
               </p>
             )}
-            {info.cn && (
-              <p className="text-sm whitespace-normal text-foreground">
-                {"🇨🇳"} {info.cn}
-              </p>
+            {/* Only with checked sound examples: the sound-parts data alone is
+                a learner hint, and some families in it are wrong (戈 さい). */}
+            {text?.sounds != null && (text.sound ?? []).length > 0 && (
+              <p>🔊 {text.sounds.join("・")}</p>
             )}
           </div>
         )}
       </div>
-      <RadicalSearchAction radical={radical} />
+      <DottedSeparator className="mx-1 mt-3" />
+      <div className="flex flex-col px-1 pt-2">
+        {info && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <button type="button" className={popoverActionCn}>
+                <InfoIcon size={14} />
+                <PopoverActionText>
+                  Learn more about radical {radical}
+                </PopoverActionText>
+              </button>
+            </DialogTrigger>
+            <RadicalDetailsDialogContent radical={radical} />
+          </Dialog>
+        )}
+        <RadicalSearchAction radical={radical} />
+        {isKanji && keyword && (
+          <OpenKanjiAction kanji={radical} keyword={keyword} />
+        )}
+      </div>
     </div>
   );
 };

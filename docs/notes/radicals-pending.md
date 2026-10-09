@@ -99,19 +99,58 @@ unchecked step.
 - [ ] **Step 1 — radical popover information** (item 2 below,
       "Radical popover text").
   - [x] 1a. Settle the popover rules (October 2026).
-  - [ ] 1b. Build the popover in the dev server with 3–5 checked
+  - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
+        popover in the dev server with 3–5 checked
         entries and iterate on the design (also try variants).
-  - [ ] 1c. Fill in every radical, in batches, most used first.
+  - [x] 1c. Fill in every radical (252, every glyph with radical info), in
+        PikaPikaGems/kanji-heatmap#311, followed by one review pass.
+        Meaning and sound examples were picked by code from Wiktionary's
+        glyph-origin role markers (see "How 1c was done" below).
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
       the radical names" below). Decided once the popover exists.
-- [ ] **Step 3 — every radical opens the radical popover**, also
+- [x] **Step 3 — every radical opens the radical popover**, also
       radicals that are kanji (夕), with "Find kanji that include 夕" and
-      "Open kanji 夕 (evening)". Waits for 1c, so no popover is empty.
-      This replaces the earlier decision that kanji radicals keep their
-      kanji link; the extra tap is fine (user).
+      "📖 Open kanji 夕 (evening)". Done in PikaPikaGems/kanji-heatmap#311
+      (moved ahead of 1c): the build keeps radical info for every kanji
+      radical (149 → 252 glyphs), and chips check "is it a radical?"
+      before "is it a kanji?". This replaces the earlier decision that
+      kanji radicals keep their kanji link; the extra tap is fine (user).
 - [ ] **Step 4 — component search** (item 3 below).
 
 ### 1. Sound info feature
+
+**Done (October 2026): which sound families to show.** The chip means "a
+sound hint for kanji with this part" and says "Sound hint for kanji with
+門:". The hint test (part visible + kanji read with the family sound)
+stays; 犬→献, 匕→死, 耂→考 and 洪→港 pass it. On top, the build hides a
+family when most kanji with the part aren't read with its sound and no
+more than 2 of its kanji are (rule and list in
+`raw-data/sound-parts/README.md`). `keepFamilies` keeps 果 里 未 分 羊 几 小
+支. Revisit later (user): 几 (机 is つくえ, 肌 is はだ), 小 and 支.
+
+**Open, revisit later (user): is this the rule we want?** As built, a
+family shows if either:
+
+1. **3 or more** of its kanji are read with the sound, or
+2. **at least half** of the kanji with the part (top-level, in yagays,
+   ScottOglesby or hlorenzi) are read with it, however few that is.
+
+Alternatives looked at (October 2026), not built:
+
+- **100% instead of "at least half"** in 2, plus the part itself must have
+  the reading. Hides 24 more, most of them good small families that fail on
+  one kanji: 主→注駐 (往), 才→材財 (閉), 直→植殖 (置 値), 旨→指脂, 必→秘泌,
+  壬→任妊, 呉→誤娯, 甬→通痛, 左→佐差, 臤→賢堅. The "part itself" clause
+  also goes against 門 (もん, chip かん).
+- **"And at least 2 kanji" added to 2 (option C).** Hides 22 single-kanji
+  families, including 洪→港 (settled twice), 系→係 (our own) and good
+  one-to-one hints such as 原→源, 敬→警, 相→想.
+
+Claude's view: keep it as built. A chip only shows on kanji that pass the
+reading test, so a small family is low-value at worst, never wrong.
+
+- **Idea:** the Anki deck's rhyme rows (R01–R20, skipped today) as a
+  different kind of hint ("rhymes with -an": 単 弾 戦 禅).
 
 Split in two (user, October 2026):
 
@@ -288,6 +327,20 @@ the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
 
 #### Radical popover text (decided with the user, October 2026)
 
+Popover layout (user, October 2026; supersedes the one-block shape below):
+the popover is a bold summary (🇯🇵 name, 🇨🇳 English words with 🧠 when it
+has meaning examples, 📍, 🔊 sounds) and a "view radical details →" link,
+then "Find kanji that include …" and, for kanji radicals, "📖 Open kanji 夕
+(evening)". The details open in a dialog with one heading per part:
+🇯🇵 Japanese name, 🇨🇳 Origin, 🧠 Semantic, 🔊 Phonetic, Sources. (Showing
+the details inside the popover was too cluttered.)
+
+Dialog sections now (user, October 2026): 🇯🇵 Japanese name (with the
+position, also on the popover's 🇯🇵 line), 🇨🇳 Chinese meaning (the
+English words, then why the glyph means them), 🧠 Meaning hint and 🔊 Sound
+hint (each opens with "A few kanji…", since the examples are not a full
+list), 🧩 Other forms (only when there are other forms), 📚 References.
+
 Shape, per radical (every section only when it applies):
 
     <RADICAL>
@@ -343,11 +396,22 @@ Data:
 
 Rules:
 
+- 🇯🇵 format (user, October 2026): each part as kana (kanji, English),
+  joined with +; a position part as kana (position in English): "さん (三,
+  three) + すい (水, water)", "て (手, hand) + へん (left side)". Shape
+  names: "Written like katakana ワ (wa) + かんむり (top)". A short
+  explanation may follow a colon. Positions in English match the 📍 line:
+  へん left side, つくり right side, かんむり top, あし bottom, たれ
+  top-left, にょう bottom-left, かまえ enclosure, がしら top.
 - 🇯🇵: only the reason, without repeating the name. Shape reasons
   (looks like ウ; のまた is written ノ + 又) need no reference. History
   reasons (まだれ's ま from 麻; ふるとり from 舊) need references.
-- Radicals that are kanji whose name is just the kanji's reading
-  (青 あお) show the name only, with no reason.
+- Every radical gets a 🇯🇵 reason, also when the name is just a word or
+  the kanji's own reading (ほこ, あお): say what the word means ("ほこ: the
+  word for spear"). A non-native reader can't tell otherwise (user,
+  October 2026; replaces "name only"). A word's meaning needs no
+  reference: it's a dictionary meaning, like the word glosses we already
+  show (user).
 - 🇨🇳: the Chinese origin of the glyph.
 - No source is a source of truth. Wiktionary, kanjium, sylhare, Anki and
   the rest are all references. One reputable reference, linked, is
@@ -358,10 +422,17 @@ Rules:
   Wiktionary's "Glyph origin" sections. For 🇯🇵 history reasons:
   Kanjipedia (漢字ペディア) or Japanese Wikipedia.
 - Meaning examples: 2–3 kanji where the radical really is the meaning
-  part, each with concepts and how it links. One is fine when only one is
-  checked. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
+  part, each with concepts and how it links. Never just one: a single
+  example shows no pattern (user, October 2026), so a radical with only
+  one gets none. Same for sound examples. The build enforces it. No separate "Meaning:" line; the 🇨🇳 line carries the meaning.
 - Sound examples: 2–3, never the radical itself, and the word must be
-  read with the family sound.
+  read with the family sound. They are learner hints, the same as the
+  sound-part chips (user, October 2026: what matters is that it helps
+  learners): the kanji's sound part in our sound-parts data is the radical,
+  whatever its history (戈 in 裁 さい, though Wiktionary gives 𢦏). No
+  reference needed. The dialog section is "🔊 Sound hint", not
+  "Phonetic", so it claims no history; the popover shows 🔊 only when the
+  dialog has examples.
 - Both example sections are optional: shape-only radicals (丶 丿 亅 亠)
   have no meaning of their own, and most radicals aren't sound parts.
 - No mnemonics, no outdated folk explanations (字 "a child under a
@@ -392,11 +463,116 @@ Data catches:
 - The sound-parts data points family heads to themselves (加 → 加), so
   the build must filter the radical out of its own sound examples.
 
+How 1c was done: Wiktionary pages for all our kanji and radicals were
+downloaded once (MediaWiki API) and each kanji's `{{Han compound}}`
+template read: in a phono-semantic compound (`ls=psc`) each part is marked
+semantic (`s`) or phonetic (`p`); in an ideogrammic compound (`ls=ic`)
+every part carries meaning. A meaning example had to be marked that way
+for the radical (or its full form, 氵 → 水) and contain the radical in our
+radical-search index; a sound example had to be marked phonetic for the
+radical and have a word in our vocab data read with the family sound.
+Concepts come from our kanji meanings. Origins and reasons were written by
+hand from the glyph-origin text. The review pass rewrote "why" lines that
+only restated the meaning, fixed odd concepts and long glosses.
+
+Gaps: filled in October 2026 from Japanese Wikipedia's radical pages
+(巾部, 酉部, 刀部, 心部, 己部, 亅部, 丿部, 耒部; the 🇯🇵 reasons and the
+shape-stroke origins), Wiktionary (麥, 黃, 齒, 丨, 彐) and 漢字ペディア (龍).
+Left: no 🇨🇳 origin for 𠂉 マ ユ, katakana-like shapes with no history as
+characters of their own.
+
+Sound-parts data to check (found while writing the popover text; not
+changed, since sound parts are learner hints, see item 1):
+
+- 省 is listed under 小 (しょう). Wiktionary: its sound part was 生, which
+  became 少 over time; 小 isn't part of it. Not used as a 小 example.
+- 裁 載 栽 are listed under 戈 (さい). Wiktionary marks none of them with
+  戈 as the sound part (it is 𢦏).
+
+Revisit later (user, October 2026; redundant on purpose for now):
+
+- When the radical is the sound part of the kanji on screen (戈 in 裁),
+  its popover shows the "Sound hint" box and the 🔊 line.
+- The dialog's "🧠 Meaning hint" line repeats the 🇨🇳 words. An optional
+  `semanticMeaning` field ("weapon") could replace it.
+
+Settled: with sounds but no example words, the summary shows 🔊 and the
+dialog leaves out the Phonetic section. The dialog heading is the radical
+alone.
+
 Open:
 
 - Naming (step 2): if the 🇯🇵 line explains the Japanese name, chip
   names could become meanings ("roof" instead of "katakana u crown").
   Revisit once the popover exists.
+
+#### Forms and families (decided with the user, October 2026)
+
+Three kinds of "same radical":
+
+- **Alias**: the same shape under another character code (⿊ = 黒,
+  氵 = ⺡). Merged; never shown on its own.
+- **Form**: a different shape of the same radical (水, ⺡ さんずい, 氺
+  したみず). Its own entry, linked in the dialog's 🧩 Other forms section.
+- Old forms (黑 艸 戶 齒 龜) are not labeled: no source says which
+  alternates are old forms. They work through their alias (tapping 黑
+  shows 黒). Glyphs the app never shows (户 靣 髙 ⿊ …) are dropped.
+
+Families come from sylhare's Alternate column (raw-data/radicals/README.md,
+"Families"); `familySkips` and `familyHeads` in ours.json hold the
+exceptions. Per field:
+
+- Japanese name, position, meaning and sound examples: **per form**. An
+  example sits under the form it is written with (泳 under ⺡, 雪 under ⻗);
+  the build checks this with kanjium's radical slot
+  (`kanjiumFormFixes` corrects it, e.g. 燃).
+- Origin: **shared**. A form shows its head's `cn`, then its own
+  `cnNote` ("Written as three strokes on the left side."). A form whose
+  story differs has its own `cn` (𠆢, ⺩).
+- 🧩 Other forms lists the family's other glyphs; the dialog switches to
+  a form when it is tapped. Name-only rows (方 on the left is ほうへん, 木
+  is きへん) have no glyph of their own, so they are not forms: the head's
+  🇯🇵 section shows them as "Also called ほうへん · へん (left side)". A radical with no other forms has no section; its
+  position is on the 🇯🇵 line.
+
+Open: **かぜかんむり belongs to no family.** sylhare lists ⺇ (かぜかんむり)
+as a form of 風, which is wrong: かぜかんむり is a name of 几 (風's outside
+looks like 几; ja.wikipedia 几部). `familySkips` in ours.json now drops ⺇
+from 風, but nothing adds the name to 几, because there is no data option
+yet to add a name-only row to another family. Add one (e.g. `familyAdds`
+in ours.json: 几 → {ja: かぜかんむり, pos: かまえ}) so 几's dialog says "Also
+called かぜかんむり".
+
+老 is named おい (an `extras` entry in ours.json); it used to inherit
+おいかんむり from 耂's CSV row.
+
+#### "Why" lines and example counts (October 2026)
+
+Rule: a meaning example's line names the radical in parentheses and how it
+links: "Silver is a metal (金).", "Hearing is done with the ear (耳)."
+Naming the sound part is only for when it explains something (視).
+
+Wiktionary's shinjitai pages (状, 献, 獣, 触) often have no glyph origin;
+it is on the traditional form (狀, 獻, 獸, 觸). Checking those found more
+examples.
+
+漢字ペディア (kanjipedia.jp, by the 日本漢字能力検定協会) is a second source
+(user, October 2026: any reputable source we can link to; Japanese is
+fine). Its origin text (成り立ち) is from 『角川新字源 改訂新版』, one page
+per kanji, linked as https://www.kanjipedia.jp/kanji/<page number>. It
+explains links Wiktionary only marks (術: a village lane, "technique"
+borrowed), and brought 乙 白 十 工 辰 ⺲ 行 角 革 虍 骨 鹿 文 至 to two or three
+examples. The dialog labels its links by kanji.
+
+Radicals still without meaning examples though they have kanji in our
+list: neither source names the radical as the meaning part with a link we
+can state (片 版, 瓦 瓶, 舛 舞, 耒 耕, 毛 尾/毬 and 卜 占 have one each; 匚
+匠: 漢字ペディア says 匚 there is a changed 矩, not "box"; 臣 臨: 漢字ペディア
+says 臥). The other 39 have no kanji filed under them (鼎 鼠 竜 …).
+
+Sound parts with no examples, and why: only one other kanji in the
+family (十 汁, 比 批, 高 稿, 匕 死, 犬 献, 竹 築, 耂 考, 面 麺), or the
+other one is rarely read with the sound (里: 鯉 り).
 
 ### 3. Component search
 
@@ -429,6 +605,17 @@ Decided (user, October 2026):
 - Non-radical parts (寺 in 時) could later open a popover with "Find kanji
   that include 寺" through component search, matching step 3.
 
+### 3b. Which parts list the reference card shows
+
+Open (user, October 2026). The reference card at the top of a kanji page
+shows the TopoKanji parts list (the release's `kanji_extended.json` field 0,
+the same data as the `(TopoKanji)` row in Component Breakdown). It writes
+some parts differently from the Character Structure sources: grass (艹) is
+written 廾, so on 茶 and 花 the chip opens 廾 にじゅうあし ("twenty legs")
+instead of くさかんむり. That is correct under "show source data as is";
+the question is which source the reference card should feature (one of
+the Character Structure sources, or our own list).
+
 ### 4. Before and after merging this work
 
 - Done: PikaPikaGems/kanji-heatmap#301 was merged, and the remote
@@ -448,6 +635,32 @@ Decided (user, October 2026):
   glyphs (23 shapes) are used by 5+. The user wants the most used ones named:
   suggestions are in section 1 of `docs/notes/naming-review.md`, waiting for
   decisions.
+- **Radical info for drawer-only parts (e.g. 勿).** 勿 is in the radical
+  drawer (`rewhowe-drawer.json`) but not in `sylhare-radicals.csv`, which
+  lists only the 214 Kangxi radicals (dictionaries file 勿 under 勹). So it
+  has no radical info: its popover shows only the keyword "must not", with no
+  🇯🇵 name, no 🇨🇳 line and no "Learn more" dialog. Option: add our own info
+  for it in `raw-data/radicals/ours.json` (a Japanese name, plus popover text
+  in `ours-popover-text.json`). Origin, checked October 2026: Wiktionary says
+  blood on a knife (the original 刎), borrowed for "do not" since oracle-bone
+  times; 漢字ペディア (新字源) says a snapped bowstring, plucked to ward off
+  evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary).
+- **Revisit: info for every drawer-only part.** Of the 253 glyphs in the
+  radical drawer, 24 had no radical info (counted October 2026, following
+  aliases): 入 九 乃 也 亡 及 久 元 井 勿 五 屯 巴 世 巨 冊 母 奄 岡 免 斉 品
+  啇 無. Each shows only its keyword. Looked into with the user:
+  - Done: 入 and 母. sylhare writes them ⼊ and ⺟ (radical code points);
+    `sylhareCodepointFixes` swaps them, so 入 is radical 11 and 母 a form of
+    毋 (ja.wikipedia 毋部).
+  - Open: 斉 is the shinjitai of 齊 (radical 210, せい; ja.wikipedia 斉部).
+    The drawer has both 斉 and 齊; only 齊 has info. Could be a form of 齊.
+  - The other 21 are not one of the 214 radicals; they are kanji (or parts)
+    filed under one. Their popover already has the keyword, "Find kanji"
+    and the kanji link, so we dropped the idea of a kanji-style popover.
+  - Sound parts among them (Wiktionary + 漢字ペディア): only 元 made a
+    strong hint and was added to `raw-data/sound-parts/ours.json`. Rejected:
+    九 (only 究; 鳩 is はと), 岡 (always おか), 屯 (rare), 無 (ぶ is its less
+    common reading); the rest have one kanji or no matching reading.
 
 ## Working rules
 

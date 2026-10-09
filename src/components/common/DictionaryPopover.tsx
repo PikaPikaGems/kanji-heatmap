@@ -12,7 +12,7 @@ export const DictLoading = () => (
 /** Service-unreachable state (network/API error). */
 export const DictError = ({ service }: { service: string }) => (
   <div className="py-2 text-xs">
-    すみません. {service} cannot be accessed right now. Try again later.
+    🙇‍♀️ 🙇 すみません. {service} cannot be accessed right now. Try again later.
   </div>
 );
 
@@ -45,6 +45,9 @@ export const DictionaryPopoverShell = ({
   children: ReactNode;
 }) => (
   <GenericPopover
+    // Opened from the vocab popover, which can itself sit at z-[80] inside
+    // the radical dialog (RadicalDetailsDialog), so go above both.
+    contentClassName="z-[90] w-auto p-0 m-0"
     trigger={
       <Button variant="outline" size="iconXl" className="relative">
         {icon}

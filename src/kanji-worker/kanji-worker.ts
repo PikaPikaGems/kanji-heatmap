@@ -18,6 +18,7 @@ import {
   fetchKanjiReadingDetails,
   fetchMainKanjiInfo,
   fetchMultiKanjiStructures,
+  fetchRadicalPopoverText,
   fetchRadicals,
   fetchRepWordDetails,
   fetchSegmentedVocab,
@@ -41,7 +42,14 @@ import {
   searchKanji,
 } from "./kanji-search";
 import { SearchSettings } from "@/lib/settings/settings";
-import { prepareRadicals, resolveRadicalForSearch } from "@/lib/radicals";
+import {
+  followAlias,
+  prepareRadicals,
+  radicalFamily,
+  RadicalPopoverDetails,
+  RadicalPopoverText,
+  resolveRadicalForSearch,
+} from "@/lib/radicals";
 
 // ---------------------------------------------------------------------------
 // Datasets
@@ -129,6 +137,11 @@ const loadSimilar = lazyDataset(
 
 const loadRepWordDetails = lazyDataset(
   (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
+);
+
+/** Read only by the radical popover. */
+const loadRadicalPopoverText = lazyDataset(
+  (): Promise<Record<string, RadicalPopoverText>> => fetchRadicalPopoverText()
 );
 
 /** Read only by the details "Character Structure" section. */
@@ -317,6 +330,44 @@ const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
   return entries == null || entries.length === 0 ? null : entries;
 });
 
+/**
+ * One radical's popover text, following aliases (氵 → ⺡) like every other
+ * radical fact, plus the sounds it gives as a sound part. Null when there is
+ * neither.
+ */
+const handleRadicalPopoverText = requirePayload(
+  async (radical: string): Promise<RadicalPopoverDetails | null> => {
+    const [texts, radicals, components] = await Promise.all([
+      loadRadicalPopoverText(),
+      loadRadicals(),
+      loadComponents(),
+    ]);
+    const textOf = (char: string) => {
+      const glyph = followAlias(char, radicals.aliases, (g) => g in texts);
+      return glyph == null ? null : texts[glyph];
+    };
+    const glyph = followAlias(radical, radicals.aliases, (g) => g in texts);
+    let text: RadicalPopoverDetails = glyph == null ? {} : texts[glyph];
+    // A form without its own origin shows its family head's (⺡ → 水),
+    // followed by its own note.
+    const family = radicalFamily(radical, radicals);
+    const headText =
+      family != null && family.head !== family.current
+        ? textOf(family.head)
+        : null;
+    if (text.cn == null && headText?.cn != null) {
+      text = {
+        ...text,
+        cn: headText.cn,
+        refs: [...(headText.refs ?? []), ...(text.refs ?? [])],
+      };
+    }
+    const sounds = components[glyph ?? radical]?.s;
+    if (glyph == null && sounds == null && text.cn == null) return null;
+    return sounds == null ? text : { ...text, sounds };
+  }
+);
+
 const HANDLERS: {
   [K in KanjiWorkerRequestName]: (
     payload: WorkerApi[K]["payload"]
@@ -350,6 +401,7 @@ const HANDLERS: {
   "similar-map": () => loadSimilar(),
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
+  "radical-popover-text": handleRadicalPopoverText,
   "retrieve-vocab-info": handleRetrieveVocabInfo,
   search: handleSearch,
   "search-result-count": handleSearchResultCount,

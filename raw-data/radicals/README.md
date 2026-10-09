@@ -33,10 +33,11 @@ three things: **aliases**, **names** (`literalEn`) and **popover info**
   an alias to 爪 so radical search uses the drawer's 爪 button.
 - A **kanji** always shows its kanji keyword, also when reached through an
   alias (衤 → 衣 shows "garment"). So a kanji never has a `literalEn` entry;
-  its popover info is kept only when an alias points at it.
-- Glyphs that are the same radical are linked **only by aliases**. Two glyphs
-  with the same Japanese name don't share anything unless one aliases to the
-  other.
+  its popover info (Japanese name, position, meaning) is always kept, since
+  a kanji radical (夕) opens the radical popover too.
+- Names and info are shared **only through aliases**. Two glyphs with the
+  same Japanese name don't share anything unless one aliases to the other.
+  Families (below) link the forms of a radical but share nothing.
 
 The build fails on a `literalEn` entry for a kanji, an unused entry, or a
 named glyph (a CSV row, an `extras` entry, or an alternate form without an
@@ -97,6 +98,38 @@ radicals of their own.
 "sylhareExtraAliases": { "⺍": "⺌", "⾡": "⻌", "𧾷": "足" }
 ```
 
+### `sylhareCodepointFixes` — ordinary characters for radical code points
+
+```jsonc
+"sylhareCodepointFixes": { "⼊": "入", "⺟": "母", "⻫": "斉" }
+```
+
+The CSV writes a few radicals with a Kangxi or radical-supplement code point
+where the drawer and every kanji list use the ordinary character. The build
+swaps them in the Radical and Alternate columns before anything else:
+
+- 入 gets radical 11's row (いる).
+- 母 becomes a form of 毋 (Japanese Wikipedia 毋部: the radical covers 毋,
+  毌 and 母).
+- 斉 becomes a form of 齊, radical 210 (Japanese Wikipedia 斉部). The CSV
+  writes it ⻫, Unicode's "J-simplified" 齊.
+
+母 has its own name in `extras`
+(はは), so it doesn't take 毋's なかれ. The build fails on a code point the CSV
+doesn't use.
+
+### `sylhareRowGlyphs` — real glyphs for private-use rows
+
+```jsonc
+"sylhareRowGlyphs": { "うしへん": "牜", "いとへん": "糹" }
+```
+
+The CSV draws some positional forms in its own private-use font (うしへん
+is U+E748). When Unicode has the glyph, map the row's Japanese name to it:
+the row then names that glyph, which becomes a form of its own (牛 → 牛,
+牜) with a `literalEn` entry ("cow left"). The build fails on a name with
+no private-use row.
+
 ### `extras` — radical forms the CSV doesn't list
 
 ```jsonc
@@ -107,3 +140,59 @@ radicals of their own.
 
 Same fields as a CSV row: Japanese name, position (へん, つくり, …) and
 meaning. Each one needs a `literalEn` entry or an alias.
+
+### Glyphs the app never shows are dropped
+
+A glyph that appears in no drawer, kanji list, decomposition or structure
+data (⿊, 靣, ⺝) is dropped from the radical data: it gets no alias, no
+keyword and no popover info. An alias stays if a shown glyph's alias chain
+passes through it. A dropped glyph that has a CSV row keeps only its name,
+as a row in its family's forms (つきへん under 月). The build fails on a
+`literalEn` entry for a dropped glyph.
+
+### Families — the forms of one radical
+
+The build writes `families` to radicals.json: head → [head, ...forms], from
+the CSV's Alternate column (水 → 水, ⺡, 氺). A form is a glyph with radical
+info or a drawer glyph, or a name-only row `{ ja, pos? }` for a CSV row with
+no glyph the app can show: a private-use codepoint (きへん under 木) or a
+dropped glyph. Alternates without a name of their own (氵, a second code for
+⺡) and repeated names are left out. A family only links its forms; each
+form keeps its own name, position and popover text.
+
+```jsonc
+"familySkips": { "𠆢": "Listed under both 人 and 入; …" },
+"familyHeads": { "丿": "ノ", "彐": "ヨ", "罒": "⺲" }
+```
+
+- `familySkips`: keeps a glyph out of every family but its own, with the
+  reason. The build fails when a glyph lands in two families.
+- `familyHeads`: the head when it isn't the CSV's Radical column, normally
+  the drawer glyph that holds the popover text.
+
+## Ours — `ours-popover-text.json`
+
+Our own text for the radical popover, keyed by glyph.
+`scripts/radical-popover-text.mjs` reads it on every `pnpm run generate-json`
+and writes `public/json/v2/radical_popover_text.json`, which the popover
+loads when it opens. The rules for what goes in it (one linked reference per
+claim, our own wording, which kanji may be examples) are in
+`docs/notes/radicals-pending.md`, "Radical popover text".
+
+```jsonc
+"隹": {
+  "ja": "…",          // 🇯🇵 why the Japanese name is what it is
+  "jaRefs": ["…"],    // only for history reasons, not shape reasons
+  "addEn": "…",       // English words added after sylhare's (comma string)
+  "cn": "…",          // 🇨🇳 Chinese origin of the glyph
+  "refs": ["…"],      // reference for cn
+  "semantic": [{ "kanji": "雄", "concepts": "…", "why": "…", "refs": ["…"] }],
+  "sound": [{ "kanji": "推", "word": "…", "reading": "…", "gloss": "…", "refs": ["…"] }]
+}
+```
+
+Every field is optional. `addEn` is merged into the radical info in
+`radicals.json` (sylhare's words first, no duplicates). The build fails on an
+unknown field, a claim without refs, an example kanji that doesn't contain
+the radical, a sound example whose sound part isn't the radical (or is the
+radical itself), or a sound word not read with the radical's sound.

@@ -14,10 +14,12 @@ export const useResolvedComponent = (component: string | null | undefined) => {
   return {
     component,
     keyword: keyword ?? "...",
-    type: (isKanji
-      ? "kanji"
-      : isKnownRadical(component, radicals)
-        ? "radical"
+    // A radical opens the radical popover even when it is also a kanji (夕);
+    // the popover links to the kanji.
+    type: (isKnownRadical(component, radicals)
+      ? "radical"
+      : isKanji
+        ? "kanji"
         : "unknown") as "kanji" | "radical" | "unknown",
   };
 };

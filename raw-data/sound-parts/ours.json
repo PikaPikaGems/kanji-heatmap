@@ -20,7 +20,12 @@
     "枝": "支",
     "肢": "支",
     "係": "系",
-    "系": "系"
+    "系": "系",
+    "元": "元",
+    "完": "元",
+    "頑": "元",
+    "玩": "元",
+    "冠": "元"
   },
   "readings": {
     "斉": [
@@ -34,6 +39,20 @@
     ],
     "系": [
       "けい"
+    ],
+    "元": [
+      "がん",
+      "かん"
     ]
+  },
+  "keepFamilies": {
+    "果": "課 菓 are か, like 果 (結果); the kanji with 果 that aren't (巣 裸 彙) are rarer",
+    "里": "理 (理由, 料理) is one of the most common kanji and is り, like 里",
+    "未": "味 (and 魅) are み, like 未; 味 is very common",
+    "分": "粉 紛 are ふん, like 分; 分 and 粉 are common",
+    "羊": "洋 養 are よう, like 羊; both are common",
+    "几": "机 肌 飢 pass the rule anyway; listed so it stays if the rule changes. Weak (机 is つくえ, 肌 is はだ): revisit later",
+    "小": "少 省 are しょう, like 小; kept for now, revisit later (user)",
+    "支": "枝 肢 are し, like 支; kept for now, revisit later (user)"
   }
 }

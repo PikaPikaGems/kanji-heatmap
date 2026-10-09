@@ -47,12 +47,53 @@ export type RadicalInfo = {
   cn?: string;
 };
 
+/**
+ * Our own radical popover text (raw-data/radicals/ours-popover-text.json),
+ * public/json/v2/radical_popover_text.json. Every field is optional; refs
+ * are the links each line was checked against.
+ */
+export type RadicalPopoverText = {
+  /** Why the Japanese name is what it is (🇯🇵 line). */
+  ja?: string;
+  jaRefs?: string[];
+  /** Chinese origin of the glyph (🇨🇳 line). */
+  cn?: string;
+  /** What is different about this form (⺡ "Written as three strokes…"). */
+  cnNote?: string;
+  /** Name-only forms whose shape differs (よこめ: "目 turned on its side…"). */
+  nameNotes?: Record<string, string>;
+  refs?: string[];
+  /** Kanji where the radical is the meaning part. */
+  semantic?: { kanji: string; concepts: string; why: string; refs: string[] }[];
+  /**
+   * Kanji whose sound part (a learner hint, as on the sound-part chips) is
+   * the radical, each with a word read with the family sound.
+   */
+  sound?: {
+    kanji: string;
+    word: string;
+    reading: string;
+    gloss: string;
+    refs?: string[];
+  }[];
+};
+
+/** The popover text plus the radical's sounds from the sound-parts data. */
+export type RadicalPopoverDetails = RadicalPopoverText & { sounds?: string[] };
+
 /** public/json/v2/radicals.json — fetched at runtime, never imported. */
 export type RadicalsFile = {
   groupedByStrokeCount: Record<string, string[]>;
   aliases: Record<string, string>;
   info: Record<string, RadicalInfo>;
+  /**
+   * Head → [head, ...forms] (水 → 水, ⺡, 氺). A form is a glyph, or a
+   * name-only row for a form with no glyph the app can show (きへん).
+   */
+  families?: Record<string, RadicalFamilyMember[]>;
 };
+
+export type RadicalFamilyMember = string | { ja: string; pos?: string };
 
 export type RadicalsRuntime = RadicalsFile & {
   strokeCountMap: Record<string, string>;
@@ -74,6 +115,7 @@ export const prepareRadicals = (file: RadicalsFile): RadicalsRuntime => ({
   groupedByStrokeCount: file.groupedByStrokeCount,
   aliases: file.aliases ?? {},
   info: file.info ?? {},
+  families: file.families ?? {},
   strokeCountMap: strokeCountMapFromGrouped(file.groupedByStrokeCount),
 });
 
@@ -126,6 +168,33 @@ export const radicalInfo = (
   if (radicals == null) return undefined;
   const glyph = followAlias(char, radicals.aliases, (g) => g in radicals.info);
   return glyph == null ? undefined : radicals.info[glyph];
+};
+
+/**
+ * The family a glyph belongs to, following aliases (氵 → ⺡, in 水's family):
+ * its head, its forms in order, and the form the glyph is (`current`).
+ * Null for a glyph in no family.
+ */
+export const radicalFamily = (
+  char: string,
+  radicals: Pick<RadicalsFile, "aliases" | "families"> | null | undefined
+): {
+  head: string;
+  members: RadicalFamilyMember[];
+  current: string;
+} | null => {
+  const families = radicals?.families;
+  if (radicals == null || families == null) return null;
+  const headOf = new Map<string, string>();
+  for (const [head, members] of Object.entries(families)) {
+    for (const member of members) {
+      if (typeof member === "string") headOf.set(member, head);
+    }
+  }
+  const current = followAlias(char, radicals.aliases, (g) => headOf.has(g));
+  if (current == null) return null;
+  const head = headOf.get(current)!;
+  return { head, members: families[head], current };
 };
 
 /**

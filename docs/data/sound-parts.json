@@ -553,6 +553,31 @@
       "kanji": "系",
       "from": "",
       "to": "系"
+    },
+    {
+      "kanji": "元",
+      "from": "",
+      "to": "元"
+    },
+    {
+      "kanji": "完",
+      "from": "",
+      "to": "元"
+    },
+    {
+      "kanji": "頑",
+      "from": "",
+      "to": "元"
+    },
+    {
+      "kanji": "玩",
+      "from": "",
+      "to": "元"
+    },
+    {
+      "kanji": "冠",
+      "from": "",
+      "to": "元"
     }
   ],
   "kept": [
@@ -577,5 +602,97 @@
       "anki": "少"
     }
   ],
-  "notReadSo": []
+  "notReadSo": [],
+  "hidden": [
+    {
+      "part": "比",
+      "members": "批",
+      "right": "批",
+      "wrong": "皆陛鹿昆"
+    },
+    {
+      "part": "乞",
+      "members": "",
+      "right": "",
+      "wrong": "旅乾"
+    },
+    {
+      "part": "牙",
+      "members": "雅芽",
+      "right": "芽雅",
+      "wrong": "既邪冴"
+    },
+    {
+      "part": "兄",
+      "members": "況競",
+      "right": "競況",
+      "wrong": "祝党克呪"
+    },
+    {
+      "part": "共",
+      "members": "供",
+      "right": "供恭",
+      "wrong": "暴異殿洪巽其"
+    },
+    {
+      "part": "区",
+      "members": "駆",
+      "right": "駆",
+      "wrong": "欧殴枢"
+    },
+    {
+      "part": "圭",
+      "members": "桂",
+      "right": "桂奎掛",
+      "wrong": "街封涯佳崖"
+    },
+    {
+      "part": "犬",
+      "members": "献",
+      "right": "献",
+      "wrong": "然状独狭猫獲黙狂獄伏獣猿狩狙"
+    },
+    {
+      "part": "少",
+      "members": "沙砂",
+      "right": "砂沙紗",
+      "wrong": "歩秒省妙劣賓抄"
+    },
+    {
+      "part": "匕",
+      "members": "死",
+      "right": "死旨此",
+      "wrong": "北化老比能疑尼壱頃匂"
+    },
+    {
+      "part": "昔",
+      "members": "借",
+      "right": "借錯",
+      "wrong": "措惜籍"
+    },
+    {
+      "part": "十",
+      "members": "汁",
+      "right": "汁",
+      "wrong": "千半古南午早計朝真直由卒協単博支準率干針乾辛幹徳壊聴喪索盾懐奉傘挿卑升隼皐叶韓阜訊辻"
+    },
+    {
+      "part": "竹",
+      "members": "築",
+      "right": "築",
+      "wrong": "答算笛第筆等箱葉笑管節簡筒符筋策範簿笹篤笙箇籍箸箋籠筈笠"
+    },
+    {
+      "part": "予",
+      "members": "預",
+      "right": "預",
+      "wrong": "野序矛"
+    },
+    {
+      "part": "単",
+      "members": "",
+      "right": "弾",
+      "wrong": "戦禅"
+    }
+  ]
 }

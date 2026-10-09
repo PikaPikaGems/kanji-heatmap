@@ -4,7 +4,6 @@
     "亅": "hook stick",
     "亠": "pot lid",
     "儿": "person legs",
-    "⼊": "enter",
     "冂": "border enclosure",
     "冖": "katakana wa crown",
     "冫": "two water",
@@ -81,7 +80,6 @@
     "龠": "pan flute",
     "⺅": "person left",
     "𠆢": "person roof",
-    "⺇": "wind crown",
     "⺉": "standing sword",
     "⺌": "small crown",
     "⻏": "large village",
@@ -91,19 +89,18 @@
     "⺡": "three water",
     "⺨": "beast left",
     "⺗": "bottom heart",
-    "⺝": "moon left",
     "⺣": "lined fire",
     "⺤": "claw crown",
     "⺭": "show left",
-    "⺪": "bolt left",
     "氺": "bottom water",
     "⻂": "clothing left",
+    "牜": "cow left",
+    "糹": "thread left",
+    "訁": "words left",
+    "釒": "metal left",
     "⺮": "bamboo crown",
-    "⽹": "net mesh",
-    "⾋": "grass",
     "⻊": "foot left",
     "⻗": "rain crown",
-    "⻟": "eat left",
     "𠂉": "no plus one",
     "マ": "katakana ma",
     "ユ": "katakana yu",
@@ -158,7 +155,8 @@
     "⺛": "无",
     "⽼": "耂",
     "⺹": "耂",
-    "尤": "尢"
+    "尤": "尢",
+    "衤": "⻂"
   },
   "sylhareSkipAlts": [
     "⺈",
@@ -170,8 +168,38 @@
   ],
   "sylhareExtraAliases": {
     "⾡": "⻌",
-    "𧾷": "足",
+    "𧾷": "⻊",
     "⺍": "⺌"
+  },
+  "sylhareCodepointFixes": {
+    "⼊": "入",
+    "⺟": "母",
+    "⻫": "斉"
+  },
+  "sylhareRowGlyphs": {
+    "うしへん": "牜",
+    "いとへん": "糹",
+    "ごんべん": "訁",
+    "かねへん": "釒"
+  },
+  "familySkips": {
+    "𠆢": "Listed under both 人 and 入; in many kanji (今, 会) it is neither, so it has its own entry",
+    "月": "Listed under 肉 because ⺼ looks like 月; 月 (moon) is its own radical",
+    "己": "Listed under 已, but 已, 己 and 巳 are different characters",
+    "巳": "Listed under 已, but 已, 己 and 巳 are different characters",
+    "龍": "竜 and 龍 each have their own origin text (竜's says it is an old form of 龍), so 龍 must not show 竜's",
+    "⺇": "Listed under 風, but かぜかんむり is a name of the 几 radical (風's outside looks like 几; ja.wikipedia 几部), not a form of 風"
+  },
+  "familyHeads": {
+    "丿": "ノ",
+    "彐": "ヨ",
+    "罒": "⺲"
+  },
+  "kanjiumFormFixes": {
+    "燃": {
+      "form": "火",
+      "why": "kanjium gives 灬, but that is the bottom of 然 (the sound part); the meaning part is 火 on the left"
+    }
   },
   "extras": {
     "𠂉": {
@@ -213,6 +241,16 @@
       "nameJa": "おうへん",
       "position": "へん",
       "meaning": "jewelry, jeweled king"
+    },
+    "老": {
+      "nameJa": "おい",
+      "position": "",
+      "meaning": "old, old age"
+    },
+    "母": {
+      "nameJa": "はは",
+      "position": "",
+      "meaning": "mother"
     }
   }
 }

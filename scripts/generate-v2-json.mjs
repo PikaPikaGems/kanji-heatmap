@@ -18,6 +18,10 @@ import { decodeFurigana, encodeFurigana } from "../src/lib/furigana.ts";
 import { componentKeyword, followAlias } from "../src/lib/radicals.ts";
 import { buildRadicalData, readRadicalSources } from "./radicals.mjs";
 import { buildSoundParts, readSoundPartSources } from "./sound-parts.mjs";
+import {
+  buildRadicalPopoverText,
+  readRadicalPopoverText,
+} from "./radical-popover-text.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW_DIR = path.join(ROOT, "raw-data");
@@ -53,27 +57,44 @@ const cumUse = readRelease("cum_use.json");
 // Drawer grouping comes from rewhowe/kanji; everything else radical-related
 // that we decided ourselves is in raw-data/radicals/ours.json.
 const { drawer, ours, sylhareRows } = readRadicalSources(RAW_DIR);
-const radicals = { radicalsGroupedByStrokeCount: drawer };
-const {
-  aliases: allAliases,
-  keywords: radicalKeywords,
-  info: radicalInfo,
-} = buildRadicalData({
-  sylhareRows,
-  ours,
-  drawer,
-  isKanji: (char) => main[char] != null,
-});
-const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
-  "components/ours.json"
-);
-
 const structureSources = {
   hl: readRaw("kanji-structure/external/hlorenzi.json"),
   ka: readRaw("kanji-structure/external/kanjium.json"),
   sc: readRaw("kanji-structure/external/scott.json"),
   ya: readRaw("kanji-structure/external/yagays.json"),
 };
+
+// Every glyph the app can show: drawer radicals, kanji, and the parts in the
+// decomposition and structure data. Radical glyphs outside this set (⿊, 靣)
+// are dropped from the radical data.
+const shownGlyphs = new Set([
+  ...Object.values(drawer).flat(),
+  ...Object.keys(main),
+]);
+const addShown = (value) => {
+  if (typeof value === "string") for (const ch of value) shownGlyphs.add(ch);
+  else if (value != null && typeof value === "object")
+    Object.values(value).forEach(addShown);
+};
+addShown(decomposition);
+Object.values(structureSources).forEach(addShown);
+
+const radicals = { radicalsGroupedByStrokeCount: drawer };
+const {
+  aliases: allAliases,
+  keywords: radicalKeywords,
+  info: radicalInfo,
+  families: radicalFamilies,
+} = buildRadicalData({
+  sylhareRows,
+  ours,
+  drawer,
+  isKanji: (char) => main[char] != null,
+  isUsed: (char) => shownGlyphs.has(char),
+});
+const { components: manualOverrides, sharedKanjiKeywords } = readRaw(
+  "components/ours.json"
+);
 
 const kanjiList = Object.keys(main);
 const isKanji = (char) => main[char] != null;
@@ -220,6 +241,26 @@ for (const [char, sounds] of Object.entries(phonetic)) {
   if (Array.isArray(sounds) && sounds.length > 0)
     releaseReadings[char] = sounds;
 }
+// Kanji that have a part as a direct, top-level piece in a Character
+// Structure source (yagays and ScottOglesby list them; hlorenzi names the
+// meaning and sound parts). Used to judge whether a sound hint holds.
+const kanjiWithPartIndex = new Map();
+for (const kanji of kanjiList) {
+  const hl = structureSources.hl[kanji] ?? {};
+  const parts = new Set([
+    ...(structureSources.ya[kanji] ?? []),
+    ...(structureSources.sc[kanji] ?? []),
+    hl.semantic,
+    hl.phonetic,
+  ]);
+  for (const part of parts) {
+    if (typeof part !== "string" || part.length === 0) continue;
+    kanjiWithPartIndex.set(part, [
+      ...(kanjiWithPartIndex.get(part) ?? []),
+      kanji,
+    ]);
+  }
+}
 let soundParts;
 try {
   soundParts = buildSoundParts({
@@ -228,6 +269,7 @@ try {
     ...readSoundPartSources(RAW_DIR),
     isKanji,
     onReadingsOf: (kanji) => extended[kanji][EXT.allOn] ?? [],
+    kanjiWithPart: (part) => kanjiWithPartIndex.get(part) ?? [],
   });
 } catch (error) {
   fail(error.message);
@@ -248,6 +290,61 @@ for (const kanji of kanjiList) {
     soundParts.soundPartOf[kanji] ?? "",
     entry[EXT.mainVocab] ?? [],
   ];
+}
+
+// ---------------------------------------------------------------------------
+// radical_popover_text.json — our own popover text per radical
+// (scripts/radical-popover-text.mjs). Loaded only when a radical popover
+// opens. Its `addEn` words are merged into the radical info instead.
+// ---------------------------------------------------------------------------
+
+const drawerGlyphs = new Set(
+  Object.values(radicals.radicalsGroupedByStrokeCount).flat()
+);
+const familyHeadOf = new Map();
+for (const [head, members] of Object.entries(radicalFamilies)) {
+  for (const member of members) {
+    if (typeof member === "string") familyHeadOf.set(member, head);
+  }
+}
+let radicalPopover;
+try {
+  radicalPopover = buildRadicalPopoverText({
+    entries: readRadicalPopoverText(RAW_DIR),
+    info: radicalInfo,
+    isRadical: (glyph) => drawerGlyphs.has(glyph) || glyph in radicalInfo,
+    isKanji,
+    // The radical-search index: the drawer radicals each kanji contains. A
+    // form outside the drawer is searched as its alias (⻗ → 雨).
+    containsRadical: (kanji, glyph) =>
+      [...(decomposition[kanji] ?? "")].includes(
+        followAlias(glyph, allAliases, (g) => drawerGlyphs.has(g)) ?? glyph
+      ),
+    headOf: (glyph) => {
+      const head = familyHeadOf.get(glyph);
+      return head == null || head === glyph ? null : head;
+    },
+    // kanjium names the radical form a kanji is written with: [radical,
+    // variant, …] (雪: 雨, ⻗). Other codes for a form count as that form.
+    // Its mistakes are fixed in radicals/ours.json (kanjiumFormFixes).
+    formIn: (kanji) => {
+      const [radical, variant] = structureSources.ka[kanji] ?? [];
+      const glyph = ours.kanjiumFormFixes?.[kanji]?.form ?? variant ?? radical;
+      if (glyph == null) return null;
+      return (
+        followAlias(glyph, allAliases, (g) => familyHeadOf.has(g)) ?? glyph
+      );
+    },
+    otherNamesOf: (glyph) =>
+      (radicalFamilies[glyph] ?? [])
+        .filter((member) => typeof member !== "string")
+        .map((member) => member.ja),
+    soundPartOf: soundParts.soundPartOf,
+    readings: soundParts.readings,
+  });
+} catch (error) {
+  fail(error.message);
+  radicalPopover = { text: {}, info: radicalInfo };
 }
 
 // ---------------------------------------------------------------------------
@@ -550,8 +647,10 @@ write("components.json", components);
 write("radicals.json", {
   groupedByStrokeCount: radicals.radicalsGroupedByStrokeCount,
   aliases: allAliases,
-  info: radicalInfo,
+  info: radicalPopover.info,
+  families: radicalFamilies,
 });
+write("radical_popover_text.json", radicalPopover.text);
 write("kanji_structures.json", outStructures);
 // Pass-throughs: reshaping nothing, only normalising the file names.
 write("kanji_decomposition.json", decomposition);

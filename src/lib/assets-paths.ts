@@ -10,6 +10,7 @@ const assetsPaths = {
   EXTENDED_HOVER_FILE_PATH: "/json/v2/kanji_extended_hover.json",
   COMPONENTS_FILE: "/json/v2/components.json",
   RADICALS_FILE: "/json/v2/radicals.json",
+  RADICAL_POPOVER_TEXT_FILE: "/json/v2/radical_popover_text.json",
   VOCAB_FILE: "/json/v2/vocab.json",
   REP_WORD_DETAILS_FILE: "/json/v2/rep_word_details.json",
   CUM_USE: "/json/v2/cum_use.json",

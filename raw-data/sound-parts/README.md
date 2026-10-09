@@ -17,7 +17,12 @@ edited. Anything we decide ourselves lives in `ours.json`.
 
 ## What a sound part means
 
-A **learner hint**, not a claim about a kanji's history. A part qualifies
+A **learner hint**, not a claim about a kanji's history. The chip means
+**a sound hint for kanji with this part** (decided with the user, October
+2026): the popover says "Sound hint for kanji with 五:" above the readings.
+It is a hint, not a rule: not every kanji with the part is read that way
+(問 and 開 contain 門 but are not かん). It is about the part's family, not the kanji page
+it sits on: 門 is もん, but its chip says かん for 間 関 簡 閑. A part qualifies
 for a kanji if:
 
 1. it is **visible** in the kanji, and
@@ -45,6 +50,13 @@ The part's own reading doesn't have to match: the release already shows
    sources say.
 4. Readings: `readings` in `ours.json`, else the release's, else Anki's
    (converted to hiragana).
+5. **Hide a family whose hint misleads more than it helps** (user, October
+   2026): most kanji with the part are not read with its sound, and no more
+   than 2 of its own kanji are. "Kanji with the part" means kanji where it
+   is a direct, top-level piece in yagays, ScottOglesby or hlorenzi (so 里
+   inside 重 doesn't count). `keepFamilies` in `ours.json` keeps a family
+   anyway. Hidden today: 十 汁, 犬 献, 比 批, 匕 死, 共 供, 区 駆, 圭 桂, 昔 借,
+   竹 築, 予 預, 兄 況競, 牙 雅芽, 少 沙砂, 単, 乞.
 
 How the Anki file is read (the file itself is untouched):
 
@@ -58,9 +70,10 @@ How the Anki file is read (the file itself is untouched):
 `docs/data/sound-parts.json` is regenerated on every build and lists what
 Anki added, what `soundPart` overrode, where Anki offered another part
 (the kanji kept the one it had), and which Anki kanji failed the reading
-test.
+test, and which families step 5 hid (with the kanji that fit and don't).
 
-The build fails if a `dropFamilies` key is not an Anki family, a `soundPart`
+The build fails if a `keepFamilies` key is not anyone's sound part, a
+`dropFamilies` key is not an Anki family, a `soundPart`
 or `readings` entry repeats what the sources already give or matches
 nothing, or a sound part ends up with no reading.
 
@@ -74,6 +87,8 @@ nothing, or a sound part ends up with no reading.
   "soundPart": { "銭": "㦮" },
   // sound part → readings, wins over the release and Anki.
   "readings": { "斉": ["さい"] },
+  // Families step 5 would hide, kept anyway. Each value is the reason.
+  "keepFamilies": { "果": "課 菓 are か, like 果 (結果); …" },
 }
 ```
 
@@ -92,6 +107,10 @@ background):
 - **枝 肢 → 支 し** (and 支 → 支, as a head): 枝 = 木 + 支 and 肢 = 肉 + 支,
   with 支 as the sound part (Wiktionary). Anki files them under 士, which
   is not in them; the release has no part for them.
+- **洪 → 港 こう is kept: 洪 IS VISIBLE IN 港** (氵 + 共-shaped top of 巷).
+  Wiktionary gives 巷 as 港's historical sound part, but the hint only
+  needs the shape to be visible and the reading to match. Settled with the
+  user twice; don't flag it again.
 - **斉 さい:** Anki says ザイ (from 剤), but 斎, 済 and 斉 itself are さい.
 - **才 さい:** Anki says ザイ (from 材, 財), but 才 itself is さい; 材 ざい is
   the voiced form, and 財 is also さい.

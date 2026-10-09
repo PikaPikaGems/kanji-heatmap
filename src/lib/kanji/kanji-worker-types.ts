@@ -1,5 +1,5 @@
 import { JLTPTtypes } from "../jlpt";
-import type { RadicalsRuntime } from "../radicals";
+import type { RadicalPopoverDetails, RadicalsRuntime } from "../radicals";
 import type { WordPartDetail } from "../furigana";
 import type {
   KanjiReadingEntry,
@@ -258,6 +258,11 @@ export interface WorkerApi {
   "kanji-structure": {
     payload: string;
     response: MultiKanjiStructureEntry | null;
+  };
+  /** One radical's popover text and sounds; null when it has neither. */
+  "radical-popover-text": {
+    payload: string;
+    response: RadicalPopoverDetails | null;
   };
   /** One kanji's reading breakdown; empty and absent both answer null. */
   "kanji-reading-details": {
