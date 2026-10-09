@@ -128,6 +128,27 @@ more than 2 of its kanji are (rule and list in
 `raw-data/sound-parts/README.md`). `keepFamilies` keeps 果 里 未 分 羊 几 小
 支. Revisit later (user): 几 (机 is つくえ, 肌 is はだ), 小 and 支.
 
+**Open, revisit later (user): is this the rule we want?** As built, a
+family shows if either:
+
+1. **3 or more** of its kanji are read with the sound, or
+2. **at least half** of the kanji with the part (top-level, in yagays,
+   ScottOglesby or hlorenzi) are read with it, however few that is.
+
+Alternatives looked at (October 2026), not built:
+
+- **100% instead of "at least half"** in 2, plus the part itself must have
+  the reading. Hides 24 more, most of them good small families that fail on
+  one kanji: 主→注駐 (往), 才→材財 (閉), 直→植殖 (置 値), 旨→指脂, 必→秘泌,
+  壬→任妊, 呉→誤娯, 甬→通痛, 左→佐差, 臤→賢堅. The "part itself" clause
+  also goes against 門 (もん, chip かん).
+- **"And at least 2 kanji" added to 2 (option C).** Hides 22 single-kanji
+  families, including 洪→港 (settled twice), 系→係 (our own) and good
+  one-to-one hints such as 原→源, 敬→警, 相→想.
+
+Claude's view: keep it as built. A chip only shows on kanji that pass the
+reading test, so a small family is low-value at worst, never wrong.
+
 - **Idea:** the Anki deck's rhyme rows (R01–R20, skipped today) as a
   different kind of hint ("rhymes with -an": 単 弾 戦 禅).
 
