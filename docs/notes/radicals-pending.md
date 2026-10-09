@@ -595,6 +595,11 @@ Decided (user, October 2026):
   written in the forms we ship (剝 → 剥, `jouyouForms` in
   `raw-data/misc/ours.json`). Components left with no shipped kanji are
   hidden; none today (彔 is in 剥 once the map is applied).
+- Same shape typed two ways in Scott's map is merged for component search
+  only (`sphmnCodepointFixes`): ⺣→灬, ⺡→氵, ⻊→𧾷, ｜→丨. Not merged: ⻌/辶
+  (one vs two dots), ⺤/爫, ⻖/⻏ (same shape, different parts: 阜 vs 邑),
+  ⺮/𥫗 (not decided). Radical aliases stay as they are; the two searches
+  behave differently on purpose.
 - A component that is a kanji also matches itself: 寺 finds 寺 plus the 7
   kanji that contain it.
 - **Drawer order:** by match count (kanji containing the component, plus

@@ -213,12 +213,14 @@ expanded to every depth by
 
 - Rows whose component isn't one character are dropped (`中一`, and one
   with an empty component).
-- `sphmnCodepointFixes` in `ours.json` reads a radical code point as its
-  ordinary twin, merging the two rows: `{ "⺣": "灬", "⺡": "氵", "⻊": "𧾷" }`.
-  Scott's map was typed by hand and writes one shape both ways (点 has 灬,
-  勲 has ⺣), so without this the drawer shows two identical-looking
-  buttons and 灬 misses 勲 and 薫. Only pairs of the same shape, chosen with
-  the user. The build fails if either glyph of a pair is not a component.
+- `sphmnCodepointFixes` in `ours.json` reads one character as another,
+  merging the two rows: `{ "⺣": "灬", "⺡": "氵", "⻊": "𧾷", "｜": "丨" }`.
+  Scott's map was typed by hand and writes one shape two ways (点 has 灬,
+  勲 has ⺣; 直 has the fullwidth bar ｜, 引 has 丨), so without this the
+  drawer shows two identical-looking buttons and 灬 misses 勲 and 薫. Only
+  pairs of the same shape, chosen with the user; ⻌/辶, ⺤/爫 and ⻖/⻏ stay
+  apart. Component search only: radical aliases are a separate thing and
+  don't change. The build fails if either glyph of a pair is not a component.
 - Kanji are written in the forms we ship, with `jouyouForms` from
   `raw-data/misc/ours.json` (剝 → 剥). Kanji we don't ship are dropped, then
   components with no kanji left.
