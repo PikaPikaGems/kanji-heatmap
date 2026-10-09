@@ -590,7 +590,7 @@ describe("sphmn_components.json", () => {
   );
   const shipped = (char: string) => v1Main[char] != null;
 
-  it("keeps every one-character row, with its shipped kanji in CSV order", () => {
+  it("keeps rows with more than one search result in CSV order", () => {
     const { sphmnCodepointFixes } = raw<{
       sphmnCodepointFixes: Record<string, string>;
     }>("radicals/ours.json");
@@ -609,7 +609,9 @@ describe("sphmn_components.json", () => {
             .filter(shipped)
             .join(""),
         ])
-        .filter(([, kanji]) => kanji.length > 0)
+        .filter(
+          ([component, kanji]) => kanji.length + Number(shipped(component)) > 1
+        )
     );
     expect(new Map(list)).toEqual(expected);
     for (const from of Object.keys(sphmnCodepointFixes)) {
