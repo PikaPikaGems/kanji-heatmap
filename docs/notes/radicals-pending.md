@@ -119,6 +119,24 @@ unchecked step.
 
 ### 1. Sound info feature
 
+**Open (October 9, 2026): which sound families to show.** Settled so far:
+the chip means "a sound hint for kanji with this part", the popover says
+"Sound hint for kanji with 門:", and the hint test (part visible + kanji
+read with the family sound) stays; 犬→献, 匕→死, 耂→考 and 洪→港 pass it
+and stay. Proposed, waiting for the user's go:
+
+- **Rule:** hide a family when most kanji with the part (top-level parts
+  from yagays, ScottOglesby and hlorenzi) are not read with its sound,
+  unless more than 2 of its kanji are, or every kanji with the part (and
+  the part itself) is. Dry run: hides 22 (十→汁, 犬→献, 匕→死, 比→批, 単,
+  乞, …). Not "more than 3": that would hide 丁 士 旦 干 几.
+- **Exceptions** (kept, each with its reason in `ours.json`): 果 (課 菓),
+  里 (理 鯉), 未 (味 魅), 分 (粉 紛), 羊 (洋 養).
+- **Revisit later:** 几 (机 肌 飢) passes but is weak: 机 is つくえ, 肌 is
+  はだ. Kept for now (user).
+- **Idea:** the Anki deck's rhyme rows (R01–R20, skipped today) as a
+  different kind of hint ("rhymes with -an": 単 弾 戦 禅).
+
 Split in two (user, October 2026):
 
 - **1A — sound part coverage. Done and merged**
