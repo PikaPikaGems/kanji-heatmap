@@ -66,11 +66,12 @@ const Harness = () => {
 describe("ComponentScreenContent", () => {
   it("shows components in drawer order", () => {
     render(<Harness />);
-    expect(screen.getAllByRole("button").map((b) => b.textContent)).toEqual([
-      "口",
-      "一",
-      "寺",
-    ]);
+    const glyphs = screen
+      .getAllByRole("button")
+      .map((b) => b.textContent)
+      // Skip the dev-only bands toggle.
+      .filter((text) => !text?.startsWith("Bands"));
+    expect(glyphs).toEqual(["口", "一", "寺"]);
   });
 
   it("re-renders only the tapped button", async () => {
