@@ -79,11 +79,12 @@ release's per-kanji parts list (`kanji_extended.json` field 0 →
 - ハ and 已 are the drawer's own glyphs for the 八 and 己 radicals, so they
   share the kanji keyword ("eight", "oneself") on purpose. No aliases.
 - 歹 stays "bare bone".
-- Replacing the 🇨🇳 meaning line is a feature (item 2, popover extra 4), not cleanup.
+- The 🇨🇳 meaning line keeps sylhare's `info.cn`; replacing it (popover extra 4) is not being done.
 - Every Kanji Heatmap Data fix is listed under "Pending" in
   `docs/notes/kanji-heatmap-data-pending.md` and is parked until the user picks
   it up.
-- 𠘨 stays aliased to 風 (popover says かぜ, wind).
+- 𠘨 stays aliased to 風 (popover says かぜ, wind). Pinned to revisit
+  (user, October 2026): see "Revisit: 𠘨 → 風 alias" in item 5.
 - Positions in the sylhare CSV are fine as they are; the popover shows only
   the first value (かまえ for "かまえ, はこがまえ").
 - The `improve-radicals` branch is abandoned. Ignore it.
@@ -96,18 +97,21 @@ release's per-kanji parts list (`kanji_extended.json` field 0 →
 One step at a time, in this order. Each session picks up the next
 unchecked step.
 
-- [ ] **Step 1 — radical popover information** (item 2 below,
+- [x] **Step 1 — radical popover information** (item 2 below,
       "Radical popover text").
   - [x] 1a. Settle the popover rules (October 2026).
-  - [ ] 1b. (In progress: first version with 宀 夂 冫 广 隹 青.) Build the
-        popover in the dev server with 3–5 checked
-        entries and iterate on the design (also try variants).
+  - [x] 1b. Build the popover in the dev server with 3–5 checked
+        entries and iterate on the design (also try variants). Done in
+        PikaPikaGems/kanji-heatmap#311: summary plus "Learn more" dialog,
+        🧩 Forms, 🔊 only with checked sound examples.
   - [x] 1c. Fill in every radical (252, every glyph with radical info), in
         PikaPikaGems/kanji-heatmap#311, followed by one review pass.
         Meaning and sound examples were picked by code from Wiktionary's
         glyph-origin role markers (see "How 1c was done" below).
 - [ ] **Step 2 — radical keyword** (chip names, "Why we're revisiting
-      the radical names" below). Decided once the popover exists.
+      the radical names" below). **Parked** (user, October 2026). Same
+      work as section 2 of `docs/notes/naming-review.md`; pick both up
+      together. Also parked with it: 勿's radical info (item 5 below).
 - [x] **Step 3 — every radical opens the radical popover**, also
       radicals that are kanji (夕), with "Find kanji that include 夕" and
       "📖 Open kanji 夕 (evening)". Done in PikaPikaGems/kanji-heatmap#311
@@ -153,8 +157,9 @@ Alternatives looked at (October 2026), not built:
 Claude's view: keep it as built. A chip only shows on kanji that pass the
 reading test, so a small family is low-value at worst, never wrong.
 
-- **Idea:** the Anki deck's rhyme rows (R01–R20, skipped today) as a
-  different kind of hint ("rhymes with -an": 単 弾 戦 禅).
+- **Idea, parked (low priority, user, October 2026):** the Anki deck's rhyme
+  rows (R01–R20, skipped today) as a different kind of hint ("rhymes with
+  -an": 単 弾 戦 禅).
 
 Split in two (user, October 2026):
 
@@ -254,8 +259,8 @@ names one by one (`docs/notes/naming-review.md`, section 2) stalled, because:
   the only chips that translate a Japanese _name_.
 - **The name is part of the popover.** Its title line is "うかんむり, u crown",
   followed by the position and the 🇨🇳 meaning line. If the name becomes a
-  meaning, the meaning line may repeat it; if a new meaning source is used
-  (popover extra 4 below), the name should match it. So the name can't be settled
+  meaning, the meaning line (sylhare's `info.cn`; no new source, see popover
+  extra 4 below) may repeat it. So the name can't be settled
   without designing the popover, and vice versa.
 - Only 107 of the 245 names ever showed; the rest belonged to radicals that
   are kanji, which show the kanji keyword. Those were deleted in the pipeline
@@ -314,19 +319,27 @@ Each adds or changes what the radical popover shows (one more field in
 the existing 🇨🇳 meaning line; 6 is the sound half of item 1.
 
 1. **The name** — see above. Decide first; it shapes the title line.
-2. **Alternate forms** — sylhare CSV "Alternate" column (王 → 玉 ⺩). Would also
+2. **Done:** the dialog's 🧩 Other forms section (see "Forms and families"
+   below). Original idea: **Alternate forms** — sylhare CSV "Alternate" column (王 → 玉 ⺩). Would also
    explain pairs like 攵/攴.
-3. **Example kanji with this radical** — e.g. the 3 most common, from the radical
+3. **Not doing** (user, October 2026): covered by the 🧠 Meaning hint examples
+   (5) and the "Search kanji by radical" link. Original idea: **Example kanji
+   with this radical** — e.g. the 3 most common, from the radical
    search index (`raw-data/radicals/external/rewhowe-decomposition.json`).
-4. **Meaning** — `info.cn` (sylhare) overlaps
+4. **Not doing** (user, October 2026): the meaning line keeps sylhare's
+   `info.cn`. Original idea: **Meaning** — `info.cn` (sylhare) overlaps
    `raw-data/radicals/external/anki-semantic-radicals.tsv`, which is shorter and
    cleaner ("Insect / Bug" vs "worm, insect, bug"). Pick or merge. The Anki file
    has ~20 simplified-Chinese rows (讠 纟 贝 …) to drop, and
    `阝(Left side)` / `阝(Right side)` must become ⻖ / ⻏.
-5. **Kanji where the radical carries the meaning** — kanjium's first slot is
+5. **Done:** the dialog's 🧠 Meaning hint lists checked examples per radical
+   (`semantic` in the popover text, e.g. 虫 → 蛇 蚊 蜂, each with a "why" line
+   and a source). Original idea: **Kanji where the radical carries the meaning** — kanjium's first slot is
    the dictionary radical (`raw-data/kanji-structure/external/kanjium.json`), usually
    the meaning part: 虫 → 蚊 蛍 蚕 蛇 蝶 蜂. Not perfect (虹 is filed under 虫).
-6. **Sound examples (1B)** — for radicals that are also sound parts (門, 几,
+6. **Done:** 🔊 sound examples with real words for 22 radicals (`sound` in
+   the popover text, e.g. 門 → 間 時間 じかん). Original idea: **Sound
+   examples (1B)** — for radicals that are also sound parts (門, 几,
    羊, …): the reading and a few words, as in item 1.
 
 #### Radical popover text (decided with the user, October 2026)
@@ -506,9 +519,8 @@ alone.
 
 Open:
 
-- Naming (step 2): if the 🇯🇵 line explains the Japanese name, chip
+- Naming (step 2, parked): if the 🇯🇵 line explains the Japanese name, chip
   names could become meanings ("roof" instead of "katakana u crown").
-  Revisit once the popover exists.
 
 #### Forms and families (decided with the user, October 2026)
 
@@ -539,13 +551,13 @@ exceptions. Per field:
   🇯🇵 section shows them as "Also called ほうへん · へん (left side)". A radical with no other forms has no section; its
   position is on the 🇯🇵 line.
 
-Open: **かぜかんむり belongs to no family.** sylhare lists ⺇ (かぜかんむり)
-as a form of 風, which is wrong: かぜかんむり is a name of 几 (風's outside
-looks like 几; ja.wikipedia 几部). `familySkips` in ours.json now drops ⺇
-from 風, but nothing adds the name to 几, because there is no data option
-yet to add a name-only row to another family. Add one (e.g. `familyAdds`
-in ours.json: 几 → {ja: かぜかんむり, pos: かまえ}) so 几's dialog says "Also
-called かぜかんむり".
+Not doing (user, October 2026): **かぜかんむり belongs to no family.**
+sylhare lists ⺇ (かぜかんむり) as a form of 風, which is wrong: かぜかんむり
+is a name of 几 (風's outside looks like 几; ja.wikipedia 几部).
+`familySkips` in ours.json drops ⺇ from 風, and nothing adds the name to
+几. Adding it would need a new option (e.g. `familyAdds`) for one name, and
+it would reach almost no one: 凪 is the only shipped kanji with that shape,
+and its 𠘨 chip opens 風's popover (alias kept on purpose), not 几's.
 
 老 is named おい (an `extras` entry in ours.json); it used to inherit
 おいかんむり from 耂's CSV row.
@@ -583,8 +595,8 @@ other one is rarely read with the sound (里: 鯉 り).
 A new search type next to radical search, built from
 `raw-data/radicals/external/sphmn-components-ck.csv` (component → every jōyō
 kanji containing it, at any depth). Finds things radical search can't
-(寺 → 侍 持 待 時 特 等 詩). In progress on the `component-search` branch
-(step 4 of the plan). How the data is built: `raw-data/radicals/README.md`,
+(寺 → 侍 持 待 時 特 等 詩). Done (step 4 of the plan), merged in
+PikaPikaGems/kanji-heatmap#313 and PikaPikaGems/kanji-heatmap#314. How the data is built: `raw-data/radicals/README.md`,
 "sph-mn components".
 
 Decided (user, October 2026):
@@ -684,11 +696,28 @@ the Character Structure sources, or our own list).
 
 - Done: the build fails if a component keyword is also a kanji keyword (see
   "Build checks").
+- **Revisit: 𠘨 → 風 alias** (parked by the user, October 2026).
+  - **Why parked:** it's not our data. The alias comes from sylhare's
+    Alternate column (row 182, `風,⺇𠘨`), the same row that wrongly files
+    ⺇/かぜかんむり under 風. Leave it as is until revisited.
+  - **What's wrong:** 𠘨 is in only two breakdowns: Scott's 風 (𠘨 + 䖝) and
+    kanjium's 凪 (radical 几, written 𠘨); yagays splits both as 几 + ….
+    The chip opens 風's popover, which is circular in 風's own breakdown and
+    contradicts kanjium for 凪.
+  - **Options:** (1) make 𠘨 a form of 几 named かぜかんむり; (2) a plain
+    component, keyword like "wind frame"; (3) keep.
+  - **Recommendation (Claude): option 1.** It matches kanjium (凪 = 几
+    written 𠘨) and gives かぜかんむり a home on a real glyph, so the dropped
+    `familyAdds` idea isn't needed. Override in `ours.json`, not the CSV:
+    `familySkips` drops 𠘨 from 風, and an `extras` entry gives it
+    かぜかんむり / かまえ. Check first that an `extras` entry can join 几's
+    family (🧩 Other forms); if not, that's a small build change.
 - **Unnamed parts:** 356 parts show "...". None is used by 10+ kanji; 28
   glyphs (23 shapes) are used by 5+. The user wants the most used ones named:
   suggestions are in section 1 of `docs/notes/naming-review.md`, waiting for
   decisions.
-- **Radical info for drawer-only parts (e.g. 勿).** 勿 is in the radical
+- Parked with step 2 (naming review): **Radical info for drawer-only parts
+  (e.g. 勿).** 勿 is in the radical
   drawer (`rewhowe-drawer.json`) but not in `sylhare-radicals.csv`, which
   lists only the 214 Kangxi radicals (dictionaries file 勿 under 勹). So it
   has no radical info: its popover shows only the keyword "must not", with no
@@ -698,16 +727,18 @@ the Character Structure sources, or our own list).
   blood on a knife (the original 刎), borrowed for "do not" since oracle-bone
   times; 漢字ペディア (新字源) says a snapped bowstring, plucked to ward off
   evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary).
-- **Revisit: info for every drawer-only part.** Of the 253 glyphs in the
+- Done: **radical-drawer kanji that aren't one of the 214 radicals.** Of the 253 glyphs in the
   radical drawer, 24 had no radical info (counted October 2026, following
   aliases): 入 九 乃 也 亡 及 久 元 井 勿 五 屯 巴 世 巨 冊 母 奄 岡 免 斉 品
   啇 無. Each shows only its keyword. Looked into with the user:
   - Done: 入 and 母. sylhare writes them ⼊ and ⺟ (radical code points);
     `sylhareCodepointFixes` swaps them, so 入 is radical 11 and 母 a form of
     毋 (ja.wikipedia 毋部).
-  - Open: 斉 is the shinjitai of 齊 (radical 210, せい; ja.wikipedia 斉部).
-    The drawer has both 斉 and 齊; only 齊 has info. Could be a form of 齊.
-  - The other 21 are not one of the 214 radicals; they are kanji (or parts)
+  - Done: 斉 is the shinjitai of 齊 (radical 210, せい; ja.wikipedia 斉部).
+    The drawer has both; 斉 is now a form of 齊 with its own radical info
+    and popover text (commit 645f2340).
+  - 勿: parked with step 2 (see above).
+  - The other 20 are not one of the 214 radicals; they are kanji (or parts)
     filed under one. Their popover already has the keyword, "Find kanji"
     and the kanji link, so we dropped the idea of a kanji-style popover.
   - Sound parts among them (Wiktionary + 漢字ペディア): only 元 made a

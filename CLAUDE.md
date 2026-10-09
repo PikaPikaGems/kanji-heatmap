@@ -1,5 +1,9 @@
 # Repo notes for Claude Code
 
+- Do not add, change or delete automated tests (unit or e2e) unless the
+  user explicitly asks for it in that conversation. This applies to every
+  agent and subagent. Running existing tests is fine. Same rule as
+  `AGENTS.md` and `.cursor/rules/tests-only-when-asked.mdc`.
 - Before finishing any change, run `pnpm exec prettier --check .` (or
   `pnpm run format:check`) and fix any reported files with
   `pnpm exec prettier --write <file>`. CI/build fails on formatting issues,
