@@ -20,6 +20,9 @@ now; the user will handle them later.
   our choices in `raw-data/sound-parts/ours.json` should move into Kanji
   Heatmap Data later, in particular:
   - 浅 銭 践 → 㦮 (the release gives 浅, which is not in 銭 or 践).
+  - 元 family (がん・かん): 完 冠 玩 頑, added October 2026. Wiktionary and
+    漢字ペディア (新字源) both give 元 as their sound part. The Anki deck has
+    it only as rhyme group R10 (~AN/EN), which our build skips.
   - Possible gaps where the release has the right part but doesn't use it:
     省 ← 生, 定 ← 正 (Wiktionary).
 - **斗 keyword: "dipper" or "measuring box"?** The radical dialog's bold

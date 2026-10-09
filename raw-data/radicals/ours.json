@@ -171,6 +171,10 @@
     "𧾷": "⻊",
     "⺍": "⺌"
   },
+  "sylhareCodepointFixes": {
+    "⼊": "入",
+    "⺟": "母"
+  },
   "sylhareRowGlyphs": {
     "うしへん": "牜",
     "いとへん": "糹",
@@ -241,6 +245,11 @@
       "nameJa": "おい",
       "position": "",
       "meaning": "old, old age"
+    },
+    "母": {
+      "nameJa": "はは",
+      "position": "",
+      "meaning": "mother"
     }
   }
 }

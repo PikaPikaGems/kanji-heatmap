@@ -613,12 +613,21 @@ the Character Structure sources, or our own list).
   times; 漢字ペディア (新字源) says a snapped bowstring, plucked to ward off
   evil, hence prohibition. In 物, 勿 is the sound part (Wiktionary).
 - **Revisit: info for every drawer-only part.** Of the 253 glyphs in the
-  radical drawer, 24 have no radical info (counted October 2026, following
+  radical drawer, 24 had no radical info (counted October 2026, following
   aliases): 入 九 乃 也 亡 及 久 元 井 勿 五 屯 巴 世 巨 冊 母 奄 岡 免 斉 品
-  啇 無. Each shows only its keyword. Some of these are themselves Kangxi
-  radicals under another glyph, so check for a missing alias before writing
-  new entries: sylhare lists 入 as ⼊ (U+2F0A, the Kangxi radical code point),
-  and 母 only as ⺟, the alternate of 毋 (なかれ).
+  啇 無. Each shows only its keyword. Looked into with the user:
+  - Done: 入 and 母. sylhare writes them ⼊ and ⺟ (radical code points);
+    `sylhareCodepointFixes` swaps them, so 入 is radical 11 and 母 a form of
+    毋 (ja.wikipedia 毋部).
+  - Open: 斉 is the shinjitai of 齊 (radical 210, せい; ja.wikipedia 斉部).
+    The drawer has both 斉 and 齊; only 齊 has info. Could be a form of 齊.
+  - The other 21 are not one of the 214 radicals; they are kanji (or parts)
+    filed under one. Their popover already has the keyword, "Find kanji"
+    and the kanji link, so we dropped the idea of a kanji-style popover.
+  - Sound parts among them (Wiktionary + 漢字ペディア): only 元 made a
+    strong hint and was added to `raw-data/sound-parts/ours.json`. Rejected:
+    九 (only 究; 鳩 is はと), 岡 (always おか), 屯 (rare), 無 (ぶ is its less
+    common reading); the rest have one kanji or no matching reading.
 
 ## Working rules
 

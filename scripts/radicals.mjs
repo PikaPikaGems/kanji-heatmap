@@ -140,6 +140,36 @@ const withRowGlyphs = (rows, rowGlyphs) => {
 };
 
 /**
+ * The CSV writes some radicals with a Kangxi or radical-supplement code
+ * point (⼊ for 入, ⺟ for 母) where the drawer and every kanji list use the
+ * ordinary character. ours.json `sylhareCodepointFixes` swaps them in the
+ * Radical and Alternate columns, so 入 gets radical 11's row and 母 becomes
+ * a form of 毋. Throws on a code point the CSV doesn't use.
+ */
+const withCodepointFixes = (rows, fixes) => {
+  const unused = new Set(Object.keys(fixes));
+  const fix = (text) =>
+    [...(text ?? "")]
+      .map((ch) => {
+        if (fixes[ch] == null) return ch;
+        unused.delete(ch);
+        return fixes[ch];
+      })
+      .join("");
+  const out = rows.map((row) => ({
+    ...row,
+    Radical: fix(row.Radical),
+    Alternate: fix(row.Alternate),
+  }));
+  if (unused.size > 0) {
+    throw new Error(
+      `sylhareCodepointFixes: the CSV never uses ${[...unused].join(", ")}`
+    );
+  }
+  return out;
+};
+
+/**
  * Every radical fact the app needs, from the sylhare CSV, the rewhowe drawer
  * and ours.json:
  *
@@ -166,7 +196,10 @@ export const buildRadicalData = ({
   isKanji,
   isUsed,
 }) => {
-  const sylhareRows = withRowGlyphs(csvRows, ours.sylhareRowGlyphs ?? {});
+  const sylhareRows = withRowGlyphs(
+    withCodepointFixes(csvRows, ours.sylhareCodepointFixes ?? {}),
+    ours.sylhareRowGlyphs ?? {}
+  );
   const drawerRadicals = new Set(Object.values(drawer).flat());
   const mergedAliases = { ...(ours.aliases ?? {}) };
   mergeSylhareAliases({

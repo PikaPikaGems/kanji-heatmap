@@ -4828,5 +4828,27 @@
   },
   "糹": {
     "ja": "いと (糸, thread) + へん (left side)."
+  },
+  "入": {
+    "ja": "いる (入, to enter).",
+    "cn": "Sources differ on the picture: an arrowhead pointing in (Wiktionary), or the doorway of a house (漢字ペディア). Both read it as \"to enter\".",
+    "refs": [
+      "https://en.wiktionary.org/wiki/入",
+      "https://www.kanjipedia.jp/kanji/0005444700"
+    ]
+  },
+  "母": {
+    "ja": "はは (母, mother). Dictionaries file 母 under 毋, whose names are なかれ and ははのかん.",
+    "jaRefs": [
+      "https://ja.wikipedia.org/wiki/毋部"
+    ],
+    "cn": "A woman (女) with two dots for breasts: a nursing mother. In the oldest writing, 女 stood for both words.",
+    "cnNote": "毋 (do not) was first written with 母 and later got one stroke for the two dots. In jōyō kanji such as 毎, 海 and 敏, the 母 part is now written 毋-style.",
+    "refs": [
+      "https://en.wiktionary.org/wiki/母",
+      "https://www.kanjipedia.jp/kanji/0006317900",
+      "https://en.wiktionary.org/wiki/毋",
+      "https://ja.wikipedia.org/wiki/毋部"
+    ]
   }
 }
