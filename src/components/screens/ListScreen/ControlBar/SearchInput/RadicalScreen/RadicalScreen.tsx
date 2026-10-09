@@ -40,12 +40,12 @@ const StrokeDivider = ({ stroke }: { stroke: string }) => {
 };
 
 /**
- * 253 of these render at once, so it is memoised and every prop is a primitive
- * or a stable callback. `onToggle` takes the radical rather than closing over
+ * 253 of these render at once (979 in the component drawer), so it is
+ * memoised and every prop is a primitive or a stable callback. `onToggle` takes the radical rather than closing over
  * it, which is what lets one shared handler serve the whole grid — a per-button
  * arrow function would make the memo useless.
  */
-const RadicalBtn = React.memo(function RadicalBtn({
+export const RadicalBtn = React.memo(function RadicalBtn({
   isDisabled,
   onToggle,
   isTouchDevice,
@@ -92,7 +92,7 @@ const ExpandedRadicalBtn = ({
   radicalKeyword,
 }: {
   radical: string;
-  radicalKeyword: string;
+  radicalKeyword: string | null;
   onClick: () => void;
 }) => {
   return (
@@ -110,14 +110,16 @@ const ExpandedRadicalBtn = ({
         <span className="sr-only">Close</span>
       </button>
       <span className="block mb-1 text-4xl kanji-font">{radical}</span>
-      <span
-        className="
+      {radicalKeyword != null && (
+        <span
+          className="
           block !text-ellipsis !text-nowrap mx-4 !overflow-hidden !whitespace-nowrap 
           text-xs font-bold px-2 rounded-full
           bg-foreground text-background"
-      >
-        {radicalKeyword}
-      </span>
+        >
+          {radicalKeyword}
+        </span>
+      )}
     </div>
   );
 };
@@ -139,11 +141,21 @@ export const ResultPreviewTitle = () => {
   );
 };
 
-export const SelectRadicalTitle = ({ count }: { count: number }) => {
+export const SelectRadicalTitle = ({
+  count,
+  noun = "Radicals",
+}: {
+  count: number;
+  noun?: string;
+}) => {
   if (count <= 0) {
-    return <TitleLayout>Select Radicals</TitleLayout>;
+    return <TitleLayout>Select {noun}</TitleLayout>;
   }
-  return <TitleLayout>Radicals Selected {`(${count})`}</TitleLayout>;
+  return (
+    <TitleLayout>
+      {noun} Selected {`(${count})`}
+    </TitleLayout>
+  );
 };
 
 export const RadicalScreenLayout = ({
@@ -151,17 +163,20 @@ export const RadicalScreenLayout = ({
   middle,
   bottom,
   count,
+  noun,
 }: {
   top: ReactNode;
   middle: ReactNode;
   bottom: ReactNode;
   count: number;
+  /** "Radicals" unless given; the component drawer says "Components". */
+  noun?: string;
 }) => {
   if (count === 0) {
     return (
       <div className="relative w-full px-1 mx-auto">
         <div className="absolute z-50 w-full m-auto -top-1">
-          <SelectRadicalTitle count={count} />
+          <SelectRadicalTitle count={count} noun={noun} />
         </div>
         <div
           className="relative flex flex-wrap items-start justify-center w-full px-2 py-3 mt-2 overflow-y-auto border-2 border-dotted rounded-md border-foreground/40"
@@ -176,7 +191,7 @@ export const RadicalScreenLayout = ({
   return (
     <div className="relative w-full px-1 mx-auto">
       <div className="absolute z-50 w-full m-auto -top-1">
-        <SelectRadicalTitle count={count} />
+        <SelectRadicalTitle count={count} noun={noun} />
       </div>
 
       <div
@@ -283,9 +298,12 @@ export const RadicalScreenContent = ({
 export const RadicalsSelected = ({
   value,
   onClick,
+  missingKeyword = "...",
 }: {
   value: string[];
   onClick: (radical: string) => void;
+  /** Shown when a glyph has no keyword; null shows the glyph alone. */
+  missingKeyword?: string | null;
 }) => {
   const getBasicInfo = useGetKanjiInfoFn();
 
@@ -296,7 +314,7 @@ export const RadicalsSelected = ({
   return (
     <>
       {value.map((radical) => {
-        const radicalKeyword = getBasicInfo(radical)?.keyword ?? "...";
+        const radicalKeyword = getBasicInfo(radical)?.keyword ?? missingKeyword;
 
         return (
           <ExpandedRadicalBtn

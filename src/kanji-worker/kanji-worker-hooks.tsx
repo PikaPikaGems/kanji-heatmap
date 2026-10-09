@@ -339,3 +339,40 @@ export const useSimilarKanjis = (kanji: string) => {
     error: state.error == null ? null : String(state.error),
   };
 };
+
+/** The component drawer: `[component, match count]`, most matches first. */
+export const useSphmnDrawer = () => {
+  const ready = useIsKanjiWorkerReady();
+  const state = useWorkerQuery<[string, number][]>(
+    ready ? () => requestWorker({ type: "sphmn-drawer" }) : null,
+    [ready]
+  );
+  return { status: state.status, data: state.data ?? null };
+};
+
+/** Every sph-mn component inside `kanji`, most-used first. */
+export const useSphmnParts = (kanji: string) => {
+  const ready = useIsKanjiWorkerReady();
+  const state = useWorkerQuery<string[]>(
+    ready && kanji
+      ? () => requestWorker({ type: "sphmn-parts", payload: kanji })
+      : null,
+    [ready, kanji],
+    // Never show one kanji's parts under another kanji.
+    false
+  );
+  return { status: state.status, data: state.data ?? null };
+};
+
+/** The kanji that contain `component` (sph-mn), not counting itself. */
+export const useSphmnKanjiOf = (component: string) => {
+  const ready = useIsKanjiWorkerReady();
+  const state = useWorkerQuery<string[]>(
+    ready && component
+      ? () => requestWorker({ type: "sphmn-kanji-of", payload: component })
+      : null,
+    [ready, component],
+    false
+  );
+  return { status: state.status, data: state.data ?? null };
+};
