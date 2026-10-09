@@ -8,7 +8,7 @@ import type {
   KanjiumEntry,
   MultiKanjiStructureEntry,
 } from "../kanji-section-constants";
-import type { SearchSettings } from "../settings/settings";
+import type { SearchSettings, SortSettings } from "../settings/settings";
 import type { GeneralKanjiItem, HoverItemReturnData } from "./kanji-info-types";
 
 export type KanjiMainInfo = {
@@ -271,8 +271,14 @@ export interface WorkerApi {
   };
   /** Every sph-mn component inside one kanji, most-used first. */
   "sphmn-parts": { payload: string; response: string[] };
-  /** The kanji that contain one component, not counting itself. */
-  "sphmn-kanji-of": { payload: string; response: string[] };
+  /**
+   * The kanji that contain one component, not counting itself, in the
+   * given sort order (sph-mn's order when the sort is "none").
+   */
+  "sphmn-kanji-of": {
+    payload: { component: string; sortSettings: SortSettings };
+    response: string[];
+  };
   /** One kanji's reading breakdown; empty and absent both answer null. */
   "kanji-reading-details": {
     payload: string;

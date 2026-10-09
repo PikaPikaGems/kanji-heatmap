@@ -297,7 +297,7 @@ const compareBy = (sortKey: SortKey, a: KanjiMainInfo, b: KanjiMainInfo) =>
 
 export const sortKanji = (
   kanjiList: string[],
-  settings: SearchSettings,
+  settings: Pick<SearchSettings, "sortSettings">,
   kanjiPool: DataPool
 ) => {
   const primarySort = settings.sortSettings.primary;
