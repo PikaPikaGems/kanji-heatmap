@@ -354,7 +354,7 @@ export const RadicalsResultsPreview = ({
     return (
       <div className="flex items-center justify-center w-full h-full p-2 text-xs font-bold">
         <div>
-          {"すみません 🙇🏽‍♀️ 🙇 . No match found."}
+          {"すみません 🙇🏽 🙇🏽‍♀️ . No match found."}
           <ClearFiltersCTA
             defaultMsg={
               <div className="flex flex-wrap items-center justify-center space-x-1">
