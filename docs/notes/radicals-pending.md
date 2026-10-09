@@ -116,9 +116,10 @@ unchecked step.
       before "is it a kanji?". This replaces the earlier decision that
       kanji radicals keep their kanji link; the extra tap is fine (user).
 - [x] **Step 4 — component search** (item 3 below), on the
-      `component-search` branch: drawer with bands, "Kanji that contain 寺",
-      component merges.
-- [ ] **Step 5 — component popover** (item 3 below, "Component popover").
+      `component-search` branch: drawer with bands, component merges.
+      ("Kanji that contain 寺" was built here, then removed in
+      PikaPikaGems/kanji-heatmap#315.)
+- [x] **Step 5 — component popover** (item 3 below, "Component popover").
 
 ### 1. Sound info feature
 
@@ -619,11 +620,12 @@ Decided (user, October 2026):
   built, then dropped: sph-mn's file is ScottOglesby's map expanded to every
   depth (identical for all 2025 kanji), so it repeated the `(ScottOglesby)`
   row.
-- **"Kanji that contain 寺"**: a new section in Structure info, after
-  Visually Similar Kanji, with the same buttons (tap → popover with the
-  kanji link). Ordered by the user's current sort setting. Up to 30, then
-  "See all N", which opens component search with that component; N counts
-  the component itself, so it matches the search.
+- **"Kanji that contain 寺"**: removed (user, October 2026,
+  PikaPikaGems/kanji-heatmap#315). It used sph-mn only, so it left out the
+  non-jōyō kanji that radical search finds (五: 伍 吾 梧) and was
+  misleading. Instead, General → Actions has two link buttons, shown only
+  when the kanji is in that drawer: flower → "Search kanji by radical X",
+  layers → "Search kanji by component X".
 
 - **Bands:** the drawer is split by match count (In 50+ / 20–49 / 10–19 /
   6–9 / 4–5 / 3 / 2 kanji), with each heading showing its number of components.
@@ -633,8 +635,7 @@ Decided (user, October 2026):
   shows the plain most-matches-first list instead; the buttons fade in on
   each flip.
 
-Component popover (next step; decided with the user, October 2026, not
-built yet):
+Component popover (done):
 
 - **Where:** only the Character Structure rows (`StructuralCategory.tsx`,
   chips from `ComponentLink` / `PartComponentLink` with
@@ -653,12 +654,8 @@ built yet):
 - **Radicals** keep the radical popover (`RadicalPopoverContent` in
   `global-links.tsx`), plus one new line opening component search, next to
   `RadicalSearchAction`, when the glyph is in the component drawer.
-- **Sound box** (the lime-bordered "Sound hint for kanji with 寺" box in
-  `SingleKanjiPart`): include it in the component popover, kanji or not.
-  Open: show it only for this kanji's own sound part (what the reference
-  card does today; Claude's recommendation, since a hint on every part
-  with sound info would suggest 日 or 寸 give 時 its reading), or whenever
-  the part has sound info (166 drawer components have some). Ask the user.
+- **Sound hint:** shown in the reference card's component popover when this
+  kanji has a sound hint for the part, kanji or not.
 - Separate from the radical popover, as already decided.
 
 ### 3b. Which parts list the reference card shows
