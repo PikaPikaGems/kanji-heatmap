@@ -340,10 +340,13 @@ export const useSimilarKanjis = (kanji: string) => {
   };
 };
 
-/** The component drawer: `[component, match count]`, most matches first. */
+/**
+ * The component drawer: `[component, match count, strokes]`, most matches
+ * first.
+ */
 export const useSphmnDrawer = () => {
   const ready = useIsKanjiWorkerReady();
-  const state = useWorkerQuery<[string, number][]>(
+  const state = useWorkerQuery<[string, number, number | null][]>(
     ready ? () => requestWorker({ type: "sphmn-drawer" }) : null,
     [ready]
   );

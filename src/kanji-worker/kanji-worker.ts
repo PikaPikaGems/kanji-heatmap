@@ -265,13 +265,22 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
 
 /**
  * The component drawer, in order, each with how many kanji component search
- * returns for it (the kanji that contain it, plus itself when it's a kanji).
+ * returns for it (the kanji that contain it, plus itself when it's a kanji)
+ * and its stroke count when known: the kanji's own, else the radical
+ * drawer's, as in scripts/sphmn-components.mjs.
  */
-const handleSphmnDrawer = async (): Promise<[string, number][]> => {
-  const [sphmn, main] = await Promise.all([loadSphmnComponents(), CORE]);
+const handleSphmnDrawer = async (): Promise<
+  [string, number, number | null][]
+> => {
+  const [sphmn, main, components] = await Promise.all([
+    loadSphmnComponents(),
+    CORE,
+    loadComponents(),
+  ]);
   return sphmn.order.map((component) => [
     component,
     sphmn.kanjiOf[component].length + (main[component] != null ? 1 : 0),
+    main[component]?.strokes ?? components[component]?.n ?? null,
   ]);
 };
 

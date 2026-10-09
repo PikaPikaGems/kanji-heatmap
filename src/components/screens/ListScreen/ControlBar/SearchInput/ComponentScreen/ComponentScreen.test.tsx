@@ -20,9 +20,9 @@ vi.mock("@/kanji-worker/kanji-worker-hooks", () => ({
   useSphmnDrawer: () => ({
     status: "success",
     data: [
-      ["口", 350],
-      ["一", 200],
-      ["寺", 8],
+      ["口", 350, 3],
+      ["一", 200, 1],
+      ["寺", 8, 6],
     ],
   }),
 }));
@@ -64,14 +64,20 @@ const Harness = () => {
 };
 
 describe("ComponentScreenContent", () => {
-  it("shows components in drawer order", () => {
-    render(<Harness />);
-    const glyphs = screen
+  const glyphs = () =>
+    screen
       .getAllByRole("button")
       .map((b) => b.textContent)
       // Skip the dev-only bands toggle.
       .filter((text) => !text?.startsWith("Bands"));
-    expect(glyphs).toEqual(["口", "一", "寺"]);
+
+  it("orders each band by stroke count, the plain list by matches", async () => {
+    render(<Harness />);
+    // Bands on: 口 and 一 share the 50+ band, so 一 (1 stroke) leads.
+    expect(glyphs()).toEqual(["一", "口", "寺"]);
+
+    await userEvent.click(screen.getByRole("button", { name: /Bands/ }));
+    expect(glyphs()).toEqual(["口", "一", "寺"]);
   });
 
   it("re-renders only the tapped button", async () => {

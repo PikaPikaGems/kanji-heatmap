@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useIsTouchDevice } from "@/hooks/use-is-touch-device";
 import {
   useKanjiSearchResult,
@@ -19,6 +19,21 @@ const BANDS: { min: number; label: string }[] = [
 ];
 const bandOf = (matches: number) =>
   BANDS.find((band) => matches >= band.min) ?? BANDS[BANDS.length - 1];
+
+type DrawerEntry = [component: string, matches: number, strokes: number | null];
+
+/**
+ * Inside a band, fewest strokes first (unknown last), then most matches.
+ * The drawer comes most-matches first, so bands are already in order and a
+ * stable sort keeps the rest of that order.
+ */
+const sortInBands = (drawer: DrawerEntry[]) =>
+  [...drawer].sort(
+    ([, matchesA, strokesA], [, matchesB, strokesB]) =>
+      BANDS.indexOf(bandOf(matchesA)) - BANDS.indexOf(bandOf(matchesB)) ||
+      (strokesA ?? Infinity) - (strokesB ?? Infinity) ||
+      matchesB - matchesA
+  );
 
 const BandHeading = ({ label }: { label: string }) => (
   <div className="w-full px-1 pt-2 pb-1 text-xs font-bold text-left text-foreground/60">
@@ -60,6 +75,10 @@ export const ComponentScreenContent = ({
   const isTouchDevice = useIsTouchDevice();
   const { data: drawer } = useSphmnDrawer();
   const [showBands, setShowBands] = useState(true);
+  const ordered = useMemo(
+    () => (drawer == null ? null : showBands ? sortInBands(drawer) : drawer),
+    [drawer, showBands]
+  );
 
   // Same pattern as RadicalScreenContent: a stable handler reading the
   // latest selection through a ref keeps RadicalBtn's memo working.
@@ -83,7 +102,7 @@ export const ComponentScreenContent = ({
     []
   );
 
-  if (drawer == null) {
+  if (ordered == null) {
     return null;
   }
 
@@ -95,7 +114,7 @@ export const ComponentScreenContent = ({
           onToggle={() => setShowBands((on) => !on)}
         />
       )}
-      {drawer.map(([component, matches], index) => {
+      {ordered.map(([component, matches], index) => {
         const isSelected = value.has(component);
         const isDisabled =
           possibleComponents != null &&
@@ -103,7 +122,7 @@ export const ComponentScreenContent = ({
           !possibleComponents.has(component);
         const band = bandOf(matches);
         const startsBand =
-          showBands && (index === 0 || bandOf(drawer[index - 1][1]) !== band);
+          showBands && (index === 0 || bandOf(ordered[index - 1][1]) !== band);
         return (
           <React.Fragment key={component}>
             {startsBand && <BandHeading label={band.label} />}
