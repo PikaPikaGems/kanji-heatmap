@@ -7,6 +7,7 @@ import { KanjiCard } from "@/components/sections/KanjiInfoCard/KanjiCard";
 import { KanjiDetails } from "@/components/sections/KanjiDetails/Details";
 import { KanjiActionsBtns } from "@/components/dependent/site-wide/KanjiActionBtns";
 import { useCrossfade } from "@/hooks/use-crossfade";
+import { ComponentSearchProvider } from "@/components/sections/KanjiDetails/ComponentSearchProvider";
 
 const Layout = ({
   first,
@@ -53,14 +54,16 @@ export const KanjiInfoContent = ({ kanji }: { kanji: string }) => {
   const fade = { style: { opacity, transition: "opacity 180ms ease" } };
   const card = <KanjiCard key={displayed} kanji={displayed} />;
   return (
-    <Layout
-      actionBar={<KanjiActionsBtns kanji={kanji} />}
-      first={<div {...fade}>{card}</div>}
-      second={
-        <div {...fade}>
-          <KanjiDetails kanji={displayed} smallScreenNode={card} />
-        </div>
-      }
-    />
+    <ComponentSearchProvider>
+      <Layout
+        actionBar={<KanjiActionsBtns kanji={kanji} />}
+        first={<div {...fade}>{card}</div>}
+        second={
+          <div {...fade}>
+            <KanjiDetails kanji={displayed} smallScreenNode={card} />
+          </div>
+        }
+      />
+    </ComponentSearchProvider>
   );
 };

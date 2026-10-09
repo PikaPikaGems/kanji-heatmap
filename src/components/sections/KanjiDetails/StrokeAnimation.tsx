@@ -93,7 +93,7 @@ const GradeStatusCopy = ({
   if (status === "error") {
     return (
       <div className="animate-fade-in">
-        すみません 🥺 🙇. The grader {`couldn't`} be loaded right now.
+        すみません 🙇🏽 🙇🏽‍♀️. The grader {`couldn't`} be loaded right now.
       </div>
     );
   }

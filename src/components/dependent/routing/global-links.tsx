@@ -3,7 +3,8 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { BookOpen, InfoIcon, Search } from "@/components/icons";
+import { BookOpen, Flower, InfoIcon } from "@/components/icons";
+import { Layers } from "lucide-react";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
   useRadicalPopoverText,
@@ -14,27 +15,41 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { RadicalDetailsDialogContent } from "@/components/dependent/site-wide/RadicalDetailsDialog";
 import { useRadicalSummary } from "@/components/dependent/site-wide/use-radical-summary";
 import { resolveRadicalForSearch } from "@/lib/radicals";
+import { useComponentSearchEntry } from "@/components/sections/KanjiDetails/use-component-search-entry";
 
 export const ComponentLink = ({
   component,
   keyword,
   title,
   type,
+  isClickable = true,
 }: {
   component: string;
   keyword: string;
   title?: string;
   type: "kanji" | "radical" | "unknown";
+  isClickable?: boolean;
 }) => {
+  const componentEntry = useComponentSearchEntry(component);
+  const link = !isClickable ? (
+    <FakeComponentLink radical={component} keyword={keyword} />
+  ) : type === "kanji" ? (
+    componentEntry ? (
+      <GlobalComponentLink component={component} keyword={keyword} isKanji />
+    ) : (
+      <FakeComponentLink radical={component} keyword={keyword} />
+    )
+  ) : type === "radical" ? (
+    <GlobalRadicalLink radical={component} keyword={keyword} />
+  ) : componentEntry ? (
+    <GlobalComponentLink component={component} keyword={keyword} />
+  ) : (
+    <FakeComponentLink radical={component} keyword={keyword} />
+  );
+
   return (
     <div className="flex flex-col text-center w-fit ">
-      {type === "kanji" ? (
-        <GlobalKanjiLink kanji={component} keyword={keyword} />
-      ) : type === "radical" ? (
-        <GlobalRadicalLink radical={component} keyword={keyword} />
-      ) : (
-        <FakeComponentLink radical={component} keyword={keyword} />
-      )}
+      {link}
       {title && (
         <div className="text-[10px] uppercase opacity-70 whitespace-nowrap">
           {title}
@@ -100,16 +115,18 @@ const RadicalJpCard = ({
   radical,
   keyword,
   fontSize,
+  isKanji = false,
 }: {
   radical: string;
   keyword: string;
   fontSize?: FontSize;
+  isKanji?: boolean;
 }) => (
   <JPCardInner
     label={keyword}
     character={radical}
     fontSize={fontSize}
-    badgeClassName="border border-black border-opacity-50"
+    badgeClassName={`border border-foreground/10 ${isKanji ? "border-solid" : "border-dashed"}`}
     badgeVariant="secondary"
   />
 );
@@ -145,12 +162,24 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
   return (
     <PopoverAction
       to={radicalSearchHref(searchText)}
-      icon={<Search size={14} />}
+      icon={<Flower size={14} />}
     >
-      Find kanji that include {searchText}
+      Search kanji by radical {searchText}
     </PopoverAction>
   );
 };
+
+const componentSearchHref = (component: string) =>
+  `/?search-type=components&search-text=${encodeURIComponent(component)}`;
+
+const ComponentSearchAction = ({ component }: { component: string }) => (
+  <PopoverAction
+    to={componentSearchHref(component)}
+    icon={<Layers size={14} />}
+  >
+    Search kanji by component {component}
+  </PopoverAction>
+);
 
 /** Opens the kanji page of a radical that is also a kanji (夕). */
 const OpenKanjiAction = ({
@@ -169,11 +198,87 @@ const OpenKanjiAction = ({
   );
 };
 
+export const ComponentPopoverContent = ({
+  component,
+  keyword,
+  isKanji,
+}: {
+  component: string;
+  keyword?: string;
+  isKanji: boolean;
+}) => {
+  const pathname = useUrlLocation();
+  const urlState = useKanjiFromUrl(component);
+
+  return (
+    <div className="max-w-xs p-1" data-vaul-no-drag>
+      <div className="flex gap-3 px-1">
+        <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
+          {component}
+        </div>
+        {keyword && keyword !== "..." && (
+          <div className="min-w-0 text-left">
+            <p className="text-sm font-bold whitespace-normal text-foreground">
+              {keyword}
+            </p>
+          </div>
+        )}
+      </div>
+      <DottedSeparator className="mx-1 mt-3" />
+      <div className="flex flex-col px-1 pt-2">
+        <ComponentSearchAction component={component} />
+        {isKanji && (
+          <PopoverAction
+            to={`${pathname}?${urlState}`}
+            icon={<BookOpen size={14} />}
+          >
+            Open kanji {component}
+            {keyword && keyword !== "..." && ` (${keyword})`}
+          </PopoverAction>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const GlobalComponentLink = ({
+  component,
+  keyword,
+  isKanji = false,
+}: {
+  component: string;
+  keyword: string;
+  isKanji?: boolean;
+}) => (
+  <GenericPopover
+    modal
+    contentClassName="z-[60] p-2"
+    trigger={
+      <button type="button" className={cnJPCardLink}>
+        <JPCardInner
+          label={keyword}
+          character={component}
+          badgeClassName={`border border-foreground/10 ${isKanji ? "border-solid" : "border-dotted"}`}
+          badgeVariant="secondary"
+        />
+      </button>
+    }
+    content={
+      <ComponentPopoverContent
+        component={component}
+        keyword={keyword}
+        isKanji={isKanji}
+      />
+    }
+  />
+);
+
 export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
   const { info, keyword, isKanji, name } = useRadicalSummary(radical);
   const { data: text } = useRadicalPopoverText(radical);
+  const componentEntry = useComponentSearchEntry(radical);
   return (
-    <div className="p-1 max-w-xs" data-vaul-no-drag>
+    <div className="max-w-xs p-1" data-vaul-no-drag>
       <div className="flex gap-3 px-1">
         <div className="flex items-center justify-center p-2 text-4xl leading-none size-14 rounded-xl bg-foreground/5 kanji-font">
           {radical}
@@ -220,6 +325,7 @@ export const RadicalPopoverContent = ({ radical }: { radical: string }) => {
           </Dialog>
         )}
         <RadicalSearchAction radical={radical} />
+        {componentEntry && <ComponentSearchAction component={radical} />}
         {isKanji && keyword && (
           <OpenKanjiAction kanji={radical} keyword={keyword} />
         )}
@@ -237,6 +343,8 @@ export const GlobalRadicalLink = ({
   keyword: string;
   fontSize?: FontSize;
 }) => {
+  const { isKanji } = useRadicalSummary(radical);
+
   return (
     <GenericPopover
       modal
@@ -247,6 +355,7 @@ export const GlobalRadicalLink = ({
             radical={radical}
             keyword={keyword}
             fontSize={fontSize}
+            isKanji={isKanji}
           />
         </button>
       }
@@ -270,7 +379,7 @@ export const FakeComponentLink = ({
         label={keyword ?? "..."}
         character={radical}
         fontSize={fontSize}
-        badgeClassName="border-black border-dashed opacity-50 border-opacity-2"
+        badgeClassName="border border-dotted border-foreground/10 opacity-50"
         badgeVariant="outline"
       />
     </div>
@@ -290,7 +399,12 @@ export const GlobalKanjiLink = ({
   const urlState = useKanjiFromUrl(kanji);
   return (
     <Link to={`${pathname}?${urlState}`} className={cnJPCardLink}>
-      <JPCardInner label={keyword} character={kanji} fontSize={fontSize} />
+      <JPCardInner
+        label={keyword}
+        character={kanji}
+        fontSize={fontSize}
+        badgeClassName="border border-solid border-foreground/10"
+      />
     </Link>
   );
 };

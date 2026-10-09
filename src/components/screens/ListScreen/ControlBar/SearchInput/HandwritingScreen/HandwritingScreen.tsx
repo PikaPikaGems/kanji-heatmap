@@ -90,7 +90,7 @@ const HandwritingResultsPreview = ({
     if (status === "success") {
       return (
         <div className={messageBoxCN}>
-          <div>すみません 🙇‍♀️ No match found. Try drawing again.</div>
+          <div>すみません 🙇🏽 🙇🏽‍♀️ No match found. Try drawing again.</div>
         </div>
       );
     }

@@ -19,7 +19,7 @@ export const DrawerCloseButton = () => (
     <Button
       variant="ghost"
       size="icon"
-      className="p-4 border-2 border-dashed rounded-xl bg-background z-1000!"
+      className="p-4 border-2 border-dashed rounded-xl bg-background z-[100]"
     >
       <CircleX className="size-8" />
     </Button>

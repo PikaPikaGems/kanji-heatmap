@@ -1,4 +1,9 @@
-import { useState, type ComponentProps, type ReactNode } from "react";
+import {
+  forwardRef,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { Download, UploadIcon } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
@@ -66,8 +71,12 @@ const BrowserGuide = ({
   </section>
 );
 
-export const InstallAppModalTrigger = (props: ComponentProps<"button">) => (
+export const InstallAppModalTrigger = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<"button">
+>((props, ref) => (
   <button
+    ref={ref}
     type="button"
     onPointerDown={(e) => e.stopPropagation()}
     className="inline-flex items-center gap-1 text-xs leading-loose underline cursor-pointer decoration-dotted underline-offset-4 hover:text-neon-accent whitespace-nowrap"
@@ -76,7 +85,8 @@ export const InstallAppModalTrigger = (props: ComponentProps<"button">) => (
     <Download size={14} />
     <strong>Install on iOS Guide ♥️</strong>
   </button>
-);
+));
+InstallAppModalTrigger.displayName = "InstallAppModalTrigger";
 
 export const InstallAppModal = ({
   open: openProp,

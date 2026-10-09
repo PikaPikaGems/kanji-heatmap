@@ -20,7 +20,6 @@ const BANDS: { min: number; label: string }[] = [
   { min: 4, label: "In 4–5 kanji" },
   { min: 3, label: "In 3 kanji" },
   { min: 2, label: "In 2 kanji" },
-  { min: 1, label: "In 1 kanji" },
 ];
 const bandOf = (matches: number) =>
   BANDS.find((band) => matches >= band.min) ?? BANDS[BANDS.length - 1];
@@ -41,7 +40,7 @@ const sortInBands = (drawer: DrawerEntry[]) =>
   );
 
 const BandHeading = ({ label }: { label: string }) => (
-  <div className="w-full px-1 pt-2 pb-1 text-xs font-bold text-left text-foreground/60">
+  <div className="w-full px-1 pt-2 pb-1 text-xs font-bold uppercase text-center text-foreground/60">
     {label}
   </div>
 );
@@ -115,6 +114,15 @@ export const ComponentScreenContent = ({
     return null;
   }
 
+  const bandCounts = ordered.reduce(
+    (counts, [, matches]) => {
+      const label = bandOf(matches).label;
+      counts[label] = (counts[label] ?? 0) + 1;
+      return counts;
+    },
+    {} as Record<string, number>
+  );
+
   return (
     <>
       <BandsSwitch showBands={showBands} onChange={setShowBands} />
@@ -135,7 +143,11 @@ export const ComponentScreenContent = ({
             (index === 0 || bandOf(ordered[index - 1][1]) !== band);
           return (
             <React.Fragment key={component}>
-              {startsBand && <BandHeading label={band.label} />}
+              {startsBand && (
+                <BandHeading
+                  label={`${band.label} (${bandCounts[band.label]})`}
+                />
+              )}
               <RadicalBtn
                 isDisabled={isDisabled}
                 onToggle={handleToggle}

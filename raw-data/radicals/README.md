@@ -217,7 +217,8 @@ expanded to every depth by
   ways for one shape; see "Component merges vs radical aliases" below.
 - Kanji are written in the forms we ship, with `jouyouForms` from
   `raw-data/misc/ours.json` (剝 → 剥). Kanji we don't ship are dropped, then
-  components with no kanji left.
+  components with no kanji left. Components with only one search result are
+  also dropped; a result includes the component itself when it is a kanji.
 - The file is in drawer order: most matches first. A match is a kanji that
   contains the component, plus the component itself when it's a kanji we
   ship (search returns it too). Ties go to fewer strokes (the kanji's own
