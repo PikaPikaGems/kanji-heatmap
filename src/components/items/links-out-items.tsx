@@ -1,6 +1,6 @@
 import { outLinks } from "@/lib/external-links";
-import { BugIcon, DiscordIcon } from "../icons";
-import { BirdIcon, InstagramIcon, Mail } from "lucide-react";
+import { BugIcon, DiscordIcon, InstagramIcon } from "../icons";
+import { BirdIcon, Mail } from "lucide-react";
 
 const bugItem = {
   href: outLinks.githubIssue,

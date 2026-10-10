@@ -41,7 +41,7 @@ export const VocabActions = ({
         <JishoBtn word={word} />
       </BugIconErrorBoundary>
       */}
-      <SpeakButton word={word} iconType="volume-2" />
+      <SpeakButton word={word} iconType="headphones" />
       {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />}
       <CopyButton textToCopy={word} iconType={"clipboard"} />
 
@@ -72,7 +72,7 @@ export const VocabActions = ({
                 text={"Listen to Kana reading"}
               />
               <IconMeanings
-                btn={<SpeakButton word={word} iconType="volume-2" />}
+                btn={<SpeakButton word={word} iconType="headphones" />}
                 text={"Listen to default reading"}
               />
             </div>
