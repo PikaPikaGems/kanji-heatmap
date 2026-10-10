@@ -1,4 +1,4 @@
-import { Library } from "lucide-react";
+import { BookType } from "lucide-react";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
 import {
@@ -107,7 +107,7 @@ export const JotobaContent = ({ word }: { word: string }) => {
 export const JotobaBtn = ({ word }: { word: string }) => {
   return (
     <DictionaryPopoverShell
-      icon={<Library />}
+      icon={<BookType />}
       contentClassName="px-4 py-2 overflow-y-scroll max-w-64 min-w-36 max-h-48"
     >
       <JotobaContent word={word} />

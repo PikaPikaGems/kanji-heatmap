@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import { BookUser } from "lucide-react";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
 import {
@@ -114,7 +114,7 @@ export const JishoContent = ({ word }: { word: string }) => {
 export const JishoBtn = ({ word }: { word: string }) => {
   return (
     <DictionaryPopoverShell
-      icon={<BookOpen />}
+      icon={<BookUser />}
       contentClassName="p-4 overflow-y-scroll max-h-48 min-w-36 max-w-64"
     >
       <JishoContent word={word} />

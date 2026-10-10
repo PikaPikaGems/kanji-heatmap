@@ -1,4 +1,5 @@
 import GithubIcon from "./GithubIcon";
+import InstagramIcon from "./InstagramIcon";
 import KoFiIcon from "./NewKoFiIcon";
 import DiscordIcon from "./DiscordIcon";
 
@@ -42,6 +43,7 @@ import {
 } from "lucide-react";
 export {
   GithubIcon,
+  InstagramIcon,
   KoFiIcon,
   DiscordIcon,
   InfoIcon,

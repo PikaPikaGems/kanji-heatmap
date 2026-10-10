@@ -1,4 +1,4 @@
-import { Globe } from "lucide-react";
+import { BookA } from "lucide-react";
 import { SpanBadge } from "@/components/ui/badge";
 import { useJsonFetch } from "@/hooks/use-json";
 import {
@@ -75,7 +75,7 @@ export const KanjiApiContent = ({ word }: { word: string }) => {
 export const KanjiApiBtn = ({ word }: { word: string }) => {
   return (
     <DictionaryPopoverShell
-      icon={<Globe />}
+      icon={<BookA />}
       contentClassName="p-4 overflow-y-scroll max-h-48 min-w-36 max-w-64"
     >
       <KanjiApiContent word={word} />

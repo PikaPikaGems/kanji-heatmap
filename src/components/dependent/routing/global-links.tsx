@@ -3,8 +3,11 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { Badge } from "@/components/ui/badge";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { BookOpen, Flower, InfoIcon } from "@/components/icons";
-import { Layers } from "lucide-react";
+import { BookOpen, InfoIcon } from "@/components/icons";
+import {
+  ComponentSearchIcon,
+  RadicalSearchIcon,
+} from "@/components/common/SearchTypeIcon";
 import { useKanjiFromUrl, useUrlLocation } from "@/hooks/routing-hooks";
 import {
   useRadicalPopoverText,
@@ -160,7 +163,7 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
   return (
     <PopoverAction
       to={radicalSearchHref(searchText)}
-      icon={<Flower size={14} />}
+      icon={<RadicalSearchIcon size={14} />}
     >
       Search kanji by radical {searchText}
     </PopoverAction>
@@ -170,7 +173,7 @@ export const RadicalSearchAction = ({ radical }: { radical: string }) => {
 const ComponentSearchAction = ({ component }: { component: string }) => (
   <PopoverAction
     to={componentSearchHref(component)}
-    icon={<Layers size={14} />}
+    icon={<ComponentSearchIcon size={14} />}
   >
     Search kanji by component {component}
   </PopoverAction>

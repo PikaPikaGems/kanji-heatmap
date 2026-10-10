@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { outLinks } from "@/lib/external-links";
 import ChangeFontButton from "./ChangeFontButton";
-import { DotIcon, Flower } from "../../icons";
-import { Layers } from "lucide-react";
+import { DotIcon } from "../../icons";
+import {
+  ComponentSearchIcon,
+  RadicalSearchIcon,
+} from "@/components/common/SearchTypeIcon";
 import { NextPrevLinks } from "../routing/NextPrevLinks";
 import { Link } from "../routing/router-adapter";
 import { componentSearchHref, radicalSearchHref } from "@/lib/search-hrefs";
@@ -69,7 +72,7 @@ const RadicalSearchButton = ({ kanji }: { kanji: string }) => {
     <SearchLinkButton
       to={radicalSearchHref(searchText)}
       label={`Search kanji by radical ${searchText}`}
-      icon={<Flower />}
+      icon={<RadicalSearchIcon />}
     />
   );
 };
@@ -82,7 +85,7 @@ const ComponentSearchButton = ({ kanji }: { kanji: string }) => {
     <SearchLinkButton
       to={componentSearchHref(kanji)}
       label={`Search kanji by component ${kanji}`}
-      icon={<Layers />}
+      icon={<ComponentSearchIcon />}
     />
   );
 };
@@ -90,7 +93,7 @@ const ComponentSearchButton = ({ kanji }: { kanji: string }) => {
 export const KanjiActions = ({ kanji }: { kanji: string }) => {
   return (
     <>
-      <SpeakButton word={kanji} iconType="volume-2" />
+      <SpeakButton word={kanji} iconType="headphones" />
       <CopyButton textToCopy={kanji} iconType="clipboard" />
       <CopyButton textToCopy={kanjiPageUrl(kanji)} iconType="link" />
       <ShareKanjiButton kanji={kanji} />
