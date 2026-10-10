@@ -21,5 +21,16 @@ const DEFAULT_SETTINGS: ActivityHeatmapSettings = {
 };
 
 /** Duration, kind filters, and compact/wide layout for the activity heatmap. */
-export const useActivityHeatmapSettings = () =>
-  useLocalStorage<ActivityHeatmapSettings>(STORAGE_KEY, DEFAULT_SETTINGS);
+export const useActivityHeatmapSettings = () => {
+  const [settings, setSetting] = useLocalStorage<ActivityHeatmapSettings>(
+    STORAGE_KEY,
+    DEFAULT_SETTINGS
+  );
+  // Filters saved before an activity kind existed lack its key; default the
+  // missing ones on instead of treating them as unchecked.
+  const withAllKinds: ActivityHeatmapSettings = {
+    ...settings,
+    filters: { ...DEFAULT_KIND_FILTERS, ...settings.filters },
+  };
+  return [withAllKinds, setSetting] as const;
+};

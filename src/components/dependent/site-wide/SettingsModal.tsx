@@ -12,7 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, Download, Loader2, CircleX } from "@/components/icons";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
+import { useStorageValue } from "@/hooks/use-storage-value";
 import { useTheme } from "@/providers/theme-hooks";
 import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
@@ -23,7 +30,12 @@ import {
   preloadKatakanaChallenges,
   clearKanjiSvgCache,
   clearKatakanaCache,
+  preloadFillTheKanjiSet,
+  clearFillTheKanjiSetCache,
+  fillTheKanjiPreloadKey,
+  FILL_THE_KANJI_PRELOAD_KEY_PREFIX,
 } from "@/lib/offline-preload";
+import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/common/SpeakButton";
@@ -183,6 +195,50 @@ const DataDownloadRow = ({
   );
 };
 
+const countDownloadedFillTheKanjiSets = () =>
+  FILL_THE_KANJI_SETS.filter(
+    ({ id }) => localStorage.getItem(fillTheKanjiPreloadKey(id)) === "true"
+  ).length;
+
+const FillTheKanjiDownloads = () => {
+  const downloaded = useStorageValue(
+    countDownloadedFillTheKanjiSets,
+    (key) => key === null || key.startsWith(FILL_THE_KANJI_PRELOAD_KEY_PREFIX)
+  );
+
+  return (
+    <Accordion type="single" collapsible>
+      <AccordionItem value="fill-the-kanji" className="border-b-0">
+        <AccordionTrigger className="py-3 text-left hover:no-underline">
+          <span className="flex flex-col">
+            <span className="text-sm font-semibold">
+              Download Fill the Kanji Challenges
+            </span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {downloaded}/{FILL_THE_KANJI_SETS.length} challenge sets
+              downloaded
+            </span>
+          </span>
+        </AccordionTrigger>
+        <AccordionContent className="pb-0 pl-3 border-l-2 border-dotted">
+          {FILL_THE_KANJI_SETS.map(({ id, label, sizeHint }) => (
+            <DataDownloadRow
+              key={id}
+              label={label}
+              sizeHint={sizeHint}
+              completeKey={fillTheKanjiPreloadKey(id)}
+              startPreload={(onProgress) =>
+                preloadFillTheKanjiSet(id, onProgress)
+              }
+              clearCache={() => clearFillTheKanjiSetCache(id)}
+            />
+          ))}
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+};
+
 const FontGrid = () => {
   const [fontIndex, setFont] = useCurrentFont();
 
@@ -324,6 +380,7 @@ export const SettingsModal = ({
             startPreload={preloadKatakanaChallenges}
             clearCache={clearKatakanaCache}
           />
+          <FillTheKanjiDownloads />
         </section>
 
         <section className="mt-6">

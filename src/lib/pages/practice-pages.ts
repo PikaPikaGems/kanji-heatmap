@@ -24,8 +24,17 @@ export const speedKatakanaPageMeta = {
   description: "Type katakana words as quickly as you can",
 } as const;
 
+export const fillTheKanjiPageMeta = {
+  href: "/fill-the-kanji",
+  title: "Fill the Kanji",
+  shortLabel: "Fill the Kanji",
+  heading: "🧩 Fill the Kanji",
+  description: "Complete sentences by picking the missing kanji",
+} as const;
+
 export const practicePageLinks = [
   recognitionPracticePageMeta,
   productionPracticePageMeta,
   speedKatakanaPageMeta,
+  fillTheKanjiPageMeta,
 ] as const;

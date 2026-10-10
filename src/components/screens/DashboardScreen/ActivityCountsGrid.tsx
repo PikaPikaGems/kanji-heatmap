@@ -1,5 +1,6 @@
-import { Eye, Keyboard, PenLine } from "lucide-react";
+import { Eye, Keyboard, PenLine, Puzzle } from "lucide-react";
 import {
+  fillTheKanjiPageMeta,
   productionPracticePageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
@@ -10,15 +11,17 @@ export type ActivityCountsDisplay = {
   speedKatakanaDays: number;
   productionDays: number;
   recognitionDays: number;
+  fillTheKanjiDays: number;
   speedKatakanaSessions: number;
   productionRounds: number;
   recognitionRounds: number;
+  fillTheKanjiRounds: number;
 };
 
 const COUNTS_ROW_CN =
-  "grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3";
+  "grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3";
 
-/** Day totals + session/round totals (3-up centered text / capped row). */
+/** Day totals + session/round totals (2×2 centered text / capped row). */
 export const ActivityCountsGrid = ({
   stats,
 }: {
@@ -47,6 +50,13 @@ export const ActivityCountsGrid = ({
         Icon={Keyboard}
         compact
       />
+      <OverviewStat
+        value={stats.fillTheKanjiDays}
+        title={fillTheKanjiPageMeta.shortLabel}
+        unit="Days"
+        Icon={Puzzle}
+        compact
+      />
     </div>
     <div className={COUNTS_ROW_CN}>
       <OverviewStat
@@ -68,6 +78,13 @@ export const ActivityCountsGrid = ({
         title={speedKatakanaPageMeta.shortLabel}
         unit="Sessions"
         Icon={Keyboard}
+        compact
+      />
+      <OverviewStat
+        value={stats.fillTheKanjiRounds}
+        title={fillTheKanjiPageMeta.shortLabel}
+        unit="Rounds"
+        Icon={Puzzle}
         compact
       />
     </div>

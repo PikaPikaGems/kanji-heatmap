@@ -4,6 +4,7 @@ import { ScreenShell } from "@/components/common/ScreenShell";
 import { StatsOverview } from "./StatsOverview";
 import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaHeatmap } from "./SpeedKatakanaHeatmap";
+import { FillTheKanjiHeatmap } from "./FillTheKanjiHeatmap";
 import { BookmarksBreakdown } from "./BookmarksBreakdown";
 
 const showTitle = false;
@@ -24,6 +25,7 @@ const DashboardScreen = () => {
       <StatsOverview />
       <ActivityCalendarHeatmap />
       <SpeedKatakanaHeatmap />
+      <FillTheKanjiHeatmap />
       <BookmarksBreakdown />
     </ScreenShell>
   );

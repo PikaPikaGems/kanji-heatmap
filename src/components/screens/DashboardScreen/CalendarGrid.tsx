@@ -1,5 +1,6 @@
 import {
   ACTIVITY_KIND_LABELS,
+  ALL_ACTIVITY_KINDS,
   ActivityByDay,
   ActivityKindFilters,
   dayTotalForFilters,
@@ -47,11 +48,11 @@ const DayDetail = ({
           ? "No activity"
           : `${total} event${total === 1 ? "" : "s"}`}
       </div>
-      {(["speedKatakana", "production", "recognition"] as const).map((kind) =>
+      {ALL_ACTIVITY_KINDS.map((kind) =>
         filters[kind] ? (
           <div key={kind} className="flex justify-between gap-4">
             <span>{ACTIVITY_KIND_LABELS[kind]}</span>
-            <span className="font-bold tabular-nums">{day[kind]}</span>
+            <span className="font-bold tabular-nums">{day[kind] ?? 0}</span>
           </div>
         ) : null
       )}

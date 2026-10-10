@@ -263,6 +263,105 @@ button {
   }
 }
 
+/* Fill the Kanji: a picked kanji falls into its blank and lands with a
+   squash-and-stretch, like a jelly hitting the table. */
+.animate-practice-fill-land {
+  animation: practice-fill-land 0.5s ease-out both;
+  transform-origin: 50% 100%;
+}
+
+@keyframes practice-fill-land {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.8em) scale(0.85, 1.2);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(0) scale(1.25, 0.75);
+  }
+  65% {
+    transform: translateY(-0.08em) scale(0.92, 1.1);
+  }
+  82% {
+    transform: translateY(0) scale(1.04, 0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+/* Fill the Kanji: a removed kanji shrinks and fades out of its blank. */
+.animate-practice-fade-out {
+  animation: practice-fade-out 0.22s ease-in both;
+}
+
+@keyframes practice-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.6) translateY(0.15em);
+  }
+}
+
+/* Fill the Kanji: correct blanks hop and send out a green ring that fades
+   as it grows (staggered per blank with animation-delay, so it ripples
+   across the sentence). */
+.animate-practice-correct-pop {
+  animation: practice-correct-pop 0.7s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+@keyframes practice-correct-pop {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0.7);
+  }
+  35% {
+    transform: translateY(-0.18em) scale(1.12);
+  }
+  70% {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 0 0 0.4em rgb(34 197 94 / 0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0);
+  }
+}
+
+/* Fill the Kanji: a wrong blank fades in red and shakes. */
+.animate-practice-shake {
+  animation:
+    fade-in 0.25s ease-out both,
+    practice-shake 0.45s ease-in-out 0.1s both;
+}
+
+@keyframes practice-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-practice-fill-land,
+  .animate-practice-correct-pop,
+  .animate-practice-shake {
+    animation: fade-in 0.2s ease-out both;
+  }
+}
+
 .animate-practice-bounce-soft {
   animation: practice-cheer-bloom 1.35s ease-out both;
 }

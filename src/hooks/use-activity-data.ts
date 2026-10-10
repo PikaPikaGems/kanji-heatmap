@@ -38,5 +38,6 @@ export const useActivityData = () => {
     speedKatakanaDays: number;
     productionDays: number;
     recognitionDays: number;
+    fillTheKanjiDays: number;
   };
 };

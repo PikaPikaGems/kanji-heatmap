@@ -1,5 +1,6 @@
 import { Link } from "@/components/dependent/routing";
 import {
+  fillTheKanjiPageMeta,
   productionPracticePageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
@@ -17,6 +18,10 @@ const practiceLinks = [
   {
     href: recognitionPracticePageMeta.href,
     label: recognitionPracticePageMeta.shortLabel,
+  },
+  {
+    href: fillTheKanjiPageMeta.href,
+    label: fillTheKanjiPageMeta.shortLabel,
   },
 ] as const;
 

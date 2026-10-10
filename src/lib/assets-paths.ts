@@ -31,6 +31,7 @@ const assetsPaths = {
   KANJI_STRUCTURES: "/json/v2/kanji_structures.json",
   ICON_SVG: "/img/app-icon.svg",
   SPEED_KATAKANA_CHALLENGE_SET: "/json/katakana/challenge-set-", // append `<setNumber>.json`
+  FILL_THE_KANJI_SET: "/json/fill-the-kanji/", // append `<setId>.json`
   SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",
 };
 

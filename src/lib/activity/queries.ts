@@ -32,9 +32,11 @@ export const summarizeActivityInRange = (
   let speedKatakanaDays = 0;
   let productionDays = 0;
   let recognitionDays = 0;
+  let fillTheKanjiDays = 0;
   let speedKatakanaSessions = 0;
   let productionRounds = 0;
   let recognitionRounds = 0;
+  let fillTheKanjiRounds = 0;
 
   for (const [key, day] of Object.entries(byDay)) {
     if (!isDateKeyInRange(key, range)) continue;
@@ -42,6 +44,7 @@ export const summarizeActivityInRange = (
     const speedKatakana = day.speedKatakana ?? 0;
     const production = day.production ?? 0;
     const recognition = day.recognition ?? 0;
+    const fillTheKanji = day.fillTheKanji ?? 0;
 
     if (filters.speedKatakana) {
       speedKatakanaSessions += speedKatakana;
@@ -55,6 +58,10 @@ export const summarizeActivityInRange = (
       recognitionRounds += recognition;
       if (recognition > 0) recognitionDays += 1;
     }
+    if (filters.fillTheKanji) {
+      fillTheKanjiRounds += fillTheKanji;
+      if (fillTheKanji > 0) fillTheKanjiDays += 1;
+    }
 
     if (dayTotalForFilters(day, filters) > 0) daysActive += 1;
   }
@@ -64,9 +71,11 @@ export const summarizeActivityInRange = (
     speedKatakanaDays,
     productionDays,
     recognitionDays,
+    fillTheKanjiDays,
     speedKatakanaSessions,
     productionRounds,
     recognitionRounds,
+    fillTheKanjiRounds,
   };
 };
 
@@ -77,22 +86,31 @@ export const countAllDaysActive = (
   byDay: ActivityByDay
 ): Pick<
   WindowedActivityStats,
-  "daysActive" | "speedKatakanaDays" | "productionDays" | "recognitionDays"
+  | "daysActive"
+  | "speedKatakanaDays"
+  | "productionDays"
+  | "recognitionDays"
+  | "fillTheKanjiDays"
 > => {
   let daysActive = 0;
   let speedKatakanaDays = 0;
   let productionDays = 0;
   let recognitionDays = 0;
+  let fillTheKanjiDays = 0;
 
   for (const day of Object.values(byDay)) {
     const speedKatakana = day.speedKatakana ?? 0;
     const production = day.production ?? 0;
     const recognition = day.recognition ?? 0;
+    const fillTheKanji = day.fillTheKanji ?? 0;
 
     if (speedKatakana > 0) speedKatakanaDays += 1;
     if (production > 0) productionDays += 1;
     if (recognition > 0) recognitionDays += 1;
-    if (speedKatakana + production + recognition > 0) daysActive += 1;
+    if (fillTheKanji > 0) fillTheKanjiDays += 1;
+    if (speedKatakana + production + recognition + fillTheKanji > 0) {
+      daysActive += 1;
+    }
   }
 
   return {
@@ -100,6 +118,7 @@ export const countAllDaysActive = (
     speedKatakanaDays,
     productionDays,
     recognitionDays,
+    fillTheKanjiDays,
   };
 };
 

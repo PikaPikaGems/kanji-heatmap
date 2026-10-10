@@ -33,6 +33,28 @@ kanji drawer stay empty unless you fill these folders (paths are in
 - `public/kanji-words/v6/<KANJI>.json`
 - `public/kanji-textbook-words-min/<KANJI>.json`
 
+The Fill the Kanji sentence sources (`raw-data/fill-the-kanji/*.tsv`) aren't
+committed either, but what the app fetches from them is: the generated
+`public/json/fill-the-kanji/<set>.json` files and
+`src/lib/fill-the-kanji/set-sizes.json`. You only need the TSVs to change the
+sentences. Get them from the maintainer, put them in `raw-data/fill-the-kanji/`,
+then run:
+
+```bash
+pnpm run generate-fill-the-kanji
+```
+
+and commit the regenerated JSON. If you replace a TSV, run
+`pnpm run sort-fill-the-kanji` before generating: it orders each set easiest
+first, by each sentence's hardest kanji: JLPT level (N5 → N1 → not in JLPT),
+then Jouyou grade, then Google frequency. Sets listed under `keepFileOrder` in
+`raw-data/fill-the-kanji/ours.json` (🌱 Basic) keep their own order.
+
+A round is 20 rows in file order, so add new
+rows at the end of a TSV. Inserting or deleting rows in the middle moves
+sentences into different rounds, and players' stats stay with the round
+numbers, not the sentences.
+
 Everything else the app fetches is committed.
 
 ## Checks
