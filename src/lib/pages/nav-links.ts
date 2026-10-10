@@ -5,10 +5,12 @@ import {
   Keyboard,
   LayoutDashboard,
   PenLine,
+  Puzzle,
   SearchIcon,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import {
+  fillTheKanjiPageMeta,
   productionPracticePageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
@@ -54,6 +56,7 @@ export const practiceNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
   { ...speedKatakanaPageMeta, Icon: Keyboard },
+  { ...fillTheKanjiPageMeta, Icon: Puzzle },
 ];
 
 /** Bottom floating island tabs (Dashboard / Explore / Mastery). */
@@ -71,5 +74,6 @@ export const headerNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
   { ...speedKatakanaPageMeta, Icon: Keyboard },
+  { ...fillTheKanjiPageMeta, Icon: Puzzle },
   { ...cumUseGraphPageMeta, Icon: ChartLine },
 ];

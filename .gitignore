@@ -16,6 +16,9 @@ public/kanji-words/*
 public/kanji-textbook-words/*
 public/kanji-textbook-words-min/*
 public/json/katakana/*
+# Fill the Kanji source sentences aren't committed; the generated
+# public/json/fill-the-kanji/*.json are. See README "Data that isn't in the repo".
+raw-data/fill-the-kanji/*.tsv
 public/js/*
 
 dist-ssr

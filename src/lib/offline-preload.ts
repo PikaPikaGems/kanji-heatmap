@@ -1,12 +1,14 @@
 import assetsPaths from "@/lib/assets-paths";
 import { localKanjiSvgUrl } from "@/lib/kanji-svg-url";
 import type { MainKanjiInfoResponseType } from "@/lib/kanji/kanji-worker-types";
+import type { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
 
 const CONCURRENCY = 6;
 const KATAKANA_CHALLENGE_SET_COUNT = 200;
 
 export const KANJI_SVG_CACHE_NAME = "kanji-svg-cache";
 export const KATAKANA_CACHE_NAME = "kanji-heatmap-katakana-cache";
+export const FILL_THE_KANJI_CACHE_NAME = "kanji-heatmap-fill-the-kanji-cache";
 
 type CancellablePreload = {
   promise: Promise<void>;
@@ -15,6 +17,16 @@ type CancellablePreload = {
 
 const katakanaChallengeUrl = (setNumber: number) =>
   `${assetsPaths.SPEED_KATAKANA_CHALLENGE_SET}${setNumber}.json`;
+
+export const fillTheKanjiSetUrl = (setId: FillTheKanjiSetId) =>
+  `${assetsPaths.FILL_THE_KANJI_SET}${setId}.json`;
+
+/** localStorage flag set once a challenge set has been downloaded. */
+export const FILL_THE_KANJI_PRELOAD_KEY_PREFIX =
+  "fill-the-kanji-preload-complete-";
+
+export const fillTheKanjiPreloadKey = (setId: FillTheKanjiSetId) =>
+  `${FILL_THE_KANJI_PRELOAD_KEY_PREFIX}${setId}`;
 
 /**
  * Fires `fetch` for each url with bounded concurrency so the existing
@@ -88,6 +100,21 @@ export function preloadKatakanaChallenges(
     katakanaChallengeUrl(i + 1)
   );
   return runPool(urls, onProgress);
+}
+
+/** One request: each challenge set is a single file. */
+export function preloadFillTheKanjiSet(
+  setId: FillTheKanjiSetId,
+  onProgress?: (done: number, total: number) => void
+): CancellablePreload {
+  return runPool([fillTheKanjiSetUrl(setId)], onProgress);
+}
+
+/** Removes one set's file, leaving the other sets in the shared cache. */
+export async function clearFillTheKanjiSetCache(setId: FillTheKanjiSetId) {
+  if (!("caches" in window)) return;
+  const cache = await caches.open(FILL_THE_KANJI_CACHE_NAME);
+  await cache.delete(new URL(fillTheKanjiSetUrl(setId), window.location.href));
 }
 
 export async function clearKanjiSvgCache() {

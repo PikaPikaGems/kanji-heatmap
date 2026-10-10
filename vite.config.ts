@@ -255,7 +255,8 @@ const pwaConfig = {
         After the initial fetch, offline access is supported.
       */
       /*
-      Two rules, not one, because these are different populations sharing one
+      Separate rules (fill-the-kanji has its own too, below) because these are
+      different populations sharing one
       LRU otherwise: 11 core data files against 200 speed-katakana challenge
       sets. A single cache capped at 50 entries meant playing a few rounds of
       speed katakana could evict kanji_main.json — the file the whole app waits
@@ -265,7 +266,7 @@ const pwaConfig = {
       {
         // Core kanji data. 11 files today, all of which a heavy session touches,
         // so the cap only needs headroom for the layout changing.
-        urlPattern: /\/json\/(?!katakana\/).*\.json$/i,
+        urlPattern: /\/json\/(?!katakana\/|fill-the-kanji\/).*\.json$/i,
         handler: "StaleWhileRevalidate" as const,
         options: {
           cacheName: "kanji-heatmap-json-cache",
@@ -285,6 +286,21 @@ const pwaConfig = {
           expiration: {
             maxEntries: 230,
             maxAgeSeconds: 365 * 24 * 60 * 60, // 1 week
+          },
+        },
+      },
+      {
+        // Fill-the-kanji challenge sets: 13 files, one per set (up to ~1.2 MB
+        // each). Kept out of the core cache for the same eviction reason as
+        // katakana. CacheFirst like katakana: the sentences aren't expected
+        // to change, so a cached set is never re-fetched.
+        urlPattern: /\/json\/fill-the-kanji\/.*\.json$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "kanji-heatmap-fill-the-kanji-cache",
+          expiration: {
+            maxEntries: 30,
+            maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
           },
         },
       },

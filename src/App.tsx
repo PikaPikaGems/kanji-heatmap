@@ -29,6 +29,7 @@ const {
   termsPage,
   privacyPage,
   speedKatakanaPage,
+  fillTheKanjiPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
 } = pageItems;
@@ -56,6 +57,11 @@ const App = () => {
               <Route
                 path={speedKatakanaPage.href}
                 component={speedKatakanaPage.Component}
+              />
+              {/* Fill the Kanji uses the shared practice shell + header. */}
+              <Route
+                path={fillTheKanjiPage.href}
+                component={fillTheKanjiPage.Component}
               />
               {/* Recognition practice has its own header. */}
               <Route

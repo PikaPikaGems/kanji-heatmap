@@ -53,7 +53,7 @@ const accuracyToBand = (accuracy: number | undefined): FreqCategory => {
   return 4;
 };
 
-const attemptCountToBand = (count: number | undefined): FreqCategory => {
+export const attemptCountToBand = (count: number | undefined): FreqCategory => {
   const value = count ?? 0;
   if (value <= 0) return 0;
   if (value === 1) return 1;
@@ -70,7 +70,7 @@ const ACCURACY_BAND_LABELS: Record<FreqCategory, string> = {
   4: "90–100% accuracy",
 };
 
-const ATTEMPT_COUNT_BAND_LABELS: Record<FreqCategory, string> = {
+export const ATTEMPT_COUNT_BAND_LABELS: Record<FreqCategory, string> = {
   0: "Not attempted",
   1: "1 attempt",
   2: "2–3 attempts",

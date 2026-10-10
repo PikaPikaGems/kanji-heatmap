@@ -64,7 +64,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const { settings, setSetting, selectChallengeSet } =
     useChallengeSearchParam();
 
-  const { summary, levelCompletion } = useSpeedKatakanaProgress();
+  const { summary } = useSpeedKatakanaProgress();
 
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled
@@ -169,7 +169,6 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
 
             <ChallengeSetSelector
               challengeSet={settings.challengeSet}
-              levelCompletion={levelCompletion}
               onSelect={selectChallengeSet}
             />
           </div>

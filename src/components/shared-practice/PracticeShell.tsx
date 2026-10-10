@@ -3,8 +3,12 @@ import { PracticeHeader } from "@/components/site-layout/PracticeHeader";
 
 /**
  * Full-screen practice layout.
- * No scrollbar-padding compensation — opening the kanji drawer must not
- * shift content horizontally (same approach as recognition-practice).
+ *
+ * The body always reserves a scrollbar (`overflow-y: scroll` in index.css).
+ * Opening a select, popover or drawer locks scroll, which removes it, so this
+ * fixed shell grows by the scrollbar width and centered content jumps
+ * sideways. `fix-scroll-layout-shift-right` on <main> pads the removed width
+ * back (the header already has it), and is 0 when nothing is locked.
  */
 export const PracticeShell = ({
   progress,
@@ -26,6 +30,8 @@ export const PracticeShell = ({
     style={height != null ? { height } : undefined}
   >
     <PracticeHeader progress={progress} />
-    <main className={`flex-1 min-h-0 overflow-hidden`}>{children}</main>
+    <main className="flex-1 min-h-0 overflow-hidden fix-scroll-layout-shift-right">
+      {children}
+    </main>
   </div>
 );
