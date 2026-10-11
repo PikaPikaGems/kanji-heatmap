@@ -167,7 +167,11 @@ export const Game = ({
 
       {/* Stays mounted under the answer drawer so nothing shifts on submit. */}
       <div className="shrink-0 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-        <div className="flex flex-col w-full max-w-md gap-3 mx-auto">
+        <div
+          className={`flex flex-col w-full max-w-md gap-3 mx-auto ${
+            tiles.length === 12 ? "sm:max-w-2xl" : ""
+          }`}
+        >
           <TileGrid tiles={tiles} onPick={game.pickTile} />
           <div className="grid grid-cols-2 gap-2">
             <PracticeButton

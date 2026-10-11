@@ -2,7 +2,7 @@
 
 export const recognitionPracticePageMeta = {
   href: "/reading-practice",
-  title: "Kanji Reading Practice",
+  title: "Reading Practice",
   shortLabel: "Reading Practice",
   heading: "👁️ Kanji Reading",
   description: "Type the correct reading for each word",
@@ -10,7 +10,7 @@ export const recognitionPracticePageMeta = {
 
 export const productionPracticePageMeta = {
   href: "/writing-practice",
-  title: "Kanji Writing Practice",
+  title: "Writing Practice",
   shortLabel: "Writing Practice",
   heading: "✍️ Kanji Writing",
   description: "Complete words by drawing the missing kanji",

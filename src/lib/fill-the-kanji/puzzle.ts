@@ -18,11 +18,11 @@ export const isTileCount = (v: unknown): v is TileCount =>
   TILE_COUNT_OPTIONS.some((n) => n === v);
 
 /**
- * Keyboard shortcut per tile, in tile order. With 12 tiles (two rows of six)
- * the bottom row is the keyboard's top letter row under the digits.
+ * Keyboard shortcut per tile, in tile order. With 12 tiles the digits run
+ * 1-0, then q and w from the keyboard's top letter row.
  */
 export const tileShortcutKeys = (tileCount: number): string[] =>
-  (tileCount === 12 ? "123456qwerty" : "12345678").split("");
+  (tileCount === 12 ? "1234567890qw" : "12345678").split("");
 
 /** One character of the sentence; `blank` indexes `Puzzle.blanks` when hidden. */
 export type PuzzleChar = { char: string; blank: number | null };

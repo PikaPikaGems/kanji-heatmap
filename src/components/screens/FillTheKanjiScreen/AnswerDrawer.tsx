@@ -5,8 +5,10 @@ import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { SpanBadge } from "@/components/ui/badge";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
+import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
-import { FuriganaSentence } from "./SentencePrompt";
+import type { Puzzle } from "@/lib/fill-the-kanji/puzzle";
+import { type BlankResult, FuriganaSentence } from "./SentencePrompt";
 import { SpeakButtons } from "./SpeakButtons";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
@@ -18,6 +20,9 @@ export type AnswerState = {
   open: boolean;
   item: FillTheKanjiItem;
   kind: FeedbackKind;
+  puzzle: Puzzle;
+  /** How each blank was answered; all null when the card was forgotten. */
+  blankResults: BlankResult[];
 } | null;
 
 const TITLES: Record<FeedbackKind, string> = {
@@ -86,6 +91,7 @@ export const AnswerDrawer = ({
   onContinue: () => void;
 }) => {
   const open = answer?.open ?? false;
+  const getKanjiInfo = useGetKanjiInfoFn();
 
   // Don't treat the Enter that submitted the answer as "Continue".
   useArmedConfirmKey({
@@ -95,7 +101,7 @@ export const AnswerDrawer = ({
   });
 
   if (!answer) return null;
-  const { item, kind } = answer;
+  const { item, kind, puzzle, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
 
   return (
@@ -104,11 +110,14 @@ export const AnswerDrawer = ({
       // The shell's title is text-lg; these headings read better smaller.
       title={<span className="text-xs">{TITLES[kind]}</span>}
       description={
-        <div className="max-h-[30dvh] overflow-y-auto px-1">
+        <div className="max-h-[45dvh] overflow-y-auto px-1">
           {/* text-foreground: the drawer description is muted by default. */}
           <FuriganaSentence
             jp={item.jp}
-            className="text-2xl sm:text-3xl text-foreground"
+            puzzle={puzzle}
+            blankResults={blankResults}
+            getInfo={getKanjiInfo ?? undefined}
+            className="text-4xl sm:text-[2.5rem] text-foreground"
           />
           <p className="pt-1 text-xs text-foreground">{item.en}</p>
         </div>
