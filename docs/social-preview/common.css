@@ -1,0 +1,67 @@
+@font-face {
+  font-family: "NSJ";
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-400-normal.woff2");
+}
+@font-face {
+  font-family: "NSJ";
+  font-weight: 700;
+  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-700-normal.woff2");
+}
+@font-face {
+  font-family: "NSJL";
+  font-weight: 700;
+  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-700-normal.woff2");
+}
+@font-face {
+  font-family: "NSJL";
+  font-weight: 800;
+  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-800-normal.woff2");
+}
+@font-face {
+  font-family: "NSJL";
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-400-normal.woff2");
+}
+@font-face {
+  font-family: "NSerif";
+  font-weight: 900;
+  src: url("../../node_modules/@fontsource/noto-serif-jp/files/noto-serif-jp-japanese-900-normal.woff2");
+}
+@font-face {
+  font-family: "NSerif";
+  font-weight: 700;
+  src: url("../../node_modules/@fontsource/noto-serif-jp/files/noto-serif-jp-japanese-700-normal.woff2");
+}
+@font-face {
+  font-family: "Nun";
+  font-weight: 800;
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2");
+}
+@font-face {
+  font-family: "Nun";
+  font-weight: 900;
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2");
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+}
+body {
+  position: relative;
+  font-family: "NSJL", "NSJ", sans-serif;
+}
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "NSJ", sans-serif;
+  font-weight: 400;
+}

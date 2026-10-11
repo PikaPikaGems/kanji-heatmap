@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>A</title>
+    <link rel="stylesheet" href="common.css" />
+    <script src="common.js"></script>
+    <style>
+      body {
+        background: #fff6e8;
+        color: #2a1608;
+      }
+      .txt {
+        position: absolute;
+        left: 64px;
+        top: 0;
+        bottom: 0;
+        width: 470px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .logo {
+        font-family: "NSerif";
+        font-weight: 900;
+        font-size: 150px;
+        line-height: 1;
+        color: #d9381e;
+        letter-spacing: -4px;
+      }
+      h1 {
+        font-family: "Nun";
+        font-weight: 900;
+        font-size: 68px;
+        line-height: 1.02;
+        margin-top: 18px;
+        letter-spacing: -1px;
+      }
+      p {
+        font-family: "NSJL";
+        font-weight: 700;
+        font-size: 26px;
+        line-height: 1.35;
+        margin-top: 20px;
+        color: #7a4a28;
+        white-space: nowrap;
+      }
+      .grid {
+        position: absolute;
+        left: 580px;
+        top: -16px;
+        display: grid;
+        grid-template-columns: repeat(6, 92px);
+        gap: 10px;
+        transform: rotate(-6deg);
+        transform-origin: center;
+      }
+      .tile {
+        width: 92px;
+        height: 92px;
+        border-radius: 18px;
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="txt">
+      <div class="logo">漢字</div>
+      <h1>Kanji<br />Heatmap</h1>
+      <p>Learn 2,000+ Japanese Kanji fast—<br />the fun, smart way</p>
+    </div>
+    <div class="grid" id="g"></div>
+    <script>
+      const r = rng(7),
+        pk = picker(r),
+        pal = [
+          "#ffe9a8",
+          "#ffd166",
+          "#ffab4a",
+          "#ff7a3d",
+          "#f04a2a",
+          "#c4271a",
+          "#8f1a14",
+        ];
+      const g = document.getElementById("g");
+      for (let i = 0; i < 54; i++) {
+        const lv = Math.min(6, Math.floor(Math.pow(r(), 1.1) * 7));
+        const t = document.createElement("div");
+        t.className = "tile";
+        t.textContent = pk();
+        t.style.background = pal[lv];
+        t.style.color = lv < 3 ? "#5a2a0c" : "#fff";
+        t.style.boxShadow = "0 6px 0 rgba(120,40,10,.18)";
+        g.appendChild(t);
+      }
+    </script>
+  </body>
+</html>
