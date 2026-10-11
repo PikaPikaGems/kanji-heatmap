@@ -24,7 +24,10 @@
  *
  * It also writes src/lib/fill-the-kanji/set-sizes.json ({ <set>: rowCount }),
  * which is committed: the dashboard and start screen need each set's round
- * count without downloading the set itself.
+ * count without downloading the set itself. And it writes
+ * src/lib/fill-the-kanji/set-versions.json ({ <set>: contentHash }): the app
+ * loads each set as <set>.json?v=<hash>, so the PWA can cache a set forever
+ * and still fetch it again as soon as its content changes.
  *
  * The TSVs are not committed (gitignored); the generated JSON is. A developer
  * who has the TSVs drops them into raw-data/fill-the-kanji/ and runs this, then
@@ -41,6 +44,7 @@ import {
   rmSync,
   readdirSync,
 } from "fs";
+import { createHash } from "crypto";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -50,6 +54,7 @@ const root = resolve(__dirname, "..");
 const srcDir = resolve(root, "raw-data/fill-the-kanji");
 const outDir = resolve(root, "public/json/fill-the-kanji");
 const sizesFile = resolve(root, "src/lib/fill-the-kanji/set-sizes.json");
+const versionsFile = resolve(root, "src/lib/fill-the-kanji/set-versions.json");
 
 const SENTENCE_HEADER = ["jpSentence", "enTranslation", "tags", "notes"];
 const EMOJI_HEADER = ["Emoji", "Expression", "Meaning", "Notes"];
@@ -83,6 +88,7 @@ rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
 const sizes = {};
+const versions = {};
 
 for (const file of files) {
   const setId = file.replace(/(-\d+)?\.tsv$/, "");
@@ -114,13 +120,11 @@ for (const file of files) {
     }
   });
 
-  writeFileSync(
-    resolve(outDir, `${setId}.json`),
-    JSON.stringify({ data }),
-    "utf-8"
-  );
+  const json = JSON.stringify({ data });
+  writeFileSync(resolve(outDir, `${setId}.json`), json, "utf-8");
 
   sizes[setId] = data.length;
+  versions[setId] = createHash("sha256").update(json).digest("hex").slice(0, 8);
   console.log(`fill-the-kanji: ${file} → ${setId}.json (${data.length} rows)`);
   if (skipped.length > 0) {
     console.warn(`  skipped ${skipped.length} row(s):\n${skipped.join("\n")}`);
@@ -128,3 +132,4 @@ for (const file of files) {
 }
 
 writeFileSync(sizesFile, JSON.stringify(sizes, null, 2) + "\n", "utf-8");
+writeFileSync(versionsFile, JSON.stringify(versions, null, 2) + "\n", "utf-8");
