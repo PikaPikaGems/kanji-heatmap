@@ -40,12 +40,6 @@ export const InitialScreen = ({
       sessionOptions={
         <>
           <ToggleRow
-            id="blur-gloss"
-            label="Blur English gloss"
-            checked={settings.blurEnglishGloss}
-            onChange={(v) => setSetting("blurEnglishGloss", v)}
-          />
-          <ToggleRow
             id="hear-on-load"
             label="Hear pronunciation on load"
             checked={settings.hearPronunciationOnLoad}

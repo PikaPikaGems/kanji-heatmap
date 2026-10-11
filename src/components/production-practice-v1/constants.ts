@@ -22,7 +22,6 @@ export const SETTINGS_KEY = "production-practice-v1-settings";
 
 export const DEFAULT_SETTINGS: ProductionPracticeSettings = {
   ...DEFAULT_DECK_FILTER_SETTINGS,
-  blurEnglishGloss: true,
   hearPronunciationOnLoad: false,
   celebratorySoundOnCorrect: true,
 };

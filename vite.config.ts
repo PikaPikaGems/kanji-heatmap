@@ -316,7 +316,7 @@ const pwaConfig = {
           cacheName: "kanji-heatmap-katakana-cache",
           expiration: {
             maxEntries: 230,
-            maxAgeSeconds: 365 * 24 * 60 * 60, // 1 week
+            maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
           },
         },
       },

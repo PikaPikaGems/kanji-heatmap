@@ -5,7 +5,6 @@ import type {
 } from "@/components/shared-practice";
 
 export type ProductionPracticeSettings = DeckFilterSettings & {
-  blurEnglishGloss: boolean;
   hearPronunciationOnLoad: boolean;
   celebratorySoundOnCorrect: boolean;
 };
