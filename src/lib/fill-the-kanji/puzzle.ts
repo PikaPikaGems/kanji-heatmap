@@ -1,12 +1,6 @@
 import { decodeFurigana, WordPartDetail } from "@/lib/furigana";
 import { isKanji, shuffle } from "@/lib/utils";
 
-/**
- * Most distinct kanji blanked in one sentence. With 8 tiles this leaves at
- * least 2 lookalike distractors; any other kanji in the sentence stay visible.
- */
-export const MAX_BLANK_KANJI = 6;
-
 /** Choices of how many tiles are offered per sentence. */
 export const TILE_COUNT_OPTIONS = [8, 12] as const;
 
@@ -64,11 +58,12 @@ export const plainSentence = (jp: string): string =>
     .join("");
 
 /**
- * Picks which kanji to blank. Sentences with more than MAX_BLANK_KANJI
- * distinct kanji get a random subset; every occurrence of a picked kanji is
- * blanked, so one tile can fill repeats (食べられるだけ食べて).
+ * Picks which kanji to blank. Every distinct kanji is blanked unless there
+ * are more than `tileCount` (each answer needs its own tile), in which case a
+ * random subset is; every occurrence of a picked kanji is blanked, so one
+ * tile can fill repeats (食べられるだけ食べて).
  */
-export const buildPuzzle = (jp: string): Puzzle => {
+export const buildPuzzle = (jp: string, tileCount: TileCount): Puzzle => {
   const chunks = parseBunsetsu(jp);
   const sentenceKanji = [
     ...new Set(
@@ -76,9 +71,9 @@ export const buildPuzzle = (jp: string): Puzzle => {
     ),
   ];
   const answers =
-    sentenceKanji.length <= MAX_BLANK_KANJI
+    sentenceKanji.length <= tileCount
       ? sentenceKanji
-      : shuffle(sentenceKanji).slice(0, MAX_BLANK_KANJI);
+      : shuffle(sentenceKanji).slice(0, tileCount);
   const answerSet = new Set(answers);
 
   const blanks: string[] = [];

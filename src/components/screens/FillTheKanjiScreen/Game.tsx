@@ -54,7 +54,7 @@ const useRoundCards = (
       .slice(start - offset, end - offset)
       .map(rowToItem)
       .filter((item) => onlyJp == null || onlyJp.includes(item.jp));
-    const puzzles = items.map((item) => buildPuzzle(item.jp));
+    const puzzles = items.map((item) => buildPuzzle(item.jp, tileCount));
     const roundKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
     const getSimilars = (k: string) => similarMap[k] ?? [];
 
