@@ -29,7 +29,7 @@ const assetsPaths = {
   // One merged file in place of the four per-source structure files: 50 KB
   // gzipped against 66 KB over four requests.
   KANJI_STRUCTURES: "/json/v2/kanji_structures.json",
-  ICON_SVG: "/img/app-icon.svg",
+  ICON_SVG: "/img/app-icon-v2.svg",
   SPEED_KATAKANA_CHALLENGE_SET: "/json/katakana/challenge-set-", // append `<setNumber>.json`
   FILL_THE_KANJI_SET: "/json/fill-the-kanji/", // append `<setId>/<chunk>.json`
   SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",
