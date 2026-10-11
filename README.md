@@ -41,8 +41,9 @@ falls back to the browser voice; a CI build fails instead.
 
 The Fill the Kanji sentence sources (`raw-data/fill-the-kanji/*.tsv`) aren't
 committed either, but what the app fetches from them is: the generated
-`public/json/fill-the-kanji/<set>.json` files and
-`src/lib/fill-the-kanji/set-sizes.json`. You only need the TSVs to change the
+`public/json/fill-the-kanji/<set>/<chunk>.json` files (each set split into
+files of 10 rounds) plus `src/lib/fill-the-kanji/set-sizes.json` and
+`set-chunks.json`. You only need the TSVs to change the
 sentences. Get them from the maintainer, put them in `raw-data/fill-the-kanji/`,
 then run:
 

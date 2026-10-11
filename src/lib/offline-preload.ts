@@ -2,7 +2,7 @@ import assetsPaths from "@/lib/assets-paths";
 import { localKanjiSvgUrl } from "@/lib/kanji-svg-url";
 import type { MainKanjiInfoResponseType } from "@/lib/kanji/kanji-worker-types";
 import type { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
-import setVersions from "@/lib/fill-the-kanji/set-versions.json";
+import setChunks from "@/lib/fill-the-kanji/set-chunks.json";
 
 const CONCURRENCY = 6;
 const KATAKANA_CHALLENGE_SET_COUNT = 200;
@@ -19,18 +19,33 @@ type CancellablePreload = {
 const katakanaChallengeUrl = (setNumber: number) =>
   `${assetsPaths.SPEED_KATAKANA_CHALLENGE_SET}${setNumber}.json`;
 
-/** Content hash per set, written by scripts/generate-fill-the-kanji.mjs. */
-const SET_VERSIONS = setVersions as Record<string, string>;
+/** Per set: a version plus one content hash per chunk file (generator output). */
+const SET_CHUNKS = setChunks as Record<
+  string,
+  { version: string; chunks: string[] } | undefined
+>;
 
-const fillTheKanjiSetPath = (setId: FillTheKanjiSetId) =>
-  `${assetsPaths.FILL_THE_KANJI_SET}${setId}.json`;
+const setVersion = (setId: FillTheKanjiSetId) =>
+  SET_CHUNKS[setId]?.version ?? "0";
+
+/** Folder holding a set's chunk files, e.g. /json/fill-the-kanji/n5/. */
+const fillTheKanjiSetDir = (setId: FillTheKanjiSetId) =>
+  `${assetsPaths.FILL_THE_KANJI_SET}${setId}/`;
 
 /**
- * Versioned URL (`?v=<content hash>`). The PWA caches set files with no age
- * limit (vite.config.ts), so a changed set needs a new URL to be fetched again.
+ * Versioned URL of one chunk (`<set>/<chunk>.json?v=<content hash>`). The PWA
+ * caches these with no age limit (vite.config.ts), so a changed chunk needs a
+ * new URL to be fetched again.
  */
-export const fillTheKanjiSetUrl = (setId: FillTheKanjiSetId) =>
-  `${fillTheKanjiSetPath(setId)}?v=${SET_VERSIONS[setId] ?? "0"}`;
+export const fillTheKanjiChunkUrl = (setId: FillTheKanjiSetId, chunk: number) =>
+  `${fillTheKanjiSetDir(setId)}${chunk}.json?v=${
+    SET_CHUNKS[setId]?.chunks[chunk] ?? "0"
+  }`;
+
+const fillTheKanjiChunkUrls = (setId: FillTheKanjiSetId) =>
+  (SET_CHUNKS[setId]?.chunks ?? []).map((_, chunk) =>
+    fillTheKanjiChunkUrl(setId, chunk)
+  );
 
 /** localStorage flag set once a challenge set has been downloaded. */
 export const FILL_THE_KANJI_PRELOAD_KEY_PREFIX =
@@ -38,7 +53,7 @@ export const FILL_THE_KANJI_PRELOAD_KEY_PREFIX =
 
 /** Includes the set's version, so a changed set no longer counts as downloaded. */
 export const fillTheKanjiPreloadKey = (setId: FillTheKanjiSetId) =>
-  `${FILL_THE_KANJI_PRELOAD_KEY_PREFIX}${setId}@${SET_VERSIONS[setId] ?? "0"}`;
+  `${FILL_THE_KANJI_PRELOAD_KEY_PREFIX}${setId}@${setVersion(setId)}`;
 
 /** Flags for older downloads of a set: the unversioned key or another version. */
 const staleFillTheKanjiPreloadKeys = (setId: FillTheKanjiSetId) => {
@@ -139,7 +154,7 @@ export function preloadFillTheKanjiSet(
   setId: FillTheKanjiSetId,
   onProgress?: (done: number, total: number) => void
 ): CancellablePreload {
-  const preload = runPool([fillTheKanjiSetUrl(setId)], onProgress);
+  const preload = runPool(fillTheKanjiChunkUrls(setId), onProgress);
   return {
     ...preload,
     promise: preload.promise.then(() =>
@@ -149,16 +164,23 @@ export function preloadFillTheKanjiSet(
 }
 
 /**
- * Removes every cached version of one set (`ignoreSearch` matches any `?v=`),
- * leaving the other sets in the shared cache.
+ * Removes every cached chunk of one set, any version (plus the older
+ * single-file `<set>.json`), leaving the other sets in the shared cache.
  */
 export async function clearFillTheKanjiSetCache(setId: FillTheKanjiSetId) {
   removeStaleFillTheKanjiPreloadKeys(setId);
   if (!("caches" in window)) return;
   const cache = await caches.open(FILL_THE_KANJI_CACHE_NAME);
-  await cache.delete(
-    new URL(fillTheKanjiSetPath(setId), window.location.href),
-    { ignoreSearch: true }
+  const dir = fillTheKanjiSetDir(setId);
+  const legacyFile = `${assetsPaths.FILL_THE_KANJI_SET}${setId}.json`;
+  const requests = await cache.keys();
+  await Promise.all(
+    requests
+      .filter((request) => {
+        const { pathname } = new URL(request.url);
+        return pathname.startsWith(dir) || pathname === legacyFile;
+      })
+      .map((request) => cache.delete(request))
   );
 }
 

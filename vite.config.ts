@@ -321,18 +321,21 @@ const pwaConfig = {
         },
       },
       {
-        // Fill-the-kanji challenge sets: 13 files, one per set (up to ~1.2 MB
-        // each). Kept out of the core cache for the same eviction reason as
-        // katakana. CacheFirst with no age limit, so a downloaded set keeps
-        // working offline indefinitely. Changed sets still get fetched: the
-        // app requests <set>.json?v=<content hash> (see fillTheKanjiSetUrl),
-        // and maxEntries evicts the old versions.
+        // Fill-the-kanji challenge sets: each set is split into chunk files
+        // of 10 rounds = one level (~190 files, ~35 KB each; roundsPerChunk
+        // in src/lib/fill-the-kanji/chunking.json). Kept out of the core
+        // cache for the same eviction reason as katakana. CacheFirst with no
+        // age limit, so a downloaded set keeps working offline indefinitely.
+        // Changed chunks still get fetched: the app requests
+        // <set>/<chunk>.json?v=<content hash> (see fillTheKanjiChunkUrl), and
+        // maxEntries evicts the old versions.
         urlPattern: /\/json\/fill-the-kanji\/.*\.json$/i,
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-heatmap-fill-the-kanji-cache",
           expiration: {
-            maxEntries: 30,
+            // ~2× the chunk count, so old versions can wait to be evicted.
+            maxEntries: 400,
           },
         },
       },

@@ -1,5 +1,5 @@
 /**
- * One row of public/json/fill-the-kanji/<set>.json, as written by
+ * One row of public/json/fill-the-kanji/<set>/<chunk>.json, as written by
  * scripts/generate-fill-the-kanji.mjs. `emoji` is only present in the emoji
  * set (where `tags` is empty).
  */

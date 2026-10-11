@@ -2,9 +2,14 @@
  * Generates the sentence lists used by the /fill-the-kanji game.
  *
  * Source → Outputs:
- *   raw-data/fill-the-kanji/<set>-<count>.tsv → public/json/fill-the-kanji/<set>.json
+ *   raw-data/fill-the-kanji/<set>-<count>.tsv
+ *     → public/json/fill-the-kanji/<set>/<chunk>.json   (chunk = 0, 1, …)
  *
- * One output file per challenge set. The trailing "-<count>" in the source
+ * Each set is split into chunk files of `roundsPerChunk` rounds of
+ * `roundSize` rows (src/lib/fill-the-kanji/chunking.json, shared with the
+ * app), so playing a round downloads one chunk, not the whole set. The last
+ * chunk also takes the leftover rows, matching the last round. The trailing
+ * "-<count>" in the source
  * file name is dropped, so the set id stays stable when rows are added. The
  * app cuts each set into rounds of 20 in file order, so reordering or
  * inserting rows in the middle of a TSV shifts which sentences belong to which
@@ -25,9 +30,11 @@
  * It also writes src/lib/fill-the-kanji/set-sizes.json ({ <set>: rowCount }),
  * which is committed: the dashboard and start screen need each set's round
  * count without downloading the set itself. And it writes
- * src/lib/fill-the-kanji/set-versions.json ({ <set>: contentHash }): the app
- * loads each set as <set>.json?v=<hash>, so the PWA can cache a set forever
- * and still fetch it again as soon as its content changes.
+ * src/lib/fill-the-kanji/set-chunks.json
+ *   ({ <set>: { version, chunks: [contentHash, …] } }):
+ * the app loads each chunk as <set>/<chunk>.json?v=<hash>, so the PWA can
+ * cache chunks forever and still fetch one again as soon as it changes.
+ * `version` (a hash of the chunk hashes) marks a set as downloaded.
  *
  * The TSVs are not committed (gitignored); the generated JSON is. A developer
  * who has the TSVs drops them into raw-data/fill-the-kanji/ and runs this, then
@@ -54,7 +61,26 @@ const root = resolve(__dirname, "..");
 const srcDir = resolve(root, "raw-data/fill-the-kanji");
 const outDir = resolve(root, "public/json/fill-the-kanji");
 const sizesFile = resolve(root, "src/lib/fill-the-kanji/set-sizes.json");
-const versionsFile = resolve(root, "src/lib/fill-the-kanji/set-versions.json");
+const chunksFile = resolve(root, "src/lib/fill-the-kanji/set-chunks.json");
+const { roundSize, roundsPerChunk } = JSON.parse(
+  readFileSync(resolve(root, "src/lib/fill-the-kanji/chunking.json"), "utf-8")
+);
+
+const hashOf = (text) =>
+  createHash("sha256").update(text).digest("hex").slice(0, 8);
+
+/** Splits rows into chunks of whole rounds; the last chunk keeps leftovers. */
+const toChunks = (rows) => {
+  const rounds = Math.max(1, Math.floor(rows.length / roundSize));
+  const chunkCount = Math.ceil(rounds / roundsPerChunk);
+  const rowsPerChunk = roundsPerChunk * roundSize;
+  return Array.from({ length: chunkCount }, (_, c) =>
+    rows.slice(
+      c * rowsPerChunk,
+      c === chunkCount - 1 ? rows.length : (c + 1) * rowsPerChunk
+    )
+  );
+};
 
 const SENTENCE_HEADER = ["jpSentence", "enTranslation", "tags", "notes"];
 const EMOJI_HEADER = ["Emoji", "Expression", "Meaning", "Notes"];
@@ -88,7 +114,7 @@ rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
 const sizes = {};
-const versions = {};
+const setChunks = {};
 
 for (const file of files) {
   const setId = file.replace(/(-\d+)?\.tsv$/, "");
@@ -120,16 +146,23 @@ for (const file of files) {
     }
   });
 
-  const json = JSON.stringify({ data });
-  writeFileSync(resolve(outDir, `${setId}.json`), json, "utf-8");
+  const setDir = resolve(outDir, setId);
+  mkdirSync(setDir, { recursive: true });
+  const hashes = toChunks(data).map((rows, c) => {
+    const json = JSON.stringify({ data: rows });
+    writeFileSync(resolve(setDir, `${c}.json`), json, "utf-8");
+    return hashOf(json);
+  });
 
   sizes[setId] = data.length;
-  versions[setId] = createHash("sha256").update(json).digest("hex").slice(0, 8);
-  console.log(`fill-the-kanji: ${file} → ${setId}.json (${data.length} rows)`);
+  setChunks[setId] = { version: hashOf(hashes.join(",")), chunks: hashes };
+  console.log(
+    `fill-the-kanji: ${file} → ${setId}/ (${data.length} rows, ${hashes.length} chunks)`
+  );
   if (skipped.length > 0) {
     console.warn(`  skipped ${skipped.length} row(s):\n${skipped.join("\n")}`);
   }
 }
 
 writeFileSync(sizesFile, JSON.stringify(sizes, null, 2) + "\n", "utf-8");
-writeFileSync(versionsFile, JSON.stringify(versions, null, 2) + "\n", "utf-8");
+writeFileSync(chunksFile, JSON.stringify(setChunks, null, 2) + "\n", "utf-8");
