@@ -407,7 +407,9 @@ export const SettingsModal = ({
             <span className="block mb-2 text-sm font-semibold">
               Theme Color
             </span>
-            <ColorGrid />
+            <div className="mx-3">
+              <ColorGrid />
+            </div>
           </div>
 
           <LightDarkRow />
