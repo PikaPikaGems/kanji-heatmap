@@ -129,8 +129,7 @@ const pwaConfig = {
     orientation: "any" as const,
     display: "standalone" as const,
     lang: "en-US" as const,
-    description:
-      "Memorize 2000+ Japanese words and Kanji effectively with a joyful experience",
+    description: "Learn 2,000+ Japanese Kanji fast—the fun, smart way",
     start_url: ".",
     theme_color: "#1d4ed8",
     background_color: "#000000",
