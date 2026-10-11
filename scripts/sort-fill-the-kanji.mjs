@@ -12,11 +12,11 @@
  *   1. JLPT level: N5, N4, N3, N2, N1, then not in JLPT. A row with both an N5
  *      and an N1 kanji counts as N1, so it comes later.
  *   2. Jouyou grade: 1–6, then 9 (secondary school), then not in Jouyou.
- *   3. Google frequency rank (higher rank number = rarer = later). Kanji with
- *      no Google rank count as rarest.
- *   4. Number of distinct kanji, fewer first: the game blanks each one, so
+ *   3. Number of distinct kanji, fewer first: the game blanks each one, so
  *      this is how many tiles the player has to place.
- *   5. Length (characters, without furigana or spaces), shorter first.
+ *   4. Length (characters, without furigana or spaces), shorter first.
+ *   5. Google frequency rank (higher rank number = rarer = later). Kanji with
+ *      no Google rank count as rarest.
  *   6. Ties keep their current order (stable sort), so rerunning is a no-op.
  *
  * Reads JLPT, grade and Google rank from public/json/v2/kanji_main.json (see
@@ -115,9 +115,9 @@ for (const file of files) {
     (a, b) =>
       a.level - b.level ||
       a.grade - b.grade ||
-      a.rank - b.rank ||
       a.kanjiCount - b.kanjiCount ||
       a.length - b.length ||
+      a.rank - b.rank ||
       a.index - b.index
   );
 
