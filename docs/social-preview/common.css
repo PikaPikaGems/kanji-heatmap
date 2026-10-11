@@ -4,10 +4,9 @@
   src: url("../../node_modules/@fontsource/kiwi-maru/files/kiwi-maru-japanese-500-normal.woff2");
 }
 @font-face {
-  font-family: "Kiwi";
-  font-weight: 500;
-  unicode-range: U+0000-00FF, U+2000-206F;
-  src: url("../../node_modules/@fontsource/kiwi-maru/files/kiwi-maru-latin-500-normal.woff2");
+  font-family: "Nunito";
+  font-weight: 800;
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2");
 }
 * {
   box-sizing: border-box;
@@ -26,11 +25,9 @@ body {
   font-weight: 500;
 }
 h1,
-.logo,
-.big,
-.k,
 .pill {
-  font-weight: 500 !important;
+  font-family: "Nunito", "Kiwi", sans-serif;
+  font-weight: 800;
 }
 .tile {
   display: flex;
