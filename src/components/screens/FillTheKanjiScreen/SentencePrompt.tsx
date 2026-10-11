@@ -25,14 +25,11 @@ const ANSWER_ANIMATION_DELAY_MS = 250;
 
 /** Blanks that were given up on get the same fill as a selected primary tile. */
 const forgotCn =
-  "rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white";
+  "inline-block rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white animate-practice-correct-pop";
 
-/** Right kanji hop one after another, like the blanks do on the question screen. */
-const hopDelayStyle = (
-  result: BlankResult | undefined,
-  blank: number | null
-) =>
-  result === "right" && blank != null
+/** Right and forgotten kanji hop one after another, like the blanks do on the question screen. */
+const hopDelayStyle = (color: string | undefined, blank: number | null) =>
+  (color === blankResultCn.right || color === forgotCn) && blank != null
     ? {
         animationDelay: `${ANSWER_ANIMATION_DELAY_MS + blank * WOBBLE_STAGGER_MS}ms`,
       }
@@ -102,7 +99,7 @@ export const FuriganaSentence = ({
                     kanji={char}
                     info={info}
                     className={color}
-                    style={hopDelayStyle(result, blank)}
+                    style={hopDelayStyle(color, blank)}
                   />
                 );
               }
@@ -111,7 +108,7 @@ export const FuriganaSentence = ({
                 <span
                   key={k}
                   className={color}
-                  style={hopDelayStyle(result, blank)}
+                  style={hopDelayStyle(color, blank)}
                 >
                   {char}
                 </span>
