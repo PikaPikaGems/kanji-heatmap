@@ -17,7 +17,7 @@ Do **not** use `useEffect` if a simpler alternative exists. Prefer, in order:
 3. Module-level setup that runs once on import (e.g. capturing a one-shot browser event)
 4. `useEffect` **only** to sync with an external system (subscriptions, timers, imperative DOM) when 1–3 cannot
 
-If you must use it, add a short comment at the effect explaining:
+If you must use it, put a code comment directly above the `useEffect` call explaining:
 
 1. Why the effect is required
 2. That there is no simpler way (not just “derive during render” or event handlers)
@@ -43,7 +43,7 @@ useEffect(() => {
 
 Do **not** add `useMemo` or `useCallback` unless profiling or an existing repo pattern clearly requires them (e.g. a stable identity that a memoized child depends on). Prefer plain values and inline functions.
 
-If you must use them, add a brief comment why the memoization is necessary and why a simpler approach is insufficient.
+If you must use them, put a code comment directly above the hook call saying why the memoization is absolutely necessary and why a simpler approach is insufficient.
 
 ## forwardRef
 

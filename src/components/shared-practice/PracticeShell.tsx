@@ -30,7 +30,12 @@ export const PracticeShell = ({
     style={height != null ? { height } : undefined}
   >
     <PracticeHeader progress={progress} />
-    <main className="flex-1 min-h-0 overflow-hidden fix-scroll-layout-shift-right">
+    {/* Bottom padding keeps the offline banner (BottomBanner) off the
+        game's bottom buttons; it's 0 when the banner isn't shown. */}
+    <main
+      className="flex-1 min-h-0 overflow-hidden fix-scroll-layout-shift-right"
+      style={{ paddingBottom: "var(--bottom-banner-height, 0px)" }}
+    >
       {children}
     </main>
   </div>

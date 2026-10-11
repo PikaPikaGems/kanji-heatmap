@@ -56,7 +56,7 @@ export const PracticeFab = () => {
           size="icon"
           variant={useSecondaryVariant ? "secondary" : "primary"}
           className={cn(
-            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom))]",
+            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom)+var(--bottom-banner-height,0px))]",
             useSecondaryVariant && "border-foreground/40"
           )}
           aria-label="Open practice menu"

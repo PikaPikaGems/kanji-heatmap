@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Tests only when asked
 
-Do **not** create, update, or expand automated tests unless the user explicitly asks for tests in the current request.
+Do **not** create, update, expand, or delete automated tests (unit or e2e) unless the user explicitly asks for tests in the current conversation. This applies to every agent and subagent. Running existing tests is fine.
 
 ## Do not (unless asked)
 

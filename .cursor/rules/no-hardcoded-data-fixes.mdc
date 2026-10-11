@@ -1,0 +1,10 @@
+---
+description: Data fixes go in raw-data/<area>/ours.json, never hardcoded in code
+alwaysApply: true
+---
+
+# No hardcoded data fixes
+
+Never hardcode data fixes in code: per-character mappings, exception lists, keyword overrides and the like (e.g. `{ 剝: "剥" }`). Put them in a data file, normally `raw-data/<area>/ours.json`, and have the script read it.
+
+Hardcoding is allowed only when the user explicitly says so for that specific case.

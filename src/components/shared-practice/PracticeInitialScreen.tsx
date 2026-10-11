@@ -117,7 +117,7 @@ export const PracticeInitialScreen = ({
           )}
         </p>
         <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
-          Start Practicing
+          Start
         </PracticeButton>
       </div>
     </div>

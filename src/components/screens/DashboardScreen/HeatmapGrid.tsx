@@ -3,7 +3,6 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -45,7 +44,6 @@ export const HeatmapPopoverProvider = ({
   }, []);
 
   const anchor = state?.anchor;
-  const virtualRef = useMemo(() => ({ current: anchor ?? null }), [anchor]);
 
   return (
     <HeatmapPopoverContext.Provider value={toggle}>
@@ -56,7 +54,7 @@ export const HeatmapPopoverProvider = ({
           if (!open) setState((cur) => cur && { ...cur, open: false });
         }}
       >
-        {virtualRef.current && <PopoverAnchor virtualRef={virtualRef} />}
+        {anchor && <PopoverAnchor virtualRef={{ current: anchor }} />}
         <PopoverContent
           className="w-56 p-3"
           side="top"

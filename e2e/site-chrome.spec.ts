@@ -36,7 +36,7 @@ test.describe("site chrome", () => {
     // Trailing "?" is fine — wouter can leave an empty query string.
     await expect(page).toHaveURL(/\/reading-practice\/?(\?.*)?$/);
     await expect(
-      page.getByRole("button", { name: "Start Practicing" })
+      page.getByRole("button", { name: "Start", exact: true })
     ).toBeVisible({ timeout: 30_000 });
   });
 

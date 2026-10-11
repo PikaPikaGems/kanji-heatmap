@@ -139,7 +139,7 @@ export const Game = ({
       </div>
 
       {/* Stays mounted under the answer drawer so nothing shifts on submit. */}
-      <div className="shrink-0 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-2 border-dashed rounded-t-3xl">
+      <div className="shrink-0 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
         <div className="flex flex-col w-full max-w-md gap-3 mx-auto">
           <TileGrid tiles={tiles} onPick={game.pickTile} />
           <div className="grid grid-cols-2 gap-2">

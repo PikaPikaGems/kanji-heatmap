@@ -21,6 +21,7 @@ import {
   InstallAppModal,
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
+import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -90,8 +91,9 @@ const HeaderDrawerContent = ({
         </div>
       </div>
 
-      <div className="flex justify-center w-full pt-2 mt-6 mb-12 border-t border-dashed gap-x-1">
+      <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
         <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
+        <NetworkStatusBadge />
       </div>
     </div>
   );

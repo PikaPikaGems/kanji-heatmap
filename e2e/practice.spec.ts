@@ -8,7 +8,10 @@ test.describe("practice modes", () => {
   }) => {
     await page.goto("/reading-practice");
 
-    const startButton = page.getByRole("button", { name: "Start Practicing" });
+    const startButton = page.getByRole("button", {
+      name: "Start",
+      exact: true,
+    });
     await expect(startButton).toBeVisible({ timeout: 30_000 });
     await expect(startButton).toBeEnabled({ timeout: 30_000 });
     await startButton.click();
@@ -20,7 +23,7 @@ test.describe("practice modes", () => {
   test("writing practice: initial screen renders", async ({ page }) => {
     await page.goto("/writing-practice");
     await expect(
-      page.getByRole("button", { name: "Start Practicing" })
+      page.getByRole("button", { name: "Start", exact: true })
     ).toBeVisible({ timeout: 30_000 });
   });
 
@@ -60,7 +63,7 @@ test.describe("practice modes", () => {
   }) => {
     await page.goto("/speed-katakana");
 
-    await page.getByRole("button", { name: "Start Game" }).click();
+    await page.getByRole("button", { name: "Start", exact: true }).click();
 
     await expect(page.getByText("パーセント")).toBeVisible({
       timeout: 30_000,
@@ -81,7 +84,7 @@ test.describe("practice modes", () => {
   }) => {
     await page.goto("/speed-katakana");
 
-    await page.getByRole("button", { name: "Start Game" }).click();
+    await page.getByRole("button", { name: "Start", exact: true }).click();
     await expect(page.getByText("パーセント")).toBeVisible({
       timeout: 30_000,
     });
@@ -114,7 +117,10 @@ test.describe("practice modes", () => {
   }) => {
     await page.goto("/reading-practice");
 
-    const startButton = page.getByRole("button", { name: "Start Practicing" });
+    const startButton = page.getByRole("button", {
+      name: "Start",
+      exact: true,
+    });
     await expect(startButton).toBeEnabled({ timeout: 30_000 });
     await startButton.click();
 
@@ -132,7 +138,7 @@ test.describe("practice modes", () => {
     await page.getByRole("button", { name: "End session" }).click();
 
     await expect(
-      page.getByRole("button", { name: "Start Practicing" })
+      page.getByRole("button", { name: "Start", exact: true })
     ).toBeVisible({ timeout: 30_000 });
   });
 
@@ -141,7 +147,10 @@ test.describe("practice modes", () => {
   }) => {
     await page.goto("/writing-practice");
 
-    const startButton = page.getByRole("button", { name: "Start Practicing" });
+    const startButton = page.getByRole("button", {
+      name: "Start",
+      exact: true,
+    });
     await expect(startButton).toBeEnabled({ timeout: 30_000 });
     await startButton.click();
 
