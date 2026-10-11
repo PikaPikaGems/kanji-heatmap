@@ -6,9 +6,13 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import { useJsonFetch } from "@/hooks/use-json";
 import { useSimilarKanjiMap } from "@/kanji-worker/kanji-worker-hooks";
-import { fillTheKanjiSetUrl } from "@/lib/offline-preload";
+import { fillTheKanjiChunkUrl } from "@/lib/offline-preload";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
-import { roundRowRange } from "@/lib/fill-the-kanji/rounds";
+import {
+  chunkOfRound,
+  chunkRowStart,
+  roundRowRange,
+} from "@/lib/fill-the-kanji/rounds";
 import {
   buildPuzzle,
   buildTiles,
@@ -23,19 +27,22 @@ import { GameCard, useFillTheKanjiGame } from "./use-fill-the-kanji-game";
 import { FillTheKanjiSettings, ItemResult } from "./types";
 
 /**
- * Loads the set file and the similar-kanji map, then builds the round's
- * cards: sentences in shuffled order, each with its blanks and 8 tiles.
+ * Loads the set chunk holding this round (not the whole set) and the
+ * similar-kanji map, then builds the round's cards: sentences in shuffled
+ * order, each with its blanks and 8 tiles.
  */
 const useRoundCards = (setId: FillTheKanjiSetId, round: number) => {
+  const chunk = chunkOfRound(round);
   const { data, status } = useJsonFetch<FillTheKanjiSetFile>(
-    fillTheKanjiSetUrl(setId)
+    fillTheKanjiChunkUrl(setId, chunk)
   );
   const similarMap = useSimilarKanjiMap();
 
   const cards = useMemo<GameCard[]>(() => {
     if (!data?.data || !similarMap) return [];
     const [start, end] = roundRowRange(setId, round);
-    const items = data.data.slice(start, end).map(rowToItem);
+    const offset = chunkRowStart(chunk);
+    const items = data.data.slice(start - offset, end - offset).map(rowToItem);
     const puzzles = items.map((item) => buildPuzzle(item.jp));
     const roundKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
     const getSimilars = (k: string) => similarMap[k] ?? [];
@@ -52,7 +59,7 @@ const useRoundCards = (setId: FillTheKanjiSetId, round: number) => {
         }),
       }))
     );
-  }, [data, similarMap, setId, round]);
+  }, [data, similarMap, setId, round, chunk]);
 
   return { cards, status };
 };

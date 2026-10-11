@@ -1,8 +1,18 @@
 import setSizes from "./set-sizes.json";
+import chunking from "./chunking.json";
 import { FILL_THE_KANJI_SETS, FillTheKanjiSetId } from "./sets";
 
-/** Sentences per round. Leftovers (< ROUND_SIZE) join the last round. */
-export const ROUND_SIZE = 20;
+/**
+ * Sentences per round. Leftovers (< ROUND_SIZE) join the last round. Shared
+ * with scripts/generate-fill-the-kanji.mjs through chunking.json.
+ */
+export const ROUND_SIZE = chunking.roundSize;
+
+/**
+ * Rounds per set file: the generator splits each set into files of this many
+ * rounds, so a round only downloads its own file, not the whole set.
+ */
+export const ROUNDS_PER_CHUNK = chunking.roundsPerChunk;
 
 const SET_SIZES = setSizes as Record<string, number>;
 
@@ -32,6 +42,14 @@ export const roundRowRange = (
   const end = round >= rounds ? setRowCount(setId) : start + ROUND_SIZE;
   return [start, end];
 };
+
+/** 0-based index of the set file (chunk) that holds a 1-based round. */
+export const chunkOfRound = (round: number): number =>
+  Math.floor((round - 1) / ROUNDS_PER_CHUNK);
+
+/** First set row in a chunk; the last chunk also holds the leftover rows. */
+export const chunkRowStart = (chunk: number): number =>
+  chunk * ROUNDS_PER_CHUNK * ROUND_SIZE;
 
 export const isValidRound = (setId: FillTheKanjiSetId, round: number) =>
   Number.isInteger(round) && round >= 1 && round <= roundCount(setId);
