@@ -7,7 +7,7 @@
     <script src="common.js"></script>
     <style>
       body {
-        background: #0c0c0e;
+        background: #050816;
       }
       .grid {
         position: absolute;
@@ -24,7 +24,6 @@
         font-size: 58px;
         color: #fff;
         border: 9px solid;
-        font-family: "NSJ";
       }
       .card {
         position: absolute;
@@ -32,42 +31,33 @@
         top: 50%;
         transform: translate(-50%, -50%);
         width: 760px;
-        padding: 44px 40px 46px;
+        padding: 44px 40px 50px;
         border-radius: 36px;
-        background: #0e0c14;
+        background: #0a1030;
         text-align: center;
         color: #fff;
         box-shadow:
-          0 0 0 6px rgba(255, 255, 255, 0.1),
+          0 0 0 6px rgba(160, 190, 255, 0.15),
           0 30px 80px rgba(0, 0, 0, 0.7);
       }
       .logo {
         display: grid;
-        grid-template-columns: repeat(2, 74px);
+        grid-template-columns: repeat(2, 84px);
         gap: 8px;
         justify-content: center;
-        margin-bottom: 22px;
+        margin-bottom: 24px;
       }
       .logo .tile {
-        width: 74px;
-        height: 74px;
-        font-size: 42px;
-        border-radius: 16px;
+        width: 84px;
+        height: 84px;
+        font-size: 48px;
+        border-radius: 18px;
         border-width: 6px;
       }
       h1 {
-        font-family: "Nun";
-        font-weight: 900;
-        font-size: 92px;
+        font-size: 96px;
         line-height: 1;
         letter-spacing: -2px;
-      }
-      p {
-        font-family: "NSJL";
-        font-weight: 700;
-        font-size: 30px;
-        margin-top: 16px;
-        color: #ffb8e6;
       }
     </style>
   </head>
@@ -76,13 +66,12 @@
     <div class="card">
       <div class="logo" id="l"></div>
       <h1>Kanji Heatmap</h1>
-      <p>Learn 2,000+ Japanese Kanji fast—<br />the fun, smart way</p>
     </div>
     <script>
       const r = rng(23),
         pk = picker(r),
-        fill = ["#5c0a47", "#8f0a6e", "#c40a8f", "#ff00aa", "#000"],
-        bd = ["#ff6b6b", "#a3e635", "#f472b6", "#60a5fa", "#ffd60a"];
+        fill = ["#0f1a5c", "#16288f", "#1f3bb8", "#2f55e6", "#050816"],
+        bd = ["#4f78f2", "#7c9fff", "#a9c4ff", "#2f55e6", "#cfe0ff"];
       function mk(ch, lv, b) {
         const t = document.createElement("div");
         t.className = "tile";
@@ -95,10 +84,10 @@
       for (let i = 0; i < 66; i++)
         g.appendChild(mk(pk(), Math.floor(r() * 4), Math.floor(r() * 5)));
       [
-        ["漢", 3, 0],
+        ["漢", 3, 2],
         ["字", 1, 1],
-        ["暗", 0, 2],
-        ["記", 2, 3],
+        ["暗", 0, 0],
+        ["記", 2, 4],
       ].forEach((a) => document.getElementById("l").appendChild(mk(...a)));
     </script>
   </body>

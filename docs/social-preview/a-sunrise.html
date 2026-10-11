@@ -7,43 +7,30 @@
     <script src="common.js"></script>
     <style>
       body {
-        background: #fff6e8;
-        color: #2a1608;
+        background: #eaf2ff;
+        color: #0f2260;
       }
       .txt {
         position: absolute;
-        left: 64px;
+        left: 70px;
         top: 0;
         bottom: 0;
-        width: 470px;
+        width: 480px;
         display: flex;
         flex-direction: column;
         justify-content: center;
       }
       .logo {
-        font-family: "NSerif";
-        font-weight: 900;
-        font-size: 150px;
+        font-size: 170px;
         line-height: 1;
-        color: #d9381e;
+        color: #2f55e6;
         letter-spacing: -4px;
       }
       h1 {
-        font-family: "Nun";
-        font-weight: 900;
-        font-size: 68px;
-        line-height: 1.02;
-        margin-top: 18px;
+        font-size: 76px;
+        line-height: 1.08;
+        margin-top: 22px;
         letter-spacing: -1px;
-      }
-      p {
-        font-family: "NSJL";
-        font-weight: 700;
-        font-size: 26px;
-        line-height: 1.35;
-        margin-top: 20px;
-        color: #7a4a28;
-        white-space: nowrap;
       }
       .grid {
         position: absolute;
@@ -67,20 +54,19 @@
     <div class="txt">
       <div class="logo">漢字</div>
       <h1>Kanji<br />Heatmap</h1>
-      <p>Learn 2,000+ Japanese Kanji fast—<br />the fun, smart way</p>
     </div>
     <div class="grid" id="g"></div>
     <script>
       const r = rng(7),
         pk = picker(r),
         pal = [
-          "#ffe9a8",
-          "#ffd166",
-          "#ffab4a",
-          "#ff7a3d",
-          "#f04a2a",
-          "#c4271a",
-          "#8f1a14",
+          "#cfe0ff",
+          "#a9c4ff",
+          "#7c9fff",
+          "#4f78f2",
+          "#2f55e6",
+          "#2039b8",
+          "#14257f",
         ];
       const g = document.getElementById("g");
       for (let i = 0; i < 54; i++) {
@@ -89,8 +75,8 @@
         t.className = "tile";
         t.textContent = pk();
         t.style.background = pal[lv];
-        t.style.color = lv < 3 ? "#5a2a0c" : "#fff";
-        t.style.boxShadow = "0 6px 0 rgba(120,40,10,.18)";
+        t.style.color = lv < 3 ? "#14257f" : "#fff";
+        t.style.boxShadow = "0 6px 0 rgba(20,37,127,.18)";
         g.appendChild(t);
       }
     </script>

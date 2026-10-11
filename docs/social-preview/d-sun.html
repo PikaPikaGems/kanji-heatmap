@@ -7,8 +7,8 @@
     <script src="common.js"></script>
     <style>
       body {
-        background: #fbfaf7;
-        color: #161616;
+        background: #f6f9ff;
+        color: #0f2260;
       }
       .sun {
         position: absolute;
@@ -36,37 +36,23 @@
         justify-content: center;
       }
       .k {
-        font-family: "NSerif";
-        font-weight: 900;
-        font-size: 40px;
-        color: #c8102e;
+        font-size: 44px;
+        color: #2f55e6;
         letter-spacing: 10px;
       }
       h1 {
-        font-family: "Nun";
-        font-weight: 900;
-        font-size: 98px;
-        line-height: 0.98;
+        font-size: 106px;
+        line-height: 1.02;
         letter-spacing: -3px;
-        margin-top: 10px;
-      }
-      p {
-        font-family: "NSJL";
-        font-weight: 700;
-        font-size: 29px;
-        line-height: 1.35;
-        color: #555;
-        margin-top: 22px;
+        margin-top: 12px;
       }
       .pill {
-        margin-top: 30px;
+        margin-top: 34px;
         align-self: flex-start;
-        background: #c8102e;
+        background: #2f55e6;
         color: #fff;
-        font-family: "NSJL";
-        font-weight: 800;
-        font-size: 24px;
-        padding: 10px 24px;
+        font-size: 26px;
+        padding: 10px 26px;
         border-radius: 99px;
       }
     </style>
@@ -76,19 +62,18 @@
     <div class="txt">
       <div class="k">漢字暗記</div>
       <h1>Kanji<br />Heatmap</h1>
-      <p>Learn 2,000+ Japanese Kanji fast—<br />the fun, smart way</p>
       <div class="pill">kanjiheatmap.com</div>
     </div>
     <script>
       const r = rng(5),
         pk = picker(r),
         pal = [
-          "#fde2e4",
-          "#fbb1b9",
-          "#f4707f",
-          "#e63950",
-          "#c8102e",
-          "#8f0a20",
+          "#dbe7ff",
+          "#b3ccff",
+          "#7c9fff",
+          "#4f78f2",
+          "#2f55e6",
+          "#14257f",
         ],
         s = document.getElementById("s"),
         N = 11,
@@ -107,10 +92,10 @@
           const t = document.createElement("div");
           t.className = "tile";
           t.textContent = pk();
-          t.style.left = x * P + 0 + "px";
+          t.style.left = x * P + "px";
           t.style.top = y * P + "px";
           t.style.background = pal[lv];
-          t.style.color = lv < 3 ? "#7a1a28" : "#fff";
+          t.style.color = lv < 3 ? "#14257f" : "#fff";
           s.appendChild(t);
         }
     </script>

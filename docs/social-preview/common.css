@@ -1,47 +1,13 @@
 @font-face {
-  font-family: "NSJ";
-  font-weight: 400;
-  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-400-normal.woff2");
+  font-family: "Kiwi";
+  font-weight: 500;
+  src: url("../../node_modules/@fontsource/kiwi-maru/files/kiwi-maru-japanese-500-normal.woff2");
 }
 @font-face {
-  font-family: "NSJ";
-  font-weight: 700;
-  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-700-normal.woff2");
-}
-@font-face {
-  font-family: "NSJL";
-  font-weight: 700;
-  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-700-normal.woff2");
-}
-@font-face {
-  font-family: "NSJL";
-  font-weight: 800;
-  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-800-normal.woff2");
-}
-@font-face {
-  font-family: "NSJL";
-  font-weight: 400;
-  src: url("../../node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-latin-400-normal.woff2");
-}
-@font-face {
-  font-family: "NSerif";
-  font-weight: 900;
-  src: url("../../node_modules/@fontsource/noto-serif-jp/files/noto-serif-jp-japanese-900-normal.woff2");
-}
-@font-face {
-  font-family: "NSerif";
-  font-weight: 700;
-  src: url("../../node_modules/@fontsource/noto-serif-jp/files/noto-serif-jp-japanese-700-normal.woff2");
-}
-@font-face {
-  font-family: "Nun";
-  font-weight: 800;
-  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2");
-}
-@font-face {
-  font-family: "Nun";
-  font-weight: 900;
-  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2");
+  font-family: "Kiwi";
+  font-weight: 500;
+  unicode-range: U+0000-00FF, U+2000-206F;
+  src: url("../../node_modules/@fontsource/kiwi-maru/files/kiwi-maru-latin-500-normal.woff2");
 }
 * {
   box-sizing: border-box;
@@ -56,12 +22,20 @@ body {
 }
 body {
   position: relative;
-  font-family: "NSJL", "NSJ", sans-serif;
+  font-family: "Kiwi", sans-serif;
+  font-weight: 500;
+}
+h1,
+.logo,
+.big,
+.k,
+.pill {
+  font-weight: 500 !important;
 }
 .tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "NSJ", sans-serif;
-  font-weight: 400;
+  font-family: "Kiwi", sans-serif;
+  font-weight: 500;
 }
