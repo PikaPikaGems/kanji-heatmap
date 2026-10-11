@@ -121,25 +121,29 @@ export const VoiceEngineChoice = () => {
 };
 
 const statusText = (s: AiVoiceState): string => {
-  switch (s.status) {
-    case "downloading":
-      return "Downloading…";
-    case "loading":
-      return "Loading the voice…";
-    case "ready":
-      return "Ready";
-    case "stopped":
-      return "Ready (reloads from this device when used)";
-    case "unavailable":
-      return s.error ?? "The AI voice isn't available on this device.";
-    case "error":
-      return s.error ?? "Something went wrong.";
-    case "not-loaded":
-      if (s.cached === null) return "Checking this device…";
-      return s.cached
-        ? "Voice files are on this device."
-        : "Not downloaded yet. Until then, the browser voice is used.";
+  if (s.status === "downloading") {
+    return "Downloading…";
   }
+  if (s.status === "loading") {
+    return "Loading the voice…";
+  }
+  if (s.status === "ready") {
+    return "Ready";
+  }
+  if (s.status === "stopped") {
+    return "Ready (reloads from this device when used)";
+  }
+  if (s.status === "unavailable") {
+    return s.error ?? "The AI voice isn't available on this device.";
+  }
+  if (s.status === "error") {
+    return s.error ?? "Something went wrong.";
+  }
+  // "not-loaded"
+  if (s.cached === null) return "Checking this device…";
+  return s.cached
+    ? "Voice files are on this device."
+    : "Not downloaded yet. Until then, the browser voice is used.";
 };
 
 const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
