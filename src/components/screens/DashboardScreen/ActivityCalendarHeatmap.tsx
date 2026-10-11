@@ -12,7 +12,6 @@ import {
 } from "@/lib/activity";
 import { useActivityData } from "@/hooks/use-activity-data";
 import { useActivityHeatmapSettings } from "@/hooks/use-activity-heatmap-settings";
-import { SectionHeading } from "./SectionHeading";
 import { ActivityCalendarHeatmapSettingsPopover } from "./ActivityCalendarHeatmapSettingsPopover";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
@@ -70,13 +69,8 @@ export const ActivityCalendarHeatmap = () => {
   const windowed = summarizeActivityInRange(byDay, range, filters);
 
   return (
-    <DashboardPanel>
+    <DashboardPanel title="Activity Heatmap" defaultOpen>
       <div key={vertical ? "compact" : "wide"} className="animate-fade-in">
-        <SectionHeading
-          title="Activity Heatmap"
-          description="Daily practice events. Brighter days mean more activity relative to your busiest day in this range."
-        />
-
         <DurationNav
           value={duration}
           onChange={(next) => setSetting("duration", next)}

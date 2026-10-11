@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { cnFocusRing } from "@/lib/generic-cn";
 import {
   useCurrentThemeColor,
   themeColorsRgb,
@@ -21,8 +22,9 @@ export const ColorGrid = ({ onSelect }: { onSelect?: () => void }) => {
           aria-label={`Theme color ${i + 1}`}
           className={cn(
             "h-10 rounded-xl border-2 transition-transform",
+            cnFocusRing,
             colorIndex === i
-              ? "border-theme-color-darker scale-95 ring-2 ring-offset-2 ring-offset-background"
+              ? "border-theme-color-darker scale-95 ring-2 ring-ring ring-offset-2 ring-offset-background"
               : "border-transparent hover:scale-105"
           )}
           style={{

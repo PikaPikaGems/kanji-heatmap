@@ -36,13 +36,17 @@ import {
   FILL_THE_KANJI_PRELOAD_KEY_PREFIX,
 } from "@/lib/offline-preload";
 import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
+import { approxRowCountLabel } from "@/lib/fill-the-kanji/rounds";
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
+import { cnOptionTile } from "@/lib/generic-cn";
+import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 import { useVoiceEngine } from "@/hooks/use-ai-voice";
 import { AiVoicePanel, VoiceEngineChoice } from "./AiVoiceSettings";
+import { VOICE_PREVIEW_TEXT } from "@/lib/ai-voice/preferences";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -62,9 +66,6 @@ const FONT_NAMES = [
   "Yusei Magic",
   "Potta One",
 ];
-
-const sectionHeadingCn =
-  "mb-3 mt-6 border-b-2 border-dotted text-xs font-extrabold uppercase tracking-widest text-muted-foreground text-left";
 
 type PreloadProgress = { done: number; total: number } | null;
 type CancelFn = () => void;
@@ -223,11 +224,11 @@ const FillTheKanjiDownloads = () => {
           </span>
         </AccordionTrigger>
         <AccordionContent className="pb-0 pl-3 border-l-2 border-dotted">
-          {FILL_THE_KANJI_SETS.map(({ id, label, sizeHint }) => (
+          {FILL_THE_KANJI_SETS.map(({ id, label, sizeHint, unit }) => (
             <DataDownloadRow
               key={id}
               label={label}
-              sizeHint={sizeHint}
+              sizeHint={`${sizeHint} · ${approxRowCountLabel(id)} ${unit}`}
               completeKey={fillTheKanjiPreloadKey(id)}
               startPreload={(onProgress) =>
                 preloadFillTheKanjiSet(id, onProgress)
@@ -254,10 +255,8 @@ const FontGrid = () => {
           aria-pressed={fontIndex === i}
           title={name}
           className={cn(
-            "flex flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 transition-colors",
-            fontIndex === i
-              ? "border-theme-color-with-opacity-100 background-theme-color-with-opacity-25"
-              : "border-input hover:bg-accent"
+            "flex flex-col items-center justify-center gap-1 p-2",
+            cnOptionTile(fontIndex === i)
           )}
         >
           <span
@@ -308,10 +307,9 @@ const JapaneseVoiceSection = () => {
   const [engine] = useVoiceEngine();
 
   return (
-    <section className="mt-6">
-      <h3 className={sectionHeadingCn}>Japanese Voice</h3>
+    <SimpleAccordion trigger="Japanese Voice">
       <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-left">
-        Voice <SpeakButton word={"こんにちは"} iconType="volume-2" />
+        Voice <SpeakButton word={VOICE_PREVIEW_TEXT} iconType="volume-2" />
       </div>
       <VoiceEngineChoice />
       {engine === "ai" && <AiVoicePanel />}
@@ -321,7 +319,7 @@ const JapaneseVoiceSection = () => {
           : "Browser voice"}
       </div>
       <JpVoiceSelect />
-    </section>
+    </SimpleAccordion>
   );
 };
 
@@ -384,31 +382,10 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Offline data caching, presentation, Japanese voice, and stroke animation preferences"
+        description="Presentation, Japanese voice, offline data caching, and stroke animation preferences"
         titleClassName="text-left"
       >
-        <section>
-          <h3 className={sectionHeadingCn}>Data</h3>
-          <DataDownloadRow
-            label="Download Kanji SVGs"
-            sizeHint="~16 MB · stroke order for ~2000 kanji"
-            completeKey="svg-preload-complete"
-            startPreload={preloadKanjiSvgs}
-            clearCache={clearKanjiSvgCache}
-          />
-          <DataDownloadRow
-            label="Download Katakana Challenges"
-            sizeHint="~1 MB · 10,000 speed katakana words"
-            completeKey="katakana-preload-complete"
-            startPreload={preloadKatakanaChallenges}
-            clearCache={clearKatakanaCache}
-          />
-          <FillTheKanjiDownloads />
-        </section>
-
-        <section className="mt-6">
-          <h3 className={sectionHeadingCn}>Presentation</h3>
-
+        <SimpleAccordion trigger="Presentation" defaultOpen>
           <div className="mb-4 text-left">
             <span className="block mb-2 text-sm font-semibold">
               Japanese Font
@@ -424,17 +401,34 @@ export const SettingsModal = ({
           </div>
 
           <LightDarkRow />
-        </section>
+        </SimpleAccordion>
 
         <JapaneseVoiceSection />
 
-        <section className="mt-6">
-          <h3 className={sectionHeadingCn}>Stroke order</h3>
+        <SimpleAccordion trigger="Data">
+          <DataDownloadRow
+            label="Download Kanji SVGs"
+            sizeHint="~16 MB · stroke order for ~2000 kanji"
+            completeKey="svg-preload-complete"
+            startPreload={preloadKanjiSvgs}
+            clearCache={clearKanjiSvgCache}
+          />
+          <DataDownloadRow
+            label="Download Katakana Challenges"
+            sizeHint="~1 MB · 10,000 speed katakana words"
+            completeKey="katakana-preload-complete"
+            startPreload={preloadKatakanaChallenges}
+            clearCache={clearKatakanaCache}
+          />
+          <FillTheKanjiDownloads />
+        </SimpleAccordion>
+
+        <SimpleAccordion trigger="Stroke Order">
           <p className="mb-3 text-xs text-left text-muted-foreground">
             Used for kanji details, writing practice, and production practice.
           </p>
           <StrokeAnimationSettingsFields />
-        </section>
+        </SimpleAccordion>
       </ScrollableDialogContent>
     </Dialog>
   );

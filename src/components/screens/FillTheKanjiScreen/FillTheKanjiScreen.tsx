@@ -54,8 +54,7 @@ const FillTheKanjiScreen = () => {
   };
 
   const finishRound = (roundResults: ItemResult[]) => {
-    const correct = roundResults.filter((r) => r.correct).length;
-    recordRoundAttempt(setId, round, correct, roundResults.length);
+    recordRoundAttempt(setId, round);
     recordActivity("fillTheKanji");
     setResults(roundResults);
     setPhase("ended");

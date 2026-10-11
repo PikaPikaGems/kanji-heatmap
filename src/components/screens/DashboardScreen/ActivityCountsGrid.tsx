@@ -30,13 +30,6 @@ export const ActivityCountsGrid = ({
   <div className="flex flex-col gap-2 sm:gap-3">
     <div className={COUNTS_ROW_CN}>
       <OverviewStat
-        value={stats.productionDays}
-        title={productionPracticePageMeta.shortLabel}
-        unit="Days"
-        Icon={PenLine}
-        compact
-      />
-      <OverviewStat
         value={stats.recognitionDays}
         title={recognitionPracticePageMeta.shortLabel}
         unit="Days"
@@ -44,10 +37,10 @@ export const ActivityCountsGrid = ({
         compact
       />
       <OverviewStat
-        value={stats.speedKatakanaDays}
-        title={speedKatakanaPageMeta.shortLabel}
+        value={stats.productionDays}
+        title={productionPracticePageMeta.shortLabel}
         unit="Days"
-        Icon={Keyboard}
+        Icon={PenLine}
         compact
       />
       <OverviewStat
@@ -57,15 +50,15 @@ export const ActivityCountsGrid = ({
         Icon={Puzzle}
         compact
       />
-    </div>
-    <div className={COUNTS_ROW_CN}>
       <OverviewStat
-        value={stats.productionRounds}
-        title={productionPracticePageMeta.shortLabel}
-        unit="Rounds"
-        Icon={PenLine}
+        value={stats.speedKatakanaDays}
+        title={speedKatakanaPageMeta.shortLabel}
+        unit="Days"
+        Icon={Keyboard}
         compact
       />
+    </div>
+    <div className={COUNTS_ROW_CN}>
       <OverviewStat
         value={stats.recognitionRounds}
         title={recognitionPracticePageMeta.shortLabel}
@@ -74,10 +67,10 @@ export const ActivityCountsGrid = ({
         compact
       />
       <OverviewStat
-        value={stats.speedKatakanaSessions}
-        title={speedKatakanaPageMeta.shortLabel}
-        unit="Sessions"
-        Icon={Keyboard}
+        value={stats.productionRounds}
+        title={productionPracticePageMeta.shortLabel}
+        unit="Rounds"
+        Icon={PenLine}
         compact
       />
       <OverviewStat
@@ -85,6 +78,13 @@ export const ActivityCountsGrid = ({
         title={fillTheKanjiPageMeta.shortLabel}
         unit="Rounds"
         Icon={Puzzle}
+        compact
+      />
+      <OverviewStat
+        value={stats.speedKatakanaSessions}
+        title={speedKatakanaPageMeta.shortLabel}
+        unit="Sessions"
+        Icon={Keyboard}
         compact
       />
     </div>

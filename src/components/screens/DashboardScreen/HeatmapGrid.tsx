@@ -1,12 +1,90 @@
-import { ReactNode } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
-  PopoverTrigger,
 } from "@/components/ui/popover";
 
-/** One heatmap square: colored button that opens a detail popover. */
+type ToggleDetail = (anchor: HTMLElement, detail: ReactNode) => void;
+
+const HeatmapPopoverContext = createContext<ToggleDetail | null>(null);
+
+type PopoverState = { anchor: HTMLElement; detail: ReactNode; open: boolean };
+
+/**
+ * One detail popover shared by every HeatmapCell inside it. A Radix Popover
+ * per cell made opening the Fill the Kanji heatmap (~1,900 cells) take about
+ * a second; cells are now plain buttons that point this popover at themselves.
+ */
+export const HeatmapPopoverProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [state, setState] = useState<PopoverState | null>(null);
+  // Set when the popover closes from a click elsewhere, so focus isn't pulled
+  // back to the old cell (what Radix does for a regular PopoverTrigger).
+  const closedByOutsideRef = useRef(false);
+
+  // Stable so the provider's state changes don't re-render every cell.
+  const toggle = useCallback<ToggleDetail>((anchor, detail) => {
+    setState((cur) =>
+      cur?.open && cur.anchor === anchor
+        ? { ...cur, open: false }
+        : { anchor, detail, open: true }
+    );
+  }, []);
+
+  const anchor = state?.anchor;
+  const virtualRef = useMemo(() => ({ current: anchor ?? null }), [anchor]);
+
+  return (
+    <HeatmapPopoverContext.Provider value={toggle}>
+      {children}
+      <Popover
+        open={state?.open ?? false}
+        onOpenChange={(open) => {
+          if (!open) setState((cur) => cur && { ...cur, open: false });
+        }}
+      >
+        {virtualRef.current && <PopoverAnchor virtualRef={virtualRef} />}
+        <PopoverContent
+          className="w-56 p-3"
+          side="top"
+          onOpenAutoFocus={() => {
+            closedByOutsideRef.current = false;
+          }}
+          onInteractOutside={(e) => {
+            // A click on the open cell itself is handled by its toggle.
+            if (anchor?.contains(e.target as Node)) {
+              e.preventDefault();
+              return;
+            }
+            closedByOutsideRef.current = true;
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+            if (!closedByOutsideRef.current) anchor?.focus();
+          }}
+        >
+          {/* Kept after closing so the fade-out still shows the content. */}
+          {state?.detail}
+        </PopoverContent>
+      </Popover>
+    </HeatmapPopoverContext.Provider>
+  );
+};
+
+/** One heatmap square: colored button that opens the shared detail popover. */
 export const HeatmapCell = ({
   cellPx,
   fillCn,
@@ -17,28 +95,30 @@ export const HeatmapCell = ({
   fillCn: string;
   label: string;
   detail: ReactNode;
-}) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <button
-        type="button"
-        aria-label={label}
-        title={label}
-        style={{ width: cellPx, height: cellPx }}
-        className={cn(
-          "cursor-pointer rounded-[2px] outline-none transition-colors",
-          "hover:bg-cyan-400 hover:border-foreground",
-          "hover:ring-2 hover:ring-foreground/30 hover:ring-offset-1 hover:ring-offset-background",
-          "focus-visible:ring-2 focus-visible:ring-ring",
-          fillCn
-        )}
-      />
-    </PopoverTrigger>
-    <PopoverContent className="w-56 p-3" side="top">
-      {detail}
-    </PopoverContent>
-  </Popover>
-);
+}) => {
+  const toggleDetail = useContext(HeatmapPopoverContext);
+  if (!toggleDetail) {
+    throw new Error("HeatmapCell must be inside a HeatmapPopoverProvider");
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      aria-haspopup="dialog"
+      title={label}
+      onClick={(e) => toggleDetail(e.currentTarget, detail)}
+      style={{ width: cellPx, height: cellPx }}
+      className={cn(
+        "cursor-pointer rounded-[2px] outline-none transition-colors",
+        "hover:bg-cyan-400 hover:border-foreground",
+        "hover:ring-2 hover:ring-foreground/30 hover:ring-offset-1 hover:ring-offset-background",
+        "focus-visible:ring-2 focus-visible:ring-ring",
+        fillCn
+      )}
+    />
+  );
+};
 
 /**
  * Fixed-size contribution grid (GitHub/Cursor-style): top labels (one per

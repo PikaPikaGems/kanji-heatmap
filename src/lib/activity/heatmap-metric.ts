@@ -1,6 +1,7 @@
 import type { FreqCategory } from "@/lib/freq/freq-category";
 import type { ChallengeSetStats } from "@/components/screens/SpeedKatakanaScreen/storage";
 import { cpmToBand, CPM_BAND_LABELS } from "./cpm-band";
+import { getActivityLevel } from "./queries";
 
 /** Which stat a Speed Katakana heatmap cell's color represents. */
 export type HeatmapCellMetric =
@@ -53,13 +54,51 @@ const accuracyToBand = (accuracy: number | undefined): FreqCategory => {
   return 4;
 };
 
-export const attemptCountToBand = (count: number | undefined): FreqCategory => {
-  const value = count ?? 0;
-  if (value <= 0) return 0;
-  if (value === 1) return 1;
-  if (value <= 3) return 2;
-  if (value <= 6) return 3;
+/** How attempt counts map to cell brightness on the game heatmaps. */
+export type AttemptCountScale = "relative" | "fixed";
+
+export const DEFAULT_ATTEMPT_COUNT_SCALE: AttemptCountScale = "relative";
+
+export const ATTEMPT_COUNT_SCALES: AttemptCountScale[] = ["relative", "fixed"];
+
+export const ATTEMPT_COUNT_SCALE_LABELS: Record<AttemptCountScale, string> = {
+  relative: "Relative to your most-attempted",
+  fixed: "Fixed steps (1, 2–3, 4+)",
+};
+
+/** Attempt-count coloring: the chosen scale plus the most attempts on any cell. */
+export type AttemptCountShading = {
+  scale: AttemptCountScale;
+  maxCount: number;
+};
+
+/** Fixed steps: a single attempt already shows at half brightness. */
+const fixedAttemptCountToBand = (count: number): FreqCategory => {
+  if (count <= 0) return 0;
+  if (count === 1) return 2;
+  if (count <= 3) return 3;
   return 4;
+};
+
+/**
+ * "relative" uses the Activity Heatmap's rule (vs the most-attempted cell, so
+ * that cell is always brightest); "fixed" uses fixedAttemptCountToBand.
+ */
+export const attemptCountToBand = (
+  count: number | undefined,
+  { scale, maxCount }: AttemptCountShading
+): FreqCategory => {
+  const value = count ?? 0;
+  return scale === "relative"
+    ? getActivityLevel(value, maxCount)
+    : fixedAttemptCountToBand(value);
+};
+
+/** Popover line for a cell's attempt count, e.g. "1 attempt". */
+export const attemptCountLabel = (count: number | undefined): string => {
+  const value = count ?? 0;
+  if (value <= 0) return "Not attempted";
+  return value === 1 ? "1 attempt" : `${value} attempts`;
 };
 
 const ACCURACY_BAND_LABELS: Record<FreqCategory, string> = {
@@ -70,16 +109,9 @@ const ACCURACY_BAND_LABELS: Record<FreqCategory, string> = {
   4: "90–100% accuracy",
 };
 
-export const ATTEMPT_COUNT_BAND_LABELS: Record<FreqCategory, string> = {
-  0: "Not attempted",
-  1: "1 attempt",
-  2: "2–3 attempts",
-  3: "4–6 attempts",
-  4: "7+ attempts",
-};
-
+/** Band labels for the fixed-band metrics; attempt count uses attemptCountLabel. */
 export const HEATMAP_METRIC_BAND_LABELS: Record<
-  HeatmapCellMetric,
+  Exclude<HeatmapCellMetric, "attemptCount">,
   Record<FreqCategory, string>
 > = {
   bestSpeedOver70: CPM_BAND_LABELS,
@@ -87,13 +119,13 @@ export const HEATMAP_METRIC_BAND_LABELS: Record<
   currentSpeed: CPM_BAND_LABELS,
   bestAccuracy: ACCURACY_BAND_LABELS,
   currentAccuracy: ACCURACY_BAND_LABELS,
-  attemptCount: ATTEMPT_COUNT_BAND_LABELS,
 };
 
 /** Band (0–4) a challenge set's cell should be painted, for the chosen metric. */
 export const metricToBand = (
   stats: ChallengeSetStats | null,
-  metric: HeatmapCellMetric
+  metric: HeatmapCellMetric,
+  attemptShading: AttemptCountShading
 ): FreqCategory => {
   if (!stats) return 0;
   switch (metric) {
@@ -108,7 +140,7 @@ export const metricToBand = (
     case "currentAccuracy":
       return accuracyToBand(stats.latestAccuracy);
     case "attemptCount":
-      return attemptCountToBand(stats.timesTaken);
+      return attemptCountToBand(stats.timesTaken, attemptShading);
   }
 };
 

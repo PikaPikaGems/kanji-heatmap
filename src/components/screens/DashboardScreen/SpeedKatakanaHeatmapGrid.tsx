@@ -1,6 +1,7 @@
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,
+  SPEED_KATAKANA_TOTAL_CHALLENGES,
   levelOf,
   positionInLevel,
   setFromLevelAndPos,
@@ -13,11 +14,15 @@ import {
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import {
+  AttemptCountShading,
+  attemptCountLabel,
   HEATMAP_METRIC_BAND_LABELS,
   HeatmapCellMetric,
   metricToBand,
   metricValueText,
 } from "@/lib/activity";
+import { useAttemptCountScale } from "@/hooks/use-attempt-count-scale";
+import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
 import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 
@@ -45,9 +50,11 @@ const SetDetail = ({
       {stats ? (
         <>
           <div className="text-muted-foreground">
-            {band === 0 && metric === "bestSpeedOver70"
-              ? "No run above 70% accuracy"
-              : HEATMAP_METRIC_BAND_LABELS[metric][band]}
+            {metric === "attemptCount"
+              ? attemptCountLabel(stats.timesTaken)
+              : band === 0 && metric === "bestSpeedOver70"
+                ? "No run above 70% accuracy"
+                : HEATMAP_METRIC_BAND_LABELS[metric][band]}
           </div>
           <div className="flex justify-between gap-4">
             <span>Best speed</span>
@@ -77,10 +84,13 @@ const SetDetail = ({
               {stats.latestAccuracy}%
             </span>
           </div>
-          <div className="flex justify-between gap-4">
-            <span>Attempts</span>
-            <span className="font-bold tabular-nums">{stats.timesTaken}</span>
-          </div>
+          {/* The top line already shows the count when coloring by it. */}
+          {metric !== "attemptCount" && (
+            <div className="flex justify-between gap-4">
+              <span>Attempts</span>
+              <span className="font-bold tabular-nums">{stats.timesTaken}</span>
+            </div>
+          )}
         </>
       ) : (
         <div className="text-muted-foreground">Not attempted yet</div>
@@ -95,6 +105,14 @@ const SetDetail = ({
           <Link to={speedKatakanaChallengeHref(setNumber)}>Practice Now</Link>
         </Button>
       </div>
+      {stats && (
+        <div className="text-center text-muted-foreground">
+          Last attempted:{" "}
+          {stats.lastAttempted != null
+            ? formatLastAttempted(stats.lastAttempted)
+            : "not recorded"}
+        </div>
+      )}
     </div>
   );
 };
@@ -102,12 +120,14 @@ const SetDetail = ({
 const ChallengeSetCell = ({
   setNumber,
   metric,
+  attemptShading,
 }: {
   setNumber: number;
   metric: HeatmapCellMetric;
+  attemptShading: AttemptCountShading;
 }) => {
   const stats = readSetStats(setNumber);
-  const band = metricToBand(stats, metric);
+  const band = metricToBand(stats, metric, attemptShading);
   const level = levelOf(setNumber);
   const pos = positionInLevel(setNumber);
   const challengeLabel = `Challenge ${level}-${pos} (#${setNumber})`;
@@ -131,6 +151,15 @@ const ChallengeSetCell = ({
   );
 };
 
+/** Most attempts on any challenge set, for the relative attempt-count scale. */
+const maxTimesTaken = () => {
+  let max = 0;
+  for (let set = 1; set <= SPEED_KATAKANA_TOTAL_CHALLENGES; set++) {
+    max = Math.max(max, readSetStats(set)?.timesTaken ?? 0);
+  }
+  return max;
+};
+
 /**
  * Fixed-size grid: 20 columns (levels) × 10 rows (sets per level).
  * Column flow fills each level top-to-bottom, then the next level.
@@ -140,6 +169,12 @@ export const SpeedKatakanaHeatmapGrid = ({
 }: {
   metric: HeatmapCellMetric;
 }) => {
+  const [scale] = useAttemptCountScale();
+  const attemptShading: AttemptCountShading = {
+    scale,
+    maxCount: maxTimesTaken(),
+  };
+
   return (
     <HeatmapGrid
       cellPx={CELL_PX}
@@ -158,6 +193,7 @@ export const SpeedKatakanaHeatmapGrid = ({
               key={setNumber}
               setNumber={setNumber}
               metric={metric}
+              attemptShading={attemptShading}
             />
           );
         })

@@ -3,11 +3,7 @@ import { STATS_KEY_PREFIX } from "@/components/screens/SpeedKatakanaScreen/stora
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { useHeatmapCellMetric } from "@/hooks/use-heatmap-cell-metric";
 import { GradientLegend } from "@/components/common/GradientLegend";
-import {
-  HEATMAP_METRIC_GRADIENT_LABELS,
-  HEATMAP_METRIC_LABELS,
-} from "@/lib/activity";
-import { SectionHeading } from "./SectionHeading";
+import { HEATMAP_METRIC_GRADIENT_LABELS } from "@/lib/activity";
 import { DashboardPanel } from "./DashboardPanel";
 import { SpeedKatakanaHeatmapGrid } from "./SpeedKatakanaHeatmapGrid";
 import { SpeedKatakanaHeatmapSettingsPopover } from "./SpeedKatakanaHeatmapSettingsPopover";
@@ -20,11 +16,7 @@ export const SpeedKatakanaHeatmap = () => {
   const gradientLabels = HEATMAP_METRIC_GRADIENT_LABELS[metric];
 
   return (
-    <DashboardPanel>
-      <SectionHeading
-        title={speedKatakanaPageMeta.shortLabel}
-        description={`Each cell is one challenge set (10 katakana words). Cells are currently colored by "${HEATMAP_METRIC_LABELS[metric]}" — brighter cells mean a higher value. Columns are levels 1–20; rows are sets within each level.`}
-      />
+    <DashboardPanel title={speedKatakanaPageMeta.shortLabel}>
       <div className="flex justify-center mb-6 animate-fade-in">
         <SpeedKatakanaHeatmapSettingsPopover />
       </div>

@@ -81,15 +81,6 @@ const RoundSummary = ({
             {stats.attemptCount === 1 ? "attempt" : "attempts"}
           </div>
           <div>🕒 Last played {formatLastAttempted(stats.lastAttempted)}</div>
-          <div>
-            🎯 Latest:{" "}
-            <span className="text-green-500">
-              {stats.latestCorrect}/{stats.itemCount}
-            </span>
-          </div>
-          <div>
-            🏆 Best: {stats.bestCorrect}/{stats.itemCount}
-          </div>
         </div>
       ) : (
         <div className="text-muted-foreground">Not played yet</div>
@@ -210,7 +201,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <p className="pt-2 text-xs text-center text-muted-foreground">
               Tip: during a round, press{" "}
               <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
-                V
+                !
               </kbd>{" "}
               to hear the sentence.
             </p>

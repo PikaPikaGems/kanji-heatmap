@@ -9,8 +9,20 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { GradientLegend } from "@/components/common/GradientLegend";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
-import { ATTEMPT_COUNT_BAND_LABELS, attemptCountToBand } from "@/lib/activity";
 import {
+  AttemptCountShading,
+  attemptCountLabel,
+  attemptCountToBand,
+} from "@/lib/activity";
+import { useAttemptCountScale } from "@/hooks/use-attempt-count-scale";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  FILL_THE_KANJI_SET_GROUPS,
   FILL_THE_KANJI_SETS,
   FillTheKanjiSetId,
 } from "@/lib/fill-the-kanji/sets";
@@ -22,14 +34,15 @@ import {
 import {
   readSetRoundStats,
   RoundStats,
+  SetRoundStats,
   STATS_KEY_PREFIX,
 } from "@/lib/fill-the-kanji/storage";
 import { fillTheKanjiRoundHref } from "@/lib/fill-the-kanji/links";
 import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
-import { SectionHeading } from "./SectionHeading";
 import { DashboardPanel } from "./DashboardPanel";
 import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
+import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
@@ -41,7 +54,7 @@ const SETTINGS_KEY = "fill-the-kanji-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
 const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 
-/** Wide / Compact layout switch, same as the Activity Heatmap's. */
+/** Wide / Compact layout switch plus the attempt-count brightness scale. */
 const LayoutSettingsPopover = ({
   compact,
   onChange,
@@ -89,6 +102,9 @@ const LayoutSettingsPopover = ({
               Compact
             </Label>
           </div>
+          <div className="pt-3 border-t border-dotted">
+            <AttemptCountScaleOptions />
+          </div>
         </div>
       }
     />
@@ -114,33 +130,9 @@ const RoundDetail = ({
         Sentences {start + 1}–{end}
       </div>
       {stats ? (
-        <>
-          <div className="text-muted-foreground">
-            {ATTEMPT_COUNT_BAND_LABELS[attemptCountToBand(stats.attemptCount)]}
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Attempts</span>
-            <span className="font-bold tabular-nums">{stats.attemptCount}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Latest</span>
-            <span className="font-bold tabular-nums">
-              {stats.latestCorrect}/{stats.itemCount}
-            </span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Best</span>
-            <span className="font-bold tabular-nums">
-              {stats.bestCorrect}/{stats.itemCount}
-            </span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Last played</span>
-            <span className="font-bold">
-              {formatLastAttempted(stats.lastAttempted)}
-            </span>
-          </div>
-        </>
+        <div className="text-muted-foreground">
+          {attemptCountLabel(stats.attemptCount)}
+        </div>
       ) : (
         <div className="text-muted-foreground">Not attempted yet</div>
       )}
@@ -154,6 +146,11 @@ const RoundDetail = ({
           <Link to={fillTheKanjiRoundHref(setId, round)}>Practice Now</Link>
         </Button>
       </div>
+      {stats && (
+        <div className="text-center text-muted-foreground">
+          Last attempted: {formatLastAttempted(stats.lastAttempted)}
+        </div>
+      )}
     </div>
   );
 };
@@ -161,12 +158,15 @@ const RoundDetail = ({
 /** One set's rounds, `columns` per row, painted by attempt count. */
 const SetHeatmapGrid = ({
   setId,
+  stats,
   columns,
+  attemptShading,
 }: {
   setId: FillTheKanjiSetId;
+  stats: SetRoundStats;
   columns: number;
+  attemptShading: AttemptCountShading;
 }) => {
-  const stats = readSetRoundStats(setId);
   const total = roundCount(setId);
   const played = Object.keys(stats).length;
   const label = FILL_THE_KANJI_SETS.find((s) => s.id === setId)?.label;
@@ -196,7 +196,9 @@ const SetHeatmapGrid = ({
               <HeatmapCell
                 key={round}
                 cellPx={CELL_PX}
-                fillCn={heatmapFillCn(attemptCountToBand(attempts))}
+                fillCn={heatmapFillCn(
+                  attemptCountToBand(attempts, attemptShading)
+                )}
                 label={`Round ${roundLabel(round)}: ${attempts} attempts`}
                 detail={
                   <RoundDetail setId={setId} round={round} stats={roundStats} />
@@ -210,7 +212,35 @@ const SetHeatmapGrid = ({
   );
 };
 
-/** Every challenge set's heatmap, stacked. */
+/** Group title plus how many of its rounds have been played. */
+const GroupTrigger = ({
+  title,
+  setIds,
+  statsById,
+}: {
+  title: string;
+  setIds: FillTheKanjiSetId[];
+  statsById: Map<FillTheKanjiSetId, SetRoundStats>;
+}) => {
+  const played = setIds.reduce(
+    (sum, id) => sum + Object.keys(statsById.get(id) ?? {}).length,
+    0
+  );
+  const total = setIds.reduce((sum, id) => sum + roundCount(id), 0);
+  return (
+    <span className="flex flex-col">
+      <span className="text-sm font-semibold">{title}</span>
+      <span className="text-xs font-normal text-muted-foreground tabular-nums">
+        {played}/{total} rounds played
+      </span>
+    </span>
+  );
+};
+
+/**
+ * Every challenge set's heatmap, in collapsible groups (only the first open),
+ * so opening the section doesn't draw every grid at once.
+ */
 export const FillTheKanjiHeatmap = () => {
   const revision = useStorageRevision(
     (key) => key == null || key.startsWith(STATS_KEY_PREFIX)
@@ -221,21 +251,56 @@ export const FillTheKanjiHeatmap = () => {
   );
   const compact = settings.compact === true;
   const columns = compact ? COMPACT_COLUMNS : WIDE_COLUMNS;
+  const [scale] = useAttemptCountScale();
+
+  // Read every set up front: the relative scale compares against the most
+  // attempts on any round across all sets.
+  const statsById = new Map(
+    FILL_THE_KANJI_SETS.map(({ id }) => [id, readSetRoundStats(id)] as const)
+  );
+  const maxCount = Math.max(
+    0,
+    ...[...statsById.values()].flatMap((stats) =>
+      Object.values(stats).map((s) => s.attemptCount)
+    )
+  );
+  const attemptShading: AttemptCountShading = { scale, maxCount };
 
   return (
-    <DashboardPanel>
-      <SectionHeading
-        title={fillTheKanjiPageMeta.shortLabel}
-        description="Each challenge set has its own heatmap. Each cell is one round of 20 sentences (the last round also takes any leftovers), 50 rounds per row (25 in the compact layout). Brighter cells mean more attempts."
-      />
-      <div
+    <DashboardPanel title={fillTheKanjiPageMeta.shortLabel}>
+      <Accordion
         key={revision}
-        className="flex flex-col gap-5 mx-auto w-fit max-w-full animate-fade-in"
+        type="multiple"
+        defaultValue={[FILL_THE_KANJI_SET_GROUPS[0].title]}
+        className="animate-fade-in"
       >
-        {FILL_THE_KANJI_SETS.map(({ id }) => (
-          <SetHeatmapGrid key={id} setId={id} columns={columns} />
+        {FILL_THE_KANJI_SET_GROUPS.map(({ title, setIds }) => (
+          <AccordionItem
+            key={title}
+            value={title}
+            className="border-b-2 border-dashed last:border-b-0"
+          >
+            <AccordionTrigger className="py-3 text-left hover:no-underline">
+              <GroupTrigger
+                title={title}
+                setIds={setIds}
+                statsById={statsById}
+              />
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-5 pl-3 border-l-2 border-dotted">
+              {setIds.map((id) => (
+                <SetHeatmapGrid
+                  key={id}
+                  setId={id}
+                  stats={statsById.get(id) ?? {}}
+                  columns={columns}
+                  attemptShading={attemptShading}
+                />
+              ))}
+            </AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
       <div className="flex items-center justify-center w-full mt-4">
         <div className="flex items-center gap-1">
           <GradientLegend /> ·

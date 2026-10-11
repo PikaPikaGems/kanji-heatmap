@@ -6,6 +6,7 @@ import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaHeatmap } from "./SpeedKatakanaHeatmap";
 import { FillTheKanjiHeatmap } from "./FillTheKanjiHeatmap";
 import { BookmarksBreakdown } from "./BookmarksBreakdown";
+import { HeatmapPopoverProvider } from "./HeatmapGrid";
 
 const showTitle = false;
 const DashboardScreen = () => {
@@ -22,10 +23,12 @@ const DashboardScreen = () => {
         <LocalStorageWarning className="mt-2 text-sm" />
       </header>
 
-      <StatsOverview />
-      <ActivityCalendarHeatmap />
-      <SpeedKatakanaHeatmap />
-      <FillTheKanjiHeatmap />
+      <HeatmapPopoverProvider>
+        <StatsOverview />
+        <ActivityCalendarHeatmap />
+        <FillTheKanjiHeatmap />
+        <SpeedKatakanaHeatmap />
+      </HeatmapPopoverProvider>
       <BookmarksBreakdown />
     </ScreenShell>
   );

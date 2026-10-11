@@ -1,16 +1,14 @@
 import { notifyStorage, safeReadJson } from "@/lib/storage";
 import { FILL_THE_KANJI_SETS, FillTheKanjiSetId } from "./sets";
 
-/** Stats for one finished round. Only full rounds are recorded. */
+/**
+ * Stats for one finished round. Only full rounds are recorded, and only how
+ * often and when: scores are deliberately not stored.
+ */
 export type RoundStats = {
   attemptCount: number;
   /** ms since epoch of the most recent finished attempt. */
   lastAttempted: number;
-  /** Sentences answered correctly in the latest / best attempt. */
-  latestCorrect: number;
-  bestCorrect: number;
-  /** Sentences in the round when last played (20, or more for the last round). */
-  itemCount: number;
 };
 
 /** Per-set map of 1-based round number → stats. */
@@ -37,22 +35,25 @@ export const countAllAttemptedRounds = (): number =>
     0
   );
 
-/** Merges one finished round into the stored stats for its set. */
+/**
+ * Merges one finished round into the stored stats for its set. Rewrites every
+ * round with only the RoundStats fields, which also drops the scores
+ * (latestCorrect / bestCorrect / itemCount) that older versions stored.
+ */
 export const recordRoundAttempt = (
   setId: FillTheKanjiSetId,
   round: number,
-  correct: number,
-  itemCount: number,
   at: Date = new Date()
 ): void => {
-  const all = readSetRoundStats(setId);
-  const prev = all[String(round)];
+  const all: SetRoundStats = {};
+  for (const [key, { attemptCount, lastAttempted }] of Object.entries(
+    readSetRoundStats(setId)
+  )) {
+    all[key] = { attemptCount, lastAttempted };
+  }
   all[String(round)] = {
-    attemptCount: (prev?.attemptCount ?? 0) + 1,
+    attemptCount: (all[String(round)]?.attemptCount ?? 0) + 1,
     lastAttempted: at.getTime(),
-    latestCorrect: correct,
-    bestCorrect: Math.max(correct, prev?.bestCorrect ?? 0),
-    itemCount,
   };
   try {
     localStorage.setItem(statsKey(setId), JSON.stringify(all));
