@@ -200,28 +200,76 @@ export const toVoiceSettings = (
     : delivery;
 };
 
+/** Speed multiplier for the snail ("say it slowly") buttons. */
+export const SLOW_SPEED_FACTOR = 0.7;
+
+type AudioSession = { type: string };
+const audioSession = (): AudioSession | undefined =>
+  (navigator as Navigator & { audioSession?: AudioSession }).audioSession;
+
+// AI speeches in progress, and the session type to restore when none are.
+let activeSpeeches = 0;
+let typeBeforeSpeech: string | null = null;
+
 /**
- * Speaks with the AI voice. Rejects when it can't (callers fall back to the
- * browser voice). `onStart` fires when audio actually starts playing.
+ * iOS mutes Web Audio (which yomiage plays through) when the ring / silent
+ * switch is on silent, while the browser voice still plays, so the AI voice
+ * seemed silent with no error. "playback" makes it play like a video does
+ * (and pauses music in other apps). Only while the AI voice speaks: other
+ * page sounds, like the correct-answer beep, still respect the switch.
+ * Safari 16.4+ only; elsewhere these do nothing.
  */
-export const speakAi = async (
+const beginSpeechAudio = () => {
+  activeSpeeches++;
+  const session = audioSession();
+  if (activeSpeeches > 1 || !session) return;
+  try {
+    typeBeforeSpeech = session.type;
+    session.type = "playback";
+  } catch {
+    // Best effort; sound still plays when the switch is off silent.
+  }
+};
+
+const endSpeechAudio = () => {
+  activeSpeeches--;
+  const session = audioSession();
+  if (activeSpeeches > 0 || !session || typeBeforeSpeech == null) return;
+  try {
+    session.type = typeBeforeSpeech;
+  } catch {
+    // Best effort.
+  }
+  typeBeforeSpeech = null;
+};
+
+type SpeakAiOptions = {
+  settings?: AiVoiceSettings;
+  /** Speak slower than the saved speed (snail buttons). */
+  slow?: boolean;
+  onStart?: () => void;
+  otherLanguages?: OtherLanguages;
+};
+
+const speakAiNow = async (
   text: string,
-  {
-    settings,
-    onStart,
-    otherLanguages,
-  }: {
-    settings?: AiVoiceSettings;
-    onStart?: () => void;
-    otherLanguages?: OtherLanguages;
-  } = {}
+  { settings, slow, onStart, otherLanguages }: SpeakAiOptions
 ): Promise<"done" | "stopped"> => {
   const mod = await loadYomiage();
   if (!mod || !voice) throw new Error("AI voice not loaded");
 
+  const saved = settings ?? readAiVoiceSettings();
+  // yomiage clamps speed to its range, so a very slow saved speed stays valid.
+  const chosen = slow
+    ? {
+        ...saved,
+        speed: (saved.speed ?? mod.DEFAULTS.speed) * SLOW_SPEED_FACTOR,
+      }
+    : saved;
+
   let started = false;
   return voice.speak(text, {
-    ...toVoiceSettings(settings ?? readAiVoiceSettings(), mod.PRESETS),
+    ...toVoiceSettings(chosen, mod.PRESETS),
     ...(otherLanguages && { otherLanguages }),
     onSentence: () => {
       if (started) return;
@@ -229,6 +277,22 @@ export const speakAi = async (
       onStart?.();
     },
   });
+};
+
+/**
+ * Speaks with the AI voice. Rejects when it can't (callers fall back to the
+ * browser voice). `onStart` fires when audio actually starts playing.
+ */
+export const speakAi = async (
+  text: string,
+  options: SpeakAiOptions = {}
+): Promise<"done" | "stopped"> => {
+  beginSpeechAudio();
+  try {
+    return await speakAiNow(text, options);
+  } finally {
+    endSpeechAudio();
+  }
 };
 
 export const getAiVoiceDebugReport = async (): Promise<string> => {

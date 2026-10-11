@@ -30,8 +30,11 @@ const FillTheKanjiScreen = () => {
   const [phase, setPhase] = useState<Phase>("initial");
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<ItemResult[] | null>(null);
-  // Bumped per start so "Retry this round" remounts the game with new blanks.
+  // Bumped per start so "Retry mistakes" remounts the game with new blanks.
   const [playKey, setPlayKey] = useState(0);
+  // Sentences being retried; null while playing a full round. A retry isn't
+  // a round attempt, so it isn't recorded in the stats.
+  const [retryJp, setRetryJp] = useState<string[] | null>(null);
 
   // Re-render the start screen's counts when a round is recorded.
   useStorageRevision((key) => key == null || key.startsWith(STATS_KEY_PREFIX));
@@ -41,7 +44,8 @@ const FillTheKanjiScreen = () => {
       ? (countAllAttemptedRounds() / totalRoundCount()) * 100
       : progress;
 
-  const play = () => {
+  const play = (onlyJp: string[] | null = null) => {
+    setRetryJp(onlyJp);
     setProgress(0);
     setResults(null);
     setPlayKey((k) => k + 1);
@@ -54,8 +58,10 @@ const FillTheKanjiScreen = () => {
   };
 
   const finishRound = (roundResults: ItemResult[]) => {
-    recordRoundAttempt(setId, round);
-    recordActivity("fillTheKanji");
+    if (retryJp == null) {
+      recordRoundAttempt(setId, round);
+      recordActivity("fillTheKanji");
+    }
     setResults(roundResults);
     setPhase("ended");
   };
@@ -69,7 +75,7 @@ const FillTheKanjiScreen = () => {
     <PracticeShell progress={headerProgress}>
       {phase === "initial" && (
         <div key="initial" className="h-full animate-fade-in">
-          <InitialScreen onStart={play} />
+          <InitialScreen onStart={() => play()} />
         </div>
       )}
 
@@ -78,6 +84,7 @@ const FillTheKanjiScreen = () => {
           <Game
             setId={setId}
             round={round}
+            onlyJp={retryJp}
             settings={settings}
             onProgress={setProgress}
             onComplete={finishRound}
@@ -90,9 +97,13 @@ const FillTheKanjiScreen = () => {
         <div key="ended" className="h-full animate-fade-in">
           <EndSession
             results={results}
-            roundLabel={`${setLabel(setId)} · Round ${roundLabel(round)}`}
+            roundLabel={`${retryJp ? "Mistakes · " : ""}${setLabel(
+              setId
+            )} · Round ${roundLabel(round)}`}
             onNext={playNextRound}
-            onRetry={play}
+            onRetryMistakes={() =>
+              play(results.filter((r) => !r.correct).map((r) => r.item.jp))
+            }
             onEnd={goToInitial}
           />
         </div>

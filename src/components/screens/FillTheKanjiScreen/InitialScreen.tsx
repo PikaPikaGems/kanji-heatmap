@@ -89,6 +89,12 @@ const RoundSummary = ({
   );
 };
 
+const Key = ({ children }: { children: string }) => (
+  <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
+    {children}
+  </kbd>
+);
+
 export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const { settings, setId, round, setSetting, selectSet, selectRound } =
     useFillTheKanjiSettings();
@@ -199,11 +205,8 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           </PracticeButton>
           {!isCoarsePointer && (
             <p className="pt-2 text-xs text-center text-muted-foreground">
-              Tip: during a round, press{" "}
-              <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
-                !
-              </kbd>{" "}
-              to hear the sentence.
+              Tip: during a round, press <Key>!</Key> to hear the sentence, or{" "}
+              <Key>@</Key> to hear it slowly.
             </p>
           )}
         </div>

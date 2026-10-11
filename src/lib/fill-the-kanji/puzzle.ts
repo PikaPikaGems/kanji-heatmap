@@ -90,10 +90,12 @@ export const buildPuzzle = (jp: string): Puzzle => {
 /**
  * TILE_COUNT shuffled tiles: the answers plus lookalike distractors.
  *
- * Distractor order: each answer's similar kanji (taken round-robin so every
- * answer gets a lookalike), then similars of those similars, then
- * `fallbackPool` (kanji from the rest of the round) for kanji with no
- * similars listed. Kanji already in the sentence are never distractors.
+ * Distractor order: each answer's similar kanji, most similar first (the
+ * similar-kanji lists are ordered that way), taken round-robin so every
+ * answer gets its closest lookalike; then similars of those similars, in the
+ * same order; then `fallbackPool` (kanji from the rest of the round) for
+ * kanji with no similars listed. Kanji already in the sentence are never
+ * distractors. Only the fallback pool and the final tile order are random.
  */
 export const buildTiles = ({
   answers,
@@ -119,12 +121,17 @@ export const buildTiles = ({
     }
   };
 
-  const firstDegree = answers.map((k) => shuffle(getSimilars(k)));
-  const longest = Math.max(0, ...firstDegree.map((list) => list.length));
-  for (let i = 0; i < longest; i++) {
-    take(firstDegree.map((list) => list[i]).filter((k) => k != null));
-  }
-  take(shuffle(firstDegree.flat().flatMap(getSimilars)));
+  // Rank 1 of every list, then rank 2 of every list, and so on.
+  const takeRoundRobin = (lists: string[][]) => {
+    const longest = Math.max(0, ...lists.map((list) => list.length));
+    for (let i = 0; i < longest; i++) {
+      take(lists.map((list) => list[i]).filter((k) => k != null));
+    }
+  };
+
+  const firstDegree = answers.map(getSimilars);
+  takeRoundRobin(firstDegree);
+  takeRoundRobin(firstDegree.map((list) => list.flatMap(getSimilars)));
   take(shuffle(fallbackPool));
 
   return shuffle([...answers, ...distractors]);

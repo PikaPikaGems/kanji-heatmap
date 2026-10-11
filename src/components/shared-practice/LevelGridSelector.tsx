@@ -80,7 +80,7 @@ export const LevelGridSelector = ({
           );
         })}
       </div>
-      <Label className="text-sm text-left">{itemHeading}</Label>
+      <Label className="pt-3 text-sm text-left">{itemHeading}</Label>
 
       <div className="grid grid-cols-10 gap-1">
         {Array.from({ length: currentLevelSize }, (_, i) => i + 1).map(

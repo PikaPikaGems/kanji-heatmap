@@ -58,8 +58,8 @@ const blankCn: Record<BlankState, string> = {
   filled: "border-dotted border-foreground/40",
   current: cn("border-dotted border-foreground", inputLikeRingCn),
   right:
-    "border-dashed border-green-500 bg-green-500/15 animate-practice-correct-pop",
-  wrong: "border-dashed border-red-500 bg-red-500/15 animate-practice-shake",
+    "border-dotted border-green-500 bg-green-500/15 animate-practice-correct-pop",
+  wrong: "border-dotted border-red-500 bg-red-500/15 animate-practice-shake",
 };
 
 /** Delay between neighbouring blanks' correct-answer pop (a ripple). */

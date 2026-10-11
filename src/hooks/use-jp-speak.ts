@@ -11,6 +11,9 @@ import { useVoiceEngine } from "./use-ai-voice";
  */
 export type SpeakStatus = "idle" | "preparing" | "speaking";
 
+/** Browser voice rate for the snail ("say it slowly") buttons. */
+const SLOW_BROWSER_RATE = 0.6;
+
 // Page-wide: the newest speak() wins. An AI call that fails after a newer
 // speak() started must not fall back and talk over it.
 let latestSpeakId = 0;
@@ -18,9 +21,9 @@ let latestSpeakId = 0;
 /**
  * Speaks `word` with the user's engine: the AI voice when AI Voice Mode is on
  * and it's ready, otherwise (or if it fails) the browser's text-to-speech.
- * Never throws.
+ * Never throws. `slow` reads it slower (snail buttons).
  */
-export const useSpeakWithStatus = (word: string) => {
+export const useSpeakWithStatus = (word: string, slow = false) => {
   const [voiceId] = useCurrentJpVoice();
   const [engine] = useVoiceEngine();
   const [status, setStatus] = useState<SpeakStatus>("idle");
@@ -52,6 +55,7 @@ export const useSpeakWithStatus = (word: string) => {
 
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = "ja-JP";
+    if (slow) utterance.rate = SLOW_BROWSER_RATE;
 
     if (!japaneseVoiceRef.current) {
       japaneseVoiceRef.current = resolveJpVoice(
@@ -65,7 +69,7 @@ export const useSpeakWithStatus = (word: string) => {
     }
 
     window.speechSynthesis.speak(utterance);
-  }, [word, voiceId]);
+  }, [word, voiceId, slow]);
 
   const speak = useCallback(() => {
     const id = ++latestSpeakId;
@@ -81,6 +85,7 @@ export const useSpeakWithStatus = (word: string) => {
     setStatus("preparing");
 
     speakAi(word, {
+      slow,
       onStart: () => {
         if (ownCallRef.current === ownCall) setStatus("speaking");
       },
@@ -91,7 +96,7 @@ export const useSpeakWithStatus = (word: string) => {
       .finally(() => {
         if (ownCallRef.current === ownCall) setStatus("idle");
       });
-  }, [engine, word, speakWithBrowser]);
+  }, [engine, word, slow, speakWithBrowser]);
 
   return { speak, status };
 };

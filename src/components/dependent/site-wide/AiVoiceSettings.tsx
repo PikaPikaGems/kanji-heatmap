@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { SpanBadge } from "@/components/ui/badge";
+import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import {
-  Copy,
   Download,
   Loader2,
   Play,
@@ -19,7 +19,6 @@ import {
   useVoiceEngine,
   useYomiageModule,
 } from "@/hooks/use-ai-voice";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import type { SpeakStatus } from "@/hooks/use-jp-speak";
 import {
   canSpeakAi,
@@ -120,7 +119,7 @@ export const VoiceEngineChoice = () => {
   );
 };
 
-const statusText = (s: AiVoiceState): string => {
+const statusText = (s: AiVoiceState): string | null => {
   if (s.status === "downloading") {
     return "Downloading…";
   }
@@ -141,8 +140,9 @@ const statusText = (s: AiVoiceState): string => {
   }
   // "not-loaded"
   if (s.cached === null) return "Checking this device…";
+  // Downloaded: the "Downloaded" line below says so.
   return s.cached
-    ? "Voice files are on this device."
+    ? null
     : "Not downloaded yet. Until then, the browser voice is used.";
 };
 
@@ -151,6 +151,7 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
   const failed = state.status === "error" || state.status === "unavailable";
   const pct = Math.round((state.progress ?? 0) * 100);
   const size = state.downloadMB != null ? `~${state.downloadMB} MB` : "…";
+  const status = statusText(state);
 
   return (
     <div className="flex flex-col gap-2 py-3 border-b-2 border-dashed">
@@ -208,22 +209,32 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
         </div>
       )}
 
-      <span
-        className={cn(
-          "text-xs text-left",
-          failed ? "text-destructive" : "text-muted-foreground"
-        )}
-        role="status"
-      >
-        {statusText(state)}
-      </span>
+      {/* Same line as the data downloads in User Preferences. */}
+      {state.cached && !busy && (
+        <span className="flex items-center gap-1 text-xs font-medium text-theme-color-with-opacity-100 animate-fade-in">
+          <Download className="size-3.5" />
+          Downloaded and cached for offline use
+        </span>
+      )}
+      {status && (
+        <span
+          className={cn(
+            "text-xs text-left",
+            failed ? "text-destructive" : "text-muted-foreground"
+          )}
+          role="status"
+        >
+          {status}
+        </span>
+      )}
       {failed && (
-        <div>
-          <DebugReportButton />
+        <div className="flex flex-col gap-2">
           <p className="text-xs text-muted-foreground">
-            If you report this problem, paste the debug report into your
+            If you report this problem, copy the debug report below into your
             message. It has device and load details, never what was spoken.
           </p>
+          {/* Keyed so a new error fetches a fresh report. */}
+          <DebugReportTerminal key={state.error ?? state.status} />
         </div>
       )}
     </div>
@@ -406,7 +417,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
       </div>
       {!ready && (
         <p className="pt-2 text-xs text-left text-muted-foreground">
-          Download the AI voice to hear presets.
+          Presets can be heard once the voice has loaded.
         </p>
       )}
 
@@ -457,24 +468,59 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
 
       <span className={cn(subheadingCn, "block mt-4")}>Delivery</span>
       {sliders("delivery")}
+      {/* Unset fields mean yomiage's defaults. */}
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        className="w-full mt-2 text-xs font-bold"
+        disabled={
+          settings.speed === undefined &&
+          settings.expressiveness === undefined &&
+          settings.rhythmVariation === undefined
+        }
+        onClick={() =>
+          updateSettings({
+            speed: undefined,
+            expressiveness: undefined,
+            rhythmVariation: undefined,
+          })
+        }
+      >
+        Reset to defaults
+      </Button>
     </div>
   );
 };
 
-const DebugReportButton = () => {
-  const { copy, status } = useCopyToClipboard(1500);
+/**
+ * The debug report on screen, terminal style, with its own copy button.
+ * Copying straight after fetching the report (the old button) silently
+ * failed on iOS: Safari only allows clipboard writes right inside the tap,
+ * and the await in between ended that. Shown text can also be selected.
+ */
+const DebugReportTerminal = () => {
+  const [report, setReport] = useState<string | null>(null);
+
+  // Effect needed: the report is async (it asks the yomiage worker), and it
+  // must be ready before the copy tap so the copy happens inside the tap.
+  useEffect(() => {
+    let cancelled = false;
+    void getAiVoiceDebugReport()
+      .catch((err: unknown) => `Debug report failed: ${String(err)}`)
+      .then((text) => {
+        if (!cancelled) setReport(text);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={async (e) => {
-        const report = await getAiVoiceDebugReport();
-        void copy(report, e);
-      }}
-    >
-      <Copy />
-      {status === "copied" ? "Copied" : "Copy debug report"}
-    </Button>
+    <ErrorTerminal
+      content={report ?? "Collecting debug report…"}
+      filename="ai-voice.log"
+    />
   );
 };
 
@@ -502,7 +548,8 @@ export const AiVoicePanel = () => {
 
       <AiVoiceFilesRow state={state} />
 
-      {mod && <AiVoiceTuning mod={mod} ready={ready} />}
+      {/* Presets and sliders only matter once the voice is downloaded. */}
+      {mod && state.cached && <AiVoiceTuning mod={mod} ready={ready} />}
 
       {mod && (
         <p className="pt-2 text-xs text-muted-foreground">{mod.CREDIT}</p>
