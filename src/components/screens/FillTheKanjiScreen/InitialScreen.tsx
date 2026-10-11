@@ -119,7 +119,10 @@ const TileCountPicker = ({
             onChange={() => onChange(count)}
             className="sr-only"
           />
-          <div className="grid grid-cols-4 gap-1" aria-hidden>
+          <div
+            className={`grid gap-1 ${count === 12 ? "grid-cols-6" : "grid-cols-4"}`}
+            aria-hidden
+          >
             {Array.from({ length: count }, (_, i) => (
               <span key={i} className="w-3 h-3 rounded-sm bg-foreground/30" />
             ))}

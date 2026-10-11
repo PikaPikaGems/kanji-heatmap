@@ -17,6 +17,13 @@ export const DEFAULT_TILE_COUNT: TileCount = 8;
 export const isTileCount = (v: unknown): v is TileCount =>
   TILE_COUNT_OPTIONS.some((n) => n === v);
 
+/**
+ * Keyboard shortcut per tile, in tile order. With 12 tiles (two rows of six)
+ * the bottom row is the keyboard's top letter row under the digits.
+ */
+export const tileShortcutKeys = (tileCount: number): string[] =>
+  (tileCount === 12 ? "123456qwerty" : "12345678").split("");
+
 /** One character of the sentence; `blank` indexes `Puzzle.blanks` when hidden. */
 export type PuzzleChar = { char: string; blank: number | null };
 

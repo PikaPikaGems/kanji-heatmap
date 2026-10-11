@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { SpeakStatus, useSpeakWithStatus } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { plainSentence, Puzzle } from "@/lib/fill-the-kanji/puzzle";
+import {
+  plainSentence,
+  Puzzle,
+  tileShortcutKeys,
+} from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { AnswerState, FeedbackKind } from "./AnswerDrawer";
 import { FillTheKanjiSettings, ItemResult } from "./types";
@@ -50,7 +54,7 @@ const isEditableTarget = (target: EventTarget | null) => {
 
 /**
  * The Fill the Kanji game loop: card cursor, which blank is selected, what
- * each blank holds, answer feedback, and keyboard shortcuts (1–9 pick a tile,
+ * each blank holds, answer feedback, and keyboard shortcuts (1–8, or 1–6 and q w e r t y, pick a tile,
  * ! reads the sentence aloud, @ reads it slowly, Backspace / Delete undo the most recently placed
  * kanji, Enter submits once every blank is filled). The Game component stays
  * responsible for loading and rendering.
@@ -222,13 +226,12 @@ export const useFillTheKanjiGame = ({
       if (e.isComposing || e.metaKey || e.ctrlKey || e.altKey) return;
       if (isEditableTarget(e.target)) return;
 
-      const digit = Number(e.key);
-      if (Number.isInteger(digit) && digit >= 1 && digit <= 9) {
-        const kanji = tilesRef.current[digit - 1];
-        if (kanji) {
-          e.preventDefault();
-          handlersRef.current.pickTile(kanji);
-        }
+      const tileIndex = tileShortcutKeys(tilesRef.current.length).indexOf(
+        e.key.toLowerCase()
+      );
+      if (tileIndex !== -1) {
+        e.preventDefault();
+        handlersRef.current.pickTile(tilesRef.current[tileIndex]);
         return;
       }
       if (e.key === "!") {
