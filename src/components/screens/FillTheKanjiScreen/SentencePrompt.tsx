@@ -58,14 +58,16 @@ export const FuriganaSentence = ({
     <p
       className={cn(
         bunsetsuRowCn,
-        "items-baseline gap-y-[0.1em]",
+        "items-baseline gap-y-[0.1em] [overflow-wrap:anywhere]",
         className,
         "leading-[1.3]"
       )}
       lang="ja"
     >
       {bunsetsu.map((parts, i) => (
-        <span key={i}>
+        // min-w-0 + max-w-full: a long bunsetsu wraps inside its own box
+        // instead of widening the row (on iOS it widened the whole drawer).
+        <span key={i} className="min-w-0 max-w-full">
           {parts.map(({ reading, chars }, j) => {
             const text = chars.map(({ char, blank }, k) => {
               const result = blank == null ? null : blankResults?.[blank];
