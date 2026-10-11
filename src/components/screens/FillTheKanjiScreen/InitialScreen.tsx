@@ -95,7 +95,6 @@ const RoundSummary = ({
   );
 };
 
-/** Radio cards: a mini grid of dots previews how many tiles each choice shows. */
 const TileCountPicker = ({
   current,
   onChange,
@@ -103,37 +102,21 @@ const TileCountPicker = ({
   current: TileCount;
   onChange: (count: TileCount) => void;
 }) => (
-  <fieldset className="flex flex-col gap-2 text-left">
-    <legend className="pb-2 text-sm font-bold">Number of choices</legend>
-    <div className="grid grid-cols-2 gap-3">
-      {TILE_COUNT_OPTIONS.map((count) => (
-        <label
-          key={count}
-          className="flex flex-col items-center gap-2 px-3 py-3 transition-colors border-2 cursor-pointer rounded-xl hover:bg-muted has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
-        >
-          <input
-            type="radio"
-            name="tile-count"
-            value={count}
-            checked={current === count}
-            onChange={() => onChange(count)}
-            className="sr-only"
-          />
-          <div
-            className={`grid gap-1 ${count === 12 ? "grid-cols-6" : "grid-cols-4"}`}
-            aria-hidden
-          >
-            {Array.from({ length: count }, (_, i) => (
-              <span key={i} className="w-3 h-3 rounded-sm bg-foreground/30" />
-            ))}
-          </div>
-          <span className="text-sm font-bold">{count} choices</span>
-          <span className="text-xs text-muted-foreground">
-            {count === 8 ? "Easier" : "Harder"}
-          </span>
-        </label>
-      ))}
-    </div>
+  <fieldset className="flex flex-wrap items-center gap-y-1 text-left">
+    <legend className="sr-only">Number of choices</legend>
+    <span className="pr-4 text-sm" aria-hidden>
+      Number of choices:
+    </span>
+    {TILE_COUNT_OPTIONS.map((count) => (
+      <RadioRow
+        key={count}
+        name="tile-count"
+        value={String(count)}
+        current={String(current)}
+        label={String(count)}
+        onChange={() => onChange(count)}
+      />
+    ))}
   </fieldset>
 );
 
