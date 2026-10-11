@@ -11,14 +11,32 @@ const bunsetsuRowCn =
 /** Right or wrong, per blank in reading order; null when it wasn't answered (Forgot). */
 export type BlankResult = "right" | "wrong" | null;
 
+// inline-block: transforms (the hop and the shake) don't apply to inline text.
 const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
-  right: "text-green-500",
-  wrong: "text-red-500",
+  right: "inline-block text-green-500 animate-practice-correct-pop",
+  wrong: "inline-block text-red-500 animate-practice-shake",
 };
+
+/** Delay between neighbouring blanks' correct-answer pop (a ripple). */
+const WOBBLE_STAGGER_MS = 70;
+
+/** Lets the drawer finish sliding up before the first kanji hops. */
+const ANSWER_ANIMATION_DELAY_MS = 250;
 
 /** Blanks that were given up on get the same fill as a selected primary tile. */
 const forgotCn =
   "rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white";
+
+/** Right kanji hop one after another, like the blanks do on the question screen. */
+const hopDelayStyle = (
+  result: BlankResult | undefined,
+  blank: number | null
+) =>
+  result === "right" && blank != null
+    ? {
+        animationDelay: `${ANSWER_ANIMATION_DELAY_MS + blank * WOBBLE_STAGGER_MS}ms`,
+      }
+    : undefined;
 
 /**
  * The full answer sentence with furigana over every reading. With a `puzzle`
@@ -84,12 +102,17 @@ export const FuriganaSentence = ({
                     kanji={char}
                     info={info}
                     className={color}
+                    style={hopDelayStyle(result, blank)}
                   />
                 );
               }
               if (!color) return char;
               return (
-                <span key={k} className={color}>
+                <span
+                  key={k}
+                  className={color}
+                  style={hopDelayStyle(result, blank)}
+                >
                   {char}
                 </span>
               );
@@ -132,9 +155,6 @@ const blankCn: Record<BlankState, string> = {
     "border-dotted border-green-500 bg-green-500/15 animate-practice-correct-pop",
   wrong: "border-dotted border-red-500 bg-red-500/15 animate-practice-shake",
 };
-
-/** Delay between neighbouring blanks' correct-answer pop (a ripple). */
-const WOBBLE_STAGGER_MS = 70;
 
 const BlankButton = ({
   blank,
