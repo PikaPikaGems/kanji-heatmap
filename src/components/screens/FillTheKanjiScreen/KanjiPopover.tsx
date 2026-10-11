@@ -4,6 +4,7 @@ import { JLPTListItems } from "@/lib/jlpt";
 import { JouyouGradeListItems, toJouyouGrade } from "@/lib/jouyou-grade";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { cn } from "@/lib/utils";
+import { FrequencyBadges } from "@/components/common/freq/FrequencyBadges";
 
 type KanjiBasicInfo = NonNullable<ReturnType<GetBasicKanjiInfo>>;
 
@@ -25,8 +26,17 @@ export const KanjiPopover = ({
   info: KanjiBasicInfo;
   className?: string;
 }) => {
-  const { keyword, jlpt, jouyouGrade } = info;
+  const { keyword, jlpt, jouyouGrade, frequency } = info;
   const jouyou = toJouyouGrade(jouyouGrade);
+  // The four ranks FrequencyBadges shows.
+  const hasFrequency =
+    frequency != null &&
+    [
+      frequency.netflix,
+      frequency.google,
+      frequency.wkfr,
+      frequency.twitter,
+    ].some((rank) => rank != null && rank >= 1);
   return (
     <GenericPopover
       // Inside a drawer: modal, or the popover can't be clicked.
@@ -43,7 +53,7 @@ export const KanjiPopover = ({
           {kanji}
         </button>
       }
-      contentClassName="w-auto min-w-28 p-0"
+      contentClassName="w-auto min-w-28 max-w-[min(20rem,calc(100vw-1.5rem))] p-0"
       content={
         <div className="flex flex-col items-center gap-1 px-5 py-3 text-center">
           <span className="text-8xl kanji-font text-foreground" lang="ja">
@@ -52,7 +62,7 @@ export const KanjiPopover = ({
           <span className="pt-1 text-sm font-bold text-foreground">
             {keyword}
           </span>
-          {(jlpt && jlpt !== "none") || jouyou !== -1 ? (
+          {(jlpt && jlpt !== "none") || jouyou !== -1 || hasFrequency ? (
             <div className="flex flex-wrap justify-center gap-1.5 pt-1">
               {jlpt && jlpt !== "none" && (
                 <LevelBadge
@@ -66,6 +76,7 @@ export const KanjiPopover = ({
                   label={`Jouyou Grade ${JouyouGradeListItems[jouyou].label}`}
                 />
               )}
+              <FrequencyBadges frequency={frequency} />
             </div>
           ) : null}
         </div>

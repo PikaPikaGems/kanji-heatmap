@@ -8,13 +8,17 @@ import { KanjiPopover } from "./KanjiPopover";
 const bunsetsuRowCn =
   "kanji-font flex flex-wrap items-center justify-center gap-x-[0.45em] gap-y-[0.35em]";
 
-/** Right or wrong, per blank in reading order; null when it wasn't answered. */
+/** Right or wrong, per blank in reading order; null when it wasn't answered (Forgot). */
 export type BlankResult = "right" | "wrong" | null;
 
 const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
   right: "text-green-500",
   wrong: "text-red-500",
 };
+
+/** Blanks that were given up on get the same fill as a selected primary tile. */
+const forgotCn =
+  "rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white";
 
 /**
  * The full answer sentence with furigana over every reading. With a `puzzle`
@@ -65,7 +69,11 @@ export const FuriganaSentence = ({
           {parts.map(({ reading, chars }, j) => {
             const text = chars.map(({ char, blank }, k) => {
               const result = blank == null ? null : blankResults?.[blank];
-              const color = result ? blankResultCn[result] : undefined;
+              const color = result
+                ? blankResultCn[result]
+                : blank != null && blankResults
+                  ? forgotCn
+                  : undefined;
               const info = isKanji(char) ? getInfo?.(char) : null;
               if (info) {
                 return (
