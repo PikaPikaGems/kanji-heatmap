@@ -21,7 +21,7 @@ const MasteryScreen = () => {
 
         <DashedNavLinkList
           items={practiceNavLinks}
-          className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-3"
+          className="grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2"
         />
       </div>
     </ScreenShell>
