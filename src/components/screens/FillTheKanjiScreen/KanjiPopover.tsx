@@ -9,7 +9,7 @@ import type { CSSProperties } from "react";
 
 type KanjiBasicInfo = NonNullable<ReturnType<GetBasicKanjiInfo>>;
 
-/** A kanji in running text that opens a popover with its badges, it enlarged and its keyword. */
+/** A kanji in running text that opens a popover with its level badges, it enlarged, its keyword and its frequency badges. */
 export const KanjiPopover = ({
   kanji,
   info,
@@ -49,7 +49,6 @@ export const KanjiPopover = ({
           <div className="flex flex-wrap justify-center">
             {jlpt && <JLPTBadge jlpt={jlpt} />}
             {hasJouyou && <JouyouGradeBadge jouyouGrade={jouyouGrade!} />}
-            <FrequencyBadges frequency={frequency} />
           </div>
           <span className="text-8xl kanji-font text-foreground" lang="ja">
             {kanji}
@@ -57,6 +56,9 @@ export const KanjiPopover = ({
           <span className="pt-1 text-sm font-bold text-foreground">
             {keyword}
           </span>
+          <div className="flex flex-wrap justify-center">
+            <FrequencyBadges frequency={frequency} />
+          </div>
         </div>
       }
     />

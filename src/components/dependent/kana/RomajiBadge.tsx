@@ -34,7 +34,7 @@ export const RomajiBadge = ({
         "text-lg sm:text-xl",
         className,
         isKana && "kanji-font",
-        preparing && "animate-pulse"
+        preparing && "animate-voice-preparing"
       )}
       aria-label={`Play reading and toggle kana or romaji for ${kana}`}
       aria-pressed={!isKana}
