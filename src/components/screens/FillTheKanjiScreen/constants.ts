@@ -7,4 +7,5 @@ export const DEFAULT_SETTINGS: FillTheKanjiSettings = {
   roundBySet: {},
   sound: { enabled: true, type: "correct" },
   readAloudOnShow: false,
+  tileCount: 8,
 };

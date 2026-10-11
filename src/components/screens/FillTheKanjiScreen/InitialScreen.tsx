@@ -30,6 +30,12 @@ import {
   readSetRoundStats,
   RoundStats,
 } from "@/lib/fill-the-kanji/storage";
+import {
+  DEFAULT_TILE_COUNT,
+  isTileCount,
+  TILE_COUNT_OPTIONS,
+  TileCount,
+} from "@/lib/fill-the-kanji/puzzle";
 import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
 import { SoundMode } from "./types";
 import { useFillTheKanjiSettings } from "./use-fill-the-kanji-settings";
@@ -88,6 +94,31 @@ const RoundSummary = ({
     </div>
   );
 };
+
+const TileCountPicker = ({
+  current,
+  onChange,
+}: {
+  current: TileCount;
+  onChange: (count: TileCount) => void;
+}) => (
+  <fieldset className="flex flex-wrap items-center gap-y-1 text-left">
+    <legend className="sr-only">Number of choices</legend>
+    <span className="pr-4 text-sm" aria-hidden>
+      Number of choices:
+    </span>
+    {TILE_COUNT_OPTIONS.map((count) => (
+      <RadioRow
+        key={count}
+        name="tile-count"
+        value={String(count)}
+        current={String(current)}
+        label={String(count)}
+        onChange={() => onChange(count)}
+      />
+    ))}
+  </fieldset>
+);
 
 const Key = ({ children }: { children: string }) => (
   <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
@@ -171,6 +202,15 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               </p>
             )}
           </div>
+
+          <TileCountPicker
+            current={
+              isTileCount(settings.tileCount)
+                ? settings.tileCount
+                : DEFAULT_TILE_COUNT
+            }
+            onChange={(count) => setSetting("tileCount", count)}
+          />
 
           <div className="text-left">
             <SetSelect selected={setId} onSelect={selectSet} />

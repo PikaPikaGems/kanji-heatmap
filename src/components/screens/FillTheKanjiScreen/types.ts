@@ -1,4 +1,5 @@
 import type { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
+import type { TileCount } from "@/lib/fill-the-kanji/puzzle";
 import type { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 
 /** How sound is played on a correct answer, when sound is enabled. */
@@ -11,6 +12,8 @@ export type FillTheKanjiSettings = {
   sound: { enabled: true; type: SoundMode } | { enabled: false };
   /** Speak each sentence when its item appears. Optional: older saved settings lack it. */
   readAloudOnShow?: boolean;
+  /** Multiple choice tiles per sentence. Optional: older saved settings lack it. */
+  tileCount?: TileCount;
 };
 
 export type ItemResult = {
