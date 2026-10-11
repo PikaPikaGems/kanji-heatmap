@@ -16,8 +16,16 @@ export const FuriganaSentence = ({
 }) => (
   // Baseline, not center: a bunsetsu with furigana is taller, and centering
   // would lift the ones without it (ゴミを sat higher than 分ける).
+  // Leading goes after `className`: its text-2xl/text-3xl would otherwise
+  // drop it (twMerge), leaving a fixed line-height that is too tall on phones.
+  // Unitless 2.2 scales the furigana gap with the text; sm+ keeps 2.25rem.
   <p
-    className={cn(bunsetsuRowCn, "items-baseline leading-[2.2]", className)}
+    className={cn(
+      bunsetsuRowCn,
+      "items-baseline",
+      className,
+      "leading-[2.2] sm:leading-[2.25rem]"
+    )}
     lang="ja"
   >
     {parseBunsetsu(jp).map((parts, i) => (
