@@ -433,7 +433,16 @@ export default defineConfig(() => ({
   plugins: [
     kanjiCanvasRefPatternsPlugin,
     yomiageFilesPlugin,
-    process.env.CF_PAGES ? null : cloudflare(),
+    process.env.CF_PAGES
+      ? null
+      : cloudflare({
+          // Cloudflare Pages serves index.html for unknown paths (no 404.html
+          // in dist), so /dashboard etc. load on a full page load. The plugin's
+          // dev emulation 404s them unless told this is a single-page app.
+          config: {
+            assets: { not_found_handling: "single-page-application" },
+          },
+        }),
     react(),
     VitePWA(pwaConfig),
     process.env.ANALYZE
