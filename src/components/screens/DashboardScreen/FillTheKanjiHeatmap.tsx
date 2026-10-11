@@ -30,6 +30,7 @@ import {
   roundCount,
   roundLabel,
   roundRowRange,
+  totalRoundCount,
 } from "@/lib/fill-the-kanji/rounds";
 import {
   readSetRoundStats,
@@ -37,6 +38,7 @@ import {
   SetRoundStats,
   STATS_KEY_PREFIX,
 } from "@/lib/fill-the-kanji/storage";
+import { uniqueSentencesRead } from "@/lib/fill-the-kanji/unique-sentences";
 import { fillTheKanjiRoundHref } from "@/lib/fill-the-kanji/links";
 import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
 import { DashboardPanel } from "./DashboardPanel";
@@ -58,19 +60,23 @@ const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 const totalAttempts = (stats: SetRoundStats) =>
   Object.values(stats).reduce((sum, s) => sum + s.attemptCount, 0);
 
-/** "5 / 384 rounds completed · 7 total attempts" */
+/** "5 / 384 rounds completed · 7 total attempts · 98 unique sentences read" */
 const ProgressSummary = ({
   completed,
   total,
   attempts,
+  sentences,
 }: {
   completed: number;
   total: number;
   attempts: number;
+  sentences: number;
 }) => (
   <>
     {completed.toLocaleString()} / {total.toLocaleString()} rounds completed ·{" "}
-    {attempts.toLocaleString()} total {attempts === 1 ? "attempt" : "attempts"}
+    {attempts.toLocaleString()} total {attempts === 1 ? "attempt" : "attempts"}{" "}
+    · {sentences.toLocaleString()} unique{" "}
+    {sentences === 1 ? "sentence" : "sentences"} read
   </>
 );
 
@@ -179,11 +185,13 @@ const RoundDetail = ({
 const SetHeatmapGrid = ({
   setId,
   stats,
+  sentences,
   columns,
   attemptShading,
 }: {
   setId: FillTheKanjiSetId;
   stats: SetRoundStats;
+  sentences: number;
   columns: number;
   attemptShading: AttemptCountShading;
 }) => {
@@ -201,6 +209,7 @@ const SetHeatmapGrid = ({
             completed={completed}
             total={total}
             attempts={totalAttempts(stats)}
+            sentences={sentences}
           />
         </span>
       </p>
@@ -257,6 +266,7 @@ const GroupTrigger = ({
     0
   );
   const total = setIds.reduce((sum, id) => sum + roundCount(id), 0);
+  const sentences = uniqueSentencesRead(setIds, statsById);
   return (
     <span className="flex flex-col">
       <span className="text-sm font-semibold">{title}</span>
@@ -265,6 +275,7 @@ const GroupTrigger = ({
           completed={completed}
           total={total}
           attempts={attempts}
+          sentences={sentences}
         />
       </span>
     </span>
@@ -299,9 +310,25 @@ export const FillTheKanjiHeatmap = () => {
     )
   );
   const attemptShading: AttemptCountShading = { scale, maxCount };
+  const allSetIds = FILL_THE_KANJI_SETS.map(({ id }) => id);
+  const allStats = allSetIds.map((id) => statsById.get(id) ?? {});
 
   return (
     <DashboardPanel title={fillTheKanjiPageMeta.shortLabel}>
+      <p className="mb-2 text-xs font-semibold text-left tabular-nums">
+        <ProgressSummary
+          completed={allStats.reduce(
+            (sum, stats) => sum + Object.keys(stats).length,
+            0
+          )}
+          total={totalRoundCount()}
+          attempts={allStats.reduce(
+            (sum, stats) => sum + totalAttempts(stats),
+            0
+          )}
+          sentences={uniqueSentencesRead(allSetIds, statsById)}
+        />
+      </p>
       <Accordion
         key={revision}
         type="multiple"
@@ -327,6 +354,7 @@ export const FillTheKanjiHeatmap = () => {
                   key={id}
                   setId={id}
                   stats={statsById.get(id) ?? {}}
+                  sentences={uniqueSentencesRead([id], statsById)}
                   columns={columns}
                   attemptShading={attemptShading}
                 />
