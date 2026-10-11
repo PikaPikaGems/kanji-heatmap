@@ -362,6 +362,34 @@ button {
   }
 }
 
+/* Badge waiting for the AI voice. Faster and deeper than Tailwind's
+   animate-pulse (2s, only down to 50%), which on iPhone looked frozen.
+   Only opacity and transform change, so it runs on the compositor and keeps
+   going while the voice is busy. */
+.animate-voice-preparing {
+  animation: voice-preparing 0.9s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes voice-preparing {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-voice-preparing {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
 .animate-practice-bounce-soft {
   animation: practice-cheer-bloom 1.35s ease-out both;
 }
