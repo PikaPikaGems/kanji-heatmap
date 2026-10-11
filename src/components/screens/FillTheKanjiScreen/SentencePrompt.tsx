@@ -18,13 +18,14 @@ export const FuriganaSentence = ({
   // would lift the ones without it (ゴミを sat higher than 分ける).
   // Leading goes after `className`: its text-2xl/text-3xl would otherwise
   // drop it (twMerge), leaving a fixed line-height that is too tall on phones.
-  // Unitless 2.2 scales the furigana gap with the text; sm+ keeps 2.25rem.
+  // Unitless 1.6 keeps wrapped lines close (furigana still clears the line
+  // above); sm+ keeps 2.25rem.
   <p
     className={cn(
       bunsetsuRowCn,
       "items-baseline",
       className,
-      "leading-[2.2] sm:leading-[2.25rem]"
+      "leading-[1.6] sm:leading-[2.25rem]"
     )}
     lang="ja"
   >
