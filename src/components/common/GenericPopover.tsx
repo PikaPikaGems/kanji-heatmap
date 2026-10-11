@@ -14,6 +14,7 @@ export const GenericPopover = ({
   contentClassName = "w-auto p-0 m-0",
   showArrow = true,
   modal = false,
+  focusOnOpen = true,
   open,
   onOpenChange,
 }: {
@@ -27,6 +28,8 @@ export const GenericPopover = ({
    * the overlay and cannot be clicked.
    */
   modal?: boolean;
+  /** When false, opening leaves focus where it was instead of moving to the first button inside. */
+  focusOnOpen?: boolean;
   /** Pass both for a controlled popover; omit for uncontrolled. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -34,7 +37,11 @@ export const GenericPopover = ({
   return (
     <Popover modal={modal} open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className={contentClassName} collisionPadding={16}>
+      <PopoverContent
+        className={contentClassName}
+        collisionPadding={16}
+        onOpenAutoFocus={focusOnOpen ? undefined : (e) => e.preventDefault()}
+      >
         {showArrow && <PopoverCardArrow />}
         {/* A long popover (the radical popover's details) can be taller than
             the space beside its trigger; scroll inside it instead of running

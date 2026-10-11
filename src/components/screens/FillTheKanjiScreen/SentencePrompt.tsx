@@ -8,13 +8,32 @@ import { KanjiPopover } from "./KanjiPopover";
 const bunsetsuRowCn =
   "kanji-font flex flex-wrap items-center justify-center gap-x-[0.45em] gap-y-[0.35em]";
 
-/** Right or wrong, per blank in reading order; null when it wasn't answered. */
+/** Right or wrong, per blank in reading order; null when it wasn't answered (Forgot). */
 export type BlankResult = "right" | "wrong" | null;
 
+// inline-block: transforms (the hop and the shake) don't apply to inline text.
 const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
-  right: "text-green-500",
-  wrong: "text-red-500",
+  right: "inline-block text-green-500 animate-practice-correct-pop",
+  wrong: "inline-block text-red-500 animate-practice-shake",
 };
+
+/** Delay between neighbouring blanks' correct-answer pop (a ripple). */
+const WOBBLE_STAGGER_MS = 70;
+
+/** Lets the drawer finish sliding up before the first kanji hops. */
+const ANSWER_ANIMATION_DELAY_MS = 250;
+
+/** Blanks that were given up on get the same fill as a selected primary tile. */
+const forgotCn =
+  "inline-block rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white animate-practice-correct-pop";
+
+/** Right and forgotten kanji hop one after another, like the blanks do on the question screen. */
+const hopDelayStyle = (color: string | undefined, blank: number | null) =>
+  (color === blankResultCn.right || color === forgotCn) && blank != null
+    ? {
+        animationDelay: `${ANSWER_ANIMATION_DELAY_MS + blank * WOBBLE_STAGGER_MS}ms`,
+      }
+    : undefined;
 
 /**
  * The full answer sentence with furigana over every reading. With a `puzzle`
@@ -54,18 +73,24 @@ export const FuriganaSentence = ({
     <p
       className={cn(
         bunsetsuRowCn,
-        "items-baseline gap-y-[0.1em]",
+        "items-baseline gap-y-[0.1em] [overflow-wrap:anywhere]",
         className,
         "leading-[1.3]"
       )}
       lang="ja"
     >
       {bunsetsu.map((parts, i) => (
-        <span key={i}>
+        // min-w-0 + max-w-full: a long bunsetsu wraps inside its own box
+        // instead of widening the row (on iOS it widened the whole drawer).
+        <span key={i} className="min-w-0 max-w-full">
           {parts.map(({ reading, chars }, j) => {
             const text = chars.map(({ char, blank }, k) => {
               const result = blank == null ? null : blankResults?.[blank];
-              const color = result ? blankResultCn[result] : undefined;
+              const color = result
+                ? blankResultCn[result]
+                : blank != null && blankResults
+                  ? forgotCn
+                  : undefined;
               const info = isKanji(char) ? getInfo?.(char) : null;
               if (info) {
                 return (
@@ -74,12 +99,17 @@ export const FuriganaSentence = ({
                     kanji={char}
                     info={info}
                     className={color}
+                    style={hopDelayStyle(color, blank)}
                   />
                 );
               }
               if (!color) return char;
               return (
-                <span key={k} className={color}>
+                <span
+                  key={k}
+                  className={color}
+                  style={hopDelayStyle(color, blank)}
+                >
                   {char}
                 </span>
               );
@@ -122,9 +152,6 @@ const blankCn: Record<BlankState, string> = {
     "border-dotted border-green-500 bg-green-500/15 animate-practice-correct-pop",
   wrong: "border-dotted border-red-500 bg-red-500/15 animate-practice-shake",
 };
-
-/** Delay between neighbouring blanks' correct-answer pop (a ripple). */
-const WOBBLE_STAGGER_MS = 70;
 
 const BlankButton = ({
   blank,
