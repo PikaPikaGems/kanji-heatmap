@@ -295,7 +295,7 @@ export const Game = ({
         <BlurredGloss
           text={current.englishGloss}
           resetKey={index}
-          blurrable={settings.blurEnglishGloss}
+          blurrable={false}
           className="mt-2"
         />
 
