@@ -152,6 +152,7 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
   const pct = Math.round((state.progress ?? 0) * 100);
   const size = state.downloadMB != null ? `~${state.downloadMB} MB` : "…";
   const status = statusText(state);
+  const needsDownload = state.status === "not-loaded" && state.cached === false;
 
   return (
     <div className="flex flex-col gap-2 py-3 border-b-2 border-dashed">
@@ -220,7 +221,9 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
         <span
           className={cn(
             "text-xs text-left",
-            failed ? "text-destructive" : "text-muted-foreground"
+            failed && "text-destructive",
+            needsDownload && "font-bold text-yellow-600 dark:text-yellow-500",
+            !failed && !needsDownload && "text-muted-foreground"
           )}
           role="status"
         >
@@ -539,14 +542,14 @@ export const AiVoicePanel = () => {
 
   return (
     <div className="text-left">
+      <AiVoiceFilesRow state={state} />
+
       <p className="p-3 mb-1 text-xs border-2 border-dashed rounded-lg text-muted-foreground">
         ⚠️ Experimental. The AI voice runs on your device: it needs a one-time
-        download (size below) and uses a few hundred MB of memory while
+        download (size above) and uses a few hundred MB of memory while
         it&apos;s loaded. It may not work on every device or browser. Whenever
         it can&apos;t play, your browser voice is used instead.
       </p>
-
-      <AiVoiceFilesRow state={state} />
 
       {/* Presets and sliders only matter once the voice is downloaded. */}
       {mod && state.cached && <AiVoiceTuning mod={mod} ready={ready} />}
