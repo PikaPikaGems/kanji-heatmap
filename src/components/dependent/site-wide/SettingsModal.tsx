@@ -294,7 +294,7 @@ const JpVoiceSelect = () => {
   const selectValue = matched?.voiceURI ?? DEFAULT_JP_VOICE_ID;
 
   return (
-    <div className="mx-4 text-left">
+    <div className="mx-1 text-left">
       <Select value={selectValue} onValueChange={setVoiceId}>
         <SelectTrigger aria-label="Japanese text-to-speech voice">
           <SelectValue />
