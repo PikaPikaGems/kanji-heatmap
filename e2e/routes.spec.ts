@@ -7,7 +7,7 @@ test.describe("route smoke coverage", () => {
       timeout: 30_000,
     });
     await expect(
-      page.getByRole("link", { name: /Kanji Reading Practice/ })
+      page.getByRole("link", { name: /Reading Practice/ })
     ).toBeVisible();
   });
 
