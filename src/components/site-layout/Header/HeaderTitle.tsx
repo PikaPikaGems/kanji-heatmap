@@ -13,7 +13,7 @@ export const HeaderTitle = () => {
         className="h-7 w-7"
       />
       <h1 className="p-0 m-0 text-lg font-bold leading-tight hidden [@media(min-width:321px)]:block ">
-        Kanji Heatmap
+        Kanji Heatmap*
       </h1>
       <h1 className="p-0 m-0 text-lg font-bold leading-tight block [@media(min-width:320px)]:hidden ">
         KH
