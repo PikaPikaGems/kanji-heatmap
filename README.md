@@ -57,6 +57,13 @@ first, by each sentence's hardest kanji: JLPT level (N5 → N1 → not in JLPT),
 then Jouyou grade, then Google frequency. Sets listed under `keepFileOrder` in
 `raw-data/fill-the-kanji/ours.json` (🌱 Basic) keep their own order.
 
+`ours.json` lives in the
+[jp-misc-data](https://github.com/PikaPikaGems/jp-misc-data) repo, next to the
+sentences, and isn't committed here either. If you have access to that repo,
+copy `DATA/final-sentences/*.tsv` and `DATA/final-sentences/ours.json` into
+`raw-data/fill-the-kanji/` (this is where the TSVs come from too); otherwise
+get both from the maintainer.
+
 A round is 20 rows in file order, so add new
 rows at the end of a TSV. Inserting or deleting rows in the middle moves
 sentences into different rounds, and players' stats stay with the round

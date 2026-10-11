@@ -19,6 +19,7 @@ public/json/katakana/*
 # Fill the Kanji source sentences aren't committed; the generated
 # public/json/fill-the-kanji/*.json are. See README "Data that isn't in the repo".
 raw-data/fill-the-kanji/*.tsv
+raw-data/fill-the-kanji/ours.json
 public/js/*
 # AI voice files (~65 MB), copied in by scripts/copy-yomiage-files.mjs.
 public/yomiage/

@@ -28,7 +28,7 @@
  * Usage: pnpm run sort-fill-the-kanji && pnpm run generate-fill-the-kanji
  */
 
-import { readFileSync, writeFileSync, readdirSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -36,9 +36,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
 const srcDir = resolve(root, "raw-data/fill-the-kanji");
-const { keepFileOrder = [] } = JSON.parse(
-  readFileSync(resolve(srcDir, "ours.json"), "utf-8")
-);
+const oursFile = resolve(srcDir, "ours.json");
+if (!existsSync(oursFile)) {
+  console.error(
+    "sort-fill-the-kanji: raw-data/fill-the-kanji/ours.json is missing. It " +
+      "isn't committed; copy it from jp-misc-data (DATA/final-sentences/ours.json) " +
+      "or get it from the maintainer (see README)."
+  );
+  process.exit(1);
+}
+const { keepFileOrder = [] } = JSON.parse(readFileSync(oursFile, "utf-8"));
 const kanjiMain = JSON.parse(
   readFileSync(resolve(root, "public/json/v2/kanji_main.json"), "utf-8")
 );
