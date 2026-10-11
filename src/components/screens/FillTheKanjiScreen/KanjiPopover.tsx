@@ -42,9 +42,9 @@ export const KanjiPopover = ({
           {kanji}
         </button>
       }
-      contentClassName="w-auto min-w-28 max-w-[min(18rem,calc(100vw-1.5rem))] p-0"
+      contentClassName="w-auto min-w-28 max-w-[min(17rem,calc(100vw-1.5rem))] p-0"
       content={
-        <div className="flex flex-col items-center gap-1 px-3 py-3 text-center">
+        <div className="flex flex-col items-center gap-1 px-1 py-3 text-center">
           {/* Same badges as the kanji drawer's general information. */}
           <div className="flex flex-wrap justify-center">
             {jlpt && <JLPTBadge jlpt={jlpt} />}
