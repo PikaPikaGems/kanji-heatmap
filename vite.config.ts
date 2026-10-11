@@ -323,15 +323,16 @@ const pwaConfig = {
       {
         // Fill-the-kanji challenge sets: 13 files, one per set (up to ~1.2 MB
         // each). Kept out of the core cache for the same eviction reason as
-        // katakana. CacheFirst like katakana, so a cached set isn't re-fetched
-        // while fresh; the 30-day expiry picks up re-sorted or edited sets.
+        // katakana. CacheFirst with no age limit, so a downloaded set keeps
+        // working offline indefinitely. Changed sets still get fetched: the
+        // app requests <set>.json?v=<content hash> (see fillTheKanjiSetUrl),
+        // and maxEntries evicts the old versions.
         urlPattern: /\/json\/fill-the-kanji\/.*\.json$/i,
         handler: "CacheFirst" as const,
         options: {
           cacheName: "kanji-heatmap-fill-the-kanji-cache",
           expiration: {
             maxEntries: 30,
-            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
           },
         },
       },

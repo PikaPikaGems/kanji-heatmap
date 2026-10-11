@@ -34,6 +34,7 @@ import {
   clearFillTheKanjiSetCache,
   fillTheKanjiPreloadKey,
   FILL_THE_KANJI_PRELOAD_KEY_PREFIX,
+  hasOutdatedFillTheKanjiDownload,
 } from "@/lib/offline-preload";
 import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 import { approxRowCountLabel } from "@/lib/fill-the-kanji/rounds";
@@ -228,7 +229,9 @@ const FillTheKanjiDownloads = () => {
             <DataDownloadRow
               key={id}
               label={label}
-              sizeHint={`${sizeHint} · ${approxRowCountLabel(id)} ${unit}`}
+              sizeHint={`${
+                hasOutdatedFillTheKanjiDownload(id) ? "Update available · " : ""
+              }${sizeHint} · ${approxRowCountLabel(id)} ${unit}`}
               completeKey={fillTheKanjiPreloadKey(id)}
               startPreload={(onProgress) =>
                 preloadFillTheKanjiSet(id, onProgress)
