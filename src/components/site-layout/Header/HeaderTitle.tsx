@@ -16,7 +16,7 @@ export const HeaderTitle = () => {
         Kanji Heatmap*
       </h1>
       <h1 className="p-0 m-0 text-lg font-bold leading-tight block [@media(min-width:320px)]:hidden ">
-        KH
+        KH*
       </h1>
     </Link>
   );
