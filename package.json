@@ -7,9 +7,9 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5174",
-    "dev:cf": "vite --port 5173",
-    "build": "eslint . && node scripts/generate-speed-katakana.mjs && tsc -b && vite build",
+    "dev": "node scripts/copy-yomiage-files.mjs && vite --port 5174",
+    "dev:cf": "node scripts/copy-yomiage-files.mjs && vite --port 5173",
+    "build": "eslint . && node scripts/generate-speed-katakana.mjs && node scripts/copy-yomiage-files.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b && tsc -p e2e/tsconfig.json",
     "test": "vitest run",
@@ -23,7 +23,8 @@
     "generate-fill-the-kanji": "node scripts/generate-fill-the-kanji.mjs",
     "sort-fill-the-kanji": "node scripts/sort-fill-the-kanji.mjs",
     "generate-json": "node scripts/generate-v2-json.mjs && node scripts/count-non-radical-components.mjs",
-    "download-kanji-svgs": "node scripts/download-kanji-svgs.mjs"
+    "download-kanji-svgs": "node scripts/download-kanji-svgs.mjs",
+    "copy-yomiage-files": "node scripts/copy-yomiage-files.mjs"
   },
   "dependencies": {
     "@fontsource/dotgothic16": "^5.2.5",
@@ -82,7 +83,8 @@
     "virtua": "^0.40.3",
     "vite-plugin-pwa": "^0.21.1",
     "wanakana": "^5.3.1",
-    "wouter": "^3.6.0"
+    "wouter": "^3.6.0",
+    "yomiage": "https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz"
   },
   "optionalDependencies": {
     "kanjicanvas": "github:asdfjkl/kanjicanvas"

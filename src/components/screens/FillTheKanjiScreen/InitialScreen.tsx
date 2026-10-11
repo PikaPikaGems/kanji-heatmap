@@ -4,6 +4,7 @@ import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { LevelGridSelector } from "@/components/shared-practice/LevelGridSelector";
 import { useEnterAction } from "@/hooks/use-enter-action";
+import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { TTS_DISCLAIMER } from "@/lib/tts";
 import {
@@ -108,6 +109,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     : "correct";
 
   useEnterAction(onStart);
+  const isCoarsePointer = useCoarsePointer();
 
   return (
     <div className="relative flex flex-col w-full h-full animate-fade-in">
@@ -157,7 +159,16 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                 />
               </div>
             )}
-            {soundEnabled && soundType === "speak" && (
+            <div className="pt-3">
+              <ToggleRow
+                id="read-aloud-on-show"
+                label="Read each sentence aloud when it appears"
+                checked={settings.readAloudOnShow ?? false}
+                onChange={(v) => setSetting("readAloudOnShow", v)}
+              />
+            </div>
+            {((soundEnabled && soundType === "speak") ||
+              settings.readAloudOnShow) && (
               <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
                 {TTS_DISCLAIMER}
               </p>
@@ -195,6 +206,15 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           <PracticeButton size="lg" onClick={onStart}>
             Start Round
           </PracticeButton>
+          {!isCoarsePointer && (
+            <p className="pt-2 text-xs text-center text-muted-foreground">
+              Tip: during a round, press{" "}
+              <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
+                V
+              </kbd>{" "}
+              to hear the sentence.
+            </p>
+          )}
         </div>
       </div>
     </div>

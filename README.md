@@ -33,6 +33,12 @@ kanji drawer stay empty unless you fill these folders (paths are in
 - `public/kanji-words/v6/<KANJI>.json`
 - `public/kanji-textbook-words-min/<KANJI>.json`
 
+The AI voice files (`public/yomiage/`, ~65 MB) aren't committed either.
+`pnpm dev` and `pnpm build` copy them in with
+`scripts/copy-yomiage-files.mjs`, downloading them once per yomiage version
+into `~/.cache/yomiage`. Offline, a dev server still starts and AI Voice Mode
+falls back to the browser voice; a CI build fails instead.
+
 The Fill the Kanji sentence sources (`raw-data/fill-the-kanji/*.tsv`) aren't
 committed either, but what the app fetches from them is: the generated
 `public/json/fill-the-kanji/<set>.json` files and

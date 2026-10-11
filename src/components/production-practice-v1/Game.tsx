@@ -5,6 +5,7 @@ import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
@@ -95,6 +96,8 @@ export const Game = ({
     [similarMap]
   );
   const speak = useSpeak(current?.word ?? "");
+  // Games keep the AI voice in memory so words after a pause play promptly.
+  useKeepAiVoiceWarm();
   const playCorrect = useCorrectSound();
 
   // Reset per-card state when the card (index) or pad size changes — done

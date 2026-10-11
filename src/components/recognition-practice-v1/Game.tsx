@@ -3,6 +3,7 @@ import { translateValue } from "@/lib/wanakana-adapter";
 import { Input } from "@/components/ui/input";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import { BlurredGloss } from "@/components/shared-practice";
@@ -42,6 +43,8 @@ export const Game = ({
   const forgotTyped = isForgotCommand(inputValue);
 
   const speak = useSpeak(current?.word ?? "");
+  // Games keep the AI voice in memory so words after a pause play promptly.
+  useKeepAiVoiceWarm();
   const playCorrect = useCorrectSound();
 
   const handleChange = (raw: string) => {

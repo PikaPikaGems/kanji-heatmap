@@ -19,6 +19,7 @@ import { Header, FloatingIsland, PracticeFab } from "@/components/site-layout/";
 import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
+import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
 
 const {
   kanjiPage,
@@ -38,6 +39,8 @@ const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
 const ProductionPracticeV1 = productionPracticeV1Page.Component;
 
 const App = () => {
+  useAiVoiceStartup();
+
   return (
     <ErrorBoundary
       details="App"

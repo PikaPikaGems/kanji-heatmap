@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { plainSentence, Puzzle } from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
@@ -39,17 +40,20 @@ const isEditableTarget = (target: EventTarget | null) => {
 /**
  * The Fill the Kanji game loop: card cursor, which blank is selected, what
  * each blank holds, answer feedback, and keyboard shortcuts (1–8 pick a tile,
- * Backspace / Delete undo the most recently placed kanji, Enter submits once
- * every blank is filled). The Game component stays responsible for loading and rendering.
+ * V reads the sentence aloud, Backspace / Delete undo the most recently placed
+ * kanji, Enter submits once every blank is filled). The Game component stays
+ * responsible for loading and rendering.
  */
 export const useFillTheKanjiGame = ({
   cards,
   sound,
+  readAloudOnShow,
   onProgress,
   onComplete,
 }: {
   cards: GameCard[];
   sound: FillTheKanjiSettings["sound"];
+  readAloudOnShow: boolean;
   onProgress: (progress: number) => void;
   onComplete: (results: ItemResult[]) => void;
 }) => {
@@ -75,7 +79,17 @@ export const useFillTheKanjiGame = ({
   }
 
   const speak = useSpeak(card ? plainSentence(card.item.jp) : "");
+  // Games keep the AI voice in memory so words after a pause play promptly.
+  useKeepAiVoiceWarm();
   const playCorrect = useCorrectSound();
+
+  // Effect needed: speaking is a side effect of a new item appearing. Keyed
+  // on the card only, so re-renders within an item don't repeat it.
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
+  useEffect(() => {
+    if (readAloudOnShow && card) speakRef.current();
+  }, [card, readAloudOnShow]);
 
   const allFilled = filled.length > 0 && filled.every((k) => k != null);
 
@@ -122,6 +136,9 @@ export const useFillTheKanjiGame = ({
         enabled: sound.enabled,
         speak: sound.enabled && sound.type === "speak" ? speak : undefined,
       });
+    } else if (sound.enabled) {
+      // A miss always reads the right sentence aloud, in either sound mode.
+      speak();
     }
     setCursor(null);
     setAnswer({
@@ -137,6 +154,7 @@ export const useFillTheKanjiGame = ({
       ...resultsRef.current,
       { item: card.item, correct: false },
     ];
+    if (sound.enabled) speak();
     setCursor(null);
     setAnswer({ open: true, item: card.item, kind: "forgot" });
   };
@@ -158,8 +176,8 @@ export const useFillTheKanjiGame = ({
   };
 
   // Latest handlers for the window listener below, without resubscribing.
-  const handlersRef = useRef({ pickTile, undo, submit, allFilled });
-  handlersRef.current = { pickTile, undo, submit, allFilled };
+  const handlersRef = useRef({ pickTile, undo, submit, allFilled, speak });
+  handlersRef.current = { pickTile, undo, submit, allFilled, speak };
   const tilesRef = useRef<string[]>([]);
   tilesRef.current = card?.tiles ?? [];
 
@@ -177,6 +195,11 @@ export const useFillTheKanjiGame = ({
           e.preventDefault();
           handlersRef.current.pickTile(kanji);
         }
+        return;
+      }
+      if (e.key === "v" || e.key === "V") {
+        e.preventDefault();
+        handlersRef.current.speak();
         return;
       }
       if (e.key === "Backspace" || e.key === "Delete") {

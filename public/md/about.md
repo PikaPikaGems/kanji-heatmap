@@ -64,6 +64,12 @@ The data published in kanjiheatmap.com by PikaPikaGems are licensed under [CC BY
   - [kanjidatabase.com](https://www.kanjidatabase.com/)
   - Alex Yatskov's Wikipedia Kanji Frequency Report
 
+### AI Voice (experimental)
+
+- [yomiage](https://github.com/PikaPikaGems/yomiage) under [MIT][mit-license], which runs [piper-plus](https://github.com/ayutaz/piper-plus) and [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) (both MIT)
+- 音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が無料公開している音声データを使用しています。
+  ■つくよみちゃんコーパス（CV.夢前黎）https://tyc.rei-yumesaki.net/material/corpus/
+
 ### Common Sources
 
 Data owned by Electronic Dictionary Research and Development Group such as KANJIDIC and EDICT are used under the Group's [license](https://www.edrdg.org/edrdg/licence.html).

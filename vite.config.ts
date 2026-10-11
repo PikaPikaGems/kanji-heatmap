@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { defineConfig, UserConfig, Plugin } from "vite";
+import { defineConfig, UserConfig, Plugin, type Connect } from "vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
@@ -50,6 +50,35 @@ const copyRefPatterns = (): void => {
   if (!fs.existsSync(REF_PATTERNS_DEST_DIR))
     fs.mkdirSync(REF_PATTERNS_DEST_DIR, { recursive: true });
   fs.copyFileSync(REF_PATTERNS_SRC, REF_PATTERNS_DEST);
+};
+
+// yomiage's voice files include `.gz` parts that it unpacks itself and checks
+// against its manifest. Vite's static server sends those with
+// `Content-Encoding: gzip`, so the browser unpacks them first and yomiage sees
+// the wrong size ("larger than the manifest says"). Serve them as plain bytes.
+const YOMIAGE_PUBLIC_DIR = path.resolve(__dirname, "public/yomiage");
+
+const yomiageRawGzMiddleware: Connect.NextHandleFunction = (req, res, next) => {
+  const match = req.url?.match(/^\/yomiage\/([^/?]+\.gz)(\?|$)/);
+  if (!match) return next();
+  const file = path.join(YOMIAGE_PUBLIC_DIR, decodeURIComponent(match[1]));
+  if (path.dirname(file) !== YOMIAGE_PUBLIC_DIR || !fs.existsSync(file)) {
+    return next();
+  }
+  const bytes = fs.readFileSync(file);
+  res.setHeader("Content-Type", "application/octet-stream");
+  res.setHeader("Content-Length", bytes.length);
+  res.end(bytes);
+};
+
+const yomiageFilesPlugin: Plugin = {
+  name: "yomiage-raw-gz",
+  configureServer(server) {
+    server.middlewares.use(yomiageRawGzMiddleware);
+  },
+  configurePreviewServer(server) {
+    server.middlewares.use(yomiageRawGzMiddleware);
+  },
 };
 
 const kanjiCanvasRefPatternsPlugin: Plugin = {
@@ -139,7 +168,9 @@ const pwaConfig = {
     // "Handwriting Alt". Too big to precache (and wasteful to ship to everyone),
     // so exclude it from precache and cache it at runtime on first use instead.
     // Same for DaKanji onnx assets (~2MB) used by "Handwriting Alt 2".
-    globIgnores: ["**/ref-patterns.js", "**/onnx/**"],
+    // The AI voice files (~65 MB) are opt-in: yomiage downloads them itself
+    // and keeps them in IndexedDB, so the service worker must not touch them.
+    globIgnores: ["**/ref-patterns.js", "**/onnx/**", "**/yomiage/**"],
     runtimeCaching: [
       // **********************
       // KANJICANVAS reference patterns (lazy, on-device handwriting recognition)
@@ -401,6 +432,7 @@ const visualizer_templates: TemplateType[] = [
 export default defineConfig(() => ({
   plugins: [
     kanjiCanvasRefPatternsPlugin,
+    yomiageFilesPlugin,
     process.env.CF_PAGES ? null : cloudflare(),
     react(),
     VitePWA(pwaConfig),
