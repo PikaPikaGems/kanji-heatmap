@@ -51,18 +51,11 @@ then run:
 pnpm run generate-fill-the-kanji
 ```
 
-and commit the regenerated JSON. If you replace a TSV, run
-`pnpm run sort-fill-the-kanji` before generating: it orders each set easiest
-first, by each sentence's hardest kanji: JLPT level (N5 → N1 → not in JLPT),
-then Jouyou grade, then Google frequency. Sets listed under `keepFileOrder` in
-`raw-data/fill-the-kanji/ours.json` (🌱 Basic) keep their own order.
-
-`ours.json` lives in the
-[jp-misc-data](https://github.com/PikaPikaGems/jp-misc-data) repo, next to the
-sentences, and isn't committed here either. If you have access to that repo,
-copy `DATA/final-sentences/*.tsv` and `DATA/final-sentences/ours.json` into
-`raw-data/fill-the-kanji/` (this is where the TSVs come from too); otherwise
-get both from the maintainer.
+and commit the regenerated JSON. The TSVs come already ordered easiest
+first (by each sentence's hardest kanji: JLPT level, then Jouyou grade, then
+Google frequency) from the jp-misc-data repo, which owns the sorting. If you
+have access to it, copy `DATA/final-sentences/*.tsv` into
+`raw-data/fill-the-kanji/`; otherwise get them from the maintainer.
 
 A round is 20 rows in file order, so add new
 rows at the end of a TSV. Inserting or deleting rows in the middle moves
