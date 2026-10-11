@@ -50,7 +50,7 @@ const isEditableTarget = (target: EventTarget | null) => {
 
 /**
  * The Fill the Kanji game loop: card cursor, which blank is selected, what
- * each blank holds, answer feedback, and keyboard shortcuts (1–8 pick a tile,
+ * each blank holds, answer feedback, and keyboard shortcuts (1–9 pick a tile,
  * ! reads the sentence aloud, @ reads it slowly, Backspace / Delete undo the most recently placed
  * kanji, Enter submits once every blank is filled). The Game component stays
  * responsible for loading and rendering.
@@ -223,7 +223,7 @@ export const useFillTheKanjiGame = ({
       if (isEditableTarget(e.target)) return;
 
       const digit = Number(e.key);
-      if (Number.isInteger(digit) && digit >= 1 && digit <= 8) {
+      if (Number.isInteger(digit) && digit >= 1 && digit <= 9) {
         const kanji = tilesRef.current[digit - 1];
         if (kanji) {
           e.preventDefault();

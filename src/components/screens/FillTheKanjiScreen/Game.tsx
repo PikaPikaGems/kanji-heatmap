@@ -12,7 +12,13 @@ import {
   chunkRowStart,
   roundRowRange,
 } from "@/lib/fill-the-kanji/rounds";
-import { buildPuzzle, buildTiles } from "@/lib/fill-the-kanji/puzzle";
+import {
+  buildPuzzle,
+  buildTiles,
+  DEFAULT_TILE_COUNT,
+  isTileCount,
+  TileCount,
+} from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiSetFile, rowToItem } from "@/lib/fill-the-kanji/types";
 import { shuffle } from "@/lib/utils";
 import { SentencePrompt } from "./SentencePrompt";
@@ -25,13 +31,14 @@ import { FillTheKanjiSettings, ItemResult } from "./types";
 /**
  * Loads the set chunk holding this round (not the whole set) and the
  * similar-kanji map, then builds the round's cards: sentences in shuffled
- * order, each with its blanks and 8 tiles. `onlyJp` keeps just those
+ * order, each with its blanks and 8 or 12 tiles. `onlyJp` keeps just those
  * sentences (retrying mistakes).
  */
 const useRoundCards = (
   setId: FillTheKanjiSetId,
   round: number,
-  onlyJp: string[] | null
+  onlyJp: string[] | null,
+  tileCount: TileCount
 ) => {
   const chunk = chunkOfRound(round);
   const { data, status } = useJsonFetch<FillTheKanjiSetFile>(
@@ -60,10 +67,11 @@ const useRoundCards = (
           sentenceKanji: puzzles[i].sentenceKanji,
           getSimilars,
           fallbackPool: roundKanji,
+          tileCount,
         }),
       }))
     );
-  }, [data, similarMap, setId, round, chunk, onlyJp]);
+  }, [data, similarMap, setId, round, chunk, onlyJp, tileCount]);
 
   return { cards, status };
 };
@@ -88,7 +96,12 @@ export const Game = ({
   onComplete: (results: ItemResult[]) => void;
   onEnd: () => void;
 }) => {
-  const { cards, status } = useRoundCards(setId, round, onlyJp);
+  const { cards, status } = useRoundCards(
+    setId,
+    round,
+    onlyJp,
+    isTileCount(settings.tileCount) ? settings.tileCount : DEFAULT_TILE_COUNT
+  );
   const game = useFillTheKanjiGame({
     cards,
     sound: settings.sound,

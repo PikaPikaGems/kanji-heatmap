@@ -30,6 +30,12 @@ import {
   readSetRoundStats,
   RoundStats,
 } from "@/lib/fill-the-kanji/storage";
+import {
+  DEFAULT_TILE_COUNT,
+  isTileCount,
+  TILE_COUNT_OPTIONS,
+  TileCount,
+} from "@/lib/fill-the-kanji/puzzle";
 import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
 import { SoundMode } from "./types";
 import { useFillTheKanjiSettings } from "./use-fill-the-kanji-settings";
@@ -88,6 +94,45 @@ const RoundSummary = ({
     </div>
   );
 };
+
+/** Radio cards: a mini grid of dots previews how many tiles each choice shows. */
+const TileCountPicker = ({
+  current,
+  onChange,
+}: {
+  current: TileCount;
+  onChange: (count: TileCount) => void;
+}) => (
+  <fieldset className="flex flex-col gap-2 text-left">
+    <legend className="pb-2 text-sm font-bold">Number of choices</legend>
+    <div className="grid grid-cols-2 gap-3">
+      {TILE_COUNT_OPTIONS.map((count) => (
+        <label
+          key={count}
+          className="flex flex-col items-center gap-2 px-3 py-3 transition-colors border-2 cursor-pointer rounded-xl hover:bg-muted has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+        >
+          <input
+            type="radio"
+            name="tile-count"
+            value={count}
+            checked={current === count}
+            onChange={() => onChange(count)}
+            className="sr-only"
+          />
+          <div className="grid grid-cols-4 gap-1" aria-hidden>
+            {Array.from({ length: count }, (_, i) => (
+              <span key={i} className="w-3 h-3 rounded-sm bg-foreground/30" />
+            ))}
+          </div>
+          <span className="text-sm font-bold">{count} choices</span>
+          <span className="text-xs text-muted-foreground">
+            {count === 8 ? "Easier" : "Harder"}
+          </span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+);
 
 const Key = ({ children }: { children: string }) => (
   <kbd className="px-1.5 py-0.5 font-mono text-[11px] border rounded bg-muted">
@@ -171,6 +216,15 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               </p>
             )}
           </div>
+
+          <TileCountPicker
+            current={
+              isTileCount(settings.tileCount)
+                ? settings.tileCount
+                : DEFAULT_TILE_COUNT
+            }
+            onChange={(count) => setSetting("tileCount", count)}
+          />
 
           <div className="text-left">
             <SetSelect selected={setId} onSelect={selectSet} />

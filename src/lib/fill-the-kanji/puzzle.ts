@@ -7,8 +7,15 @@ import { isKanji, shuffle } from "@/lib/utils";
  */
 export const MAX_BLANK_KANJI = 6;
 
-/** Tiles offered per sentence (keyboard shortcuts 1–8). */
-export const TILE_COUNT = 8;
+/** Choices of how many tiles are offered per sentence. */
+export const TILE_COUNT_OPTIONS = [8, 12] as const;
+
+export type TileCount = (typeof TILE_COUNT_OPTIONS)[number];
+
+export const DEFAULT_TILE_COUNT: TileCount = 8;
+
+export const isTileCount = (v: unknown): v is TileCount =>
+  TILE_COUNT_OPTIONS.some((n) => n === v);
 
 /** One character of the sentence; `blank` indexes `Puzzle.blanks` when hidden. */
 export type PuzzleChar = { char: string; blank: number | null };
@@ -88,7 +95,7 @@ export const buildPuzzle = (jp: string): Puzzle => {
 };
 
 /**
- * TILE_COUNT shuffled tiles: the answers plus lookalike distractors.
+ * `tileCount` shuffled tiles: the answers plus lookalike distractors.
  *
  * Distractor order: each answer's similar kanji, most similar first (the
  * similar-kanji lists are ordered that way), taken round-robin so every
@@ -102,13 +109,15 @@ export const buildTiles = ({
   sentenceKanji,
   getSimilars,
   fallbackPool,
+  tileCount,
 }: {
   answers: string[];
   sentenceKanji: string[];
   getSimilars: (kanji: string) => string[];
   fallbackPool: string[];
+  tileCount: TileCount;
 }): string[] => {
-  const needed = TILE_COUNT - answers.length;
+  const needed = tileCount - answers.length;
   const used = new Set(sentenceKanji);
   const distractors: string[] = [];
 
