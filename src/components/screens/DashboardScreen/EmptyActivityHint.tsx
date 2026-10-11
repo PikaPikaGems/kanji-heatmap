@@ -8,20 +8,20 @@ import {
 
 const practiceLinks = [
   {
-    href: speedKatakanaPageMeta.href,
-    label: speedKatakanaPageMeta.shortLabel,
+    href: recognitionPracticePageMeta.href,
+    label: recognitionPracticePageMeta.shortLabel,
   },
   {
     href: productionPracticePageMeta.href,
     label: productionPracticePageMeta.shortLabel,
   },
   {
-    href: recognitionPracticePageMeta.href,
-    label: recognitionPracticePageMeta.shortLabel,
-  },
-  {
     href: fillTheKanjiPageMeta.href,
     label: fillTheKanjiPageMeta.shortLabel,
+  },
+  {
+    href: speedKatakanaPageMeta.href,
+    label: speedKatakanaPageMeta.shortLabel,
   },
 ] as const;
 

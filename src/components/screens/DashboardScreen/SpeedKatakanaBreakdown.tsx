@@ -10,7 +10,6 @@ import {
 } from "@/components/screens/SpeedKatakanaScreen/storage";
 import { countBands, cpmToBand } from "@/lib/activity";
 import { useStorageRevision } from "@/hooks/use-storage-value";
-import { SectionHeading } from "./SectionHeading";
 import { SegmentedBandBar } from "./SegmentedBandBar";
 import { DashboardPanel } from "./DashboardPanel";
 import { GradientLegend } from "@/components/common/GradientLegend";
@@ -47,11 +46,7 @@ export const SpeedKatakanaBreakdown = () => {
   useStorageRevision((key) => key == null || key.startsWith(STATS_KEY_PREFIX));
 
   return (
-    <DashboardPanel>
-      <SectionHeading
-        title={speedKatakanaPageMeta.shortLabel}
-        description="Each bar is one challenge set (10 challenges), grouped by best CPM. Only attempts with accuracy > 70% count. Brighter = higher CPM. Clear a full 48-word run above 70% accuracy to fill these bars."
-      />
+    <DashboardPanel title={speedKatakanaPageMeta.shortLabel}>
       <div className="grid grid-flow-col grid-cols-4 grid-rows-5 gap-x-2 gap-y-2 sm:gap-x-2 sm:gap-y-2">
         {Array.from({ length: LEVELS }, (_, i) => i + 1).map((level) => (
           <LevelCell key={level} level={level} />

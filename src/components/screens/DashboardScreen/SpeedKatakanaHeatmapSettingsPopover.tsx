@@ -9,6 +9,7 @@ import {
   HeatmapCellMetric,
 } from "@/lib/activity";
 import { useHeatmapCellMetric } from "@/hooks/use-heatmap-cell-metric";
+import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 
 const MetricRadioOption = ({
   name,
@@ -84,6 +85,11 @@ export const SpeedKatakanaHeatmapSettingsPopover = ({
               />
             ))}
           </div>
+          {metric === "attemptCount" && (
+            <div className="pt-3 border-t border-dotted">
+              <AttemptCountScaleOptions />
+            </div>
+          )}
         </div>
       }
       contentClassName="m-0 p-0 max-w-56"

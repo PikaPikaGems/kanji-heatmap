@@ -8,8 +8,9 @@ export const VOICE_ENGINE_KEY = "jp-voice-engine";
 export const AI_VOICE_SETTINGS_KEY = "ai-voice-settings";
 
 /** Read by every preset preview and the Test Voice button. */
-export const AI_VOICE_PREVIEW_TEXT =
-  "こんにちは。今日はいい天気ですね！私は毎朝、近くの公園を散歩しています。Let's do our best! 明日も晴れるといいな。";
+/** Spoken by "Test Voice" and the speaker button next to "Voice". */
+export const VOICE_PREVIEW_TEXT =
+  "こんにちは。今日はいい天気ですね！明日も晴れるといいな。また近くの公園を散歩したいな。";
 
 export type AiVoiceShape = {
   pitch: number;

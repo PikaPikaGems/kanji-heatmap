@@ -13,6 +13,9 @@ export type ChallengeSetStats = {
    * Missing/0 means no qualifying attempt yet (dashboard treats as not attempted).
    */
   bestCpmWithAccuracyOver70?: number;
+  /** ms since epoch of the latest attempt. Missing for attempts recorded
+   * before this was tracked. */
+  lastAttempted?: number;
 };
 
 export const STATS_KEY_PREFIX = "speed-katakana-stats-";
@@ -45,7 +48,8 @@ export const computeAverageCpm = (totalSets: number): number | null => {
 /** Merges a finished session's result into the stored stats for a set. */
 export const recordSetResult = (
   setNumber: number,
-  { accuracy, charsPerMinute }: SessionStats
+  { accuracy, charsPerMinute }: SessionStats,
+  at: Date = new Date()
 ): void => {
   const prev = readSetStats(setNumber);
   const next: ChallengeSetStats = {
@@ -58,6 +62,7 @@ export const recordSetResult = (
       accuracy > 70
         ? Math.max(charsPerMinute, prev?.bestCpmWithAccuracyOver70 ?? 0)
         : prev?.bestCpmWithAccuracyOver70,
+    lastAttempted: at.getTime(),
   };
   try {
     localStorage.setItem(statsKey(setNumber), JSON.stringify(next));

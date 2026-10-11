@@ -34,13 +34,14 @@ import {
   type AiVoiceState,
 } from "@/lib/ai-voice/engine";
 import {
-  AI_VOICE_PREVIEW_TEXT,
+  VOICE_PREVIEW_TEXT,
   type AiVoiceSettings,
   type AiVoiceShape,
   type VoiceEngine,
 } from "@/lib/ai-voice/preferences";
 import sliderHints from "@/lib/ai-voice/yomiage-slider-hints.json";
 import { cn } from "@/lib/utils";
+import { cnOptionTile } from "@/lib/generic-cn";
 
 type Yomiage = typeof import("yomiage");
 type SliderName =
@@ -57,12 +58,11 @@ type SliderSpec = {
 };
 const SLIDERS = sliderHints.sliders as SliderSpec[];
 
+/** Equal-width option tile, same look as the Japanese Font grid. */
 const chipCn = (selected: boolean) =>
   cn(
-    "rounded-xl border-2 px-3 py-1.5 text-sm font-semibold transition-colors",
-    selected
-      ? "border-theme-color-with-opacity-100 background-theme-color-with-opacity-25"
-      : "border-input hover:bg-accent"
+    "flex items-center justify-center gap-2 px-2 py-2 text-sm font-semibold",
+    cnOptionTile(selected)
   );
 
 const subheadingCn = "mb-2 text-sm font-semibold text-left";
@@ -89,7 +89,7 @@ export const VoiceEngineChoice = () => {
 
   return (
     <div
-      className="flex flex-wrap gap-2 mb-3"
+      className="grid grid-cols-2 gap-2 mb-3"
       role="group"
       aria-label="Text-to-speech engine"
     >
@@ -99,11 +99,20 @@ export const VoiceEngineChoice = () => {
           type="button"
           aria-pressed={engine === value}
           onClick={() => choose(value)}
-          className={cn(chipCn(engine === value), "flex items-center gap-2")}
+          className={chipCn(engine === value)}
         >
           {label}
           {value === "ai" && (
-            <SpanBadge variant="outline" className="px-1.5 py-0 text-[10px]">
+            <SpanBadge
+              variant="outline"
+              className={cn(
+                "px-1.5 py-0 text-[10px]",
+                // Matches the tile's own border (see cnOptionTile).
+                engine === value
+                  ? "border-theme-color-with-opacity-100"
+                  : "border-muted-foreground/40"
+              )}
+            >
               Experimental
             </SpanBadge>
           )}
@@ -231,10 +240,8 @@ const usePreview = () => {
     const call = ++callRef.current;
     window.speechSynthesis.cancel();
     setStatus("preparing");
-    speakAi(AI_VOICE_PREVIEW_TEXT, {
+    speakAi(VOICE_PREVIEW_TEXT, {
       settings,
-      // The preview's English sentence shows how mixed text is read.
-      otherLanguages: "read",
       onStart: () => {
         if (callRef.current === call) setStatus("speaking");
       },
@@ -377,16 +384,17 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
   return (
     <div className="pt-3">
       <span className={cn(subheadingCn, "block")}>Preset</span>
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Preset">
+      {/* Rows of 3 so Custom isn't left alone on its own row. */}
+      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset">
         {[...presetNames, "custom" as const].map((name) => (
           <button
             key={name}
             type="button"
             aria-pressed={choice === name}
             onClick={() => choosePreset(name)}
-            className={chipCn(choice === name)}
+            className={cn(chipCn(choice === name), "capitalize")}
           >
-            {name === "custom" ? "Custom" : name}
+            {name}
           </button>
         ))}
       </div>
@@ -396,30 +404,39 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
         </p>
       )}
 
-      <div className="flex items-center gap-2 py-3">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={!ready}
-          onClick={() =>
-            preview.play({
-              ...settings,
-              preset: choice,
-            })
-          }
-          aria-busy={preview.status === "preparing"}
-        >
-          {preview.status === "preparing" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <Play />
-          )}
-          Test Voice
-        </Button>
-        {previewing && (
-          <Button variant="ghost" size="sm" onClick={preview.stop}>
-            <Square />
+      {/* Full width like Stroke Order's "Reset to defaults"; becomes Stop
+          while the preview plays. */}
+      <div className="py-3">
+        {previewing ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full text-xs font-bold"
+            onClick={preview.stop}
+            aria-busy={preview.status === "preparing"}
+          >
+            {preview.status === "preparing" ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Square />
+            )}
             Stop
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full text-xs font-bold"
+            disabled={!ready}
+            onClick={() =>
+              preview.play({
+                ...settings,
+                preset: choice,
+              })
+            }
+          >
+            <Play />
+            Test Voice
           </Button>
         )}
       </div>

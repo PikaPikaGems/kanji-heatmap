@@ -16,10 +16,10 @@ test.describe("dashboard", () => {
     await expect(page.getByLabel("Next period")).toBeVisible();
 
     await expect(
-      page.getByRole("checkbox", { name: "Kanji Writing" })
+      page.getByRole("checkbox", { name: "Reading Practice" })
     ).toBeVisible();
     await expect(
-      page.getByRole("checkbox", { name: "Kanji Reading" })
+      page.getByRole("checkbox", { name: "Writing Practice" })
     ).toBeVisible();
     await expect(
       page.getByRole("checkbox", { name: "Speed Katakana" })

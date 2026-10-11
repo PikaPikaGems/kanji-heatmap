@@ -10,6 +10,10 @@ const SET_SIZES = setSizes as Record<string, number>;
 export const setRowCount = (setId: FillTheKanjiSetId): number =>
   SET_SIZES[setId] ?? 0;
 
+/** Row count rounded down to the hundred, e.g. 1,944 → "1,900+". */
+export const approxRowCountLabel = (setId: FillTheKanjiSetId): string =>
+  `${(Math.floor(setRowCount(setId) / 100) * 100).toLocaleString("en-US")}+`;
+
 /** Rounds in a set: rows cut into ROUND_SIZE chunks, remainder merged. */
 export const roundCount = (setId: FillTheKanjiSetId): number =>
   Math.max(1, Math.floor(setRowCount(setId) / ROUND_SIZE));

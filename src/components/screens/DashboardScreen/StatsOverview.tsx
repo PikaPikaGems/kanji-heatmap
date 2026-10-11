@@ -2,7 +2,6 @@ import { Cake, CalendarDays } from "lucide-react";
 import { formatCakeDay } from "@/lib/activity";
 import { useActivityData } from "@/hooks/use-activity-data";
 import { formatRawCount } from "@/lib/format-count";
-import { SectionHeading } from "./SectionHeading";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { DashboardPanel } from "./DashboardPanel";
 import { OverviewCaption } from "./OverviewStat";
@@ -18,11 +17,7 @@ export const StatsOverview = () => {
   } = useActivityData();
 
   return (
-    <DashboardPanel>
-      <SectionHeading
-        title="All-time Overview"
-        description="All-time activity since your first recorded session."
-      />
+    <DashboardPanel title="All-time Overview" defaultOpen>
       <ActivityCountsGrid
         stats={{
           speedKatakanaDays,

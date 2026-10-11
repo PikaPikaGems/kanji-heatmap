@@ -3,7 +3,7 @@
 export const recognitionPracticePageMeta = {
   href: "/reading-practice",
   title: "Kanji Reading Practice",
-  shortLabel: "Kanji Reading",
+  shortLabel: "Reading Practice",
   heading: "👁️ Kanji Reading",
   description: "Type the correct reading for each word",
 } as const;
@@ -11,7 +11,7 @@ export const recognitionPracticePageMeta = {
 export const productionPracticePageMeta = {
   href: "/writing-practice",
   title: "Kanji Writing Practice",
-  shortLabel: "Kanji Writing",
+  shortLabel: "Writing Practice",
   heading: "✍️ Kanji Writing",
   description: "Complete words by drawing the missing kanji",
 } as const;
@@ -35,6 +35,6 @@ export const fillTheKanjiPageMeta = {
 export const practicePageLinks = [
   recognitionPracticePageMeta,
   productionPracticePageMeta,
-  speedKatakanaPageMeta,
   fillTheKanjiPageMeta,
+  speedKatakanaPageMeta,
 ] as const;

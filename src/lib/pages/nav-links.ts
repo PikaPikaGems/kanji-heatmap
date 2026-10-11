@@ -55,8 +55,8 @@ export const masteryPageMeta = {
 export const practiceNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
-  { ...speedKatakanaPageMeta, Icon: Keyboard },
   { ...fillTheKanjiPageMeta, Icon: Puzzle },
+  { ...speedKatakanaPageMeta, Icon: Keyboard },
 ];
 
 /** Bottom floating island tabs (Dashboard / Explore / Mastery). */
@@ -73,7 +73,7 @@ export const headerNavLinks: NavLinkItem[] = [
   { ...masteryPageMeta, Icon: GraduationCap },
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
-  { ...speedKatakanaPageMeta, Icon: Keyboard },
   { ...fillTheKanjiPageMeta, Icon: Puzzle },
+  { ...speedKatakanaPageMeta, Icon: Keyboard },
   { ...cumUseGraphPageMeta, Icon: ChartLine },
 ];

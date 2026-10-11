@@ -18,7 +18,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
-import { SectionHeading } from "./SectionHeading";
 import { DashboardPanel } from "./DashboardPanel";
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
@@ -144,13 +143,8 @@ export const BookmarksBreakdown = () => {
     !ready || search.status === "loading" || search.status === "idle";
 
   const bands = showGrade ? gradeBands : jlptBands;
-  const description = showGrade
-    ? "How much of each jouyou grade you've bookmarked. Bookmark a word from a kanji’s detail drawer to start filling these bars."
-    : "How much of each JLPT band you've bookmarked. Bookmark a word from a kanji’s detail drawer to start filling these bars.";
-
   return (
-    <DashboardPanel>
-      <SectionHeading title="Bookmarks" description={description} />
+    <DashboardPanel title="Bookmarks">
       <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
         <Label
           htmlFor={switchId}
