@@ -97,9 +97,7 @@ const FillTheKanjiScreen = () => {
         <div key="ended" className="h-full animate-fade-in">
           <EndSession
             results={results}
-            roundLabel={`${retryJp ? "Mistakes · " : ""}${setLabel(
-              setId
-            )} · Round ${roundLabel(round)}`}
+            roundLabel={`${setLabel(setId)} · Round ${roundLabel(round)}`}
             onNext={playNextRound}
             onRetryMistakes={() =>
               play(results.filter((r) => !r.correct).map((r) => r.item.jp))
