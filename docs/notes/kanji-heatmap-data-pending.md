@@ -68,6 +68,13 @@ now; the user will handle them later.
      ~292 fallback kanji with a real visual measure.
   4. Rerun Kanjistat (the R package) and keep more than ~20 neighbors.
 
+  Examples noticed in Fill the Kanji (October 2026), which now offers each
+  answer's most similar kanji first:
+
+  - 午 → 牛 is missing (午's list: 千 十 干 平 升 汗 汁 年 弁 半; 牛's: 件 告).
+  - 飯 → 飲 is only 8th of 10, so it rarely makes the tiles; 飯's list
+    starts with 鼓, which doesn't look like 飯.
+
   Start with 1 + 2, and measure recall against `poolexp_judgements.yaml`
   (held out, since the flashcards become an input). Then consider 3 so
   every shipped kanji gets a visual-similarity list.

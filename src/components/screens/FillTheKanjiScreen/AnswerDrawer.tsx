@@ -1,15 +1,17 @@
 import { PracticeButton } from "@/components/ui/practice-button";
-import { SpeakButton } from "@/components/common/SpeakButton";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PracticeDrawerShell } from "@/components/production-practice-v1/drawers/PracticeDrawerShell";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
+import { SpanBadge } from "@/components/ui/badge";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
-import { plainSentence } from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { FuriganaSentence } from "./SentencePrompt";
+import { SpeakButtons } from "./SpeakButtons";
+import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
-export type FeedbackKind = "correct" | "wrong" | "forgot";
+/** "almost": wrong, but at least half the blanks were right. */
+export type FeedbackKind = "correct" | "almost" | "wrong" | "forgot";
 
 /** The last answer shown; kept after closing so the drawer can slide away. */
 export type AnswerState = {
@@ -20,6 +22,7 @@ export type AnswerState = {
 
 const TITLES: Record<FeedbackKind, string> = {
   correct: "🎉 Correct!",
+  almost: "😅 Almost there!",
   wrong: "🙈 Not quite",
   forgot: "🫶 No worries",
 };
@@ -53,12 +56,13 @@ const NotesPopover = ({ item }: { item: FillTheKanjiItem }) => (
         {item.tags.length > 0 && (
           <div className="flex flex-wrap justify-center gap-1.5 pt-2 border-t border-dotted">
             {item.tags.map((tag) => (
-              <span
+              <SpanBadge
                 key={tag}
-                className="px-2 py-0.5 text-xs font-semibold rounded-full bg-muted"
+                variant="outline"
+                className="font-medium text-muted-foreground"
               >
                 {tag}
-              </span>
+              </SpanBadge>
             ))}
           </div>
         )}
@@ -73,9 +77,12 @@ const NotesPopover = ({ item }: { item: FillTheKanjiItem }) => (
  */
 export const AnswerDrawer = ({
   answer,
+  speech,
   onContinue,
 }: {
   answer: AnswerState;
+  /** The answered sentence's speech (the drawer opens on the current card). */
+  speech: SentenceSpeech;
   onContinue: () => void;
 }) => {
   const open = answer?.open ?? false;
@@ -103,6 +110,7 @@ export const AnswerDrawer = ({
             jp={item.jp}
             className="text-2xl sm:text-3xl text-foreground"
           />
+          <p className="pt-1 text-xs text-foreground">{item.en}</p>
         </div>
       }
       footer={
@@ -114,7 +122,7 @@ export const AnswerDrawer = ({
       }
     >
       <div className="flex items-center justify-center gap-3 px-4">
-        <SpeakButton word={plainSentence(item.jp)} iconType="headphones" />
+        <SpeakButtons speech={speech} />
         {hasNotes && <NotesPopover item={item} />}
       </div>
     </PracticeDrawerShell>

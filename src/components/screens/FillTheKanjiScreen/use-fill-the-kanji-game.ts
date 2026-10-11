@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useSpeak } from "@/hooks/use-jp-speak";
+import { SpeakStatus, useSpeakWithStatus } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { plainSentence, Puzzle } from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { AnswerState, FeedbackKind } from "./AnswerDrawer";
 import { FillTheKanjiSettings, ItemResult } from "./types";
+
+type Speech = { speak: () => void; status: SpeakStatus };
+/** The current sentence's speech, shared by the buttons and shortcuts. */
+export type SentenceSpeech = { normal: Speech; slow: Speech };
 
 export type GameCard = {
   item: FillTheKanjiItem;
@@ -25,6 +29,13 @@ const nextEmpty = (filled: (string | null)[], from: number): number | null => {
   return null;
 };
 
+/** All right: correct; at least half the blanks right: almost; else wrong. */
+const feedbackKind = (right: number, total: number): FeedbackKind => {
+  if (right === total) return "correct";
+  if (right * 2 >= total) return "almost";
+  return "wrong";
+};
+
 const isEditableTarget = (target: EventTarget | null) => {
   const el = target as HTMLElement | null;
   if (!el) return false;
@@ -40,7 +51,7 @@ const isEditableTarget = (target: EventTarget | null) => {
 /**
  * The Fill the Kanji game loop: card cursor, which blank is selected, what
  * each blank holds, answer feedback, and keyboard shortcuts (1–8 pick a tile,
- * ! reads the sentence aloud, Backspace / Delete undo the most recently placed
+ * ! reads the sentence aloud, @ reads it slowly, Backspace / Delete undo the most recently placed
  * kanji, Enter submits once every blank is filled). The Game component stays
  * responsible for loading and rendering.
  */
@@ -78,7 +89,13 @@ export const useFillTheKanjiGame = ({
     setCursor(0);
   }
 
-  const speak = useSpeak(card ? plainSentence(card.item.jp) : "");
+  const sentence = card ? plainSentence(card.item.jp) : "";
+  const speech: SentenceSpeech = {
+    normal: useSpeakWithStatus(sentence),
+    slow: useSpeakWithStatus(sentence, true),
+  };
+  const speak = speech.normal.speak;
+  const speakSlowly = speech.slow.speak;
   // Games keep the AI voice in memory so words after a pause play promptly.
   useKeepAiVoiceWarm();
   const playCorrect = useCorrectSound();
@@ -129,7 +146,10 @@ export const useFillTheKanjiGame = ({
 
   const submit = () => {
     if (feedback != null || !card || !allFilled) return;
-    const correct = filled.every((k, i) => k === card.puzzle.blanks[i]);
+    const rightCount = filled.filter(
+      (k, i) => k === card.puzzle.blanks[i]
+    ).length;
+    const correct = rightCount === filled.length;
     resultsRef.current = [...resultsRef.current, { item: card.item, correct }];
     if (correct) {
       playCorrect({
@@ -144,7 +164,7 @@ export const useFillTheKanjiGame = ({
     setAnswer({
       open: true,
       item: card.item,
-      kind: correct ? "correct" : "wrong",
+      kind: feedbackKind(rightCount, filled.length),
     });
   };
 
@@ -176,8 +196,22 @@ export const useFillTheKanjiGame = ({
   };
 
   // Latest handlers for the window listener below, without resubscribing.
-  const handlersRef = useRef({ pickTile, undo, submit, allFilled, speak });
-  handlersRef.current = { pickTile, undo, submit, allFilled, speak };
+  const handlersRef = useRef({
+    pickTile,
+    undo,
+    submit,
+    allFilled,
+    speak,
+    speakSlowly,
+  });
+  handlersRef.current = {
+    pickTile,
+    undo,
+    submit,
+    allFilled,
+    speak,
+    speakSlowly,
+  };
   const tilesRef = useRef<string[]>([]);
   tilesRef.current = card?.tiles ?? [];
 
@@ -200,6 +234,11 @@ export const useFillTheKanjiGame = ({
       if (e.key === "!") {
         e.preventDefault();
         handlersRef.current.speak();
+        return;
+      }
+      if (e.key === "@") {
+        e.preventDefault();
+        handlersRef.current.speakSlowly();
         return;
       }
       if (e.key === "Backspace" || e.key === "Delete") {
@@ -229,6 +268,7 @@ export const useFillTheKanjiGame = ({
     feedback,
     answer,
     allFilled,
+    speech,
     pickTile,
     selectBlank,
     submit,
