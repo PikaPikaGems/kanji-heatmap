@@ -399,34 +399,9 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
 
   return (
     <div className="pt-3">
-      <span className={cn(subheadingCn, "block")}>Preset</span>
-      {/* Rows of 3 so Custom isn't left alone on its own row. */}
-      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset">
-        {[...presetNames, "custom" as const].map((name) => (
-          // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
-          <PracticeButton
-            key={name}
-            variant={choice === name ? "primary" : "secondary"}
-            aria-pressed={choice === name}
-            onClick={() => choosePreset(name)}
-            className={cn(
-              "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
-              choice !== name && "border-dashed"
-            )}
-          >
-            {name}
-          </PracticeButton>
-        ))}
-      </div>
-      {!ready && (
-        <p className="pt-2 text-xs text-left text-muted-foreground">
-          Presets can be heard once the voice has loaded.
-        </p>
-      )}
-
       {/* Full width like Stroke Order's "Reset to defaults"; becomes Stop
           while the preview plays. */}
-      <div className="py-3">
+      <div className="pb-3">
         {previewing ? (
           <Button
             variant="secondary"
@@ -460,8 +435,32 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
           </Button>
         )}
       </div>
+      <span className={cn(subheadingCn, "block")}>Preset</span>
+      {/* Rows of 3 so Custom isn't left alone on its own row. */}
+      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset">
+        {[...presetNames, "custom" as const].map((name) => (
+          // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
+          <PracticeButton
+            key={name}
+            variant={choice === name ? "primary" : "secondary"}
+            aria-pressed={choice === name}
+            onClick={() => choosePreset(name)}
+            className={cn(
+              "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
+              choice !== name && "border-dashed"
+            )}
+          >
+            {name}
+          </PracticeButton>
+        ))}
+      </div>
+      {!ready && (
+        <p className="pt-2 text-xs text-left text-muted-foreground">
+          Presets can be heard once the voice has loaded.
+        </p>
+      )}
 
-      <span className={cn(subheadingCn, "block mt-2")}>Voice</span>
+      <span className={cn(subheadingCn, "block mt-4")}>Voice</span>
       {!isCustom && (
         <p className="text-xs text-left text-muted-foreground">
           Set by the preset. Select Custom to change these.
