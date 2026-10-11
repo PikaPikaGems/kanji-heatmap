@@ -84,7 +84,7 @@
     "vite-plugin-pwa": "^0.21.1",
     "wanakana": "^5.3.1",
     "wouter": "^3.6.0",
-    "yomiage": "https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz"
+    "yomiage": "https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.3/yomiage-0.3.3.tgz"
   },
   "optionalDependencies": {
     "kanjicanvas": "github:asdfjkl/kanjicanvas"
