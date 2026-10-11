@@ -39,7 +39,7 @@ import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 import { approxRowCountLabel } from "@/lib/fill-the-kanji/rounds";
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
-import { cnOptionTile } from "@/lib/generic-cn";
+import { PracticeButton } from "@/components/ui/practice-button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
@@ -248,15 +248,17 @@ const FontGrid = () => {
   return (
     <div className="grid grid-cols-5 gap-2">
       {FONT_NAMES.map((name, i) => (
-        <button
+        // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
+        <PracticeButton
           key={i}
-          type="button"
+          size="icon"
+          variant={fontIndex === i ? "primary" : "secondary"}
           onClick={() => setFont(i)}
           aria-pressed={fontIndex === i}
           title={name}
           className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2",
-            cnOptionTile(fontIndex === i)
+            "flex-col w-full h-auto gap-1 p-2 rounded-xl",
+            fontIndex !== i && "border-dashed"
           )}
         >
           <span
@@ -265,10 +267,15 @@ const FontGrid = () => {
           >
             字体
           </span>
-          <span className="w-full truncate text-center text-[10px] text-muted-foreground">
+          <span
+            className={cn(
+              "w-full truncate text-center text-[10px] font-normal tracking-normal",
+              fontIndex === i ? "opacity-80" : "text-muted-foreground"
+            )}
+          >
             {name}
           </span>
-        </button>
+        </PracticeButton>
       ))}
     </div>
   );

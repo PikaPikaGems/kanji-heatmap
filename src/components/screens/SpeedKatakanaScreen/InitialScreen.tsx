@@ -177,10 +177,10 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dashed rounded-3xl bg-background">
+      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
         <div className="w-full max-w-lg mx-auto">
           <PracticeButton size="lg" onClick={onStart}>
-            Start Game
+            Start
           </PracticeButton>
         </div>
       </div>

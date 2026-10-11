@@ -14,7 +14,10 @@
  *   2. Jouyou grade: 1–6, then 9 (secondary school), then not in Jouyou.
  *   3. Google frequency rank (higher rank number = rarer = later). Kanji with
  *      no Google rank count as rarest.
- *   4. Ties keep their current order (stable sort), so rerunning is a no-op.
+ *   4. Number of distinct kanji, fewer first: the game blanks each one, so
+ *      this is how many tiles the player has to place.
+ *   5. Length (characters, without furigana or spaces), shorter first.
+ *   6. Ties keep their current order (stable sort), so rerunning is a no-op.
  *
  * Reads JLPT, grade and Google rank from public/json/v2/kanji_main.json (see
  * MainKanjiInfoItemType in src/lib/kanji/kanji-worker-types.ts).
@@ -73,6 +76,8 @@ const googleRankOf = (kanji) => {
 const KANJI = /[㐀-䶿一-鿿]/g;
 const kanjiIn = (jp) => jp.replace(/\[[^\]]*\]/g, "").match(KANJI) ?? [];
 const hardest = (kanji, keyOf) => Math.max(0, ...kanji.map(keyOf));
+const visibleLength = (jp) =>
+  jp.replace(/\[[^\]]*\]/g, "").replace(/\s/g, "").length;
 
 const files = readdirSync(srcDir)
   .filter((f) => f.endsWith(".tsv"))
@@ -93,13 +98,16 @@ for (const file of files) {
   const jpColumn = header.startsWith("Emoji\t") ? 1 : 0;
 
   const rows = lines.map((line, index) => {
-    const kanji = kanjiIn(line.split("\t")[jpColumn] ?? "");
+    const jp = line.split("\t")[jpColumn] ?? "";
+    const kanji = kanjiIn(jp);
     return {
       line,
       index,
       level: hardest(kanji, levelOf),
       grade: hardest(kanji, gradeOf),
       rank: hardest(kanji, googleRankOf),
+      kanjiCount: new Set(kanji).size,
+      length: visibleLength(jp),
     };
   });
 
@@ -108,6 +116,8 @@ for (const file of files) {
       a.level - b.level ||
       a.grade - b.grade ||
       a.rank - b.rank ||
+      a.kanjiCount - b.kanjiCount ||
+      a.length - b.length ||
       a.index - b.index
   );
 

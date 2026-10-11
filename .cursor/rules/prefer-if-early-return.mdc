@@ -1,0 +1,28 @@
+---
+description: Prefer if/else with early exits; avoid switch/case
+globs: **/*.{ts,tsx,js,mjs}
+alwaysApply: true
+---
+
+# Prefer if / else and early exits; avoid switch
+
+Use `if` / `else` with early exits (`return`, `continue`, `break` out of a loop) as much as possible, so the main path stays unindented. Do **not** use `switch` / `case` statements.
+
+```ts
+// ❌ BAD — switch
+switch (status) {
+  case "loading":
+    return "Loading…";
+  case "error":
+    return error ?? "Something went wrong.";
+  default:
+    return "Ready";
+}
+
+// ✅ GOOD — early returns
+if (status === "loading") return "Loading…";
+if (status === "error") return error ?? "Something went wrong.";
+return "Ready";
+```
+
+For a plain value-per-key mapping, a lookup object (`Record<Key, Value>`) is also fine.

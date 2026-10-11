@@ -21,6 +21,7 @@ import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representat
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
+import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 
 const StudyNotesLoadingFallback = () => (
   <div
@@ -97,8 +98,9 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
       </div>
 
       <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
-      <div className="flex w-full pt-2 mt-6 mb-12 border-t border-dashed justify-left gap-x-1">
+      <div className="flex flex-col items-start w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
         <InstallAppModal />
+        <NetworkStatusBadge />
       </div>
     </div>
   );

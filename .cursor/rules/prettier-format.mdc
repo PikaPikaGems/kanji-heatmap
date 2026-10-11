@@ -21,6 +21,17 @@ pnpm exec prettier --write path/to/file1.tsx path/to/file2.ts
 
 Do **not** run `pnpm run format` / `prettier --write .` unless the user explicitly asks for a full-repo format.
 
+## Before finishing any change
+
+Run the repo-wide check and fix only the files it reports:
+
+```bash
+pnpm exec prettier --check .   # or: pnpm run format:check
+pnpm exec prettier --write <reported files>
+```
+
+CI runs `format:check` and fails on formatting issues. `pnpm run build` does not run Prettier, so a passing build doesn't mean formatting is clean.
+
 ## Config to match (do not fight these)
 
 - `printWidth`: 80

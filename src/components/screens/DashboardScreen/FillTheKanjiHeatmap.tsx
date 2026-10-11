@@ -54,6 +54,26 @@ const SETTINGS_KEY = "fill-the-kanji-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
 const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 
+/** Sums a set's attempt counts across its rounds. */
+const totalAttempts = (stats: SetRoundStats) =>
+  Object.values(stats).reduce((sum, s) => sum + s.attemptCount, 0);
+
+/** "5 / 384 rounds completed · 7 total attempts" */
+const ProgressSummary = ({
+  completed,
+  total,
+  attempts,
+}: {
+  completed: number;
+  total: number;
+  attempts: number;
+}) => (
+  <>
+    {completed.toLocaleString()} / {total.toLocaleString()} rounds completed ·{" "}
+    {attempts.toLocaleString()} total {attempts === 1 ? "attempt" : "attempts"}
+  </>
+);
+
 /** Wide / Compact layout switch plus the attempt-count brightness scale. */
 const LayoutSettingsPopover = ({
   compact,
@@ -168,7 +188,7 @@ const SetHeatmapGrid = ({
   attemptShading: AttemptCountShading;
 }) => {
   const total = roundCount(setId);
-  const played = Object.keys(stats).length;
+  const completed = Object.keys(stats).length;
   const label = FILL_THE_KANJI_SETS.find((s) => s.id === setId)?.label;
 
   return (
@@ -176,7 +196,12 @@ const SetHeatmapGrid = ({
       <p className="mb-2 text-xs font-bold text-left">
         {label}{" "}
         <span className="font-normal text-muted-foreground tabular-nums">
-          · {played}/{total} rounds played
+          ·{" "}
+          <ProgressSummary
+            completed={completed}
+            total={total}
+            attempts={totalAttempts(stats)}
+          />
         </span>
       </p>
       {/* Scrolls sideways on narrow screens instead of widening the page. */}
@@ -212,7 +237,7 @@ const SetHeatmapGrid = ({
   );
 };
 
-/** Group title plus how many of its rounds have been played. */
+/** Group title plus how many of its rounds have been completed. */
 const GroupTrigger = ({
   title,
   setIds,
@@ -222,8 +247,13 @@ const GroupTrigger = ({
   setIds: FillTheKanjiSetId[];
   statsById: Map<FillTheKanjiSetId, SetRoundStats>;
 }) => {
-  const played = setIds.reduce(
-    (sum, id) => sum + Object.keys(statsById.get(id) ?? {}).length,
+  const groupStats = setIds.map((id) => statsById.get(id) ?? {});
+  const completed = groupStats.reduce(
+    (sum, stats) => sum + Object.keys(stats).length,
+    0
+  );
+  const attempts = groupStats.reduce(
+    (sum, stats) => sum + totalAttempts(stats),
     0
   );
   const total = setIds.reduce((sum, id) => sum + roundCount(id), 0);
@@ -231,7 +261,11 @@ const GroupTrigger = ({
     <span className="flex flex-col">
       <span className="text-sm font-semibold">{title}</span>
       <span className="text-xs font-normal text-muted-foreground tabular-nums">
-        {played}/{total} rounds played
+        <ProgressSummary
+          completed={completed}
+          total={total}
+          attempts={attempts}
+        />
       </span>
     </span>
   );

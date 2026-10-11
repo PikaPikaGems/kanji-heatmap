@@ -42,8 +42,8 @@ entirely.
 - **Guards:** `PracticeFab.tsx` + `practiceNavLinks`.
 - **Steps:** from `/`, open the practice FAB; visit Reading, Writing,
   Speed Katakana in turn (returning via browser Back).
-- **Assertions:** each game's start screen renders ("Start Practicing" /
-  "Start Game"); Back returns to the list with state intact.
+- **Assertions:** each game's start screen renders ("Start" on every
+  game); Back returns to the list with state intact.
 
 ### NAV-4: Home-search memory restores the last query
 

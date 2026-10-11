@@ -56,68 +56,68 @@ const getWordTags = (entry: CommonWordEntry): WordTag[] => {
 };
 
 const WordTagBadge = ({ tag }: { tag: WordTag }) => {
-  switch (tag.kind) {
-    case "kaishi":
-      return (
-        <BadgeWithPopover
-          name="✓ Kaishi 1.5k"
-          desc="This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners"
-        />
-      );
-    case "jlpt":
-      return <JLPTBadge jlpt={tag.jlpt} />;
-    case "tier":
-      return (
-        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
-          {tag.tier} {tag.label}
-        </Badge>
-      );
-    case "book":
-      return (
-        <BadgeWithPopover
-          name={
-            tag.jlpt ? (
-              <span className="inline-flex items-center">
-                <span
-                  className={`h-2 w-2 block ${JLPTListItems[tag.jlpt].cn} !rounded-full mr-1`}
-                />
-                {tag.label}
-              </span>
-            ) : (
-              tag.label
-            )
-          }
-          desc={
-            <>
-              These word lists are community-maintained and may differ from the
-              official editions.{" "}
-              <ExternalTextLink
-                href={outLinks.githubContentIssue}
-                text="Suggest an edit."
-              />
-              <DottedSeparator className="my-2" />
-              <p className="mb-1 font-bold">
-                Levels: more basic → more advanced
-              </p>
-              <ul className="space-y-0.5">
-                {BOOK_LEVEL_RANGES.map(([from, to]) => (
-                  <li key={from}>
-                    {from} → {to}
-                  </li>
-                ))}
-              </ul>
-            </>
-          }
-        />
-      );
-    case "variant":
-      return (
-        <BadgeWithPopover
-          name="⚠️ Variant"
-          desc="This word might not be usually written or read this way"
-        />
-      );
+  if (tag.kind === "kaishi") {
+    return (
+      <BadgeWithPopover
+        name="✓ Kaishi 1.5k"
+        desc="This word is included in Kaishi 1.5k - a free, modern, modular Japanese Anki deck for beginners"
+      />
+    );
   }
+  if (tag.kind === "jlpt") {
+    return <JLPTBadge jlpt={tag.jlpt} />;
+  }
+  if (tag.kind === "tier") {
+    return (
+      <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
+        {tag.tier} {tag.label}
+      </Badge>
+    );
+  }
+  if (tag.kind === "book") {
+    return (
+      <BadgeWithPopover
+        name={
+          tag.jlpt ? (
+            <span className="inline-flex items-center">
+              <span
+                className={`h-2 w-2 block ${JLPTListItems[tag.jlpt].cn} !rounded-full mr-1`}
+              />
+              {tag.label}
+            </span>
+          ) : (
+            tag.label
+          )
+        }
+        desc={
+          <>
+            These word lists are community-maintained and may differ from the
+            official editions.{" "}
+            <ExternalTextLink
+              href={outLinks.githubContentIssue}
+              text="Suggest an edit."
+            />
+            <DottedSeparator className="my-2" />
+            <p className="mb-1 font-bold">Levels: more basic → more advanced</p>
+            <ul className="space-y-0.5">
+              {BOOK_LEVEL_RANGES.map(([from, to]) => (
+                <li key={from}>
+                  {from} → {to}
+                </li>
+              ))}
+            </ul>
+          </>
+        }
+      />
+    );
+  }
+  // "variant"
+  return (
+    <BadgeWithPopover
+      name="⚠️ Variant"
+      desc="This word might not be usually written or read this way"
+    />
+  );
 };
 
 const tagKey = (tag: WordTag) => (tag.kind === "book" ? tag.id : tag.kind);

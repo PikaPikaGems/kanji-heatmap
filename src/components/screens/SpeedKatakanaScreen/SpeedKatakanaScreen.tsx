@@ -95,7 +95,11 @@ const SpeedKatakanaScreen = () => {
         style={{ top: viewport.offsetTop, height: viewport.height }}
       >
         <SpeedKatakanaHeader progress={headerProgress} />
-        <main className="relative flex-1 min-h-0 overflow-hidden">
+        {/* Room for the offline banner (BottomBanner); 0 when it's hidden. */}
+        <main
+          className="relative flex-1 min-h-0 overflow-hidden"
+          style={{ paddingBottom: "var(--bottom-banner-height, 0px)" }}
+        >
           {phase === "initial" && (
             <div key="initial" className="h-full animate-fade-in">
               <InitialScreen onStart={startGame} />

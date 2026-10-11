@@ -38,16 +38,18 @@ export const gradeMessage = (kanji: string, result: GradeResult): string => {
 
 /** Short headline for the select / feedback drawers. */
 export const gradeHeadline = (rank: number): string => {
-  switch (getGradeBand(rank)) {
-    case "awesome":
-      return "🎯 Awesome!";
-    case "solid":
-      return "💚 Solid · Almost perfect!";
-    case "getting-there":
-      return "🌀 Getting there";
-    case "not-quite":
-      return "🙈 Not quite";
+  const band = getGradeBand(rank);
+  if (band === "awesome") {
+    return "🎯 Awesome!";
   }
+  if (band === "solid") {
+    return "💚 Solid · Almost perfect!";
+  }
+  if (band === "getting-there") {
+    return "🌀 Getting there";
+  }
+  // "not-quite"
+  return "🙈 Not quite";
 };
 
 /**
@@ -61,15 +63,17 @@ export const feedbackTitle = (
   if (variant === "incorrect") {
     return "Not quite — here is the correct kanji";
   }
-  switch (getGradeBand(rank)) {
-    case "awesome":
-      return "🎯 Awesome!";
-    case "solid":
-      return "💚 Solid!";
-    case "getting-there":
-      return "🌀 Getting there!";
-    case "not-quite":
-      // Right kanji picked, but drawing wasn't in the model top-10.
-      return "🎉 That's the one!";
+  const band = getGradeBand(rank);
+  if (band === "awesome") {
+    return "🎯 Awesome!";
   }
+  if (band === "solid") {
+    return "💚 Solid!";
+  }
+  if (band === "getting-there") {
+    return "🌀 Getting there!";
+  }
+  // "not-quite"
+  // Right kanji picked, but drawing wasn't in the model top-10.
+  return "🎉 That's the one!";
 };

@@ -128,20 +128,23 @@ export const metricToBand = (
   attemptShading: AttemptCountShading
 ): FreqCategory => {
   if (!stats) return 0;
-  switch (metric) {
-    case "bestSpeedOver70":
-      return cpmToBand(stats.bestCpmWithAccuracyOver70);
-    case "bestSpeed":
-      return cpmToBand(stats.bestCpm);
-    case "currentSpeed":
-      return cpmToBand(stats.latestCpm);
-    case "bestAccuracy":
-      return accuracyToBand(stats.bestAccuracy);
-    case "currentAccuracy":
-      return accuracyToBand(stats.latestAccuracy);
-    case "attemptCount":
-      return attemptCountToBand(stats.timesTaken, attemptShading);
+  if (metric === "bestSpeedOver70") {
+    return cpmToBand(stats.bestCpmWithAccuracyOver70);
   }
+  if (metric === "bestSpeed") {
+    return cpmToBand(stats.bestCpm);
+  }
+  if (metric === "currentSpeed") {
+    return cpmToBand(stats.latestCpm);
+  }
+  if (metric === "bestAccuracy") {
+    return accuracyToBand(stats.bestAccuracy);
+  }
+  if (metric === "currentAccuracy") {
+    return accuracyToBand(stats.latestAccuracy);
+  }
+  // "attemptCount"
+  return attemptCountToBand(stats.timesTaken, attemptShading);
 };
 
 /** Short "<value> <unit>" text for the chosen metric, e.g. for aria-labels. */
@@ -150,20 +153,23 @@ export const metricValueText = (
   metric: HeatmapCellMetric
 ): string => {
   if (!stats) return "not attempted";
-  switch (metric) {
-    case "bestSpeedOver70":
-      return stats.bestCpmWithAccuracyOver70 != null
-        ? `${stats.bestCpmWithAccuracyOver70} CPM`
-        : "no run above 70% accuracy";
-    case "bestSpeed":
-      return `${stats.bestCpm} CPM`;
-    case "currentSpeed":
-      return `${stats.latestCpm} CPM`;
-    case "bestAccuracy":
-      return `${stats.bestAccuracy}% accuracy`;
-    case "currentAccuracy":
-      return `${stats.latestAccuracy}% accuracy`;
-    case "attemptCount":
-      return `${stats.timesTaken} attempts`;
+  if (metric === "bestSpeedOver70") {
+    return stats.bestCpmWithAccuracyOver70 != null
+      ? `${stats.bestCpmWithAccuracyOver70} CPM`
+      : "no run above 70% accuracy";
   }
+  if (metric === "bestSpeed") {
+    return `${stats.bestCpm} CPM`;
+  }
+  if (metric === "currentSpeed") {
+    return `${stats.latestCpm} CPM`;
+  }
+  if (metric === "bestAccuracy") {
+    return `${stats.bestAccuracy}% accuracy`;
+  }
+  if (metric === "currentAccuracy") {
+    return `${stats.latestAccuracy}% accuracy`;
+  }
+  // "attemptCount"
+  return `${stats.timesTaken} attempts`;
 };

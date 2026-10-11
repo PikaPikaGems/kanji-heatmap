@@ -76,7 +76,7 @@ export const FILL_THE_KANJI_SET_GROUPS: {
     setIds: ["n5", "n4", "n3", "n2", "n1", "intermediate"],
   },
   {
-    title: "Textbook Sentences",
+    title: "Basic to Fluent",
     setIds: ["beginner-1", "beginner-2", "beginner-3"],
   },
   { title: "Verbs and Emoji", setIds: ["verb-focused", "emoji"] },

@@ -41,7 +41,7 @@ import {
 } from "@/lib/ai-voice/preferences";
 import sliderHints from "@/lib/ai-voice/yomiage-slider-hints.json";
 import { cn } from "@/lib/utils";
-import { cnOptionTile } from "@/lib/generic-cn";
+import { PracticeButton } from "@/components/ui/practice-button";
 
 type Yomiage = typeof import("yomiage");
 type SliderName =
@@ -57,13 +57,6 @@ type SliderSpec = {
   hint: string;
 };
 const SLIDERS = sliderHints.sliders as SliderSpec[];
-
-/** Equal-width option tile, same look as the Japanese Font grid. */
-const chipCn = (selected: boolean) =>
-  cn(
-    "flex items-center justify-center gap-2 px-2 py-2 text-sm font-semibold",
-    cnOptionTile(selected)
-  );
 
 const subheadingCn = "mb-2 text-sm font-semibold text-left";
 
@@ -94,12 +87,16 @@ export const VoiceEngineChoice = () => {
       aria-label="Text-to-speech engine"
     >
       {ENGINE_OPTIONS.map(({ value, label }) => (
-        <button
+        // Same tiles as the presets and the kanji pickers in the games.
+        <PracticeButton
           key={value}
-          type="button"
+          variant={engine === value ? "primary" : "secondary"}
           aria-pressed={engine === value}
           onClick={() => choose(value)}
-          className={chipCn(engine === value)}
+          className={cn(
+            "w-full h-auto px-2 py-2 text-sm rounded-xl",
+            engine !== value && "border-dashed"
+          )}
         >
           {label}
           {value === "ai" && (
@@ -107,41 +104,46 @@ export const VoiceEngineChoice = () => {
               variant="outline"
               className={cn(
                 "px-1.5 py-0 text-[10px]",
-                // Matches the tile's own border (see cnOptionTile).
+                // Matches the tile: white on the filled selected tile, the
+                // secondary tile's border color otherwise.
                 engine === value
-                  ? "border-theme-color-with-opacity-100"
-                  : "border-muted-foreground/40"
+                  ? "border-white/70 text-white"
+                  : "border-foreground/30"
               )}
             >
               Experimental
             </SpanBadge>
           )}
-        </button>
+        </PracticeButton>
       ))}
     </div>
   );
 };
 
 const statusText = (s: AiVoiceState): string => {
-  switch (s.status) {
-    case "downloading":
-      return "Downloading…";
-    case "loading":
-      return "Loading the voice…";
-    case "ready":
-      return "Ready";
-    case "stopped":
-      return "Ready (reloads from this device when used)";
-    case "unavailable":
-      return s.error ?? "The AI voice isn't available on this device.";
-    case "error":
-      return s.error ?? "Something went wrong.";
-    case "not-loaded":
-      if (s.cached === null) return "Checking this device…";
-      return s.cached
-        ? "Voice files are on this device."
-        : "Not downloaded yet. Until then, the browser voice is used.";
+  if (s.status === "downloading") {
+    return "Downloading…";
   }
+  if (s.status === "loading") {
+    return "Loading the voice…";
+  }
+  if (s.status === "ready") {
+    return "Ready";
+  }
+  if (s.status === "stopped") {
+    return "Ready (reloads from this device when used)";
+  }
+  if (s.status === "unavailable") {
+    return s.error ?? "The AI voice isn't available on this device.";
+  }
+  if (s.status === "error") {
+    return s.error ?? "Something went wrong.";
+  }
+  // "not-loaded"
+  if (s.cached === null) return "Checking this device…";
+  return s.cached
+    ? "Voice files are on this device."
+    : "Not downloaded yet. Until then, the browser voice is used.";
 };
 
 const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
@@ -387,15 +389,19 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
       {/* Rows of 3 so Custom isn't left alone on its own row. */}
       <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset">
         {[...presetNames, "custom" as const].map((name) => (
-          <button
+          // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
+          <PracticeButton
             key={name}
-            type="button"
+            variant={choice === name ? "primary" : "secondary"}
             aria-pressed={choice === name}
             onClick={() => choosePreset(name)}
-            className={cn(chipCn(choice === name), "capitalize")}
+            className={cn(
+              "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
+              choice !== name && "border-dashed"
+            )}
           >
             {name}
-          </button>
+          </PracticeButton>
         ))}
       </div>
       {!ready && (

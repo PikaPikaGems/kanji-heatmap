@@ -15,7 +15,12 @@ import {
   PageNotFound,
   DefaultErrorFallback,
 } from "./components/error";
-import { Header, FloatingIsland, PracticeFab } from "@/components/site-layout/";
+import {
+  BottomBanner,
+  Header,
+  FloatingIsland,
+  PracticeFab,
+} from "@/components/site-layout/";
 import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
@@ -133,6 +138,8 @@ const App = () => {
                 <PracticeFab />
               </Route>
             </Switch>
+            {/* Outside the Switch so it also shows on the game screens. */}
+            <BottomBanner />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

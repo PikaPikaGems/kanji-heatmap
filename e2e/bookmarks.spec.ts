@@ -24,9 +24,10 @@ test.describe("bookmarks", () => {
     });
 
     await page.goto("/dashboard");
-    await expect(page.getByText("Bookmarks")).toBeVisible({
-      timeout: 30_000,
-    });
+    const bookmarksSection = page.getByRole("button", { name: "Bookmarks" });
+    await expect(bookmarksSection).toBeVisible({ timeout: 30_000 });
+    // Dashboard sections are accordions; Bookmarks starts closed.
+    await bookmarksSection.click();
     // 水 is N5 — the band row should show one bookmarked entry.
     await expect(page.getByText(/^1 \/ \d+$/)).toBeVisible({
       timeout: 30_000,
@@ -39,7 +40,7 @@ test.describe("bookmarks", () => {
     await page.goto("/reading-practice");
 
     await expect(
-      page.getByRole("button", { name: "Start Practicing" })
+      page.getByRole("button", { name: "Start", exact: true })
     ).toBeVisible({ timeout: 30_000 });
 
     await page.getByLabel("Bookmarked only").click();
@@ -48,7 +49,7 @@ test.describe("bookmarks", () => {
       timeout: 30_000,
     });
     await expect(
-      page.getByRole("button", { name: "Start Practicing" })
+      page.getByRole("button", { name: "Start", exact: true })
     ).toBeDisabled();
   });
 });
