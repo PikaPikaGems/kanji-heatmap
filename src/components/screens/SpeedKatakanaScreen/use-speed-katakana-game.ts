@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { translateValue } from "@/lib/wanakana-adapter";
 import { isMatch, isOnTrack } from "@/lib/speed-katakana-match";
 import { useSpeak } from "@/hooks/use-jp-speak";
+import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import {
@@ -58,6 +59,8 @@ export const useSpeedKatakanaGame = ({
   // Sound feedback. useSpeak is a hook, so it must run before any early return;
   // an empty word is harmless while the set is still loading.
   const speak = useSpeak(words[index]?.katakana ?? "");
+  // Games keep the AI voice in memory so words after a pause play promptly.
+  useKeepAiVoiceWarm();
   const playCorrect = useCorrectSound();
   const kanaInput = useKanaInput({
     setRawValue: setInputValue,

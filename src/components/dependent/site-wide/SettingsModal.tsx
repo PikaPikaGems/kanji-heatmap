@@ -41,6 +41,8 @@ import { cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
+import { useVoiceEngine } from "@/hooks/use-ai-voice";
+import { AiVoicePanel, VoiceEngineChoice } from "./AiVoiceSettings";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
 const FONT_NAMES = [
@@ -302,6 +304,27 @@ const JpVoiceSelect = () => {
   );
 };
 
+const JapaneseVoiceSection = () => {
+  const [engine] = useVoiceEngine();
+
+  return (
+    <section className="mt-6">
+      <h3 className={sectionHeadingCn}>Japanese Voice</h3>
+      <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-left">
+        Voice <SpeakButton word={"こんにちは"} iconType="volume-2" />
+      </div>
+      <VoiceEngineChoice />
+      {engine === "ai" && <AiVoicePanel />}
+      <div className="mt-4 mb-2 text-sm font-semibold text-left">
+        {engine === "ai"
+          ? "Browser voice (used when the AI voice can't play)"
+          : "Browser voice"}
+      </div>
+      <JpVoiceSelect />
+    </section>
+  );
+};
+
 const LightDarkRow = () => {
   const { theme, setTheme } = useTheme();
   const isDark =
@@ -403,13 +426,7 @@ export const SettingsModal = ({
           <LightDarkRow />
         </section>
 
-        <section className="mt-6">
-          <h3 className={sectionHeadingCn}>Japanese Voice</h3>
-          <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-left">
-            Voice <SpeakButton word={"こんにちは"} iconType="volume-2" />
-          </div>
-          <JpVoiceSelect />
-        </section>
+        <JapaneseVoiceSection />
 
         <section className="mt-6">
           <h3 className={sectionHeadingCn}>Stroke order</h3>

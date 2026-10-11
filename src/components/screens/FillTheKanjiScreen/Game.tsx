@@ -78,6 +78,7 @@ export const Game = ({
   const game = useFillTheKanjiGame({
     cards,
     sound: settings.sound,
+    readAloudOnShow: settings.readAloudOnShow ?? false,
     onProgress,
     onComplete,
   });

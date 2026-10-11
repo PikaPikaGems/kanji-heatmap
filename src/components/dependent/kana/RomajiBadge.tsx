@@ -2,7 +2,7 @@ import { useState } from "react";
 import { badgeVariants } from "@/components/ui/badge-utils";
 import { cn } from "@/lib/utils";
 import { translateValue } from "@/lib/wanakana-adapter";
-import { useSpeak } from "@/hooks/use-jp-speak";
+import { useSpeakWithStatus } from "@/hooks/use-jp-speak";
 
 export const RomajiBadge = ({
   kana,
@@ -14,7 +14,9 @@ export const RomajiBadge = ({
   showFocusRing?: boolean;
 }) => {
   const [isKana, setIsKana] = useState(true);
-  const speak = useSpeak(kana);
+  const { speak, status } = useSpeakWithStatus(kana);
+  // Only the AI voice has a wait before audio starts.
+  const preparing = status === "preparing";
 
   const content = isKana ? kana : translateValue(kana, "romaji");
 
@@ -31,10 +33,12 @@ export const RomajiBadge = ({
           : "focus-visible:ring-0 focus-visible:ring-offset-0",
         "text-lg sm:text-xl",
         className,
-        isKana && "kanji-font"
+        isKana && "kanji-font",
+        preparing && "animate-pulse"
       )}
       aria-label={`Play reading and toggle kana or romaji for ${kana}`}
       aria-pressed={!isKana}
+      aria-busy={preparing}
       onClick={() => {
         setIsKana((prev) => !prev);
         speak();

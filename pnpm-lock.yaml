@@ -179,6 +179,9 @@ importers:
       wouter:
         specifier: ^3.6.0
         version: 3.6.0(react@18.3.1)
+      yomiage:
+        specifier: https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz
+        version: https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz(react@18.3.1)
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.41.0
@@ -5090,6 +5093,16 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  yomiage@https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz:
+    resolution: {integrity: sha512-e6NN++pZtKXjc1eB1OsgMB8B1WSM3R312qHxg6V+wAJN0bf6pBjEhgerzmzMtLL31p9BWEKp7gMPt2V8XBZZyw==, tarball: https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz}
+    version: 0.3.2
+    hasBin: true
+    peerDependencies:
+      react: '>=18'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   youch-core@0.3.3:
     resolution: {integrity: sha512-ho7XuGjLaJ2hWHoK8yFnsUGy2Y5uDpqSTq1FkHLK4/oqKtyUU1AFbOOxY4IpC9f0fTLjwYbslUz0Po5BpD1wrA==}
@@ -10338,6 +10351,10 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  yomiage@https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.2/yomiage-0.3.2.tgz(react@18.3.1):
+    optionalDependencies:
+      react: 18.3.1
 
   youch-core@0.3.3:
     dependencies:

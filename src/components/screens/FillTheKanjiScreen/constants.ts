@@ -6,4 +6,5 @@ export const DEFAULT_SETTINGS: FillTheKanjiSettings = {
   setId: "n5",
   roundBySet: {},
   sound: { enabled: true, type: "correct" },
+  readAloudOnShow: false,
 };

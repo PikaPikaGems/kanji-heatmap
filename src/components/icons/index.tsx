@@ -40,6 +40,8 @@ import {
   Loader2,
   Share2,
   BookOpen,
+  Square,
+  RefreshCw,
 } from "lucide-react";
 export {
   GithubIcon,
@@ -82,4 +84,6 @@ export {
   Loader2,
   Share2,
   BookOpen,
+  Square,
+  RefreshCw,
 };

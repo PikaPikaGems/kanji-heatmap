@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { useSpeak } from "@/hooks/use-jp-speak";
-import { AudioLines, Headphones, Volume2 } from "../icons";
+import { useSpeakWithStatus } from "@/hooks/use-jp-speak";
+import { AudioLines, Headphones, Loader2, Volume2 } from "../icons";
 
 type AudioIconType = "audio-lines" | "volume-2" | "headphones";
 const audioIcons: Record<AudioIconType, ReactNode> = {
@@ -26,7 +26,9 @@ export const SpeakButton = ({
     | "destructive"
     | "link";
 }) => {
-  const speak = useSpeak(word);
+  const { speak, status } = useSpeakWithStatus(word);
+  // Only the AI voice has a wait before audio starts.
+  const preparing = status === "preparing";
 
   return (
     <Button
@@ -37,8 +39,9 @@ export const SpeakButton = ({
         speak();
       }}
       autoFocus={autoFocus}
+      aria-busy={preparing}
     >
-      {audioIcons[iconType]}
+      {preparing ? <Loader2 className="animate-spin" /> : audioIcons[iconType]}
     </Button>
   );
 };

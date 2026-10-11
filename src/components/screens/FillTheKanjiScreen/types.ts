@@ -9,6 +9,8 @@ export type FillTheKanjiSettings = {
   /** Last selected round per set, so switching sets keeps your place. */
   roundBySet: Partial<Record<FillTheKanjiSetId, number>>;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
+  /** Speak each sentence when its item appears. Optional: older saved settings lack it. */
+  readAloudOnShow?: boolean;
 };
 
 export type ItemResult = {

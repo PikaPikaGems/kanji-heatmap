@@ -5,8 +5,12 @@ import { cn } from "@/lib/utils";
 
 export const Slider = ({
   className,
+  thumbLabel,
   ...props
-}: ComponentProps<typeof SliderPrimitive.Root>) => (
+}: ComponentProps<typeof SliderPrimitive.Root> & {
+  /** Accessible name for the thumb, which is the focusable slider element. */
+  thumbLabel?: string;
+}) => (
   <SliderPrimitive.Root
     className={cn(
       "relative flex w-full touch-none select-none items-center",
@@ -17,6 +21,9 @@ export const Slider = ({
     <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
       <SliderPrimitive.Range className="absolute h-full bg-primary" />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+    <SliderPrimitive.Thumb
+      aria-label={thumbLabel}
+      className="block h-4 w-4 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    />
   </SliderPrimitive.Root>
 );

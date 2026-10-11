@@ -1,0 +1,47 @@
+{
+  "source": "https://pikapikagems.github.io/yomiage/ (hints and steps copied verbatim from the demo page; labels are ours)",
+  "sliders": [
+    {
+      "name": "pitch",
+      "group": "voice",
+      "label": "Pitch",
+      "step": 0.5,
+      "hint": "How high or low the voice is, in semitones (12 = one octave): −2 is slightly lower, −12 an octave down. On its own a big change sounds like the same small speaker sped up or slowed down; combine it with formant for a different-sounding voice."
+    },
+    {
+      "name": "formant",
+      "group": "voice",
+      "label": "Formant",
+      "step": 0.5,
+      "hint": "The \"size\" of the voice: the resonances of the throat and mouth, independent of pitch. Negative sounds like a bigger, deeper body (more mature); positive sounds smaller (younger). Large values start to sound artificial."
+    },
+    {
+      "name": "breathReduction",
+      "group": "voice",
+      "label": "Breath reduction",
+      "step": 0.05,
+      "hint": "Softens the hissy, airy high frequencies. Shifted voices pick up some breath noise, so the presets that shift use 0.6. Higher is cleaner, but s and sh sounds get duller."
+    },
+    {
+      "name": "speed",
+      "group": "delivery",
+      "label": "Speed",
+      "step": 0.05,
+      "hint": "How fast she talks. 1 is the model's natural pace, 0.5 half as fast, 1.5 half again as fast. Changes the tempo only, not the pitch."
+    },
+    {
+      "name": "expressiveness",
+      "group": "delivery",
+      "label": "Expressiveness",
+      "step": 0.05,
+      "hint": "How much the tone and intonation vary. Low is flat and steady, a bit robotic; high is livelier but can wobble. (piper's noise scale)"
+    },
+    {
+      "name": "rhythmVariation",
+      "group": "delivery",
+      "label": "Rhythm variation",
+      "step": 0.05,
+      "hint": "How much the length of sounds and pauses varies. Low is metronome-steady; high is more natural but uneven. (piper's noise W)"
+    }
+  ]
+}
