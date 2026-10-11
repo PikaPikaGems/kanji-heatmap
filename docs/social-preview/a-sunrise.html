@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>A</title>
+    <link rel="stylesheet" href="common.css" />
+    <script src="common.js"></script>
+    <style>
+      body {
+        background: #eaf2ff;
+        color: #0f2260;
+      }
+      .txt {
+        position: absolute;
+        left: 70px;
+        top: 0;
+        bottom: 0;
+        width: 480px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .logo {
+        font-size: 170px;
+        line-height: 1;
+        color: #2f55e6;
+        letter-spacing: -4px;
+      }
+      h1 {
+        font-size: 76px;
+        line-height: 1.08;
+        margin-top: 22px;
+        letter-spacing: -1px;
+      }
+      .grid {
+        position: absolute;
+        left: 580px;
+        top: -16px;
+        display: grid;
+        grid-template-columns: repeat(6, 92px);
+        gap: 10px;
+        transform: rotate(-6deg);
+        transform-origin: center;
+      }
+      .tile {
+        width: 92px;
+        height: 92px;
+        border-radius: 18px;
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="txt">
+      <div class="logo">漢字</div>
+      <h1>Kanji<br />Heatmap</h1>
+    </div>
+    <div class="grid" id="g"></div>
+    <script>
+      const r = rng(7),
+        pk = picker(r),
+        pal = [
+          "#cfe0ff",
+          "#a9c4ff",
+          "#7c9fff",
+          "#4f78f2",
+          "#2f55e6",
+          "#2039b8",
+          "#14257f",
+        ];
+      const g = document.getElementById("g");
+      for (let i = 0; i < 54; i++) {
+        const lv = Math.min(6, Math.floor(Math.pow(r(), 1.1) * 7));
+        const t = document.createElement("div");
+        t.className = "tile";
+        t.textContent = pk();
+        t.style.background = pal[lv];
+        t.style.color = lv < 3 ? "#14257f" : "#fff";
+        t.style.boxShadow = "0 6px 0 rgba(20,37,127,.18)";
+        g.appendChild(t);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>C</title>
+    <link rel="stylesheet" href="common.css" />
+    <script src="common.js"></script>
+    <style>
+      body {
+        background: #050816;
+      }
+      .grid {
+        position: absolute;
+        left: -30px;
+        top: -30px;
+        display: grid;
+        grid-template-columns: repeat(11, 112px);
+        gap: 12px;
+      }
+      .tile {
+        width: 112px;
+        height: 112px;
+        border-radius: 24px;
+        font-size: 58px;
+        color: #fff;
+        border: 9px solid;
+      }
+      .card {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 760px;
+        padding: 44px 40px 50px;
+        border-radius: 36px;
+        background: #0a1030;
+        text-align: center;
+        color: #fff;
+        box-shadow:
+          0 0 0 6px rgba(160, 190, 255, 0.15),
+          0 30px 80px rgba(0, 0, 0, 0.7);
+      }
+      .logo {
+        display: grid;
+        grid-template-columns: repeat(2, 84px);
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+      .logo .tile {
+        width: 84px;
+        height: 84px;
+        font-size: 48px;
+        border-radius: 18px;
+        border-width: 6px;
+      }
+      h1 {
+        font-size: 96px;
+        line-height: 1;
+        letter-spacing: -2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid" id="g"></div>
+    <div class="card">
+      <div class="logo" id="l"></div>
+      <h1>Kanji Heatmap</h1>
+    </div>
+    <script>
+      const r = rng(23),
+        pk = picker(r),
+        fill = ["#0f1a5c", "#16288f", "#1f3bb8", "#2f55e6", "#050816"],
+        bd = ["#4f78f2", "#7c9fff", "#a9c4ff", "#2f55e6", "#cfe0ff"];
+      function mk(ch, lv, b) {
+        const t = document.createElement("div");
+        t.className = "tile";
+        t.textContent = ch;
+        t.style.background = fill[lv];
+        t.style.borderColor = bd[b];
+        return t;
+      }
+      const g = document.getElementById("g");
+      for (let i = 0; i < 66; i++)
+        g.appendChild(mk(pk(), Math.floor(r() * 4), Math.floor(r() * 5)));
+      [
+        ["漢", 3, 2],
+        ["字", 1, 1],
+        ["暗", 0, 0],
+        ["記", 2, 4],
+      ].forEach((a) => document.getElementById("l").appendChild(mk(...a)));
+    </script>
+  </body>
+</html>

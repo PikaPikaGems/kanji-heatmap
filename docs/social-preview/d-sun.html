@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>D</title>
+    <link rel="stylesheet" href="common.css" />
+    <script src="common.js"></script>
+    <style>
+      body {
+        background: #f6f9ff;
+        color: #0f2260;
+      }
+      .sun {
+        position: absolute;
+        left: 44px;
+        top: 50%;
+        width: 560px;
+        height: 560px;
+        transform: translateY(-50%);
+      }
+      .sun .tile {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-radius: 11px;
+        font-size: 27px;
+      }
+      .txt {
+        position: absolute;
+        left: 640px;
+        top: 0;
+        bottom: 0;
+        right: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .k {
+        font-size: 44px;
+        color: #2f55e6;
+        letter-spacing: 10px;
+      }
+      h1 {
+        font-size: 106px;
+        line-height: 1.02;
+        letter-spacing: -3px;
+        margin-top: 12px;
+      }
+      .pill {
+        margin-top: 34px;
+        align-self: flex-start;
+        background: #2f55e6;
+        color: #fff;
+        font-size: 26px;
+        padding: 10px 26px;
+        border-radius: 99px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sun" id="s"></div>
+    <div class="txt">
+      <div class="k">漢字暗記</div>
+      <h1>Kanji<br />Heatmap</h1>
+      <div class="pill">kanjiheatmap.com</div>
+    </div>
+    <script>
+      const r = rng(5),
+        pk = picker(r),
+        pal = [
+          "#dbe7ff",
+          "#b3ccff",
+          "#7c9fff",
+          "#4f78f2",
+          "#2f55e6",
+          "#14257f",
+        ],
+        s = document.getElementById("s"),
+        N = 11,
+        P = 51,
+        R = 5.6;
+      for (let y = 0; y < N; y++)
+        for (let x = 0; x < N; x++) {
+          const dx = x - 5,
+            dy = y - 5,
+            d = Math.hypot(dx, dy);
+          if (d > R) continue;
+          const lv = Math.min(
+            5,
+            Math.max(0, Math.round(5 - d * 0.8 + (r() - 0.5) * 1.8))
+          );
+          const t = document.createElement("div");
+          t.className = "tile";
+          t.textContent = pk();
+          t.style.left = x * P + "px";
+          t.style.top = y * P + "px";
+          t.style.background = pal[lv];
+          t.style.color = lv < 3 ? "#14257f" : "#fff";
+          s.appendChild(t);
+        }
+    </script>
+  </body>
+</html>

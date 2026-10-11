@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>B</title>
+    <link rel="stylesheet" href="common.css" />
+    <script src="common.js"></script>
+    <style>
+      body {
+        background: radial-gradient(
+          ellipse at 28% 50%,
+          #1b2a8a 0%,
+          #0b1033 45%,
+          #05060f 100%
+        );
+        color: #fff;
+      }
+      .ghost {
+        position: absolute;
+        inset: -20px;
+        display: grid;
+        grid-template-columns: repeat(14, 86px);
+        gap: 10px;
+        opacity: 0.5;
+      }
+      .ghost .tile {
+        width: 86px;
+        height: 86px;
+        border-radius: 16px;
+        font-size: 44px;
+      }
+      .veil {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          rgba(5, 6, 15, 0.94) 0%,
+          rgba(5, 6, 15, 0.85) 45%,
+          rgba(5, 6, 15, 0.1) 100%
+        );
+      }
+      .big {
+        position: absolute;
+        left: 70px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 300px;
+        line-height: 0.9;
+        background: linear-gradient(180deg, #9db4ff, #4a63ff);
+        -webkit-background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 40px rgba(80, 110, 255, 0.6));
+      }
+      .right {
+        position: absolute;
+        left: 470px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 680px;
+      }
+      h1 {
+        font-size: 112px;
+        line-height: 1.05;
+        letter-spacing: -2px;
+      }
+      .bar {
+        display: flex;
+        gap: 8px;
+        margin-top: 34px;
+      }
+      .bar i {
+        width: 44px;
+        height: 14px;
+        border-radius: 7px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ghost" id="g"></div>
+    <div class="veil"></div>
+    <div class="big">漢</div>
+    <div class="right">
+      <h1>Kanji<br />Heatmap</h1>
+      <div class="bar">
+        <i style="background: #16205e"></i><i style="background: #1f3bb8"></i
+        ><i style="background: #3b5bff"></i><i style="background: #7b93ff"></i
+        ><i style="background: #c3cfff"></i>
+      </div>
+    </div>
+    <script>
+      const r = rng(11),
+        pk = picker(r),
+        pal = ["#0e1440", "#142070", "#1c33a8", "#2748d8", "#4a67ff"];
+      const g = document.getElementById("g");
+      for (let i = 0; i < 84; i++) {
+        const t = document.createElement("div");
+        t.className = "tile";
+        const lv = Math.floor(r() * 5);
+        t.textContent = pk();
+        t.style.background = pal[lv];
+        t.style.color = "rgba(255,255,255,.8)";
+        g.appendChild(t);
+      }
+    </script>
+  </body>
+</html>

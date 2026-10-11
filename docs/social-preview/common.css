@@ -1,0 +1,38 @@
+@font-face {
+  font-family: "Kiwi";
+  font-weight: 500;
+  src: url("../../node_modules/@fontsource/kiwi-maru/files/kiwi-maru-japanese-500-normal.woff2");
+}
+@font-face {
+  font-family: "Nunito";
+  font-weight: 800;
+  src: url("../../node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2");
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+}
+body {
+  position: relative;
+  font-family: "Kiwi", sans-serif;
+  font-weight: 500;
+}
+h1,
+.pill {
+  font-family: "Nunito", "Kiwi", sans-serif;
+  font-weight: 800;
+}
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Kiwi", sans-serif;
+  font-weight: 500;
+}

@@ -50,10 +50,11 @@ export const FuriganaSentence = ({
     // Unitless 1.3 keeps wrapped lines close (furigana still clears the line
     // above). The rt is shifted down (a negative margin barely moves
     // it) into the line's half-leading, so it sits close to its kanji.
+    // Row gap is small: the rt's own reserved height already separates lines.
     <p
       className={cn(
         bunsetsuRowCn,
-        "items-baseline",
+        "items-baseline gap-y-[0.1em]",
         className,
         "leading-[1.3]"
       )}
@@ -88,7 +89,7 @@ export const FuriganaSentence = ({
               <ruby key={j}>
                 {text}
                 <rp>(</rp>
-                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none translate-y-[0.35em]">
+                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none translate-y-[0.2em]">
                   {reading}
                 </rt>
                 <rp>)</rp>
