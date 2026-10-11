@@ -1,53 +1,105 @@
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, isKanji } from "@/lib/utils";
 import { parseBunsetsu, Puzzle } from "@/lib/fill-the-kanji/puzzle";
+import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import { KanjiPopover } from "./KanjiPopover";
 
 /** Bunsetsu laid out with a visible gap between them, wrapping as needed. */
 const bunsetsuRowCn =
   "kanji-font flex flex-wrap items-center justify-center gap-x-[0.45em] gap-y-[0.35em]";
 
-/** The full answer sentence with furigana over every reading. */
+/** Right or wrong, per blank in reading order; null when it wasn't answered. */
+export type BlankResult = "right" | "wrong" | null;
+
+const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
+  right: "text-green-500",
+  wrong: "text-red-500",
+};
+
+/**
+ * The full answer sentence with furigana over every reading. With a `puzzle`
+ * and `blankResults`, the blanked kanji are colored by how they were answered.
+ */
 export const FuriganaSentence = ({
   jp,
+  puzzle,
+  blankResults,
+  getInfo,
   className,
 }: {
   jp: string;
+  puzzle?: Puzzle;
+  blankResults?: BlankResult[];
+  /** When given, each kanji opens a popover showing it large with its keyword and levels. */
+  getInfo?: GetBasicKanjiInfo;
   className?: string;
-}) => (
-  // Baseline, not center: a bunsetsu with furigana is taller, and centering
-  // would lift the ones without it (ゴミを sat higher than 分ける).
-  // Leading goes after `className`: its text-2xl/text-3xl would otherwise
-  // drop it (twMerge), leaving a fixed line-height that is too tall on phones.
-  // Unitless 2.2 scales the furigana gap with the text; sm+ keeps 2.25rem.
-  <p
-    className={cn(
-      bunsetsuRowCn,
-      "items-baseline",
-      className,
-      "leading-[2.2] sm:leading-[2.25rem]"
-    )}
-    lang="ja"
-  >
-    {parseBunsetsu(jp).map((parts, i) => (
-      <span key={i}>
-        {parts.map(([text, reading], j) =>
-          reading ? (
-            <ruby key={j}>
-              {text}
-              <rp>(</rp>
-              <rt className="text-[0.45em] font-normal text-muted-foreground pb-[0.6em]">
-                {reading}
-              </rt>
-              <rp>)</rp>
-            </ruby>
-          ) : (
-            <span key={j}>{text}</span>
-          )
-        )}
-      </span>
-    ))}
-  </p>
-);
+}) => {
+  const bunsetsu =
+    puzzle?.bunsetsu ??
+    parseBunsetsu(jp).map((parts) =>
+      parts.map(([text, reading]) => ({
+        reading,
+        chars: Array.from(text).map((char) => ({ char, blank: null })),
+      }))
+    );
+  return (
+    // Baseline, not center: a bunsetsu with furigana is taller, and centering
+    // would lift the ones without it (ゴミを sat higher than 分ける).
+    // Leading goes after `className`: its text-2xl/text-3xl would otherwise
+    // drop it (twMerge), leaving a fixed line-height that is too tall on phones.
+    // Unitless 1.3 keeps wrapped lines close (furigana still clears the line
+    // above). The rt is shifted down (a negative margin barely moves
+    // it) into the line's half-leading, so it sits close to its kanji.
+    <p
+      className={cn(
+        bunsetsuRowCn,
+        "items-baseline",
+        className,
+        "leading-[1.3]"
+      )}
+      lang="ja"
+    >
+      {bunsetsu.map((parts, i) => (
+        <span key={i}>
+          {parts.map(({ reading, chars }, j) => {
+            const text = chars.map(({ char, blank }, k) => {
+              const result = blank == null ? null : blankResults?.[blank];
+              const color = result ? blankResultCn[result] : undefined;
+              const info = isKanji(char) ? getInfo?.(char) : null;
+              if (info) {
+                return (
+                  <KanjiPopover
+                    key={k}
+                    kanji={char}
+                    info={info}
+                    className={color}
+                  />
+                );
+              }
+              if (!color) return char;
+              return (
+                <span key={k} className={color}>
+                  {char}
+                </span>
+              );
+            });
+            if (!reading) return <span key={j}>{text}</span>;
+            return (
+              <ruby key={j}>
+                {text}
+                <rp>(</rp>
+                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none translate-y-[0.35em]">
+                  {reading}
+                </rt>
+                <rp>)</rp>
+              </ruby>
+            );
+          })}
+        </span>
+      ))}
+    </p>
+  );
+};
 
 /** Smaller text for longer sentences, so they don't push the tiles off-screen. */
 const promptSizeCn = (length: number) => {

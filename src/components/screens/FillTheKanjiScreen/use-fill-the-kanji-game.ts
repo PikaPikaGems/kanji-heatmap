@@ -169,6 +169,10 @@ export const useFillTheKanjiGame = ({
       open: true,
       item: card.item,
       kind: feedbackKind(rightCount, filled.length),
+      puzzle: card.puzzle,
+      blankResults: filled.map((k, i) =>
+        k === card.puzzle.blanks[i] ? "right" : "wrong"
+      ),
     });
   };
 
@@ -180,7 +184,13 @@ export const useFillTheKanjiGame = ({
     ];
     if (sound.enabled) speak();
     setCursor(null);
-    setAnswer({ open: true, item: card.item, kind: "forgot" });
+    setAnswer({
+      open: true,
+      item: card.item,
+      kind: "forgot",
+      puzzle: card.puzzle,
+      blankResults: card.puzzle.blanks.map(() => null),
+    });
   };
 
   const advance = () => {

@@ -1,7 +1,10 @@
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { gradeHeadline } from "@/lib/dakanji-grade";
-import { cn } from "@/lib/utils";
+import {
+  KanjiTile,
+  KanjiTileGrid,
+} from "@/components/shared-practice/KanjiTileGrid";
 import type { GradeRankInfo } from "../types";
 import { PracticeDrawerShell } from "./PracticeDrawerShell";
 
@@ -70,29 +73,21 @@ export const SelectSimilarKanjiDrawer = ({
       }
     >
       <div className="px-3 pb-2 overflow-y-auto sm:px-4">
-        <div className="grid max-w-md grid-cols-4 gap-1.5 mx-auto sm:gap-2">
+        <KanjiTileGrid className="sm:grid-cols-6 sm:max-w-2xl">
           {candidates.map((c, i) => {
             const isSelected = selected === c;
             return (
-              <PracticeButton
+              <KanjiTile
                 key={c}
-                type="button"
-                size="icon"
-                variant={isSelected ? "primary" : "secondary"}
+                kanji={c}
+                selected={isSelected}
                 autoFocus={i === 0}
+                ariaLabel={isSelected ? `Deselect ${c}` : `Select ${c}`}
                 onClick={() => onSelect(isSelected ? null : c)}
-                className={cn(
-                  "aspect-square h-auto w-full min-h-0 p-0 sm:text-5xl text-4xl kanji-font rounded-xl",
-                  !isSelected && "border-dashed"
-                )}
-                aria-pressed={isSelected}
-                aria-label={isSelected ? `Deselect ${c}` : `Select ${c}`}
-              >
-                {c}
-              </PracticeButton>
+              />
             );
           })}
-        </div>
+        </KanjiTileGrid>
       </div>
     </PracticeDrawerShell>
   );
