@@ -96,10 +96,10 @@
     ]
   },
   "everyday-phrases-onomatopoeia": {
-    "version": "ff96ad0a",
+    "version": "3d28ad7d",
     "chunks": [
       "d4a9c834",
-      "d399e960",
+      "f0d5b798",
       "e39d5fb1",
       "9543d0ed",
       "a962f88a",
@@ -128,81 +128,81 @@
     ]
   },
   "intermediate": {
-    "version": "9722f79e",
+    "version": "6772457f",
     "chunks": [
-      "7f44aa37",
-      "d1afde19",
-      "7673dda7",
-      "d2fc9e07",
-      "ff91fdc9",
-      "f258a263"
+      "8e0c8cdc",
+      "e732508c",
+      "bf8f1458",
+      "23cc3003",
+      "4093d53c",
+      "69d22471"
     ]
   },
   "n1": {
-    "version": "8914c46c",
+    "version": "0e0f2a97",
     "chunks": [
-      "a2827ef8",
+      "d94711ad",
       "7a646a07",
       "a0926867",
-      "6ed12aac",
-      "46b62d8a",
-      "671a3900",
-      "a8916212",
-      "23b83ea1",
-      "78607a6f",
-      "3be08535",
+      "e3743b83",
+      "77d44d51",
+      "8a189210",
+      "b396ac26",
+      "7d4c9ddd",
+      "5f8d253d",
+      "0b7df130",
       "a801c941"
     ]
   },
   "n2": {
-    "version": "ffe59b03",
+    "version": "cb37cd22",
     "chunks": [
       "4da80671",
       "d45e82c8",
-      "9bc6751f",
-      "f8cae910",
-      "9bed88a3",
-      "542fb75c",
-      "f451d5de",
-      "97c33ed2",
+      "abe146e4",
+      "8ecfac1b",
+      "377f7e2f",
+      "64c767f4",
+      "f0aabb32",
+      "d0ae9c1e",
       "4690a5cf",
       "940f296d"
     ]
   },
   "n3": {
-    "version": "b1c65e54",
+    "version": "f9d66342",
     "chunks": [
-      "399e57cc",
+      "f17ae25b",
       "0521648d",
-      "2264ed7d",
-      "8a37159e",
-      "a4052acd",
-      "a4702c37",
-      "c7195840",
-      "dd14f31a",
+      "24878df0",
+      "77d87b12",
+      "8deb9778",
+      "1c6c4e22",
+      "361a0300",
+      "e2940913",
       "9a42bc39",
-      "4e3d6d2f"
+      "f69bb0fb"
     ]
   },
   "n4": {
-    "version": "ec3775d2",
+    "version": "fc70fa38",
     "chunks": [
-      "0b0b0fb7",
-      "364aaa3f",
+      "afb6a447",
+      "d09ce9f3",
       "1ff2951c",
-      "347236e1",
-      "63da10c4",
-      "d266d6c0",
-      "1998bb91"
+      "9b675049",
+      "5111e1f1",
+      "d0a364cd",
+      "2522501e"
     ]
   },
   "n5": {
-    "version": "8b0fbc92",
+    "version": "3aac30b0",
     "chunks": [
-      "5e51935f",
-      "86d61808",
-      "568bdb11",
-      "06f80147"
+      "241bb7ef",
+      "0d13c942",
+      "0f9b6e38",
+      "2ca48fa2"
     ]
   },
   "short-phrases": {
@@ -224,33 +224,33 @@
     ]
   },
   "verb-focused": {
-    "version": "bb4e2a8f",
+    "version": "e545b23d",
     "chunks": [
       "8a4e8a4a",
       "03645c90",
       "7ff7886c",
-      "062105b7",
+      "fd02cd5c",
       "cd8e0c3b",
       "ccf644d0",
       "5e7e2cde",
       "0efe1318",
       "5c10bab8",
       "518cee4d",
-      "381b72f4",
+      "204ae976",
       "dab7cb4f",
-      "666d2bda",
-      "ed2f1592",
-      "d4ff81d6",
-      "a9bc6e0c",
+      "60d70f1f",
+      "b36c4ed6",
+      "83ed3016",
+      "905ee0de",
       "d9d1a69c",
       "901d1e3f",
       "5f59ce37",
-      "df2daf6b",
+      "eeeeae1d",
       "b5406d58",
-      "d942ec36",
+      "e13e9d05",
       "ba0dee56",
       "48ea7ab8",
-      "6cb0cf5c",
+      "981cfcb2",
       "2064d996",
       "82d29be0",
       "61bfed87"
