@@ -59,8 +59,6 @@ internals.
 
 Deterministic under default settings: word order fixed, set 1 starts
 パーセント (1 / 48). Matching engine: `src/lib/speed-katakana-match.ts`.
-Challenge data (`public/json/katakana/`) is generated in jp-misc-data
-(`kanji-heatmap-build/scripts/generate-speed-katakana.mjs`) and committed here.
 
 ### SK-1: "skip" advances without credit
 

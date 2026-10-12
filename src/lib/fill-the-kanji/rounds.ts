@@ -3,9 +3,8 @@ import chunking from "./chunking.json";
 import { FILL_THE_KANJI_SETS, FillTheKanjiSetId } from "./sets";
 
 /**
- * Sentences per round. Leftovers (< ROUND_SIZE) join the last round. Shared
- * with jp-misc-data's kanji-heatmap-build/scripts/generate-fill-the-kanji.mjs through chunking.json,
- * which that build owns and copies here.
+ * Sentences per round, from chunking.json (generated, like the set files).
+ * Leftovers (< ROUND_SIZE) join the last round.
  */
 export const ROUND_SIZE = chunking.roundSize;
 

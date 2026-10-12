@@ -7,7 +7,7 @@ export function kanjiSvgCode(kanji: string): string {
 }
 
 /**
- * The ~2426 kanji in the release's `filtered_kanji.json` (jp-misc-data's kanji-heatmap-build/raw-data/kanji-heatmap-data/) ship as committed SVGs
+ * The ~2426 kanji the app ships have committed SVGs
  * under `public/svg/`, so those don't need the CDN at all. Everything
  * outside that set (e.g. 唸) still lazy-loads from the CDN below.
  */
