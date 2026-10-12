@@ -3,12 +3,15 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { PracticeDrawerShell } from "@/components/production-practice-v1/drawers/PracticeDrawerShell";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { SpanBadge } from "@/components/ui/badge";
+import { CopyButton } from "@/components/common/CopyButton";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
-import type { Puzzle } from "@/lib/fill-the-kanji/puzzle";
+import { plainSentence, type Puzzle } from "@/lib/fill-the-kanji/puzzle";
+import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { type BlankResult, FuriganaSentence } from "./SentencePrompt";
+import { KanjiPopover } from "./KanjiPopover";
 import { SpeakButtons } from "./SpeakButtons";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
@@ -21,6 +24,10 @@ export type AnswerState = {
   item: FillTheKanjiItem;
   kind: FeedbackKind;
   puzzle: Puzzle;
+  /** The multiple choice tiles offered for this sentence. */
+  tiles: string[];
+  /** The kanji placed in each blank (null where left empty). */
+  filled: (string | null)[];
   /** How each blank was answered; all null when the card was forgotten. */
   blankResults: BlankResult[];
 } | null;
@@ -31,6 +38,61 @@ const TITLES: Record<FeedbackKind, string> = {
   wrong: "🙈 Not quite",
   forgot: "🫶 No worries",
 };
+
+/** Green: every blank it was placed in was right; red: any was wrong. */
+const tileResultCn = (
+  kanji: string,
+  puzzle: Puzzle,
+  filled: (string | null)[]
+) => {
+  const placedIn = filled.flatMap((k, i) => (k === kanji ? [i] : []));
+  if (placedIn.length === 0) return "text-foreground";
+  return placedIn.every((i) => puzzle.blanks[i] === kanji)
+    ? "text-green-500"
+    : "text-red-500";
+};
+
+/** The tiles that were offered, colored by whether (and how well) each was picked. */
+const TileChoices = ({
+  tiles,
+  puzzle,
+  filled,
+  getInfo,
+}: {
+  tiles: string[];
+  puzzle: Puzzle;
+  filled: (string | null)[];
+  getInfo: GetBasicKanjiInfo | undefined;
+}) => (
+  <p
+    className="flex flex-wrap justify-center gap-x-2 pb-4 text-xs kanji-font"
+    lang="ja"
+  >
+    {tiles.map((kanji, i) => {
+      const className = cn("px-0.5", tileResultCn(kanji, puzzle, filled));
+      const info = getInfo?.(kanji);
+      if (!info) {
+        return (
+          <span key={`${kanji}-${i}`} className={className}>
+            {kanji}
+          </span>
+        );
+      }
+      return (
+        <KanjiPopover
+          key={`${kanji}-${i}`}
+          kanji={kanji}
+          info={info}
+          className={className}
+        />
+      );
+    })}
+  </p>
+);
+
+/** Plain sentence, sentence with furigana, then the translation. */
+const clipboardText = (item: FillTheKanjiItem) =>
+  [plainSentence(item.jp), item.jp, item.en].join("\n");
 
 const CONFIRM_KEYS = ["Enter", " "] as const;
 
@@ -101,7 +163,7 @@ export const AnswerDrawer = ({
   });
 
   if (!answer) return null;
-  const { item, kind, puzzle, blankResults } = answer;
+  const { item, kind, puzzle, tiles, filled, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
 
   return (
@@ -124,6 +186,12 @@ export const AnswerDrawer = ({
       }
       footer={
         <div className="px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-md mx-auto w-full">
+          <TileChoices
+            tiles={tiles}
+            puzzle={puzzle}
+            filled={filled}
+            getInfo={getKanjiInfo ?? undefined}
+          />
           <PracticeButton size="lg" onClick={onContinue}>
             Continue
           </PracticeButton>
@@ -132,6 +200,10 @@ export const AnswerDrawer = ({
     >
       <div className="flex items-center justify-center gap-3 px-4">
         <SpeakButtons speech={speech} />
+        <span className="text-muted-foreground" aria-hidden>
+          ·
+        </span>
+        <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
         {hasNotes && <NotesPopover item={item} />}
       </div>
     </PracticeDrawerShell>

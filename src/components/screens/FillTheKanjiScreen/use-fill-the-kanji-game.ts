@@ -170,6 +170,8 @@ export const useFillTheKanjiGame = ({
       item: card.item,
       kind: feedbackKind(rightCount, filled.length),
       puzzle: card.puzzle,
+      tiles: card.tiles,
+      filled,
       blankResults: filled.map((k, i) =>
         k === card.puzzle.blanks[i] ? "right" : "wrong"
       ),
@@ -189,6 +191,8 @@ export const useFillTheKanjiGame = ({
       item: card.item,
       kind: "forgot",
       puzzle: card.puzzle,
+      tiles: card.tiles,
+      filled,
       blankResults: card.puzzle.blanks.map(() => null),
     });
   };

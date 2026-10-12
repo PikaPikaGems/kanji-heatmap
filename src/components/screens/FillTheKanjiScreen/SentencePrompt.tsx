@@ -12,9 +12,11 @@ const bunsetsuRowCn =
 export type BlankResult = "right" | "wrong" | null;
 
 // inline-block: transforms (the hop and the shake) don't apply to inline text.
+// Wrong is yellow, not red: the drawer shows the correct kanji there.
 const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
   right: "inline-block text-green-500 animate-practice-correct-pop",
-  wrong: "inline-block text-red-500 animate-practice-shake",
+  wrong:
+    "inline-block text-yellow-600 dark:text-yellow-400 animate-practice-shake",
 };
 
 /** Delay between neighbouring blanks' correct-answer pop (a ripple). */
