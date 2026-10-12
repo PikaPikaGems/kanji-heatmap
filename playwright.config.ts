@@ -19,8 +19,7 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command:
-      "node scripts/generate-speed-katakana.mjs && pnpm exec vite --port 5174",
+    command: "pnpm exec vite --port 5174",
     url: "http://localhost:5174",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
