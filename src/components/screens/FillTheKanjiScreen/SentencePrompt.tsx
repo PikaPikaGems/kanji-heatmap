@@ -69,9 +69,9 @@ export const FuriganaSentence = ({
     // Leading goes after `className`: its text-2xl/text-3xl would otherwise
     // drop it (twMerge), leaving a fixed line-height that is too tall on phones.
     // Unitless 1.3 keeps wrapped lines close (furigana still clears the line
-    // above). The rt is shifted down (a negative margin barely moves
-    // it) into the line's half-leading, so it sits close to its kanji.
-    // Row gap is small: the rt's own reserved height already separates lines.
+    // above). The reading's negative bottom margin pulls it into the line's
+    // half-leading, so it sits close to its kanji.
+    // Row gap is small: the reading's own height already separates lines.
     <p
       className={cn(
         bunsetsuRowCn,
@@ -117,15 +117,17 @@ export const FuriganaSentence = ({
               );
             });
             if (!reading) return <span key={j}>{text}</span>;
+            // Not <ruby>: iOS Safari drew the reading left of its kanji when
+            // other text came before it in the bunsetsu. An inline-block with
+            // the reading stacked on top always centers it over the kanji, and
+            // its baseline is still the kanji's (the last line).
             return (
-              <ruby key={j}>
-                {text}
-                <rp>(</rp>
-                <rt className="text-[0.45em] font-normal text-muted-foreground leading-none translate-y-[0.2em]">
+              <span key={j} className="inline-block text-center">
+                <span className="block text-[0.45em] font-normal text-muted-foreground leading-none whitespace-nowrap -mb-[0.2em]">
                   {reading}
-                </rt>
-                <rp>)</rp>
-              </ruby>
+                </span>
+                {text}
+              </span>
             );
           })}
         </span>
