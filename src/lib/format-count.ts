@@ -18,3 +18,20 @@ export const formatCompactCount = (n: number) => {
   const body = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
   return `~${body}k`;
 };
+
+/** Count rounded down to the hundred, for approximate labels: 1944 → "1,900+". */
+export const formatApproxCount = (n: number) =>
+  `${formatRawCount(Math.floor(n / 100) * 100)}+`;
+
+/**
+ * Rough size for download labels, two significant digits:
+ * 937_833 → "~940 KB", 1_147_796 → "~1.1 MB", 9_877_476 → "~9.9 MB".
+ */
+export const formatApproxBytes = (bytes: number) => {
+  const rounded = Number(bytes.toPrecision(2));
+  const [value, unit] =
+    rounded >= 1_000_000
+      ? [rounded / 1_000_000, "MB"]
+      : [rounded / 1_000, "KB"];
+  return `~${Number(value.toPrecision(2))} ${unit}`;
+};

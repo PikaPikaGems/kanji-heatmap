@@ -38,6 +38,12 @@ import {
 } from "@/lib/offline-preload";
 import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 import { approxRowCountLabel } from "@/lib/fill-the-kanji/batches";
+import {
+  fillTheKanjiSetBytes,
+  KANJI_SVG_SIZES,
+  KATAKANA_SIZES,
+} from "@/lib/download-sizes";
+import { formatApproxBytes, formatApproxCount } from "@/lib/format-count";
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -225,13 +231,13 @@ const FillTheKanjiDownloads = () => {
           </span>
         </AccordionTrigger>
         <AccordionContent className="pb-0 pl-3 border-l-2 border-dotted">
-          {FILL_THE_KANJI_SETS.map(({ id, label, sizeHint, unit }) => (
+          {FILL_THE_KANJI_SETS.map(({ id, label, unit }) => (
             <DataDownloadRow
               key={id}
               label={label}
               sizeHint={`${
                 hasOutdatedFillTheKanjiDownload(id) ? "Update available · " : ""
-              }${sizeHint} · ${approxRowCountLabel(id)} ${unit}`}
+              }${formatApproxBytes(fillTheKanjiSetBytes(id))} · ${approxRowCountLabel(id)} ${unit}`}
               completeKey={fillTheKanjiPreloadKey(id)}
               startPreload={(onProgress) =>
                 preloadFillTheKanjiSet(id, onProgress)
@@ -418,14 +424,14 @@ export const SettingsModal = ({
         <SimpleAccordion trigger="Data">
           <DataDownloadRow
             label="Download Kanji SVGs"
-            sizeHint="~16 MB · stroke order for ~2000 kanji"
+            sizeHint={`${formatApproxBytes(KANJI_SVG_SIZES.bytes)} · stroke order for ${formatApproxCount(KANJI_SVG_SIZES.count)} kanji`}
             completeKey="svg-preload-complete"
             startPreload={preloadKanjiSvgs}
             clearCache={clearKanjiSvgCache}
           />
           <DataDownloadRow
             label="Download Katakana Challenges"
-            sizeHint="~1 MB · 10,000 speed katakana words"
+            sizeHint={`${formatApproxBytes(KATAKANA_SIZES.bytes)} · ${formatApproxCount(KATAKANA_SIZES.count)} speed katakana words`}
             completeKey="katakana-preload-complete"
             startPreload={preloadKatakanaChallenges}
             clearCache={clearKatakanaCache}

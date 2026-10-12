@@ -1,5 +1,6 @@
 import setSizes from "./set-sizes.json";
 import chunking from "./chunking.json";
+import { formatApproxCount } from "@/lib/format-count";
 import { FILL_THE_KANJI_SETS, FillTheKanjiSetId } from "./sets";
 
 /**
@@ -22,7 +23,7 @@ export const setRowCount = (setId: FillTheKanjiSetId): number =>
 
 /** Row count rounded down to the hundred, e.g. 1,944 → "1,900+". */
 export const approxRowCountLabel = (setId: FillTheKanjiSetId): string =>
-  `${(Math.floor(setRowCount(setId) / 100) * 100).toLocaleString("en-US")}+`;
+  formatApproxCount(setRowCount(setId));
 
 /** Batches in a set: rows cut into BATCH_SIZE chunks, remainder merged. */
 export const batchCount = (setId: FillTheKanjiSetId): number =>
