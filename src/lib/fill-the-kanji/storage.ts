@@ -1,5 +1,6 @@
 import { notifyStorage, safeReadJson } from "@/lib/storage";
 import { FILL_THE_KANJI_SETS, FillTheKanjiSetId } from "./sets";
+import { sentencesInBatches } from "./batches";
 
 /**
  * Stats for one finished batch. Only full batches are recorded, and only how
@@ -28,6 +29,12 @@ export const readBatchStats = (
 
 export const countAttemptedBatches = (setId: FillTheKanjiSetId): number =>
   Object.keys(readSetBatchStats(setId)).length;
+
+/** Rows (phrases) seen in a set: every row of its finished batches. */
+export const rowsSeen = (
+  setId: FillTheKanjiSetId,
+  stats: SetBatchStats
+): number => sentencesInBatches(setId, Object.keys(stats));
 
 export const countAllAttemptedBatches = (): number =>
   FILL_THE_KANJI_SETS.reduce(
