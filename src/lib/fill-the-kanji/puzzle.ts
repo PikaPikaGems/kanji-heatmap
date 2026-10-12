@@ -102,7 +102,7 @@ export const buildPuzzle = (jp: string, tileCount: TileCount): Puzzle => {
  * Distractor order: each answer's similar kanji, most similar first (the
  * similar-kanji lists are ordered that way), taken round-robin so every
  * answer gets its closest lookalike; then similars of those similars, in the
- * same order; then `fallbackPool` (kanji from the rest of the round) for
+ * same order; then `fallbackPool` (kanji from the rest of the batch) for
  * kanji with no similars listed. Kanji already in the sentence are never
  * distractors. Only the fallback pool and the final tile order are random.
  */

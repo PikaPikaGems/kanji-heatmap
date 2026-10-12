@@ -8,10 +8,10 @@ import { useSimilarKanjiMap } from "@/kanji-worker/kanji-worker-hooks";
 import { fillTheKanjiChunkUrl } from "@/lib/offline-preload";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
 import {
-  chunkOfRound,
+  chunkOfBatch,
   chunkRowStart,
-  roundRowRange,
-} from "@/lib/fill-the-kanji/rounds";
+  batchRowRange,
+} from "@/lib/fill-the-kanji/batches";
 import {
   buildPuzzle,
   buildTiles,
@@ -29,18 +29,18 @@ import { GameCard, useFillTheKanjiGame } from "./use-fill-the-kanji-game";
 import { FillTheKanjiSettings, ItemResult } from "./types";
 
 /**
- * Loads the set chunk holding this round (not the whole set) and the
- * similar-kanji map, then builds the round's cards: sentences in shuffled
+ * Loads the set chunk holding this batch (not the whole set) and the
+ * similar-kanji map, then builds the batch's cards: sentences in shuffled
  * order, each with its blanks and 8 or 12 tiles. `onlyJp` keeps just those
  * sentences (retrying mistakes).
  */
-const useRoundCards = (
+const useBatchCards = (
   setId: FillTheKanjiSetId,
-  round: number,
+  batch: number,
   onlyJp: string[] | null,
   tileCount: TileCount
 ) => {
-  const chunk = chunkOfRound(round);
+  const chunk = chunkOfBatch(batch);
   const { data, status } = useJsonFetch<FillTheKanjiSetFile>(
     fillTheKanjiChunkUrl(setId, chunk)
   );
@@ -48,14 +48,14 @@ const useRoundCards = (
 
   const cards = useMemo<GameCard[]>(() => {
     if (!data?.data || !similarMap) return [];
-    const [start, end] = roundRowRange(setId, round);
+    const [start, end] = batchRowRange(setId, batch);
     const offset = chunkRowStart(chunk);
     const items = data.data
       .slice(start - offset, end - offset)
       .map(rowToItem)
       .filter((item) => onlyJp == null || onlyJp.includes(item.jp));
     const puzzles = items.map((item) => buildPuzzle(item.jp, tileCount));
-    const roundKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
+    const batchKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
     const getSimilars = (k: string) => similarMap[k] ?? [];
 
     return shuffle(
@@ -66,12 +66,12 @@ const useRoundCards = (
           answers: puzzles[i].answers,
           sentenceKanji: puzzles[i].sentenceKanji,
           getSimilars,
-          fallbackPool: roundKanji,
+          fallbackPool: batchKanji,
           tileCount,
         }),
       }))
     );
-  }, [data, similarMap, setId, round, chunk, onlyJp, tileCount]);
+  }, [data, similarMap, setId, batch, chunk, onlyJp, tileCount]);
 
   return { cards, status };
 };
@@ -80,7 +80,7 @@ const ignoreEscape = () => {};
 
 export const Game = ({
   setId,
-  round,
+  batch,
   onlyJp,
   settings,
   onProgress,
@@ -88,17 +88,17 @@ export const Game = ({
   onEnd,
 }: {
   setId: FillTheKanjiSetId;
-  round: number;
-  /** Only these sentences (retrying mistakes); null plays the whole round. */
+  batch: number;
+  /** Only these sentences (retrying mistakes); null plays the whole batch. */
   onlyJp: string[] | null;
   settings: FillTheKanjiSettings;
   onProgress: (progress: number) => void;
   onComplete: (results: ItemResult[]) => void;
   onEnd: () => void;
 }) => {
-  const { cards, status } = useRoundCards(
+  const { cards, status } = useBatchCards(
     setId,
-    round,
+    batch,
     onlyJp,
     isTileCount(settings.tileCount) ? settings.tileCount : DEFAULT_TILE_COUNT
   );
@@ -132,7 +132,7 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full animate-fade-in-fast">
-      {/* Escape ends the round, except while the answer drawer is open:
+      {/* Escape ends the batch, except while the answer drawer is open:
           there it closes the notes popover instead. The drawer's overlay
           covers this button anyway. */}
       <EndSession onClick={revealed ? ignoreEscape : onEnd} />

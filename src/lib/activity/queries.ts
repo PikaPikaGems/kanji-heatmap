@@ -36,7 +36,7 @@ export const summarizeActivityInRange = (
   let speedKatakanaSessions = 0;
   let productionRounds = 0;
   let recognitionRounds = 0;
-  let fillTheKanjiRounds = 0;
+  let fillTheKanjiBatches = 0;
 
   for (const [key, day] of Object.entries(byDay)) {
     if (!isDateKeyInRange(key, range)) continue;
@@ -59,7 +59,7 @@ export const summarizeActivityInRange = (
       if (recognition > 0) recognitionDays += 1;
     }
     if (filters.fillTheKanji) {
-      fillTheKanjiRounds += fillTheKanji;
+      fillTheKanjiBatches += fillTheKanji;
       if (fillTheKanji > 0) fillTheKanjiDays += 1;
     }
 
@@ -75,7 +75,7 @@ export const summarizeActivityInRange = (
     speedKatakanaSessions,
     productionRounds,
     recognitionRounds,
-    fillTheKanjiRounds,
+    fillTheKanjiBatches,
   };
 };
 

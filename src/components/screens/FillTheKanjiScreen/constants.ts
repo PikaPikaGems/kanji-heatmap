@@ -4,7 +4,7 @@ export const SETTINGS_KEY = "fill-the-kanji-settings";
 
 export const DEFAULT_SETTINGS: FillTheKanjiSettings = {
   setId: "n5",
-  roundBySet: {},
+  batchBySet: {},
   sound: { enabled: true, type: "correct" },
   readAloudOnShow: false,
   tileCount: 8,

@@ -18,7 +18,7 @@ export type AllTimeActivity = {
   productionRounds: number;
   recognitionRounds: number;
   /** Optional: stored records from before Fill the Kanji existed lack it. */
-  fillTheKanjiRounds?: number;
+  fillTheKanjiBatches?: number;
 };
 
 export type DayCounts = {
@@ -52,7 +52,7 @@ export type WindowedActivityStats = {
   speedKatakanaSessions: number;
   productionRounds: number;
   recognitionRounds: number;
-  fillTheKanjiRounds: number;
+  fillTheKanjiBatches: number;
 };
 
 export const EMPTY_DAY_COUNTS: DayCounts = {
@@ -67,7 +67,7 @@ export const EMPTY_ALL_TIME: AllTimeActivity = {
   speedKatakanaSessions: 0,
   productionRounds: 0,
   recognitionRounds: 0,
-  fillTheKanjiRounds: 0,
+  fillTheKanjiBatches: 0,
 };
 
 export const DEFAULT_KIND_FILTERS: ActivityKindFilters = {

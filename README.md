@@ -79,9 +79,9 @@ Every data file the app fetches (`public/json/v2/`, `public/json/katakana/`,
 Never edit them by hand: a data change is made in the data build, and its
 output is copied over these files.
 
-In Fill the Kanji, a round is cut from the set in file order, so a data change
+In Fill the Kanji, a batch is cut from the set in file order, so a data change
 that inserts or deletes sentences in the middle of a set moves sentences into
-different rounds, and players' stats stay with the round numbers, not the
+different batches, and players' stats stay with the batch numbers, not the
 sentences.
 
 ### File sizes

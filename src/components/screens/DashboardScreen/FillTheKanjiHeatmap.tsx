@@ -27,17 +27,17 @@ import {
   FillTheKanjiSetId,
 } from "@/lib/fill-the-kanji/sets";
 import {
-  roundCount,
-  roundLabel,
-  roundRowRange,
-} from "@/lib/fill-the-kanji/rounds";
+  batchCount,
+  batchLabel,
+  batchRowRange,
+} from "@/lib/fill-the-kanji/batches";
 import {
-  readSetRoundStats,
-  RoundStats,
-  SetRoundStats,
+  readSetBatchStats,
+  BatchStats,
+  SetBatchStats,
   STATS_KEY_PREFIX,
 } from "@/lib/fill-the-kanji/storage";
-import { fillTheKanjiRoundHref } from "@/lib/fill-the-kanji/links";
+import { fillTheKanjiBatchHref } from "@/lib/fill-the-kanji/links";
 import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
 import { DashboardPanel } from "./DashboardPanel";
 import { HeatmapCell } from "./HeatmapGrid";
@@ -46,7 +46,7 @@ import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
-/** Rounds per row (rows read left to right, top to bottom) per layout. */
+/** Batches per row (rows read left to right, top to bottom) per layout. */
 const WIDE_COLUMNS = 50;
 const COMPACT_COLUMNS = 25;
 
@@ -54,11 +54,11 @@ const SETTINGS_KEY = "fill-the-kanji-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
 const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 
-/** Sums a set's attempt counts across its rounds. */
-const totalAttempts = (stats: SetRoundStats) =>
+/** Sums a set's attempt counts across its batches. */
+const totalAttempts = (stats: SetBatchStats) =>
   Object.values(stats).reduce((sum, s) => sum + s.attemptCount, 0);
 
-/** "5 / 384 rounds completed · 7 total attempts" */
+/** "5 / 384 batches completed · 7 total attempts" */
 const ProgressSummary = ({
   completed,
   total,
@@ -69,7 +69,7 @@ const ProgressSummary = ({
   attempts: number;
 }) => (
   <>
-    {completed.toLocaleString()} / {total.toLocaleString()} rounds completed ·{" "}
+    {completed.toLocaleString()} / {total.toLocaleString()} batches completed ·{" "}
     {attempts.toLocaleString()} total {attempts === 1 ? "attempt" : "attempts"}
   </>
 );
@@ -131,20 +131,20 @@ const LayoutSettingsPopover = ({
   );
 };
 
-const RoundDetail = ({
+const BatchDetail = ({
   setId,
-  round,
+  batch,
   stats,
 }: {
   setId: FillTheKanjiSetId;
-  round: number;
-  stats: RoundStats | undefined;
+  batch: number;
+  stats: BatchStats | undefined;
 }) => {
-  const [start, end] = roundRowRange(setId, round);
+  const [start, end] = batchRowRange(setId, batch);
   return (
     <div className="space-y-1.5 text-xs">
       <div className="font-extrabold">
-        Round {roundLabel(round)} (#{round})
+        Batch {batchLabel(batch)} (#{batch})
       </div>
       <div className="text-muted-foreground">
         Sentences {start + 1}–{end}
@@ -163,7 +163,7 @@ const RoundDetail = ({
           variant="ghost"
           className="w-full text-xs font-semibold underline underline-offset-4 decoration-dotted"
         >
-          <Link to={fillTheKanjiRoundHref(setId, round)}>Practice Now</Link>
+          <Link to={fillTheKanjiBatchHref(setId, batch)}>Practice Now</Link>
         </Button>
       </div>
       {stats && (
@@ -175,7 +175,7 @@ const RoundDetail = ({
   );
 };
 
-/** One set's rounds, `columns` per row, painted by attempt count. */
+/** One set's batches, `columns` per row, painted by attempt count. */
 const SetHeatmapGrid = ({
   setId,
   stats,
@@ -183,11 +183,11 @@ const SetHeatmapGrid = ({
   attemptShading,
 }: {
   setId: FillTheKanjiSetId;
-  stats: SetRoundStats;
+  stats: SetBatchStats;
   columns: number;
   attemptShading: AttemptCountShading;
 }) => {
-  const total = roundCount(setId);
+  const total = batchCount(setId);
   const completed = Object.keys(stats).length;
   const label = FILL_THE_KANJI_SETS.find((s) => s.id === setId)?.label;
 
@@ -214,19 +214,19 @@ const SetHeatmapGrid = ({
           }}
         >
           {Array.from({ length: total }, (_, i) => {
-            const round = i + 1;
-            const roundStats = stats[String(round)];
-            const attempts = roundStats?.attemptCount ?? 0;
+            const batch = i + 1;
+            const batchStats = stats[String(batch)];
+            const attempts = batchStats?.attemptCount ?? 0;
             return (
               <HeatmapCell
-                key={round}
+                key={batch}
                 cellPx={CELL_PX}
                 fillCn={heatmapFillCn(
                   attemptCountToBand(attempts, attemptShading)
                 )}
-                label={`Round ${roundLabel(round)}: ${attempts} attempts`}
+                label={`Batch ${batchLabel(batch)}: ${attempts} attempts`}
                 detail={
-                  <RoundDetail setId={setId} round={round} stats={roundStats} />
+                  <BatchDetail setId={setId} batch={batch} stats={batchStats} />
                 }
               />
             );
@@ -237,7 +237,7 @@ const SetHeatmapGrid = ({
   );
 };
 
-/** Group title plus how many of its rounds have been completed. */
+/** Group title plus how many of its batches have been completed. */
 const GroupTrigger = ({
   title,
   setIds,
@@ -245,7 +245,7 @@ const GroupTrigger = ({
 }: {
   title: string;
   setIds: FillTheKanjiSetId[];
-  statsById: Map<FillTheKanjiSetId, SetRoundStats>;
+  statsById: Map<FillTheKanjiSetId, SetBatchStats>;
 }) => {
   const groupStats = setIds.map((id) => statsById.get(id) ?? {});
   const completed = groupStats.reduce(
@@ -256,7 +256,7 @@ const GroupTrigger = ({
     (sum, stats) => sum + totalAttempts(stats),
     0
   );
-  const total = setIds.reduce((sum, id) => sum + roundCount(id), 0);
+  const total = setIds.reduce((sum, id) => sum + batchCount(id), 0);
   return (
     <span className="flex flex-col">
       <span className="text-sm font-semibold">{title}</span>
@@ -288,9 +288,9 @@ export const FillTheKanjiHeatmap = () => {
   const [scale] = useAttemptCountScale();
 
   // Read every set up front: the relative scale compares against the most
-  // attempts on any round across all sets.
+  // attempts on any batch across all sets.
   const statsById = new Map(
-    FILL_THE_KANJI_SETS.map(({ id }) => [id, readSetRoundStats(id)] as const)
+    FILL_THE_KANJI_SETS.map(({ id }) => [id, readSetBatchStats(id)] as const)
   );
   const maxCount = Math.max(
     0,

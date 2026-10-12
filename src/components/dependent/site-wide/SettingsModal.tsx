@@ -37,7 +37,7 @@ import {
   hasOutdatedFillTheKanjiDownload,
 } from "@/lib/offline-preload";
 import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
-import { approxRowCountLabel } from "@/lib/fill-the-kanji/rounds";
+import { approxRowCountLabel } from "@/lib/fill-the-kanji/batches";
 import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 import { PracticeButton } from "@/components/ui/practice-button";

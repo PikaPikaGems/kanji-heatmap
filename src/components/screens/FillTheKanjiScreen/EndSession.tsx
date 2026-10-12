@@ -9,15 +9,15 @@ const CONTINUE_KEYS = ["Enter", " "] as const;
 
 export const EndSession = ({
   results,
-  roundLabel,
+  batchLabel,
   onNext,
   onRetryMistakes,
   onEnd,
 }: {
   results: ItemResult[];
-  roundLabel: string;
+  batchLabel: string;
   onNext: () => void;
-  /** Replays just the missed sentences; not recorded as a round attempt. */
+  /** Replays just the missed sentences; not recorded as a batch attempt. */
   onRetryMistakes: () => void;
   onEnd: () => void;
 }) => {
@@ -31,7 +31,7 @@ export const EndSession = ({
     <EndScreenLayout
       className="px-4"
       heading={cheer}
-      subtitle={roundLabel}
+      subtitle={batchLabel}
       stats={
         <>
           <Stat value={correct} unit={`/${results.length}`} label="Correct" />
@@ -53,7 +53,7 @@ export const EndSession = ({
           </button>
         )
       }
-      primaryLabel="Next Round"
+      primaryLabel="Next Batch"
       onPrimary={onNext}
       secondaryLabel="End Session"
       onSecondary={onEnd}

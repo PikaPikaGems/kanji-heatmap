@@ -5,43 +5,43 @@ import { URL_PARAMS } from "@/lib/settings/url-params";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
 import {
   isFillTheKanjiSetId,
-  isValidRound,
-  roundCount,
-} from "@/lib/fill-the-kanji/rounds";
-import { readSetRoundStats } from "@/lib/fill-the-kanji/storage";
+  isValidBatch,
+  batchCount,
+} from "@/lib/fill-the-kanji/batches";
+import { readSetBatchStats } from "@/lib/fill-the-kanji/storage";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { FillTheKanjiSettings } from "./types";
 
 const SET_PARAM = URL_PARAMS.fillTheKanjiSet;
-const ROUND_PARAM = URL_PARAMS.fillTheKanjiRound;
+const BATCH_PARAM = URL_PARAMS.fillTheKanjiBatch;
 
-/** First round of a set with no recorded attempt, or 1 when all are played. */
-const firstUnplayedRound = (setId: FillTheKanjiSetId): number => {
-  const stats = readSetRoundStats(setId);
-  const total = roundCount(setId);
-  for (let round = 1; round <= total; round++) {
-    if (!stats[String(round)]) return round;
+/** First batch of a set with no recorded attempt, or 1 when all are played. */
+const firstUnplayedBatch = (setId: FillTheKanjiSetId): number => {
+  const stats = readSetBatchStats(setId);
+  const total = batchCount(setId);
+  for (let batch = 1; batch <= total; batch++) {
+    if (!stats[String(batch)]) return batch;
   }
   return 1;
 };
 
-/** The round to show for a set: the remembered one, else the first unplayed. */
-export const selectedRoundFor = (
+/** The batch to show for a set: the remembered one, else the first unplayed. */
+export const selectedBatchFor = (
   settings: FillTheKanjiSettings,
   setId: FillTheKanjiSetId
 ): number => {
-  const remembered = settings.roundBySet[setId];
-  return remembered != null && isValidRound(setId, remembered)
+  const remembered = settings.batchBySet[setId];
+  return remembered != null && isValidBatch(setId, remembered)
     ? remembered
-    : firstUnplayedRound(setId);
+    : firstUnplayedBatch(setId);
 };
 
 /**
- * Settings for the start screen, kept in sync with `?set=` and `?round=`:
+ * Settings for the start screen, kept in sync with `?set=` and `?batch=`:
  * - Valid URL params → settings (so a dashboard "Practice Now" link lands on
- *   that round)
+ *   that batch)
  * - Invalid params → removed from the URL (replace)
- * - Selecting a set or round → URL (replace, so browsing doesn't spam history)
+ * - Selecting a set or batch → URL (replace, so browsing doesn't spam history)
  */
 export const useFillTheKanjiSettings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,30 +53,30 @@ export const useFillTheKanjiSettings = () => {
   const setId = isFillTheKanjiSetId(settings.setId)
     ? settings.setId
     : DEFAULT_SETTINGS.setId;
-  const storedRoundBySet = settings.roundBySet;
-  const roundBySet = useMemo(() => storedRoundBySet ?? {}, [storedRoundBySet]);
-  const resolved: FillTheKanjiSettings = { ...settings, setId, roundBySet };
-  const round = selectedRoundFor(resolved, setId);
+  const storedBatchBySet = settings.batchBySet;
+  const batchBySet = useMemo(() => storedBatchBySet ?? {}, [storedBatchBySet]);
+  const resolved: FillTheKanjiSettings = { ...settings, setId, batchBySet };
+  const batch = selectedBatchFor(resolved, setId);
 
   const rawSet = searchParams.get(SET_PARAM);
-  const rawRound = searchParams.get(ROUND_PARAM);
+  const rawBatch = searchParams.get(BATCH_PARAM);
   const setFromUrl =
     rawSet != null && isFillTheKanjiSetId(rawSet) ? rawSet : null;
-  const roundNumber = rawRound == null ? NaN : Number(rawRound);
-  const roundFromUrl =
-    setFromUrl != null && isValidRound(setFromUrl, roundNumber)
-      ? roundNumber
+  const batchNumber = rawBatch == null ? NaN : Number(rawBatch);
+  const batchFromUrl =
+    setFromUrl != null && isValidBatch(setFromUrl, batchNumber)
+      ? batchNumber
       : null;
 
   useLayoutEffect(() => {
     const badSet = rawSet != null && setFromUrl == null;
-    const badRound = rawRound != null && roundFromUrl == null;
-    if (badSet || badRound) {
+    const badBatch = rawBatch != null && batchFromUrl == null;
+    if (badSet || badBatch) {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
           if (badSet) next.delete(SET_PARAM);
-          if (badRound) next.delete(ROUND_PARAM);
+          if (badBatch) next.delete(BATCH_PARAM);
           return next;
         },
         { replace: true }
@@ -88,29 +88,29 @@ export const useFillTheKanjiSettings = () => {
     }
     if (
       setFromUrl != null &&
-      roundFromUrl != null &&
-      roundBySet[setFromUrl] !== roundFromUrl
+      batchFromUrl != null &&
+      batchBySet[setFromUrl] !== batchFromUrl
     ) {
-      setSetting("roundBySet", { ...roundBySet, [setFromUrl]: roundFromUrl });
+      setSetting("batchBySet", { ...batchBySet, [setFromUrl]: batchFromUrl });
     }
   }, [
     rawSet,
-    rawRound,
+    rawBatch,
     setFromUrl,
-    roundFromUrl,
+    batchFromUrl,
     setId,
-    roundBySet,
+    batchBySet,
     setSetting,
     setSearchParams,
   ]);
 
   const syncToUrl = useCallback(
-    (nextSet: FillTheKanjiSetId, nextRound: number) => {
+    (nextSet: FillTheKanjiSetId, nextBatch: number) => {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
           next.set(SET_PARAM, nextSet);
-          next.set(ROUND_PARAM, String(nextRound));
+          next.set(BATCH_PARAM, String(nextBatch));
           return next;
         },
         { replace: true }
@@ -119,29 +119,29 @@ export const useFillTheKanjiSettings = () => {
     [setSearchParams]
   );
 
-  const selectRound = useCallback(
-    (nextSet: FillTheKanjiSetId, nextRound: number) => {
+  const selectBatch = useCallback(
+    (nextSet: FillTheKanjiSetId, nextBatch: number) => {
       setSetting("setId", nextSet);
-      setSetting("roundBySet", { ...roundBySet, [nextSet]: nextRound });
-      syncToUrl(nextSet, nextRound);
+      setSetting("batchBySet", { ...batchBySet, [nextSet]: nextBatch });
+      syncToUrl(nextSet, nextBatch);
     },
-    [roundBySet, setSetting, syncToUrl]
+    [batchBySet, setSetting, syncToUrl]
   );
 
   const selectSet = useCallback(
     (nextSet: FillTheKanjiSetId) => {
-      const remembered = { ...DEFAULT_SETTINGS, roundBySet };
-      selectRound(nextSet, selectedRoundFor(remembered, nextSet));
+      const remembered = { ...DEFAULT_SETTINGS, batchBySet };
+      selectBatch(nextSet, selectedBatchFor(remembered, nextSet));
     },
-    [roundBySet, selectRound]
+    [batchBySet, selectBatch]
   );
 
   return {
     settings: resolved,
     setId,
-    round,
+    batch,
     setSetting,
     selectSet,
-    selectRound,
+    selectBatch,
   };
 };

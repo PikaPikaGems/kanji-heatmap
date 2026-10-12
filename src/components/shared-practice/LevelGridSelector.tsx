@@ -3,7 +3,7 @@ import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
 
 /**
  * Level grid + item grid for picking one item inside numbered levels (speed
- * katakana challenge sets, fill-the-kanji rounds). Level squares are shaded by
+ * katakana challenge sets, fill-the-kanji batches). Level squares are shaded by
  * how much of the level is done; item squares by whether that item is done.
  * Re-selecting the current level keeps the position; another level jumps to
  * its first item.
