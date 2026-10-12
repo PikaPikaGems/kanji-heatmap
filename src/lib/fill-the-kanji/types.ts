@@ -1,7 +1,6 @@
 /**
- * One row of public/json/fill-the-kanji/<set>/<chunk>.json, as written by
- * jp-misc-data's kanji-heatmap-build/scripts/generate-fill-the-kanji.mjs. `emoji` is only present in the emoji
- * set (where `tags` is empty).
+ * One row of public/json/fill-the-kanji/<set>/<chunk>.json. `emoji` is only
+ * present in the emoji set (where `tags` is empty).
  */
 export type FillTheKanjiRow =
   | [jp: string, en: string, tags: string, notes: string]

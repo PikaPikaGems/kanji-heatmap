@@ -379,7 +379,7 @@ const pwaConfig = {
 
       // **********************
       // Cache KANJI SVG — committed local files (public/svg/, the
-      // ~2426 filtered_kanji.json set) plus the CDN fallback for everything
+      // ~2426 shipped kanji) plus the CDN fallback for everything
       // else (e.g. 唸), sharing one cache so clearKanjiSvgCache() covers both.
       // **********************
       ...(ASSETS_ORIGIN

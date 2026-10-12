@@ -48,8 +48,7 @@ export type RadicalInfo = {
 };
 
 /**
- * Our own radical popover text (jp-misc-data's kanji-heatmap-build/raw-data/radicals/ours-popover-text.json),
- * public/json/v2/radical_popover_text.json. Every field is optional; refs
+ * Our own radical popover text, public/json/v2/radical_popover_text.json. Every field is optional; refs
  * are the links each line was checked against.
  */
 export type RadicalPopoverText = {
