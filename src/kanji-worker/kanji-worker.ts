@@ -345,13 +345,9 @@ const handleKanjiGeneral = requirePayload(async (kanji: string) => {
 });
 
 const handleKanjiSimilar = requirePayload(async (kanji: string) => {
-  const [mainInfoMap, similar] = await Promise.all([CORE, loadSimilar()]);
-  // Kanji outside the main set still show, after the ones we know.
-  const matches = similar[kanji] ?? [];
-  return [
-    ...matches.filter((match) => mainInfoMap[match] != null),
-    ...matches.filter((match) => mainInfoMap[match] == null),
-  ];
+  const similar = await loadSimilar();
+  // Most similar first, including kanji outside the main set.
+  return similar[kanji] ?? [];
 });
 
 const handleRetrieveVocabInfo = requirePayload(async (word: string) =>

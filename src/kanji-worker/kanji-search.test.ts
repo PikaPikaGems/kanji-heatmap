@@ -170,8 +170,8 @@ describe("filterKanji", () => {
       settings({ type: "similar", text: "水" }),
       pool
     );
-    // 氷 is not in the pool, so it comes after the kanji we know.
-    expect(result).toEqual(["水", "火", "氷"]);
+    // 氷 is not in the pool but still keeps its similar-map place.
+    expect(result).toEqual(["水", "氷", "火"]);
   });
 
   it("similar: drops kanji outside the pool once a filter or sort is set", () => {

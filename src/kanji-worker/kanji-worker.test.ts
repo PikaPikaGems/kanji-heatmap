@@ -288,20 +288,23 @@ describe("data handlers", () => {
     expect([...single].sort()).toEqual([...map["五"]].sort());
   });
 
-  it("lists similar kanji outside kanji_main after the ones it knows", async () => {
-    send(110, "kanji-similar", "伽");
+  it("lists similar kanji most similar first, kanji outside kanji_main included", async () => {
+    send(110, "kanji-similar", "栗");
     await settle();
 
-    // 珈, 迦 and 駕 are not in kanji_main.
+    // 粟 is not in kanji_main.
     expect(replyFor(110)?.response.data).toEqual([
-      "茄",
-      "加",
-      "架",
-      "賀",
-      "嘉",
-      "珈",
-      "迦",
-      "駕",
+      "粟",
+      "乗",
+      "東",
+      "要",
+      "果",
+      "察",
+      "菜",
+      "票",
+      "柔",
+      "桑",
+      "県",
     ]);
   });
 

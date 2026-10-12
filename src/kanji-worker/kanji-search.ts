@@ -232,15 +232,15 @@ export const filterKanji = (
     const filtered = filterByKanjiSimple(inPool, settings, kanjiPool);
 
     // Kanji outside the main set have nothing to filter or sort by, so —
-    // like multi-kanji — they only show with the default settings, after
-    // the kanji we know.
+    // like multi-kanji — they only show with the default settings, in the
+    // similar-map order (most similar first) among the kanji we know.
     if (!hasNoFilters(settings) || settings.sortSettings.primary !== "none") {
       return filtered;
     }
-    const outsidePool = ordered.filter(
-      (kanji) => kanjiPool.main[kanji] == null
+    const kept = new Set(filtered);
+    return ordered.filter(
+      (kanji) => kanjiPool.main[kanji] == null || kept.has(kanji)
     );
-    return [...filtered, ...outsidePool];
   }
 
   // TODO: add logic early exit (return all)
