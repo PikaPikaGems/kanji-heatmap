@@ -1,5 +1,8 @@
 # Kanji Heatmap Data: pending fixes
 
+**Moved:** the data build (`raw-data/`, the generators, `docs/data/`) now lives in
+jp-misc-data's `kanji-heatmap-build/`; the paths below are relative to it.
+
 Fixes that belong upstream in [Kanji Heatmap Data](https://github.com/PikaPikaGems/kanji-heatmap-data), not in this repo. All parked for
 now; the user will handle them later.
 

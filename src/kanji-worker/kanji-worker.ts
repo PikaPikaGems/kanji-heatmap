@@ -267,7 +267,7 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
  * The component drawer, in order, each with how many kanji component search
  * returns for it (the kanji that contain it, plus itself when it's a kanji)
  * and its stroke count when known: the kanji's own, else the radical
- * drawer's, as in scripts/sphmn-components.mjs.
+ * drawer's, as in jp-misc-data's kanji-heatmap-build/scripts/sphmn-components.mjs.
  */
 const handleSphmnDrawer = async (): Promise<
   [string, number, number | null][]

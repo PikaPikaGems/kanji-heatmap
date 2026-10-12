@@ -1,7 +1,7 @@
 /**
  * The Fill the Kanji challenge sets, in display order.
  *
- * `id` must match a file stem written by scripts/generate-fill-the-kanji.mjs
+ * `id` must match a file stem written by jp-misc-data's kanji-heatmap-build/scripts/generate-fill-the-kanji.mjs
  * (the source TSV name without its trailing "-<count>"), and is also the key
  * used for stored stats, so renaming an id loses the stats recorded under it.
  * `sizeHint` (download size) is approximate and only shown in the download

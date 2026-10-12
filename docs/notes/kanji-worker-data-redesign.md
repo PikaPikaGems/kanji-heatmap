@@ -1,5 +1,8 @@
 # Kanji worker + JSON data layout redesign
 
+**Moved:** the data build (`raw-data/`, the generators, `docs/data/`) now lives in
+jp-misc-data's `kanji-heatmap-build/`; the paths below are relative to it.
+
 **Status:** implemented on `claude/kanji-worker-simplify-xgcr03`, except for
 the one item listed under "Still to do" at the end (as of 2026-07-25).
 **Supersedes:** the open question in `worker-main-thread-double-caching.md`

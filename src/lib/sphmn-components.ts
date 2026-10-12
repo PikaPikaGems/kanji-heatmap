@@ -1,8 +1,8 @@
 /**
  * sph-mn's component table (`public/json/v2/sphmn_components.json`, built by
- * scripts/sphmn-components.mjs). The file lists each component with every
+ * jp-misc-data's kanji-heatmap-build/scripts/sphmn-components.mjs). The file lists each component with every
  * shipped kanji containing it, at any depth, in drawer order: most matches
- * first. See raw-data/radicals/README.md, "sph-mn components".
+ * first. See jp-misc-data's kanji-heatmap-build/raw-data/radicals/README.md, "sph-mn components".
  */
 export type SphmnComponentsFile = [component: string, kanji: string][];
 
