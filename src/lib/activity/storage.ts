@@ -19,7 +19,7 @@ const kindToAllTimeField: Record<
   speedKatakana: "speedKatakanaSessions",
   production: "productionRounds",
   recognition: "recognitionRounds",
-  fillTheKanji: "fillTheKanjiRounds",
+  fillTheKanji: "fillTheKanjiBatches",
 };
 
 export const readAllTimeActivity = (): AllTimeActivity =>

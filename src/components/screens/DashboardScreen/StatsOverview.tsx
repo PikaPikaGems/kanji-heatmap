@@ -27,7 +27,7 @@ export const StatsOverview = () => {
           speedKatakanaSessions: allTime.speedKatakanaSessions,
           productionRounds: allTime.productionRounds,
           recognitionRounds: allTime.recognitionRounds,
-          fillTheKanjiRounds: allTime.fillTheKanjiRounds ?? 0,
+          fillTheKanjiBatches: allTime.fillTheKanjiBatches ?? 0,
         }}
       />
       <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row">

@@ -1,4 +1,4 @@
 {
-  "roundSize": 20,
-  "roundsPerChunk": 10
+  "batchSize": 20,
+  "batchesPerChunk": 10
 }

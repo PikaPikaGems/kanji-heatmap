@@ -83,7 +83,7 @@ export const OverviewStat = ({
   value: number | string;
   /** Activity name, e.g. "Speed Katakana" or "Total". */
   title: string;
-  /** Metric unit, e.g. "Days", "Sessions", "Rounds". */
+  /** Metric unit, e.g. "Days", "Sessions", "Rounds", "Batches". */
   unit: string;
   Icon: LucideIcon;
   className?: string;

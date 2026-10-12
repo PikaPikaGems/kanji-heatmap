@@ -5,14 +5,14 @@ import { PracticeShell } from "@/components/shared-practice";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { recordActivity } from "@/lib/activity";
 import {
-  roundCount,
-  roundLabel,
+  batchCount,
+  batchLabel,
   setLabel,
-  totalRoundCount,
-} from "@/lib/fill-the-kanji/rounds";
+  totalBatchCount,
+} from "@/lib/fill-the-kanji/batches";
 import {
-  countAllAttemptedRounds,
-  recordRoundAttempt,
+  countAllAttemptedBatches,
+  recordBatchAttempt,
   STATS_KEY_PREFIX,
 } from "@/lib/fill-the-kanji/storage";
 import { InitialScreen } from "./InitialScreen";
@@ -26,22 +26,22 @@ type Phase = "initial" | "playing" | "ended";
 const FillTheKanjiScreen = () => {
   useHtmlDocumentTitle(fillTheKanjiPageMeta.heading);
 
-  const { settings, setId, round, selectRound } = useFillTheKanjiSettings();
+  const { settings, setId, batch, selectBatch } = useFillTheKanjiSettings();
   const [phase, setPhase] = useState<Phase>("initial");
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<ItemResult[] | null>(null);
   // Bumped per start so "Retry mistakes" remounts the game with new blanks.
   const [playKey, setPlayKey] = useState(0);
-  // Sentences being retried; null while playing a full round. A retry isn't
-  // a round attempt, so it isn't recorded in the stats.
+  // Sentences being retried; null while playing a full batch. A retry isn't
+  // a batch attempt, so it isn't recorded in the stats.
   const [retryJp, setRetryJp] = useState<string[] | null>(null);
 
-  // Re-render the start screen's counts when a round is recorded.
+  // Re-render the start screen's counts when a batch is recorded.
   useStorageRevision((key) => key == null || key.startsWith(STATS_KEY_PREFIX));
 
   const headerProgress =
     phase === "initial"
-      ? (countAllAttemptedRounds() / totalRoundCount()) * 100
+      ? (countAllAttemptedBatches() / totalBatchCount()) * 100
       : progress;
 
   const play = (onlyJp: string[] | null = null) => {
@@ -57,17 +57,17 @@ const FillTheKanjiScreen = () => {
     setPhase("initial");
   };
 
-  const finishRound = (roundResults: ItemResult[]) => {
+  const finishBatch = (batchResults: ItemResult[]) => {
     if (retryJp == null) {
-      recordRoundAttempt(setId, round);
+      recordBatchAttempt(setId, batch);
       recordActivity("fillTheKanji");
     }
-    setResults(roundResults);
+    setResults(batchResults);
     setPhase("ended");
   };
 
-  const playNextRound = () => {
-    selectRound(setId, round >= roundCount(setId) ? 1 : round + 1);
+  const playNextBatch = () => {
+    selectBatch(setId, batch >= batchCount(setId) ? 1 : batch + 1);
     play();
   };
 
@@ -83,11 +83,11 @@ const FillTheKanjiScreen = () => {
         <div key={`playing-${playKey}`} className="h-full animate-fade-in">
           <Game
             setId={setId}
-            round={round}
+            batch={batch}
             onlyJp={retryJp}
             settings={settings}
             onProgress={setProgress}
-            onComplete={finishRound}
+            onComplete={finishBatch}
             onEnd={goToInitial}
           />
         </div>
@@ -97,8 +97,8 @@ const FillTheKanjiScreen = () => {
         <div key="ended" className="h-full animate-fade-in">
           <EndSession
             results={results}
-            roundLabel={`${setLabel(setId)} · Round ${roundLabel(round)}`}
-            onNext={playNextRound}
+            batchLabel={`${setLabel(setId)} · Batch ${batchLabel(batch)}`}
+            onNext={playNextBatch}
             onRetryMistakes={() =>
               play(results.filter((r) => !r.correct).map((r) => r.item.jp))
             }

@@ -204,7 +204,7 @@ export const useFillTheKanjiGame = ({
       return;
     }
     // Progress is reported here (the only place index advances) rather than
-    // via an effect; the parent resets it to 0 when a round starts.
+    // via an effect; the parent resets it to 0 when a batch starts.
     onProgress((nextIndex / cards.length) * 100);
     setIndex(nextIndex);
   };

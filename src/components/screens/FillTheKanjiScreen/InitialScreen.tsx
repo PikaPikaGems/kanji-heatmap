@@ -14,21 +14,21 @@ import {
 import {
   isFillTheKanjiSetId,
   levelCount,
-  levelOfRound,
+  levelOfBatch,
   positionInLevel,
-  roundCount,
-  roundFromLevelAndPos,
-  roundLabel,
-  roundRowRange,
-  roundsInLevel,
-  ROUNDS_PER_LEVEL,
+  batchCount,
+  batchFromLevelAndPos,
+  batchLabel,
+  batchRowRange,
+  batchesInLevel,
+  BATCHES_PER_LEVEL,
   setRowCount,
-  totalRoundCount,
-} from "@/lib/fill-the-kanji/rounds";
+  totalBatchCount,
+} from "@/lib/fill-the-kanji/batches";
 import {
-  countAllAttemptedRounds,
-  readSetRoundStats,
-  RoundStats,
+  countAllAttemptedBatches,
+  readSetBatchStats,
+  BatchStats,
 } from "@/lib/fill-the-kanji/storage";
 import {
   DEFAULT_TILE_COUNT,
@@ -58,26 +58,26 @@ const SetSelect = ({
       value: id,
       label,
       description: `${setRowCount(id).toLocaleString()} sentences · ${
-        Object.keys(readSetRoundStats(id)).length
-      }/${roundCount(id)} rounds played`,
+        Object.keys(readSetBatchStats(id)).length
+      }/${batchCount(id)} batches played`,
     }))}
   />
 );
 
-const RoundSummary = ({
+const BatchSummary = ({
   setId,
-  round,
+  batch,
   stats,
 }: {
   setId: FillTheKanjiSetId;
-  round: number;
-  stats: RoundStats | null;
+  batch: number;
+  stats: BatchStats | null;
 }) => {
-  const [start, end] = roundRowRange(setId, round);
+  const [start, end] = batchRowRange(setId, batch);
   return (
     <div className="flex flex-col gap-1 text-xs font-bold text-left min-h-10">
       <div>
-        Round {roundLabel(round)} (#{round}) · Items {start + 1}–{end} of{" "}
+        Batch {batchLabel(batch)} (#{batch}) · Items {start + 1}–{end} of{" "}
         {setRowCount(setId).toLocaleString()}
       </div>
       {stats ? (
@@ -127,9 +127,9 @@ const Key = ({ children }: { children: string }) => (
 );
 
 export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
-  const { settings, setId, round, setSetting, selectSet, selectRound } =
+  const { settings, setId, batch, setSetting, selectSet, selectBatch } =
     useFillTheKanjiSettings();
-  const stats = readSetRoundStats(setId);
+  const stats = readSetBatchStats(setId);
 
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled
@@ -149,7 +149,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               {fillTheKanjiPageMeta.heading}
             </h1>
             <p className="text-xs font-bold text-muted-foreground tabular-nums">
-              {countAllAttemptedRounds()} of {totalRoundCount()} rounds played
+              {countAllAttemptedBatches()} of {totalBatchCount()} batches played
             </p>
           </div>
 
@@ -217,23 +217,23 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           </div>
           <LevelGridSelector
             levelCount={levelCount(setId)}
-            itemsPerLevel={ROUNDS_PER_LEVEL}
-            levelSize={(level) => roundsInLevel(setId, level)}
+            itemsPerLevel={BATCHES_PER_LEVEL}
+            levelSize={(level) => batchesInLevel(setId, level)}
             isDone={(level, pos) =>
-              stats[String(roundFromLevelAndPos(level, pos))] != null
+              stats[String(batchFromLevelAndPos(level, pos))] != null
             }
-            level={levelOfRound(round)}
-            position={positionInLevel(round)}
+            level={levelOfBatch(batch)}
+            position={positionInLevel(batch)}
             onSelect={(level, pos) =>
-              selectRound(setId, roundFromLevelAndPos(level, pos))
+              selectBatch(setId, batchFromLevelAndPos(level, pos))
             }
             levelHeading="Select a Level"
-            itemHeading="Select a Round"
+            itemHeading="Select a Batch"
           />
-          <RoundSummary
+          <BatchSummary
             setId={setId}
-            round={round}
-            stats={stats[String(round)] ?? null}
+            batch={batch}
+            stats={stats[String(batch)] ?? null}
           />
         </div>
       </div>
@@ -245,7 +245,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           </PracticeButton>
           {!isCoarsePointer && (
             <p className="pt-2 text-xs text-center text-muted-foreground">
-              Tip: during a round, press <Key>!</Key> to hear the sentence, or{" "}
+              Tip: during a batch, press <Key>!</Key> to hear the sentence, or{" "}
               <Key>@</Key> to hear it slowly.
             </p>
           )}

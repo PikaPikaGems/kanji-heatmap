@@ -15,13 +15,13 @@ export type ActivityCountsDisplay = {
   speedKatakanaSessions: number;
   productionRounds: number;
   recognitionRounds: number;
-  fillTheKanjiRounds: number;
+  fillTheKanjiBatches: number;
 };
 
 const COUNTS_ROW_CN =
   "grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3";
 
-/** Day totals + session/round totals (2×2 centered text / capped row). */
+/** Day totals + session/round/batch totals (2×2 centered text / capped row). */
 export const ActivityCountsGrid = ({
   stats,
 }: {
@@ -74,9 +74,9 @@ export const ActivityCountsGrid = ({
         compact
       />
       <OverviewStat
-        value={stats.fillTheKanjiRounds}
+        value={stats.fillTheKanjiBatches}
         title={fillTheKanjiPageMeta.shortLabel}
-        unit="Rounds"
+        unit="Batches"
         Icon={Puzzle}
         compact
       />

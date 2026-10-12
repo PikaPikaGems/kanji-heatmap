@@ -7,8 +7,8 @@ export type SoundMode = "correct" | "speak";
 
 export type FillTheKanjiSettings = {
   setId: FillTheKanjiSetId;
-  /** Last selected round per set, so switching sets keeps your place. */
-  roundBySet: Partial<Record<FillTheKanjiSetId, number>>;
+  /** Last selected batch per set, so switching sets keeps your place. */
+  batchBySet: Partial<Record<FillTheKanjiSetId, number>>;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
   /** Speak each sentence when its item appears. Optional: older saved settings lack it. */
   readAloudOnShow?: boolean;
