@@ -24,7 +24,7 @@ export const StrokeCountField = ({
         labelPosition="bottom"
         className="pt-2 pb-4 text-xs"
         value={values}
-        onValueChange={setValues}
+        onValueChange={(val) => setValues([val[0], val[1]])}
         min={1}
         max={MAX_STROKE_COUNT}
         step={1}

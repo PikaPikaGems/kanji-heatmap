@@ -6,6 +6,7 @@
     "node": "22"
   },
   "type": "module",
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "node scripts/copy-yomiage-files.mjs && vite --port 5174",
     "dev:cf": "node scripts/copy-yomiage-files.mjs && vite --port 5173",
