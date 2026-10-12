@@ -30,9 +30,12 @@ import {
   batchCount,
   batchLabel,
   batchRowRange,
+  formatPercentComplete,
+  setRowCount,
 } from "@/lib/fill-the-kanji/batches";
 import {
   readSetBatchStats,
+  rowsSeen,
   BatchStats,
   SetBatchStats,
   STATS_KEY_PREFIX,
@@ -43,6 +46,7 @@ import { DashboardPanel } from "./DashboardPanel";
 import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
+import { FillTheKanjiSetProgress } from "./FillTheKanjiSetProgress";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
@@ -58,19 +62,23 @@ const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 const totalAttempts = (stats: SetBatchStats) =>
   Object.values(stats).reduce((sum, s) => sum + s.attemptCount, 0);
 
-/** "5 / 384 batches completed · 7 total attempts" */
+/** "240 phrases seen · 2% complete · 24 total attempts*" */
 const ProgressSummary = ({
-  completed,
+  seen,
   total,
   attempts,
 }: {
-  completed: number;
+  seen: number;
+  /** Phrases in the set (or group). */
   total: number;
   attempts: number;
 }) => (
   <>
-    {completed.toLocaleString()} / {total.toLocaleString()} batches completed ·{" "}
-    {attempts.toLocaleString()} total {attempts === 1 ? "attempt" : "attempts"}
+    <span className="font-bold text-green-500">{seen.toLocaleString()}</span>{" "}
+    phrases seen ·{" "}
+    <span className="font-bold">{formatPercentComplete(seen, total)}</span>{" "}
+    complete · <span className="font-bold">{attempts.toLocaleString()}</span>{" "}
+    total {attempts === 1 ? "attempt" : "attempts"}*
   </>
 );
 
@@ -188,7 +196,6 @@ const SetHeatmapGrid = ({
   attemptShading: AttemptCountShading;
 }) => {
   const total = batchCount(setId);
-  const completed = Object.keys(stats).length;
   const label = FILL_THE_KANJI_SETS.find((s) => s.id === setId)?.label;
 
   return (
@@ -198,8 +205,8 @@ const SetHeatmapGrid = ({
         <span className="font-normal text-muted-foreground tabular-nums">
           ·{" "}
           <ProgressSummary
-            completed={completed}
-            total={total}
+            seen={rowsSeen(setId, stats)}
+            total={setRowCount(setId)}
             attempts={totalAttempts(stats)}
           />
         </span>
@@ -237,7 +244,7 @@ const SetHeatmapGrid = ({
   );
 };
 
-/** Group title plus how many of its batches have been completed. */
+/** Group title plus how many of its phrases have been seen. */
 const GroupTrigger = ({
   title,
   setIds,
@@ -247,25 +254,20 @@ const GroupTrigger = ({
   setIds: FillTheKanjiSetId[];
   statsById: Map<FillTheKanjiSetId, SetBatchStats>;
 }) => {
-  const groupStats = setIds.map((id) => statsById.get(id) ?? {});
-  const completed = groupStats.reduce(
-    (sum, stats) => sum + Object.keys(stats).length,
+  const seen = setIds.reduce(
+    (sum, id) => sum + rowsSeen(id, statsById.get(id) ?? {}),
     0
   );
-  const attempts = groupStats.reduce(
-    (sum, stats) => sum + totalAttempts(stats),
+  const attempts = setIds.reduce(
+    (sum, id) => sum + totalAttempts(statsById.get(id) ?? {}),
     0
   );
-  const total = setIds.reduce((sum, id) => sum + batchCount(id), 0);
+  const total = setIds.reduce((sum, id) => sum + setRowCount(id), 0);
   return (
     <span className="flex flex-col">
       <span className="text-sm font-semibold">{title}</span>
       <span className="text-xs font-normal text-muted-foreground tabular-nums">
-        <ProgressSummary
-          completed={completed}
-          total={total}
-          attempts={attempts}
-        />
+        <ProgressSummary seen={seen} total={total} attempts={attempts} />
       </span>
     </span>
   );
@@ -335,6 +337,10 @@ export const FillTheKanjiHeatmap = () => {
           </AccordionItem>
         ))}
       </Accordion>
+      <p className="mt-4 text-[10px] text-muted-foreground">
+        * A phrase (sentence or emoji) counts as seen once you finish a batch
+        that has it. Complete is the share of the set (or group) seen.
+      </p>
       <div className="flex items-center justify-center w-full mt-4">
         <div className="flex items-center gap-1">
           <GradientLegend /> ·
@@ -343,6 +349,9 @@ export const FillTheKanjiHeatmap = () => {
             onChange={(v) => setSetting("compact", v)}
           />
         </div>
+      </div>
+      <div className="mt-6">
+        <FillTheKanjiSetProgress statsById={statsById} />
       </div>
     </DashboardPanel>
   );

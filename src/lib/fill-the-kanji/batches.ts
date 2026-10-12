@@ -100,3 +100,26 @@ export const batchesInLevel = (
 /** "3-7" for batch 27. */
 export const batchLabel = (batch: number): string =>
   `${levelOfBatch(batch)}-${positionInLevel(batch)}`;
+
+/**
+ * Sentences in a set's finished batches (keys of its stored stats). Sets
+ * share no sentences, so sums across sets count each sentence once.
+ */
+export const sentencesInBatches = (
+  setId: FillTheKanjiSetId,
+  batches: string[]
+): number =>
+  batches
+    .map(Number)
+    .filter((batch) => isValidBatch(setId, batch))
+    .reduce((sum, batch) => {
+      const [start, end] = batchRowRange(setId, batch);
+      return sum + end - start;
+    }, 0);
+
+/** Share of `total` as a whole percent, "<1%" for small nonzero shares. */
+export const formatPercentComplete = (done: number, total: number): string => {
+  if (done <= 0 || total <= 0) return "0%";
+  const percent = Math.floor((done / total) * 100);
+  return percent < 1 ? "<1%" : `${percent}%`;
+};
