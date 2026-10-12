@@ -1,0 +1,25 @@
+{
+  "kanjiSvgs": {
+    "count": 2426,
+    "bytes": 9877476
+  },
+  "katakana": {
+    "count": 9600,
+    "bytes": 273245
+  },
+  "fillTheKanji": {
+    "beginner-1": 716413,
+    "beginner-2": 852164,
+    "beginner-3": 564251,
+    "emoji": 108506,
+    "everyday-phrases-onomatopoeia": 937833,
+    "intermediate": 633818,
+    "n1": 687480,
+    "n2": 598819,
+    "n3": 507706,
+    "n4": 330348,
+    "n5": 196371,
+    "short-phrases": 231675,
+    "verb-focused": 1147796
+  }
+}
