@@ -27,6 +27,8 @@ export type AiVoiceState = {
   progress: number | null;
   /** Human-readable reason for "error" / "unavailable". */
   error: string | null;
+  /** Why the last speak() fell back to the browser voice; null once one plays. */
+  speakError: string | null;
 };
 
 let state: AiVoiceState = {
@@ -35,6 +37,7 @@ let state: AiVoiceState = {
   downloadMB: null,
   progress: null,
   error: null,
+  speakError: null,
 };
 const listeners = new Set<() => void>();
 
@@ -166,11 +169,22 @@ export const deleteAiVoiceFiles = async () => {
 /** Frees the engine's memory (files stay). Used when switching to the browser voice. */
 export const unloadAiVoice = () => {
   voice?.unload();
+  restoreAudioSession();
 };
 
 /** True when speak() can use the AI voice ("stopped" reloads on its own). */
 export const canSpeakAi = () =>
   voice !== null && (voice.status === "ready" || voice.status === "stopped");
+
+/**
+ * The memory was freed (idle, or the app went to the background). Speaking
+ * now would wait for a reload, which takes seconds on a phone.
+ */
+export const aiVoiceNeedsReload = () => voice?.status === "stopped";
+
+/** Records why an AI speak fell back to the browser voice (shown in settings). */
+export const reportAiSpeakFailure = (reason: string) =>
+  setState({ speakError: reason });
 
 export const stopAiSpeech = () => {
   voice?.stop();
@@ -207,40 +221,38 @@ type AudioSession = { type: string };
 const audioSession = (): AudioSession | undefined =>
   (navigator as Navigator & { audioSession?: AudioSession }).audioSession;
 
-// AI speeches in progress, and the session type to restore when none are.
-let activeSpeeches = 0;
-let typeBeforeSpeech: string | null = null;
+// The session type before the AI voice switched it to "playback".
+let typeBeforeAiVoice: string | null = null;
 
 /**
  * iOS mutes Web Audio (which yomiage plays through) when the ring / silent
  * switch is on silent, while the browser voice still plays, so the AI voice
  * seemed silent with no error. "playback" makes it play like a video does
- * (and pauses music in other apps). Only while the AI voice speaks: other
- * page sounds, like the correct-answer beep, still respect the switch.
- * Safari 16.4+ only; elsewhere these do nothing.
+ * (and pauses music in other apps). Set once and kept while AI Voice Mode is
+ * on: switching the type back and forth around every speech interrupted
+ * Safari's audio, so later speeches failed with no sound at all. Safari
+ * 16.4+ only; elsewhere these do nothing.
  */
-const beginSpeechAudio = () => {
-  activeSpeeches++;
+const preferPlaybackAudio = () => {
   const session = audioSession();
-  if (activeSpeeches > 1 || !session) return;
+  if (!session || session.type === "playback") return;
   try {
-    typeBeforeSpeech = session.type;
+    typeBeforeAiVoice = session.type;
     session.type = "playback";
   } catch {
     // Best effort; sound still plays when the switch is off silent.
   }
 };
 
-const endSpeechAudio = () => {
-  activeSpeeches--;
+const restoreAudioSession = () => {
   const session = audioSession();
-  if (activeSpeeches > 0 || !session || typeBeforeSpeech == null) return;
+  if (!session || typeBeforeAiVoice == null) return;
   try {
-    session.type = typeBeforeSpeech;
+    session.type = typeBeforeAiVoice;
   } catch {
     // Best effort.
   }
-  typeBeforeSpeech = null;
+  typeBeforeAiVoice = null;
 };
 
 type SpeakAiOptions = {
@@ -287,11 +299,14 @@ export const speakAi = async (
   text: string,
   options: SpeakAiOptions = {}
 ): Promise<"done" | "stopped"> => {
-  beginSpeechAudio();
+  preferPlaybackAudio();
   try {
-    return await speakAiNow(text, options);
-  } finally {
-    endSpeechAudio();
+    const result = await speakAiNow(text, options);
+    if (result === "done") setState({ speakError: null });
+    return result;
+  } catch (err) {
+    setState({ speakError: describeError(err) });
+    throw err;
   }
 };
 

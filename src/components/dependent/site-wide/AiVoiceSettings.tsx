@@ -230,14 +230,21 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
           {status}
         </span>
       )}
-      {failed && (
+      {!failed && state.speakError && (
+        <span className="text-xs text-left text-destructive" role="status">
+          Last time the AI voice couldn&apos;t play: {state.speakError}
+        </span>
+      )}
+      {(failed || state.speakError) && (
         <div className="flex flex-col gap-2">
           <p className="text-xs text-muted-foreground">
             If you report this problem, copy the debug report below into your
             message. It has device and load details, never what was spoken.
           </p>
           {/* Keyed so a new error fetches a fresh report. */}
-          <DebugReportTerminal key={state.error ?? state.status} />
+          <DebugReportTerminal
+            key={state.error ?? state.speakError ?? state.status}
+          />
         </div>
       )}
     </div>
