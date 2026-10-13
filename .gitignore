@@ -43,3 +43,6 @@ dist-ssr
 test-results/
 playwright-report/
 coverage/
+
+# Claude desktop app local preview config
+.claude/launch.json
