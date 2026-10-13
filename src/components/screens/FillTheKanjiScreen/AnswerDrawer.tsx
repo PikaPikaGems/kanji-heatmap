@@ -28,7 +28,7 @@ export type AnswerState = {
   tiles: string[];
   /** The kanji placed in each blank (null where left empty). */
   filled: (string | null)[];
-  /** How each blank was answered; all null when the card was forgotten. */
+  /** How each blank was answered (empty ones, as after Forgot, are wrong). */
   blankResults: BlankResult[];
 } | null;
 
@@ -39,17 +39,23 @@ const TITLES: Record<FeedbackKind, string> = {
   forgot: "🫶 No worries",
 };
 
-/** Green: every blank it was placed in was right; red: any was wrong. */
+/**
+ * Answer kanji: green when every blank needing it got it, yellow when any was
+ * missed (left empty or filled with something else). Other kanji: red when
+ * placed anywhere, plain when left alone.
+ */
 const tileResultCn = (
   kanji: string,
   puzzle: Puzzle,
   filled: (string | null)[]
 ) => {
-  const placedIn = filled.flatMap((k, i) => (k === kanji ? [i] : []));
-  if (placedIn.length === 0) return "text-foreground";
-  return placedIn.every((i) => puzzle.blanks[i] === kanji)
-    ? "text-green-500"
-    : "text-red-500";
+  const neededIn = puzzle.blanks.flatMap((k, i) => (k === kanji ? [i] : []));
+  if (neededIn.length > 0) {
+    return neededIn.every((i) => filled[i] === kanji)
+      ? "text-green-500"
+      : "text-yellow-600 dark:text-yellow-400";
+  }
+  return filled.includes(kanji) ? "text-red-500" : "text-foreground";
 };
 
 /** The tiles that were offered, colored by whether (and how well) each was picked. */

@@ -10,6 +10,7 @@ import {
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { AnswerState, FeedbackKind } from "./AnswerDrawer";
 import { FillTheKanjiSettings, ItemResult } from "./types";
+import type { BlankResult } from "./SentencePrompt";
 
 type Speech = { speak: () => void; status: SpeakStatus };
 /** The current sentence's speech, shared by the buttons and shortcuts. */
@@ -23,6 +24,12 @@ export type GameCard = {
 
 const emptyFill = (card: GameCard | undefined) =>
   Array.from({ length: card?.puzzle.blanks.length ?? 0 }, () => null);
+
+/** Right where the placed kanji matches the answer; wrong otherwise, empty blanks included. */
+const blankResultsOf = (
+  filled: (string | null)[],
+  blanks: string[]
+): BlankResult[] => blanks.map((k, i) => (filled[i] === k ? "right" : "wrong"));
 
 /** Next empty blank after `from`, wrapping around; null when all are filled. */
 const nextEmpty = (filled: (string | null)[], from: number): number | null => {
@@ -172,9 +179,7 @@ export const useFillTheKanjiGame = ({
       puzzle: card.puzzle,
       tiles: card.tiles,
       filled,
-      blankResults: filled.map((k, i) =>
-        k === card.puzzle.blanks[i] ? "right" : "wrong"
-      ),
+      blankResults: blankResultsOf(filled, card.puzzle.blanks),
     });
   };
 
@@ -193,7 +198,8 @@ export const useFillTheKanjiGame = ({
       puzzle: card.puzzle,
       tiles: card.tiles,
       filled,
-      blankResults: card.puzzle.blanks.map(() => null),
+      // Empty blanks count as wrong: the drawer shows the missed kanji in yellow.
+      blankResults: blankResultsOf(filled, card.puzzle.blanks),
     });
   };
 
