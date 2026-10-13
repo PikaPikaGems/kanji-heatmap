@@ -8,12 +8,12 @@ import { KanjiPopover } from "./KanjiPopover";
 const bunsetsuRowCn =
   "kanji-font flex flex-wrap items-center justify-center gap-x-[0.45em] gap-y-[0.35em]";
 
-/** Right or wrong, per blank in reading order; null when it wasn't answered (Forgot). */
-export type BlankResult = "right" | "wrong" | null;
+/** Right or wrong, per blank in reading order (left empty counts as wrong). */
+export type BlankResult = "right" | "wrong";
 
 // inline-block: transforms (the hop and the shake) don't apply to inline text.
 // Wrong is yellow, not red: the drawer shows the correct kanji there.
-const blankResultCn: Record<Exclude<BlankResult, null>, string> = {
+const blankResultCn: Record<BlankResult, string> = {
   right: "inline-block text-green-500 animate-practice-correct-pop",
   wrong:
     "inline-block text-yellow-600 dark:text-yellow-400 animate-practice-shake",
@@ -25,13 +25,12 @@ const WOBBLE_STAGGER_MS = 70;
 /** Lets the drawer finish sliding up before the first kanji hops. */
 const ANSWER_ANIMATION_DELAY_MS = 250;
 
-/** Blanks that were given up on get the same fill as a selected primary tile. */
-const forgotCn =
-  "inline-block rounded-lg px-[0.04em] background-theme-color-with-opacity-100 text-white animate-practice-correct-pop";
-
-/** Right and forgotten kanji hop one after another, like the blanks do on the question screen. */
-const hopDelayStyle = (color: string | undefined, blank: number | null) =>
-  (color === blankResultCn.right || color === forgotCn) && blank != null
+/** Right kanji hop one after another, like the blanks do on the question screen. */
+const hopDelayStyle = (
+  result: BlankResult | undefined,
+  blank: number | null
+) =>
+  result === "right" && blank != null
     ? {
         animationDelay: `${ANSWER_ANIMATION_DELAY_MS + blank * WOBBLE_STAGGER_MS}ms`,
       }
@@ -87,12 +86,8 @@ export const FuriganaSentence = ({
         <span key={i} className="min-w-0 max-w-full">
           {parts.map(({ reading, chars }, j) => {
             const text = chars.map(({ char, blank }, k) => {
-              const result = blank == null ? null : blankResults?.[blank];
-              const color = result
-                ? blankResultCn[result]
-                : blank != null && blankResults
-                  ? forgotCn
-                  : undefined;
+              const result = blank == null ? undefined : blankResults?.[blank];
+              const color = result && blankResultCn[result];
               const info = isKanji(char) ? getInfo?.(char) : null;
               if (info) {
                 return (
@@ -101,7 +96,7 @@ export const FuriganaSentence = ({
                     kanji={char}
                     info={info}
                     className={color}
-                    style={hopDelayStyle(color, blank)}
+                    style={hopDelayStyle(result, blank)}
                   />
                 );
               }
@@ -110,7 +105,7 @@ export const FuriganaSentence = ({
                 <span
                   key={k}
                   className={color}
-                  style={hopDelayStyle(color, blank)}
+                  style={hopDelayStyle(result, blank)}
                 >
                   {char}
                 </span>
@@ -118,12 +113,21 @@ export const FuriganaSentence = ({
             });
             if (!reading) return <span key={j}>{text}</span>;
             // Not <ruby>: iOS Safari drew the reading left of its kanji when
-            // other text came before it in the bunsetsu. An inline-block with
-            // the reading stacked on top always centers it over the kanji, and
-            // its baseline is still the kanji's (the last line).
+            // other text came before it in the bunsetsu. Nor a block stacked
+            // over the kanji in an inline-block: iOS still shifted it left.
+            // The reading is absolutely centered over its kanji instead
+            // (left-1/2 + -translate-x-1/2 needs no intrinsic sizing). The
+            // top padding reserves its height minus the 0.2em it dips into the
+            // line's half-leading; the min width (0.45em per kana) keeps a
+            // long reading from running over its neighbours. The baseline is
+            // still the kanji's.
             return (
-              <span key={j} className="inline-block text-center">
-                <span className="block text-[0.45em] font-normal text-muted-foreground leading-none whitespace-nowrap -mb-[0.2em]">
+              <span
+                key={j}
+                className="relative inline-block pt-[0.25em] text-center"
+                style={{ minWidth: `${Array.from(reading).length * 0.45}em` }}
+              >
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[0.45em] font-normal text-muted-foreground leading-none whitespace-nowrap">
                   {reading}
                 </span>
                 {text}
