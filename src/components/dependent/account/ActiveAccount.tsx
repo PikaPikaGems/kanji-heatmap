@@ -8,6 +8,7 @@ import { useAccountEmail } from "@/lib/engine/account-email";
 import { SYNC_STATUS_KEY, snapshotValue } from "@/lib/engine/store-cache";
 import type { AccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
+import { FsrsSettingsItem } from "./FsrsSettingsItem";
 import { LogoutPopover } from "./LogoutPopover";
 import { SyncChip } from "./SyncChip";
 
@@ -40,6 +41,7 @@ export const ActiveAccount = ({
         <LogoutPopover pendingCount={sync?.pendingOperationsCount ?? 0} />
       </div>
       <SyncChip sync={sync} />
+      <FsrsSettingsItem />
       {!status.writeAccess.allowed && (
         <Notice>{copyForWriteBlocker(status.writeAccess.reason)}</Notice>
       )}

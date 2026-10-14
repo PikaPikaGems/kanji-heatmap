@@ -5,6 +5,7 @@ import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { ActiveAccount } from "./ActiveAccount";
+import { FsrsSettingsItem } from "./FsrsSettingsItem";
 
 /**
  * Account area of the sidebar. Renders nothing when this build has no study
@@ -35,16 +36,19 @@ export const AccountSection = () => {
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
       {status.kind === "signed-out" && (
-        // The dialog lives outside the drawer, so close the drawer first.
-        <DrawerPrimitive.Close asChild>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={openLoginDialog}
-          >
-            Log in
-          </Button>
-        </DrawerPrimitive.Close>
+        <div className="flex flex-col gap-1">
+          {/* The dialog lives outside the drawer, so close the drawer first. */}
+          <DrawerPrimitive.Close asChild>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={openLoginDialog}
+            >
+              Log in
+            </Button>
+          </DrawerPrimitive.Close>
+          <FsrsSettingsItem />
+        </div>
       )}
       {status.kind === "recovery" && (
         <DrawerPrimitive.Close asChild>
