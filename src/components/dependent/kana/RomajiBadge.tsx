@@ -14,7 +14,9 @@ export const RomajiBadge = ({
   showFocusRing?: boolean;
 }) => {
   const [isKana, setIsKana] = useState(true);
-  const { speak, status } = useSpeakWithStatus(kana);
+  // Readings mark okurigana and affixes (ね.る, い。く, -がた); the AI voice
+  // goes almost silent on "。", so speak the word without them.
+  const { speak, status } = useSpeakWithStatus(kana.replace(/[-.。]/g, ""));
   // Only the AI voice has a wait before audio starts.
   const preparing = status === "preparing";
 

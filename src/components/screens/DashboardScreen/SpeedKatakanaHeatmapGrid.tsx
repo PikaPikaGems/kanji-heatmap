@@ -160,14 +160,25 @@ const maxTimesTaken = () => {
   return max;
 };
 
+/** Levels per grid: all of them side by side, or two stacked halves. */
+const levelGroups = (compact: boolean): number[][] => {
+  const levels = Array.from({ length: LEVELS }, (_, i) => i + 1);
+  if (!compact) return [levels];
+  const half = Math.ceil(LEVELS / 2);
+  return [levels.slice(0, half), levels.slice(half)];
+};
+
 /**
- * Fixed-size grid: 20 columns (levels) × 10 rows (sets per level).
- * Column flow fills each level top-to-bottom, then the next level.
+ * Fixed-size grid: one column per level (20 wide, or 10 + 10 stacked when
+ * compact) × 10 rows (sets per level). Column flow fills each level
+ * top-to-bottom, then the next level.
  */
 export const SpeedKatakanaHeatmapGrid = ({
   metric,
+  compact,
 }: {
   metric: HeatmapCellMetric;
+  compact: boolean;
 }) => {
   const [scale] = useAttemptCountScale();
   const attemptShading: AttemptCountShading = {
@@ -175,19 +186,20 @@ export const SpeedKatakanaHeatmapGrid = ({
     maxCount: maxTimesTaken(),
   };
 
-  return (
+  return levelGroups(compact).map((levels) => (
     <HeatmapGrid
+      key={levels[0]}
       cellPx={CELL_PX}
       rowCount={CHALLENGES_PER_LEVEL}
-      topLabels={Array.from({ length: LEVELS }, (_, i) => i + 1)}
+      topLabels={levels}
       topLabelCn="flex items-end justify-center h-3 tabular-nums"
       leftLabels={Array.from({ length: CHALLENGES_PER_LEVEL }, (_, i) =>
         i === 0 || i === 4 || i === 9 ? i + 1 : ""
       )}
     >
-      {Array.from({ length: LEVELS }, (_, levelIndex) =>
+      {levels.map((level) =>
         Array.from({ length: CHALLENGES_PER_LEVEL }, (_, posIndex) => {
-          const setNumber = setFromLevelAndPos(levelIndex + 1, posIndex + 1);
+          const setNumber = setFromLevelAndPos(level, posIndex + 1);
           return (
             <ChallengeSetCell
               key={setNumber}
@@ -199,5 +211,5 @@ export const SpeedKatakanaHeatmapGrid = ({
         })
       )}
     </HeatmapGrid>
-  );
+  ));
 };
