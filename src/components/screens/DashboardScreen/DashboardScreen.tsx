@@ -6,6 +6,7 @@ import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaHeatmap } from "./SpeedKatakanaHeatmap";
 import { FillTheKanjiHeatmap } from "./FillTheKanjiHeatmap";
 import { BookmarksBreakdown } from "./BookmarksBreakdown";
+import { KanjiMastery } from "./KanjiMastery";
 import { HeatmapPopoverProvider } from "./HeatmapGrid";
 
 const showTitle = false;
@@ -26,6 +27,7 @@ const DashboardScreen = () => {
       <HeatmapPopoverProvider>
         <StatsOverview />
         <ActivityCalendarHeatmap />
+        <KanjiMastery />
         <FillTheKanjiHeatmap />
         <SpeedKatakanaHeatmap />
       </HeatmapPopoverProvider>

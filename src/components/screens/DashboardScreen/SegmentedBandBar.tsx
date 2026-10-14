@@ -5,15 +5,21 @@ import { cn } from "@/lib/utils";
 /**
  * Stacked bar: contiguous blocks per band.
  * Band 0 is omitted so the muted track shows through (empty = visible).
+ * `bandCn` / `bandLabels` (indexed by band) replace the five frequency shades
+ * and the generic "band n" screen reader text for bars with other scales.
  */
 export const SegmentedBandBar = ({
   counts,
   totalUnits,
   className = "",
+  bandCn,
+  bandLabels,
 }: {
   counts: number[];
   totalUnits: number;
   className?: string;
+  bandCn?: readonly string[];
+  bandLabels?: readonly string[];
 }) => {
   const safeTotal = Math.max(totalUnits, 1);
 
@@ -25,7 +31,9 @@ export const SegmentedBandBar = ({
       )}
       role="img"
       aria-label={counts
-        .map((c, i) => (c > 0 ? `band ${i}: ${c}` : null))
+        .map((c, i) =>
+          c > 0 ? `${bandLabels?.[i] ?? `band ${i}`}: ${c}` : null
+        )
         .filter(Boolean)
         .join(", ")}
     >
@@ -34,7 +42,7 @@ export const SegmentedBandBar = ({
         return (
           <div
             key={band}
-            className={freqCategoryCn[band as FreqCategory]}
+            className={bandCn?.[band] ?? freqCategoryCn[band as FreqCategory]}
             style={{ width: `${(count / safeTotal) * 100}%` }}
           />
         );
