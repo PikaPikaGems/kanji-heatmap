@@ -27,7 +27,7 @@
       "group": "delivery",
       "label": "Speed",
       "step": 0.05,
-      "hint": "How fast she talks. 1 is the model's natural pace, 0.5 half as fast, 1.5 half again as fast. Changes the tempo only, not the pitch."
+      "hint": "How fast she talks. 1 is the model's natural pace, 0.5 half as fast, 0.25 a quarter as fast, 1.5 half again as fast. Changes the tempo only, not the pitch."
     },
     {
       "name": "expressiveness",
