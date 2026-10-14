@@ -25,6 +25,8 @@ import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
+import { LoginDialog } from "@/components/dependent/account/LoginDialog";
+import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
 
 const {
   kanjiPage,
@@ -140,6 +142,9 @@ const App = () => {
             </Switch>
             {/* Outside the Switch so it also shows on the game screens. */}
             <BottomBanner />
+            {/* Also outside the Switch: any screen can open these. */}
+            <LoginDialog />
+            <RecoveryDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
