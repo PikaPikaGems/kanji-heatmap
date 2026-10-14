@@ -36,12 +36,12 @@ export const AccountSection = () => {
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
       {status.kind === "signed-out" && (
-        <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
           {/* The dialog lives outside the drawer, so close the drawer first. */}
           <DrawerPrimitive.Close asChild>
             <Button
               variant="outline"
-              className="w-full"
+              className="flex-1"
               onClick={openLoginDialog}
             >
               Log in

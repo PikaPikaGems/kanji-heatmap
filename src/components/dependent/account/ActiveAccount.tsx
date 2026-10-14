@@ -38,10 +38,12 @@ export const ActiveAccount = ({
             {name}
           </span>
         </span>
-        <LogoutPopover pendingCount={sync?.pendingOperationsCount ?? 0} />
+        <div className="flex items-center gap-1.5">
+          <FsrsSettingsItem />
+          <LogoutPopover pendingCount={sync?.pendingOperationsCount ?? 0} />
+        </div>
       </div>
       <SyncChip sync={sync} />
-      <FsrsSettingsItem />
       {!status.writeAccess.allowed && (
         <Notice>{copyForWriteBlocker(status.writeAccess.reason)}</Notice>
       )}
