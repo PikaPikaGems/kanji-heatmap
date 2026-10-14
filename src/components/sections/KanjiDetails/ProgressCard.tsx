@@ -98,7 +98,7 @@ export const ProgressCard = ({
         {progressRows(card).map(({ label, value }) => (
           <div
             key={label}
-            className="flex items-baseline justify-between gap-3 py-1.5 border-t border-dotted border-foreground/15"
+            className="flex items-baseline justify-between gap-3 py-1 border-t border-dotted border-foreground/15"
           >
             <dt className="text-xs text-muted-foreground">{label}</dt>
             <dd className="text-sm font-bold text-right tabular-nums">

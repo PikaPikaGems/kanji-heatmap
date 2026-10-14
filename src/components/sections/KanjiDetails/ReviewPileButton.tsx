@@ -18,7 +18,10 @@ import {
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
-import { useReviewPileItem } from "@/lib/engine/use-review-pile-item";
+import {
+  refreshReviewPileItem,
+  useReviewPileItem,
+} from "@/lib/engine/use-review-pile-item";
 import { utf8ByteLength } from "./KanjiStudyNotes/utf8-bytes";
 
 const addCn =
@@ -45,6 +48,21 @@ const Note = ({
     }`}
   >
     {children}
+  </p>
+);
+
+const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
+  <p className="px-2 text-xs text-left max-w-64 text-muted-foreground">
+    Couldn&apos;t load your review pile.{" "}
+    {onRetry && (
+      <button
+        type="button"
+        className="underline rounded decoration-dotted underline-offset-4 hover:text-foreground hover:decoration-solid"
+        onClick={onRetry}
+      >
+        Try again
+      </button>
+    )}
   </p>
 );
 
@@ -195,6 +213,16 @@ const ActiveReviewPileButton = ({
         )}
         Add {word} to my review pile
       </button>
+      {snapshot.status === "failed" && (
+        <LoadFailedNote
+          onRetry={
+            snapshot.retryable && api
+              ? () => void refreshReviewPileItem(api, kanji)
+              : undefined
+          }
+        />
+      )}
+      {snapshot.status === "ready" && !snapshot.result.ok && <LoadFailedNote />}
       {blocker && <Note tone="muted">{copyForWriteBlocker(blocker)}</Note>}
       {tooLong && <Note tone="error">{copyForCode("validation_failed")}</Note>}
       {action.kind === "error" && <Note tone="error">{action.message}</Note>}

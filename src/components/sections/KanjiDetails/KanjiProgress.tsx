@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { useReviewPileItem } from "@/lib/engine/use-review-pile-item";
+import { useEngineApi } from "@/lib/engine/use-engine-query";
+import {
+  refreshReviewPileItem,
+  useReviewPileItem,
+} from "@/lib/engine/use-review-pile-item";
 import { StudyNoteNotice } from "./KanjiStudyNotes/StudyNoteNotice";
 import { ProgressCard } from "./ProgressCard";
 
@@ -11,8 +15,20 @@ const Message = ({ children }: { children: string }) => (
   <p className="p-3 text-sm text-left text-muted-foreground">{children}</p>
 );
 
+const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
+  <div className="flex flex-col items-start gap-2 p-3 text-sm text-left text-muted-foreground">
+    <p>Couldn&apos;t load your progress.</p>
+    {onRetry && (
+      <Button variant="outline" size="sm" onClick={onRetry}>
+        Try again
+      </Button>
+    )}
+  </div>
+);
+
 /** Logged in: the kanji's reading and writing cards from `pile.watch`. */
 const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
+  const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
 
   if (snapshot.status === "loading" || snapshot.status === "unavailable") {
@@ -26,9 +42,18 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
       </div>
     );
   }
-  if (snapshot.status === "failed" || !snapshot.result.ok) {
-    return <Message>Your progress isn&apos;t available right now.</Message>;
+  if (snapshot.status === "failed") {
+    return (
+      <LoadFailed
+        onRetry={
+          snapshot.retryable && api
+            ? () => void refreshReviewPileItem(api, kanji)
+            : undefined
+        }
+      />
+    );
   }
+  if (!snapshot.result.ok) return <LoadFailed />;
 
   const item = snapshot.result.value;
   if (item === null) {
@@ -37,7 +62,7 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-2 pb-2 sm:gap-3 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-2 pb-2 sm:gap-3 lg:grid-cols-2">
       <ProgressCard title="Reading" Icon={Eye} card={item.reading} />
       <ProgressCard title="Writing" Icon={PenLine} card={item.writing} />
     </div>
