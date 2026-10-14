@@ -4,16 +4,20 @@ import {
   GraduationCap,
   Keyboard,
   LayoutDashboard,
+  PencilLine,
   PenLine,
   Puzzle,
+  ScanEye,
   SearchIcon,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import {
   fillTheKanjiPageMeta,
   productionPracticePageMeta,
+  readingMasteryPageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
+  writingMasteryPageMeta,
 } from "@/lib/pages/practice-pages";
 
 export type NavLinkIcon = ComponentType<
@@ -55,6 +59,8 @@ export const masteryPageMeta = {
 export const practiceNavLinks: NavLinkItem[] = [
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
+  { ...readingMasteryPageMeta, Icon: ScanEye },
+  { ...writingMasteryPageMeta, Icon: PencilLine },
   { ...fillTheKanjiPageMeta, Icon: Puzzle },
   { ...speedKatakanaPageMeta, Icon: Keyboard },
 ];
@@ -73,6 +79,8 @@ export const headerNavLinks: NavLinkItem[] = [
   { ...masteryPageMeta, Icon: GraduationCap },
   { ...recognitionPracticePageMeta, Icon: Eye },
   { ...productionPracticePageMeta, Icon: PenLine },
+  { ...readingMasteryPageMeta, Icon: ScanEye },
+  { ...writingMasteryPageMeta, Icon: PencilLine },
   { ...fillTheKanjiPageMeta, Icon: Puzzle },
   { ...speedKatakanaPageMeta, Icon: Keyboard },
   { ...cumUseGraphPageMeta, Icon: ChartLine },

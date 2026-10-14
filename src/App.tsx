@@ -41,6 +41,8 @@ const {
   fillTheKanjiPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  writingMasteryPage,
 } = pageItems;
 
 const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
@@ -83,6 +85,15 @@ const App = () => {
               <Route
                 path={productionPracticeV1Page.href}
                 component={ProductionPracticeV1}
+              />
+              {/* Mastery games (review pile) share the practice shell. */}
+              <Route
+                path={readingMasteryPage.href}
+                component={readingMasteryPage.Component}
+              />
+              <Route
+                path={writingMasteryPage.href}
+                component={writingMasteryPage.Component}
               />
               <Route>
                 <Header />
