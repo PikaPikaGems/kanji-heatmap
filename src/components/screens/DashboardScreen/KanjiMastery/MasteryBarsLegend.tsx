@@ -42,7 +42,7 @@ const GradientStrip = ({
 
 /** A few levels, so every square is named. */
 const LevelStrip = () => (
-  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
     <span className="font-bold text-foreground">
       {MASTERY_METRIC_TITLES.mastery}
     </span>
