@@ -1,18 +1,26 @@
 import type { Kanji, ReviewPileItemView } from "engine-contract";
-import { REVIEW_PILE_ALL_KEY } from "./store-cache";
-import { useEngineQuery } from "./use-engine-query";
+import { getCachedStore, REVIEW_PILE_ALL_KEY } from "./store-cache";
+import { useEngineApi, useEngineQuery } from "./use-engine-query";
 
 /**
  * - `loading`: the engine or the store hasn't answered yet.
- * - `unavailable`: the pile can't be read right now (signed out, old browser,
- *   recovery, no engine in this build). `byKanji` is empty.
+ * - `failed`: the engine answered with an error. `retry` re-reads the store
+ *   when the error says a retry can help, else it is null.
+ * - `unavailable`: the pile can't be read at all (no engine in this build or
+ *   browser).
+ * `byKanji` is empty unless `ready`.
  */
-export type ReviewPileSnapshot = {
-  status: "loading" | "ready" | "unavailable";
-  byKanji: ReadonlyMap<Kanji, ReviewPileItemView>;
-};
+type PileByKanji = ReadonlyMap<Kanji, ReviewPileItemView>;
 
-const EMPTY: ReadonlyMap<Kanji, ReviewPileItemView> = new Map();
+export type ReviewPileSnapshot =
+  | { status: "loading" | "ready" | "unavailable"; byKanji: PileByKanji }
+  | {
+      status: "failed";
+      byKanji: PileByKanji;
+      retry: (() => void) | null;
+    };
+
+const EMPTY: PileByKanji = new Map();
 const LOADING: ReviewPileSnapshot = { status: "loading", byKanji: EMPTY };
 const UNAVAILABLE: ReviewPileSnapshot = {
   status: "unavailable",
@@ -22,7 +30,7 @@ const UNAVAILABLE: ReviewPileSnapshot = {
 // Keyed by the store's snapshot value, which is stable between updates: the
 // same Map comes back every render (anything derived from it can key on its
 // identity), without useMemo.
-const snapshotsByValue = new WeakMap<object, ReviewPileSnapshot>();
+const readyByValue = new WeakMap<object, ReviewPileSnapshot>();
 
 /**
  * Every review-pile row by kanji (`reviews.pile.watchAll()`, the same cached
@@ -30,20 +38,37 @@ const snapshotsByValue = new WeakMap<object, ReviewPileSnapshot>();
  * virtualize and memoize their items).
  */
 export const useReviewPileByKanji = (): ReviewPileSnapshot => {
-  const snapshot = useEngineQuery(REVIEW_PILE_ALL_KEY, (api) =>
-    api.reviews.pile.watchAll()
+  const api = useEngineApi();
+  const snapshot = useEngineQuery(REVIEW_PILE_ALL_KEY, (a) =>
+    a.reviews.pile.watchAll()
   );
 
   if (snapshot.status === "loading") return LOADING;
-  if (snapshot.status !== "ready" || !snapshot.result.ok) return UNAVAILABLE;
+  if (snapshot.status === "unavailable") return UNAVAILABLE;
+  if (snapshot.status === "failed") {
+    return {
+      status: "failed",
+      byKanji: EMPTY,
+      retry:
+        snapshot.retryable && api
+          ? () =>
+              void getCachedStore(api, REVIEW_PILE_ALL_KEY, (a) =>
+                a.reviews.pile.watchAll()
+              ).refresh()
+          : null,
+    };
+  }
+  if (!snapshot.result.ok) {
+    return { status: "failed", byKanji: EMPTY, retry: null };
+  }
 
   const value = snapshot.result.value;
-  const cached = snapshotsByValue.get(value);
+  const cached = readyByValue.get(value);
   if (cached) return cached;
   const next: ReviewPileSnapshot = {
     status: "ready",
     byKanji: new Map(value.map((item) => [item.kanji, item])),
   };
-  snapshotsByValue.set(value, next);
+  readyByValue.set(value, next);
   return next;
 };

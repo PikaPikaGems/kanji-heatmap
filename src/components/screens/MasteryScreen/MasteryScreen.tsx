@@ -1,14 +1,17 @@
 import { lazy } from "react";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useIsKanjiWorkerReady } from "@/kanji-worker/kanji-worker-hooks";
 import { AccountGateMessage } from "@/components/mastery-review/MasteryGateScreen";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
 import { ControlBar } from "../ListScreen/ControlBar";
 import { ItemCountBadge } from "../ListScreen/ControlBar/ItemCountBadge";
 import LoadingKanjis from "../ListScreen/KanjiList/LoadingKanjis";
 import { SuspendedKanjiList } from "../ListScreen/KanjiList/LazyKanjiList";
 import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
+import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
 import { MasteryTileColors } from "./MasteryTileColors";
 
@@ -21,6 +24,7 @@ const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
   const account = useAccountStatus();
   const ready = useIsKanjiWorkerReady();
+  const pile = useReviewPileByKanji();
 
   if (account.kind === "loading") {
     return (
@@ -36,9 +40,24 @@ const MasteryScreen = () => {
 
   if (account.kind !== "active") {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 px-6 pt-12 text-center min-h-dvh pb-28 animate-fade-in">
+      <MasteryCenteredMessage>
         <AccountGateMessage status={account} />
-      </div>
+      </MasteryCenteredMessage>
+    );
+  }
+
+  if (pile.status === "failed") {
+    return (
+      <MasteryCenteredMessage>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Couldn&apos;t load your progress.
+        </p>
+        {pile.retry && (
+          <Button variant="outline" onClick={pile.retry}>
+            Try again
+          </Button>
+        )}
+      </MasteryCenteredMessage>
     );
   }
 
