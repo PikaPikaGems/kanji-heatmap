@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { feedbackTitle } from "@/lib/dakanji-grade";
@@ -7,7 +8,11 @@ import { StrokePreview } from "../StrokePreview";
 import { WritingPracticeModal } from "../WritingPracticeModal";
 import type { DrawingSnapshot, GradeRankInfo, PracticeItem } from "../types";
 import { ItemReveal } from "./ItemReveal";
-import { NextKanjiFooter, PracticeDrawerShell } from "./PracticeDrawerShell";
+import {
+  NextKanjiFooter,
+  PracticeDrawerShell,
+  RatingFooter,
+} from "./PracticeDrawerShell";
 
 /** Side-by-side preview size; stays under ~42vw so 320px phones don't overflow. */
 const PREVIEW_SIZE = 130;
@@ -21,6 +26,7 @@ export const FeedbackDrawer = ({
   grade,
   drawing,
   gradingEnabled = true,
+  rating,
   onNext,
 }: {
   open: boolean;
@@ -29,15 +35,21 @@ export const FeedbackDrawer = ({
   grade: GradeRankInfo;
   drawing: DrawingSnapshot | null;
   gradingEnabled?: boolean;
+  /** Mastery game, correct answer: rating buttons replace "Next Kanji". */
+  rating?: {
+    intervals: Record<FsrsRating, string>;
+    onRate: (rating: FsrsRating) => void;
+  };
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
 
   // Enter/Space → Next Kanji. Arm after a beat so the key that opened
-  // feedback (e.g. Enter on Select → Next) doesn't also advance.
+  // feedback (e.g. Enter on Select → Next) doesn't also advance. Off when
+  // rating: the user has to pick Hard / Good / Easy.
   useArmedConfirmKey({
     onConfirm: onNext,
-    enabled: open && !practiceOpen,
+    enabled: open && !practiceOpen && !rating,
     keys: ENTER_OR_SPACE,
   });
 
@@ -62,7 +74,13 @@ export const FeedbackDrawer = ({
         title={title}
         titleClassName={bounce ? "animate-practice-bounce-soft" : undefined}
         description={<ItemReveal item={item} />}
-        footer={<NextKanjiFooter onNext={onNext} />}
+        footer={
+          rating ? (
+            <RatingFooter intervals={rating.intervals} onRate={rating.onRate} />
+          ) : (
+            <NextKanjiFooter onNext={onNext} />
+          )
+        }
       >
         {kind === "noKanji" ? (
           <div className="flex flex-col items-center gap-2 px-3 pb-2 mt-4 overflow-y-auto sm:px-4">

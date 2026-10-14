@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { translateValue } from "@/lib/wanakana-adapter";
+import type { FsrsRating } from "engine-contract";
 import { Input } from "@/components/ui/input";
-import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import { BlurredGloss } from "@/components/shared-practice";
+import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   isForgotCommand,
@@ -14,17 +15,21 @@ import {
 } from "@/lib/practice-commands";
 import { PracticeItem, SessionResult, SoundMode } from "./types";
 import { isReadingCorrect } from "./match-reading";
+import { AnswerActions } from "./AnswerActions";
 import { AnswerFeedback } from "./AnswerFeedback";
 
 export const Game = ({
   sessionItems,
   sound,
+  grading,
   onProgress,
   onComplete,
   onEnd,
 }: {
   sessionItems: PracticeItem[];
   sound: { enabled: true; type: SoundMode } | { enabled: false };
+  /** Mastery game only: rating buttons replace Next, grades go to the engine. */
+  grading?: MasteryGrading;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
@@ -73,9 +78,10 @@ export const Game = ({
     return null;
   }
 
-  const openFeedback = (correct: boolean) => {
+  const openFeedback = (correct: boolean, rating?: FsrsRating) => {
     if (feedback != null) return;
     inputRef.current?.blur();
+    if (rating) grading?.onGrade(rating);
     const result: SessionResult = { ...current, correct };
     resultsRef.current = [...resultsRef.current, result];
     if (correct) {
@@ -111,7 +117,7 @@ export const Game = ({
 
     if (e.key === "Escape") {
       e.preventDefault();
-      if (!matched) openFeedback(false);
+      if (!matched) openFeedback(false, "again");
       return;
     }
 
@@ -119,11 +125,12 @@ export const Game = ({
     e.preventDefault();
 
     if (matched) {
-      openFeedback(true);
+      // Mastery: pressing a rating button is the only way to continue.
+      if (!grading) openFeedback(true);
       return;
     }
     if (forgotTyped) {
-      openFeedback(false);
+      openFeedback(false, "again");
     }
   };
 
@@ -180,24 +187,13 @@ export const Game = ({
               {...kanaInput}
             />
 
-            <div className="grid grid-cols-2 gap-2">
-              <PracticeButton
-                variant="danger"
-                size="md"
-                disabled={matched}
-                onClick={() => openFeedback(false)}
-              >
-                Forgot
-              </PracticeButton>
-              <PracticeButton
-                variant="primary"
-                size="md"
-                disabled={!matched}
-                onClick={() => openFeedback(true)}
-              >
-                Next
-              </PracticeButton>
-            </div>
+            <AnswerActions
+              matched={matched}
+              grading={grading}
+              onForgot={() => openFeedback(false, "again")}
+              onNext={() => openFeedback(true)}
+              onRate={(rating) => openFeedback(true, rating)}
+            />
           </>
         ) : (
           <AnswerFeedback

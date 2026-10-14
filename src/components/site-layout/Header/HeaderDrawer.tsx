@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
 import { headerNavLinks } from "@/lib/pages/nav-links";
+import { dueNavHrefs, useVisibleNavLinks } from "@/lib/pages/mode-nav-links";
+import {
+  type DueCounts,
+  totalDue,
+  useDueCount,
+} from "@/lib/engine/use-due-count";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
+import { NotificationDot } from "@/components/common/NotificationDot";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
@@ -34,10 +41,14 @@ const infoLinks = [
 type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
 const HeaderDrawerContent = ({
+  due,
   onAction,
 }: {
+  due: DueCounts | null;
   onAction: (modal: OpenedModal) => void;
 }) => {
+  const navLinks = useVisibleNavLinks(headerNavLinks);
+
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
@@ -54,7 +65,8 @@ const HeaderDrawerContent = ({
         </div>
         <AccountSection />
         <DashedNavLinkList
-          items={headerNavLinks}
+          items={navLinks}
+          dotHrefs={dueNavHrefs(due)}
           className="flex flex-col gap-2"
           iconClassName="mt-0 mr-1"
           onItemPointerDown={(e) => e.stopPropagation()}
@@ -111,6 +123,7 @@ const HeaderDrawer = ({
   const [openedModal, setOpenedModal] = useState<OpenedModal>(
     initiallyOpen ? "sidebar" : "none"
   );
+  const due = useDueCount();
 
   return (
     <>
@@ -128,8 +141,16 @@ const HeaderDrawer = ({
         }}
       >
         <DrawerPrimitive.Trigger asChild>
-          <Button variant="outline" size="iconXl" aria-label="Open menu">
+          <Button
+            variant="outline"
+            size="iconXl"
+            aria-label="Open menu"
+            className="relative"
+          >
             <Menu className="w-7 h-7" />
+            {totalDue(due) > 0 && (
+              <NotificationDot className="-top-1 -right-1" />
+            )}
           </Button>
         </DrawerPrimitive.Trigger>
         <DrawerPrimitive.Portal>
@@ -141,7 +162,7 @@ const HeaderDrawer = ({
             <DrawerPrimitive.Description className="sr-only">
               Site navigation links and settings
             </DrawerPrimitive.Description>
-            <HeaderDrawerContent onAction={setOpenedModal} />
+            <HeaderDrawerContent due={due} onAction={setOpenedModal} />
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       </DrawerPrimitive.Root>

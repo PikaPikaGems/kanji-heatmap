@@ -2,8 +2,11 @@ import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { ScreenShell } from "@/components/common/ScreenShell";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
 import { practiceNavLinks } from "@/lib/pages/nav-links";
+import { useVisibleNavLinks } from "@/lib/pages/mode-nav-links";
+
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
+  const modeLinks = useVisibleNavLinks(practiceNavLinks);
 
   return (
     <ScreenShell>
@@ -20,7 +23,7 @@ const MasteryScreen = () => {
         </div>
 
         <DashedNavLinkList
-          items={practiceNavLinks}
+          items={modeLinks}
           className="grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2"
         />
       </div>

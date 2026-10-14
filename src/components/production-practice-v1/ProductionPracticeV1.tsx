@@ -1,47 +1,22 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
 import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
-import { recognizeDaKanji, warmupDaKanji } from "@/lib/dakanji-adapter";
-import { recognizeKanji, warmupKanjiCanvas } from "@/lib/kanjicanvas-adapter";
 import type { DrawingSubmitPayload } from "@/lib/stroke-types";
 import { InitialScreen } from "./InitialScreen";
 import { ModelLoadingScreen } from "./ModelLoadingScreen";
 import { ModelErrorLighterRecognizer } from "./ModelErrorLighterRecognizer";
 import { ModelErrorNoRecognizer } from "./ModelErrorNoRecognizer";
-import { formatModelLoadErrorReport } from "./format-model-load-error";
 import { Game } from "./Game";
+import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import {
-  DEFAULT_SETTINGS,
-  RECOGNIZE_TOP_K,
-  SESSION_SIZE,
-  SETTINGS_KEY,
-} from "./constants";
+  useHandwritingBackend,
+  type LoadPhase,
+} from "./use-handwriting-backend";
 import { ProductionPracticeSettings, SessionResult } from "./types";
-
-type RecognitionBackend = "dakanji" | "kanjicanvas" | "none";
-
-type LoadPhase =
-  | { status: "loading-dakanji" }
-  | { status: "loading-backup" }
-  | { status: "error-lighter"; errorReport: string | null }
-  | { status: "error-none"; errorReport: string | null };
-
-const recognizeWithBackend = (
-  backend: RecognitionBackend,
-  payload: DrawingSubmitPayload
-): Promise<string[]> => {
-  if (backend === "dakanji") {
-    return recognizeDaKanji(payload, RECOGNIZE_TOP_K);
-  }
-  if (backend === "kanjicanvas") {
-    return recognizeKanji(payload.strokes);
-  }
-  return Promise.resolve([]);
-};
 
 const FadeIn = ({ children }: { children: ReactNode }) => (
   <div className="h-full animate-fade-in">{children}</div>
@@ -53,8 +28,8 @@ type ProductionPracticePhaseProps = {
   settings: ProductionPracticeSettings;
   randomKanjiPool: string[];
   gradingEnabled: boolean;
-  activeBackend: RecognitionBackend;
-  continueWithChosenBackend: (chosen: RecognitionBackend) => void;
+  recognize: (payload: DrawingSubmitPayload) => Promise<string[]>;
+  continueWithChosenBackend: (chosen: "kanjicanvas" | "none") => void;
 };
 
 const ProductionPracticePhase = ({
@@ -63,7 +38,7 @@ const ProductionPracticePhase = ({
   settings,
   randomKanjiPool,
   gradingEnabled,
-  activeBackend,
+  recognize,
   continueWithChosenBackend,
 }: ProductionPracticePhaseProps) => {
   const { phase } = session;
@@ -124,7 +99,7 @@ const ProductionPracticePhase = ({
           settings={settings}
           randomKanjiPool={randomKanjiPool}
           gradingEnabled={gradingEnabled}
-          recognize={(payload) => recognizeWithBackend(activeBackend, payload)}
+          recognize={recognize}
           onProgress={session.setProgress}
           onComplete={session.finishSession}
           onEnd={session.goToInitial}
@@ -157,63 +132,25 @@ const ProductionPracticeV1 = () => {
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const [loadPhase, setLoadPhase] = useState<LoadPhase>({
-    status: "loading-dakanji",
-  });
-  // Sticky for the visit once the user commits to a backend (or none).
-  const [backend, setBackend] = useState<RecognitionBackend | null>(null);
-  const pendingCommitRef = useRef<(() => void) | null>(null);
+  const handwriting = useHandwritingBackend();
+  const { loadPhase } = handwriting;
 
   const session = usePracticeSession<SessionResult>({
     activityKind: "production",
     sessionSize: SESSION_SIZE,
-    onGoToInitial: () => {
-      setLoadPhase({ status: "loading-dakanji" });
-      pendingCommitRef.current = null;
-    },
+    onGoToInitial: handwriting.reset,
     // Warm recognition before "playing"; park on loading / confirm-fallback
     // while backends spin up.
     onPlay: (commitPlaying) => {
-      void warmThenCommit(commitPlaying);
+      void handwriting.warmThenCommit(commitPlaying, () =>
+        session.setPhase("loading")
+      );
     },
   });
   const { phase, hasMore } = session;
 
-  const warmThenCommit = async (commitPlaying: () => void) => {
-    if (backend != null) {
-      commitPlaying();
-      return;
-    }
-
-    pendingCommitRef.current = commitPlaying;
-    setLoadPhase({ status: "loading-dakanji" });
-    session.setPhase("loading");
-
-    try {
-      await warmupDaKanji();
-      setBackend("dakanji");
-      pendingCommitRef.current = null;
-      commitPlaying();
-      return;
-    } catch (daKanjiError) {
-      console.error("DaKanji warmup failed", daKanjiError);
-      const errorReport = formatModelLoadErrorReport(daKanjiError);
-
-      setLoadPhase({ status: "loading-backup" });
-      try {
-        await warmupKanjiCanvas();
-        setLoadPhase({ status: "error-lighter", errorReport });
-      } catch (canvasError) {
-        console.error("KanjiCanvas warmup failed", canvasError);
-        setLoadPhase({ status: "error-none", errorReport });
-      }
-    }
-  };
-
-  const continueWithChosenBackend = (chosen: RecognitionBackend) => {
-    setBackend(chosen);
-    const commit = pendingCommitRef.current;
-    pendingCommitRef.current = null;
+  const continueWithChosenBackend = (chosen: "kanjicanvas" | "none") => {
+    const commit = handwriting.chooseBackend(chosen);
     if (commit) {
       commit();
       return;
@@ -230,9 +167,6 @@ const ProductionPracticeV1 = () => {
     () => session.deck.map((item) => item.kanji),
     [session.deck]
   );
-
-  const activeBackend = backend ?? "none";
-  const gradingEnabled = activeBackend !== "none";
 
   const phaseKey =
     phase === "loading"
@@ -254,8 +188,8 @@ const ProductionPracticeV1 = () => {
           session={session}
           settings={settings}
           randomKanjiPool={randomKanjiPool}
-          gradingEnabled={gradingEnabled}
-          activeBackend={activeBackend}
+          gradingEnabled={handwriting.gradingEnabled}
+          recognize={handwriting.recognize}
           continueWithChosenBackend={continueWithChosenBackend}
         />
       </PracticeShell>

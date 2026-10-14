@@ -1,5 +1,6 @@
 import { ComponentType, SVGProps, forwardRef } from "react";
 import { Link } from "@/components/dependent/routing";
+import { NotificationDot } from "@/components/common/NotificationDot";
 import { cn } from "@/lib/utils";
 
 type IconComponent = ComponentType<
@@ -15,6 +16,8 @@ type DashedNavLinkProps = {
   onPointerDown?: (e: React.PointerEvent) => void;
   className?: string;
   iconClassName?: string;
+  /** Shows the due dot in the top-right corner. */
+  showDot?: boolean;
 };
 
 // forwardRef required: HeaderDrawer wraps this in `<DrawerClose asChild>` via
@@ -31,6 +34,7 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       onPointerDown,
       className,
       iconClassName,
+      showDot,
       ...rest
     },
     ref
@@ -42,7 +46,7 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
         onClick={onClick}
         onPointerDown={onPointerDown}
         className={cn(
-          "block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent",
+          "relative block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent",
           className
         )}
         {...rest}
@@ -60,6 +64,7 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
             {description}
           </p>
         )}
+        {showDot && <NotificationDot />}
       </Link>
     );
   }

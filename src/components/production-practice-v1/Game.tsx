@@ -10,6 +10,7 @@ import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { BlurredGloss } from "@/components/shared-practice";
+import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   useGetKanjiInfoFn,
@@ -47,6 +48,8 @@ type CardStep =
       kind: "noKanji" | "correct" | "incorrect";
       grade: GradeRankInfo;
       recognitionSkipped?: boolean;
+      /** Mastery game, counted correct: the user still has to rate it. */
+      ratable?: boolean;
     };
 
 export const Game = ({
@@ -54,6 +57,7 @@ export const Game = ({
   settings,
   randomKanjiPool,
   gradingEnabled = true,
+  grading,
   recognize,
   onProgress,
   onComplete,
@@ -64,6 +68,8 @@ export const Game = ({
   randomKanjiPool: string[];
   /** When false, skip recognition and score by pick only. */
   gradingEnabled?: boolean;
+  /** Mastery game only: wrong answers grade "again", right ones get rated. */
+  grading?: MasteryGrading;
   recognize: (payload: DrawingSubmitPayload) => Promise<string[]>;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
@@ -156,6 +162,7 @@ export const Game = ({
 
   const onForgotFromDraw = () => {
     if (step.type !== "draw") return;
+    grading?.onGrade("again");
     pushResult(false, -1);
     setStep({
       type: "feedback",
@@ -224,6 +231,7 @@ export const Game = ({
 
   const onSelectForgot = () => {
     if (step.type !== "select") return;
+    grading?.onGrade("again");
     pushResult(false, step.grade.rank);
     setStep({
       type: "feedback",
@@ -244,6 +252,8 @@ export const Game = ({
       : pickedCorrect;
     if (sessionCorrect) {
       playCorrect({ enabled: settings.celebratorySoundOnCorrect });
+    } else {
+      grading?.onGrade("again");
     }
     pushResult(sessionCorrect, step.grade.rank);
     setStep({
@@ -251,6 +261,7 @@ export const Game = ({
       kind: pickedCorrect ? "correct" : "incorrect",
       grade: step.grade,
       recognitionSkipped: step.recognitionSkipped,
+      ratable: grading != null && sessionCorrect,
     });
   };
 
@@ -349,6 +360,17 @@ export const Game = ({
         grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
         drawing={drawing}
         gradingEnabled={feedbackGradingEnabled}
+        rating={
+          feedback?.ratable && grading
+            ? {
+                intervals: grading.intervals,
+                onRate: (rating) => {
+                  grading.onGrade(rating);
+                  advance();
+                },
+              }
+            : undefined
+        }
         onNext={advance}
       />
     </div>

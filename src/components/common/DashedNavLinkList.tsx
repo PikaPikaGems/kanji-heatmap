@@ -10,6 +10,8 @@ type DashedNavLinkListProps = {
   iconClassName?: string;
   onItemClick?: () => void;
   onItemPointerDown?: (e: React.PointerEvent) => void;
+  /** Hrefs that show the due dot. */
+  dotHrefs?: ReadonlySet<string>;
   wrapItem?: (link: ReactNode, item: NavLinkItem) => ReactNode;
 };
 
@@ -20,6 +22,7 @@ export const DashedNavLinkList = ({
   iconClassName,
   onItemClick,
   onItemPointerDown,
+  dotHrefs,
   wrapItem,
 }: DashedNavLinkListProps) => {
   return (
@@ -35,6 +38,7 @@ export const DashedNavLinkList = ({
             onPointerDown={onItemPointerDown}
             className={itemClassName}
             iconClassName={iconClassName}
+            showDot={dotHrefs?.has(item.href)}
           />
         );
 

@@ -7,10 +7,13 @@ import {
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
+import { NotificationDot } from "@/components/common/NotificationDot";
 import {
   floatingIslandNavLinks,
   practiceNavLinks,
 } from "@/lib/pages/nav-links";
+import { dueNavHrefs, useVisibleNavLinks } from "@/lib/pages/mode-nav-links";
+import { totalDue, useDueCount } from "@/lib/engine/use-due-count";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
@@ -36,6 +39,8 @@ export const PracticeFab = () => {
   const useSecondaryVariant = location === "/" && hasBgMeaning;
 
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
+  const due = useDueCount();
+  const modeLinks = useVisibleNavLinks(practiceNavLinks);
 
   if (!fabHrefs.has(location)) {
     return null;
@@ -65,6 +70,7 @@ export const PracticeFab = () => {
           onFocus={prefetchPracticeRoutes}
         >
           <NotebookPen />
+          {totalDue(due) > 0 && <NotificationDot className="top-2 right-2" />}
         </PracticeButton>
       </PopoverTrigger>
       <PopoverContent
@@ -77,7 +83,8 @@ export const PracticeFab = () => {
           Select a mode
         </p>
         <DashedNavLinkList
-          items={practiceNavLinks}
+          items={modeLinks}
+          dotHrefs={dueNavHrefs(due)}
           className="grid grid-cols-2 gap-2"
           onItemClick={() => setOpen(false)}
         />

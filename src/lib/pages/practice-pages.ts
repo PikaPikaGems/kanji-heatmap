@@ -16,6 +16,22 @@ export const productionPracticePageMeta = {
   description: "Complete words by drawing the missing kanji",
 } as const;
 
+export const readingMasteryPageMeta = {
+  href: "/reading-mastery",
+  title: "Reading Mastery",
+  shortLabel: "Reading Mastery",
+  heading: "👁️ Kanji Reading Mastery",
+  description: "Review due readings from your review pile",
+} as const;
+
+export const writingMasteryPageMeta = {
+  href: "/writing-mastery",
+  title: "Writing Mastery",
+  shortLabel: "Writing Mastery",
+  heading: "✍️ Kanji Writing Mastery",
+  description: "Review due kanji writing from your review pile",
+} as const;
+
 export const speedKatakanaPageMeta = {
   href: "/speed-katakana",
   title: "Speed Katakana",
@@ -35,6 +51,8 @@ export const fillTheKanjiPageMeta = {
 export const practicePageLinks = [
   recognitionPracticePageMeta,
   productionPracticePageMeta,
+  readingMasteryPageMeta,
+  writingMasteryPageMeta,
   fillTheKanjiPageMeta,
   speedKatakanaPageMeta,
 ] as const;
