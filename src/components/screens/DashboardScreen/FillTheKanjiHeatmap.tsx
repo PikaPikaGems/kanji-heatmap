@@ -1,7 +1,6 @@
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { GradientLegend } from "@/components/common/GradientLegend";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import {
@@ -42,7 +41,7 @@ import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 import { FillTheKanjiSetProgress } from "./FillTheKanjiSetProgress";
-import { HeatmapLayoutPopover } from "./HeatmapLayoutPopover";
+import { HeatmapLegendRow } from "./HeatmapLegendRow";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
@@ -280,18 +279,13 @@ export const FillTheKanjiHeatmap = () => {
         * A phrase (sentence or emoji) counts as seen once you finish a batch
         that has it. Complete is the share of the set (or group) seen.
       </p>
-      <div className="flex items-center justify-center w-full mt-4">
-        <div className="flex items-center gap-1">
-          <GradientLegend /> ·
-          <HeatmapLayoutPopover
-            name="Fill the Kanji"
-            compact={compact}
-            onChange={(v) => setSetting("compact", v)}
-          >
-            <AttemptCountScaleOptions />
-          </HeatmapLayoutPopover>
-        </div>
-      </div>
+      <HeatmapLegendRow
+        name="Fill the Kanji"
+        compact={compact}
+        onCompactChange={(v) => setSetting("compact", v)}
+      >
+        <AttemptCountScaleOptions />
+      </HeatmapLegendRow>
       <div className="mt-6">
         <FillTheKanjiSetProgress statsById={statsById} />
       </div>

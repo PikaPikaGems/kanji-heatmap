@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { GenericPopover } from "@/components/common/GenericPopover";
+import { GradientLegend } from "@/components/common/GradientLegend";
 
-/** Settings button beside a heatmap's legend: the Wide / Compact switch, plus any extra options. */
-export const HeatmapLayoutPopover = ({
+/** The Wide / Compact switch, plus any extra options. */
+const HeatmapSettingsPopover = ({
   name,
   compact,
   onChange,
@@ -66,3 +67,38 @@ export const HeatmapLayoutPopover = ({
     />
   );
 };
+
+/**
+ * Every dashboard heatmap's footer: the gradient legend, then its settings
+ * button. One component so the heatmaps keep the same spacing and controls.
+ */
+export const HeatmapLegendRow = ({
+  name,
+  lessLabel,
+  moreLabel,
+  compact,
+  onCompactChange,
+  children,
+}: {
+  /** The heatmap's name, for screen readers. */
+  name: string;
+  lessLabel?: string;
+  moreLabel?: string;
+  compact: boolean;
+  onCompactChange: (compact: boolean) => void;
+  /** Extra settings under the layout switch. */
+  children?: ReactNode;
+}) => (
+  <div className="flex items-center justify-center w-full mt-4">
+    <div className="flex items-center gap-1">
+      <GradientLegend lessLabel={lessLabel} moreLabel={moreLabel} /> ·
+      <HeatmapSettingsPopover
+        name={name}
+        compact={compact}
+        onChange={onCompactChange}
+      >
+        {children}
+      </HeatmapSettingsPopover>
+    </div>
+  </div>
+);

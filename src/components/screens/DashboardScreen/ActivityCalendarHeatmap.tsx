@@ -12,14 +12,13 @@ import {
 } from "@/lib/activity";
 import { useActivityData } from "@/hooks/use-activity-data";
 import { useActivityHeatmapSettings } from "@/hooks/use-activity-heatmap-settings";
-import { ActivityCalendarHeatmapSettingsPopover } from "./ActivityCalendarHeatmapSettingsPopover";
+import { HeatmapLegendRow } from "./HeatmapLegendRow";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
 import { DurationNav } from "./DurationNav";
 import { CalendarGrid } from "./CalendarGrid";
 import { VerticalCalendarGrid } from "./VerticalCalendarGrid";
 import { DashboardPanel } from "./DashboardPanel";
-import { GradientLegend } from "@/components/common/GradientLegend";
 import { OverviewCaption } from "./OverviewStat";
 import { formatRawCount } from "@/lib/format-count";
 
@@ -92,12 +91,11 @@ export const ActivityCalendarHeatmap = () => {
             }
           />
         </div>
-        <div className="flex items-center justify-center w-full mt-4 mb-4">
-          <div className="flex items-center gap-1">
-            <GradientLegend /> ·
-            <ActivityCalendarHeatmapSettingsPopover />
-          </div>
-        </div>
+        <HeatmapLegendRow
+          name="Activity"
+          compact={vertical}
+          onCompactChange={(v) => setSetting("vertical", v)}
+        />
 
         <div className="mt-6">
           <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">

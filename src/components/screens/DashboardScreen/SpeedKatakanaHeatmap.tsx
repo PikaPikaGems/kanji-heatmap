@@ -3,12 +3,11 @@ import { STATS_KEY_PREFIX } from "@/components/screens/SpeedKatakanaScreen/stora
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { useHeatmapCellMetric } from "@/hooks/use-heatmap-cell-metric";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { GradientLegend } from "@/components/common/GradientLegend";
 import { HEATMAP_METRIC_GRADIENT_LABELS } from "@/lib/activity";
 import { DashboardPanel } from "./DashboardPanel";
 import { SpeedKatakanaHeatmapGrid } from "./SpeedKatakanaHeatmapGrid";
 import { SpeedKatakanaHeatmapSettingsPopover } from "./SpeedKatakanaHeatmapSettingsPopover";
-import { HeatmapLayoutPopover } from "./HeatmapLayoutPopover";
+import { HeatmapLegendRow } from "./HeatmapLegendRow";
 
 const SETTINGS_KEY = "speed-katakana-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
@@ -37,20 +36,13 @@ export const SpeedKatakanaHeatmap = () => {
       >
         <SpeedKatakanaHeatmapGrid metric={metric} compact={compact} />
       </div>
-      <div className="flex items-center justify-center w-full">
-        <div className="flex items-center gap-1">
-          <GradientLegend
-            lessLabel={gradientLabels.less}
-            moreLabel={gradientLabels.more}
-          />{" "}
-          ·
-          <HeatmapLayoutPopover
-            name="Speed Katakana"
-            compact={compact}
-            onChange={(v) => setSetting("compact", v)}
-          />
-        </div>
-      </div>
+      <HeatmapLegendRow
+        name="Speed Katakana"
+        lessLabel={gradientLabels.less}
+        moreLabel={gradientLabels.more}
+        compact={compact}
+        onCompactChange={(v) => setSetting("compact", v)}
+      />
     </DashboardPanel>
   );
 };
