@@ -77,10 +77,13 @@ export const FailedOperationRow = ({
             )}
           </p>
           <p className="text-xs text-muted-foreground">
-            {copyForCode(op.code)} ·{" "}
-            <time dateTime={new Date(op.failedAt).toISOString()}>
+            <time
+              className="whitespace-nowrap"
+              dateTime={new Date(op.failedAt).toISOString()}
+            >
               {failedDate(op.failedAt)}
-            </time>
+            </time>{" "}
+            · {copyForCode(op.code)}
           </p>
           {op.diagnosticId !== undefined && (
             <p className="font-mono text-[10px] break-all text-muted-foreground">
@@ -93,7 +96,7 @@ export const FailedOperationRow = ({
         </SpanBadge>
       </div>
       {status.kind === "confirm-dismiss" ? (
-        <div className="flex flex-col gap-2 text-xs">
+        <div className="flex flex-col gap-2 text-xs ml-7">
           <p>
             Dismissing removes this note&apos;s text from this device. Copy it
             first if you still need it.
@@ -102,6 +105,7 @@ export const FailedOperationRow = ({
             <Button
               variant="destructive"
               size="sm"
+              className="h-8 px-2.5 text-xs"
               onClick={() => void dismiss()}
             >
               Dismiss anyway
@@ -109,6 +113,7 @@ export const FailedOperationRow = ({
             <Button
               variant="outline"
               size="sm"
+              className="h-8 px-2.5 text-xs"
               onClick={() => setStatus({ kind: "idle" })}
             >
               Cancel
@@ -116,11 +121,12 @@ export const FailedOperationRow = ({
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 ml-7">
           {text !== null && (
             <Button
               variant="outline"
               size="sm"
+              className="h-8 px-2.5 text-xs"
               onClick={(e) => void copy(text, e)}
             >
               {copyStatus === "copied" && "Copied"}
@@ -132,6 +138,7 @@ export const FailedOperationRow = ({
             <Button
               variant="outline"
               size="sm"
+              className="h-8 px-2.5 text-xs"
               onClick={() => {
                 openKanji(kanji);
                 closeSyncOperations();
@@ -143,6 +150,7 @@ export const FailedOperationRow = ({
           <Button
             variant="ghost"
             size="sm"
+            className="h-8 px-2.5 text-xs"
             disabled={!api || status.kind === "busy"}
             onClick={() => {
               if (needsConfirm) {
