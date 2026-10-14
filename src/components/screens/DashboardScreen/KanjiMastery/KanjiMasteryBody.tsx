@@ -4,9 +4,14 @@ import {
   useKanjiSearch,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { toSearchSettings } from "@/lib/settings/search-settings-adapter";
-import { REVIEW_PILE_ALL_KEY, snapshotValue } from "@/lib/engine/store-cache";
-import { useEngineQuery } from "@/lib/engine/use-engine-query";
+import {
+  getCachedStore,
+  REVIEW_PILE_ALL_KEY,
+  snapshotValue,
+} from "@/lib/engine/store-cache";
+import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
+import { Button } from "@/components/ui/button";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
 
@@ -17,22 +22,45 @@ const KanjiDrawerGlobal = lazy(
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
+const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
+  <div className="flex flex-col items-center gap-3 py-6 text-sm text-center text-muted-foreground">
+    <p>Couldn&apos;t load your kanji mastery.</p>
+    {onRetry ? (
+      <Button variant="outline" size="sm" onClick={onRetry}>
+        Try again
+      </Button>
+    ) : null}
+  </div>
+);
+
 /** Pile snapshot + kanji data -> loading / failed / the mastery view. */
 export const KanjiMasteryBody = () => {
-  const pile = useEngineQuery(REVIEW_PILE_ALL_KEY, (api) =>
-    api.reviews.pile.watchAll()
+  const api = useEngineApi();
+  const pile = useEngineQuery(REVIEW_PILE_ALL_KEY, (a) =>
+    a.reviews.pile.watchAll()
   );
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
 
-  const pileFailed =
-    pile.status === "failed" || (pile.status === "ready" && !pile.result.ok);
-  if (pileFailed || search.status === "error") {
+  if (pile.status === "failed") {
     return (
-      <p className="text-sm text-muted-foreground">
-        Couldn&apos;t load your kanji mastery. Try again in a moment.
-      </p>
+      <LoadFailed
+        onRetry={
+          pile.retryable && api
+            ? () =>
+                void getCachedStore(api, REVIEW_PILE_ALL_KEY, (a) =>
+                  a.reviews.pile.watchAll()
+                ).refresh()
+            : undefined
+        }
+      />
     );
+  }
+  if (
+    (pile.status === "ready" && !pile.result.ok) ||
+    search.status === "error"
+  ) {
+    return <LoadFailed />;
   }
 
   const rows = snapshotValue(pile);

@@ -27,11 +27,11 @@ const METRIC_VIEWS: Record<MasteryMetric, MetricView> = {
     segmentLabels: ["Not started", ...STABILITY_BAND_LABELS],
     segmentCn: [
       "",
-      "bg-[rgba(var(--theme-color-selected),0.15)]",
-      "bg-[rgba(var(--theme-color-selected),0.3)]",
-      "bg-[rgba(var(--theme-color-selected),0.45)]",
-      "bg-[rgba(var(--theme-color-selected),0.6)]",
-      "bg-[rgba(var(--theme-color-selected),0.8)]",
+      "bg-[rgba(var(--theme-color-selected),0.25)]",
+      "bg-[rgba(var(--theme-color-selected),0.4)]",
+      "bg-[rgba(var(--theme-color-selected),0.55)]",
+      "bg-[rgba(var(--theme-color-selected),0.7)]",
+      "bg-[rgba(var(--theme-color-selected),0.85)]",
       "bg-[rgba(var(--theme-color-selected),1)]",
     ],
   },
@@ -40,10 +40,10 @@ const METRIC_VIEWS: Record<MasteryMetric, MetricView> = {
     segmentLabels: ["Not started", ...DIFFICULTY_BAND_LABELS],
     segmentCn: [
       "",
-      "bg-[rgba(var(--theme-color-selected),0.2)]",
-      "bg-[rgba(var(--theme-color-selected),0.4)]",
-      "bg-[rgba(var(--theme-color-selected),0.6)]",
-      "bg-[rgba(var(--theme-color-selected),0.8)]",
+      "bg-[rgba(var(--theme-color-selected),0.25)]",
+      "bg-[rgba(var(--theme-color-selected),0.45)]",
+      "bg-[rgba(var(--theme-color-selected),0.65)]",
+      "bg-[rgba(var(--theme-color-selected),0.85)]",
       "bg-[rgba(var(--theme-color-selected),1)]",
     ],
   },
@@ -56,7 +56,7 @@ const KIND_TITLES: Record<MasteryCardKind, string> = {
 };
 
 const Legend = ({ view }: { view: MetricView }) => (
-  <ul className="flex flex-wrap mb-3 text-[10px] gap-x-3 gap-y-1 text-muted-foreground">
+  <ul className="flex flex-wrap pt-3 mt-auto text-[10px] gap-x-3 gap-y-1 text-muted-foreground">
     {view.segmentLabels.map((label, band) => (
       <li key={label} className="flex items-center gap-1">
         <span
@@ -122,11 +122,10 @@ export const MasteryCard = ({
 }) => {
   const view = METRIC_VIEWS[metric];
   return (
-    <section className="p-3 border rounded-lg">
-      <h3 className="mb-2 text-sm font-bold">
+    <section className="flex flex-col min-w-0 p-3 text-left border rounded-xl border-foreground/5 bg-muted/10">
+      <h3 className="mb-3 text-sm font-bold">
         {KIND_TITLES[kind]} {view.title}
       </h3>
-      <Legend view={view} />
       <div className="flex flex-col gap-1.5">
         {groups.map(({ key, label, cn }) => (
           <BarRow
@@ -149,6 +148,7 @@ export const MasteryCard = ({
           />
         </div>
       </div>
+      <Legend view={view} />
     </section>
   );
 };

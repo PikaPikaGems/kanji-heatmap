@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { ReviewPileItemView } from "engine-contract";
+import { SpanBadge } from "@/components/ui/badge";
 import { Link } from "@/components/dependent/routing/router-adapter";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import {
@@ -28,7 +29,7 @@ const TopList = ({
   cards: TopCard[];
   detail: (card: TopCard) => ReactNode;
 }) => (
-  <section>
+  <section className="min-w-0 px-3 py-3 text-left border rounded-xl border-foreground/5 bg-muted/10">
     <h3 className="mb-2 text-sm font-bold">{title}</h3>
     {cards.length === 0 ? (
       <p className="text-xs text-muted-foreground">{empty}</p>
@@ -46,8 +47,13 @@ const TopList = ({
               <span className="text-2xl kanji-font" lang="ja">
                 {card.kanji}
               </span>
-              <span className="text-xs">{CARD_TYPE_LABELS[card.cardType]}</span>
-              <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+              <SpanBadge
+                variant="outline"
+                className="px-2 py-0 text-[10px] font-medium text-muted-foreground"
+              >
+                {CARD_TYPE_LABELS[card.cardType]}
+              </SpanBadge>
+              <span className="ml-auto text-xs text-muted-foreground tabular-nums whitespace-nowrap">
                 {detail(card)}
               </span>
             </Link>
