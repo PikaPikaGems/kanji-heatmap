@@ -1,5 +1,5 @@
 import type { FreqCategory } from "@/lib/freq/freq-category";
-import type { ChallengeSetStats } from "@/components/screens/SpeedKatakanaScreen/storage";
+import type { ChallengeSetStats } from "@/lib/speed-katakana/stats";
 import { cpmToBand, CPM_BAND_LABELS } from "./cpm-band";
 import { getActivityLevel } from "./queries";
 

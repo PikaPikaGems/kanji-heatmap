@@ -15,10 +15,7 @@ const formatDay = (date: Date, now: Date) => {
   });
 };
 
-export const formatLastAttempted = (timestamp: number, now = new Date()) =>
-  formatDay(new Date(timestamp), now);
-
-/** Same as formatLastAttempted, for an engine "YYYY-MM-DD" day. */
+/** "today", "yesterday", or a short date, for an engine "YYYY-MM-DD" day. */
 export const formatLastAttemptedDay = (day: LocalDate, now = new Date()) => {
   const [year, month, date] = day.split("-").map(Number);
   return formatDay(new Date(year, month - 1, date), now);

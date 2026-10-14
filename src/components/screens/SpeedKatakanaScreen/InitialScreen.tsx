@@ -5,18 +5,28 @@ import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { useEnterAction } from "@/hooks/use-enter-action";
+import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { TTS_DISCLAIMER } from "@/lib/tts";
+import {
+  AllChallengeSetStats,
+  summarizeChallengeSetStats,
+} from "@/lib/speed-katakana/stats";
 import { SoundMode, WordCount } from "./types";
-import { readSetStats } from "./storage";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 import { levelOf, positionInLevel } from "./constants";
-import { useSpeedKatakanaProgress } from "./use-speed-katakana-progress";
 import { ChallengeSetSelector } from "./ChallengeSetSelector";
 import { useChallengeSearchParam } from "./use-challenge-search-param";
 
-const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const currentStats = readSetStats(challengeSet);
+const SetStats = ({
+  challengeSet,
+  allStats,
+}: {
+  challengeSet: number;
+  /** Null when progress isn't available (logged out, loading). */
+  allStats: AllChallengeSetStats | null;
+}) => {
+  const currentStats = allStats?.get(challengeSet);
   const level = levelOf(challengeSet);
   const pos = positionInLevel(challengeSet);
   const stats = currentStats
@@ -65,7 +75,8 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const { settings, setSetting, selectChallengeSet } =
     useChallengeSearchParam();
 
-  const { summary } = useSpeedKatakanaProgress();
+  const allStats = useSpeedKatakanaStats();
+  const summary = summarizeChallengeSetStats(allStats);
 
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled
@@ -170,11 +181,12 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
 
             <ChallengeSetSelector
               challengeSet={settings.challengeSet}
+              allStats={allStats}
               onSelect={selectChallengeSet}
             />
           </div>
 
-          <SetStats challengeSet={settings.challengeSet} />
+          <SetStats challengeSet={settings.challengeSet} allStats={allStats} />
         </div>
       </div>
 

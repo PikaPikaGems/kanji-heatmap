@@ -1,16 +1,11 @@
 import {
   CHALLENGES_PER_LEVEL,
   LEVELS,
-  SPEED_KATAKANA_TOTAL_CHALLENGES,
   levelOf,
   positionInLevel,
   setFromLevelAndPos,
 } from "@/components/screens/SpeedKatakanaScreen/constants";
 import { speedKatakanaChallengeHref } from "@/components/screens/SpeedKatakanaScreen/challenge-search-param";
-import {
-  ChallengeSetStats,
-  readSetStats,
-} from "@/components/screens/SpeedKatakanaScreen/storage";
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +17,11 @@ import {
   metricValueText,
 } from "@/lib/activity";
 import { useAttemptCountScale } from "@/hooks/use-attempt-count-scale";
-import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
+import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
+import type {
+  AllChallengeSetStats,
+  ChallengeSetStats,
+} from "@/lib/speed-katakana/stats";
 import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 
@@ -107,10 +106,7 @@ const SetDetail = ({
       </div>
       {stats && (
         <div className="text-center text-muted-foreground">
-          Last attempted:{" "}
-          {stats.lastAttempted != null
-            ? formatLastAttempted(stats.lastAttempted)
-            : "not recorded"}
+          Last attempted: {formatLastAttemptedDay(stats.lastAttemptedAt)}
         </div>
       )}
     </div>
@@ -119,14 +115,15 @@ const SetDetail = ({
 
 const ChallengeSetCell = ({
   setNumber,
+  stats,
   metric,
   attemptShading,
 }: {
   setNumber: number;
+  stats: ChallengeSetStats | null;
   metric: HeatmapCellMetric;
   attemptShading: AttemptCountShading;
 }) => {
-  const stats = readSetStats(setNumber);
   const band = metricToBand(stats, metric, attemptShading);
   const level = levelOf(setNumber);
   const pos = positionInLevel(setNumber);
@@ -152,13 +149,8 @@ const ChallengeSetCell = ({
 };
 
 /** Most attempts on any challenge set, for the relative attempt-count scale. */
-const maxTimesTaken = () => {
-  let max = 0;
-  for (let set = 1; set <= SPEED_KATAKANA_TOTAL_CHALLENGES; set++) {
-    max = Math.max(max, readSetStats(set)?.timesTaken ?? 0);
-  }
-  return max;
-};
+const maxTimesTaken = (allStats: AllChallengeSetStats) =>
+  Math.max(0, ...[...allStats.values()].map((s) => s.timesTaken));
 
 /** Levels per grid: all of them side by side, or two stacked halves. */
 const levelGroups = (compact: boolean): number[][] => {
@@ -174,16 +166,18 @@ const levelGroups = (compact: boolean): number[][] => {
  * top-to-bottom, then the next level.
  */
 export const SpeedKatakanaHeatmapGrid = ({
+  allStats,
   metric,
   compact,
 }: {
+  allStats: AllChallengeSetStats;
   metric: HeatmapCellMetric;
   compact: boolean;
 }) => {
   const [scale] = useAttemptCountScale();
   const attemptShading: AttemptCountShading = {
     scale,
-    maxCount: maxTimesTaken(),
+    maxCount: maxTimesTaken(allStats),
   };
 
   return levelGroups(compact).map((levels) => (
@@ -204,6 +198,7 @@ export const SpeedKatakanaHeatmapGrid = ({
             <ChallengeSetCell
               key={setNumber}
               setNumber={setNumber}
+              stats={allStats.get(setNumber) ?? null}
               metric={metric}
               attemptShading={attemptShading}
             />

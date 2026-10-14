@@ -1,17 +1,16 @@
 import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
+import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
+import { summarizeChallengeSetStats } from "@/lib/speed-katakana/stats";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { EndSession } from "./EndSession";
 import { SessionStats } from "./types";
-import { recordActivity } from "@/lib/activity";
-import { recordSetResult } from "./storage";
-import { useCompletedSetsCount } from "./use-completed-sets-count";
 import { SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
 import { useChallengeSearchParam } from "./use-challenge-search-param";
 
@@ -27,7 +26,9 @@ const SpeedKatakanaScreen = () => {
   const { settings, selectChallengeSet } = useChallengeSearchParam();
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState<SessionStats | null>(null);
-  const completedSetsCount = useCompletedSetsCount();
+  const { completed: completedSetsCount } = summarizeChallengeSetStats(
+    useSpeedKatakanaStats()
+  );
   const recorder = useActivityRecorder();
   const isCoarsePointer = useCoarsePointer();
 
@@ -61,8 +62,6 @@ const SpeedKatakanaScreen = () => {
 
   const finishGame = (sessionStats: SessionStats) => {
     if (settings.wordCount === 48) {
-      recordSetResult(settings.challengeSet, sessionStats);
-      recordActivity("speedKatakana");
       void recorder.recordRound({
         type: "speed_katakana_session_completed",
         challengeId: settings.challengeSet,

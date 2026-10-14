@@ -6,9 +6,15 @@
  *
  * Add a key or prefix here in the same change that removes its last writer.
  */
-const LEGACY_KEYS: readonly string[] = [];
+const LEGACY_KEYS: readonly string[] = [
+  // Activity counters: all-time totals and per-day counts per game.
+  "activity-all-time",
+  "activity-by-day",
+];
 const LEGACY_KEY_PREFIXES: readonly string[] = [
   "fill-the-kanji-stats-",
+  // Speed Katakana per-set stats: `speed-katakana-stats-{setNumber}`.
+  "speed-katakana-stats-",
   // Bookmarks: `b:{kanji}:{word}` = "true".
   "b:",
   // Study notes: `kanji-study-notes:v1:{kanji}` = JSON `{ notes }`.
