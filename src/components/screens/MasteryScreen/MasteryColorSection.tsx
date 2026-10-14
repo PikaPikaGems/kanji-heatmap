@@ -7,16 +7,29 @@ import {
   type HeatmapMetric,
   isCombinedHeatmapMetric,
 } from "@/lib/engine/mastery-heatmap-metrics";
+import {
+  MASTERY_RULES_HINT,
+  type MasteryMetric,
+} from "@/lib/engine/mastery-metrics";
 import { MasteryLegend } from "./MasteryLegend";
 import { useHeatmapMetric } from "./use-heatmap-metric";
 
+const getMeasureHint = (measure: MasteryMetric): string => {
+  if (measure === "mastery") {
+    return `Mastery is how settled a card is, so darker tiles are further along. ${MASTERY_RULES_HINT}`;
+  }
+  if (measure === "stability") {
+    return "Stability is how long a memory is expected to last, so darker tiles are stronger.";
+  }
+  return "Difficulty runs from 1 (easy) to 10 (hard) for you, so darker tiles are harder.";
+};
+
 const getMetricHint = (metric: HeatmapMetric): string => {
-  const measure =
-    getHeatmapMeasure(metric) === "stability"
-      ? "Stability is how long a memory is expected to last, so darker tiles are stronger."
-      : "Difficulty runs from 1 (easy) to 10 (hard) for you, so darker tiles are harder.";
-  if (!isCombinedHeatmapMetric(metric)) return measure;
-  return `${measure} Combined needs both reading and writing started, and uses the weaker of the two.`;
+  const measure = getHeatmapMeasure(metric);
+  const description = getMeasureHint(measure);
+  if (!isCombinedHeatmapMetric(metric)) return description;
+  const pick = measure === "difficulty" ? "harder" : "weaker";
+  return `${description} Combined needs both reading and writing started, and uses the ${pick} of the two.`;
 };
 
 /** Mastery's stand-in for the frequency "Background Color Meaning" section. */

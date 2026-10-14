@@ -34,7 +34,9 @@ const getLookup = (
 
   const measure = getHeatmapMeasure(metric);
   const lookup: TileColorLookup = (kanji) => {
-    const band = getHeatmapBand(metric, pile.get(kanji));
+    // Read per tile, not when the lookup is built: mastery levels depend on
+    // the clock, and the lookup lives as long as the pile snapshot.
+    const band = getHeatmapBand(metric, pile.get(kanji), Date.now());
     return {
       bgCn: getBandFillCn(measure, band),
       textCn: getBandTextCn(measure, band),

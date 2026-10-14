@@ -1,6 +1,7 @@
-import type {
-  MasteryCardKind,
-  MasteryMetric,
+import {
+  MASTERY_METRIC_TITLES,
+  type MasteryCardKind,
+  type MasteryMetric,
 } from "@/lib/engine/mastery-metrics";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
@@ -15,25 +16,24 @@ import type {
 } from "./mastery-tally";
 
 type MetricView = {
-  title: string;
   /** Screen reader text per segment; 0 is "Not started". */
   segmentLabels: readonly string[];
   /** Fill per segment, same palette as the legend and the /mastery heatmap; index 0 is unused (the empty track). */
   segmentCn: readonly string[];
 };
 
-const toMetricView = (measure: MasteryMetric, title: string): MetricView => {
+const toMetricView = (measure: MasteryMetric): MetricView => {
   const labels = getBandLabels(measure);
   return {
-    title,
     segmentLabels: [NOT_STARTED_LABEL, ...labels],
     segmentCn: ["", ...labels.map((_, band) => getBandFillCn(measure, band))],
   };
 };
 
 const METRIC_VIEWS: Record<MasteryMetric, MetricView> = {
-  stability: toMetricView("stability", "Stability"),
-  difficulty: toMetricView("difficulty", "Difficulty"),
+  mastery: toMetricView("mastery"),
+  stability: toMetricView("stability"),
+  difficulty: toMetricView("difficulty"),
 };
 
 const KIND_TITLES: Record<MasteryCardKind, string> = {
@@ -98,7 +98,7 @@ export const MasteryCard = ({
   return (
     <section className="min-w-0 p-3 text-left border rounded-xl border-foreground/5 bg-muted/10">
       <h3 className="mb-3 text-sm font-bold">
-        {KIND_TITLES[kind]} {view.title}
+        {KIND_TITLES[kind]} {MASTERY_METRIC_TITLES[metric]}
       </h3>
       <div className="flex flex-col gap-1.5">
         {groups.map(({ key, label, cn }) => (

@@ -7,6 +7,12 @@ import type { MasteryMetric } from "./mastery-metrics";
  * color is dark itself, so faint steps vanish into the dark background.
  */
 const FILL_CN: Record<MasteryMetric, string[]> = {
+  mastery: [
+    "bg-[rgba(var(--theme-color-selected),0.2)] dark:bg-[rgba(var(--theme-color-selected),0.32)]",
+    "bg-[rgba(var(--theme-color-selected),0.45)] dark:bg-[rgba(var(--theme-color-selected),0.52)]",
+    "bg-[rgba(var(--theme-color-selected),0.75)] dark:bg-[rgba(var(--theme-color-selected),0.76)]",
+    "bg-[rgba(var(--theme-color-selected),1)]",
+  ],
   stability: [
     "bg-[rgba(var(--theme-color-selected),0.18)] dark:bg-[rgba(var(--theme-color-selected),0.32)]",
     "bg-[rgba(var(--theme-color-selected),0.34)] dark:bg-[rgba(var(--theme-color-selected),0.44)]",

@@ -1,11 +1,10 @@
 import type { ReviewPileItemView } from "engine-contract";
 import {
-  cardMetrics,
-  difficultyBand,
   DIFFICULTY_BAND_LABELS,
+  itemBand,
   type MasteryCardKind,
+  MASTERY_LEVEL_LABELS,
   type MasteryMetric,
-  stabilityBand,
   STABILITY_BAND_LABELS,
 } from "./mastery-metrics";
 
@@ -16,17 +15,20 @@ import {
 
 /** In the order the picker lists them. */
 export const HEATMAP_METRICS = [
-  "reading-difficulty",
+  "reading-mastery",
   "reading-stability",
-  "writing-difficulty",
+  "reading-difficulty",
+  "writing-mastery",
   "writing-stability",
+  "writing-difficulty",
+  "combined-mastery",
   "combined-stability",
   "combined-difficulty",
 ] as const;
 
 export type HeatmapMetric = (typeof HEATMAP_METRICS)[number];
 
-export const DEFAULT_HEATMAP_METRIC: HeatmapMetric = "reading-stability";
+export const DEFAULT_HEATMAP_METRIC: HeatmapMetric = "combined-mastery";
 
 export const isHeatmapMetric = (value: unknown): value is HeatmapMetric =>
   HEATMAP_METRICS.some((metric) => metric === value);
@@ -35,14 +37,29 @@ const METRIC_INFO: Record<
   HeatmapMetric,
   { label: string; card: MasteryCardKind; measure: MasteryMetric }
 > = {
+  "reading-mastery": {
+    label: "Reading mastery",
+    card: "reading",
+    measure: "mastery",
+  },
+  "reading-stability": {
+    label: "Reading stability",
+    card: "reading",
+    measure: "stability",
+  },
   "reading-difficulty": {
     label: "Reading difficulty",
     card: "reading",
     measure: "difficulty",
   },
-  "reading-stability": {
-    label: "Reading stability",
-    card: "reading",
+  "writing-mastery": {
+    label: "Writing mastery",
+    card: "writing",
+    measure: "mastery",
+  },
+  "writing-stability": {
+    label: "Writing stability",
+    card: "writing",
     measure: "stability",
   },
   "writing-difficulty": {
@@ -50,10 +67,10 @@ const METRIC_INFO: Record<
     card: "writing",
     measure: "difficulty",
   },
-  "writing-stability": {
-    label: "Writing stability",
-    card: "writing",
-    measure: "stability",
+  "combined-mastery": {
+    label: "Combined mastery",
+    card: "combined",
+    measure: "mastery",
   },
   "combined-stability": {
     label: "Combined stability",
@@ -79,22 +96,24 @@ export const isCombinedHeatmapMetric = (metric: HeatmapMetric): boolean =>
   METRIC_INFO[metric].card === "combined";
 
 /** Band labels from lowest to highest value (not including "Not started"). */
-export const getBandLabels = (measure: MasteryMetric): readonly string[] =>
-  measure === "stability" ? STABILITY_BAND_LABELS : DIFFICULTY_BAND_LABELS;
+export const getBandLabels = (measure: MasteryMetric): readonly string[] => {
+  if (measure === "mastery") return MASTERY_LEVEL_LABELS;
+  return measure === "stability"
+    ? STABILITY_BAND_LABELS
+    : DIFFICULTY_BAND_LABELS;
+};
 
 /**
  * 0-based band (lowest value first) a pile row falls in for this metric, or
  * null for "Not started": not in the pile, or a needed card is still new.
+ * `now` (ms) is only used by the mastery levels.
  */
 export const getHeatmapBand = (
   metric: HeatmapMetric,
-  item: ReviewPileItemView | undefined
+  item: ReviewPileItemView | undefined,
+  now: number
 ): number | null => {
   if (item == null) return null;
   const { card, measure } = METRIC_INFO[metric];
-  const metrics = cardMetrics(item, card);
-  if (metrics == null) return null;
-  return measure === "stability"
-    ? stabilityBand(metrics.stability)
-    : difficultyBand(metrics.difficulty);
+  return itemBand(item, card, measure, now);
 };

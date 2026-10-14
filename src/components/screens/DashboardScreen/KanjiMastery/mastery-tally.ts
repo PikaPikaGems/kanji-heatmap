@@ -11,14 +11,13 @@ import {
   JouyouGradeListItems,
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
+import { getBandLabels } from "@/lib/engine/mastery-heatmap-metrics";
 import {
-  cardMetrics,
-  difficultyBand,
-  DIFFICULTY_BAND_LABELS,
   isCardStarted,
+  itemBand,
   type MasteryCardKind,
-  stabilityBand,
-  STABILITY_BAND_LABELS,
+  type MasteryMetric,
+  MASTERY_METRICS,
 } from "@/lib/engine/mastery-metrics";
 
 export const MASTERY_CARD_KINDS: readonly MasteryCardKind[] = [
@@ -63,46 +62,46 @@ export const JOUYOU_GROUPING: MasteryGrouping = {
 
 /**
  * Segment counts for one bar, indexed by band: 0 is "Not started", then the
- * metric's bands in order (the last stability band is burned).
+ * metric's bands in order.
  */
 export type BandCounts = number[];
 
 export type MasteryTally = {
   /** Kanji that have an anchor word: the 100% every bar is measured against. */
   total: number;
-  stability: Record<MasteryCardKind, BandCounts>;
-  difficulty: Record<MasteryCardKind, BandCounts>;
-};
+} & Record<MasteryMetric, Record<MasteryCardKind, BandCounts>>;
 
-const emptyBands = (labels: readonly string[]): BandCounts =>
-  new Array<number>(labels.length + 1).fill(0);
+const emptyBands = (metric: MasteryMetric): BandCounts =>
+  new Array<number>(getBandLabels(metric).length + 1).fill(0);
 
-const emptyByKind = (labels: readonly string[]) => ({
-  reading: emptyBands(labels),
-  writing: emptyBands(labels),
-  combined: emptyBands(labels),
+const emptyByKind = (metric: MasteryMetric) => ({
+  reading: emptyBands(metric),
+  writing: emptyBands(metric),
+  combined: emptyBands(metric),
 });
 
 const emptyTally = (): MasteryTally => ({
   total: 0,
-  stability: emptyByKind(STABILITY_BAND_LABELS),
-  difficulty: emptyByKind(DIFFICULTY_BAND_LABELS),
+  mastery: emptyByKind("mastery"),
+  stability: emptyByKind("stability"),
+  difficulty: emptyByKind("difficulty"),
 });
 
 const countStarted = (
   tally: MasteryTally,
   item: ReviewPileItemView,
-  kind: MasteryCardKind
+  kind: MasteryCardKind,
+  now: number
 ) => {
-  const metrics = cardMetrics(item, kind);
-  if (!metrics) return;
-  tally.stability[kind][stabilityBand(metrics.stability) + 1] += 1;
-  tally.difficulty[kind][difficultyBand(metrics.difficulty) + 1] += 1;
+  for (const metric of MASTERY_METRICS) {
+    const band = itemBand(item, kind, metric, now);
+    if (band != null) tally[metric][kind][band + 1] += 1;
+  }
 };
 
 /** Everything not counted into a band is "Not started". */
 const fillNotStarted = (tally: MasteryTally) => {
-  for (const metric of ["stability", "difficulty"] as const) {
+  for (const metric of MASTERY_METRICS) {
     for (const kind of MASTERY_CARD_KINDS) {
       const counts = tally[metric][kind];
       const started = counts.reduce((sum, n) => sum + n, 0);
@@ -119,13 +118,15 @@ export type MasteryTallies = {
 /**
  * Buckets every pile card by group, card kind and metric band. `allKanji`
  * is every kanji in the app; only those with an anchor word can be studied,
- * so only they count toward a group's total.
+ * so only they count toward a group's total. `now` (ms) dates the mastery
+ * levels.
  */
 export const tallyMastery = (
   allKanji: readonly string[],
   pile: readonly ReviewPileItemView[],
   getInfo: GetBasicKanjiInfo,
-  grouping: MasteryGrouping
+  grouping: MasteryGrouping,
+  now: number
 ): MasteryTallies => {
   const all = emptyTally();
   const byGroup: Record<string, MasteryTally> = Object.fromEntries(
@@ -149,8 +150,8 @@ export const tallyMastery = (
       all.total += 1;
     }
     for (const kind of MASTERY_CARD_KINDS) {
-      countStarted(tally, item, kind);
-      countStarted(all, item, kind);
+      countStarted(tally, item, kind, now);
+      countStarted(all, item, kind, now);
     }
   }
 
