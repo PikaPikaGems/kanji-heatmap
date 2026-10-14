@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Loader2, LogOut } from "lucide-react";
+import { Drawer as DrawerPrimitive } from "vaul";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -7,6 +8,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { copyForCode, UNSYNCED_LOGOUT_COPY } from "@/lib/engine/engine-copy";
+import {
+  openSyncOperations,
+  type SyncOperationsTab,
+} from "@/lib/engine/sync-operations-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import type { ActionStatus } from "./action-status";
 import { SyncNowButton } from "./SyncNowButton";
@@ -19,6 +24,25 @@ type MenuStatus =
   | { kind: "idle" }
   | { kind: "busy"; action: "logout" | "prepare-clear" }
   | { kind: "error"; message: string };
+
+/** Opens the operations modal; it lives outside the drawer, so close that first. */
+const OperationsLink = ({
+  tab,
+  children,
+}: {
+  tab: SyncOperationsTab;
+  children: string;
+}) => (
+  <DrawerPrimitive.Close asChild>
+    <button
+      type="button"
+      className="font-semibold text-left underline underline-offset-4"
+      onClick={() => openSyncOperations(tab)}
+    >
+      {children}
+    </button>
+  </DrawerPrimitive.Close>
+);
 
 const clearDataLabel = "Log out and remove all my data from this device";
 
@@ -66,6 +90,7 @@ const LogoutMenu = ({
       {pendingCount > 0 && (
         <>
           <p>{UNSYNCED_LOGOUT_COPY}</p>
+          <OperationsLink tab="pending">View unsynced changes</OperationsLink>
           <SyncNowButton />
         </>
       )}
@@ -126,7 +151,10 @@ const ConfirmClear = ({
       <p className="font-semibold">Remove all your data from this device?</p>
       <p>Unsynced changes on this device will be lost.</p>
       {hasRejectedNotes && (
-        <p>Some rejected notes may only exist on this device.</p>
+        <>
+          <p>Some rejected notes may only exist on this device.</p>
+          <OperationsLink tab="attention">Review rejected notes</OperationsLink>
+        </>
       )}
       <Button
         variant="destructive"

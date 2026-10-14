@@ -22,6 +22,7 @@ const CODE_COPY: Record<string, string> = {
   local_cache_unreadable: "This device's saved data couldn't be opened.",
   no_active_session: "Log in to save your progress.",
   validation_failed: "This is too long to save.",
+  unknown_operation_error: "Something went wrong.",
   pile_item_exists: "Already in your review pile.",
   unsupported_kanji: "This kanji can't be saved.",
   review_handle_expired: "This review timed out. Skipping it.",
@@ -54,6 +55,9 @@ export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
 export const PUSH_BLOCKED_COPY =
   "Changes from this device can't upload. Log out and remove this device's data to fix it.";
+
+export const OLD_PENDING_COPY =
+  "Some changes have been waiting to upload for over a week. Go online and sync soon, or saving will be paused.";
 
 export const REVIEW_SETTINGS_UPDATE_COPY =
   "Refresh the app to update review settings.";

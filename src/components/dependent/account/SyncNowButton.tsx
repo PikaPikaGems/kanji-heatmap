@@ -6,7 +6,7 @@ import { useEngineApi } from "@/lib/engine/use-engine-query";
 import type { ActionStatus } from "./action-status";
 
 /** Runs `sync.catchUp()` and shows its failure under the button. */
-export const SyncNowButton = () => {
+export const SyncNowButton = ({ label = "Sync now" }: { label?: string }) => {
   const api = useEngineApi();
   const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
   const busy = status.kind === "busy";
@@ -31,7 +31,7 @@ export const SyncNowButton = () => {
         onClick={() => void syncNow()}
       >
         {busy && <Loader2 className="animate-spin" />}
-        Sync now
+        {label}
       </Button>
       {status.kind === "error" && (
         <p role="alert" className="text-xs text-destructive">

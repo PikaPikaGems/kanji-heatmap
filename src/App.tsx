@@ -27,6 +27,7 @@ import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shor
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
 import { LoginDialog } from "@/components/dependent/account/LoginDialog";
 import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
+import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
 import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
 
 const {
@@ -158,6 +159,7 @@ const App = () => {
             <LoginDialog />
             <RecoveryDialog />
             <FsrsSettingsDialog />
+            <SyncOperationsDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>
