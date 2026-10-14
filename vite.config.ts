@@ -117,11 +117,17 @@ const kanjiCanvasRefPatternsPlugin: Plugin = {
 
 // The study engine (accounts, sync, review piles) is optional and is not an
 // npm dependency. KH_STUDY_ENGINE_ENTRY points at a built experimental-engine
-// `dist` directory; without it, `kh-study-engine` and `kh-study-engine/mock`
-// resolve to a stub and the app runs with accounts unavailable.
+// `dist` directory; otherwise the one scripts/fetch-study-engine.mjs builds
+// into .study-engine/ is used when present (deploys with
+// KH_STUDY_ENGINE_TOKEN). Without either, `kh-study-engine` and
+// `kh-study-engine/mock` resolve to a stub and the app runs with accounts
+// unavailable.
+const FETCHED_STUDY_ENGINE_DIST = path.resolve(__dirname, ".study-engine/dist");
 const STUDY_ENGINE_DIST = process.env.KH_STUDY_ENGINE_ENTRY
   ? path.resolve(process.env.KH_STUDY_ENGINE_ENTRY)
-  : null;
+  : fs.existsSync(path.join(FETCHED_STUDY_ENGINE_DIST, "engine/index.js"))
+    ? FETCHED_STUDY_ENGINE_DIST
+    : null;
 const STUDY_ENGINE_STUB = path.resolve(
   __dirname,
   "src/lib/engine/not-included.ts"

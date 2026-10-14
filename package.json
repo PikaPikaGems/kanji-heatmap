@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "node scripts/copy-yomiage-files.mjs && vite --port 5174",
     "dev:cf": "node scripts/copy-yomiage-files.mjs && vite --port 5173",
-    "build": "eslint . && node scripts/copy-yomiage-files.mjs && tsc -b && vite build",
+    "build": "eslint . && node scripts/copy-yomiage-files.mjs && node scripts/fetch-study-engine.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b && tsc -p e2e/tsconfig.json",
     "test": "vitest run",
