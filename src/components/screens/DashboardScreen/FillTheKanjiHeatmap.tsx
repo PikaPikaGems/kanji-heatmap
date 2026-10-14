@@ -1,12 +1,6 @@
 import { Link } from "@/components/dependent/routing";
-import { useId } from "react";
-import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { GenericPopover } from "@/components/common/GenericPopover";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { GradientLegend } from "@/components/common/GradientLegend";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import {
@@ -47,6 +41,7 @@ import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 import { FillTheKanjiSetProgress } from "./FillTheKanjiSetProgress";
+import { HeatmapLegendRow } from "./HeatmapLegendRow";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
@@ -81,63 +76,6 @@ const ProgressSummary = ({
     total {attempts === 1 ? "attempt" : "attempts"}*
   </>
 );
-
-/** Wide / Compact layout switch plus the attempt-count brightness scale. */
-const LayoutSettingsPopover = ({
-  compact,
-  onChange,
-}: {
-  compact: boolean;
-  onChange: (compact: boolean) => void;
-}) => {
-  const switchId = useId();
-  return (
-    <GenericPopover
-      contentClassName="m-0 p-0 max-w-56"
-      trigger={
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="p-2 rounded-xl bg-background"
-          aria-label="Fill the Kanji heatmap settings"
-        >
-          <Settings className="size-2" />
-        </Button>
-      }
-      content={
-        <div className="p-5 space-y-3 text-left">
-          <div className="text-xs font-extrabold uppercase text-muted-foreground">
-            Layout
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Label
-              htmlFor={switchId}
-              className={!compact ? "text-foreground font-semibold" : undefined}
-            >
-              Wide
-            </Label>
-            <Switch
-              id={switchId}
-              checked={compact}
-              onCheckedChange={onChange}
-              aria-label="Toggle compact Fill the Kanji heatmap"
-            />
-            <Label
-              htmlFor={switchId}
-              className={compact ? "text-foreground font-semibold" : undefined}
-            >
-              Compact
-            </Label>
-          </div>
-          <div className="pt-3 border-t border-dotted">
-            <AttemptCountScaleOptions />
-          </div>
-        </div>
-      }
-    />
-  );
-};
 
 const BatchDetail = ({
   setId,
@@ -341,15 +279,13 @@ export const FillTheKanjiHeatmap = () => {
         * A phrase (sentence or emoji) counts as seen once you finish a batch
         that has it. Complete is the share of the set (or group) seen.
       </p>
-      <div className="flex items-center justify-center w-full mt-4">
-        <div className="flex items-center gap-1">
-          <GradientLegend /> ·
-          <LayoutSettingsPopover
-            compact={compact}
-            onChange={(v) => setSetting("compact", v)}
-          />
-        </div>
-      </div>
+      <HeatmapLegendRow
+        name="Fill the Kanji"
+        compact={compact}
+        onCompactChange={(v) => setSetting("compact", v)}
+      >
+        <AttemptCountScaleOptions />
+      </HeatmapLegendRow>
       <div className="mt-6">
         <FillTheKanjiSetProgress statsById={statsById} />
       </div>

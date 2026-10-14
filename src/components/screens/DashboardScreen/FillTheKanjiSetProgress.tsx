@@ -8,7 +8,7 @@ import {
 } from "@/lib/fill-the-kanji/sets";
 import { setRowCount } from "@/lib/fill-the-kanji/batches";
 import { SetBatchStats, rowsSeen } from "@/lib/fill-the-kanji/storage";
-import { OverviewCaption } from "./OverviewStat";
+import { OverviewCaption } from "./ActivityStatCard";
 
 /**
  * One thin bar per set (phrases seen / phrases in the set), like the

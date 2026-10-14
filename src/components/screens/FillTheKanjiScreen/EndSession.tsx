@@ -28,7 +28,7 @@ const MissedKanjiList = ({
   onOpen: (kanji: string) => void;
 }) => (
   <p
-    className="flex flex-wrap justify-center gap-x-2 text-xs kanji-font"
+    className="flex flex-wrap justify-center gap-x-2 text-sm kanji-font"
     lang="ja"
   >
     {missed.map(({ kanji, kind }) => (

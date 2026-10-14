@@ -5,7 +5,7 @@ import {
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
 } from "@/lib/pages/practice-pages";
-import { OverviewStat } from "./OverviewStat";
+import { ActivityStatCard } from "./ActivityStatCard";
 
 export type ActivityCountsDisplay = {
   speedKatakanaDays: number;
@@ -18,75 +18,44 @@ export type ActivityCountsDisplay = {
   fillTheKanjiBatches: number;
 };
 
-const COUNTS_ROW_CN =
-  "grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3";
-
-/** Day totals + session/round/batch totals (2×2 centered text / capped row). */
+/** One card per activity: its days, then its rounds / batches / sessions. */
 export const ActivityCountsGrid = ({
   stats,
 }: {
   stats: ActivityCountsDisplay;
 }) => (
-  <div className="flex flex-col gap-2 sm:gap-3">
-    <div className={COUNTS_ROW_CN}>
-      <OverviewStat
-        value={stats.recognitionDays}
-        title={recognitionPracticePageMeta.shortLabel}
-        unit="Days"
-        Icon={Eye}
-        compact
-      />
-      <OverviewStat
-        value={stats.productionDays}
-        title={productionPracticePageMeta.shortLabel}
-        unit="Days"
-        Icon={PenLine}
-        compact
-      />
-      <OverviewStat
-        value={stats.fillTheKanjiDays}
-        title={fillTheKanjiPageMeta.shortLabel}
-        unit="Days"
-        Icon={Puzzle}
-        compact
-      />
-      <OverviewStat
-        value={stats.speedKatakanaDays}
-        title={speedKatakanaPageMeta.shortLabel}
-        unit="Days"
-        Icon={Keyboard}
-        compact
-      />
-    </div>
-    <div className={COUNTS_ROW_CN}>
-      <OverviewStat
-        value={stats.recognitionRounds}
-        title={recognitionPracticePageMeta.shortLabel}
-        unit="Rounds"
-        Icon={Eye}
-        compact
-      />
-      <OverviewStat
-        value={stats.productionRounds}
-        title={productionPracticePageMeta.shortLabel}
-        unit="Rounds"
-        Icon={PenLine}
-        compact
-      />
-      <OverviewStat
-        value={stats.fillTheKanjiBatches}
-        title={fillTheKanjiPageMeta.shortLabel}
-        unit="Batches"
-        Icon={Puzzle}
-        compact
-      />
-      <OverviewStat
-        value={stats.speedKatakanaSessions}
-        title={speedKatakanaPageMeta.shortLabel}
-        unit="Sessions"
-        Icon={Keyboard}
-        compact
-      />
-    </div>
+  <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
+    <ActivityStatCard
+      title={recognitionPracticePageMeta.shortLabel}
+      Icon={Eye}
+      counts={[
+        { value: stats.recognitionDays, unit: "Days" },
+        { value: stats.recognitionRounds, unit: "Rounds" },
+      ]}
+    />
+    <ActivityStatCard
+      title={productionPracticePageMeta.shortLabel}
+      Icon={PenLine}
+      counts={[
+        { value: stats.productionDays, unit: "Days" },
+        { value: stats.productionRounds, unit: "Rounds" },
+      ]}
+    />
+    <ActivityStatCard
+      title={fillTheKanjiPageMeta.shortLabel}
+      Icon={Puzzle}
+      counts={[
+        { value: stats.fillTheKanjiDays, unit: "Days" },
+        { value: stats.fillTheKanjiBatches, unit: "Batches" },
+      ]}
+    />
+    <ActivityStatCard
+      title={speedKatakanaPageMeta.shortLabel}
+      Icon={Keyboard}
+      counts={[
+        { value: stats.speedKatakanaDays, unit: "Days" },
+        { value: stats.speedKatakanaSessions, unit: "Sessions" },
+      ]}
+    />
   </div>
 );

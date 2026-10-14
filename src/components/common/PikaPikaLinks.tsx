@@ -10,15 +10,7 @@ export const PikaPikaLinks = () => {
         rel="noreferrer"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <Badge>🎤 Ririkku</Badge>
-      </a>
-      <a
-        href={outLinks.jpWordRanks}
-        target="_blank"
-        rel="noreferrer"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <Badge>🦉 JP Word Ranks</Badge>
+        <Badge>🎤 Ririkku ✨</Badge>
       </a>
     </div>
   );

@@ -7,11 +7,28 @@ import type {
 import { translateValue } from "@/lib/wanakana-adapter";
 import { cn } from "@/lib/utils";
 
-const MAX_ONYOMI = 4;
+const MAX_READINGS = 4;
 
 /**
- * Up to four onyomi, plus the first kunyomi when there are three or fewer,
- * so there are usually at least two. An onyomi that the phonetic component
+ * シャ for ジャ, ひ for -び: the reading without (han)dakuten or the
+ * okurigana and affix marks.
+ */
+const unvoiced = (reading: string) =>
+  reading
+    .replace(/[-.。]/g, "")
+    .normalize("NFD")
+    .replace(/[\u3099\u309A]/g, "")
+    .normalize("NFC");
+
+/** Drops rendaku forms (ジャ after シャ, -び after ひ) that repeat an earlier reading. */
+const withoutRendaku = (readings: string[]) =>
+  readings.filter(
+    (r, i) => readings.findIndex((o) => unvoiced(o) === unvoiced(r)) === i
+  );
+
+/**
+ * Up to four readings: onyomi first, then kunyomi to fill the rest, without
+ * rendaku repeats. An onyomi that the phonetic component
  * gives (間 → カン from 門) gets the same lime tint as the sound hint in the
  * kanji drawer.
  */
@@ -23,8 +40,11 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
 
   if (general == null) return null;
 
-  const onyomi = general.allOn.slice(0, MAX_ONYOMI);
-  const kunyomi = onyomi.length <= 3 ? general.allKun.slice(0, 1) : [];
+  const onyomi = withoutRendaku(general.allOn).slice(0, MAX_READINGS);
+  const kunyomi = withoutRendaku(general.allKun).slice(
+    0,
+    MAX_READINGS - onyomi.length
+  );
   const phoneticSounds = hover?.phonetic?.sound ?? [];
   const isPhonetic = (on: string) =>
     phoneticSounds.includes(translateValue(on, "hiragana"));

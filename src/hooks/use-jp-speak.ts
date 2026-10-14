@@ -36,6 +36,16 @@ const unlockBrowserVoice = () => {
   window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
 };
 
+/** Small kana that join the kana before them into one mora (きょ, ファ). */
+const SMALL_KANA = /[ゃゅょぁぃぅぇぉゎャュョァィゥェォヮ]/g;
+
+/**
+ * One kana sound (め, ジ, きょ). The AI voice often reads these too quietly
+ * to hear, so the browser voice reads them instead.
+ */
+const isSingleMora = (word: string) =>
+  /^[ぁ-ゖァ-ヺ]$/.test(word.replace(SMALL_KANA, "").trim());
+
 // Page-wide: the newest speak() wins. An AI call that fails after a newer
 // speak() started must not fall back and talk over it.
 let latestSpeakId = 0;
@@ -96,7 +106,7 @@ export const useSpeakWithStatus = (word: string, slow = false) => {
   const speak = useCallback(() => {
     const id = ++latestSpeakId;
 
-    if (engine !== "ai" || !canSpeakAi()) {
+    if (engine !== "ai" || !canSpeakAi() || isSingleMora(word)) {
       stopAiSpeech();
       speakWithBrowser();
       return;

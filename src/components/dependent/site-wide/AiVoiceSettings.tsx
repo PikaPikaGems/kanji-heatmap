@@ -433,8 +433,8 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
 
   const choosePreset = (next: PresetName | "custom") => {
     const patch: Partial<AiVoiceSettings> = { preset: next };
-    // First time on Custom: start from the preset that was selected.
-    if (next === "custom" && !settings.custom) {
+    // Custom starts from the preset it was switched from, like Delivery.
+    if (next === "custom" && !isCustom) {
       patch.custom = { ...PRESETS[lastPreset] };
     }
     preview.play(updateSettings(patch));

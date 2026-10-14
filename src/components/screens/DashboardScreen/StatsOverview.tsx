@@ -4,7 +4,7 @@ import { useActivityData } from "@/hooks/use-activity-data";
 import { formatRawCount } from "@/lib/format-count";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { DashboardPanel } from "./DashboardPanel";
-import { OverviewCaption } from "./OverviewStat";
+import { OverviewCaption } from "./ActivityStatCard";
 
 export const StatsOverview = () => {
   const {

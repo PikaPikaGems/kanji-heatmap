@@ -112,10 +112,7 @@ export const FuriganaSentence = ({
               );
             });
             if (!reading) return <span key={j}>{text}</span>;
-            // Not <ruby>: iOS Safari drew the reading left of its kanji when
-            // other text came before it in the bunsetsu. Nor a block stacked
-            // over the kanji in an inline-block: iOS still shifted it left.
-            // The reading is absolutely centered over its kanji instead
+            // The reading is absolutely centered over its kanji
             // (left-1/2 + -translate-x-1/2 needs no intrinsic sizing). The
             // top padding reserves its height minus the 0.2em it dips into the
             // line's half-leading; the min width (0.45em per kana) keeps a
