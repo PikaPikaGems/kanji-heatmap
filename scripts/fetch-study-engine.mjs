@@ -11,10 +11,10 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const REPO = "PikaPikaGems/experimental-engine";
-// The audited engine build (9df9feb) plus the read-only review watch fix, on
-// the engine's claude/cool-carson-jxegku branch until it merges. Bump
-// together with the dexie, ts-fsrs and engine-contract pins in package.json.
-const COMMIT = "f9363e125d69aa9324fb73345e4304433fe282b5";
+// The audited engine build (9df9feb) plus the read-only review watch fix
+// (experimental-engine#87), on the engine's main. Bump together with the
+// dexie, ts-fsrs and engine-contract pins in package.json.
+const COMMIT = "b3a22645fb02f1afefb242b5a997ba6e846ab27a";
 const DIR = ".study-engine";
 
 const token = process.env.KH_STUDY_ENGINE_TOKEN;
