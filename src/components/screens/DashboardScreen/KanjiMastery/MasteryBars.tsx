@@ -4,6 +4,7 @@ import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { MasteryBarsLegend } from "./MasteryBarsLegend";
 import { MasteryCard } from "./MasteryCard";
 import {
   JLPT_GROUPING,
@@ -32,7 +33,7 @@ export const MasteryBars = ({
 
   return (
     <>
-      <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
+      <div className="flex items-center justify-center gap-2 mb-3 text-xs text-muted-foreground">
         <Label
           htmlFor={switchId}
           className={!showJouyou ? "text-foreground font-semibold" : undefined}
@@ -52,6 +53,7 @@ export const MasteryBars = ({
           Jouyou
         </Label>
       </div>
+      <MasteryBarsLegend />
       <div className="grid gap-3 sm:grid-cols-2">
         {MASTERY_CARD_KINDS.flatMap((kind) =>
           METRICS.map((metric) => (

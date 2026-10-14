@@ -2,10 +2,11 @@ import type {
   MasteryCardKind,
   MasteryMetric,
 } from "@/lib/engine/mastery-metrics";
+import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
-  DIFFICULTY_BAND_LABELS,
-  STABILITY_BAND_LABELS,
-} from "@/lib/engine/mastery-metrics";
+  getBandLabels,
+  NOT_STARTED_LABEL,
+} from "@/lib/engine/mastery-heatmap-metrics";
 import { SegmentedBandBar } from "../SegmentedBandBar";
 import type {
   MasteryGroup,
@@ -15,38 +16,24 @@ import type {
 
 type MetricView = {
   title: string;
-  /** Legend and screen reader text per segment; 0 is "Not started". */
+  /** Screen reader text per segment; 0 is "Not started". */
   segmentLabels: readonly string[];
-  /** Fill per segment, light to dark; index 0 is unused (the empty track). */
+  /** Fill per segment, same palette as the legend and the /mastery heatmap; index 0 is unused (the empty track). */
   segmentCn: readonly string[];
 };
 
+const toMetricView = (measure: MasteryMetric, title: string): MetricView => {
+  const labels = getBandLabels(measure);
+  return {
+    title,
+    segmentLabels: [NOT_STARTED_LABEL, ...labels],
+    segmentCn: ["", ...labels.map((_, band) => getBandFillCn(measure, band))],
+  };
+};
+
 const METRIC_VIEWS: Record<MasteryMetric, MetricView> = {
-  stability: {
-    title: "Stability",
-    segmentLabels: ["Not started", ...STABILITY_BAND_LABELS],
-    segmentCn: [
-      "",
-      "bg-[rgba(var(--theme-color-selected),0.25)]",
-      "bg-[rgba(var(--theme-color-selected),0.4)]",
-      "bg-[rgba(var(--theme-color-selected),0.55)]",
-      "bg-[rgba(var(--theme-color-selected),0.7)]",
-      "bg-[rgba(var(--theme-color-selected),0.85)]",
-      "bg-[rgba(var(--theme-color-selected),1)]",
-    ],
-  },
-  difficulty: {
-    title: "Difficulty",
-    segmentLabels: ["Not started", ...DIFFICULTY_BAND_LABELS],
-    segmentCn: [
-      "",
-      "bg-[rgba(var(--theme-color-selected),0.25)]",
-      "bg-[rgba(var(--theme-color-selected),0.45)]",
-      "bg-[rgba(var(--theme-color-selected),0.65)]",
-      "bg-[rgba(var(--theme-color-selected),0.85)]",
-      "bg-[rgba(var(--theme-color-selected),1)]",
-    ],
-  },
+  stability: toMetricView("stability", "Stability"),
+  difficulty: toMetricView("difficulty", "Difficulty"),
 };
 
 const KIND_TITLES: Record<MasteryCardKind, string> = {
@@ -54,19 +41,6 @@ const KIND_TITLES: Record<MasteryCardKind, string> = {
   writing: "Writing",
   combined: "Combined",
 };
-
-const Legend = ({ view }: { view: MetricView }) => (
-  <ul className="flex flex-wrap pt-3 mt-auto text-[10px] gap-x-3 gap-y-1 text-muted-foreground">
-    {view.segmentLabels.map((label, band) => (
-      <li key={label} className="flex items-center gap-1">
-        <span
-          className={`inline-block w-2.5 h-2.5 rounded-sm border border-border ${band === 0 ? "bg-muted/50" : view.segmentCn[band]}`}
-        />
-        {label}
-      </li>
-    ))}
-  </ul>
-);
 
 const BarRow = ({
   label,
@@ -122,7 +96,7 @@ export const MasteryCard = ({
 }) => {
   const view = METRIC_VIEWS[metric];
   return (
-    <section className="flex flex-col min-w-0 p-3 text-left border rounded-xl border-foreground/5 bg-muted/10">
+    <section className="min-w-0 p-3 text-left border rounded-xl border-foreground/5 bg-muted/10">
       <h3 className="mb-3 text-sm font-bold">
         {KIND_TITLES[kind]} {view.title}
       </h3>
@@ -148,7 +122,6 @@ export const MasteryCard = ({
           />
         </div>
       </div>
-      <Legend view={view} />
     </section>
   );
 };

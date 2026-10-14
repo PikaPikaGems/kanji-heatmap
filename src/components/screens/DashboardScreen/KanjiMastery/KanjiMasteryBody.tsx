@@ -12,6 +12,7 @@ import {
 import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { Button } from "@/components/ui/button";
+import { PanelNotice } from "../PanelNotice";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
 
@@ -23,14 +24,14 @@ const KanjiDrawerGlobal = lazy(
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
 const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
-  <div className="flex flex-col items-center gap-3 py-6 text-sm text-center text-muted-foreground">
+  <PanelNotice>
     <p>Couldn&apos;t load your kanji mastery.</p>
     {onRetry ? (
       <Button variant="outline" size="sm" onClick={onRetry}>
         Try again
       </Button>
     ) : null}
-  </div>
+  </PanelNotice>
 );
 
 /** Pile snapshot + kanji data -> loading / failed / the mastery view. */
