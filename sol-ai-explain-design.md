@@ -295,6 +295,28 @@ Style defaults:
 | Cartoon or anime | Playful cartoon illustration with anime-inspired expressions, clean outlines, simple cel shading, and an expressive central subject. |
 | Custom           | The user's saved or inline custom style description.                                                                                 |
 
+### Palette prompts
+
+Replace `{PALETTE_PROMPT}` with the prompt for the selected color below. These
+apply to every style, including Custom. The accent values for lime, cyan, and
+hot pink come from the app's existing `themeColors` definitions. Resolve Blue
+from the app's blue theme during implementation rather than its neutral CSS
+`--primary` value.
+
+| Color              | Default palette prompt                                                                                                                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lime               | Use bright lime green (#a3e635) as the dominant accent. Support it with pale lime, off-white, and charcoal. Keep the focal subject vivid and clearly separated from the background.                       |
+| Cyan / aqua        | Use luminous cyan/aqua (#2effff) as the dominant accent. Support it with pale aqua, off-white, and deep teal or charcoal. Keep the focal subject clear; avoid making the whole image glow.                |
+| Blue               | Use Kanji Heatmap's blue theme color as the dominant accent, with lighter blue, off-white, and deep navy support colors. Keep the focal subject vivid and the background simple.                          |
+| Fuchsia / hot pink | Use vivid fuchsia/hot pink (#fb02a8) as the dominant accent. Support it with pale pink, off-white, and deep plum or charcoal. Keep the focal subject bold without filling every area with saturated pink. |
+| Black and white    | Use only black, white, and shades of gray. No colored accents. Make the mnemonic readable through strong silhouettes, clear light-dark contrast, and shading appropriate to the selected style.           |
+
+For Blue, include the resolved theme color's hex value in the effective prompt.
+Adapt these palettes to the style: watercolor uses washes, pixel art uses a
+limited set of flat colors, and cartoon/anime uses clean cel shading. Color
+names describe a dominant accent, not a requirement that every object be that
+color.
+
 Store the actual image file. Grok's default image URLs are temporary; use returned
 image bytes/base64 where supported rather than saving only a remote URL.
 
