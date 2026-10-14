@@ -14,6 +14,8 @@ Decisions confirmed on 15 October 2026:
 - Memorable word usage can include anime, books, songs, haiku, quotes, and lyrics.
 - Use real web search for Anchor Word details and AI Kanji Essays.
 - Keep both essays short using character targets and maximums in their prompts.
+- Default images to the Kanji Heatmap illustration style and its six-color
+  palette, with distinct primary, secondary, accent, and neutral roles.
 
 ## 1. Scope
 
@@ -108,6 +110,8 @@ Add compact subsections:
 | Kanji essay prompt           | Default in section 6                                                     |
 | Image model                  | A supported Grok Imagine model; check availability during implementation |
 | Shared image prompt          | Default in section 5                                                     |
+| Kanji Heatmap style prompt   | Editable default style in section 5                                      |
+| Kanji Heatmap palette prompt | Editable default palette in section 5                                    |
 | Watercolor style prompt      | Editable preset in section 5                                             |
 | 16-bit game art style prompt | Editable preset in section 5                                             |
 | Cartoon / anime style prompt | Editable preset in section 5                                             |
@@ -228,16 +232,20 @@ visible only when AI is ready.
 
 - **Describe your mnemonic** textarea.
 - Hint: **Describe a scene that helps you remember this kanji.**
-- Style: **Watercolor / 16-bit game art / Cartoon or anime / Custom**.
-- Color: **Lime / Cyan / Blue / Hot pink / Black and white**.
-- Default style: Watercolor. Default color: Blue.
+- Style: **Kanji Heatmap / Watercolor / 16-bit game art / Cartoon or anime / Custom**.
+- Palette: **Kanji Heatmap / Lime / Cyan / Blue / Hot pink / Black and white**.
+- Default style: Kanji Heatmap. Default palette: Kanji Heatmap.
 - **✨ Generate Visual Mnemonic** button.
 - Require a nonempty scene description. If Custom is selected without a saved
   custom style, provide an inline field for the style description.
 
-Use the app's existing palette values when available. Color choices describe
-the dominant palette, with neutral support colors as needed. Black and white
-means grayscale only.
+Style controls the illustration's shapes, lines, and shading. Palette controls
+its colors. Keep these independent: watercolor can use the Kanji Heatmap palette,
+and the Kanji Heatmap style can use a black-and-white palette.
+
+Use the app's existing palette values when available. The Kanji Heatmap palette
+combines six colors with distinct roles. The other choices are alternate palettes
+led by one accent color, or grayscale for Black and white.
 
 ### Gallery of three
 
@@ -251,7 +259,7 @@ means grayscale only.
   images are untouched.
 - Delete only the selected image, with a compact confirmation.
 - Retain scene, style, palette, and generation instructions with each image.
-- Changing style or color controls does not modify saved images until generation.
+- Changing style or palette controls does not modify saved images until generation.
 
 First implementation uses fresh generation for regeneration: replay the saved
 scene with current style/palette and appended change instructions. Label this
@@ -286,7 +294,32 @@ watermarks, or a kanji character; the app displays the correct character
 separately.
 ```
 
-Style defaults:
+### Kanji Heatmap style prompt
+
+The default style should feel like a friendly sticker illustration that belongs
+beside the site's buttons and cards. Use rounded silhouettes, solid lines, and
+simple fills. The app supplies the image container's rounded border; do not ask
+the model to paint a decorative frame into the image.
+
+```text
+Create a playful, friendly illustration that fits the Kanji Heatmap interface.
+
+Use rounded shapes, soft corners, and clean, solid outlines with consistent
+thickness and rounded ends. Use flat color fills with minimal, simple shading.
+Avoid realistic textures, intricate detail, and heavy gradients.
+
+Build the mnemonic around one clear focal subject. Use expressive poses and a
+few exaggerated details to make the scene memorable. Keep the background simple
+with generous breathing room. The image must remain easy to understand at
+thumbnail size.
+
+Apply the selected palette supplied separately. Keep the focal subject and its
+important details clearly separated from the background.
+
+Do not add lettering, captions, a decorative frame, or a kanji character.
+```
+
+Other style defaults:
 
 | Style            | Prompt                                                                                                                               |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
@@ -297,11 +330,48 @@ Style defaults:
 
 ### Palette prompts
 
-Replace `{PALETTE_PROMPT}` with the prompt for the selected color below. These
+Replace `{PALETTE_PROMPT}` with the prompt for the selected palette below. These
 apply to every style, including Custom. The accent values for lime, cyan, and
 hot pink come from the app's existing `themeColors` definitions. Resolve Blue
 from the app's blue theme during implementation rather than its neutral CSS
 `--primary` value.
+
+#### Kanji Heatmap palette — default
+
+| Role      | Color                        | Use                            |
+| --------- | ---------------------------- | ------------------------------ |
+| Primary   | Blue                         | Main subject and larger shapes |
+| Secondary | Cyan / aqua (#2effff)        | Supporting shapes and depth    |
+| Accent    | Lime (#a3e635)               | A memorable focal detail       |
+| Accent    | Fuchsia / hot pink (#fb02a8) | Playful contrast               |
+| Neutral   | Black                        | Outlines and dark contrast     |
+| Neutral   | White                        | Background and breathing room  |
+
+```text
+Use the Kanji Heatmap six-color palette: blue, cyan/aqua (#2effff), lime
+(#a3e635), fuchsia/hot pink (#fb02a8), black, and white.
+
+Let blue be the primary color for the main subject and larger shapes. Use
+cyan/aqua as the secondary color for supporting shapes and depth. Use lime or
+hot pink as the strongest small accent on a memorable detail; the other accent
+may appear sparingly. Use black and white for outlines, contrast, and breathing
+room, according to the selected illustration style.
+
+Do not give all colors equal visual weight. All six are available, but not every
+image needs all six. Keep the scene clear rather than filling every area with
+saturated color.
+
+Adapt the palette to the selected style: soft washes for watercolor, crisp
+limited-color blocks for 16-bit game art, and clean fills with simple shading
+for Kanji Heatmap or cartoon/anime illustrations.
+```
+
+Include the resolved blue theme color's hex value when composing this prompt.
+Lighter and darker variations may support shading, but the named six colors
+define the palette's identity. Treat primary and secondary as visual roles,
+not rigid percentages. This palette also applies to Custom styles.
+
+#### Alternate palettes
 
 | Color              | Default palette prompt                                                                                                                                                                                    |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
