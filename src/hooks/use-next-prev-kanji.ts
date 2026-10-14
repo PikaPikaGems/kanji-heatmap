@@ -1,19 +1,16 @@
-import { createContext, useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import { getFinalResults } from "@/lib/results-utils";
-
-/**
- * Whether the kanji drawer may step through the current search results.
- * Practice screens turn this off: their drawer opens on a single kanji from
- * the end-of-round recap, which has nothing to do with the list's results.
- */
-export const KanjiNavigationContext = createContext(true);
+import { isPracticePath } from "@/lib/practice-return-path";
+import { useUrlLocation } from "@/hooks/routing-hooks";
 
 export const useNextPrevKanji = (currentKanji: string) => {
   const kanjisData = useKanjiSearchResult();
   const searchSettings = useSearchSettings();
-  const navigationEnabled = useContext(KanjiNavigationContext);
+  // On practice pages the drawer opens on a single kanji from the end-of-round
+  // recap, which has nothing to do with the home screen's search results.
+  const navigationEnabled = !isPracticePath(useUrlLocation());
 
   const nextPrev = useMemo(() => {
     if (!navigationEnabled) {

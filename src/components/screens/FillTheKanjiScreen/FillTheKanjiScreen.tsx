@@ -3,7 +3,6 @@ import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { PracticeShell } from "@/components/shared-practice";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
-import { KanjiNavigationContext } from "@/hooks/use-next-prev-kanji";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { recordActivity } from "@/lib/activity";
 import {
@@ -111,13 +110,7 @@ const FillTheKanjiScreen = () => {
         )}
       </PracticeShell>
 
-      {/* The recap's missed kanji open here; no stepping through the home
-        screen's search results from a single kanji. */}
-      {phase === "ended" && (
-        <KanjiNavigationContext.Provider value={false}>
-          <KanjiDrawerGlobal />
-        </KanjiNavigationContext.Provider>
-      )}
+      {phase === "ended" && <KanjiDrawerGlobal />}
     </>
   );
 };
