@@ -67,6 +67,8 @@ const METRIC_INFO: Record<
   },
 };
 
+export const NOT_STARTED_LABEL = "Not started";
+
 export const getHeatmapMetricLabel = (metric: HeatmapMetric): string =>
   METRIC_INFO[metric].label;
 

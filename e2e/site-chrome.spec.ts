@@ -14,9 +14,6 @@ test.describe("site chrome", () => {
 
     await island.getByRole("link", { name: "Visualize Mastery" }).click();
     await expect(page).toHaveURL(/\/mastery$/);
-    await expect(page.getByText("Coming soon")).toBeVisible({
-      timeout: 30_000,
-    });
 
     await island.getByRole("link", { name: "Explore Kanji" }).click();
     await expect(page).toHaveURL(/\/(\?.*)?$/);

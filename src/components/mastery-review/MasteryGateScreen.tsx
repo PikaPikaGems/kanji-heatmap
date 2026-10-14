@@ -18,24 +18,21 @@ const GateMessage = ({
   children: ReactNode;
   action?: ReactNode;
 }) => (
-  <div className="relative flex flex-col items-center justify-center w-full h-full gap-4 px-6 text-center animate-fade-in">
-    <LeavePractice />
+  <>
     <p className="max-w-sm text-sm text-muted-foreground">{children}</p>
     {action}
-  </div>
+  </>
 );
 
 /**
- * What /reading-mastery and /writing-mastery show instead of the game while
- * the account can't review (design 5.1 and 5.8).
+ * Why the account can't use this screen, with the way out when there is one
+ * (design 5.1 and 5.8). Lays itself out in whatever flex column holds it.
  */
-export const MasteryGateScreen = ({
+export const AccountGateMessage = ({
   status,
 }: {
-  status: Exclude<AccountStatus, { kind: "active" }>;
+  status: Exclude<AccountStatus, { kind: "active" | "loading" }>;
 }) => {
-  if (status.kind === "loading") return <MasteryLoading />;
-
   if (status.kind === "unavailable") {
     if (status.reason === "not-included") {
       return <GateMessage>{NOT_IN_BUILD_COPY}</GateMessage>;
@@ -78,5 +75,24 @@ export const MasteryGateScreen = ({
     >
       You need to log in to access this
     </GateMessage>
+  );
+};
+
+/**
+ * What /reading-mastery and /writing-mastery show instead of the game while
+ * the account can't review (design 5.1 and 5.8).
+ */
+export const MasteryGateScreen = ({
+  status,
+}: {
+  status: Exclude<AccountStatus, { kind: "active" }>;
+}) => {
+  if (status.kind === "loading") return <MasteryLoading />;
+
+  return (
+    <div className="relative flex flex-col items-center justify-center w-full h-full gap-4 px-6 text-center animate-fade-in">
+      <LeavePractice />
+      <AccountGateMessage status={status} />
+    </div>
   );
 };
