@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
+import { RATING_KEYS, ratingForKey } from "@/components/shared-practice";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
 import { StrokePreview } from "../StrokePreview";
@@ -18,6 +19,8 @@ import {
 const PREVIEW_SIZE = 130;
 
 const ENTER_OR_SPACE = ["Enter", " "] as const;
+/** Mastery: the "Next" keys plus 1 / 2 / 3, all of which rate. */
+const RATING_OR_SPACE = [...RATING_KEYS, " "] as const;
 
 export const FeedbackDrawer = ({
   open,
@@ -45,12 +48,18 @@ export const FeedbackDrawer = ({
   const [practiceOpen, setPracticeOpen] = useState(false);
 
   // Enter/Space → Next Kanji. Arm after a beat so the key that opened
-  // feedback (e.g. Enter on Select → Next) doesn't also advance. Off when
-  // rating: the user has to pick Hard / Good / Easy.
+  // feedback (e.g. Enter on Select → Next) doesn't also advance. When
+  // rating, Enter/Space mean Good and 1 / 2 / 3 mean Hard / Good / Easy.
   useArmedConfirmKey({
-    onConfirm: onNext,
-    enabled: open && !practiceOpen && !rating,
-    keys: ENTER_OR_SPACE,
+    onConfirm: (key) => {
+      if (!rating) {
+        onNext();
+        return;
+      }
+      rating.onRate(ratingForKey(key) ?? "good");
+    },
+    enabled: open && !practiceOpen,
+    keys: rating ? RATING_OR_SPACE : ENTER_OR_SPACE,
   });
 
   const title =

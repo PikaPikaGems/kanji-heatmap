@@ -13,7 +13,8 @@ export const useArmedConfirmKey = ({
   keys = ["Enter"],
   armDelayMs = 300,
 }: {
-  onConfirm: () => void;
+  /** Gets the key that fired, for callers that map several keys. */
+  onConfirm: (key: string) => void;
   enabled?: boolean;
   /** Pass a module-level constant to avoid re-subscribing every render. */
   keys?: readonly string[];
@@ -41,7 +42,7 @@ export const useArmedConfirmKey = ({
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (el.isContentEditable) return;
       e.preventDefault();
-      onConfirmRef.current();
+      onConfirmRef.current(e.key);
     };
 
     window.addEventListener("keyup", onKeyUp);

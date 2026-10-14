@@ -10,6 +10,7 @@ import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { BlurredGloss } from "@/components/shared-practice";
+import { FORGOT_KEYS } from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
@@ -84,6 +85,7 @@ export const Game = ({
   const drawSubmitRef = useRef<(payload: DrawingSubmitPayload) => void>(
     () => {}
   );
+  const forgotFromDrawRef = useRef<() => void>(() => {});
   const padSize = useFitPadSize(DRAW_SVG_SIZE);
 
   const current = sessionItems[index];
@@ -136,6 +138,12 @@ export const Game = ({
     [step.type, strokes, padSize]
   );
   useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
+  // Mastery: key 1 is Forgot while the draw step's Forgot button is enabled.
+  useEnterAction(
+    grading && step.type === "draw" ? () => forgotFromDrawRef.current() : null,
+    true,
+    FORGOT_KEYS
+  );
 
   if (!current) {
     return null;
@@ -170,6 +178,8 @@ export const Game = ({
       grade: { rank: -1, topGuess: null, inTop10: false },
     });
   };
+
+  forgotFromDrawRef.current = onForgotFromDraw;
 
   const openSelectStep = (
     grade: GradeRankInfo,
@@ -320,6 +330,7 @@ export const Game = ({
             setStrokes={setStrokes}
             showForgotBtn
             onClickForgot={onForgotFromDraw}
+            forgotHint={grading ? "1" : undefined}
             forgotDisabled={recognizing || step.type !== "draw"}
             showSubmitBtn
             submitIcon={<Rocket />}
@@ -348,6 +359,7 @@ export const Game = ({
         selected={selected}
         gradingEnabled={selectGradingEnabled}
         recognitionSkipped={recognitionSkippedOnSelect}
+        forgotShortcut={grading != null}
         onSelect={setSelected}
         onForgot={onSelectForgot}
         onNext={onSelectNext}

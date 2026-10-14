@@ -6,7 +6,12 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
-import { BlurredGloss } from "@/components/shared-practice";
+import {
+  BlurredGloss,
+  FORGOT_KEY,
+  GRADE_DIGIT_KEYS,
+  ratingForKey,
+} from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
@@ -121,12 +126,29 @@ export const Game = ({
       return;
     }
 
+    // Mastery shortcuts (Anki-style): 1 = Forgot while it is enabled; once
+    // the reading matches, 2 / 3 / 4 = Hard / Good / Easy and Enter = Good.
+    // Digits are never part of a reading, so they never type.
+    if (grading && GRADE_DIGIT_KEYS.includes(e.key)) e.preventDefault();
+    const rating = grading && matched ? ratingForKey(e.key) : null;
+    if (rating) {
+      e.preventDefault();
+      // Not the Enter that commits an IME composition (Safari reports it
+      // after compositionend, as keyCode 229), and not a held key.
+      if (e.repeat || e.nativeEvent.keyCode === 229) return;
+      openFeedback(true, rating);
+      return;
+    }
+    if (grading && !matched && e.key === FORGOT_KEY) {
+      if (!e.repeat) openFeedback(false, "again");
+      return;
+    }
+
     if (e.key !== "Enter") return;
     e.preventDefault();
 
     if (matched) {
-      // Mastery: pressing a rating button is the only way to continue.
-      if (!grading) openFeedback(true);
+      openFeedback(true);
       return;
     }
     if (forgotTyped) {
