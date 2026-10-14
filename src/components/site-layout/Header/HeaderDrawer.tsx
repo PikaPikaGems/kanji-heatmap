@@ -22,6 +22,8 @@ import {
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
+import { AccountSection } from "@/components/dependent/account/AccountSection";
+import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -50,6 +52,7 @@ const HeaderDrawerContent = ({
             <ModeToggle />
           </div>
         </div>
+        <AccountSection />
         <DashedNavLinkList
           items={headerNavLinks}
           className="flex flex-col gap-2"
@@ -94,6 +97,7 @@ const HeaderDrawerContent = ({
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
         <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
         <NetworkStatusBadge />
+        <MockBackendPanel />
       </div>
     </div>
   );

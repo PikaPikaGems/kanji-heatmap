@@ -48,6 +48,15 @@ export const UPDATE_BROWSER_COPY =
 
 export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
+export const PUSH_BLOCKED_COPY =
+  "Changes from this device can't upload. Log out and remove this device's data to fix it.";
+
+export const REVIEW_SETTINGS_UPDATE_COPY =
+  "Refresh the app to update review settings.";
+
+export const UNSYNCED_LOGOUT_COPY =
+  "You have unsynced changes. They stay on this device for now, but may be deleted when the cache expires or another account needs space. Sync before logging out to avoid losing them.";
+
 /** Message for an engine `{ code }` error, with a generic fallback. */
 export const copyForCode = (code: string): string =>
   CODE_COPY[code] ?? "Something went wrong. Try again.";
