@@ -17,7 +17,8 @@ Decisions confirmed on 15 October 2026:
 - Default images to the Kanji Heatmap illustration style and its six-color
   palette, with distinct primary, secondary, accent, and neutral roles.
 - Provide clearly labeled Download MP3 buttons for Anchor Word and Kanji Essay.
-- Generate square 1K images and scale their display to fit the drawer.
+- Make image resolution and quality configurable in User Preferences. Default
+  to square 1K images at Standard quality; scale their display to fit the drawer.
 
 ## 1. Scope
 
@@ -105,26 +106,37 @@ kanji essays, visual mnemonics, and narration.
 
 Add compact subsections:
 
-| Preference                   | Default and behavior                                                     |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| Sentence prompt              | Existing default, unchanged                                              |
-| Vocabulary details prompt    | Default in section 4                                                     |
-| Kanji essay prompt           | Default in section 6                                                     |
-| Image model                  | A supported Grok Imagine model; check availability during implementation |
-| Shared image prompt          | Default in section 5                                                     |
-| Kanji Heatmap style prompt   | Editable default style in section 5                                      |
-| Kanji Heatmap palette prompt | Editable default palette in section 5                                    |
-| Watercolor style prompt      | Editable preset in section 5                                             |
-| 16-bit game art style prompt | Editable preset in section 5                                             |
-| Cartoon / anime style prompt | Editable preset in section 5                                             |
-| Custom style prompt          | User-written style instructions                                          |
-| Speech voice                 | Eve initially; allow supported built-in voices                           |
-| Speech language              | Automatic by default; Japanese is the other option                       |
-| Generated content storage    | Space used and Clear generated content action                            |
+| Preference                   | Default and behavior                                                             |
+| ---------------------------- | -------------------------------------------------------------------------------- |
+| Sentence prompt              | Existing default, unchanged                                                      |
+| Vocabulary details prompt    | Default in section 4                                                             |
+| Kanji essay prompt           | Default in section 6                                                             |
+| Image model                  | A supported Grok Imagine model; check availability during implementation         |
+| Image resolution             | 1K (default) / 2K                                                                |
+| Image quality                | Standard (default) / Higher detail; only for models supporting quality selection |
+| Shared image prompt          | Default in section 5                                                             |
+| Kanji Heatmap style prompt   | Editable default style in section 5                                              |
+| Kanji Heatmap palette prompt | Editable default palette in section 5                                            |
+| Watercolor style prompt      | Editable preset in section 5                                                     |
+| 16-bit game art style prompt | Editable preset in section 5                                                     |
+| Cartoon / anime style prompt | Editable preset in section 5                                                     |
+| Custom style prompt          | User-written style instructions                                                  |
+| Speech voice                 | Eve initially; allow supported built-in voices                                   |
+| Speech language              | Automatic by default; Japanese is the other option                               |
+| Generated content storage    | Space used and Clear generated content action                                    |
 
 Every default prompt editor has **Reset to default** and lists its supported
 placeholders. No separately configurable text regeneration template is needed
 for the first implementation; use the shared template above.
+
+Group image resolution and quality under **Visual Mnemonics** in User
+Preferences. For Grok Imagine Image 2.0, Standard maps to `low` and Higher detail
+maps to `medium`. Show a short note that larger images and higher quality can
+cost more, with the selected combination's price when reliably available.
+Do not offer unsupported options for another model or silently increase cost.
+Preference changes apply only to the next explicit image generation; existing
+gallery images retain their original resolution and quality. Save both settings
+with each generated image. Keep these controls out of the drawer's main form.
 
 Speech language maps to `auto` or `ja`. Explain Japanese with: **Forces Japanese
 speech mode, even when the text includes English.** This setting is separate
@@ -275,12 +287,13 @@ the generated illustration to reproduce its strokes correctly.
 
 ### Image size and quality
 
-- Request `aspect_ratio: "1:1"`, `resolution: "1k"`, and one image per action.
-  This gives a roughly 1024-by-1024 square: enough detail for the drawer and a
-  useful download without requesting a 2K image.
-- For `grok-imagine-image-2.0`, explicitly request `quality: "low"`, the provider's
-  current default generation tier. Verify actual examples before release; do
-  not imply that the API tier name guarantees or measures visual quality.
+- Request `aspect_ratio: "1:1"`, the resolution selected in User Preferences,
+  and one image per action. Default `resolution: "1k"` gives a roughly
+  1024-by-1024 square: enough detail for the drawer and a useful download.
+- For `grok-imagine-image-2.0`, explicitly request the selected quality tier:
+  `low` for Standard (default), or `medium` for Higher detail. Verify actual
+  examples before release; do not imply that the API tier name guarantees or
+  measures visual quality.
 - Set size through API options, not just words in the prompt. Do not silently
   fall back to a larger resolution or a more expensive quality tier.
 - Display the selected image at full available drawer width, capped at 512 CSS
@@ -288,7 +301,7 @@ the generated illustration to reproduce its strokes correctly.
 - Use approximately 80–96 CSS pixel thumbnails, shrinking to fit narrow drawers.
 - Save the image file once and scale it for display; do not store base64 strings
   or extra full-resolution copies for each thumbnail.
-- Download the saved 1K image. Changing its on-screen size does not generate a
+- Download the image at its saved resolution. Changing its on-screen size does not generate a
   new image or reduce the price already paid.
 - Dimensions and file size are different: encoded bytes vary by format and image
   detail. Record actual byte size for the storage display. Do not promise a fixed
@@ -569,7 +582,7 @@ Use a lazily loaded local database with three tables:
 | Table           | Identity and contents                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Text results    | Vocabulary word + reading, or kanji essay; Markdown, sources, model, prompt, instructions, timestamp, and content fingerprint |
-| Mnemonic images | Image ID and kanji; file, scene, style, palette, effective prompt, instructions, model, and timestamp                         |
+| Mnemonic images | Image ID and kanji; file, scene, style, palette, resolution, quality, effective prompt, instructions, model, and timestamp    |
 | Audio           | Source identity + content fingerprint + voice + language + audio format; MP3 file and timestamp                               |
 
 The content fingerprint identifies the exact text being narrated. No API keys
@@ -676,8 +689,9 @@ Manual checks:
   feature-specific errors.
 - Missing essays offer generation; existing essays remain the default.
 - Gallery stops at three images; replacing one leaves the other two intact.
-- Images use explicit 1K square API settings, fit the drawer, and download at
-  their saved resolution without another generation request.
+- Images use the resolution and quality from User Preferences, default to 1K
+  Standard, fit the drawer, and download at their saved resolution without
+  another generation request. Preference changes leave saved images intact.
 - Saved images and MP3s remain usable offline after the app is available offline.
 - Automatic and Japanese language choices map to the correct API values.
 - Replacing text never plays the old recording as narration of the new text.
