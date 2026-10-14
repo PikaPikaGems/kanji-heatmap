@@ -47,8 +47,8 @@ const SpeedKatakanaHeatmapBody = () => {
         onCompactChange={(v) => setSetting("compact", v)}
       />
       <p className="mt-4 text-[10px] text-center text-muted-foreground">
-        Showing sessions from {isCoarsePointer ? "touchscreens" : "keyboards"},
-        like this device.
+        Results from {isCoarsePointer ? "touchscreen" : "keyboard"} sessions,
+        like on this device.
       </p>
     </>
   );
