@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const MAX_ONYOMI = 4;
 
 /**
- * Up to four onyomi, plus the first kunyomi when there is only one onyomi,
+ * Up to four onyomi, plus the first kunyomi when there are three or fewer,
  * so there are usually at least two. An onyomi that the phonetic component
  * gives (間 → カン from 門) gets the same lime tint as the sound hint in the
  * kanji drawer.
@@ -24,7 +24,7 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
   if (general == null) return null;
 
   const onyomi = general.allOn.slice(0, MAX_ONYOMI);
-  const kunyomi = onyomi.length <= 1 ? general.allKun.slice(0, 1) : [];
+  const kunyomi = onyomi.length <= 3 ? general.allKun.slice(0, 1) : [];
   const phoneticSounds = hover?.phonetic?.sound ?? [];
   const isPhonetic = (on: string) =>
     phoneticSounds.includes(translateValue(on, "hiragana"));

@@ -16,7 +16,11 @@ export type FillTheKanjiSettings = {
   tileCount?: TileCount;
 };
 
+/** An answer kanji that wasn't placed: left empty (forgot) or filled with another kanji (wrong). */
+export type MissedKanji = { kanji: string; kind: "forgot" | "wrong" };
+
 export type ItemResult = {
   item: FillTheKanjiItem;
   correct: boolean;
+  missed: MissedKanji[];
 };

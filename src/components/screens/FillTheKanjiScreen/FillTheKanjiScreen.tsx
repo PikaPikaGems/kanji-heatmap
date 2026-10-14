@@ -2,6 +2,8 @@ import { useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useStorageRevision } from "@/hooks/use-storage-value";
 import { PracticeShell } from "@/components/shared-practice";
+import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
+import { KanjiNavigationContext } from "@/hooks/use-next-prev-kanji";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { recordActivity } from "@/lib/activity";
 import {
@@ -72,41 +74,51 @@ const FillTheKanjiScreen = () => {
   };
 
   return (
-    <PracticeShell progress={headerProgress}>
-      {phase === "initial" && (
-        <div key="initial" className="h-full animate-fade-in">
-          <InitialScreen onStart={() => play()} />
-        </div>
-      )}
+    <>
+      <PracticeShell progress={headerProgress}>
+        {phase === "initial" && (
+          <div key="initial" className="h-full animate-fade-in">
+            <InitialScreen onStart={() => play()} />
+          </div>
+        )}
 
-      {phase === "playing" && (
-        <div key={`playing-${playKey}`} className="h-full animate-fade-in">
-          <Game
-            setId={setId}
-            batch={batch}
-            onlyJp={retryJp}
-            settings={settings}
-            onProgress={setProgress}
-            onComplete={finishBatch}
-            onEnd={goToInitial}
-          />
-        </div>
-      )}
+        {phase === "playing" && (
+          <div key={`playing-${playKey}`} className="h-full animate-fade-in">
+            <Game
+              setId={setId}
+              batch={batch}
+              onlyJp={retryJp}
+              settings={settings}
+              onProgress={setProgress}
+              onComplete={finishBatch}
+              onEnd={goToInitial}
+            />
+          </div>
+        )}
 
-      {phase === "ended" && results && (
-        <div key="ended" className="h-full animate-fade-in">
-          <EndSession
-            results={results}
-            batchLabel={`${setLabel(setId)} · Batch ${batchLabel(batch)}`}
-            onNext={playNextBatch}
-            onRetryMistakes={() =>
-              play(results.filter((r) => !r.correct).map((r) => r.item.jp))
-            }
-            onEnd={goToInitial}
-          />
-        </div>
+        {phase === "ended" && results && (
+          <div key="ended" className="h-full animate-fade-in">
+            <EndSession
+              results={results}
+              batchLabel={`${setLabel(setId)} · Batch ${batchLabel(batch)}`}
+              onNext={playNextBatch}
+              onRetryMistakes={() =>
+                play(results.filter((r) => !r.correct).map((r) => r.item.jp))
+              }
+              onEnd={goToInitial}
+            />
+          </div>
+        )}
+      </PracticeShell>
+
+      {/* The recap's missed kanji open here; no stepping through the home
+        screen's search results from a single kanji. */}
+      {phase === "ended" && (
+        <KanjiNavigationContext.Provider value={false}>
+          <KanjiDrawerGlobal />
+        </KanjiNavigationContext.Provider>
       )}
-    </PracticeShell>
+    </>
   );
 };
 

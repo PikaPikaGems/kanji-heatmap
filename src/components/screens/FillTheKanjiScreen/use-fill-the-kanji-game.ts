@@ -9,7 +9,7 @@ import {
 } from "@/lib/fill-the-kanji/puzzle";
 import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { AnswerState, FeedbackKind } from "./AnswerDrawer";
-import { FillTheKanjiSettings, ItemResult } from "./types";
+import { FillTheKanjiSettings, ItemResult, MissedKanji } from "./types";
 import type { BlankResult } from "./SentencePrompt";
 
 type Speech = { speak: () => void; status: SpeakStatus };
@@ -30,6 +30,12 @@ const blankResultsOf = (
   filled: (string | null)[],
   blanks: string[]
 ): BlankResult[] => blanks.map((k, i) => (filled[i] === k ? "right" : "wrong"));
+
+const missedOf = (filled: (string | null)[], blanks: string[]): MissedKanji[] =>
+  blanks.flatMap((kanji, i): MissedKanji[] => {
+    if (filled[i] === kanji) return [];
+    return [{ kanji, kind: filled[i] == null ? "forgot" : "wrong" }];
+  });
 
 /** Next empty blank after `from`, wrapping around; null when all are filled. */
 const nextEmpty = (filled: (string | null)[], from: number): number | null => {
@@ -161,7 +167,14 @@ export const useFillTheKanjiGame = ({
       (k, i) => k === card.puzzle.blanks[i]
     ).length;
     const correct = rightCount === filled.length;
-    resultsRef.current = [...resultsRef.current, { item: card.item, correct }];
+    resultsRef.current = [
+      ...resultsRef.current,
+      {
+        item: card.item,
+        correct,
+        missed: missedOf(filled, card.puzzle.blanks),
+      },
+    ];
     if (correct) {
       playCorrect({
         enabled: sound.enabled,
@@ -187,7 +200,11 @@ export const useFillTheKanjiGame = ({
     if (feedback != null || !card || allFilled) return;
     resultsRef.current = [
       ...resultsRef.current,
-      { item: card.item, correct: false },
+      {
+        item: card.item,
+        correct: false,
+        missed: missedOf(filled, card.puzzle.blanks),
+      },
     ];
     if (sound.enabled) speak();
     setCursor(null);
