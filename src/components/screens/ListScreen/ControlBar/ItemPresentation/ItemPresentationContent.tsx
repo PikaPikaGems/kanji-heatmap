@@ -21,7 +21,7 @@ import { isAccountUiHidden } from "@/lib/engine/account-ui";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 
-const H2 = ({ children }: { children: ReactNode }) => (
+export const H2 = ({ children }: { children: ReactNode }) => (
   <h2 className="mt-4 mb-2 font-bold border-b-2 border-dotted">{children}</h2>
 );
 
@@ -63,7 +63,8 @@ const BackgroundColorSection = () => {
   );
 };
 
-const CardStateSettings = () => {
+/** Design and border color settings, shared with /mastery. */
+export const CardStateSettings = () => {
   const cardState = useItemSettings();
   const dispatch = useItemSettingsDispatch();
   // Study status comes from the account, so builds without the engine don't
@@ -120,15 +121,28 @@ const CardStateSettings = () => {
   );
 };
 
-export const ItemPresentationSettingsContent = () => {
+/** The popover's title and body frame; /mastery fills it with its own sections. */
+export const ItemPresentationSettingsFrame = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   return (
     <article className="text-left">
       <h1 className="flex items-center pb-0 mb-0 space-x-2 text-lg font-bold">
         Item Presentation Settings
       </h1>
       <DottedSeparator className="p-0 m-0" />
+      {children}
+    </article>
+  );
+};
+
+export const ItemPresentationSettingsContent = () => {
+  return (
+    <ItemPresentationSettingsFrame>
       <CardStateSettings />
       <BackgroundColorSection />
-    </article>
+    </ItemPresentationSettingsFrame>
   );
 };

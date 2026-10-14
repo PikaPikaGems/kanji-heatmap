@@ -4,12 +4,21 @@ import { SettledSearchInput } from "./SearchInput/SettledSearchInput";
 import { SettledSortAndFilter } from "./SortAndFilter/SettledSortAndFilter";
 import LazyItemPresentation, {
   ItemPresentationLoadingFallback,
+  type ItemPresentationPopover,
 } from "./ItemPresentation/LazyItemPresentation";
 import { ErrorBoundary } from "@/components/error";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { SearchInputErrorFallback } from "./SearchInput/SearchInputErrorFallback";
 
-export const ControlBar = () => {
+/**
+ * `Popover` is the lazy item-presentation popover: /mastery swaps in its own,
+ * whose background-color section picks a mastery metric.
+ */
+export const ControlBar = ({
+  Popover,
+}: {
+  Popover: ItemPresentationPopover;
+}) => {
   return (
     <>
       <ErrorBoundary
@@ -37,7 +46,7 @@ export const ControlBar = () => {
         }
       >
         <Suspense fallback={<ItemPresentationLoadingFallback />}>
-          <LazyItemPresentation />
+          <LazyItemPresentation Popover={Popover} />
         </Suspense>
       </ErrorBoundary>
     </>

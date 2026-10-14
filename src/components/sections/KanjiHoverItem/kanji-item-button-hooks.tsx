@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { JLPTListItems } from "@/lib/jlpt";
 import { JouyouGradeListItems, toJouyouGrade } from "@/lib/jouyou-grade";
 import { freqCategoryCn, getFreqCategory } from "@/lib/freq/freq-category";
@@ -11,6 +12,7 @@ import {
 } from "@/lib/engine/use-kanji-sets";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
+import { TileColorContext } from "./tile-color-context";
 
 export const cn = `animate-fade-in-fast h-95 w-full p-1.5 rounded-lg text-2xl ml-1 border-4 bg-opacity-100 z-0 hover:border-neon-accent transition-all transition-discrete duration-500`;
 export const loadingCn = `${cn} animate-pulse duration-1000 h-full !bg-lime-400 !border-3 border-white dark:border-black`;
@@ -63,6 +65,7 @@ export const useItemBtnCn = (kanji: string) => {
   const bgSrc = useBgSrc();
   const itemType = useItemType();
   const { borderColorMeaning } = useDeferredItemSettings();
+  const tileColor = useContext(TileColorContext)?.(kanji);
 
   const kanjiInfo = getInfo?.(kanji);
 
@@ -82,11 +85,13 @@ export const useItemBtnCn = (kanji: string) => {
       : undefined;
   const freqRankCategory = getFreqCategory(freqRank);
 
-  const textColor = dontIncludeFreq
-    ? "text-black dark:text-white"
-    : freqRankCategory > 3
-      ? "text-white"
-      : "dark:text-white text-gray-700";
+  const textColor =
+    tileColor?.textCn ??
+    (dontIncludeFreq
+      ? "text-black dark:text-white"
+      : freqRankCategory > 3
+        ? "text-white"
+        : "dark:text-white text-gray-700");
   const jlpt = kanjiInfo?.jlpt ?? "none";
 
   const border = getBorderCn(
@@ -99,11 +104,13 @@ export const useItemBtnCn = (kanji: string) => {
     freqRankCategory
   );
 
-  const bgColor = dontIncludeFreq
-    ? ""
-    : freqRankCategory === 0
-      ? "bg-background"
-      : freqCategoryCn[freqRankCategory];
+  const bgColor =
+    tileColor?.bgCn ??
+    (dontIncludeFreq
+      ? ""
+      : freqRankCategory === 0
+        ? "bg-background"
+        : freqCategoryCn[freqRankCategory]);
 
   const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}`;
   const btnCn =

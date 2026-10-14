@@ -1,11 +1,11 @@
-import { lazy, useState } from "react";
+import { ComponentType, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Flower } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
-const ItemPresentationSettingsPopover = lazy(
-  () => import("./ItemPresentationPopover")
-);
+export type ItemPresentationPopover = ComponentType<{
+  initiallyOpen: boolean;
+}>;
 
 export const ItemPresentationLoadingFallback = () => (
   <Button
@@ -20,11 +20,16 @@ export const ItemPresentationLoadingFallback = () => (
 );
 
 /**
- * Keeps item-presentation settings out of the list-screen chunk until opened.
+ * Keeps item-presentation settings (`Popover`, a lazy component) out of the
+ * list-screen chunk until opened.
  * While the chunk loads, Suspense shows {@link ItemPresentationLoadingFallback}
  * in place of the trigger so the control bar does not shift.
  */
-const LazyItemPresentation = () => {
+const LazyItemPresentation = ({
+  Popover,
+}: {
+  Popover: ItemPresentationPopover;
+}) => {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   if (!shouldLoad) {
@@ -42,7 +47,7 @@ const LazyItemPresentation = () => {
     );
   }
 
-  return <ItemPresentationSettingsPopover initiallyOpen />;
+  return <Popover initiallyOpen />;
 };
 
 export default LazyItemPresentation;
