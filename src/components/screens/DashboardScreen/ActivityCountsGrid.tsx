@@ -29,32 +29,48 @@ export const ActivityCountsGrid = ({
       title={recognitionPracticePageMeta.shortLabel}
       Icon={Eye}
       counts={[
-        { value: stats.recognitionDays, unit: "Days" },
-        { value: stats.recognitionRounds, unit: "Rounds" },
+        { value: stats.recognitionDays, unit: "Days", unitSingular: "Day" },
+        {
+          value: stats.recognitionRounds,
+          unit: "Rounds",
+          unitSingular: "Round",
+        },
       ]}
     />
     <ActivityStatCard
       title={productionPracticePageMeta.shortLabel}
       Icon={PenLine}
       counts={[
-        { value: stats.productionDays, unit: "Days" },
-        { value: stats.productionRounds, unit: "Rounds" },
+        { value: stats.productionDays, unit: "Days", unitSingular: "Day" },
+        {
+          value: stats.productionRounds,
+          unit: "Rounds",
+          unitSingular: "Round",
+        },
       ]}
     />
     <ActivityStatCard
       title={fillTheKanjiPageMeta.shortLabel}
       Icon={Puzzle}
       counts={[
-        { value: stats.fillTheKanjiDays, unit: "Days" },
-        { value: stats.fillTheKanjiBatches, unit: "Batches" },
+        { value: stats.fillTheKanjiDays, unit: "Days", unitSingular: "Day" },
+        {
+          value: stats.fillTheKanjiBatches,
+          unit: "Batches",
+          unitSingular: "Batch",
+        },
       ]}
     />
     <ActivityStatCard
       title={speedKatakanaPageMeta.shortLabel}
       Icon={Keyboard}
       counts={[
-        { value: stats.speedKatakanaDays, unit: "Days" },
-        { value: stats.speedKatakanaSessions, unit: "Sessions" },
+        { value: stats.speedKatakanaDays, unit: "Days", unitSingular: "Day" },
+        {
+          value: stats.speedKatakanaSessions,
+          unit: "Sessions",
+          unitSingular: "Session",
+        },
       ]}
     />
   </div>

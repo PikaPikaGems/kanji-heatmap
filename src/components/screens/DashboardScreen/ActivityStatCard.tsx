@@ -75,19 +75,35 @@ export type StatCount = {
   value: number;
   /** e.g. "Days", "Rounds", "Batches", "Sessions". */
   unit: string;
+  /** Shown when the value is exactly 1, e.g. "Day", "Batch". */
+  unitSingular: string;
 };
 
-/** One count: the number, then its unit. */
-const StatCountItem = ({ value, unit }: StatCount) => (
+/** One count: the number, then its unit. The primary count stands out. */
+const StatCountItem = ({
+  value,
+  unit,
+  unitSingular,
+  primary,
+}: StatCount & { primary: boolean }) => (
   <div className="flex items-baseline gap-1.5 min-w-0">
     <StatValue
       display={formatCompactCount(value)}
       raw={formatRawCount(value)}
       abbreviated={value >= 1000}
-      className="text-xl text-foreground"
+      className={
+        primary
+          ? "text-[1.75rem] text-foreground"
+          : "text-lg font-semibold text-foreground/60"
+      }
     />
-    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-      {unit}
+    <span
+      className={cn(
+        "font-bold uppercase tracking-wider text-muted-foreground",
+        primary ? "text-xs" : "text-[10px]"
+      )}
+    >
+      {value === 1 ? unitSingular : unit}
     </span>
   </div>
 );
@@ -101,20 +117,27 @@ export const ActivityStatCard = ({
   /** Activity name, e.g. "Speed Katakana". */
   title: string;
   Icon: LucideIcon;
+  /**
+   * The first count (e.g. days) is the most prominent; when it is 0 the
+   * whole card is dimmed.
+   */
   counts: StatCount[];
 }) => (
-  <div className="flex flex-col w-full min-w-0 gap-2 px-2.5 py-2 text-left border rounded-xl border-foreground/5 bg-muted/10 sm:px-3 sm:py-2.5">
+  <div
+    className={cn(
+      "flex flex-col w-full min-w-0 gap-2 px-2.5 py-2 text-left border rounded-xl border-foreground/5 bg-muted/10 sm:px-3 sm:py-2.5",
+      counts[0]?.value === 0 && "opacity-40"
+    )}
+  >
     <div className="flex items-center min-w-0 gap-2">
       <div className="flex items-center justify-center border rounded-lg size-7 shrink-0 border-foreground/10 bg-background text-foreground/65">
         <Icon className="size-3.5" aria-hidden />
       </div>
-      <div className="text-xs font-bold truncate text-foreground/80">
-        {title}
-      </div>
+      <div className="text-xs truncate">{title}</div>
     </div>
-    <div className="flex flex-wrap pl-0.5 gap-x-4 gap-y-1">
-      {counts.map((count) => (
-        <StatCountItem key={count.unit} {...count} />
+    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
+      {counts.map((count, i) => (
+        <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}
     </div>
   </div>
