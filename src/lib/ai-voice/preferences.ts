@@ -38,9 +38,10 @@ export const FLAT_DELIVERY = {
  * What the user picked in User Preferences. Unset fields mean "yomiage's
  * default", so the defaults stay owned by yomiage. `custom` holds the values
  * for the Custom chip and is kept while a preset is selected, so switching
- * back to Custom restores them. The same goes for the delivery fields
- * (`speed`, `expressiveness`, `rhythmVariation`): they are the Custom
- * delivery's values and only apply while `deliveryPreset` is Custom.
+ * back to Custom restores them. The delivery fields (`speed`,
+ * `expressiveness`, `rhythmVariation`) are the Custom delivery's values and
+ * only apply while `deliveryPreset` is Custom; switching to Custom resets them
+ * to the preset it was switched from.
  */
 export type AiVoiceSettings = Delivery & {
   preset?: PresetName | "custom";
