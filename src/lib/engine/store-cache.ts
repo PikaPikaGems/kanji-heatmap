@@ -46,3 +46,5 @@ export const snapshotValue = <T>(
 
 export const AUTH_STATUS_KEY = "auth.watchStatus";
 export const SYNC_STATUS_KEY = "sync.watchStatus";
+export const BOOKMARKS_ALL_KEY = "bookmarks.watchAll";
+export const REVIEW_PILE_ALL_KEY = "reviews.pile.watchAll";

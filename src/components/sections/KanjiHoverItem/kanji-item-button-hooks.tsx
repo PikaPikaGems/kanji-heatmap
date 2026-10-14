@@ -5,8 +5,10 @@ import { freqMap } from "@/lib/options/options-label-maps";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { useDeferredItemSettings } from "@/providers/item-settings-hooks";
 import { useBgSrc } from "@/hooks/routing-hooks";
-import { useGetRepresentativeWordFn } from "@/providers/kanji-representative-word-hooks";
-import { isBookmarked } from "@/lib/bookmarks";
+import {
+  useBookmarkedKanji,
+  useReviewingKanji,
+} from "@/lib/engine/use-kanji-sets";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
 
@@ -21,19 +23,21 @@ export const useItemType = () => {
 };
 
 const getStudyStatusBorderCn = (
-  kanji: string,
-  word: string | null
+  isBookmarked: boolean,
+  isReviewing: boolean
 ): string | null => {
-  if (!word) return null;
-  return isBookmarked(kanji, word) ? "border-green-500" : null;
+  if (isBookmarked && isReviewing) return "border-lime-500";
+  if (isBookmarked) return "border-green-500";
+  if (isReviewing) return "border-foreground";
+  return null;
 };
 
 const getBorderCn = (
   borderColorMeaning: BorderColorMeaning,
   jlpt: JLTPTtypes,
   grade: number | undefined,
-  kanji: string,
-  representativeWord: string | null,
+  isBookmarked: boolean,
+  isReviewing: boolean,
   dontIncludeFreq: boolean,
   freqRankCategory: number
 ): string => {
@@ -47,14 +51,15 @@ const getBorderCn = (
     return JouyouGradeListItems[toJouyouGrade(grade)].cnBorder;
   }
   if (borderColorMeaning === "study-status") {
-    return getStudyStatusBorderCn(kanji, representativeWord) ?? fallback;
+    return getStudyStatusBorderCn(isBookmarked, isReviewing) ?? fallback;
   }
   return fallback;
 };
 
 export const useItemBtnCn = (kanji: string) => {
   const getInfo = useGetKanjiInfoFn();
-  const getRepresentativeWord = useGetRepresentativeWordFn();
+  const bookmarks = useBookmarkedKanji();
+  const reviewing = useReviewingKanji();
   const bgSrc = useBgSrc();
   const itemType = useItemType();
   const { borderColorMeaning } = useDeferredItemSettings();
@@ -84,13 +89,12 @@ export const useItemBtnCn = (kanji: string) => {
       : "dark:text-white text-gray-700";
   const jlpt = kanjiInfo?.jlpt ?? "none";
 
-  const representativeWord = getRepresentativeWord(kanji)?.word ?? null;
   const border = getBorderCn(
     borderColorMeaning,
     jlpt,
     kanjiInfo?.jouyouGrade,
-    kanji,
-    representativeWord,
+    bookmarks.kanji.has(kanji),
+    reviewing.kanji.has(kanji),
     dontIncludeFreq,
     freqRankCategory
   );

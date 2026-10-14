@@ -4,6 +4,7 @@ import { JLPTSelector } from "@/components/common/jlpt/JLPTSelector";
 import { JouyouGradeSelector } from "@/components/common/JouyouGradeSelector";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { JOUYOU_GRADE_TYPE_ARR, JouyouGradeType } from "@/lib/jouyou-grade";
+import { BookmarkedOnlyToggle } from "./BookmarkedOnlyToggle";
 import { LeavePractice } from "./EndSessionButton";
 import { ToggleRow } from "./ToggleRow";
 import { DeckFilterSettings } from "./types";
@@ -71,9 +72,7 @@ export const PracticeInitialScreen = ({
               />
             </div>
           </div>
-          <ToggleRow
-            id="bookmarked-only"
-            label="Bookmarked only"
+          <BookmarkedOnlyToggle
             checked={filters.bookmarkedOnly}
             onChange={(v) => onFilterChange("bookmarkedOnly", v)}
           />

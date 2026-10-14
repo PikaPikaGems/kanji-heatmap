@@ -17,6 +17,8 @@ import { JouyouGradeBordersMeanings } from "@/components/common/JouyouGradeBorde
 import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoIcon";
 import { useBgSrc, useBgSrcDispatch } from "@/hooks/routing-hooks";
 import BasicSelect from "@/components/common/BasicSelect";
+import { isAccountUiHidden } from "@/lib/engine/account-ui";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 
 const H2 = ({ children }: { children: ReactNode }) => (
@@ -64,6 +66,14 @@ const BackgroundColorSection = () => {
 const CardStateSettings = () => {
   const cardState = useItemSettings();
   const dispatch = useItemSettingsDispatch();
+  // Study status comes from the account, so builds without the engine don't
+  // offer it. A saved "study-status" choice shows as "none" there (the same
+  // borders, since nothing is bookmarked or reviewing).
+  const hasStudyStatus = !isAccountUiHidden(useAccountStatus());
+  const borderColorMeaning =
+    !hasStudyStatus && cardState.borderColorMeaning === "study-status"
+      ? "none"
+      : cardState.borderColorMeaning;
 
   return (
     <>
@@ -76,7 +86,7 @@ const CardStateSettings = () => {
       />
       <H2>Border Color Meaning</H2>
       <BasicSelect
-        value={cardState.borderColorMeaning}
+        value={borderColorMeaning}
         onChange={(v) =>
           dispatch("borderColorMeaning", v as BorderColorMeaning)
         }
@@ -84,22 +94,24 @@ const CardStateSettings = () => {
         isLabelSrOnly={true}
         options={[
           { value: "jlpt", label: "JLPT Level" },
-          { value: "study-status", label: "Study Status" },
+          ...(hasStudyStatus
+            ? [{ value: "study-status", label: "Study Status" }]
+            : []),
           { value: "grade", label: "Jouyou Grade" },
           { value: "none", label: "None" },
         ]}
       />
-      {cardState.borderColorMeaning === "jlpt" && (
+      {borderColorMeaning === "jlpt" && (
         <div key="jlpt" className="animate-fade-in">
           <JLPTBordersMeanings />
         </div>
       )}
-      {cardState.borderColorMeaning === "study-status" && (
+      {borderColorMeaning === "study-status" && (
         <div key="study-status" className="animate-fade-in">
           <StudyStatusBorderMeanings />
         </div>
       )}
-      {cardState.borderColorMeaning === "grade" && (
+      {borderColorMeaning === "grade" && (
         <div key="grade" className="animate-fade-in">
           <JouyouGradeBordersMeanings />
         </div>

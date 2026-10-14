@@ -12,7 +12,10 @@ import {
   JouyouGradeListItems,
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
-import { useBookmarkedKanji } from "@/hooks/use-bookmarked-kanji";
+import { AccountRequiredNotice } from "@/components/dependent/account/AccountRequiredNotice";
+import { isAccountUiHidden } from "@/lib/engine/account-ui";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
@@ -77,11 +80,11 @@ const BreakdownRows = ({ bands }: { bands: BreakdownBand[] }) => (
   </Table>
 );
 
-export const BookmarksBreakdown = () => {
+const BookmarksBreakdownBody = () => {
   const ready = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
-  const bookmarked = useBookmarkedKanji();
+  const bookmarks = useBookmarkedKanji();
   const [showGrade, setShowGrade] = useState(false);
   const switchId = useId();
 
@@ -94,7 +97,7 @@ export const BookmarksBreakdown = () => {
       next[jlpt].total += 1;
     }
 
-    for (const kanji of bookmarked) {
+    for (const kanji of bookmarks.kanji) {
       const jlpt = getInfo(kanji)?.jlpt ?? "none";
       next[jlpt].bookmarked += 1;
     }
@@ -109,7 +112,7 @@ export const BookmarksBreakdown = () => {
         total: next[jlpt].total,
       };
     });
-  }, [ready, getInfo, search.data, bookmarked]);
+  }, [ready, getInfo, search.data, bookmarks.kanji]);
 
   const gradeBands = useMemo((): BreakdownBand[] => {
     const next = emptyGradeCounts();
@@ -120,7 +123,7 @@ export const BookmarksBreakdown = () => {
       next[grade].total += 1;
     }
 
-    for (const kanji of bookmarked) {
+    for (const kanji of bookmarks.kanji) {
       const grade = toJouyouGrade(getInfo(kanji)?.jouyouGrade);
       next[grade].bookmarked += 1;
     }
@@ -135,16 +138,19 @@ export const BookmarksBreakdown = () => {
         total: next[grade].total,
       };
     });
-  }, [ready, getInfo, search.data, bookmarked]);
+  }, [ready, getInfo, search.data, bookmarks.kanji]);
 
   // Grade now comes from the same synchronous lookup as JLPT, so there is no
   // separate grade-map request to wait on.
   const loading =
-    !ready || search.status === "loading" || search.status === "idle";
+    !ready ||
+    search.status === "loading" ||
+    search.status === "idle" ||
+    bookmarks.status === "loading";
 
   const bands = showGrade ? gradeBands : jlptBands;
   return (
-    <DashboardPanel title="Bookmarks">
+    <>
       <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
         <Label
           htmlFor={switchId}
@@ -171,6 +177,23 @@ export const BookmarksBreakdown = () => {
         </div>
       ) : (
         <BreakdownRows bands={bands} />
+      )}
+    </>
+  );
+};
+
+export const BookmarksBreakdown = () => {
+  const status = useAccountStatus();
+
+  // Bookmarks belong to the account, which builds without the engine lack.
+  if (isAccountUiHidden(status)) return null;
+
+  return (
+    <DashboardPanel title="Bookmarks">
+      {status.kind === "active" ? (
+        <BookmarksBreakdownBody />
+      ) : (
+        <AccountRequiredNotice status={status} />
       )}
     </DashboardPanel>
   );

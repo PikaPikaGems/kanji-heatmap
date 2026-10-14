@@ -11,6 +11,7 @@ import { FrequencyRankDataSource } from "@/components/common/freq/FrequencyRankD
 import { FrequencyRankingRangeField } from "@/components/common/freq/FrequencyRankingRangeField";
 
 import { FilterSectionLayout } from "./FilterContentLayout";
+import { BookmarkedOnlyFilterToggle } from "./BookmarkedOnlyFilterToggle";
 import { FilterToggleRow } from "./FilterToggleRow";
 import { ItemCount } from "./ItemCount";
 import {
@@ -149,9 +150,7 @@ export const SortAndFilterSettingsForm = ({
           }
           toggleFiltersField={
             <>
-              <FilterToggleRow
-                id="filter-bookmarked-only"
-                label="Bookmarked only"
+              <BookmarkedOnlyFilterToggle
                 checked={filterValues.bookmarkedOnly}
                 onChange={form.setBookmarkedOnly}
               />

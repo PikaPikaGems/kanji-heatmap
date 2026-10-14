@@ -10,7 +10,6 @@ test.describe("dashboard", () => {
     await expect(page.getByText("All-time Overview")).toBeVisible();
     await expect(page.getByText("Activity Heatmap")).toBeVisible();
     await expect(page.getByText("Speed Katakana").first()).toBeVisible();
-    await expect(page.getByText("Bookmarks")).toBeVisible();
 
     await expect(page.getByLabel("Previous period")).toBeVisible();
     await expect(page.getByLabel("Next period")).toBeVisible();

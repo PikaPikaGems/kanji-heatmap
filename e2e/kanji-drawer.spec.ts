@@ -42,16 +42,4 @@ test.describe("kanji detail drawer", () => {
     await expect(page).not.toHaveURL(/open=%E6%B0%B4/);
     await expect(drawer).toBeVisible();
   });
-
-  test("review pile action shows coming soon popover", async ({ page }) => {
-    await page.goto("/?open=%E6%B0%B4"); // 水
-
-    const drawer = page.getByRole("dialog");
-    await expect(drawer).toBeVisible({ timeout: 30_000 });
-
-    await drawer
-      .getByRole("button", { name: /Add .+ to my review pile/ })
-      .click();
-    await expect(page.getByText("Coming soon!")).toBeVisible();
-  });
 });

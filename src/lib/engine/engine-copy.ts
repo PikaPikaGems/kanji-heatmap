@@ -46,6 +46,10 @@ const BLOCKER_COPY: Record<WriteBlocker, string> = {
 export const UPDATE_BROWSER_COPY =
   "This browser can't save your progress. Update iOS, iPadOS, macOS or your browser to log in.";
 
+export const LOGIN_TO_ACCESS_COPY = "You need to log in to access this.";
+
+export const UPDATE_BROWSER_TO_USE_COPY = "Update your browser to use this.";
+
 export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
 export const PUSH_BLOCKED_COPY =
