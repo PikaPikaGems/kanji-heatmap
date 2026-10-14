@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+const DEFAULT_KEYS = ["Enter"] as const;
+
 /**
  * Confirm-key listener that "arms" itself before firing, so the key press
  * that opened the current UI (e.g. Enter submitting the previous step)
@@ -10,7 +12,7 @@ import { useEffect, useRef } from "react";
 export const useArmedConfirmKey = ({
   onConfirm,
   enabled = true,
-  keys = ["Enter"],
+  keys = DEFAULT_KEYS,
   armDelayMs = 300,
 }: {
   /** Gets the key that fired, for callers that map several keys. */

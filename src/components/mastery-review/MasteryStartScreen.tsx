@@ -1,19 +1,17 @@
-import type { UTCTimestamp } from "engine-contract";
-import { SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import type { CardType } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Stat } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useEnterAction } from "@/hooks/use-enter-action";
-import { openFsrsSettings } from "@/lib/engine/fsrs-settings-dialog";
+import { useDueCount } from "@/lib/engine/use-due-count";
 import { nextDueCopy } from "./next-due-copy";
+import { useNextDueAt } from "./use-next-due-at";
 
 /** Start screen of a mastery game: how many cards are due, then Start. */
 export const MasteryStartScreen = ({
   heading,
   description,
-  due,
-  nextDueAt,
+  cardType,
   ready,
   blocker,
   error,
@@ -21,9 +19,7 @@ export const MasteryStartScreen = ({
 }: {
   heading: string;
   description: string;
-  /** Cards due now; null while counting. */
-  due: number | null;
-  nextDueAt: UTCTimestamp | null | undefined;
+  cardType: CardType;
   /** The card data (words, readings) has loaded. */
   ready: boolean;
   /** Why reviewing can't start, shown instead of the Start hint. */
@@ -32,6 +28,8 @@ export const MasteryStartScreen = ({
   error?: string;
   onStart: () => void;
 }) => {
+  const due = useDueCount()?.[cardType] ?? null;
+  const nextDueAt = useNextDueAt(cardType);
   const canStart = ready && blocker == null && due != null && due > 0;
 
   useEnterAction(canStart ? onStart : null, canStart);
@@ -55,11 +53,6 @@ export const MasteryStartScreen = ({
           {due === 0 && (
             <p className="text-sm font-bold">{nextDueCopy(nextDueAt)}</p>
           )}
-
-          <Button variant="ghost" size="sm" onClick={openFsrsSettings}>
-            <SlidersHorizontal />
-            FSRS settings
-          </Button>
         </div>
       </div>
 

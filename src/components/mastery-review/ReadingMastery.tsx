@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { PracticeShell } from "@/components/shared-practice";
 import { Game } from "@/components/recognition-practice-v1/Game";
 import {
@@ -10,7 +11,6 @@ import {
 import type { RecognitionPracticeSettings } from "@/components/recognition-practice-v1/types";
 import { useLockVisualViewportScroll } from "@/components/recognition-practice-v1/use-lock-visual-viewport-scroll";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { useDueCount } from "@/lib/engine/use-due-count";
 import { readingMasteryPageMeta } from "@/lib/pages/practice-pages";
 import { getMasteryBlocker } from "./get-mastery-blocker";
 import { MasteryEndScreen } from "./MasteryEndScreen";
@@ -19,7 +19,6 @@ import { MasteryLoading } from "./MasteryLoading";
 import { MasteryStartScreen } from "./MasteryStartScreen";
 import { useMasteryItemLookup } from "./use-mastery-item-lookup";
 import { useMasterySession } from "./use-mastery-session";
-import { useNextDueAt } from "./use-next-due-at";
 
 const ignoreProgress = () => {};
 
@@ -42,8 +41,6 @@ const ReadingMasteryPhase = ({
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const due = useDueCount();
-  const nextDueAt = useNextDueAt("reading");
   const { state } = session;
 
   if (state.status === "start") {
@@ -52,8 +49,7 @@ const ReadingMasteryPhase = ({
         <MasteryStartScreen
           heading={readingMasteryPageMeta.heading}
           description={readingMasteryPageMeta.description}
-          due={due?.reading ?? null}
-          nextDueAt={nextDueAt}
+          cardType="reading"
           ready={ready}
           blocker={blocker}
           error={state.error}
@@ -66,10 +62,10 @@ const ReadingMasteryPhase = ({
   if (state.status === "ended") {
     return (
       <MasteryEndScreen
-        tally={session.tally}
+        results={session.results}
         saveError={session.saveError}
-        due={due?.reading ?? null}
-        nextDueAt={nextDueAt}
+        cardType="reading"
+        moreDue={state.moreDue}
         onMore={onStart}
         onDone={session.leave}
       />
@@ -128,6 +124,8 @@ const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
           onNext={next}
         />
       </PracticeShell>
+
+      {session.state.status === "ended" && <KanjiDrawerGlobal />}
     </>
   );
 };

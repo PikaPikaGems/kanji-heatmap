@@ -10,11 +10,15 @@ import type { PracticeItem } from "@/components/shared-practice";
 import { PRACTICE_SESSION_SIZE } from "@/components/shared-practice/constants";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { ratingIntervalLabels } from "@/lib/engine/format-interval";
+import { refreshDueCounts } from "@/lib/engine/use-due-count";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 
-export type RatingTally = Record<FsrsRating, number>;
-
-const EMPTY_TALLY: RatingTally = { again: 0, hard: 0, good: 0, easy: 0 };
+/** A card the user answered this round, with the rating it got. */
+export type MasteryResult = {
+  kanji: string;
+  keyword: string;
+  rating: FsrsRating;
+};
 
 /**
  * - `preparing`: the host screen is getting ready (writing loads its
@@ -35,7 +39,11 @@ export type MasteryState =
       position: number;
       total: number;
     }
-  | { status: "ended" };
+  | {
+      status: "ended";
+      /** Cards of this type still due right now. */
+      moreDue: number;
+    };
 
 /**
  * One review round of a mastery game (host/guide/REVIEWS.md walkthrough):
@@ -53,15 +61,17 @@ export const useMasterySession = ({
 }) => {
   const api = useEngineApi();
   const [state, setState] = useState<MasteryState>({ status: "start" });
-  const [tally, setTally] = useState<RatingTally>(EMPTY_TALLY);
+  const [results, setResults] = useState<MasteryResult[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const queueRef = useRef<{ cards: DueCard[]; next: number }>({
     cards: [],
     next: 0,
   });
-  // Handle of the card on screen, until it is graded or cancelled.
-  const openHandleRef = useRef<string | null>(null);
+  // The card on screen, until it is graded or cancelled.
+  const openCardRef = useRef<{ handleId: string; item: PracticeItem } | null>(
+    null
+  );
   // The grade call of the card just answered; the next card waits for it.
   const gradeRef = useRef<Promise<void>>(Promise.resolve());
   // Bumped when a round starts or stops, so a slow call from an earlier one
@@ -76,9 +86,9 @@ export const useMasterySession = ({
     return () => {
       closedRef.current = true;
       runRef.current += 1;
-      const handleId = openHandleRef.current;
-      openHandleRef.current = null;
-      if (api && handleId) void api.reviews.cancel(handleId);
+      const open = openCardRef.current;
+      openCardRef.current = null;
+      if (api && open) void api.reviews.cancel(open.handleId);
     };
   }, [api]);
 
@@ -103,7 +113,7 @@ export const useMasterySession = ({
         void engine.reviews.cancel(opened.value.handleId);
         return;
       }
-      openHandleRef.current = opened.value.handleId;
+      openCardRef.current = { handleId: opened.value.handleId, item };
       setState({
         status: "card",
         review: opened.value,
@@ -114,14 +124,17 @@ export const useMasterySession = ({
       });
       return;
     }
-    if (run === runRef.current) setState({ status: "ended" });
+    if (run !== runRef.current) return;
+    const left = await engine.reviews.getDueCount(cardType);
+    if (run !== runRef.current) return;
+    setState({ status: "ended", moreDue: left.ok ? left.value : 0 });
   };
 
   const start = async () => {
     if (!api || closedRef.current) return;
     runRef.current += 1;
     const run = runRef.current;
-    setTally(EMPTY_TALLY);
+    setResults([]);
     setSaveError(null);
     setState({ status: "opening" });
 
@@ -140,20 +153,25 @@ export const useMasterySession = ({
 
   /** Grades the card on screen. Call once per card. */
   const grade = (rating: FsrsRating) => {
-    const handleId = openHandleRef.current;
-    if (!api || !handleId) return;
-    openHandleRef.current = null;
+    const open = openCardRef.current;
+    if (!api || !open) return;
+    openCardRef.current = null;
+    const { handleId, item } = open;
+    const answered = { kanji: item.kanji, keyword: item.keyword, rating };
 
     gradeRef.current = (async () => {
       const result = await api.reviews.grade({ handleId, rating });
+      // The header dot and start screen shouldn't wait for the next poll.
+      refreshDueCounts();
       if (result.ok) {
-        setTally((prev) => ({ ...prev, [rating]: prev[rating] + 1 }));
+        setResults((prev) => [...prev, answered]);
         return;
       }
       // A rejected grade leaves the handle open.
       void api.reviews.cancel(handleId);
       // stale_version: the card changed elsewhere, skip it silently.
       if (result.error.code === "stale_version") return;
+      setResults((prev) => [...prev, answered]);
       setSaveError(copyForCode(result.error.code));
     })();
   };
@@ -171,9 +189,9 @@ export const useMasterySession = ({
   /** Back to the start screen, cancelling the open card. */
   const leave = () => {
     runRef.current += 1;
-    const handleId = openHandleRef.current;
-    openHandleRef.current = null;
-    if (api && handleId) void api.reviews.cancel(handleId);
+    const open = openCardRef.current;
+    openCardRef.current = null;
+    if (api && open) void api.reviews.cancel(open.handleId);
     setState({ status: "start" });
   };
 
@@ -187,7 +205,7 @@ export const useMasterySession = ({
 
   return {
     state,
-    tally,
+    results,
     saveError,
     progress: progress(),
     start,

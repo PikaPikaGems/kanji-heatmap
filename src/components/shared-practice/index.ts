@@ -15,6 +15,8 @@ export {
   ratingForKey,
 } from "./rating-keys";
 export { RecapTile } from "./RecapTile";
+export { RoundRecap } from "./RoundRecap";
+export type { RoundRecapTile } from "./RoundRecap";
 export { ToggleRow } from "./ToggleRow";
 export { usePracticeDeck } from "./use-practice-deck";
 export type {

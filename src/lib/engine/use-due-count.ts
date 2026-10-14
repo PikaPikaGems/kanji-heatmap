@@ -8,6 +8,12 @@ export const REVIEW_PILE_ALL_KEY = "reviews.pile.watchAll";
 
 const POLL_MS = 60_000;
 
+const refreshSignal = new EventTarget();
+
+/** Re-checks the due counts everywhere now, e.g. after grading a card. */
+export const refreshDueCounts = () =>
+  refreshSignal.dispatchEvent(new Event("refresh"));
+
 export type DueCounts = Record<CardType, number>;
 
 /**
@@ -16,7 +22,7 @@ export type DueCounts = Record<CardType, number>;
  *
  * `getDueCount` is a one-shot snapshot and the engine has no due timer, so it
  * is re-checked when the review pile changes, when the tab regains focus or
- * becomes visible, and every minute.
+ * becomes visible, on `refreshDueCounts()`, and every minute.
  */
 export const useDueCount = (): DueCounts | null => {
   const api = useEngineApi();
@@ -27,9 +33,10 @@ export const useDueCount = (): DueCounts | null => {
   const [counts, setCounts] = useState<DueCounts | null>(null);
   const active = account.kind === "active";
 
-  // Effect needed: subscribes to window focus / document visibility and runs a
-  // poll timer, none of which can be derived during render; `pile` is a
-  // re-run trigger only (a new snapshot means a card's schedule changed).
+  // Effect needed: subscribes to window focus / document visibility and the
+  // refresh signal, and runs a poll timer, none of which can be derived
+  // during render; `pile` is a re-run trigger only (a new snapshot means a
+  // card's schedule changed).
   useEffect(() => {
     if (!api || !active) return;
 
@@ -58,11 +65,13 @@ export const useDueCount = (): DueCounts | null => {
     refresh();
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", onVisibilityChange);
+    refreshSignal.addEventListener("refresh", refresh);
     const timer = window.setInterval(refresh, POLL_MS);
     return () => {
       cancelled = true;
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      refreshSignal.removeEventListener("refresh", refresh);
       window.clearInterval(timer);
     };
   }, [api, active, pile]);

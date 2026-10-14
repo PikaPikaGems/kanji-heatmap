@@ -1,6 +1,11 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { PracticeShell } from "@/components/shared-practice";
+import type {
+  MasteryGrading,
+  PracticeItem,
+} from "@/components/shared-practice";
 import { Game } from "@/components/production-practice-v1/Game";
 import { ModelErrorLighterRecognizer } from "@/components/production-practice-v1/ModelErrorLighterRecognizer";
 import { ModelErrorNoRecognizer } from "@/components/production-practice-v1/ModelErrorNoRecognizer";
@@ -13,7 +18,7 @@ import type { ProductionPracticeSettings } from "@/components/production-practic
 import { useHandwritingBackend } from "@/components/production-practice-v1/use-handwriting-backend";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { REVIEW_PILE_ALL_KEY, useDueCount } from "@/lib/engine/use-due-count";
+import { REVIEW_PILE_ALL_KEY } from "@/lib/engine/use-due-count";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import { writingMasteryPageMeta } from "@/lib/pages/practice-pages";
 import { getMasteryBlocker } from "./get-mastery-blocker";
@@ -23,12 +28,48 @@ import { MasteryLoading } from "./MasteryLoading";
 import { MasteryStartScreen } from "./MasteryStartScreen";
 import { useMasteryItemLookup } from "./use-mastery-item-lookup";
 import { useMasterySession } from "./use-mastery-session";
-import { useNextDueAt } from "./use-next-due-at";
 
 const ignoreProgress = () => {};
 
 type WritingMasterySession = ReturnType<typeof useMasterySession>;
 type Handwriting = ReturnType<typeof useHandwritingBackend>;
+
+const WritingMasteryCard = ({
+  item,
+  settings,
+  gradingEnabled,
+  grading,
+  recognize,
+  onNext,
+  onEnd,
+}: {
+  item: PracticeItem;
+  settings: ProductionPracticeSettings;
+  gradingEnabled: boolean;
+  grading: MasteryGrading;
+  recognize: Handwriting["recognize"];
+  onNext: () => void;
+  onEnd: () => void;
+}) => {
+  // Filler for the look-alike grid: the other kanji in the review pile.
+  const pile = snapshotValue(
+    useEngineQuery(REVIEW_PILE_ALL_KEY, (api) => api.reviews.pile.watchAll())
+  );
+
+  return (
+    <Game
+      sessionItems={[item]}
+      settings={settings}
+      randomKanjiPool={pile?.map((entry) => entry.kanji) ?? []}
+      gradingEnabled={gradingEnabled}
+      grading={grading}
+      recognize={recognize}
+      onProgress={ignoreProgress}
+      onComplete={onNext}
+      onEnd={onEnd}
+    />
+  );
+};
 
 const WritingMasteryPhase = ({
   session,
@@ -51,12 +92,6 @@ const WritingMasteryPhase = ({
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const due = useDueCount();
-  const nextDueAt = useNextDueAt("writing");
-  // Filler for the look-alike grid: the other kanji in the review pile.
-  const pile = snapshotValue(
-    useEngineQuery(REVIEW_PILE_ALL_KEY, (api) => api.reviews.pile.watchAll())
-  );
   const { state } = session;
   const { loadPhase } = handwriting;
 
@@ -66,8 +101,7 @@ const WritingMasteryPhase = ({
         <MasteryStartScreen
           heading={writingMasteryPageMeta.heading}
           description={writingMasteryPageMeta.description}
-          due={due?.writing ?? null}
-          nextDueAt={nextDueAt}
+          cardType="writing"
           ready={ready}
           blocker={blocker}
           error={state.error}
@@ -105,10 +139,10 @@ const WritingMasteryPhase = ({
   if (state.status === "ended") {
     return (
       <MasteryEndScreen
-        tally={session.tally}
+        results={session.results}
         saveError={session.saveError}
-        due={due?.writing ?? null}
-        nextDueAt={nextDueAt}
+        cardType="writing"
+        moreDue={state.moreDue}
         onMore={onStart}
         onDone={session.leave}
       />
@@ -119,15 +153,13 @@ const WritingMasteryPhase = ({
 
   return (
     <div key={state.review.handleId} className="h-full animate-fade-in">
-      <Game
-        sessionItems={[state.item]}
+      <WritingMasteryCard
+        item={state.item}
         settings={settings}
-        randomKanjiPool={pile?.map((item) => item.kanji) ?? []}
         gradingEnabled={handwriting.gradingEnabled}
         grading={{ intervals: state.intervals, onGrade: session.grade }}
         recognize={handwriting.recognize}
-        onProgress={ignoreProgress}
-        onComplete={() => void session.next()}
+        onNext={() => void session.next()}
         onEnd={session.leave}
       />
     </div>
@@ -163,17 +195,21 @@ const WritingMasteryRun = ({ blocker }: { blocker: string | null }) => {
   };
 
   return (
-    <PracticeShell progress={session.progress}>
-      <WritingMasteryPhase
-        session={session}
-        handwriting={handwriting}
-        ready={getItem != null}
-        blocker={blocker}
-        onStart={start}
-        onChooseBackend={chooseBackend}
-        onCancelPrepare={cancelPrepare}
-      />
-    </PracticeShell>
+    <>
+      <PracticeShell progress={session.progress}>
+        <WritingMasteryPhase
+          session={session}
+          handwriting={handwriting}
+          ready={getItem != null}
+          blocker={blocker}
+          onStart={start}
+          onChooseBackend={chooseBackend}
+          onCancelPrepare={cancelPrepare}
+        />
+      </PracticeShell>
+
+      {session.state.status === "ended" && <KanjiDrawerGlobal />}
+    </>
   );
 };
 
