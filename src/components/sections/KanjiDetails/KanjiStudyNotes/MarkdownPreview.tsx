@@ -4,35 +4,14 @@ import ReactMarkdown, {
   type Components,
   type ExtraProps,
 } from "react-markdown";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeSanitize from "rehype-sanitize";
 import remarkDirective from "remark-directive";
 import { cn } from "@/lib/utils";
 import { StudyNoteVocabButton } from "./StudyNoteVocabButton";
 import { remarkJapaneseVocab } from "./markdown";
+import { getNodeProperty, sanitizeSchema } from "./markdown-sanitize";
 
 type MarkdownSpanProps = ComponentPropsWithoutRef<"span"> & ExtraProps;
-
-/** Keep GitHub-style defaults, plus vocab data-* attrs on spans. */
-const sanitizeSchema = {
-  ...defaultSchema,
-  attributes: {
-    ...defaultSchema.attributes,
-    span: [...(defaultSchema.attributes?.span ?? []), "data*"],
-  },
-};
-
-const getNodeProperty = (
-  node: MarkdownSpanProps["node"],
-  ...names: string[]
-): string | undefined => {
-  for (const name of names) {
-    const value = node?.properties?.[name];
-    if (typeof value === "string" && value.length > 0) {
-      return value;
-    }
-  }
-  return undefined;
-};
 
 const MarkdownSpan = ({ node, children }: MarkdownSpanProps) => {
   const word = getNodeProperty(node, "data-vocab-word", "dataVocabWord");
