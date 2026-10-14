@@ -1,7 +1,7 @@
 import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useStorageRevision } from "@/hooks/use-storage-value";
+import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import {
   AttemptCountShading,
@@ -28,15 +28,14 @@ import {
   setRowCount,
 } from "@/lib/fill-the-kanji/batches";
 import {
-  readSetBatchStats,
-  rowsSeen,
+  AllSetBatchStats,
   BatchStats,
   SetBatchStats,
-  STATS_KEY_PREFIX,
-} from "@/lib/fill-the-kanji/storage";
+  rowsSeen,
+} from "@/lib/fill-the-kanji/progress";
 import { fillTheKanjiBatchHref } from "@/lib/fill-the-kanji/links";
-import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
-import { DashboardPanel } from "./DashboardPanel";
+import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
+import { AccountGatedPanel } from "./AccountGatedPanel";
 import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
@@ -114,7 +113,7 @@ const BatchDetail = ({
       </div>
       {stats && (
         <div className="text-center text-muted-foreground">
-          Last attempted: {formatLastAttempted(stats.lastAttempted)}
+          Last attempted: {formatLastAttemptedDay(stats.lastAttemptedAt)}
         </div>
       )}
     </div>
@@ -160,7 +159,7 @@ const SetHeatmapGrid = ({
         >
           {Array.from({ length: total }, (_, i) => {
             const batch = i + 1;
-            const batchStats = stats[String(batch)];
+            const batchStats = stats[batch];
             const attempts = batchStats?.attemptCount ?? 0;
             return (
               <HeatmapCell
@@ -190,7 +189,7 @@ const GroupTrigger = ({
 }: {
   title: string;
   setIds: FillTheKanjiSetId[];
-  statsById: Map<FillTheKanjiSetId, SetBatchStats>;
+  statsById: AllSetBatchStats;
 }) => {
   const seen = setIds.reduce(
     (sum, id) => sum + rowsSeen(id, statsById.get(id) ?? {}),
@@ -215,10 +214,8 @@ const GroupTrigger = ({
  * Every challenge set's heatmap, in collapsible groups (only the first open),
  * so opening the section doesn't draw every grid at once.
  */
-export const FillTheKanjiHeatmap = () => {
-  const revision = useStorageRevision(
-    (key) => key == null || key.startsWith(STATS_KEY_PREFIX)
-  );
+const FillTheKanjiHeatmapBody = () => {
+  const statsById = useAllSetBatchStats();
   const [settings, setSetting] = useLocalStorage<HeatmapSettings>(
     SETTINGS_KEY,
     DEFAULT_SETTINGS
@@ -227,11 +224,11 @@ export const FillTheKanjiHeatmap = () => {
   const columns = compact ? COMPACT_COLUMNS : WIDE_COLUMNS;
   const [scale] = useAttemptCountScale();
 
-  // Read every set up front: the relative scale compares against the most
-  // attempts on any batch across all sets.
-  const statsById = new Map(
-    FILL_THE_KANJI_SETS.map(({ id }) => [id, readSetBatchStats(id)] as const)
-  );
+  // Still loading (or the read failed): nothing to draw yet.
+  if (!statsById) return null;
+
+  // The relative scale compares against the most attempts on any batch across
+  // all sets.
   const maxCount = Math.max(
     0,
     ...[...statsById.values()].flatMap((stats) =>
@@ -241,9 +238,8 @@ export const FillTheKanjiHeatmap = () => {
   const attemptShading: AttemptCountShading = { scale, maxCount };
 
   return (
-    <DashboardPanel title={fillTheKanjiPageMeta.shortLabel}>
+    <>
       <Accordion
-        key={revision}
         type="multiple"
         defaultValue={[FILL_THE_KANJI_SET_GROUPS[0].title]}
         className="animate-fade-in"
@@ -289,6 +285,12 @@ export const FillTheKanjiHeatmap = () => {
       <div className="mt-6">
         <FillTheKanjiSetProgress statsById={statsById} />
       </div>
-    </DashboardPanel>
+    </>
   );
 };
+
+export const FillTheKanjiHeatmap = () => (
+  <AccountGatedPanel title={fillTheKanjiPageMeta.shortLabel}>
+    <FillTheKanjiHeatmapBody />
+  </AccountGatedPanel>
+);

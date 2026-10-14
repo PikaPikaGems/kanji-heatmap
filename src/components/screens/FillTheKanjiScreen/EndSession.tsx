@@ -5,6 +5,7 @@ import { pickEndCheer } from "@/lib/practice-cheers";
 import { cn, percent } from "@/lib/utils";
 import { Stat } from "@/components/shared-practice";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { ItemResult, MissedKanji } from "./types";
 
 const CONTINUE_KEYS = ["Enter", " "] as const;
@@ -57,11 +58,14 @@ export const EndSession = ({
   results,
   batchLabel,
   onNext,
+  saveError,
   onRetryMistakes,
   onEnd,
 }: {
   results: ItemResult[];
   batchLabel: string;
+  /** Copy for why saving the batch to the account failed, if it did. */
+  saveError: string | null;
   onNext: () => void;
   /** Replays just the missed sentences; not recorded as a batch attempt. */
   onRetryMistakes: () => void;
@@ -110,6 +114,8 @@ export const EndSession = ({
               Retry mistakes
             </button>
           )}
+
+          <ProgressNotSavedNotice saveError={saveError} />
         </div>
       </div>
 

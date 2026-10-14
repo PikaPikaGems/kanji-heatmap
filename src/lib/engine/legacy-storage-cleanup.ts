@@ -7,7 +7,7 @@
  * Add a key or prefix here in the same change that removes its last writer.
  */
 const LEGACY_KEYS: readonly string[] = [];
-const LEGACY_KEY_PREFIXES: readonly string[] = [];
+const LEGACY_KEY_PREFIXES: readonly string[] = ["fill-the-kanji-stats-"];
 
 export const removeLegacyStudyData = () => {
   try {
