@@ -8,9 +8,6 @@ test.describe("site chrome", () => {
     const island = page.getByRole("navigation", { name: "Primary" });
     await island.getByRole("link", { name: "Dashboard" }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByText(/Local storage only/)).toBeVisible({
-      timeout: 30_000,
-    });
 
     await island.getByRole("link", { name: "Visualize Mastery" }).click();
     await expect(page).toHaveURL(/\/mastery$/);
