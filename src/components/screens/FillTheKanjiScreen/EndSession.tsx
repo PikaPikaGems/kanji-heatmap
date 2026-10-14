@@ -79,8 +79,10 @@ export const EndSession = ({
 
   return (
     <div className="flex flex-col w-full h-full animate-fade-in">
-      <div className="flex-1 min-h-0 px-4 pt-4 overflow-y-auto">
-        <div className="flex flex-col items-center max-w-md gap-10 pb-4 mx-auto">
+      {/* m-auto centers the recap in the space above the buttons and, unlike
+          justify-center, still scrolls from the top when it overflows. */}
+      <div className="flex flex-col flex-1 min-h-0 px-4 pt-4 overflow-y-auto">
+        <div className="flex flex-col items-center w-full max-w-md gap-10 pb-4 m-auto">
           <div className="text-center">
             <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
               {cheer}
