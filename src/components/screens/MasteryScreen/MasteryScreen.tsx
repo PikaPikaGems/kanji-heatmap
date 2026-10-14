@@ -13,13 +13,18 @@ import { SuspendedKanjiList } from "../ListScreen/KanjiList/LazyKanjiList";
 import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
 import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
+import { MasterySignedOutBanner } from "./MasterySignedOutBanner";
 import { MasteryTileColors } from "./MasteryTileColors";
 
 const MasteryPresentationPopover = lazy(
   () => import("./MasteryPresentationPopover")
 );
 
-/** The `/` grid, search, sort and filter, colored by mastery (design 5.9). */
+/**
+ * The `/` grid, search, sort and filter, colored by mastery (design 5.9).
+ * Signed out, nothing is in the pile, so the tiles stay uncolored and a
+ * bottom banner asks to log in.
+ */
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
   const account = useAccountStatus();
@@ -38,7 +43,7 @@ const MasteryScreen = () => {
     );
   }
 
-  if (account.kind !== "active") {
+  if (account.kind !== "active" && account.kind !== "signed-out") {
     return (
       <MasteryCenteredMessage>
         <AccountGateMessage status={account} />
@@ -46,7 +51,7 @@ const MasteryScreen = () => {
     );
   }
 
-  if (pile.status === "failed") {
+  if (account.kind === "active" && pile.status === "failed") {
     return (
       <MasteryCenteredMessage>
         <p className="max-w-sm text-sm text-muted-foreground">
@@ -62,23 +67,26 @@ const MasteryScreen = () => {
   }
 
   return (
-    <ListScreenLayout
-      controlBar={<ControlBar Popover={MasteryPresentationPopover} />}
-      badge={
-        <>
-          <ItemCountBadge />
-          <MasteryMetricBadge />
-        </>
-      }
-    >
-      {ready ? (
-        <MasteryTileColors>
-          <SuspendedKanjiList />
-        </MasteryTileColors>
-      ) : (
-        <LoadingKanjis />
-      )}
-    </ListScreenLayout>
+    <>
+      <ListScreenLayout
+        controlBar={<ControlBar Popover={MasteryPresentationPopover} />}
+        badge={
+          <>
+            <ItemCountBadge />
+            <MasteryMetricBadge />
+          </>
+        }
+      >
+        {ready ? (
+          <MasteryTileColors>
+            <SuspendedKanjiList />
+          </MasteryTileColors>
+        ) : (
+          <LoadingKanjis />
+        )}
+      </ListScreenLayout>
+      {account.kind === "signed-out" && <MasterySignedOutBanner />}
+    </>
   );
 };
 
