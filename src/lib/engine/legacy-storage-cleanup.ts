@@ -11,6 +11,8 @@ const LEGACY_KEY_PREFIXES: readonly string[] = [
   "fill-the-kanji-stats-",
   // Bookmarks: `b:{kanji}:{word}` = "true".
   "b:",
+  // Study notes: `kanji-study-notes:v1:{kanji}` = JSON `{ notes }`.
+  "kanji-study-notes:v1:",
 ];
 
 export const removeLegacyStudyData = () => {
