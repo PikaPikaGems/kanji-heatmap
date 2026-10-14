@@ -16,6 +16,8 @@ Decisions confirmed on 15 October 2026:
 - Keep both essays short using character targets and maximums in their prompts.
 - Default images to the Kanji Heatmap illustration style and its six-color
   palette, with distinct primary, secondary, accent, and neutral roles.
+- Provide clearly labeled Download MP3 buttons for Anchor Word and Kanji Essay.
+- Generate square 1K images and scale their display to fit the drawer.
 
 ## 1. Scope
 
@@ -147,6 +149,8 @@ Replace the current **View Vocabulary Details — Coming soon!** placeholder wit
 - Render the generated answer inline using the Kanji Essay Markdown renderer.
 - Show the existing **Highlight kanji** switch.
 - Show shared regeneration controls, sources, and MP3 controls.
+- Once narration exists, show a visible **Download MP3** button beside its audio
+  controls. Do not hide it in a menu or make it an icon-only action.
 - Save by word and reading, not just kanji. An updated anchor word must not show
   details generated for the previous word.
 
@@ -268,6 +272,34 @@ outside the first scope and must not be implied by the UI.
 
 Display the actual kanji through the app's font beside the image. Do not rely on
 the generated illustration to reproduce its strokes correctly.
+
+### Image size and quality
+
+- Request `aspect_ratio: "1:1"`, `resolution: "1k"`, and one image per action.
+  This gives a roughly 1024-by-1024 square: enough detail for the drawer and a
+  useful download without requesting a 2K image.
+- For `grok-imagine-image-2.0`, explicitly request `quality: "low"`, the provider's
+  current default generation tier. Verify actual examples before release; do
+  not imply that the API tier name guarantees or measures visual quality.
+- Set size through API options, not just words in the prompt. Do not silently
+  fall back to a larger resolution or a more expensive quality tier.
+- Display the selected image at full available drawer width, capped at 512 CSS
+  pixels. Preserve its square aspect ratio and avoid horizontal overflow.
+- Use approximately 80–96 CSS pixel thumbnails, shrinking to fit narrow drawers.
+- Save the image file once and scale it for display; do not store base64 strings
+  or extra full-resolution copies for each thumbnail.
+- Download the saved 1K image. Changing its on-screen size does not generate a
+  new image or reduce the price already paid.
+- Dimensions and file size are different: encoded bytes vary by format and image
+  detail. Record actual byte size for the storage display. Do not promise a fixed
+  file size or silently discard a completed image because it exceeds a target.
+
+Image generation is charged per image at the selected resolution and quality,
+not against the sentence feature's text-token budget. As checked on 15 October
+2026, Grok Imagine Image 2.0 lists 1K Low at US$0.04 and 2K Low at US$0.06 per
+image; 1K Medium is US$0.06 and 2K Medium is US$0.08. Larger generation can cost
+more. Recheck the selected model's pricing before implementation; other models
+can have different rates.
 
 ### Shared image prompt
 
@@ -400,6 +432,8 @@ image bytes/base64 where supported rather than saving only a remote URL.
 - If a saved AI essay exists and the published essay is missing, show it directly.
 - Render AI essays with the existing Markdown renderer and **Highlight kanji**.
 - Show **AI-generated essay**, shared regeneration controls, and MP3 controls.
+- Once narration exists, show a visible **Download MP3** button beside its audio
+  controls, for both AI-generated and published essays.
 - Narration is also available for existing published essays when AI is ready.
 - If a published essay later becomes available, show it by default. Keep any
   saved AI essay accessible through **View saved AI essay**; do not erase it.
@@ -490,6 +524,15 @@ Use a full-width primary button for vocabulary details and essays:
 
 Show **Download MP3**, **Regenerate MP3**, and **AI-generated voice** when audio
 exists. Playback uses the saved file and makes no provider request.
+
+Download MP3 is a direct, clearly labeled button in both Anchor Word and Kanji
+Essay. It downloads the exact recording used for playback, with no regeneration
+or additional provider charge. Use `audio/mpeg` and descriptive filenames such
+as `anchor-word-{WORD}-{READING}.mp3` and `kanji-essay-{KANJI}.mp3`, with filename
+characters sanitized. Keep the button usable on mobile. Before audio exists,
+show the generation action rather than a download link to an unavailable file.
+If saving to the database failed, allow downloading the completed in-memory
+recording while it is still available. Report download failures clearly.
 
 ### Narration preparation
 
@@ -633,10 +676,14 @@ Manual checks:
   feature-specific errors.
 - Missing essays offer generation; existing essays remain the default.
 - Gallery stops at three images; replacing one leaves the other two intact.
+- Images use explicit 1K square API settings, fit the drawer, and download at
+  their saved resolution without another generation request.
 - Saved images and MP3s remain usable offline after the app is available offline.
 - Automatic and Japanese language choices map to the correct API values.
 - Replacing text never plays the old recording as narration of the new text.
 - Downloads work; clear-content action preserves preferences.
+- Download MP3 is visible and works in both Anchor Word and Kanji Essay after
+  generation, including on mobile; downloads do not increase provider usage.
 - Storage failures and canceled requests preserve prior saved content.
 - Disabling AI hides the new generation UI without deleting saved records.
 - Mobile drawer layout remains usable with the keyboard open.
@@ -649,6 +696,7 @@ and the production build with `CF_PAGES=1`, following the repository instruction
 
 - [xAI speech API](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech)
 - [xAI image generation](https://docs.x.ai/developers/model-capabilities/images/generation)
+- [Grok Imagine Image 2.0 resolution and quality pricing](https://docs.x.ai/developers/models/grok-imagine-image-2.0)
 - [xAI web search configuration](https://docs.x.ai/developers/tools/web-search)
 - [xAI pricing](https://docs.x.ai/developers/pricing)
 - [xAI key permissions](https://docs.x.ai/developers/rest-api-reference/management/auth)
