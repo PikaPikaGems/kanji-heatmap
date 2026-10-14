@@ -14,7 +14,11 @@ import type {
   VoiceStatus,
   OtherLanguages,
 } from "yomiage";
-import { readAiVoiceSettings, type AiVoiceSettings } from "./preferences";
+import {
+  deliveryOf,
+  readAiVoiceSettings,
+  type AiVoiceSettings,
+} from "./preferences";
 
 type Yomiage = typeof import("yomiage");
 
@@ -200,11 +204,7 @@ export const toVoiceSettings = (
   settings: AiVoiceSettings,
   presets: Readonly<Record<PresetName, unknown>>
 ): VoiceSettings => {
-  const delivery = definedOnly({
-    speed: settings.speed,
-    expressiveness: settings.expressiveness,
-    rhythmVariation: settings.rhythmVariation,
-  });
+  const delivery = definedOnly(deliveryOf(settings));
   if (settings.preset === "custom") {
     return settings.custom ? { ...delivery, ...settings.custom } : delivery;
   }
@@ -272,10 +272,14 @@ const speakAiNow = async (
 
   const saved = settings ?? readAiVoiceSettings();
   // yomiage clamps speed to its range, so a very slow saved speed stays valid.
-  const chosen = slow
+  const delivery = deliveryOf(saved);
+  // Slow is the chosen delivery, slowed down, so it goes in as Custom.
+  const chosen: AiVoiceSettings = slow
     ? {
         ...saved,
-        speed: (saved.speed ?? mod.DEFAULTS.speed) * SLOW_SPEED_FACTOR,
+        ...delivery,
+        deliveryPreset: "custom",
+        speed: (delivery.speed ?? mod.DEFAULTS.speed) * SLOW_SPEED_FACTOR,
       }
     : saved;
 
