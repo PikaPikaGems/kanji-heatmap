@@ -115,6 +115,7 @@ const ProductionPracticePhase = ({
           results={session.hasMore ? session.results : session.runResults}
           hasMore={session.hasMore}
           wordsCleared={session.deck.length}
+          saveError={session.saveError}
           onNext={session.startNextSession}
           onEnd={session.goToInitial}
         />
@@ -136,7 +137,7 @@ const ProductionPracticeV1 = () => {
   const { loadPhase } = handwriting;
 
   const session = usePracticeSession<SessionResult>({
-    activityKind: "production",
+    recordType: "writing_practice_round_completed",
     sessionSize: SESSION_SIZE,
     onGoToInitial: handwriting.reset,
     // Warm recognition before "playing"; park on loading / confirm-fallback

@@ -3,6 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { RadioRow, ToggleRow } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
+import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { TTS_DISCLAIMER } from "@/lib/tts";
@@ -182,6 +183,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           <PracticeButton size="lg" onClick={onStart}>
             Start
           </PracticeButton>
+          <SaveProgressHint className="pt-2" />
         </div>
       </div>
     </div>

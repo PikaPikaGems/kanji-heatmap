@@ -1,4 +1,4 @@
-import type { GenericChallengeEventRecord } from "engine-contract";
+import type { ActivityRecordInput } from "@/lib/engine/use-activity-recorder";
 import type { FillTheKanjiSetId } from "./sets";
 
 /**
@@ -10,16 +10,12 @@ import type { FillTheKanjiSetId } from "./sets";
 export const fillTheKanjiActivityType = (setId: FillTheKanjiSetId): string =>
   `fill_the_kanji_${setId.replace(/-/g, "_")}`;
 
-/** The engine record for a finished batch that started playing at `startedAt`. */
+/** The engine record for a finished batch of a set. */
 export const batchCompletedRecord = (
   setId: FillTheKanjiSetId,
-  batch: number,
-  startedAt: number
-): GenericChallengeEventRecord => ({
+  batch: number
+): ActivityRecordInput => ({
   type: "generic_challenge_completed",
   activityType: fillTheKanjiActivityType(setId),
   challengeId: batch,
-  startedAt,
-  endedAt: Date.now(),
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 });

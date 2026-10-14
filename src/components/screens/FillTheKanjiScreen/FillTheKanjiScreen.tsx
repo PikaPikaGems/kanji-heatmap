@@ -1,14 +1,10 @@
-import { useRef, useState } from "react";
-import type { EngineAPI } from "engine-contract";
+import { useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { PracticeShell } from "@/components/shared-practice";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
-import { recordActivity } from "@/lib/activity";
-import { copyForCode } from "@/lib/engine/engine-copy";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
 import {
   batchCount,
   batchLabel,
@@ -29,8 +25,7 @@ const FillTheKanjiScreen = () => {
   useHtmlDocumentTitle(fillTheKanjiPageMeta.heading);
 
   const { settings, setId, batch, selectBatch } = useFillTheKanjiSettings();
-  const account = useAccountStatus();
-  const api = useEngineApi();
+  const recorder = useActivityRecorder();
   const allStats = useAllSetBatchStats();
   const [phase, setPhase] = useState<Phase>("initial");
   const [progress, setProgress] = useState(0);
@@ -40,14 +35,6 @@ const FillTheKanjiScreen = () => {
   // Sentences being retried; null while playing a full batch. A retry isn't
   // a batch attempt, so it isn't recorded in the stats.
   const [retryJp, setRetryJp] = useState<string[] | null>(null);
-  // When the current batch started playing; sent with its engine record.
-  const startedAtRef = useRef(0);
-  // Why the finished batch couldn't be saved, shown on the end screen. Tagged
-  // with the play it belongs to so a late answer never shows on a later one.
-  const [saveFailure, setSaveFailure] = useState<{
-    playKey: number;
-    message: string;
-  } | null>(null);
 
   const headerProgress =
     phase === "initial"
@@ -56,7 +43,7 @@ const FillTheKanjiScreen = () => {
       : progress;
 
   const play = (onlyJp: string[] | null = null) => {
-    startedAtRef.current = Date.now();
+    recorder.startRound();
     setRetryJp(onlyJp);
     setProgress(0);
     setResults(null);
@@ -69,23 +56,9 @@ const FillTheKanjiScreen = () => {
     setPhase("initial");
   };
 
-  const saveBatch = async (engine: EngineAPI) => {
-    const forPlay = playKey;
-    const result = await engine.activity.record(
-      batchCompletedRecord(setId, batch, startedAtRef.current)
-    );
-    if (!result.ok) {
-      setSaveFailure({
-        playKey: forPlay,
-        message: copyForCode(result.error.code),
-      });
-    }
-  };
-
   const finishBatch = (batchResults: ItemResult[]) => {
     if (retryJp == null) {
-      recordActivity("fillTheKanji");
-      if (account.kind === "active" && api) void saveBatch(api);
+      void recorder.recordRound(batchCompletedRecord(setId, batch));
     }
     setResults(batchResults);
     setPhase("ended");
@@ -131,9 +104,7 @@ const FillTheKanjiScreen = () => {
             <EndSession
               results={results}
               batchLabel={`${setLabel(setId)} · Batch ${batchLabel(batch)}`}
-              saveError={
-                saveFailure?.playKey === playKey ? saveFailure.message : null
-              }
+              saveError={recorder.saveError}
               onNext={playNextBatch}
               onRetryMistakes={() =>
                 play(results.filter((r) => !r.correct).map((r) => r.item.jp))

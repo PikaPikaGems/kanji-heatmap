@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { JLPTSelector } from "@/components/common/jlpt/JLPTSelector";
 import { JouyouGradeSelector } from "@/components/common/JouyouGradeSelector";
+import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { JOUYOU_GRADE_TYPE_ARR, JouyouGradeType } from "@/lib/jouyou-grade";
 import { BookmarkedOnlyToggle } from "./BookmarkedOnlyToggle";
@@ -118,6 +119,7 @@ export const PracticeInitialScreen = ({
         <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
           Start
         </PracticeButton>
+        <SaveProgressHint />
       </div>
     </div>
   </div>

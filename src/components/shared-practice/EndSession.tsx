@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
 import { Link } from "@/components/dependent/routing/router-adapter";
@@ -25,6 +26,7 @@ export const EndSession = ({
   results,
   hasMore,
   wordsCleared,
+  saveError,
   onNext,
   onEnd,
 }: {
@@ -33,6 +35,8 @@ export const EndSession = ({
   hasMore: boolean;
   /** Total words in the filtered deck (used on the final complete screen). */
   wordsCleared: number;
+  /** Why the finished round couldn't be saved, if it couldn't. */
+  saveError: string | null;
   onNext: () => void;
   onEnd: () => void;
 }) => {
@@ -62,14 +66,17 @@ export const EndSession = ({
           </>
         }
         afterStats={
-          forgottenKanji.length > 0 && (
-            <Link
-              href={multiKanjiSearchHref(forgottenKanji)}
-              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
-            >
-              View {forgottenKanji.length} kanji you forgot
-            </Link>
-          )
+          <>
+            {forgottenKanji.length > 0 && (
+              <Link
+                href={multiKanjiSearchHref(forgottenKanji)}
+                className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
+              >
+                View {forgottenKanji.length} kanji you forgot
+              </Link>
+            )}
+            <ProgressNotSavedNotice saveError={saveError} />
+          </>
         }
         primaryLabel="Done"
         onPrimary={onEnd}
@@ -103,6 +110,7 @@ export const EndSession = ({
               </div>
             ))}
           </div>
+          <ProgressNotSavedNotice saveError={saveError} className="pb-4" />
         </div>
       </div>
 

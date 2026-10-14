@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
+import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
+import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
 import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
@@ -26,6 +28,8 @@ const SpeedKatakanaScreen = () => {
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState<SessionStats | null>(null);
   const completedSetsCount = useCompletedSetsCount();
+  const recorder = useActivityRecorder();
+  const isCoarsePointer = useCoarsePointer();
 
   // Pin the play area to the area above the on-screen keyboard. See the hook.
   const viewport = useVisualViewport();
@@ -50,6 +54,7 @@ const SpeedKatakanaScreen = () => {
   const startGame = () => {
     // Must run inside the click's call stack for iOS to open the keyboard.
     primerRef.current?.focus();
+    recorder.startRound();
     setProgress(0);
     setPhase("playing");
   };
@@ -58,6 +63,13 @@ const SpeedKatakanaScreen = () => {
     if (settings.wordCount === 48) {
       recordSetResult(settings.challengeSet, sessionStats);
       recordActivity("speedKatakana");
+      void recorder.recordRound({
+        type: "speed_katakana_session_completed",
+        challengeId: settings.challengeSet,
+        accuracyVal: sessionStats.accuracy,
+        cpmVal: sessionStats.charsPerMinute,
+        pointerType: isCoarsePointer ? "coarse" : "fine",
+      });
     }
     setStats(sessionStats);
     setPhase("ended");
@@ -66,6 +78,7 @@ const SpeedKatakanaScreen = () => {
   const startNextChallenge = () => {
     primerRef.current?.focus();
     selectChallengeSet(nextChallengeSet(settings.challengeSet));
+    recorder.startRound();
     setProgress(0);
     setPhase("playing");
   };
@@ -127,6 +140,7 @@ const SpeedKatakanaScreen = () => {
                 onNext={startNextChallenge}
                 onEnd={goToInitial}
                 completedSets={completedSetsCount}
+                saveError={recorder.saveError}
               />
             </div>
           )}
