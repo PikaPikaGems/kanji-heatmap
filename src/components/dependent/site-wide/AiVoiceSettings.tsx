@@ -442,15 +442,17 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
 
   const chooseDelivery = (next: DeliveryPreset) => {
     const patch: Partial<AiVoiceSettings> = { deliveryPreset: next };
-    // First time on Custom from Flat: start from Flat's values.
-    if (
-      next === "custom" &&
-      deliveryChoice === "flat" &&
-      settings.speed === undefined &&
-      settings.expressiveness === undefined &&
-      settings.rhythmVariation === undefined
-    ) {
+    // Custom starts from the preset it was switched from. Unset fields mean
+    // yomiage's defaults, which is Default's values.
+    if (next === "custom" && deliveryChoice === "flat") {
       Object.assign(patch, FLAT_DELIVERY);
+    }
+    if (next === "custom" && deliveryChoice === "default") {
+      Object.assign(patch, {
+        speed: undefined,
+        expressiveness: undefined,
+        rhythmVariation: undefined,
+      });
     }
     preview.play(updateSettings(patch));
   };
