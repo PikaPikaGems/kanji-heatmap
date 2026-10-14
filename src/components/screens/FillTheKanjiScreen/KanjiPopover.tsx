@@ -6,10 +6,11 @@ import { toJouyouGrade } from "@/lib/jouyou-grade";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { cn } from "@/lib/utils";
 import type { CSSProperties } from "react";
+import { KanjiReadingBadges } from "./KanjiReadingBadges";
 
 type KanjiBasicInfo = NonNullable<ReturnType<GetBasicKanjiInfo>>;
 
-/** A kanji in running text that opens a popover with its level badges, it enlarged, its keyword and its frequency badges. */
+/** A kanji in running text that opens a popover with its level badges, it enlarged, its keyword, its readings and its frequency badges. */
 export const KanjiPopover = ({
   kanji,
   info,
@@ -56,6 +57,7 @@ export const KanjiPopover = ({
           <span className="pt-1 text-sm font-bold text-foreground">
             {keyword}
           </span>
+          <KanjiReadingBadges kanji={kanji} />
           <div className="flex flex-wrap justify-center">
             <FrequencyBadges frequency={frequency} />
           </div>

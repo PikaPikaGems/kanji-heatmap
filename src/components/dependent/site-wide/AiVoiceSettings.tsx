@@ -1,8 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type { PresetName } from "yomiage";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { SpanBadge } from "@/components/ui/badge";
 import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import {
@@ -33,8 +45,12 @@ import {
   type AiVoiceState,
 } from "@/lib/ai-voice/engine";
 import {
+  DELIVERY_PRESETS,
+  deliveryPresetOf,
+  FLAT_DELIVERY,
   VOICE_PREVIEW_TEXT,
   type AiVoiceSettings,
+  type DeliveryPreset,
   type AiVoiceShape,
   type VoiceEngine,
 } from "@/lib/ai-voice/preferences";
@@ -297,20 +313,18 @@ const VoiceSlider = ({
   spec,
   value,
   range,
-  disabled,
   onChange,
 }: {
   spec: SliderSpec;
   value: number;
   range: readonly [number, number];
-  disabled?: boolean;
   onChange: (v: number) => void;
 }) => {
   const [min, max] = range;
   const [expanded, setExpanded] = useState(false);
   const hintId = `ai-voice-${spec.name}-hint`;
   return (
-    <div className={cn("py-2 text-left", disabled && "opacity-60")}>
+    <div className="py-2 text-left">
       <div className="flex items-center justify-between gap-3 mb-2">
         <span className="text-sm font-semibold">{spec.label}</span>
         <output className="text-xs tabular-nums">{formatValue(value)}</output>
@@ -320,7 +334,6 @@ const VoiceSlider = ({
         max={max}
         step={spec.step}
         value={[value]}
-        disabled={disabled}
         onValueChange={([v]) => onChange(v)}
         thumbLabel={spec.label}
       />
@@ -346,6 +359,55 @@ const VoiceSlider = ({
   );
 };
 
+/** A row of preset tiles, the same as the writing-practice / Fill the Kanji kanji pickers. */
+const PresetTiles = <T extends string>({
+  label,
+  options,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  options: readonly T[];
+  selected: T;
+  onSelect: (next: T) => void;
+}) => (
+  // Rows of 3 so Custom isn't left alone on its own row.
+  <div className="grid grid-cols-3 gap-2" role="group" aria-label={label}>
+    {options.map((name) => (
+      <PracticeButton
+        key={name}
+        variant={selected === name ? "primary" : "secondary"}
+        aria-pressed={selected === name}
+        onClick={() => onSelect(name)}
+        className={cn(
+          "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
+          selected !== name && "border-dashed"
+        )}
+      >
+        {name}
+      </PracticeButton>
+    ))}
+  </div>
+);
+
+/** The Custom sliders under a preset row; open until the user folds it. */
+const CustomizationSection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <Accordion type="single" collapsible defaultValue="open" className="mt-3">
+    <AccordionItem value="open" className="border-b-0">
+      <AccordionTrigger className="justify-start gap-2 py-1 text-sm font-semibold text-left">
+        {title}
+      </AccordionTrigger>
+      <AccordionContent className="pb-0">{children}</AccordionContent>
+    </AccordionItem>
+  </Accordion>
+);
+
 const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
   const [settings, updateSettings] = useAiVoiceSettings();
   const preview = usePreview();
@@ -362,6 +424,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
   const shape: AiVoiceShape =
     isCustom && settings.custom ? settings.custom : { ...PRESETS[lastPreset] };
 
+  const deliveryChoice = deliveryPresetOf(settings);
   const delivery = {
     speed: settings.speed ?? DEFAULTS.speed,
     expressiveness: settings.expressiveness ?? DEFAULTS.expressiveness,
@@ -373,6 +436,21 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
     // First time on Custom: start from the preset that was selected.
     if (next === "custom" && !settings.custom) {
       patch.custom = { ...PRESETS[lastPreset] };
+    }
+    preview.play(updateSettings(patch));
+  };
+
+  const chooseDelivery = (next: DeliveryPreset) => {
+    const patch: Partial<AiVoiceSettings> = { deliveryPreset: next };
+    // First time on Custom from Flat: start from Flat's values.
+    if (
+      next === "custom" &&
+      deliveryChoice === "flat" &&
+      settings.speed === undefined &&
+      settings.expressiveness === undefined &&
+      settings.rhythmVariation === undefined
+    ) {
+      Object.assign(patch, FLAT_DELIVERY);
     }
     preview.play(updateSettings(patch));
   };
@@ -390,14 +468,13 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
       ? shape[name]
       : delivery[name];
 
-  const sliders = (group: SliderSpec["group"], disabled?: boolean) =>
+  const sliders = (group: SliderSpec["group"]) =>
     SLIDERS.filter((s) => s.group === group).map((spec) => (
       <VoiceSlider
         key={spec.name}
         spec={spec}
         value={valueOf(spec.name)}
         range={RANGES[spec.name]}
-        disabled={disabled}
         onChange={(v) => setValue(spec.name, v)}
       />
     ));
@@ -434,6 +511,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
               preview.play({
                 ...settings,
                 preset: choice,
+                deliveryPreset: deliveryChoice,
               })
             }
           >
@@ -442,62 +520,57 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
           </Button>
         )}
       </div>
-      <span className={cn(subheadingCn, "block")}>Preset</span>
-      {/* Rows of 3 so Custom isn't left alone on its own row. */}
-      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset">
-        {[...presetNames, "custom" as const].map((name) => (
-          // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
-          <PracticeButton
-            key={name}
-            variant={choice === name ? "primary" : "secondary"}
-            aria-pressed={choice === name}
-            onClick={() => choosePreset(name)}
-            className={cn(
-              "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
-              choice !== name && "border-dashed"
-            )}
-          >
-            {name}
-          </PracticeButton>
-        ))}
-      </div>
+      <span className={cn(subheadingCn, "block")}>Voice Presets</span>
+      <PresetTiles
+        label="Voice Presets"
+        options={[...presetNames, "custom" as const]}
+        selected={choice}
+        onSelect={choosePreset}
+      />
       {!ready && (
         <p className="pt-2 text-xs text-left text-muted-foreground">
           Presets can be heard once the voice has loaded.
         </p>
       )}
-
-      <span className={cn(subheadingCn, "block mt-4")}>Voice</span>
-      {!isCustom && (
-        <p className="text-xs text-left text-muted-foreground">
-          Set by the preset. Select Custom to change these.
-        </p>
+      {isCustom && (
+        <CustomizationSection title="Voice Customization">
+          {sliders("voice")}
+        </CustomizationSection>
       )}
-      {sliders("voice", !isCustom)}
 
-      <span className={cn(subheadingCn, "block mt-4")}>Delivery</span>
-      {sliders("delivery")}
-      {/* Unset fields mean yomiage's defaults. */}
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        className="w-full mt-2 text-xs font-bold"
-        disabled={
-          settings.speed === undefined &&
-          settings.expressiveness === undefined &&
-          settings.rhythmVariation === undefined
-        }
-        onClick={() =>
-          updateSettings({
-            speed: undefined,
-            expressiveness: undefined,
-            rhythmVariation: undefined,
-          })
-        }
-      >
-        Reset to defaults
-      </Button>
+      <span className={cn(subheadingCn, "block mt-4")}>Delivery Presets</span>
+      <PresetTiles
+        label="Delivery Presets"
+        options={DELIVERY_PRESETS}
+        selected={deliveryChoice}
+        onSelect={chooseDelivery}
+      />
+      {deliveryChoice === "custom" && (
+        <CustomizationSection title="Delivery Customization">
+          {sliders("delivery")}
+          {/* Unset fields mean yomiage's defaults. */}
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="w-full mt-2 text-xs font-bold"
+            disabled={
+              settings.speed === undefined &&
+              settings.expressiveness === undefined &&
+              settings.rhythmVariation === undefined
+            }
+            onClick={() =>
+              updateSettings({
+                speed: undefined,
+                expressiveness: undefined,
+                rhythmVariation: undefined,
+              })
+            }
+          >
+            Reset to defaults
+          </Button>
+        </CustomizationSection>
+      )}
     </div>
   );
 };

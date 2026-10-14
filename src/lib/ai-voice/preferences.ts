@@ -18,18 +18,62 @@ export type AiVoiceShape = {
   breathReduction: number;
 };
 
+export type DeliveryPreset = "flat" | "default" | "custom";
+export const DELIVERY_PRESETS: DeliveryPreset[] = ["flat", "default", "custom"];
+
+type Delivery = {
+  speed?: number;
+  expressiveness?: number;
+  rhythmVariation?: number;
+};
+
+/** Slow and steady: every word evenly paced, no intonation swings. */
+export const FLAT_DELIVERY = {
+  speed: 0.5,
+  expressiveness: 0,
+  rhythmVariation: 0,
+} as const;
+
 /**
  * What the user picked in User Preferences. Unset fields mean "yomiage's
  * default", so the defaults stay owned by yomiage. `custom` holds the values
  * for the Custom chip and is kept while a preset is selected, so switching
- * back to Custom restores them.
+ * back to Custom restores them. The same goes for the delivery fields
+ * (`speed`, `expressiveness`, `rhythmVariation`): they are the Custom
+ * delivery's values and only apply while `deliveryPreset` is Custom.
  */
-export type AiVoiceSettings = {
+export type AiVoiceSettings = Delivery & {
   preset?: PresetName | "custom";
   custom?: AiVoiceShape;
-  speed?: number;
-  expressiveness?: number;
-  rhythmVariation?: number;
+  deliveryPreset?: DeliveryPreset;
+};
+
+const isDeliveryPreset = (v: unknown): v is DeliveryPreset =>
+  DELIVERY_PRESETS.includes(v as DeliveryPreset);
+
+/**
+ * The selected delivery preset. Settings saved before delivery presets
+ * existed have none: Custom if any delivery value was changed, else Default.
+ */
+export const deliveryPresetOf = (settings: AiVoiceSettings): DeliveryPreset => {
+  if (settings.deliveryPreset) return settings.deliveryPreset;
+  const changed =
+    settings.speed !== undefined ||
+    settings.expressiveness !== undefined ||
+    settings.rhythmVariation !== undefined;
+  return changed ? "custom" : "default";
+};
+
+/** The delivery values in effect. Unset fields mean yomiage's defaults. */
+export const deliveryOf = (settings: AiVoiceSettings): Delivery => {
+  const preset = deliveryPresetOf(settings);
+  if (preset === "flat") return FLAT_DELIVERY;
+  if (preset === "default") return {};
+  return {
+    speed: settings.speed,
+    expressiveness: settings.expressiveness,
+    rhythmVariation: settings.rhythmVariation,
+  };
 };
 
 export const readVoiceEngine = (): VoiceEngine => {
@@ -79,6 +123,9 @@ export const readAiVoiceSettings = (): AiVoiceSettings => {
             breathReduction: custom.breathReduction,
           }
         : undefined,
+    deliveryPreset: isDeliveryPreset(raw.deliveryPreset)
+      ? raw.deliveryPreset
+      : undefined,
     speed: numberOrUndefined(raw.speed),
     expressiveness: numberOrUndefined(raw.expressiveness),
     rhythmVariation: numberOrUndefined(raw.rhythmVariation),
