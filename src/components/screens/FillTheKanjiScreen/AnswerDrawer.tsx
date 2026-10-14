@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { PracticeDrawerShell } from "@/components/production-practice-v1/drawers/PracticeDrawerShell";
@@ -13,6 +14,9 @@ import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { type BlankResult, FuriganaSentence } from "./SentencePrompt";
 import { KanjiPopover } from "./KanjiPopover";
 import { SpeakButtons } from "./SpeakButtons";
+import { AiExplainDialog } from "./AiExplainDialog";
+import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { isAiExplainReady } from "@/lib/ai-explain/preferences";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
 /** "almost": wrong, but at least half the blanks were right. */
@@ -102,47 +106,96 @@ const clipboardText = (item: FillTheKanjiItem) =>
 
 const CONFIRM_KEYS = ["Enter", " "] as const;
 
-/** Notes and tags as written in the data, in a scrollable popover. */
-const NotesPopover = ({ item }: { item: FillTheKanjiItem }) => (
-  <GenericPopover
-    // Inside a drawer: modal, or the popover can't be clicked.
-    modal
-    trigger={
-      <button
-        type="button"
-        className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
-      >
-        View notes
-      </button>
-    }
-    // Up to 24rem wide; shorter notes shrink the popover to fit.
-    contentClassName="w-auto max-w-[min(24rem,calc(100vw-2rem))] p-0"
-    content={
-      <div className="flex flex-col gap-3 px-4 py-3 text-sm text-center">
-        {item.notes ? (
-          <p className="whitespace-pre-line" lang="ja">
-            {item.notes}
-          </p>
-        ) : (
-          <p className="text-muted-foreground">No notes for this sentence.</p>
-        )}
-        {item.tags.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-1.5 pt-2 border-t border-dotted">
-            {item.tags.map((tag) => (
-              <SpanBadge
-                key={tag}
-                variant="outline"
-                className="font-medium text-muted-foreground"
-              >
-                {tag}
-              </SpanBadge>
-            ))}
+/** The popover and the AI Explain modal are never open together. */
+type NotesView = "closed" | "notes" | "explain";
+
+/**
+ * Notes and tags as written in the data, in a scrollable popover. With AI
+ * Explain set up, it also offers a button that opens the explanation modal.
+ */
+const NotesPopover = ({
+  item,
+  showAiExplain,
+}: {
+  item: FillTheKanjiItem;
+  showAiExplain: boolean;
+}) => {
+  const [view, setView] = useState<NotesView>("closed");
+  const explain = useAiExplain();
+  const japaneseText = plainSentence(item.jp);
+  const triggerClassName = cn(
+    cnDottedUnderlineTrigger,
+    "text-xs text-foreground"
+  );
+
+  return (
+    <>
+      <GenericPopover
+        // Inside a drawer: modal, or the popover can't be clicked.
+        modal
+        open={view === "notes"}
+        onOpenChange={(open) => setView(open ? "notes" : "closed")}
+        trigger={
+          <button type="button" className={triggerClassName}>
+            View notes
+          </button>
+        }
+        // Up to 24rem wide; shorter notes shrink the popover to fit.
+        contentClassName="w-auto max-w-[min(24rem,calc(100vw-2rem))] p-0"
+        content={
+          <div className="flex flex-col gap-3 px-4 py-3 text-sm text-center">
+            {item.notes ? (
+              <p className="whitespace-pre-line" lang="ja">
+                {item.notes}
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                No notes for this sentence.
+              </p>
+            )}
+            {item.tags.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-1.5 pt-2 border-t border-dotted">
+                {item.tags.map((tag) => (
+                  <SpanBadge
+                    key={tag}
+                    variant="outline"
+                    className="font-medium text-muted-foreground"
+                  >
+                    {tag}
+                  </SpanBadge>
+                ))}
+              </div>
+            )}
+            {showAiExplain && (
+              <div className="pt-2 border-t border-dotted">
+                <button
+                  type="button"
+                  className={triggerClassName}
+                  onClick={() => {
+                    setView("explain");
+                    explain.run(japaneseText);
+                  }}
+                >
+                  AI Explain
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    }
-  />
-);
+        }
+      />
+      <AiExplainDialog
+        open={view === "explain"}
+        onClose={() => {
+          explain.cancel();
+          setView("closed");
+        }}
+        japaneseText={japaneseText}
+        state={explain.state}
+        onRegenerate={() => explain.run(japaneseText, { fresh: true })}
+      />
+    </>
+  );
+};
 
 /**
  * Bottom-sheet answer reveal after Next or Forgot, using the writing-practice
@@ -160,6 +213,7 @@ export const AnswerDrawer = ({
 }) => {
   const open = answer?.open ?? false;
   const getKanjiInfo = useGetKanjiInfoFn();
+  const [aiExplainSettings] = useAiExplainSettings();
 
   // Don't treat the Enter that submitted the answer as "Continue".
   useArmedConfirmKey({
@@ -171,6 +225,7 @@ export const AnswerDrawer = ({
   if (!answer) return null;
   const { item, kind, puzzle, tiles, filled, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
+  const showAiExplain = isAiExplainReady(aiExplainSettings);
 
   return (
     <PracticeDrawerShell
@@ -210,7 +265,9 @@ export const AnswerDrawer = ({
           ·
         </span>
         <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
-        {hasNotes && <NotesPopover item={item} />}
+        {(hasNotes || showAiExplain) && (
+          <NotesPopover item={item} showAiExplain={showAiExplain} />
+        )}
       </div>
     </PracticeDrawerShell>
   );
