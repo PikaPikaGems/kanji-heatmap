@@ -53,6 +53,9 @@ export const UPDATE_BROWSER_TO_USE_COPY = "Update your browser to use this.";
 
 export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
+export const ENGINE_FAILED_COPY =
+  "Your progress couldn't be loaded. Refresh the page to try again.";
+
 export const PUSH_BLOCKED_COPY =
   "Changes from this device can't upload. Log out and remove this device's data to fix it.";
 
