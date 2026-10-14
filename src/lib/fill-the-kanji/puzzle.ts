@@ -42,6 +42,22 @@ export const parseSentence = (jp: string): WordPartDetail[] =>
   decodeFurigana(jp);
 
 /**
+ * A reading belongs to the kanji at the end of its base: spaces mark
+ * bunsetsu here, so the kana before a kanji end up in its base too
+ * (やって来[き], 立[た]ち上[あ]がって). Those kana become plain text.
+ */
+const withoutLeadingKana = (part: WordPartDetail): WordPartDetail[] => {
+  const [text, reading] = part;
+  const chars = Array.from(text);
+  const firstKanji = chars.findIndex(isKanji);
+  if (reading == null || firstKanji <= 0) return [part];
+  return [
+    [chars.slice(0, firstKanji).join("")],
+    [chars.slice(firstKanji).join(""), reading],
+  ];
+};
+
+/**
  * The sentence split at its spaces, which mark bunsetsu boundaries in the
  * data ("電車[でんしゃ]で 行[い]くしか ないです"), each chunk decoded.
  */
@@ -49,7 +65,7 @@ export const parseBunsetsu = (jp: string): WordPartDetail[][] =>
   jp
     .split(/\s+/)
     .filter(Boolean)
-    .map((chunk) => decodeFurigana(chunk));
+    .map((chunk) => decodeFurigana(chunk).flatMap(withoutLeadingKana));
 
 /** The sentence without readings or spacing, e.g. for text-to-speech. */
 export const plainSentence = (jp: string): string =>
