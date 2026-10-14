@@ -20,6 +20,7 @@ import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StudyNotesAccordion } from "./StudyNotesAccordion";
+import { YourProgressAccordion } from "./YourProgressAccordion";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
@@ -207,6 +208,7 @@ export const KanjiDetails = ({
         </SimpleAccordion>
       )}
       <StudyNotesAccordion kanji={kanji} />
+      <YourProgressAccordion kanji={kanji} />
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />

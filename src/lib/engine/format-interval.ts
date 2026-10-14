@@ -19,6 +19,25 @@ export const formatInterval = (ms: number): string => {
   return `${Math.max(1, Math.round(days / MONTH_DAYS))}mo`;
 };
 
+const withUnit = (value: number, unit: string) =>
+  `${value} ${value === 1 ? unit : `${unit}s`}`;
+
+/**
+ * A length of `days` in words, in the largest unit that fits (never years,
+ * like the max-interval slider): "40 minutes", "5.5 hours", "12 days",
+ * "19.2 months".
+ */
+export const formatDaysHuman = (days: number): string => {
+  const oneDecimal = (value: number) => Math.round(value * 10) / 10;
+
+  if (days < 1 / 24) {
+    return withUnit(Math.max(1, Math.round(days * 24 * 60)), "minute");
+  }
+  if (days < 1) return withUnit(oneDecimal(days * 24), "hour");
+  if (days < MONTH_DAYS) return withUnit(oneDecimal(days), "day");
+  return withUnit(oneDecimal(days / MONTH_DAYS), "month");
+};
+
 /**
  * The frozen next-review interval of each rating for an open review
  * (`scheduledAt - openedAt`, host/api/REVIEWS.md), as short labels.
