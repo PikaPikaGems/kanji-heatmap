@@ -77,14 +77,14 @@ export type StatCount = {
   unit: string;
 };
 
-/** One count: the number, then its unit. Zero is dimmed so progress stands out. */
+/** One count: the number, then its unit. */
 const StatCountItem = ({ value, unit }: StatCount) => (
   <div className="flex items-baseline gap-1.5 min-w-0">
     <StatValue
       display={formatCompactCount(value)}
       raw={formatRawCount(value)}
       abbreviated={value >= 1000}
-      className={cn("text-xl", value === 0 && "opacity-40")}
+      className="text-xl text-foreground"
     />
     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
       {unit}
