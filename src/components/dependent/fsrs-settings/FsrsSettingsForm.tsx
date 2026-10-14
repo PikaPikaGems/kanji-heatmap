@@ -15,7 +15,7 @@ import {
 } from "@/lib/engine/fsrs-steps";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
-import { SwitchField } from "./FieldParts";
+import { SwitchField, Warning } from "./FieldParts";
 import { IntervalField } from "./IntervalField";
 import { ModelWeightsField } from "./ModelWeightsField";
 import { RetentionField } from "./RetentionField";
@@ -83,10 +83,13 @@ export const FsrsSettingsForm = ({
   api,
   initial,
   blocker,
+  notice,
 }: {
   api: EngineAPI;
   initial: ReviewSettings;
   blocker: SaveBlocker | null;
+  /** Extra context shown above the form that doesn't block saving. */
+  notice: string | null;
 }) => {
   const defaults = api.reviews.settings.defaultSettings;
   const [draft, setDraft] = useState(initial);
@@ -146,6 +149,9 @@ export const FsrsSettingsForm = ({
       <div className="flex-1 min-h-0 px-6 pb-4 overflow-y-auto">
         <div className="flex flex-col gap-5 pt-2 text-left">
           {blocker !== null && <BlockerBanner blocker={blocker} />}
+          {notice !== null && save.kind !== "saved" && (
+            <Warning>{notice}</Warning>
+          )}
           <div className="grid items-start gap-x-10 gap-y-5 md:grid-cols-2">
             <div className="flex flex-col gap-5">
               <RetentionField

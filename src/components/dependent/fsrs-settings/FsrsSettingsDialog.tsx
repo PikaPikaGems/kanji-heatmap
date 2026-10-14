@@ -39,6 +39,7 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
         api={api}
         initial={defaults}
         blocker={{ kind: "signed-out" }}
+        notice={null}
       />
     );
   }
@@ -51,6 +52,7 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
           kind: "write",
           reason: getWriteBlocker(status) ?? "loading",
         }}
+        notice={null}
       />
     );
   }
@@ -65,15 +67,37 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
 
   const value = snapshotValue(current);
   if (value) {
-    return <FsrsSettingsForm api={api} initial={value} blocker={blocker} />;
+    return (
+      <FsrsSettingsForm
+        api={api}
+        initial={value}
+        blocker={blocker}
+        notice={null}
+      />
+    );
   }
   if (blocker?.kind === "update-required") {
-    return <FsrsSettingsForm api={api} initial={defaults} blocker={blocker} />;
+    return (
+      <FsrsSettingsForm
+        api={api}
+        initial={defaults}
+        blocker={blocker}
+        notice={null}
+      />
+    );
   }
-  if (current.status === "ready" || current.status === "failed") {
-    return <Message>Couldn&apos;t load your settings.</Message>;
+  if (current.status === "loading") {
+    return <Message>Loading your settings…</Message>;
   }
-  return <Message>Loading your settings…</Message>;
+  // The read failed; the form still works, but say what it started from.
+  return (
+    <FsrsSettingsForm
+      api={api}
+      initial={defaults}
+      blocker={blocker}
+      notice="Couldn't load your current settings, so this shows the defaults. Saving replaces your saved settings."
+    />
+  );
 };
 
 /**
