@@ -19,7 +19,7 @@ import { DurationNav } from "./DurationNav";
 import { CalendarGrid } from "./CalendarGrid";
 import { VerticalCalendarGrid } from "./VerticalCalendarGrid";
 import { DashboardPanel } from "./DashboardPanel";
-import { OverviewCaption } from "./OverviewStat";
+import { OverviewCaption } from "./ActivityStatCard";
 import { formatRawCount } from "@/lib/format-count";
 
 const ActivityHeatmapGrid = ({
