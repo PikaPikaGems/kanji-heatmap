@@ -1,6 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import type { CardProgress } from "engine-contract";
 import { formatDaysHuman, formatInterval } from "@/lib/engine/format-interval";
+import { getBandFillCn } from "@/lib/engine/mastery-colors";
+import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import {
+  isCardStarted,
+  MASTERY_LEVEL_LABELS,
+  masteryLevel,
+} from "@/lib/engine/mastery-metrics";
 import { relativeTime } from "@/lib/engine/relative-time";
 
 const NONE = "—";
@@ -20,16 +27,29 @@ const nextReviewIn = (dueAt: string, now: number) => {
   return dueMs <= now ? "Due now" : formatInterval(dueMs - now);
 };
 
+type ProgressRow = {
+  label: string;
+  value: string;
+  /** Fill of a small swatch before the value, as on the /mastery heatmap. */
+  swatchCn?: string;
+};
+
 /** The rows under "Next review in", for one card (design doc 5.4). */
-const progressRows = (card: CardProgress) => {
+const progressRows = (card: CardProgress, now: number): ProgressRow[] => {
   // A card nobody has graded yet has no memory model to report.
-  const studied = card.learningState !== "new";
+  const studied = isCardStarted(card);
+  const level = studied ? masteryLevel(card, now) : null;
   const seen = card.repetitions;
   const ratings = card.ratingsSummary ?? {};
   const correct =
     (ratings.hard ?? 0) + (ratings.good ?? 0) + (ratings.easy ?? 0);
 
   return [
+    {
+      label: "Mastery",
+      value: level == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[level],
+      swatchCn: getBandFillCn("mastery", level),
+    },
     {
       label: "Stability",
       value: studied ? formatDaysHuman(card.stability) : NONE,
@@ -95,13 +115,19 @@ export const ProgressCard = ({
         </span>
       </div>
       <dl className="flex flex-col">
-        {progressRows(card).map(({ label, value }) => (
+        {progressRows(card, now).map(({ label, value, swatchCn }) => (
           <div
             key={label}
             className="flex items-baseline justify-between gap-3 py-1 border-t border-dotted border-foreground/15"
           >
             <dt className="text-xs text-muted-foreground">{label}</dt>
-            <dd className="text-sm font-bold text-right tabular-nums">
+            <dd className="flex items-center justify-end gap-1.5 text-sm font-bold text-right tabular-nums">
+              {swatchCn ? (
+                <span
+                  className={`inline-block size-3 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
+                  aria-hidden
+                />
+              ) : null}
               {value}
             </dd>
           </div>
