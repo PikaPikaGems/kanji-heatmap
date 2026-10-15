@@ -263,7 +263,7 @@ const PromptField = () => {
     <div className="mb-4">
       <div className="flex items-center justify-between mb-1">
         <label htmlFor={id} className="text-sm font-semibold">
-          Explain Prompt
+          Grammar Explain
         </label>
         <Button
           type="button"
@@ -408,7 +408,7 @@ const Subsections = () => {
       </SubsectionItem>
       <SubsectionItem
         value="explain-prompt"
-        title="Explain Prompt"
+        title="Grammar Explain"
         subtitle={`Sentence explanation · ${settings.prompt === undefined ? "default prompt" : "custom prompt"}`}
       >
         <PromptField />
