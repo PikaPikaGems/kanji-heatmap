@@ -99,7 +99,7 @@ export const startEngine = () => {
     });
 };
 
-const subscribe = (listener: () => void) => {
+export const subscribeEngineState = (listener: () => void) => {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);
@@ -109,4 +109,4 @@ const subscribe = (listener: () => void) => {
 export const getEngineState = () => state;
 
 export const useEngineState = () =>
-  useSyncExternalStore(subscribe, getEngineState);
+  useSyncExternalStore(subscribeEngineState, getEngineState);

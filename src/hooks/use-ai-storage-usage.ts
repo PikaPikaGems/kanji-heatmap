@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { AiStorageUsage } from "@/lib/ai-explain/storage-budgets";
+import { useCurrentOwnerId } from "@/lib/engine/content-owner";
 
 /** Same as AI_GENERATED_CONTENT_EVENT; spelled out so the storage module stays lazy. */
 const AI_GENERATED_CONTENT_EVENT = "ai-generated-content-changed";
@@ -23,14 +24,19 @@ const readEstimate = async () => {
   }
 };
 
-/** Bytes used by AI content per kind, refreshed whenever it changes. */
+/**
+ * Bytes used by AI content per kind, refreshed whenever it changes or the
+ * owner (logged-in account or guest) does.
+ */
 export const useAiStorageUsage = () => {
+  const ownerId = useCurrentOwnerId();
   const [state, setState] = useState<AiStorageUsageState>({
     status: "loading",
   });
 
   // Effect needed: sizes come from IndexedDB and the Storage API (async,
-  // outside React), and the change subscription must end on unmount.
+  // outside React), and the change subscription must end on unmount. It
+  // re-runs on ownerId because the sizes counted as "mine" belong to one owner.
   useEffect(() => {
     let active = true;
     const refresh = async () => {
@@ -51,7 +57,7 @@ export const useAiStorageUsage = () => {
       active = false;
       window.removeEventListener(AI_GENERATED_CONTENT_EVENT, refresh);
     };
-  }, []);
+  }, [ownerId]);
 
   return state;
 };

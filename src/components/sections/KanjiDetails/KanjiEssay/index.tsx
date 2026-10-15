@@ -1,6 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { getKanjiEssayUrl } from "@/lib/kanji-essays";
+import { useCurrentOwnerId } from "@/lib/engine/content-owner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -108,6 +109,7 @@ const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
     url ? { status: "loading" } : { status: "ready", markdown: null }
   );
   const [retry, setRetry] = useState(0);
+  const ownerId = useCurrentOwnerId();
 
   // Effect needed: fetches the published Markdown from an external URL, with
   // cancellation on unmount; render and event handlers cannot perform mount loading.
@@ -167,8 +169,12 @@ const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
       <div className="pl-2">
         <EssaySourceSwitch source={source} onSourceChange={setSource} />
       </div>
-      {/* Keyed so each switch remounts and fades in instead of snapping. */}
-      <div key={source} className="space-y-4 animate-fade-in-fast">
+      {/* Keyed so each switch remounts and fades in instead of snapping. Login
+          and logout switch the saved AI essay and MP3s the same way. */}
+      <div
+        key={`${ownerId}:${source}`}
+        className="space-y-4 animate-fade-in-fast"
+      >
         {source === "mine" ? (
           <AiKanjiEssay key={kanji} kanji={kanji} keyword={keyword} />
         ) : (

@@ -7,6 +7,7 @@ import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
 import { AiContentNotice } from "@/components/common/AiContentNotice";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { scrollResultIntoView } from "@/lib/scroll";
+import { useCurrentOwnerId } from "@/lib/engine/content-owner";
 import type { MnemonicImage } from "@/lib/ai-explain/storage";
 import { ImagePreview } from "./ImagePreview";
 import { MnemonicForm, type MnemonicDraft } from "./MnemonicForm";
@@ -328,8 +329,10 @@ const MnemonicGallery = ({
   );
 };
 
-const VisualMnemonics = (props: { kanji: string; keyword: string }) => (
-  <MnemonicGallery key={props.kanji} {...props} />
-);
+const VisualMnemonics = (props: { kanji: string; keyword: string }) => {
+  const ownerId = useCurrentOwnerId();
+  // Remounts on login/logout to show the new owner's saved images.
+  return <MnemonicGallery key={`${ownerId}:${props.kanji}`} {...props} />;
+};
 
 export default VisualMnemonics;

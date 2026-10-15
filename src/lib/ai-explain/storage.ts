@@ -2,9 +2,9 @@ import type { Table } from "dexie";
 import type { ImagePalette, ImageStyle } from "./prompts";
 import type { AiSource } from "./xai";
 import { safeReadJson } from "@/lib/storage";
+import { GUEST_OWNER_ID, getCurrentOwnerId } from "@/lib/engine/content-owner";
 import {
   AI_STORAGE_LIMITS,
-  CURRENT_OWNER_ID,
   type AiStorageUsage,
   type KindUsage,
 } from "./storage-budgets";
@@ -71,9 +71,13 @@ type AiDatabase = import("dexie").Dexie & {
 const textBytes = (value: unknown) => JSON.stringify(value).length * 2;
 const blobRecordBytes = ({ blob, ...rest }: { blob: Blob }) =>
   blob.size + textBytes(rest);
-const tracked = <T extends object>(record: T, bytes: number) => ({
+const tracked = <T extends object>(
+  record: T,
+  bytes: number,
+  ownerId: string
+) => ({
   ...record,
-  ownerId: CURRENT_OWNER_ID,
+  ownerId,
   bytes,
   lastUsedAt: Date.now(),
 });
@@ -88,9 +92,11 @@ const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
 /**
  * Database key for one owner's copy of an item. Callers use plain ids
  * (`essay:食`); the owner is added here so two people on one device never
- * read or replace each other's content.
+ * read or replace each other's content. Every exported function below reads
+ * the owner once, when it is called, and uses it throughout, so a login or
+ * logout halfway through can't split one save between two owners.
  */
-const ownedKey = (id: string, ownerId = CURRENT_OWNER_ID) => `${ownerId}:${id}`;
+const ownedKey = (id: string, ownerId: string) => `${ownerId}:${id}`;
 /** The plain id a caller knows, from an owned database key. */
 const plainId = (key: string, ownerId: string) =>
   key.startsWith(`${ownerId}:`) ? key.slice(ownerId.length + 1) : key;
@@ -111,10 +117,11 @@ const moveLegacyExplanations = async (db: AiDatabase) => {
       .filter(([, record]) => typeof record?.text === "string")
       .map(([sentence, { text, model, instructions, createdAt }]) => {
         const record = { text, model, instructions, createdAt };
+        // Saved before accounts existed, so these belong to the guest.
         return {
           ...record,
-          id: ownedKey(sentenceKey(sentence)),
-          ownerId: CURRENT_OWNER_ID,
+          id: ownedKey(sentenceKey(sentence), GUEST_OWNER_ID),
+          ownerId: GUEST_OWNER_ID,
           bytes: textBytes(record),
           lastUsedAt: createdAt,
         };
@@ -165,7 +172,7 @@ export const getAiDatabase = () => {
               .toCollection()
               .modify((record: Record<string, unknown> & Tracked) => {
                 delete record.prompt;
-                record.ownerId ??= CURRENT_OWNER_ID;
+                record.ownerId ??= GUEST_OWNER_ID;
                 record.lastUsedAt ??= record.createdAt as number;
                 record.bytes = textBytes(record);
               });
@@ -179,7 +186,7 @@ export const getAiDatabase = () => {
                   record: Record<string, unknown> & Tracked & { blob: Blob }
                 ) => {
                   delete record.prompt;
-                  record.ownerId ??= CURRENT_OWNER_ID;
+                  record.ownerId ??= GUEST_OWNER_ID;
                   record.lastUsedAt ??= record.createdAt as number;
                   record.bytes = blobRecordBytes(record);
                 }
@@ -202,7 +209,7 @@ export const getAiDatabase = () => {
             await table.clear();
             await table.bulkAdd(
               records.map((record) => {
-                const ownerId = record.ownerId ?? CURRENT_OWNER_ID;
+                const ownerId = record.ownerId ?? GUEST_OWNER_ID;
                 return {
                   ...record,
                   ownerId,
@@ -253,8 +260,8 @@ const readUsageRows = async (table: TrackedTable) => {
 };
 const sumBytes = (rows: UsageRow[]) =>
   rows.reduce((total, row) => total + row.bytes, 0);
-const splitByOwner = (rows: UsageRow[]): KindUsage => {
-  const mine = sumBytes(rows.filter((row) => row.ownerId === CURRENT_OWNER_ID));
+const splitByOwner = (rows: UsageRow[], ownerId: string): KindUsage => {
+  const mine = sumBytes(rows.filter((row) => row.ownerId === ownerId));
   return { mine, others: sumBytes(rows) - mine };
 };
 
@@ -295,6 +302,7 @@ const fitTextLimit = async (db: AiDatabase, keepId: string) => {
 };
 
 export const getAiStorageUsage = async (): Promise<AiStorageUsage> => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   const [essays, answers, audio, images] = await Promise.all(
     [db.textResults, db.explanations, db.audio, db.images].map((table) =>
@@ -302,9 +310,9 @@ export const getAiStorageUsage = async (): Promise<AiStorageUsage> => {
     )
   );
   return {
-    text: splitByOwner([...essays, ...answers]),
-    audio: splitByOwner(audio),
-    images: splitByOwner(images),
+    text: splitByOwner([...essays, ...answers], ownerId),
+    audio: splitByOwner(audio, ownerId),
+    images: splitByOwner(images, ownerId),
   };
 };
 
@@ -342,8 +350,11 @@ window.addEventListener("storage", (event) => {
 export const readSentenceExplanation = async (
   sentence: string
 ): Promise<SentenceExplanation | undefined> => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
-  const record = await db.explanations.get(ownedKey(sentenceKey(sentence)));
+  const record = await db.explanations.get(
+    ownedKey(sentenceKey(sentence), ownerId)
+  );
   if (!record || typeof record.text !== "string" || !record.text.trim())
     return undefined;
   touch(asTracked(db.explanations), record);
@@ -354,26 +365,31 @@ export const writeSentenceExplanation = async (
   record: SentenceExplanation,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
-  const id = ownedKey(sentenceKey(sentence));
+  const id = ownedKey(sentenceKey(sentence), ownerId);
   await db.transaction("rw", db.explanations, db.textResults, async () => {
     checkEpoch(expectedEpoch);
-    await db.explanations.put(tracked({ ...record, id }, textBytes(record)));
+    await db.explanations.put(
+      tracked({ ...record, id }, textBytes(record), ownerId)
+    );
     await fitTextLimit(db, id);
   });
   changed();
 };
 export const deleteSentenceExplanation = async (sentence: string) => {
+  const ownerId = getCurrentOwnerId();
   await (
     await getAiDatabase()
-  ).explanations.delete(ownedKey(sentenceKey(sentence)));
+  ).explanations.delete(ownedKey(sentenceKey(sentence), ownerId));
   changed();
 };
 export const getTextResult = async (
   id: string
 ): Promise<AiTextResult | undefined> => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
-  const record = await db.textResults.get(ownedKey(id));
+  const record = await db.textResults.get(ownedKey(id, ownerId));
   touch(asTracked(db.textResults), record);
   return record && { ...record, id };
 };
@@ -382,20 +398,21 @@ export const saveTextResult = async (
   expectedCreatedAt?: number,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   await db.transaction(
     "rw",
     [db.textResults, db.audio, db.explanations],
     async () => {
       checkEpoch(expectedEpoch);
-      const key = ownedKey(result.id);
+      const key = ownedKey(result.id, ownerId);
       const old = await db.textResults.get(key);
       if (old?.createdAt !== expectedCreatedAt)
         throw new Error(
           "This result changed in another window. Reopen it before regenerating."
         );
       await db.textResults.put(
-        tracked({ ...result, id: key }, textBytes(result))
+        tracked({ ...result, id: key }, textBytes(result), ownerId)
       );
       if (old && old.fingerprint !== result.fingerprint)
         await db.audio.where("sourceId").equals(key).delete();
@@ -406,8 +423,9 @@ export const saveTextResult = async (
 };
 /** Deletes an essay or vocabulary details with its narration. */
 export const deleteTextResult = async (id: string) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
-  const key = ownedKey(id);
+  const key = ownedKey(id, ownerId);
   await db.transaction("rw", db.textResults, db.audio, async () => {
     await db.textResults.delete(key);
     await db.audio.where("sourceId").equals(key).delete();
@@ -417,11 +435,12 @@ export const deleteTextResult = async (id: string) => {
 export const listMnemonicImages = async (
   kanji: string
 ): Promise<MnemonicImage[]> => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   const images = await db.images
     .where("kanji")
     .equals(kanji)
-    .filter((image) => image.ownerId === CURRENT_OWNER_ID)
+    .filter((image) => image.ownerId === ownerId)
     .sortBy("createdAt");
   images.forEach((image) => touch(asTracked(db.images), image));
   return images;
@@ -431,6 +450,7 @@ export const saveMnemonicImage = async (
   expectedCreatedAt?: number,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.images, async () => {
     checkEpoch(expectedEpoch);
@@ -439,28 +459,29 @@ export const saveMnemonicImage = async (
       throw new Error(
         "This image changed in another window. Reopen it before regenerating."
       );
-    if (old && (old.kanji !== image.kanji || old.ownerId !== CURRENT_OWNER_ID))
+    if (old && (old.kanji !== image.kanji || old.ownerId !== ownerId))
       throw new Error("Cannot change this image.");
     if (
       !old &&
       (await db.images
         .where("kanji")
         .equals(image.kanji)
-        .filter((saved) => saved.ownerId === CURRENT_OWNER_ID)
+        .filter((saved) => saved.ownerId === ownerId)
         .count()) >= 3
     )
       throw new Error(
         "Three mnemonics are already saved. Delete one before adding another."
       );
-    await db.images.put(tracked(image, blobRecordBytes(image)));
+    await db.images.put(tracked(image, blobRecordBytes(image), ownerId));
   });
   changed();
 };
 export const deleteMnemonicImage = async (id: string) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.images, async () => {
     const image = await db.images.get(id);
-    if (image?.ownerId === CURRENT_OWNER_ID) await db.images.delete(id);
+    if (image?.ownerId === ownerId) await db.images.delete(id);
   });
   changed();
 };
@@ -468,10 +489,11 @@ export const getAudioForSource = async (
   sourceId: string,
   fingerprint: string
 ) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   const records = await db.audio
     .where("sourceId")
-    .equals(ownedKey(sourceId))
+    .equals(ownedKey(sourceId, ownerId))
     .toArray();
   const record: (AiAudioRecord & Tracked) | undefined = records
     .filter((record) => record.fingerprint === fingerprint)
@@ -489,19 +511,22 @@ export const saveAudioRecord = async (
   record: AiAudioRecord,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.audio, db.textResults, async () => {
     checkEpoch(expectedEpoch);
-    const key = ownedKey(record.id);
-    const text = await db.textResults.get(ownedKey(record.sourceId));
+    const key = ownedKey(record.id, ownerId);
+    const sourceKey = ownedKey(record.sourceId, ownerId);
+    const text = await db.textResults.get(sourceKey);
     if (text && text.fingerprint !== record.fingerprint)
       throw new Error(
         "The text changed while its audio was generating. Generate audio for the current text."
       );
     await db.audio.put(
       tracked(
-        { ...record, id: key, sourceId: ownedKey(record.sourceId) },
-        blobRecordBytes(record)
+        { ...record, id: key, sourceId: sourceKey },
+        blobRecordBytes(record),
+        ownerId
       )
     );
     const audio = asTracked(db.audio);
@@ -526,6 +551,7 @@ export const contentFingerprint = async (text: string) => {
 };
 /** Deletes everything the current owner generated on this device. */
 export const clearGeneratedContent = async () => {
+  const ownerId = getCurrentOwnerId();
   const db = await getAiDatabase();
   // Advance before clearing so in-flight paid requests cannot repopulate storage.
   localStorage.setItem(
@@ -539,10 +565,7 @@ export const clearGeneratedContent = async () => {
       // Every key of this owner, read from the index without loading records.
       await asTracked(table)
         .where(USAGE_INDEX)
-        .between(
-          [CURRENT_OWNER_ID, -Infinity, -Infinity],
-          [CURRENT_OWNER_ID, Infinity, Infinity]
-        )
+        .between([ownerId, -Infinity, -Infinity], [ownerId, Infinity, Infinity])
         .delete();
     }
   });

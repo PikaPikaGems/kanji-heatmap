@@ -17,6 +17,7 @@ import { SpeakButtons } from "./SpeakButtons";
 import { AiExplainDialog } from "./AiExplainDialog";
 import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { useCurrentOwnerId } from "@/lib/engine/content-owner";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
 /** "almost": wrong, but at least half the blanks were right. */
@@ -221,6 +222,7 @@ export const AnswerDrawer = ({
   const open = answer?.open ?? false;
   const getKanjiInfo = useGetKanjiInfoFn();
   const [aiExplainSettings] = useAiExplainSettings();
+  const ownerId = useCurrentOwnerId();
 
   // Don't treat the Enter that submitted the answer as "Continue".
   useArmedConfirmKey({
@@ -274,6 +276,8 @@ export const AnswerDrawer = ({
         <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
         {(hasNotes || showAiExplain) && (
           <NotesPopover
+            // Remounts on login/logout: the open answer belongs to one owner.
+            key={ownerId}
             item={item}
             showAiExplain={showAiExplain}
             speech={speech}

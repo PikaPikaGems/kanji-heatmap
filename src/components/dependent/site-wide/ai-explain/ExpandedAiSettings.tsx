@@ -18,6 +18,7 @@ import {
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
 import { DEFAULT_AI_IMAGE_MODEL } from "@/lib/ai-explain/prompts";
+import { useCurrentOwnerId } from "@/lib/engine/content-owner";
 
 type PromptEditorProps = {
   title: string;
@@ -311,7 +312,7 @@ type StorageStatus =
   | { status: "confirm"; bytes?: number }
   | { status: "clearing" }
   | { status: "error"; message: string };
-export const GeneratedStorageSettings = () => {
+const OwnedGeneratedStorage = () => {
   const [state, setState] = useState<StorageStatus>({ status: "loading" });
   // Effect needed: database sizes and clear events come from browser storage, not render-time data or this component's own buttons.
   useEffect(() => {
@@ -428,4 +429,13 @@ export const GeneratedStorageSettings = () => {
       </TextActionButton>
     </div>
   );
+};
+
+/**
+ * Remounts for the new owner on login/logout, so a pending "Delete generated
+ * content" confirmation can't carry over and delete the other owner's content.
+ */
+export const GeneratedStorageSettings = () => {
+  const ownerId = useCurrentOwnerId();
+  return <OwnedGeneratedStorage key={ownerId} />;
 };
