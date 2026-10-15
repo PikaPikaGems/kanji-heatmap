@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { Loader2, Pause, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { Slider } from "@/components/ui/slider";
 import {
+  AiPrimaryButton,
+  AiRequestFeedback,
   DownloadButton,
   RegenerateButton,
 } from "@/components/common/AiActionButtons";
 import {
   addAiExplainUsage,
+  DEFAULT_AI_SPEECH_VOICE,
   isAiExplainReady,
   readAiExplainSettings,
 } from "@/lib/ai-explain/preferences";
@@ -29,16 +32,67 @@ type AudioState = {
   warning?: string;
 };
 
+const formatTime = (seconds: number) => {
+  if (!Number.isFinite(seconds)) return "--:--";
+  const whole = Math.floor(seconds);
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+};
+
+/** A minimal audio bar: play/pause, elapsed / total, and a seek slider. */
+const MiniPlayer = ({
+  playing,
+  disabled,
+  current,
+  duration,
+  onToggle,
+  onSeek,
+}: {
+  playing: boolean;
+  disabled: boolean;
+  current: number;
+  duration: number;
+  onToggle: () => void;
+  onSeek: (seconds: number) => void;
+}) => (
+  <div className="flex items-center gap-3">
+    <PracticeButton
+      variant="secondary"
+      size="icon"
+      disabled={disabled}
+      onClick={onToggle}
+      aria-label={playing ? "Pause narration" : "Play narration"}
+      className="shrink-0 rounded-full"
+    >
+      {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
+    </PracticeButton>
+    <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+      {formatTime(current)} / {formatTime(duration)}
+    </span>
+    <Slider
+      disabled={disabled || !Number.isFinite(duration) || duration <= 0}
+      min={0}
+      max={Number.isFinite(duration) && duration > 0 ? duration : 1}
+      step={0.1}
+      value={[current]}
+      onValueChange={([seconds]) => onSeek(seconds)}
+      thumbLabel="Seek narration"
+    />
+  </div>
+);
+
 const SavedAudio = ({
   record,
   filename,
+  regenerate,
 }: {
   record: AiAudioRecord;
   filename: string;
+  regenerate: ReactNode;
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [url, setUrl] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [time, setTime] = useState({ current: 0, duration: 0 });
   const [message, setMessage] = useState("");
 
   // Effect needed: owns a browser object URL and stops the external audio player
@@ -64,9 +118,7 @@ const SavedAudio = ({
       await audio.play();
       setMessage("");
     } catch {
-      setMessage(
-        "Couldn't play the MP3. Try the audio controls or download it."
-      );
+      setMessage("Couldn't play the MP3. Download it to listen instead.");
     }
   };
 
@@ -82,7 +134,7 @@ const SavedAudio = ({
 
   return (
     <div className="space-y-3">
-      <Button className="w-full" disabled={!url} onClick={() => void toggle()}>
+      <AiPrimaryButton disabled={!url} onClick={() => void toggle()}>
         {playing ? (
           <>
             <Pause /> Pause
@@ -92,34 +144,46 @@ const SavedAudio = ({
             <Play /> Read Aloud
           </>
         )}
-      </Button>
+      </AiPrimaryButton>
       <audio
         ref={audioRef}
         src={url || undefined}
-        controls
-        className="w-full"
         preload="metadata"
-        aria-label="AI-generated narration"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
+        onLoadedMetadata={(event) =>
+          setTime({
+            current: event.currentTarget.currentTime,
+            duration: event.currentTarget.duration,
+          })
+        }
+        onTimeUpdate={(event) =>
+          setTime({
+            current: event.currentTarget.currentTime,
+            duration: event.currentTarget.duration,
+          })
+        }
         onError={() =>
           setMessage("Couldn't load the saved audio. Try regenerating the MP3.")
         }
       />
-      <div className="flex flex-wrap gap-2">
+      <MiniPlayer
+        playing={playing}
+        disabled={!url}
+        current={time.current}
+        duration={time.duration}
+        onToggle={() => void toggle()}
+        onSeek={(seconds) => {
+          if (audioRef.current) audioRef.current.currentTime = seconds;
+        }}
+      />
+      <div className="flex flex-wrap items-center gap-1">
         <DownloadButton onClick={() => void download()}>
           Download MP3
         </DownloadButton>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            if (audioRef.current) audioRef.current.currentTime = 0;
-          }}
-        >
-          Restart
-        </Button>
+        <span aria-hidden>·</span>
+        {regenerate}
       </div>
       <p className="text-xs text-muted-foreground">
         AI-generated voice ·{" "}
@@ -202,7 +266,7 @@ export const AiAudio = ({
     try {
       const text = prepareNarration(markdown);
       if (!text) throw new Error("There is no text to read aloud.");
-      const voice = settings.speechVoice ?? "eve";
+      const voice = settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE;
       const language = settings.speechLanguage ?? "auto";
       const blob = await generateXaiSpeech({
         apiKey: settings.apiKey,
@@ -253,64 +317,51 @@ export const AiAudio = ({
     );
   return (
     <div className="space-y-3 border-t border-dotted pt-4">
-      {state.record && (
+      {state.record ? (
         <SavedAudio
           key={`${state.record.id}-${state.record.createdAt}`}
           record={state.record}
           filename={filename}
+          regenerate={
+            <RegenerateButton
+              disabled={state.status === "generating"}
+              onClick={() => void generate()}
+            >
+              Regenerate MP3
+            </RegenerateButton>
+          }
         />
-      )}
-      {state.status === "generating" && (
-        <p role="status" className="flex items-center gap-2 text-sm">
-          <Loader2 className="size-4 animate-spin" /> Generating audio…
-        </p>
-      )}
-      {state.record ? (
-        <RegenerateButton
-          disabled={state.status === "generating"}
-          onClick={() => void generate()}
-        >
-          Regenerate MP3
-        </RegenerateButton>
       ) : (
-        <PracticeButton
-          variant="primary"
-          size="md"
+        <AiPrimaryButton
           disabled={state.status === "generating"}
           onClick={() => void generate()}
         >
           Generate MP3 to listen
-        </PracticeButton>
+        </AiPrimaryButton>
       )}
-      {state.status === "generating" && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            request.current?.abort();
-            request.current = null;
-            setState({ status: "ready", record: state.record });
-          }}
-        >
-          Cancel
-        </Button>
-      )}
-      {state.message && (
-        <p role="alert" className="text-sm text-destructive">
-          {state.message}{" "}
-          <button
-            className="underline"
-            onClick={() => setRevision((value) => value + 1)}
-          >
-            Reload saved audio
-          </button>
-        </p>
-      )}
-      {state.warning && (
-        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
-          {state.warning}
-        </p>
-      )}
+      <AiRequestFeedback
+        busy={state.status === "generating"}
+        busyLabel="Generating audio…"
+        onCancel={() => {
+          request.current?.abort();
+          request.current = null;
+          setState({ status: "ready", record: state.record });
+        }}
+        error={
+          state.message && (
+            <>
+              {state.message}{" "}
+              <button
+                className="underline"
+                onClick={() => setRevision((value) => value + 1)}
+              >
+                Reload saved audio
+              </button>
+            </>
+          )
+        }
+        warning={state.warning}
+      />
     </div>
   );
 };

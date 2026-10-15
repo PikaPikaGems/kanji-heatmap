@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PracticeButton } from "@/components/ui/practice-button";
 import { CopyButton } from "@/components/common/CopyButton";
 import {
+  AiPrimaryButton,
+  AiRequestFeedback,
   DownloadMarkdownButton,
   RegenerateButton,
 } from "@/components/common/AiActionButtons";
@@ -107,48 +107,28 @@ export const GeneratedText = ({
             onClick={() => void generate(instructions)}
           />
         ) : (
-          <PracticeButton
-            variant="primary"
-            size="md"
-            className="h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base"
+          <AiPrimaryButton
             disabled={busy}
             onClick={() => void generate(instructions)}
           >
             {generateLabel}
-          </PracticeButton>
+          </AiPrimaryButton>
         )}
       </div>
-      {busy && (
-        <div role="status" className="space-y-2">
-          <p className="flex items-center gap-2 text-sm">
-            <Loader2 className="size-4 animate-spin" /> Asking Grok and
-            searching the web…
-          </p>
-          {state.preview && (
-            <details>
-              <summary className="cursor-pointer text-xs">
-                Pending answer
-              </summary>
-              <MarkdownPreview source={normalizeAiMarkdown(state.preview)} />
-            </details>
-          )}
-        </div>
-      )}
-      {busy && (
-        <Button variant="ghost" size="sm" onClick={cancel}>
-          Cancel
-        </Button>
-      )}
-      {state.message && (
-        <p role="alert" className="text-sm font-bold text-destructive">
-          {state.message}
-        </p>
-      )}
-      {state.warning && (
-        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
-          {state.warning}
-        </p>
-      )}
+      <AiRequestFeedback
+        busy={busy}
+        busyLabel="Asking Grok and searching the web…"
+        onCancel={cancel}
+        error={state.message}
+        warning={state.warning}
+      >
+        {state.preview && (
+          <details>
+            <summary className="cursor-pointer text-xs">Pending answer</summary>
+            <MarkdownPreview source={normalizeAiMarkdown(state.preview)} />
+          </details>
+        )}
+      </AiRequestFeedback>
       <AiContentNotice />
     </div>
   );

@@ -3,6 +3,8 @@ import { notifyStorage, safeReadJson } from "@/lib/storage";
 
 export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
 export const AI_EXPLAIN_USAGE_KEY = "ai-explain-usage";
+export const AI_SPEECH_VOICES = ["ara", "eve", "rex", "sal", "leo"];
+export const DEFAULT_AI_SPEECH_VOICE = "ara";
 
 /** Replaced with the sentence (furigana stripped) before sending. */
 export const JAPANESE_TEXT_PLACEHOLDER = "{JAPANESE_TEXT}";

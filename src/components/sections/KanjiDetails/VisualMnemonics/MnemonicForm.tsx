@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PracticeButton } from "@/components/ui/practice-button";
+import {
+  AiPrimaryButton,
+  AiRequestFeedback,
+} from "@/components/common/AiActionButtons";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import {
@@ -240,42 +242,27 @@ export const MnemonicForm = ({
             />
           </div>
         )}
-        <PracticeButton
+        <AiPrimaryButton
           type="submit"
-          variant="primary"
-          size="md"
-          className="h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base"
           disabled={
             !draft.description.trim() ||
             (draft.style === "custom" && !draft.customStyle.trim())
           }
         >
-          {pending
-            ? "Generating image…"
-            : image
-              ? "Regenerate"
-              : "✨ Generate Visual Mnemonic"}
-        </PracticeButton>
+          {image ? "Regenerate" : "✨ Generate Visual Mnemonic"}
+        </AiPrimaryButton>
       </fieldset>
-      {pending && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            controller.current?.abort();
-            controller.current = null;
-            setRequest({ status: "idle" });
-            onPending(false);
-          }}
-        >
-          Cancel generation
-        </Button>
-      )}
-      {request.status === "error" && (
-        <p role="alert" className="text-sm font-bold text-destructive">
-          {request.message}
-        </p>
-      )}
+      <AiRequestFeedback
+        busy={pending}
+        busyLabel="Generating image…"
+        onCancel={() => {
+          controller.current?.abort();
+          controller.current = null;
+          setRequest({ status: "idle" });
+          onPending(false);
+        }}
+        error={request.status === "error" ? request.message : undefined}
+      />
     </form>
   );
 };

@@ -3,6 +3,11 @@ import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
+import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
+import {
+  AI_SPEECH_VOICES,
+  DEFAULT_AI_SPEECH_VOICE,
+} from "@/lib/ai-explain/preferences";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   DEFAULT_AI_IMAGE_MODEL,
@@ -240,38 +245,31 @@ export const ImageSettings = () => {
 
 export const SpeechSettings = () => {
   const [settings, update] = useAiExplainSettings();
-  const id = useId();
   return (
     <div className="mb-4 space-y-3">
-      <label className="block text-sm font-semibold" htmlFor={`${id}-voice`}>
-        Speech voice
-      </label>
-      <select
-        id={`${id}-voice`}
-        className="w-full p-2 border rounded-lg bg-background"
-        value={settings.speechVoice ?? "eve"}
-        onChange={(event) => update({ speechVoice: event.target.value })}
-      >
-        {["eve", "ara", "rex", "sal", "leo"].map((voice) => (
-          <option key={voice} value={voice}>
-            {voice[0].toUpperCase() + voice.slice(1)}
-          </option>
-        ))}
-      </select>
-      <label className="block text-sm font-semibold" htmlFor={`${id}-language`}>
-        Speech language
-      </label>
-      <select
-        id={`${id}-language`}
-        className="w-full p-2 border rounded-lg bg-background"
+      <ResponsiveSelect
+        label="Speech voice"
+        value={settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE}
+        onChange={(speechVoice) => update({ speechVoice })}
+        options={AI_SPEECH_VOICES.map((voice) => ({
+          value: voice,
+          label:
+            voice[0].toUpperCase() +
+            voice.slice(1) +
+            (voice === DEFAULT_AI_SPEECH_VOICE ? " (default)" : ""),
+        }))}
+      />
+      <ResponsiveSelect
+        label="Speech language"
         value={settings.speechLanguage ?? "auto"}
-        onChange={(event) =>
-          update({ speechLanguage: event.target.value as "auto" | "ja" })
+        onChange={(speechLanguage) =>
+          update({ speechLanguage: speechLanguage as "auto" | "ja" })
         }
-      >
-        <option value="auto">Automatic (default)</option>
-        <option value="ja">Japanese</option>
-      </select>
+        options={[
+          { value: "auto", label: "Automatic (default)" },
+          { value: "ja", label: "Japanese" },
+        ]}
+      />
       <p className="text-xs text-muted-foreground">
         Japanese forces Japanese speech mode, even when the text includes
         English. Saved recordings stay playable; use Regenerate MP3 to apply new

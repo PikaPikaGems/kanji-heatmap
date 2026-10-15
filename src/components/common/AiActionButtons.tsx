@@ -1,5 +1,7 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
-import { Download, RotateCcw } from "lucide-react";
+import { Download, Loader2, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
@@ -72,3 +74,65 @@ export const DownloadMarkdownButton = ({
     </span>
   );
 };
+
+/** The one style for the main AI action (Generate, Read Aloud, …). */
+export const AiPrimaryButton = ({
+  className,
+  ...props
+}: ComponentProps<typeof PracticeButton>) => (
+  <PracticeButton
+    variant="primary"
+    size="md"
+    className={cn(
+      "h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base",
+      className
+    )}
+    {...props}
+  />
+);
+
+/**
+ * What shows under an AI action button, in one fixed order: the in-progress
+ * status (plus any live preview), Cancel, the error, then the warning.
+ */
+export const AiRequestFeedback = ({
+  busy,
+  busyLabel,
+  onCancel,
+  error,
+  warning,
+  children,
+}: {
+  busy: boolean;
+  busyLabel: string;
+  onCancel?: () => void;
+  error?: ReactNode;
+  warning?: ReactNode;
+  children?: ReactNode;
+}) => (
+  <>
+    {busy && (
+      <div role="status" className="space-y-2">
+        <p className="flex items-center gap-2 text-sm">
+          <Loader2 className="size-4 animate-spin" /> {busyLabel}
+        </p>
+        {children}
+      </div>
+    )}
+    {busy && onCancel && (
+      <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+        Cancel
+      </Button>
+    )}
+    {error && (
+      <p role="alert" className="text-sm font-bold text-destructive">
+        {error}
+      </p>
+    )}
+    {warning && (
+      <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+        {warning}
+      </p>
+    )}
+  </>
+);
