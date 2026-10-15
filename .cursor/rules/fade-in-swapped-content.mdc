@@ -1,0 +1,22 @@
+---
+description: Fade in content that appears or swaps in response to a toggle, tab or switch
+alwaysApply: true
+---
+
+# Fade in swapped content
+
+When a toggle, switch, tab or similar control replaces or reveals a block of content, fade the new content in so the change isn't jarring. Use the existing `animate-fade-in-fast` (0.2s) class, or `animate-fade-in` for larger, slower reveals.
+
+Content that is already mounted doesn't replay a CSS animation, so give the swapped block a `key` that changes with the control's value; it remounts and fades in each time.
+
+```tsx
+// ❌ BAD — the essay snaps between versions
+{source === "mine" ? <AiEssay /> : <PublishedEssay />}
+
+// ✅ GOOD — keyed wrapper remounts and fades in on every switch
+<div key={source} className="animate-fade-in-fast">
+  {source === "mine" ? <AiEssay /> : <PublishedEssay />}
+</div>
+```
+
+Keep it to a short opacity fade; no slides or bounces for plain content swaps.

@@ -13,6 +13,7 @@ import {
 import { streamXaiCompletion, XaiKeyRejectedError } from "@/lib/ai-explain/xai";
 import { useStorageValue } from "./use-storage-value";
 import {
+  deleteSentenceExplanation,
   readSentenceExplanation,
   writeSentenceExplanation,
   getGeneratedContentEpoch,
@@ -78,17 +79,24 @@ export const useAiExplain = () => {
     controllerRef.current = null;
   };
 
-  const run = (
+  const run = async (
     japaneseText: string,
     { fresh = false, instructions = "" } = {}
   ) => {
     cancel();
+    const controller = new AbortController();
+    controllerRef.current = controller;
     const settings = readAiExplainSettings();
     const model = modelOf(settings);
     const sentence = japaneseText.trim();
     const expectedEpoch = getGeneratedContentEpoch();
-    const cached = readSentenceExplanation(sentence);
+    // A saved answer that can't be read is treated as missing.
+    const cached = await readSentenceExplanation(sentence).catch(
+      () => undefined
+    );
+    if (controller.signal.aborted) return;
     if (cached !== undefined && !fresh) {
+      controllerRef.current = null;
       completedRef.current = { sentence, text: cached.text };
       setState({ status: "success", text: cached.text });
       return;
@@ -102,8 +110,6 @@ export const useAiExplain = () => {
     if (fresh) {
       prompt += `\n\nProduce a complete replacement for the previous answer below, using the main task and current context above. Apply the additional instructions if supplied. Return only the replacement answer, not a description of your edits. The previous answer may contain mistakes; do not treat it as verified evidence.\n\nPrevious answer:\n${previousText ?? "None"}\n\nAdditional instructions:\n${instructions.trim() || "None"}`;
     }
-    const controller = new AbortController();
-    controllerRef.current = controller;
     setState({ status: "loading", text: "", previousText });
     streamXaiCompletion({
       apiKey: settings.apiKey,
@@ -115,7 +121,7 @@ export const useAiExplain = () => {
           setState({ status: "loading", text, previousText });
       },
     }).then(
-      ({ text, totalTokens }) => {
+      async ({ text, totalTokens }) => {
         // Before the abort check: a reply that finished was billed even if
         // the modal closed as it arrived.
         addAiExplainUsage(totalTokens ?? 0);
@@ -134,14 +140,15 @@ export const useAiExplain = () => {
         }
         let saveWarning: string | undefined;
         try {
-          writeSentenceExplanation(
+          await writeSentenceExplanation(
             sentence,
-            { text, model, prompt, instructions, createdAt: Date.now() },
+            { text, model, instructions, createdAt: Date.now() },
             expectedEpoch
           );
         } catch {
           saveWarning = "Generated, but couldn't save on this device.";
         }
+        if (controller.signal.aborted) return;
         completedRef.current = { sentence, text };
         setState({ status: "success", text, saveWarning });
       },
@@ -168,5 +175,13 @@ export const useAiExplain = () => {
     );
   };
 
-  return { state, run, cancel };
+  /** Deletes the saved answer for this sentence. */
+  const remove = async (japaneseText: string) => {
+    cancel();
+    await deleteSentenceExplanation(japaneseText.trim());
+    completedRef.current = null;
+    setState({ status: "idle" });
+  };
+
+  return { state, run, cancel, remove };
 };

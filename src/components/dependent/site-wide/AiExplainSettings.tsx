@@ -192,6 +192,8 @@ const ApiKeyField = () => {
         Saved only in this browser and sent only to xAI. Requests are billed to
         your xAI account. Get a key at{" "}
         <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        Your key and custom prompts aren&apos;t private: anyone using this
+        browser can see them.
       </p>
     </div>
   );
@@ -412,7 +414,7 @@ const Subsections = () => {
       <SubsectionItem
         value="speech"
         title="Read Aloud"
-        subtitle="Voice and language"
+        subtitle="Voice, language, and MP3 quality"
       >
         <SpeechSettings />
       </SubsectionItem>
@@ -481,6 +483,17 @@ export const AiExplainSection = () => {
         {!keyOk && (
           <p className="text-xs text-muted-foreground">
             Add a Grok API key that works to turn this on.
+          </p>
+        )}
+        {active && (
+          <p
+            role="note"
+            className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 text-amber-700 dark:text-amber-400"
+          >
+            Heads up: what you generate is saved only in this browser. It
+            isn&apos;t backed up and can be lost if browser data is cleared, and
+            anyone using this computer can see it. Download anything you want to
+            keep.
           </p>
         )}
         {active && <Subsections />}

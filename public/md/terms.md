@@ -1,6 +1,6 @@
 # Terms of Use
 
-_Last Updated: December 12, 2025_
+_Last Updated: October 15, 2026_
 
 By using kanjiheatmap.com (the “Site”), you agree to these Terms of Use and our [Privacy Policy](/privacy).
 
@@ -11,6 +11,16 @@ You may not:
 - Scrape, crawl, or extract data from the Site.
 - Send bulk requests or engage in any activity to overload or disrupt the Site.
 - Use the Site for any unlawful or harmful purpose.
+
+## AI Study Tools
+
+AI Study Tools (such as AI Explain, AI essays, Visual Mnemonics and Read Aloud) are optional and experimental. If you turn them on:
+
+- You use your own xAI API key. Requests go directly from your browser to xAI, are billed to your xAI account, and are subject to [xAI’s terms for API use](https://x.ai/legal). We don’t receive or store your key, your requests, or what xAI sends back.
+- Your key, custom prompts and generated content (text, images and audio) are saved only in this browser, on this device. They are **not private**: anyone with access to this computer or browser profile may be able to see them.
+- Saved content may be removed if you clear your browser data, if your browser frees up space, or when the Site removes older MP3s and AI Explain answers to stay within its storage limits. Download anything you want to keep.
+- AI can make mistakes. Check anything important against a reliable source.
+- You are responsible for what you ask the AI to generate and how you use the results.
 
 ## Disclaimer of Warranties
 

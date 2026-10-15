@@ -116,9 +116,11 @@ type NotesView = "closed" | "notes" | "explain";
 const NotesPopover = ({
   item,
   showAiExplain,
+  speech,
 }: {
   item: FillTheKanjiItem;
   showAiExplain: boolean;
+  speech: SentenceSpeech;
 }) => {
   const [view, setView] = useState<NotesView>("closed");
   const explain = useAiExplain();
@@ -173,7 +175,7 @@ const NotesPopover = ({
                   className={triggerClassName}
                   onClick={() => {
                     setView("explain");
-                    explain.run(japaneseText);
+                    void explain.run(japaneseText);
                   }}
                 >
                   ✨ AI Explain
@@ -191,10 +193,12 @@ const NotesPopover = ({
           setView("closed");
         }}
         japaneseText={japaneseText}
+        speech={speech}
         state={explain.state}
         onRegenerate={(instructions) =>
-          explain.run(japaneseText, { fresh: true, instructions })
+          void explain.run(japaneseText, { fresh: true, instructions })
         }
+        onDelete={() => explain.remove(japaneseText)}
       />
     </>
   );
@@ -269,7 +273,11 @@ export const AnswerDrawer = ({
         </span>
         <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
         {(hasNotes || showAiExplain) && (
-          <NotesPopover item={item} showAiExplain={showAiExplain} />
+          <NotesPopover
+            item={item}
+            showAiExplain={showAiExplain}
+            speech={speech}
+          />
         )}
       </div>
     </PracticeDrawerShell>

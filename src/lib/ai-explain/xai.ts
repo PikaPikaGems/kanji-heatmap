@@ -381,12 +381,15 @@ export const generateXaiSpeech = async ({
   text,
   voice,
   language,
+  bitRate,
   signal,
 }: {
   apiKey: string;
   text: string;
   voice: string;
   language: "auto" | "ja";
+  /** MP3 bits per second; lower is smaller. */
+  bitRate: number;
   signal: AbortSignal;
 }): Promise<Blob> => {
   if (!text.trim()) throw new Error("There is no text to read aloud.");
@@ -399,7 +402,7 @@ export const generateXaiSpeech = async ({
       text,
       voice_id: voice,
       language,
-      output_format: { codec: "mp3", sample_rate: 24000, bit_rate: 128000 },
+      output_format: { codec: "mp3", sample_rate: 24000, bit_rate: bitRate },
     }),
     signal,
   });

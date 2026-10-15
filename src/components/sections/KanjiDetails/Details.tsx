@@ -180,18 +180,19 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger="Kanji Essay">
-        <ErrorBoundary details="KanjiEssay in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiEssay
-              key={kanji}
-              kanji={kanji}
-              keyword={data?.keyword ?? ""}
-            />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
-
+      {isAiExplainReady(aiSettings) && (
+        <SimpleAccordion trigger="Kanji Essay">
+          <ErrorBoundary details="KanjiEssay in KanjiDetails">
+            <Suspense fallback={<StudyNotesLoadingFallback />}>
+              <KanjiEssay
+                key={kanji}
+                kanji={kanji}
+                keyword={data?.keyword ?? ""}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </SimpleAccordion>
+      )}
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Visual Mnemonics">
           <ErrorBoundary details="VisualMnemonics in KanjiDetails">

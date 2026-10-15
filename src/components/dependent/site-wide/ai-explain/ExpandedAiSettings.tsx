@@ -2,14 +2,17 @@ import { useEffect, useId, useState } from "react";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
+import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
 import {
   DownloadMarkdownButton,
   TextActionButton,
 } from "@/components/common/AiActionButtons";
 import BasicSelect from "@/components/common/BasicSelect";
 import {
+  AI_SPEECH_BIT_RATES,
   AI_SPEECH_VOICES,
+  DEFAULT_AI_SPEECH_BIT_RATE,
+  type AiSpeechBitRate,
   DEFAULT_AI_SPEECH_VOICE,
 } from "@/lib/ai-explain/preferences";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
@@ -48,14 +51,13 @@ const PromptEditor = ({
           <RotateCcw /> Reset to default
         </Button>
       </div>
-      <StudyNotesTextarea
+      <ResponsiveTextarea
         id={id}
+        title={title}
         rows={10}
         value={value ?? defaultValue}
-        onChange={(event) =>
-          onChange(
-            event.target.value === defaultValue ? undefined : event.target.value
-          )
+        onValueChange={(next) =>
+          onChange(next === defaultValue ? undefined : next)
         }
         spellCheck={false}
       />
@@ -256,6 +258,28 @@ export const SpeechSettings = () => {
       </div>
       <div className="space-y-1">
         <p aria-hidden className="text-sm font-semibold">
+          MP3 quality
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label="MP3 quality"
+          value={String(settings.speechBitRate ?? DEFAULT_AI_SPEECH_BIT_RATE)}
+          onChange={(rate) =>
+            update({ speechBitRate: Number(rate) as AiSpeechBitRate })
+          }
+          options={AI_SPEECH_BIT_RATES.map((rate) => ({
+            value: String(rate),
+            // 1 kbps is 7.5 KB of audio per minute.
+            label: `${rate / 1000} kbps · ~${((rate / 1000) * 0.0075).toFixed(2)} MB per minute${rate === DEFAULT_AI_SPEECH_BIT_RATE ? " (default)" : ""}`,
+          }))}
+        />
+        <p className="text-xs text-muted-foreground">
+          Lower is smaller but can sound muffled. Applies to new MP3s.
+        </p>
+      </div>
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
           Speech language
         </p>
         <BasicSelect
@@ -294,9 +318,13 @@ export const GeneratedStorageSettings = () => {
     let active = true;
     const refresh = () => {
       import("@/lib/ai-explain/storage")
-        .then(({ getGeneratedContentSize }) => getGeneratedContentSize())
+        .then(({ getAiStorageUsage }) => getAiStorageUsage())
         .then(
-          (bytes) => {
+          (usage) => {
+            const bytes = Object.values(usage).reduce(
+              (sum, kind) => sum + kind.mine + kind.others,
+              0
+            );
             if (active)
               setState((previous) =>
                 previous.status === "confirm" || previous.status === "clearing"
@@ -378,8 +406,9 @@ export const GeneratedStorageSettings = () => {
               : state.message}
       </p>
       <p className="text-xs text-muted-foreground">
-        Saved only on this device and browser. Browser data can be cleared or
-        lost. Download content you want to keep.
+        Saved only on this device and browser, and not private: anyone with
+        access to this computer can see it. Browser data can be cleared or lost.
+        Download content you want to keep.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}
