@@ -395,22 +395,22 @@ const SubsectionItem = ({
 const Subsections = () => {
   const [settings] = useAiExplainSettings();
   const usage = useAiExplainUsage();
-  const customized = [
-    settings.prompt !== undefined && "custom prompt",
-    settings.model !== undefined && "custom model",
-  ].filter(Boolean);
 
   return (
     <Accordion type="multiple">
       <SubsectionItem
         value="customizations"
         title="Customizations"
-        subtitle={`Prompt and model · ${
-          customized.length > 0 ? customized.join(", ") : "defaults"
-        }`}
+        subtitle={`Model · ${settings.model ?? DEFAULT_AI_EXPLAIN_MODEL}`}
+      >
+        <ModelField />
+      </SubsectionItem>
+      <SubsectionItem
+        value="explain-prompt"
+        title="Explain Prompt"
+        subtitle={`Sentence explanation · ${settings.prompt === undefined ? "default prompt" : "custom prompt"}`}
       >
         <PromptField />
-        <ModelField />
       </SubsectionItem>
       <SubsectionItem
         value="searched-text"
