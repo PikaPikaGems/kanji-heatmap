@@ -18,7 +18,7 @@ import {
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
 import { DEFAULT_AI_IMAGE_MODEL } from "@/lib/ai-explain/prompts";
-import { useCurrentOwnerId } from "@/lib/engine/content-owner";
+import { OwnedAiContent } from "@/components/common/OwnedAiContent";
 
 type PromptEditorProps = {
   title: string;
@@ -435,7 +435,8 @@ const OwnedGeneratedStorage = () => {
  * Remounts for the new owner on login/logout, so a pending "Delete generated
  * content" confirmation can't carry over and delete the other owner's content.
  */
-export const GeneratedStorageSettings = () => {
-  const ownerId = useCurrentOwnerId();
-  return <OwnedGeneratedStorage key={ownerId} />;
-};
+export const GeneratedStorageSettings = () => (
+  <OwnedAiContent>
+    <OwnedGeneratedStorage />
+  </OwnedAiContent>
+);

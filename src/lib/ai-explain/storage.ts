@@ -2,7 +2,7 @@ import type { Table } from "dexie";
 import type { ImagePalette, ImageStyle } from "./prompts";
 import type { AiSource } from "./xai";
 import { safeReadJson } from "@/lib/storage";
-import { GUEST_OWNER_ID, getCurrentOwnerId } from "@/lib/engine/content-owner";
+import { GUEST_OWNER_ID, requireOwnerId } from "@/lib/engine/content-owner";
 import {
   AI_STORAGE_LIMITS,
   type AiStorageUsage,
@@ -302,7 +302,7 @@ const fitTextLimit = async (db: AiDatabase, keepId: string) => {
 };
 
 export const getAiStorageUsage = async (): Promise<AiStorageUsage> => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const [essays, answers, audio, images] = await Promise.all(
     [db.textResults, db.explanations, db.audio, db.images].map((table) =>
@@ -350,7 +350,7 @@ window.addEventListener("storage", (event) => {
 export const readSentenceExplanation = async (
   sentence: string
 ): Promise<SentenceExplanation | undefined> => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const record = await db.explanations.get(
     ownedKey(sentenceKey(sentence), ownerId)
@@ -365,7 +365,7 @@ export const writeSentenceExplanation = async (
   record: SentenceExplanation,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const id = ownedKey(sentenceKey(sentence), ownerId);
   await db.transaction("rw", db.explanations, db.textResults, async () => {
@@ -378,7 +378,7 @@ export const writeSentenceExplanation = async (
   changed();
 };
 export const deleteSentenceExplanation = async (sentence: string) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   await (
     await getAiDatabase()
   ).explanations.delete(ownedKey(sentenceKey(sentence), ownerId));
@@ -387,7 +387,7 @@ export const deleteSentenceExplanation = async (sentence: string) => {
 export const getTextResult = async (
   id: string
 ): Promise<AiTextResult | undefined> => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const record = await db.textResults.get(ownedKey(id, ownerId));
   touch(asTracked(db.textResults), record);
@@ -398,7 +398,7 @@ export const saveTextResult = async (
   expectedCreatedAt?: number,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   await db.transaction(
     "rw",
@@ -423,7 +423,7 @@ export const saveTextResult = async (
 };
 /** Deletes an essay or vocabulary details with its narration. */
 export const deleteTextResult = async (id: string) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const key = ownedKey(id, ownerId);
   await db.transaction("rw", db.textResults, db.audio, async () => {
@@ -435,7 +435,7 @@ export const deleteTextResult = async (id: string) => {
 export const listMnemonicImages = async (
   kanji: string
 ): Promise<MnemonicImage[]> => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const images = await db.images
     .where("kanji")
@@ -450,7 +450,7 @@ export const saveMnemonicImage = async (
   expectedCreatedAt?: number,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.images, async () => {
     checkEpoch(expectedEpoch);
@@ -477,7 +477,7 @@ export const saveMnemonicImage = async (
   changed();
 };
 export const deleteMnemonicImage = async (id: string) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.images, async () => {
     const image = await db.images.get(id);
@@ -489,7 +489,7 @@ export const getAudioForSource = async (
   sourceId: string,
   fingerprint: string
 ) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const records = await db.audio
     .where("sourceId")
@@ -511,7 +511,7 @@ export const saveAudioRecord = async (
   record: AiAudioRecord,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   await db.transaction("rw", db.audio, db.textResults, async () => {
     checkEpoch(expectedEpoch);
@@ -551,7 +551,7 @@ export const contentFingerprint = async (text: string) => {
 };
 /** Deletes everything the current owner generated on this device. */
 export const clearGeneratedContent = async () => {
-  const ownerId = getCurrentOwnerId();
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   // Advance before clearing so in-flight paid requests cannot repopulate storage.
   localStorage.setItem(

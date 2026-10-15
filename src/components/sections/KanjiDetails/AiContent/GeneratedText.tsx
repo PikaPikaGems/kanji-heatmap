@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { CopyButton } from "@/components/common/CopyButton";
 import {
   AiPrimaryButton,
@@ -9,6 +8,7 @@ import {
 } from "@/components/common/AiActionButtons";
 import { CollapsibleSection } from "@/components/common/CollapsibleSection";
 import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
+import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
 import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
 import { deleteTextResult } from "@/lib/ai-explain/storage";
 import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
@@ -46,13 +46,7 @@ export const GeneratedText = ({
   const result = state.result;
   const markdown = result ? normalizeAiMarkdown(result.markdown) : "";
 
-  if (state.status === "loading") {
-    return (
-      <p className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading saved AI content…
-      </p>
-    );
-  }
+  if (state.status === "loading") return <SavedAiContentLoading />;
 
   return (
     <div ref={topRef} className="space-y-4 text-left">
