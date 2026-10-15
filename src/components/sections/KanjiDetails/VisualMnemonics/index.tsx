@@ -123,7 +123,7 @@ const ImageActions = ({
  */
 const NewMnemonicPlaceholder = ({ pending }: { pending: boolean }) => (
   <div className="space-y-3">
-    <div className="mx-auto flex aspect-square w-full max-w-lg flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-foreground/20 text-muted-foreground">
+    <div className="animate-fade-in mx-auto flex aspect-square w-full max-w-lg flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-foreground/20 text-muted-foreground">
       {pending ? (
         <Loader2 className="size-8 animate-spin" />
       ) : (
