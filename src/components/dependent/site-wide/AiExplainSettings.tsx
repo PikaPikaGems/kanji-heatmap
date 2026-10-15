@@ -37,7 +37,8 @@ import { cn } from "@/lib/utils";
 import {
   GeneratedStorageSettings,
   ImageSettings,
-  SearchedPromptSettings,
+  VocabularyPromptSettings,
+  KanjiEssayPromptSettings,
   SpeechSettings,
 } from "./ai-explain/ExpandedAiSettings";
 
@@ -413,11 +414,18 @@ const Subsections = () => {
         <PromptField />
       </SubsectionItem>
       <SubsectionItem
-        value="searched-text"
-        title="Vocabulary and essays"
-        subtitle="Prompts · uses paid web search"
+        value="vocabulary-details"
+        title="Vocabulary Details"
+        subtitle="Anchor Word prompt · uses paid web search"
       >
-        <SearchedPromptSettings />
+        <VocabularyPromptSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="kanji-essay"
+        title="Kanji Essay"
+        subtitle="Essay prompt · uses paid web search"
+      >
+        <KanjiEssayPromptSettings />
       </SubsectionItem>
       <SubsectionItem
         value="images"

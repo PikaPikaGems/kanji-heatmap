@@ -63,14 +63,18 @@ const PromptEditor = ({
   );
 };
 
-export const SearchedPromptSettings = () => {
+const SearchUsageNotice = () => (
+  <p className="mb-3 text-xs text-muted-foreground">
+    Uses paid web search. Search calls and model tokens are billed to your xAI
+    account.
+  </p>
+);
+
+export const VocabularyPromptSettings = () => {
   const [settings, update] = useAiExplainSettings();
   return (
     <>
-      <p className="mb-3 text-xs text-muted-foreground">
-        Uses paid web search. Search calls and model tokens are billed to your
-        xAI account.
-      </p>
+      <SearchUsageNotice />
       <PromptEditor
         title="Vocabulary details prompt"
         value={settings.vocabularyPrompt}
@@ -78,6 +82,15 @@ export const SearchedPromptSettings = () => {
         placeholders="{WORD}, {READING}, {DICTIONARY_CONTEXT}"
         onChange={(vocabularyPrompt) => update({ vocabularyPrompt })}
       />
+    </>
+  );
+};
+
+export const KanjiEssayPromptSettings = () => {
+  const [settings, update] = useAiExplainSettings();
+  return (
+    <>
+      <SearchUsageNotice />
       <PromptEditor
         title="Kanji essay prompt"
         value={settings.kanjiEssayPrompt}
