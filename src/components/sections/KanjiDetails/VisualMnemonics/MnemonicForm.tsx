@@ -3,7 +3,7 @@ import {
   AiPrimaryButton,
   AiRequestFeedback,
 } from "@/components/common/AiActionButtons";
-import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
+import BasicSelect from "@/components/common/BasicSelect";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import {
   readAiExplainSettings,
@@ -198,7 +198,8 @@ export const MnemonicForm = ({
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <ResponsiveSelect
+            <BasicSelect
+              triggerCN="rounded-lg"
               label="Style"
               value={draft.style}
               onChange={(style) =>
@@ -210,7 +211,8 @@ export const MnemonicForm = ({
             />
           </div>
           <div>
-            <ResponsiveSelect
+            <BasicSelect
+              triggerCN="rounded-lg"
               label="Palette"
               value={draft.palette}
               onChange={(palette) =>

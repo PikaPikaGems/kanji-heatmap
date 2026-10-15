@@ -1,9 +1,10 @@
 import { useEffect, useId, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
-import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
+import { TextActionButton } from "@/components/common/AiActionButtons";
+import BasicSelect from "@/components/common/BasicSelect";
 import {
   AI_SPEECH_VOICES,
   DEFAULT_AI_SPEECH_VOICE,
@@ -24,7 +25,7 @@ type PromptEditorProps = {
   title: string;
   value?: string;
   defaultValue: string;
-  placeholders: string;
+  placeholders?: string;
   onChange: (value: string | undefined) => void;
 };
 const PromptEditor = ({
@@ -45,6 +46,7 @@ const PromptEditor = ({
           type="button"
           size="sm"
           variant="ghost"
+          className="rounded-lg"
           onClick={() => onChange(undefined)}
           disabled={value === undefined}
         >
@@ -62,9 +64,11 @@ const PromptEditor = ({
         }
         spellCheck={false}
       />
-      <p className="text-xs text-muted-foreground">
-        Placeholders: {placeholders}
-      </p>
+      {placeholders && (
+        <p className="text-xs text-muted-foreground">
+          Placeholders: {placeholders}
+        </p>
+      )}
     </div>
   );
 };
@@ -119,6 +123,7 @@ const ImageGenerationSettings = () => {
         Image model
       </label>
       <Input
+        className="rounded-lg"
         id={`${id}-model`}
         value={settings.imageModel ?? ""}
         placeholder={DEFAULT_AI_IMAGE_MODEL}
@@ -126,42 +131,44 @@ const ImageGenerationSettings = () => {
           update({ imageModel: event.target.value.trim() || undefined })
         }
       />
-      <label
-        className="block text-sm font-semibold"
-        htmlFor={`${id}-resolution`}
-      >
-        Resolution
-      </label>
-      <select
-        id={`${id}-resolution`}
-        className="w-full p-2 border rounded-lg bg-background"
-        value={settings.imageResolution ?? "1k"}
-        onChange={(event) =>
-          update({ imageResolution: event.target.value as "1k" | "2k" })
-        }
-      >
-        <option value="1k">1K (default)</option>
-        <option value="2k">2K</option>
-      </select>
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
+          Resolution
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label="Resolution"
+          value={settings.imageResolution ?? "1k"}
+          onChange={(imageResolution) =>
+            update({ imageResolution: imageResolution as "1k" | "2k" })
+          }
+          options={[
+            { value: "1k", label: "1K (default)" },
+            { value: "2k", label: "2K" },
+          ]}
+        />
+      </div>
       {supportsQuality && (
         <>
-          <label
-            className="block text-sm font-semibold"
-            htmlFor={`${id}-quality`}
-          >
-            Quality
-          </label>
-          <select
-            id={`${id}-quality`}
-            className="w-full p-2 border rounded-lg bg-background"
-            value={settings.imageQuality ?? "low"}
-            onChange={(event) =>
-              update({ imageQuality: event.target.value as "low" | "medium" })
-            }
-          >
-            <option value="low">Standard (default)</option>
-            <option value="medium">Higher detail</option>
-          </select>
+          <div className="space-y-1">
+            <p aria-hidden className="text-sm font-semibold">
+              Quality
+            </p>
+            <BasicSelect
+              isLabelSrOnly
+              triggerCN="rounded-lg"
+              label="Quality"
+              value={settings.imageQuality ?? "low"}
+              onChange={(imageQuality) =>
+                update({ imageQuality: imageQuality as "low" | "medium" })
+              }
+              options={[
+                { value: "low", label: "Standard (default)" },
+                { value: "medium", label: "Higher detail" },
+              ]}
+            />
+          </div>
         </>
       )}
       <p className="text-xs text-muted-foreground">
@@ -215,7 +222,6 @@ export const ImageSettings = () => {
           title={`${IMAGE_STYLE_LABELS[style]} style prompt`}
           value={settings.imageStylePrompts?.[style]}
           defaultValue={DEFAULT_IMAGE_STYLE_PROMPTS[style]}
-          placeholders="No placeholders"
           onChange={(value) =>
             update({
               imageStylePrompts: {
@@ -230,7 +236,6 @@ export const ImageSettings = () => {
         title="Kanji Heatmap palette prompt"
         value={settings.imagePalettePrompt}
         defaultValue={DEFAULT_IMAGE_PALETTE_PROMPT}
-        placeholders="No placeholders"
         onChange={(imagePalettePrompt) => update({ imagePalettePrompt })}
       />
     </>
@@ -241,29 +246,43 @@ export const SpeechSettings = () => {
   const [settings, update] = useAiExplainSettings();
   return (
     <div className="mb-4 space-y-3">
-      <ResponsiveSelect
-        label="Speech voice"
-        value={settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE}
-        onChange={(speechVoice) => update({ speechVoice })}
-        options={AI_SPEECH_VOICES.map((voice) => ({
-          value: voice,
-          label:
-            voice[0].toUpperCase() +
-            voice.slice(1) +
-            (voice === DEFAULT_AI_SPEECH_VOICE ? " (default)" : ""),
-        }))}
-      />
-      <ResponsiveSelect
-        label="Speech language"
-        value={settings.speechLanguage ?? "auto"}
-        onChange={(speechLanguage) =>
-          update({ speechLanguage: speechLanguage as "auto" | "ja" })
-        }
-        options={[
-          { value: "auto", label: "Automatic (default)" },
-          { value: "ja", label: "Japanese" },
-        ]}
-      />
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
+          Speech voice
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label="Speech voice"
+          value={settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE}
+          onChange={(speechVoice) => update({ speechVoice })}
+          options={AI_SPEECH_VOICES.map((voice) => ({
+            value: voice,
+            label:
+              voice[0].toUpperCase() +
+              voice.slice(1) +
+              (voice === DEFAULT_AI_SPEECH_VOICE ? " (default)" : ""),
+          }))}
+        />
+      </div>
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
+          Speech language
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label="Speech language"
+          value={settings.speechLanguage ?? "auto"}
+          onChange={(speechLanguage) =>
+            update({ speechLanguage: speechLanguage as "auto" | "ja" })
+          }
+          options={[
+            { value: "auto", label: "Automatic (default)" },
+            { value: "ja", label: "Japanese" },
+          ]}
+        />
+      </div>
       <p className="text-xs text-muted-foreground">
         Japanese forces Japanese speech mode, even when the text includes
         English. Saved recordings stay playable; use Regenerate MP3 to apply new
@@ -339,18 +358,22 @@ export const GeneratedStorageSettings = () => {
           anything you want to keep first. Your API key and preferences stay
           saved.
         </p>
-        <div className="flex gap-2">
-          <Button variant="destructive" onClick={clear}>
+        <div className="flex flex-wrap items-center gap-1">
+          <TextActionButton
+            icon={<Trash2 size={14} />}
+            className="text-rose-500"
+            onClick={clear}
+          >
             Delete generated content
-          </Button>
-          <Button
-            variant="outline"
+          </TextActionButton>
+          <span aria-hidden>·</span>
+          <TextActionButton
             onClick={() =>
               setState({ status: "ready", bytes: state.bytes ?? 0 })
             }
           >
             Cancel
-          </Button>
+          </TextActionButton>
         </div>
       </div>
     );
@@ -369,18 +392,21 @@ export const GeneratedStorageSettings = () => {
         Saved only on this device and browser. Browser data can be cleared or
         lost. Download content you want to keep.
       </p>
-      <Button
-        variant="outline"
+      <TextActionButton
+        icon={<Trash2 size={14} />}
+        className="text-rose-500"
+        busy={state.status === "clearing"}
+        busyLabel="Clearing…"
         onClick={() =>
           setState({
             status: "confirm",
             bytes: state.status === "ready" ? state.bytes : undefined,
           })
         }
-        disabled={state.status === "loading" || state.status === "clearing"}
+        disabled={state.status === "loading"}
       >
         Clear generated content
-      </Button>
+      </TextActionButton>
     </div>
   );
 };

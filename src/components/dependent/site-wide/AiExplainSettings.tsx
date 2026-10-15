@@ -152,6 +152,7 @@ const ApiKeyField = () => {
       </label>
       <div className="flex gap-2">
         <Input
+          className="rounded-lg"
           id={id}
           type={visible ? "text" : "password"}
           value={settings.apiKey}
@@ -232,6 +233,7 @@ const ModelField = () => {
         Model
       </label>
       <Input
+        className="rounded-lg"
         id={id}
         list={listId}
         value={settings.model ?? ""}
@@ -269,6 +271,7 @@ const PromptField = () => {
           type="button"
           variant="ghost"
           size="sm"
+          className="rounded-lg"
           onClick={() => update({ prompt: undefined })}
           disabled={settings.prompt === undefined}
         >
@@ -343,6 +346,7 @@ const UsageField = () => {
         Monthly text-token budget (optional)
       </label>
       <Input
+        className="rounded-lg"
         id={id}
         type="number"
         inputMode="numeric"
@@ -387,7 +391,7 @@ const SubsectionItem = ({
         </span>
       </span>
     </AccordionTrigger>
-    <AccordionContent className="pt-1 pb-0 pl-3 border-l-2 border-dotted">
+    <AccordionContent className="pt-1.5 pb-1.5 pl-3 pr-1.5 border-l-2 border-dotted">
       {children}
     </AccordionContent>
   </AccordionItem>

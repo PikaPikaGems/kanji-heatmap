@@ -26,7 +26,7 @@ export const ResponsiveSelect = ({
       <BasicSelect
         value={value}
         onChange={onChange}
-        triggerCN={"h-10 w-full rounded-lg text-xl"}
+        triggerCN={"h-8 w-full rounded-lg"}
         options={options}
         label={label}
         isLabelSrOnly={false}
@@ -42,14 +42,14 @@ export const ResponsiveSelect = ({
           value={value}
           setValue={onChange}
           options={options}
-          triggerClassName="rounded-lg text-xl"
+          triggerClassName="rounded-lg"
         />
       </div>
       <div className="block sm:hidden">
         <BasicSelect
           value={value}
           onChange={onChange}
-          triggerCN={"h-10 w-full rounded-lg text-xl"}
+          triggerCN={"h-8 w-full rounded-lg"}
           options={options}
           label={label}
           isLabelSrOnly={false}
