@@ -135,7 +135,7 @@ export const ActivityStatCard = ({
       </div>
       <div className="text-xs truncate">{title}</div>
     </div>
-    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
+    <div className="flex flex-col items-start pl-0.5 gap-x-4 gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline">
       {counts.map((count, i) => (
         <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}
