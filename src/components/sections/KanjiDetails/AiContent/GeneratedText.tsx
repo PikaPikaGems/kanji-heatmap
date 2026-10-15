@@ -108,7 +108,7 @@ export const GeneratedText = ({
           />
         ) : (
           <AiPrimaryButton
-            disabled={busy}
+            busy={busy}
             onClick={() => void generate(instructions)}
           >
             {generateLabel}
@@ -117,7 +117,6 @@ export const GeneratedText = ({
       </div>
       <AiRequestFeedback
         busy={busy}
-        busyLabel={result ? undefined : "Asking Grok and searching the web…"}
         onCancel={cancel}
         error={state.message}
         warning={state.warning}

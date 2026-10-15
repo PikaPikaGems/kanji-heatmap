@@ -6,52 +6,51 @@ import { downloadBlob } from "@/lib/ai-explain/download";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
-/** The one style for secondary AI actions: bold text, dotted underline, icon. */
+/**
+ * The one style for secondary AI actions: bold text, dotted underline, icon.
+ * While busy it shows a spinner and a muted busyLabel, disabled.
+ */
 export const TextActionButton = ({
   icon,
+  busy = false,
+  busyLabel,
+  disabled,
   children,
   className,
   ...props
-}: ComponentProps<"button"> & { icon: ReactNode }) => (
-  <button
-    type="button"
-    {...props}
-    className={cn(cnDottedUnderlineTrigger, "disabled:opacity-50", className)}
-  >
-    {icon}
-    <strong>{children}</strong>
-  </button>
-);
-
-/** While busy it shows a spinner and a muted "Regenerating…" label, disabled. */
-export const RegenerateButton = ({
-  children = "Regenerate",
-  busy = false,
-  busyLabel = "Regenerating…",
-  disabled,
-  className,
-  ...props
-}: Omit<ComponentProps<typeof TextActionButton>, "icon"> & {
+}: ComponentProps<"button"> & {
+  icon: ReactNode;
   busy?: boolean;
   busyLabel?: ReactNode;
 }) => (
-  <TextActionButton
-    icon={
-      busy ? (
-        <Loader2 size={14} className="animate-spin" />
-      ) : (
-        <RotateCcw size={14} />
-      )
-    }
+  <button
+    type="button"
+    {...props}
     disabled={busy || disabled}
     className={cn(
+      cnDottedUnderlineTrigger,
+      "disabled:opacity-50",
+      className,
       busy &&
-        "cursor-default text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100",
-      className
+        "cursor-default text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100"
     )}
+  >
+    {busy ? <Loader2 size={14} className="animate-spin" /> : icon}
+    <strong>{busy ? (busyLabel ?? children) : children}</strong>
+  </button>
+);
+
+export const RegenerateButton = ({
+  children = "Regenerate",
+  busyLabel = "Regenerating…",
+  ...props
+}: Omit<ComponentProps<typeof TextActionButton>, "icon">) => (
+  <TextActionButton
+    icon={<RotateCcw size={14} />}
+    busyLabel={busyLabel}
     {...props}
   >
-    {busy ? busyLabel : children}
+    {children}
   </TextActionButton>
 );
 
@@ -98,50 +97,61 @@ export const DownloadMarkdownButton = ({
   );
 };
 
-/** The one style for the main AI action (Generate, Read Aloud, …). */
+/**
+ * The one style for main AI actions (Generate, Read Aloud, Download, …).
+ * While busy it shows a spinner and "Generating…" (or busyLabel), disabled.
+ */
 export const AiPrimaryButton = ({
   className,
+  busy = false,
+  busyLabel = "Generating…",
+  disabled,
+  children,
   ...props
-}: ComponentProps<typeof PracticeButton>) => (
+}: ComponentProps<typeof PracticeButton> & {
+  busy?: boolean;
+  busyLabel?: ReactNode;
+}) => (
   <PracticeButton
     variant="primary"
     size="md"
     className={cn(
-      "h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base",
+      "h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base [&_svg]:size-5",
       className
     )}
+    disabled={busy || disabled}
     {...props}
-  />
+  >
+    {busy ? (
+      <>
+        <Loader2 className="animate-spin" /> {busyLabel}
+      </>
+    ) : (
+      children
+    )}
+  </PracticeButton>
 );
 
 /**
- * What shows under an AI action button, in one fixed order: the in-progress
- * status (plus any live preview), Cancel, the error, then the warning. Omit
- * busyLabel when a RegenerateButton already shows the progress.
+ * What shows under an AI action button, in one fixed order: any live preview,
+ * Cancel, the error, then the warning. The button itself shows progress.
  */
 export const AiRequestFeedback = ({
   busy,
-  busyLabel,
   onCancel,
   error,
   warning,
   children,
 }: {
   busy: boolean;
-  busyLabel?: string;
   onCancel?: () => void;
   error?: ReactNode;
   warning?: ReactNode;
   children?: ReactNode;
 }) => (
   <>
-    {busy && (
+    {busy && children && (
       <div role="status" className="space-y-2">
-        {busyLabel && (
-          <p className="flex items-center gap-2 text-sm">
-            <Loader2 className="size-4 animate-spin" /> {busyLabel}
-          </p>
-        )}
         {children}
       </div>
     )}

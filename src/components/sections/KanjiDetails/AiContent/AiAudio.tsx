@@ -317,7 +317,7 @@ export const AiAudio = ({
         />
       ) : (
         <AiPrimaryButton
-          disabled={state.status === "generating"}
+          busy={state.status === "generating"}
           onClick={() => void generate()}
         >
           Generate MP3 to listen
@@ -325,7 +325,6 @@ export const AiAudio = ({
       )}
       <AiRequestFeedback
         busy={state.status === "generating"}
-        busyLabel={state.record ? undefined : "Generating audio…"}
         onCancel={() => {
           request.current?.abort();
           request.current = null;

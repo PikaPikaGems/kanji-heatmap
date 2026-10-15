@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
+import { Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DownloadButton,
+  TextActionButton,
+} from "@/components/common/AiActionButtons";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import type { MnemonicImage } from "@/lib/ai-explain/storage";
 import { ImagePreview } from "./ImagePreview";
@@ -43,10 +48,8 @@ const ImageActions = ({
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant="outline"
+      <div className="flex flex-wrap items-center gap-1">
+        <DownloadButton
           disabled={disabled || action === "deleting"}
           onClick={() => {
             try {
@@ -67,46 +70,43 @@ const ImageActions = ({
           }}
         >
           Download
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
+        </DownloadButton>
+        <span aria-hidden>·</span>
+        <TextActionButton
+          icon={<Trash2 size={14} />}
+          className="text-destructive"
           disabled={disabled || action === "deleting"}
           onClick={() => setAction("confirm-delete")}
         >
           Delete
-        </Button>
+        </TextActionButton>
       </div>
-      {action === "confirm-delete" && (
+      {action !== "idle" && (
         <div className="space-y-2 rounded-lg border p-3">
           <p className="text-sm">
             Delete this mnemonic? Download it first if you want to keep it.
           </p>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
+          <div className="flex flex-wrap items-center gap-1">
+            <TextActionButton
+              icon={<Trash2 size={14} />}
+              className="text-destructive"
+              busy={action === "deleting"}
+              busyLabel="Deleting…"
               disabled={disabled}
               onClick={() => void remove()}
             >
               Delete image
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
+            </TextActionButton>
+            <span aria-hidden>·</span>
+            <TextActionButton
+              icon={<X size={14} />}
+              disabled={action === "deleting"}
               onClick={() => setAction("idle")}
             >
               Keep image
-            </Button>
+            </TextActionButton>
           </div>
         </div>
-      )}
-      {action === "deleting" && (
-        <p role="status" className="text-sm">
-          Deleting image…
-        </p>
       )}
       {error && (
         <p role="alert" className="text-sm text-destructive">
@@ -258,14 +258,13 @@ const MnemonicGallery = ({
         </div>
       )}
       {gallery.images.length < 3 && selected && (
-        <Button
-          type="button"
-          variant="outline"
+        <TextActionButton
+          icon={<Plus size={14} />}
           disabled={pending}
           onClick={() => setGallery({ ...gallery, selectedId: null })}
         >
           Add mnemonic
-        </Button>
+        </TextActionButton>
       )}
       {gallery.images.length === 3 && (
         <p className="text-sm text-muted-foreground">

@@ -244,6 +244,8 @@ export const MnemonicForm = ({
         )}
         <AiPrimaryButton
           type="submit"
+          busy={pending}
+          busyLabel={image ? "Regenerating…" : "Generating…"}
           disabled={
             !draft.description.trim() ||
             (draft.style === "custom" && !draft.customStyle.trim())
@@ -254,7 +256,6 @@ export const MnemonicForm = ({
       </fieldset>
       <AiRequestFeedback
         busy={pending}
-        busyLabel="Generating image…"
         onCancel={() => {
           controller.current?.abort();
           controller.current = null;
