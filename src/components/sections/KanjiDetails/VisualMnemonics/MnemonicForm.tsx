@@ -154,7 +154,7 @@ export const MnemonicForm = ({
 
   return (
     <form
-      className="space-y-3"
+      className="space-y-3 text-left"
       onSubmit={(event) => {
         event.preventDefault();
         void generate();
@@ -278,7 +278,7 @@ export const MnemonicForm = ({
         </Button>
       )}
       {request.status === "error" && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-sm font-bold text-destructive">
           {request.message}
         </p>
       )}

@@ -205,7 +205,7 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
-      <SimpleAccordion trigger="⭐️ Personal Study Notes">
+      <SimpleAccordion trigger="Personal Study Notes">
         <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
           <Suspense fallback={<StudyNotesLoadingFallback />}>
             <KanjiStudyNotes key={kanji} kanji={kanji} />

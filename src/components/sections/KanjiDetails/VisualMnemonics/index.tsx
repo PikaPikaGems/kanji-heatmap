@@ -199,16 +199,7 @@ const MnemonicGallery = ({
   );
 
   return (
-    <div className="space-y-4 p-2">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-4xl" lang="ja">
-          {kanji}
-        </span>
-        <span className="text-sm text-muted-foreground">
-          {gallery.images.filter((image) => !image.unsaved).length} saved ·{" "}
-          {gallery.images.length} of 3 slots
-        </span>
-      </div>
+    <div className="space-y-4 p-2 text-left">
       {gallery.images.length > 0 && (
         <div
           className="flex flex-wrap gap-2"
@@ -323,6 +314,10 @@ const MnemonicGallery = ({
         AI can make mistakes. Generated content is saved only in this browser.
         It may be lost if browser data is cleared. Download anything you want to
         keep.
+      </p>
+      <p className="text-xs text-muted-foreground">
+        {gallery.images.filter((image) => !image.unsaved).length} saved ·{" "}
+        {gallery.images.length} of 3 slots
       </p>
     </div>
   );

@@ -132,16 +132,6 @@ export const GeneratedText = ({
           )}
         </div>
       )}
-      {(state.message || downloadError) && (
-        <p role="alert" className="text-sm text-destructive">
-          {state.message || downloadError}
-        </p>
-      )}
-      {state.warning && (
-        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
-          {state.warning}
-        </p>
-      )}
       <div className="flex flex-wrap gap-2">
         {result ? (
           <Button
@@ -169,6 +159,16 @@ export const GeneratedText = ({
           </Button>
         )}
       </div>
+      {(state.message || downloadError) && (
+        <p role="alert" className="text-sm font-bold text-destructive">
+          {state.message || downloadError}
+        </p>
+      )}
+      {state.warning && (
+        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+          {state.warning}
+        </p>
+      )}
       <AiContentNotice />
     </div>
   );
