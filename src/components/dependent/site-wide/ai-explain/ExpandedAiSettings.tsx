@@ -16,6 +16,7 @@ import {
   DEFAULT_IMAGE_PROMPT,
   DEFAULT_IMAGE_STYLE_PROMPTS,
   DEFAULT_IMAGE_PALETTE_PROMPT,
+  IMAGE_STYLE_LABELS,
   type ImageStyle,
 } from "@/lib/ai-explain/prompts";
 
@@ -196,13 +197,6 @@ const ImageGenerationSettings = () => {
   );
 };
 
-const styleLabels: Record<ImageStyle, string> = {
-  "kanji-heatmap": "Kanji Heatmap",
-  watercolor: "Watercolor",
-  "pixel-art": "16-bit game art",
-  cartoon: "Cartoon / anime",
-  custom: "Custom",
-};
 export const ImageSettings = () => {
   const [settings, update] = useAiExplainSettings();
   return (
@@ -215,10 +209,10 @@ export const ImageSettings = () => {
         placeholders="{KANJI}, {KEYWORD}, {DESCRIPTION}, {STYLE_PROMPT}, {PALETTE_PROMPT}"
         onChange={(imagePrompt) => update({ imagePrompt })}
       />
-      {(Object.keys(styleLabels) as ImageStyle[]).map((style) => (
+      {(Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).map((style) => (
         <PromptEditor
           key={style}
-          title={`${styleLabels[style]} style prompt`}
+          title={`${IMAGE_STYLE_LABELS[style]} style prompt`}
           value={settings.imageStylePrompts?.[style]}
           defaultValue={DEFAULT_IMAGE_STYLE_PROMPTS[style]}
           placeholders="No placeholders"

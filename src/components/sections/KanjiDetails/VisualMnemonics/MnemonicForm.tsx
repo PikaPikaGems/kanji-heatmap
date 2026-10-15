@@ -13,6 +13,8 @@ import {
 import {
   buildImagePrompt,
   DEFAULT_AI_IMAGE_MODEL,
+  IMAGE_PALETTE_LABELS,
+  IMAGE_STYLE_LABELS,
   type ImageStyle,
   type ImagePalette,
 } from "@/lib/ai-explain/prompts";
@@ -181,13 +183,9 @@ export const MnemonicForm = ({
               onChange={(style) =>
                 setDraft({ ...draft, style: style as ImageStyle })
               }
-              options={[
-                { value: "kanji-heatmap", label: "Kanji Heatmap" },
-                { value: "watercolor", label: "Watercolor" },
-                { value: "pixel-art", label: "16-bit game art" },
-                { value: "cartoon", label: "Cartoon or anime" },
-                { value: "custom", label: "Custom" },
-              ]}
+              options={Object.entries(IMAGE_STYLE_LABELS).map(
+                ([value, label]) => ({ value, label })
+              )}
             />
           </div>
           <div>
@@ -197,14 +195,9 @@ export const MnemonicForm = ({
               onChange={(palette) =>
                 setDraft({ ...draft, palette: palette as ImagePalette })
               }
-              options={[
-                { value: "kanji-heatmap", label: "Kanji Heatmap" },
-                { value: "lime", label: "Lime" },
-                { value: "cyan", label: "Cyan / aqua" },
-                { value: "blue", label: "Blue" },
-                { value: "pink", label: "Hot pink" },
-                { value: "grayscale", label: "Black and white" },
-              ]}
+              options={Object.entries(IMAGE_PALETTE_LABELS).map(
+                ([value, label]) => ({ value, label })
+              )}
             />
           </div>
         </div>

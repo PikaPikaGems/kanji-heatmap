@@ -12,7 +12,24 @@ export type ImagePalette =
   | "cyan"
   | "blue"
   | "pink"
+  | "pastel"
   | "grayscale";
+export const IMAGE_STYLE_LABELS: Record<ImageStyle, string> = {
+  "kanji-heatmap": "Kanji Heatmap",
+  watercolor: "Watercolor",
+  "pixel-art": "8-bit game art",
+  cartoon: "Cartoon or anime",
+  custom: "Custom",
+};
+export const IMAGE_PALETTE_LABELS: Record<ImagePalette, string> = {
+  "kanji-heatmap": "Kanji Heatmap",
+  lime: "Lime",
+  cyan: "Cyan / aqua",
+  blue: "Blue",
+  pink: "Hot pink",
+  pastel: "Pastel",
+  grayscale: "Black and white",
+};
 export const DEFAULT_AI_IMAGE_MODEL = "grok-imagine-image-2.0";
 
 export const DEFAULT_VOCABULARY_PROMPT =
@@ -26,15 +43,15 @@ export const DEFAULT_IMAGE_PROMPT =
 
 // Blue is the default theme RGB 25,60,184 in use-change-theme-color.ts.
 export const DEFAULT_IMAGE_PALETTE_PROMPT =
-  "Use the Kanji Heatmap six-color palette: blue, cyan/aqua (#2effff), lime\n(#a3e635), fuchsia/hot pink (#fb02a8), black, and white.\n\nLet blue be the primary color for the main subject and larger shapes. Use\ncyan/aqua as the secondary color for supporting shapes and depth. Use lime or\nhot pink as the strongest small accent on a memorable detail; the other accent\nmay appear sparingly. Use black and white for outlines, contrast, and breathing\nroom, according to the selected illustration style.\n\nDo not give all colors equal visual weight. All six are available, but not every\nimage needs all six. Keep the scene clear rather than filling every area with\nsaturated color.\n\nAdapt the palette to the selected style: soft washes for watercolor, crisp\nlimited-color blocks for 16-bit game art, and clean fills with simple shading\nfor Kanji Heatmap or cartoon/anime illustrations.\nBlue theme color: #193cb8.";
+  "Use the Kanji Heatmap six-color palette: blue, cyan/aqua (#2effff), lime\n(#a3e635), fuchsia/hot pink (#fb02a8), black, and white.\n\nLet blue be the primary color for the main subject and larger shapes. Use\ncyan/aqua as the secondary color for supporting shapes and depth. Use lime or\nhot pink as the strongest small accent on a memorable detail; the other accent\nmay appear sparingly. Use black and white for outlines, contrast, and breathing\nroom, according to the selected illustration style.\n\nDo not give all colors equal visual weight. All six are available, but not every\nimage needs all six. Keep the scene clear rather than filling every area with\nsaturated color.\n\nAdapt the palette to the selected style: soft washes for watercolor, crisp\nflat color blocks for 8-bit game art, and clean fills with simple shading\nfor Kanji Heatmap or cartoon/anime illustrations.\nBlue theme color: #193cb8.";
 
 export const DEFAULT_IMAGE_STYLE_PROMPTS: Record<ImageStyle, string> = {
   "kanji-heatmap":
     "Create a playful, friendly illustration that fits the Kanji Heatmap interface.\n\nUse rounded shapes, soft corners, and clean, solid outlines with consistent\nthickness and rounded ends. Use flat color fills with minimal, simple shading.\nAvoid realistic textures, intricate detail, and heavy gradients.\n\nBuild the mnemonic around one clear focal subject. Use expressive poses and a\nfew exaggerated details to make the scene memorable. Keep the background simple\nwith generous breathing room. The image must remain easy to understand at\nthumbnail size.\n\nApply the selected palette supplied separately. Keep the focal subject and its\nimportant details clearly separated from the background.\n\nDo not add lettering, captions, a decorative frame, or a kanji character.",
   watercolor:
-    "Soft watercolor illustration, visible paper texture, gentle washes, expressive shapes, and crisp focal details.",
+    "Soft, airy watercolor illustration. Use a few loose, translucent washes with gentle\nedges that bleed softly into each other, and leave plenty of white paper showing.\n\nKeep it minimal: one simple focal subject, at most two or three supporting shapes,\nand a pale, mostly empty background. Use light, delicate linework only where it\nhelps the subject read. Prefer muted, harmonious tones.\n\nAvoid heavy outlines, dense texture, busy patterns, and fine detail.",
   "pixel-art":
-    "Classic 16-bit game illustration, deliberate pixel shapes, crisp edges, limited colors, clear silhouettes, and no blurry smoothing.",
+    "Simple 8-bit retro game sprite art, like an early home console game. Use very low\nresolution with large, clearly visible square pixels, as if drawn on a grid about\n32 to 48 pixels wide and scaled up with no smoothing.\n\nUse four to six flat colors. No gradients, anti-aliasing, or soft shading.\n\nMake one chunky, readable sprite the focal subject, on a plain or very simple\nbackground. Keep detail to a minimum.",
   cartoon:
     "Playful cartoon illustration with anime-inspired expressions, clean outlines, simple cel shading, and an expressive central subject.",
   custom: "",
@@ -47,6 +64,8 @@ export const DEFAULT_IMAGE_PALETTE_PROMPTS: Record<ImagePalette, string> = {
   cyan: "Use luminous cyan/aqua (#2effff) as the dominant accent, supported by pale aqua, off-white, deep teal or charcoal. Avoid making the whole image glow.",
   blue: "Use Kanji Heatmap blue (#193cb8) as the dominant accent, with lighter blue, off-white, and deep navy. Keep the subject vivid and background simple.",
   pink: "Use vivid fuchsia/hot pink (#fb02a8) as the dominant accent, with pale pink, off-white, deep plum or charcoal. Avoid filling every area with saturated pink.",
+  pastel:
+    "Use a soft pastel palette: baby pink, lavender, mint, powder blue, pale butter yellow, and peach, on a cream or off-white background. Keep colors light and low in saturation. Give the focal subject one slightly deeper pastel, such as dusty rose or soft periwinkle, so it stands out. Avoid neon, harsh black, and strong saturated contrast.",
   grayscale:
     "Use only black, white, and shades of gray. No colored accents. Use strong silhouettes and clear light-dark contrast.",
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X } from "lucide-react";
+import { ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DownloadButton,
@@ -82,7 +82,7 @@ const ImageActions = ({
         </TextActionButton>
       </div>
       {action !== "idle" && (
-        <div className="space-y-2 rounded-lg border p-3 text-center">
+        <div className="animate-fade-in-fast space-y-2 rounded-lg border p-3 text-center">
           <p className="text-sm">
             Delete this mnemonic? Download it first if you want to keep it.
           </p>
@@ -116,6 +116,31 @@ const ImageActions = ({
     </div>
   );
 };
+
+/**
+ * Holds the selected image's place (image, caption, action row) while a new
+ * mnemonic is being made, so switching to "+" doesn't shift the layout.
+ */
+const NewMnemonicPlaceholder = ({ pending }: { pending: boolean }) => (
+  <div className="space-y-3">
+    <div className="mx-auto flex aspect-square w-full max-w-lg flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-foreground/20 text-muted-foreground">
+      {pending ? (
+        <Loader2 className="size-8 animate-spin" />
+      ) : (
+        <ImagePlus className="size-8" />
+      )}
+      <span className="text-sm">
+        {pending
+          ? "Generating your mnemonic…"
+          : "Describe your new mnemonic below"}
+      </span>
+    </div>
+    <p className="text-center text-xs text-muted-foreground">New mnemonic</p>
+    <div aria-hidden className="invisible flex justify-center">
+      <DownloadButton tabIndex={-1}>Download</DownloadButton>
+    </div>
+  </div>
+);
 
 const MnemonicGallery = ({
   kanji,
@@ -237,6 +262,9 @@ const MnemonicGallery = ({
             </button>
           )}
         </div>
+      )}
+      {!selected && gallery.images.length > 0 && (
+        <NewMnemonicPlaceholder pending={pending} />
       )}
       {selected && (
         <div className="space-y-3">

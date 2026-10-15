@@ -3,7 +3,6 @@ import { Download, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { downloadBlob } from "@/lib/ai-explain/download";
-import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,11 +27,12 @@ export const TextActionButton = ({
     {...props}
     disabled={busy || disabled}
     className={cn(
-      cnDottedUnderlineTrigger,
-      "text-foreground disabled:opacity-50",
+      // Like cnDottedUnderlineTrigger, but the hover highlight is enabled-only.
+      "inline-flex items-center gap-1 rounded-lg px-1 leading-loose text-foreground underline decoration-dotted underline-offset-4",
+      "enabled:cursor-pointer enabled:hover:bg-neon-accent enabled:hover:text-black",
+      "disabled:cursor-not-allowed disabled:opacity-50",
       className,
-      busy &&
-        "cursor-default text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100"
+      busy && "text-muted-foreground disabled:opacity-100"
     )}
   >
     {busy ? <Loader2 size={14} className="animate-spin" /> : icon}
