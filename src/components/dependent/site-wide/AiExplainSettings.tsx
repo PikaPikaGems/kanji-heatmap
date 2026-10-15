@@ -485,6 +485,17 @@ export const AiExplainSection = () => {
             Add a Grok API key that works to turn this on.
           </p>
         )}
+        {active && (
+          <p
+            role="note"
+            className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 text-amber-700 dark:text-amber-400"
+          >
+            Heads up: what you generate is saved only in this browser. It
+            isn&apos;t backed up and can be lost if browser data is cleared, and
+            anyone using this computer can see it. Download anything you want to
+            keep.
+          </p>
+        )}
         {active && <Subsections />}
       </div>
     </SimpleAccordion>
