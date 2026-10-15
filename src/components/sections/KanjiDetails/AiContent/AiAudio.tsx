@@ -307,7 +307,8 @@ export const AiAudio = ({
           filename={filename}
           regenerate={
             <RegenerateButton
-              disabled={state.status === "generating"}
+              busy={state.status === "generating"}
+              busyLabel="Regenerating MP3…"
               onClick={() => void generate()}
             >
               Regenerate MP3
@@ -324,7 +325,7 @@ export const AiAudio = ({
       )}
       <AiRequestFeedback
         busy={state.status === "generating"}
-        busyLabel="Generating audio…"
+        busyLabel={state.record ? undefined : "Generating audio…"}
         onCancel={() => {
           request.current?.abort();
           request.current = null;

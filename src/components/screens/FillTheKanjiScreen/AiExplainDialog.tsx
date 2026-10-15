@@ -85,7 +85,7 @@ const RegenerationControls = ({
       />
       <RegenerateButton
         onClick={() => onRegenerate(instructions)}
-        disabled={loading}
+        busy={loading}
       />
     </div>
   );

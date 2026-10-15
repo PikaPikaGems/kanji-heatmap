@@ -23,12 +23,35 @@ export const TextActionButton = ({
   </button>
 );
 
+/** While busy it shows a spinner and a muted "Regenerating…" label, disabled. */
 export const RegenerateButton = ({
   children = "Regenerate",
+  busy = false,
+  busyLabel = "Regenerating…",
+  disabled,
+  className,
   ...props
-}: Omit<ComponentProps<typeof TextActionButton>, "icon">) => (
-  <TextActionButton icon={<RotateCcw size={14} />} {...props}>
-    {children}
+}: Omit<ComponentProps<typeof TextActionButton>, "icon"> & {
+  busy?: boolean;
+  busyLabel?: ReactNode;
+}) => (
+  <TextActionButton
+    icon={
+      busy ? (
+        <Loader2 size={14} className="animate-spin" />
+      ) : (
+        <RotateCcw size={14} />
+      )
+    }
+    disabled={busy || disabled}
+    className={cn(
+      busy &&
+        "cursor-default text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100",
+      className
+    )}
+    {...props}
+  >
+    {busy ? busyLabel : children}
   </TextActionButton>
 );
 
@@ -93,7 +116,8 @@ export const AiPrimaryButton = ({
 
 /**
  * What shows under an AI action button, in one fixed order: the in-progress
- * status (plus any live preview), Cancel, the error, then the warning.
+ * status (plus any live preview), Cancel, the error, then the warning. Omit
+ * busyLabel when a RegenerateButton already shows the progress.
  */
 export const AiRequestFeedback = ({
   busy,
@@ -104,7 +128,7 @@ export const AiRequestFeedback = ({
   children,
 }: {
   busy: boolean;
-  busyLabel: string;
+  busyLabel?: string;
   onCancel?: () => void;
   error?: ReactNode;
   warning?: ReactNode;
@@ -113,9 +137,11 @@ export const AiRequestFeedback = ({
   <>
     {busy && (
       <div role="status" className="space-y-2">
-        <p className="flex items-center gap-2 text-sm">
-          <Loader2 className="size-4 animate-spin" /> {busyLabel}
-        </p>
+        {busyLabel && (
+          <p className="flex items-center gap-2 text-sm">
+            <Loader2 className="size-4 animate-spin" /> {busyLabel}
+          </p>
+        )}
         {children}
       </div>
     )}

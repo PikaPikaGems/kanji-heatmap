@@ -103,7 +103,7 @@ export const GeneratedText = ({
       <div className="flex flex-wrap gap-2">
         {result ? (
           <RegenerateButton
-            disabled={busy}
+            busy={busy}
             onClick={() => void generate(instructions)}
           />
         ) : (
@@ -117,7 +117,7 @@ export const GeneratedText = ({
       </div>
       <AiRequestFeedback
         busy={busy}
-        busyLabel="Asking Grok and searching the web…"
+        busyLabel={result ? undefined : "Asking Grok and searching the web…"}
         onCancel={cancel}
         error={state.message}
         warning={state.warning}
