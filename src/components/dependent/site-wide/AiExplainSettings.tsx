@@ -27,8 +27,11 @@ import {
 import {
   DEFAULT_AI_EXPLAIN_MODEL,
   hasValidAiExplainKey,
-  readAiExplainSettings,
+  readAiOwnerKey,
+  writeAiOwnerKey,
 } from "@/lib/ai-explain/preferences";
+import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
+import { GUEST_OWNER_ID, useCurrentOwner } from "@/lib/engine/content-owner";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
 import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
@@ -108,8 +111,9 @@ const KeyCheckStatus = ({
 /** Wait after the last keystroke before checking, so typing isn't checked per letter. */
 const KEY_CHECK_DELAY_MS = 600;
 
-const ApiKeyField = () => {
-  const [settings, update] = useAiExplainSettings();
+/** Edits the key of one owner; remounts for the next owner, never shows theirs. */
+const ApiKeyField = ({ ownerId }: { ownerId: string }) => {
+  const [settings] = useAiExplainSettings();
   const [visible, setVisible] = useState(false);
   const [check, setCheck] = useState<KeyCheck>({ status: "idle" });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -117,12 +121,13 @@ const ApiKeyField = () => {
 
   const runCheck = (apiKey: string) => {
     setCheck({ status: "checking" });
-    // A result for a key that has since changed is dropped.
-    const stillCurrent = () => readAiExplainSettings().apiKey === apiKey;
+    // A result for a key that has since changed is dropped. It is saved for
+    // the owner who typed the key, even if someone else is logged in by then.
+    const stillCurrent = () => readAiOwnerKey(ownerId).apiKey === apiKey;
     checkXaiKey(apiKey).then(
       (result) => {
         if (!stillCurrent()) return;
-        update({ keyValid: result === "valid" });
+        writeAiOwnerKey(ownerId, { apiKey, keyValid: result === "valid" });
         setCheck(result === "valid" ? { status: "idle" } : { status: result });
       },
       () => {
@@ -133,7 +138,7 @@ const ApiKeyField = () => {
   };
 
   const onKeyChange = (apiKey: string) => {
-    update({ apiKey, keyValid: false });
+    writeAiOwnerKey(ownerId, { apiKey, keyValid: false });
     clearTimeout(timerRef.current);
     if (apiKey === "") {
       setCheck({ status: "idle" });
@@ -189,8 +194,9 @@ const ApiKeyField = () => {
         />
       )}
       <p className="pt-1 text-xs text-muted-foreground">
-        Saved only in this browser and sent only to xAI. Requests are billed to
-        your xAI account. Get a key at{" "}
+        Saved only in this browser
+        {ownerId === GUEST_OWNER_ID ? "" : ", for your account only,"} and sent
+        only to xAI. Requests are billed to your xAI account. Get a key at{" "}
         <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
         Your key and custom prompts aren&apos;t private: anyone using this
         browser can see them.
@@ -449,12 +455,56 @@ const Subsections = () => {
   );
 };
 
-export const AiExplainSection = () => {
+/** The key, switch and settings of one owner. */
+const OwnedAiExplainControls = ({ ownerId }: { ownerId: string }) => {
   const [settings, update] = useAiExplainSettings();
   const keyOk = hasValidAiExplainKey(settings);
   // The saved choice is kept while the key is missing or rejected, so a
   // working key turns it back on.
   const active = settings.enabled && keyOk;
+
+  return (
+    <>
+      <ApiKeyField ownerId={ownerId} />
+      <div className="flex items-center py-2">
+        <Switch
+          checked={active}
+          disabled={!keyOk}
+          onCheckedChange={(enabled) => update({ enabled })}
+          aria-label="Enable AI Study Tools"
+        />
+        <span
+          className={cn(
+            "px-2 text-sm font-semibold",
+            !keyOk && "text-muted-foreground"
+          )}
+        >
+          Enable AI Study Tools
+        </span>
+      </div>
+      {!keyOk && (
+        <p className="text-xs text-muted-foreground">
+          Add a Grok API key that works to turn this on.
+        </p>
+      )}
+      {active && (
+        <p
+          role="note"
+          className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 text-amber-700 dark:text-amber-400"
+        >
+          Heads up: what you generate is saved only in this browser. It
+          isn&apos;t backed up and can be lost if browser data is cleared, and
+          anyone using this computer can see it. Download anything you want to
+          keep.
+        </p>
+      )}
+      {active && <Subsections />}
+    </>
+  );
+};
+
+export const AiExplainSection = () => {
+  const owner = useCurrentOwner();
 
   return (
     <SimpleAccordion trigger="AI Study Tools (Experimental)">
@@ -463,40 +513,14 @@ export const AiExplainSection = () => {
           Ask Grok about sentences, anchor words, and kanji essays. Generate
           visual mnemonics and MP3 narration. Requests use your xAI account.
         </p>
-        <ApiKeyField />
-        <div className="flex items-center py-2">
-          <Switch
-            checked={active}
-            disabled={!keyOk}
-            onCheckedChange={(enabled) => update({ enabled })}
-            aria-label="Enable AI Study Tools"
-          />
-          <span
-            className={cn(
-              "px-2 text-sm font-semibold",
-              !keyOk && "text-muted-foreground"
-            )}
-          >
-            Enable AI Study Tools
-          </span>
-        </div>
-        {!keyOk && (
-          <p className="text-xs text-muted-foreground">
-            Add a Grok API key that works to turn this on.
-          </p>
+        {/* Until we know whose key this is, show none. */}
+        {owner.status === "unknown" ? (
+          <SavedAiContentLoading />
+        ) : (
+          <div key={owner.ownerId} className="animate-fade-in-fast">
+            <OwnedAiExplainControls ownerId={owner.ownerId} />
+          </div>
         )}
-        {active && (
-          <p
-            role="note"
-            className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 text-amber-700 dark:text-amber-400"
-          >
-            Heads up: what you generate is saved only in this browser. It
-            isn&apos;t backed up and can be lost if browser data is cleared, and
-            anyone using this computer can see it. Download anything you want to
-            keep.
-          </p>
-        )}
-        {active && <Subsections />}
       </div>
     </SimpleAccordion>
   );

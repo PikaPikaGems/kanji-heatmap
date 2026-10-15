@@ -5,8 +5,15 @@ import {
   type ImageStyle,
 } from "./prompts";
 import { notifyStorage, safeReadJson } from "@/lib/storage";
+import {
+  getCurrentOwner,
+  GUEST_OWNER_ID,
+  type ContentOwner,
+} from "@/lib/engine/content-owner";
 
 export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
+/** The xAI API key per owner: `{ [ownerId]: { apiKey, keyValid } }`. */
+export const AI_EXPLAIN_KEYS_KEY = "ai-explain-keys";
 export const AI_EXPLAIN_USAGE_KEY = "ai-explain-usage";
 export const AI_SPEECH_VOICES = ["ara", "eve", "rex", "sal", "leo"];
 export const DEFAULT_AI_SPEECH_VOICE = "ara";
@@ -48,15 +55,20 @@ Rules:
   Natural: It looks like rain, so you'd better take an umbrella.
 - Grammar: 3 to 5 patterns at JLPT N4 level or above only, each one short sentence under 15 words. Never explain N5 basics: particles (は, が, を, に, で, へ, と, も, の, か, よ, ね), です, だ, ます forms, plain past or negative forms, この/その/あの. If the text has fewer than 3 N4+ patterns, list only those; if it has none, write "No N4+ grammar here."`;
 
-/**
- * Unset `model` / `prompt` mean the defaults above, so improving a default
- * reaches everyone who never edited it.
- */
-export type AiExplainSettings = {
-  enabled: boolean;
+/** The xAI key of one owner (a logged-in account, or the guest). */
+export type AiOwnerKey = {
   apiKey: string;
   /** True once xAI accepted `apiKey`; reset whenever the key changes. */
   keyValid: boolean;
+};
+
+/**
+ * Preferences shared by everyone using this browser. Unset `model` / `prompt`
+ * mean the defaults above, so improving a default reaches everyone who never
+ * edited it. The API key is not here: it belongs to one owner (see below).
+ */
+export type AiExplainPreferences = {
+  enabled: boolean;
   model?: string;
   prompt?: string;
   /** Optional; when set, User Preferences shows usage as a progress bar. */
@@ -77,6 +89,9 @@ export type AiExplainSettings = {
   speechLanguage?: "auto" | "ja";
 };
 
+/** What AI features read: the shared preferences plus the current owner's key. */
+export type AiExplainSettings = AiExplainPreferences & AiOwnerKey;
+
 const optionalString = (v: unknown) =>
   typeof v === "string" && v.trim() !== "" ? v : undefined;
 
@@ -93,18 +108,15 @@ const readPromptRecord = <K extends string>(
   return result;
 };
 
-/** Reads the saved settings, dropping anything malformed. */
-export const readAiExplainSettings = (): AiExplainSettings => {
+/** Reads the shared preferences, dropping anything malformed. */
+export const readAiExplainPreferences = (): AiExplainPreferences => {
   const raw = safeReadJson<Record<string, unknown> | null>(
     AI_EXPLAIN_SETTINGS_KEY,
     null
   );
-  if (!raw || typeof raw !== "object")
-    return { enabled: false, apiKey: "", keyValid: false };
+  if (!raw || typeof raw !== "object") return { enabled: false };
   return {
     enabled: raw.enabled === true,
-    apiKey: typeof raw.apiKey === "string" ? raw.apiKey : "",
-    keyValid: raw.keyValid === true,
     model: optionalString(raw.model),
     prompt: optionalString(raw.prompt),
     vocabularyPrompt: optionalString(raw.vocabularyPrompt),
@@ -136,14 +148,104 @@ export const readAiExplainSettings = (): AiExplainSettings => {
   };
 };
 
-export const writeAiExplainSettings = (settings: AiExplainSettings) => {
+export const writeAiExplainPreferences = (
+  preferences: AiExplainPreferences
+) => {
   try {
-    localStorage.setItem(AI_EXPLAIN_SETTINGS_KEY, JSON.stringify(settings));
+    localStorage.setItem(AI_EXPLAIN_SETTINGS_KEY, JSON.stringify(preferences));
   } catch {
-    // Storage can throw (e.g. private mode); the settings just aren't saved.
+    // Storage can throw (e.g. private mode); the preferences just aren't saved.
   }
   notifyStorage(AI_EXPLAIN_SETTINGS_KEY);
 };
+
+const NO_KEY: AiOwnerKey = { apiKey: "", keyValid: false };
+
+/** Owners with a saved key; anything malformed is dropped. */
+const readOwnerKeys = (): Map<string, AiOwnerKey> => {
+  const raw = safeReadJson<unknown>(AI_EXPLAIN_KEYS_KEY, null);
+  const keys = new Map<string, AiOwnerKey>();
+  if (!raw || typeof raw !== "object") return keys;
+  for (const [ownerId, value] of Object.entries(raw)) {
+    if (!value || typeof value !== "object") continue;
+    const { apiKey, keyValid } = value as Record<string, unknown>;
+    if (typeof apiKey === "string" && apiKey !== "")
+      keys.set(ownerId, { apiKey, keyValid: keyValid === true });
+  }
+  return keys;
+};
+
+/** The key saved for this owner on this device (none saved reads as empty). */
+export const readAiOwnerKey = (ownerId: string): AiOwnerKey =>
+  readOwnerKeys().get(ownerId) ?? NO_KEY;
+
+/** Saves this owner's key; an empty `apiKey` deletes it. */
+export const writeAiOwnerKey = (ownerId: string, key: AiOwnerKey) => {
+  const keys = readOwnerKeys();
+  if (key.apiKey === "") keys.delete(ownerId);
+  else keys.set(ownerId, { apiKey: key.apiKey, keyValid: key.keyValid });
+  try {
+    if (keys.size === 0) localStorage.removeItem(AI_EXPLAIN_KEYS_KEY);
+    else
+      localStorage.setItem(
+        AI_EXPLAIN_KEYS_KEY,
+        JSON.stringify(Object.fromEntries(keys))
+      );
+  } catch {
+    // Storage can throw (e.g. private mode); the key just isn't saved.
+  }
+  notifyStorage(AI_EXPLAIN_KEYS_KEY);
+};
+
+export const deleteAiOwnerKey = (ownerId: string) =>
+  writeAiOwnerKey(ownerId, NO_KEY);
+
+/**
+ * xAI refused `apiKey`: mark it unusable, unless the owner has since saved a
+ * different key.
+ */
+export const rejectAiOwnerKey = (ownerId: string, apiKey: string) => {
+  if (readAiOwnerKey(ownerId).apiKey !== apiKey) return;
+  writeAiOwnerKey(ownerId, { apiKey, keyValid: false });
+};
+
+/**
+ * Before keys were per owner, the one key lived in the shared preferences.
+ * Move it to the guest (who owned everything saved then) and drop it from
+ * there. Module-level: runs once when this file loads.
+ */
+const moveSharedKeyToGuest = () => {
+  const raw = safeReadJson<Record<string, unknown> | null>(
+    AI_EXPLAIN_SETTINGS_KEY,
+    null
+  );
+  if (!raw || typeof raw !== "object") return;
+  if (!("apiKey" in raw) && !("keyValid" in raw)) return;
+  const { apiKey, keyValid, ...preferences } = raw;
+  if (
+    typeof apiKey === "string" &&
+    apiKey !== "" &&
+    readAiOwnerKey(GUEST_OWNER_ID).apiKey === ""
+  )
+    writeAiOwnerKey(GUEST_OWNER_ID, { apiKey, keyValid: keyValid === true });
+  try {
+    localStorage.setItem(AI_EXPLAIN_SETTINGS_KEY, JSON.stringify(preferences));
+  } catch {
+    // Storage can throw (e.g. private mode); this runs again next load.
+  }
+};
+moveSharedKeyToGuest();
+
+/**
+ * The shared preferences plus this owner's key. While the owner is unknown
+ * nobody's key is used, so AI features read as not set up.
+ */
+export const readAiExplainSettings = (
+  owner: ContentOwner = getCurrentOwner()
+): AiExplainSettings => ({
+  ...readAiExplainPreferences(),
+  ...(owner.status === "known" ? readAiOwnerKey(owner.ownerId) : NO_KEY),
+});
 
 /** The switch can only be turned on with a key xAI accepted. */
 export const hasValidAiExplainKey = (settings: AiExplainSettings) =>
