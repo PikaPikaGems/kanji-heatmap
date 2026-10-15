@@ -29,6 +29,25 @@ type RequestState =
   | { status: "pending" }
   | { status: "error"; message: string };
 
+export type MnemonicDraft = {
+  description: string;
+  style: ImageStyle;
+  palette: ImagePalette;
+  customStyle: string;
+  instructions: string;
+};
+
+const initialDraft = (image?: MnemonicImage): MnemonicDraft => ({
+  description: image?.description ?? "",
+  style: image?.style ?? "kanji-heatmap",
+  palette: image?.palette ?? "kanji-heatmap",
+  customStyle:
+    image?.customStyle ??
+    readAiExplainSettings().imageStylePrompts?.custom ??
+    "",
+  instructions: "",
+});
+
 export const MnemonicForm = ({
   kanji,
   keyword,
@@ -36,6 +55,8 @@ export const MnemonicForm = ({
   expectedCreatedAt,
   onComplete,
   onPending,
+  savedDraft,
+  onDraftChange,
 }: {
   kanji: string;
   keyword: string;
@@ -43,18 +64,18 @@ export const MnemonicForm = ({
   expectedCreatedAt?: number;
   onComplete: (image: MnemonicImage, saved: boolean) => void;
   onPending: (pending: boolean) => void;
+  /** What the learner last typed for this slot, kept while they switch away. */
+  savedDraft?: MnemonicDraft;
+  onDraftChange: (draft: MnemonicDraft) => void;
 }) => {
   const id = useId();
-  const [draft, setDraft] = useState({
-    description: image?.description ?? "",
-    style: image?.style ?? ("kanji-heatmap" as ImageStyle),
-    palette: image?.palette ?? ("kanji-heatmap" as ImagePalette),
-    customStyle:
-      image?.customStyle ??
-      readAiExplainSettings().imageStylePrompts?.custom ??
-      "",
-    instructions: "",
-  });
+  const [draft, setDraftState] = useState<MnemonicDraft>(
+    () => savedDraft ?? initialDraft(image)
+  );
+  const setDraft = (next: MnemonicDraft) => {
+    setDraftState(next);
+    onDraftChange(next);
+  };
   const [request, setRequest] = useState<RequestState>({ status: "idle" });
   const controller = useRef<AbortController | null>(null);
   const pending = request.status === "pending";

@@ -8,7 +8,7 @@ import {
 import { downloadBlob } from "@/lib/ai-explain/download";
 import type { MnemonicImage } from "@/lib/ai-explain/storage";
 import { ImagePreview } from "./ImagePreview";
-import { MnemonicForm } from "./MnemonicForm";
+import { MnemonicForm, type MnemonicDraft } from "./MnemonicForm";
 
 type GalleryImage = MnemonicImage & {
   unsaved?: boolean;
@@ -151,6 +151,8 @@ const MnemonicGallery = ({
 }) => {
   const [gallery, setGallery] = useState<GalleryState>({ status: "loading" });
   const [pending, setPending] = useState(false);
+  // Drafts per slot ("new" or an image id), so switching slots keeps typing.
+  const [drafts, setDrafts] = useState<Record<string, MnemonicDraft>>({});
   const [loadAttempt, setLoadAttempt] = useState(0);
 
   // Effect needed: read the external IndexedDB database and subscribe to content
@@ -222,6 +224,7 @@ const MnemonicGallery = ({
   const selected = gallery.images.find(
     (image) => image.id === gallery.selectedId
   );
+  const slot = selected?.id ?? "new";
 
   return (
     <div className="space-y-4 p-2 text-left">
@@ -306,13 +309,22 @@ const MnemonicGallery = ({
       )}
       {(selected || gallery.images.length < 3) && (
         <MnemonicForm
-          key={selected?.id ?? "new"}
+          key={slot}
           kanji={kanji}
           keyword={keyword}
           image={selected}
           expectedCreatedAt={selected?.persistedCreatedAt}
           onPending={setPending}
+          savedDraft={drafts[slot]}
+          onDraftChange={(draft) =>
+            setDrafts((current) => ({ ...current, [slot]: draft }))
+          }
           onComplete={(image, saved) => {
+            setDrafts((current) => {
+              const rest = { ...current };
+              delete rest[slot];
+              return rest;
+            });
             setGallery((current) => {
               if (current.status !== "ready") return current;
               const previous = current.images.find(

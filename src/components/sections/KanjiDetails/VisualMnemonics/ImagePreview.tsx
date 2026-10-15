@@ -14,14 +14,17 @@ export const ImagePreview = ({
   description: string;
   thumbnail?: boolean;
 }) => {
-  const [url, setUrl] = useState("");
+  // The URL is stored with its blob so a stale image never shows for a frame
+  // after the blob changes and before the effect creates the new URL.
+  const [source, setSource] = useState<{ blob: Blob; url: string }>();
   const [loadedUrl, setLoadedUrl] = useState("");
+  const url = source?.blob === blob ? source.url : "";
 
   // Effect needed: object URLs own browser resources and must be revoked on
   // replacement/unmount; render and event handlers cannot provide that cleanup.
   useEffect(() => {
     const next = URL.createObjectURL(blob);
-    setUrl(next);
+    setSource({ blob, url: next });
     return () => URL.revokeObjectURL(next);
   }, [blob]);
 
@@ -34,13 +37,16 @@ export const ImagePreview = ({
       }
     >
       {url && (
+        // A keyframe (not a transition) so the fade plays on every switch, even
+        // when the new image decodes within the same frame.
         <img
+          key={url}
           src={url}
           alt={description}
           onLoad={() => setLoadedUrl(url)}
           className={cn(
-            "absolute inset-0 size-full object-contain transition-opacity duration-500 ease-out",
-            loadedUrl === url ? "opacity-100" : "opacity-0"
+            "absolute inset-0 size-full object-contain",
+            loadedUrl === url ? "animate-fade-in" : "opacity-0"
           )}
         />
       )}
