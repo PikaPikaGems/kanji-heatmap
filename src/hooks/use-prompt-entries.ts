@@ -1,0 +1,91 @@
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import {
+  DEFAULT_AI_EXPLAIN_PROMPT,
+  JAPANESE_TEXT_PLACEHOLDER,
+} from "@/lib/ai-explain/preferences";
+import {
+  DEFAULT_IMAGE_PALETTE_PROMPT,
+  DEFAULT_IMAGE_PROMPT,
+  DEFAULT_IMAGE_STYLE_PROMPTS,
+  DEFAULT_KANJI_ESSAY_PROMPT,
+  DEFAULT_VOCABULARY_PROMPT,
+  IMAGE_STYLE_LABELS,
+  type ImageStyle,
+} from "@/lib/ai-explain/prompts";
+
+export type PromptEntry = {
+  id: string;
+  label: string;
+  value?: string;
+  defaultValue: string;
+  placeholders?: string;
+  usesSearch?: boolean;
+  onChange: (value: string | undefined) => void;
+};
+
+/** Every editable prompt, in menu order (Custom style last). */
+export const usePromptEntries = (): PromptEntry[] => {
+  const [settings, update] = useAiExplainSettings();
+  const styles = (Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).filter(
+    (style) => style !== "custom"
+  );
+  const styleEntry = (style: ImageStyle): PromptEntry => ({
+    id: `style:${style}`,
+    label: `${IMAGE_STYLE_LABELS[style]} style`,
+    value: settings.imageStylePrompts?.[style],
+    defaultValue: DEFAULT_IMAGE_STYLE_PROMPTS[style],
+    onChange: (value) =>
+      update({
+        imageStylePrompts: { ...settings.imageStylePrompts, [style]: value },
+      }),
+  });
+  return [
+    {
+      id: "grammar",
+      label: "Grammar Explain",
+      value: settings.prompt,
+      defaultValue: DEFAULT_AI_EXPLAIN_PROMPT,
+      placeholders: `${JAPANESE_TEXT_PLACEHOLDER} (if missing, the sentence is added at the end)`,
+      onChange: (prompt) => update({ prompt }),
+    },
+    {
+      id: "vocabulary",
+      label: "Vocabulary Details",
+      value: settings.vocabularyPrompt,
+      defaultValue: DEFAULT_VOCABULARY_PROMPT,
+      placeholders: "{WORD}, {READING}, {DICTIONARY_CONTEXT}",
+      usesSearch: true,
+      onChange: (vocabularyPrompt) => update({ vocabularyPrompt }),
+    },
+    {
+      id: "essay",
+      label: "Kanji Essay",
+      value: settings.kanjiEssayPrompt,
+      defaultValue: DEFAULT_KANJI_ESSAY_PROMPT,
+      placeholders: "{KANJI}, {KANJI_CONTEXT}",
+      usesSearch: true,
+      onChange: (kanjiEssayPrompt) => update({ kanjiEssayPrompt }),
+    },
+    {
+      id: "image",
+      label: "Visual Mnemonics: shared image",
+      value: settings.imagePrompt,
+      defaultValue: DEFAULT_IMAGE_PROMPT,
+      placeholders:
+        "{KANJI}, {KEYWORD}, {DESCRIPTION}, {STYLE_PROMPT}, {PALETTE_PROMPT}",
+      onChange: (imagePrompt) => update({ imagePrompt }),
+    },
+    {
+      id: "palette",
+      label: "Kanji Heatmap palette",
+      value: settings.imagePalettePrompt,
+      defaultValue: DEFAULT_IMAGE_PALETTE_PROMPT,
+      onChange: (imagePalettePrompt) => update({ imagePalettePrompt }),
+    },
+    ...styles.map(styleEntry),
+    styleEntry("custom"),
+  ];
+};
+
+export const useEditedPromptCount = () =>
+  usePromptEntries().filter((entry) => entry.value !== undefined).length;

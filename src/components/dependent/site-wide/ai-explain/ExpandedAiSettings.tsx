@@ -10,16 +10,8 @@ import {
   DEFAULT_AI_SPEECH_VOICE,
 } from "@/lib/ai-explain/preferences";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import {
-  DEFAULT_AI_IMAGE_MODEL,
-  DEFAULT_VOCABULARY_PROMPT,
-  DEFAULT_KANJI_ESSAY_PROMPT,
-  DEFAULT_IMAGE_PROMPT,
-  DEFAULT_IMAGE_STYLE_PROMPTS,
-  DEFAULT_IMAGE_PALETTE_PROMPT,
-  IMAGE_STYLE_LABELS,
-  type ImageStyle,
-} from "@/lib/ai-explain/prompts";
+import { usePromptEntries } from "@/hooks/use-prompt-entries";
+import { DEFAULT_AI_IMAGE_MODEL } from "@/lib/ai-explain/prompts";
 
 type PromptEditorProps = {
   title: string;
@@ -55,7 +47,7 @@ const PromptEditor = ({
       </div>
       <StudyNotesTextarea
         id={id}
-        rows={7}
+        rows={10}
         value={value ?? defaultValue}
         onChange={(event) =>
           onChange(
@@ -70,45 +62,6 @@ const PromptEditor = ({
         </p>
       )}
     </div>
-  );
-};
-
-const SearchUsageNotice = () => (
-  <p className="mb-3 text-xs text-muted-foreground">
-    Uses paid web search. Search calls and model tokens are billed to your xAI
-    account.
-  </p>
-);
-
-export const VocabularyPromptSettings = () => {
-  const [settings, update] = useAiExplainSettings();
-  return (
-    <>
-      <SearchUsageNotice />
-      <PromptEditor
-        title="Vocabulary details prompt"
-        value={settings.vocabularyPrompt}
-        defaultValue={DEFAULT_VOCABULARY_PROMPT}
-        placeholders="{WORD}, {READING}, {DICTIONARY_CONTEXT}"
-        onChange={(vocabularyPrompt) => update({ vocabularyPrompt })}
-      />
-    </>
-  );
-};
-
-export const KanjiEssayPromptSettings = () => {
-  const [settings, update] = useAiExplainSettings();
-  return (
-    <>
-      <SearchUsageNotice />
-      <PromptEditor
-        title="Kanji essay prompt"
-        value={settings.kanjiEssayPrompt}
-        defaultValue={DEFAULT_KANJI_ESSAY_PROMPT}
-        placeholders="{KANJI}, {KANJI_CONTEXT}"
-        onChange={(kanjiEssayPrompt) => update({ kanjiEssayPrompt })}
-      />
-    </>
   );
 };
 
@@ -204,41 +157,50 @@ const ImageGenerationSettings = () => {
   );
 };
 
-export const ImageSettings = () => {
-  const [settings, update] = useAiExplainSettings();
+export const ImageSettings = ImageGenerationSettings;
+
+/** One picker and one editor for every prompt, instead of a box per prompt. */
+export const PromptSettings = () => {
+  const entries = usePromptEntries();
+  const [selectedId, setSelectedId] = useState(entries[0].id);
+  const selected =
+    entries.find((entry) => entry.id === selectedId) ?? entries[0];
   return (
-    <>
-      <ImageGenerationSettings />
-      <PromptEditor
-        title="Shared image prompt"
-        value={settings.imagePrompt}
-        defaultValue={DEFAULT_IMAGE_PROMPT}
-        placeholders="{KANJI}, {KEYWORD}, {DESCRIPTION}, {STYLE_PROMPT}, {PALETTE_PROMPT}"
-        onChange={(imagePrompt) => update({ imagePrompt })}
-      />
-      <PromptEditor
-        title="Kanji Heatmap palette prompt"
-        value={settings.imagePalettePrompt}
-        defaultValue={DEFAULT_IMAGE_PALETTE_PROMPT}
-        onChange={(imagePalettePrompt) => update({ imagePalettePrompt })}
-      />
-      {(Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).map((style) => (
-        <PromptEditor
-          key={style}
-          title={`${IMAGE_STYLE_LABELS[style]} style prompt`}
-          value={settings.imageStylePrompts?.[style]}
-          defaultValue={DEFAULT_IMAGE_STYLE_PROMPTS[style]}
-          onChange={(value) =>
-            update({
-              imageStylePrompts: {
-                ...settings.imageStylePrompts,
-                [style]: value,
-              },
-            })
-          }
+    <div className="mb-4 space-y-3">
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
+          Prompt to edit
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label="Prompt to edit"
+          value={selected.id}
+          onChange={setSelectedId}
+          options={entries.map((entry) => ({
+            value: entry.id,
+            label:
+              entry.value === undefined
+                ? entry.label
+                : `${entry.label} (edited)`,
+          }))}
         />
-      ))}
-    </>
+      </div>
+      {selected.usesSearch && (
+        <p className="text-xs text-muted-foreground">
+          Uses paid web search. Search calls and model tokens are billed to your
+          xAI account.
+        </p>
+      )}
+      <PromptEditor
+        key={selected.id}
+        title={selected.label}
+        value={selected.value}
+        defaultValue={selected.defaultValue}
+        placeholders={selected.placeholders}
+        onChange={selected.onChange}
+      />
+    </div>
   );
 };
 

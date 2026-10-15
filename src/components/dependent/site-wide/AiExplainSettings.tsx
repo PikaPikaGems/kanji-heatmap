@@ -5,7 +5,6 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  RotateCcw,
   Trash2,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -26,19 +25,17 @@ import {
 } from "@/components/ui/accordion";
 import {
   DEFAULT_AI_EXPLAIN_MODEL,
-  DEFAULT_AI_EXPLAIN_PROMPT,
   hasValidAiExplainKey,
-  JAPANESE_TEXT_PLACEHOLDER,
   readAiExplainSettings,
 } from "@/lib/ai-explain/preferences";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
+import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
 import { cn } from "@/lib/utils";
 import {
   GeneratedStorageSettings,
   ImageSettings,
-  VocabularyPromptSettings,
-  KanjiEssayPromptSettings,
+  PromptSettings,
   SpeechSettings,
 } from "./ai-explain/ExpandedAiSettings";
 
@@ -256,55 +253,6 @@ const ModelField = () => {
   );
 };
 
-const PromptField = () => {
-  const [settings, update] = useAiExplainSettings();
-  const id = useId();
-  const prompt = settings.prompt ?? DEFAULT_AI_EXPLAIN_PROMPT;
-
-  return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="text-sm font-semibold">
-          Grammar Explain
-        </label>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="rounded-lg"
-          onClick={() => update({ prompt: undefined })}
-          disabled={settings.prompt === undefined}
-        >
-          <RotateCcw /> Reset to default
-        </Button>
-      </div>
-      <textarea
-        id={id}
-        value={prompt}
-        onChange={(e) => {
-          const next = e.target.value;
-          update({
-            prompt: next === DEFAULT_AI_EXPLAIN_PROMPT ? undefined : next,
-          });
-        }}
-        rows={12}
-        spellCheck={false}
-        className={cn(
-          // Like the kanji drawer's study notes editor.
-          "block w-full resize-none bg-background rounded-xl border-[3px] border-dotted border-border p-3.5",
-          "font-mono text-base leading-[1.55rem] whitespace-pre-wrap break-words",
-          "outline-none focus:border-ring focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-        )}
-      />
-      <p className="pt-1 text-xs text-muted-foreground">
-        {prompt.includes(JAPANESE_TEXT_PLACEHOLDER)
-          ? `${JAPANESE_TEXT_PLACEHOLDER} is replaced with the sentence.`
-          : `${JAPANESE_TEXT_PLACEHOLDER} is missing, so the sentence is added at the end.`}
-      </p>
-    </div>
-  );
-};
-
 const formatTokens = (n: number) => n.toLocaleString("en-US");
 
 const UsageField = () => {
@@ -400,6 +348,7 @@ const SubsectionItem = ({
 const Subsections = () => {
   const [settings] = useAiExplainSettings();
   const usage = useAiExplainUsage();
+  const editedPrompts = useEditedPromptCount();
 
   return (
     <Accordion type="multiple">
@@ -411,30 +360,9 @@ const Subsections = () => {
         <ModelField />
       </SubsectionItem>
       <SubsectionItem
-        value="explain-prompt"
-        title="Grammar Explain"
-        subtitle={`Sentence explanation · ${settings.prompt === undefined ? "default prompt" : "custom prompt"}`}
-      >
-        <PromptField />
-      </SubsectionItem>
-      <SubsectionItem
-        value="vocabulary-details"
-        title="Vocabulary Details"
-        subtitle="Anchor Word prompt · uses paid web search"
-      >
-        <VocabularyPromptSettings />
-      </SubsectionItem>
-      <SubsectionItem
-        value="kanji-essay"
-        title="Kanji Essay"
-        subtitle="Essay prompt · uses paid web search"
-      >
-        <KanjiEssayPromptSettings />
-      </SubsectionItem>
-      <SubsectionItem
         value="images"
         title="Visual Mnemonics"
-        subtitle="Image size, quality, styles, and palette"
+        subtitle="Image model, size, and quality"
       >
         <ImageSettings />
       </SubsectionItem>
@@ -444,6 +372,17 @@ const Subsections = () => {
         subtitle="Voice and language"
       >
         <SpeechSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="prompts"
+        title="Prompts (advanced)"
+        subtitle={
+          editedPrompts === 0
+            ? "All prompts use the defaults"
+            : `${editedPrompts} edited ${editedPrompts === 1 ? "prompt" : "prompts"}`
+        }
+      >
+        <PromptSettings />
       </SubsectionItem>
       <SubsectionItem
         value="storage"
