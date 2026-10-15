@@ -26,12 +26,14 @@ export function Combobox<T>({
   options,
   emptyMsg = "No match found.",
   searchMsg = "Search..",
+  triggerClassName,
 }: {
   value: T;
   setValue: (x: T) => void;
   options: { value: T; label: string; description?: string }[];
   emptyMsg?: string;
   searchMsg?: string;
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -45,7 +47,10 @@ export function Combobox<T>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between text-ellipsis text-left p-2 whitespace-nowrap"
+          className={cn(
+            "w-full justify-between text-ellipsis text-left p-2 whitespace-nowrap",
+            triggerClassName
+          )}
         >
           {value
             ? options.find((option) => option.value === value)?.label

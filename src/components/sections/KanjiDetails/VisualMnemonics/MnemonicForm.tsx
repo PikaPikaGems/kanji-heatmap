@@ -187,7 +187,7 @@ export const MnemonicForm = ({
           <StudyNotesTextarea
             id={`${id}-scene`}
             required
-            rows={3}
+            rows={12}
             maxLength={4000}
             value={draft.description}
             onChange={(event) =>
