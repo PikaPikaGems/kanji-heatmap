@@ -6,15 +6,7 @@ export type ImageStyle =
   | "pixel-art"
   | "cartoon"
   | "custom";
-export type ImagePalette =
-  | "kanji-heatmap"
-  | "lime"
-  | "cyan"
-  | "blue"
-  | "pink"
-  | "pastel"
-  | "grayscale"
-  | "custom";
+export type ImagePalette = "kanji-heatmap" | "pastel" | "grayscale" | "custom";
 export const IMAGE_STYLE_LABELS: Record<ImageStyle, string> = {
   "kanji-heatmap": "Kanji Heatmap",
   watercolor: "Watercolor",
@@ -24,10 +16,6 @@ export const IMAGE_STYLE_LABELS: Record<ImageStyle, string> = {
 };
 export const IMAGE_PALETTE_LABELS: Record<ImagePalette, string> = {
   "kanji-heatmap": "Kanji Heatmap",
-  lime: "Lime",
-  cyan: "Cyan / aqua",
-  blue: "Blue",
-  pink: "Hot pink",
   pastel: "Pastel",
   grayscale: "Black and white",
   custom: "Custom",
@@ -62,10 +50,6 @@ export const DEFAULT_IMAGE_STYLE_PROMPTS: Record<ImageStyle, string> = {
 // Blue is the default theme RGB 25,60,184 in use-change-theme-color.ts.
 export const DEFAULT_IMAGE_PALETTE_PROMPTS: Record<ImagePalette, string> = {
   "kanji-heatmap": DEFAULT_IMAGE_PALETTE_PROMPT,
-  lime: "Use bright lime green (#a3e635) as the dominant accent, supported by pale lime, off-white, and charcoal. Keep the subject clearly separated from the background.",
-  cyan: "Use luminous cyan/aqua (#2effff) as the dominant accent, supported by pale aqua, off-white, deep teal or charcoal. Avoid making the whole image glow.",
-  blue: "Use Kanji Heatmap blue (#193cb8) as the dominant accent, with lighter blue, off-white, and deep navy. Keep the subject vivid and background simple.",
-  pink: "Use vivid fuchsia/hot pink (#fb02a8) as the dominant accent, with pale pink, off-white, deep plum or charcoal. Avoid filling every area with saturated pink.",
   pastel:
     "Use a dreamy pastel palette: powder blue, aqua, mint, lavender, lilac, blush pink, peach, and warm butter yellow, with creamy whites for highlights. Keep everything light, airy, and low in contrast, as if lit by warm, glowing light. Give the focal subject a slightly deeper rose or warm cream so it stands out. Iridescent or pearly touches are welcome. Avoid neon, pure black, harsh shadows, and saturated primary colors.",
   grayscale:

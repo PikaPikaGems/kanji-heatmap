@@ -41,7 +41,12 @@ export type MnemonicDraft = {
 const initialDraft = (image?: MnemonicImage): MnemonicDraft => ({
   description: image?.description ?? "",
   style: image?.style ?? "kanji-heatmap",
-  palette: image?.palette ?? "kanji-heatmap",
+  // Images made with a palette that has since been removed fall back to the
+  // Kanji Heatmap palette when regenerated.
+  palette:
+    image && image.palette in IMAGE_PALETTE_LABELS
+      ? image.palette
+      : "kanji-heatmap",
   customStyle:
     image?.customStyle ??
     readAiExplainSettings().imageStylePrompts?.custom ??
