@@ -216,6 +216,12 @@ export const ImageSettings = () => {
         placeholders="{KANJI}, {KEYWORD}, {DESCRIPTION}, {STYLE_PROMPT}, {PALETTE_PROMPT}"
         onChange={(imagePrompt) => update({ imagePrompt })}
       />
+      <PromptEditor
+        title="Kanji Heatmap palette prompt"
+        value={settings.imagePalettePrompt}
+        defaultValue={DEFAULT_IMAGE_PALETTE_PROMPT}
+        onChange={(imagePalettePrompt) => update({ imagePalettePrompt })}
+      />
       {(Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).map((style) => (
         <PromptEditor
           key={style}
@@ -232,12 +238,6 @@ export const ImageSettings = () => {
           }
         />
       ))}
-      <PromptEditor
-        title="Kanji Heatmap palette prompt"
-        value={settings.imagePalettePrompt}
-        defaultValue={DEFAULT_IMAGE_PALETTE_PROMPT}
-        onChange={(imagePalettePrompt) => update({ imagePalettePrompt })}
-      />
     </>
   );
 };
