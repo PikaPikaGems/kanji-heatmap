@@ -22,6 +22,8 @@ import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { isAiExplainReady } from "@/lib/ai-explain/preferences";
 
 const StudyNotesLoadingFallback = () => (
   <div
@@ -108,6 +110,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
 const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 const KanjiEssay = lazy(() => import("./KanjiEssay"));
+const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   const info = useKanjiRepresentativeWordDetails(kanji);
@@ -132,6 +135,7 @@ export const KanjiDetails = ({
   smallScreenNode: ReactNode;
 }) => {
   const getInfo = useGetKanjiInfoFn();
+  const [aiSettings] = useAiExplainSettings();
 
   if (getInfo == null) {
     return <BasicLoading />;
@@ -176,13 +180,6 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger="⭐️ Personal Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
       <SimpleAccordion trigger="Kanji Essay">
         <ErrorBoundary details="KanjiEssay in KanjiDetails">
           <Suspense fallback={<StudyNotesLoadingFallback />}>
@@ -195,6 +192,26 @@ export const KanjiDetails = ({
         </ErrorBoundary>
       </SimpleAccordion>
 
+      {isAiExplainReady(aiSettings) && (
+        <SimpleAccordion trigger="Visual Mnemonics">
+          <ErrorBoundary details="VisualMnemonics in KanjiDetails">
+            <Suspense fallback={<StudyNotesLoadingFallback />}>
+              <VisualMnemonics
+                key={kanji}
+                kanji={kanji}
+                keyword={data?.keyword ?? ""}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </SimpleAccordion>
+      )}
+      <SimpleAccordion trigger="Personal Study Notes">
+        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
+          <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <KanjiStudyNotes key={kanji} kanji={kanji} />
+          </Suspense>
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />

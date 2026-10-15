@@ -399,7 +399,7 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Presentation, Japanese voice, offline data caching, stroke animation, and AI Explain preferences"
+        description="Presentation, Japanese voice, offline data caching, stroke animation, and AI Study Tools preferences"
         titleClassName="text-left"
       >
         <SimpleAccordion trigger="Presentation" defaultOpen>

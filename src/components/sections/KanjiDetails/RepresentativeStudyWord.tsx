@@ -8,6 +8,11 @@ import { DotIcon, InfoIcon } from "lucide-react";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 
 import { VocabActions } from "@/components/common/VocabActions";
+import { lazy, Suspense } from "react";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+
+const AnchorWordDetails = lazy(() => import("./AiContent/AnchorWordDetails"));
 
 const ViewVocabDetails = () => (
   <GenericPopover
@@ -52,6 +57,7 @@ const WhatIsARepresentativeStudyWord = () => {
 
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   const data = useKanjiRepresentativeWordDetails(kanji);
+  const [aiSettings] = useAiExplainSettings();
 
   if (!data) {
     return (
@@ -88,9 +94,26 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <VocabActions word={word} kana={reading} />
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
-          <ViewVocabDetails />
-        </div>
+        {!isAiExplainReady(aiSettings) && (
+          <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
+            <ViewVocabDetails />
+          </div>
+        )}
+        {isAiExplainReady(aiSettings) && (
+          <Suspense
+            fallback={
+              <p className="text-xs text-muted-foreground">
+                Loading AI controls…
+              </p>
+            }
+          >
+            <AnchorWordDetails
+              word={word}
+              reading={reading}
+              englishGloss={englishGloss}
+            />
+          </Suspense>
+        )}
 
         <div className="mt-6 text-sm">
           👇 Explore <span className="font-bold">{word}</span> in the wild

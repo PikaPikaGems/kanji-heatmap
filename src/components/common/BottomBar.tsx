@@ -15,12 +15,8 @@ export const BottomBar = ({
 }) => {
   return (
     <>
-      <div className={`my-4 w-fit ${justify === "center" ? "mx-auto" : ""}`}>
-        <PikaPikaLinks />
-      </div>
-
       <div
-        className={`flex flex-wrap items-center gap-x-1 justify-${justify} w-full mt-4 mb-8`}
+        className={`flex flex-wrap items-center gap-x-1 justify-${justify} w-full mt-4`}
       >
         <LinksOutItems />
         <DotIcon className="w-2 m-0" />
@@ -28,6 +24,11 @@ export const BottomBar = ({
         <DebugInfo />
         <SettingsModal />
         {includeNode}
+      </div>
+      <div
+        className={`mt-4 mb-8 w-fit ${justify === "center" ? "mx-auto" : ""}`}
+      >
+        <PikaPikaLinks />
       </div>
     </>
   );

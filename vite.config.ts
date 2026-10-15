@@ -169,8 +169,23 @@ const pwaConfig = {
     // Same for DaKanji onnx assets (~2MB) used by "Handwriting Alt 2".
     // The AI voice files (~65 MB) are opt-in: yomiage downloads them itself
     // and keeps them in IndexedDB, so the service worker must not touch them.
-    globIgnores: ["**/ref-patterns.js", "**/onnx/**", "**/yomiage/**"],
+    // Dexie is optional: fetch it only when an enabled AI tool opens its database.
+    globIgnores: [
+      "**/ref-patterns.js",
+      "**/onnx/**",
+      "**/yomiage/**",
+      "**/ai-dexie-*.js",
+    ],
     runtimeCaching: [
+      {
+        urlPattern: /\/assets\/ai-dexie-[^/]+\.js$/i,
+        handler: "CacheFirst" as const,
+        options: {
+          cacheName: "ai-dexie-library-cache",
+          expiration: { maxEntries: 2, maxAgeSeconds: 365 * 24 * 60 * 60 },
+          cacheableResponse: { statuses: [200] },
+        },
+      },
       // **********************
       // KANJICANVAS reference patterns (lazy, on-device handwriting recognition)
       // **********************
@@ -472,8 +487,16 @@ export default defineConfig(() => ({
       output: {
         // Keep the app entry lean by isolating large, cache-friendly vendor groups.
         manualChunks(id) {
+          // Shared CommonJS helpers must stay eager; placing them in the optional
+          // Dexie chunk would make React import Dexie on every page load.
+          if (id.includes("commonjsHelpers")) return "react-vendor";
+
           if (!id.includes("node_modules")) {
             return;
+          }
+
+          if (id.includes("/dexie/") || id.includes("/.pnpm/dexie@")) {
+            return "ai-dexie";
           }
 
           if (

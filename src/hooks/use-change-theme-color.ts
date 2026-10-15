@@ -11,7 +11,7 @@ export const themeColorsRgb = [
   "59, 130, 246", // blue-500
   "99, 102, 241", // indigo-500
   "0, 170, 255", // punchier sky
-  "46, 255, 255", // true cyan
+  "14, 116, 144", // cyan-700: readable with white text
   "20, 184, 166", // teal-500
   "16, 185, 129", // emerald-500
   "22, 163, 74", // green-600

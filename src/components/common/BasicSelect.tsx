@@ -45,7 +45,7 @@ const BasicSelect = ({
       </Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
-          className={`w-full pl-2 ${triggerCN}`}
+          className={`w-full pl-2 pr-3 ${triggerCN}`}
           id={`select-${id}`}
         >
           <SelectValue>

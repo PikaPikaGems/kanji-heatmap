@@ -1,17 +1,17 @@
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {
   CircleCheck,
   CircleX,
   Eye,
   EyeOff,
   Loader2,
-  RotateCcw,
   Trash2,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
+import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import {
   useAiExplainSettings,
@@ -26,14 +26,19 @@ import {
 } from "@/components/ui/accordion";
 import {
   DEFAULT_AI_EXPLAIN_MODEL,
-  DEFAULT_AI_EXPLAIN_PROMPT,
   hasValidAiExplainKey,
-  JAPANESE_TEXT_PLACEHOLDER,
   readAiExplainSettings,
 } from "@/lib/ai-explain/preferences";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
+import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
 import { cn } from "@/lib/utils";
+import {
+  GeneratedStorageSettings,
+  ImageSettings,
+  PromptSettings,
+  SpeechSettings,
+} from "./ai-explain/ExpandedAiSettings";
 
 /** A check in progress or its failure; a pass is saved as `keyValid`. */
 type KeyCheck =
@@ -145,6 +150,7 @@ const ApiKeyField = () => {
       </label>
       <div className="flex gap-2">
         <Input
+          className="rounded-lg"
           id={id}
           type={visible ? "text" : "password"}
           value={settings.apiKey}
@@ -197,99 +203,94 @@ type ModelList =
   | { status: "done"; models: string[] }
   | { status: "error"; message: string };
 
+const DEFAULT_MODEL_OPTION = "__default__";
+const CUSTOM_MODEL_OPTION = "__custom__";
+
 const ModelField = () => {
   const [settings, update] = useAiExplainSettings();
   const [list, setList] = useState<ModelList>({ status: "idle" });
+  const [customOpen, setCustomOpen] = useState(false);
   const id = useId();
-  const listId = `${id}-models`;
 
-  // Loaded on first focus, so the key's models are offered as suggestions
-  // without a hardcoded list.
-  const loadModels = () => {
+  // Effect needed: fetches this key's models from xAI when the section opens;
+  // render can't await a request, and the result must be ignored after unmount.
+  useEffect(() => {
     if (settings.apiKey === "") return;
-    if (list.status === "loading" || list.status === "done") return;
+    let active = true;
     setList({ status: "loading" });
     listXaiModels(settings.apiKey).then(
-      (models) => setList({ status: "done", models }),
+      (models) => active && setList({ status: "done", models }),
       (error: unknown) =>
+        active &&
         setList({
           status: "error",
           message: error instanceof Error ? error.message : "",
         })
     );
-  };
+    return () => {
+      active = false;
+    };
+  }, [settings.apiKey]);
+
+  // The default model is already the first option.
+  const models =
+    list.status === "done"
+      ? list.models.filter((model) => model !== DEFAULT_AI_EXPLAIN_MODEL)
+      : [];
+  const current = settings.model;
+  const options = [
+    {
+      value: DEFAULT_MODEL_OPTION,
+      label: `Default (${DEFAULT_AI_EXPLAIN_MODEL})`,
+    },
+    ...models.map((model) => ({ value: model, label: model })),
+    // Keep a saved model that isn't (or isn't yet) in the list selectable.
+    ...(current !== undefined && !models.includes(current)
+      ? [{ value: current, label: current }]
+      : []),
+    { value: CUSTOM_MODEL_OPTION, label: "Type a model name…" },
+  ];
 
   return (
-    <div className="mb-4">
-      <label htmlFor={id} className="block mb-1 text-sm font-semibold">
+    <div className="mb-4 space-y-1">
+      <p aria-hidden className="text-sm font-semibold">
         Model
-      </label>
-      <Input
-        id={id}
-        list={listId}
-        value={settings.model ?? ""}
-        onFocus={loadModels}
-        onChange={(e) => update({ model: e.target.value.trim() || undefined })}
-        placeholder={DEFAULT_AI_EXPLAIN_MODEL}
-        autoComplete="off"
-        spellCheck={false}
+      </p>
+      <ResponsiveSelect
+        isLabelSrOnly
+        label="Model"
+        value={
+          customOpen ? CUSTOM_MODEL_OPTION : (current ?? DEFAULT_MODEL_OPTION)
+        }
+        onChange={(next) => {
+          if (next === CUSTOM_MODEL_OPTION) {
+            setCustomOpen(true);
+            return;
+          }
+          setCustomOpen(false);
+          update({ model: next === DEFAULT_MODEL_OPTION ? undefined : next });
+        }}
+        options={options}
       />
-      <datalist id={listId}>
-        {list.status === "done" &&
-          list.models.map((model) => <option key={model} value={model} />)}
-      </datalist>
+      {customOpen && (
+        <Input
+          className="rounded-lg"
+          id={id}
+          aria-label="Model name"
+          value={current ?? ""}
+          onChange={(e) =>
+            update({ model: e.target.value.trim() || undefined })
+          }
+          placeholder={DEFAULT_AI_EXPLAIN_MODEL}
+          autoComplete="off"
+          spellCheck={false}
+          autoFocus
+        />
+      )}
       <p className="pt-1 text-xs text-muted-foreground">
         {list.status === "loading" && "Loading your models… "}
         {list.status === "error" && `Couldn't load models. ${list.message} `}
-        Leave empty for {DEFAULT_AI_EXPLAIN_MODEL}.
-      </p>
-    </div>
-  );
-};
-
-const PromptField = () => {
-  const [settings, update] = useAiExplainSettings();
-  const id = useId();
-  const prompt = settings.prompt ?? DEFAULT_AI_EXPLAIN_PROMPT;
-
-  return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="text-sm font-semibold">
-          Explain Prompt
-        </label>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => update({ prompt: undefined })}
-          disabled={settings.prompt === undefined}
-        >
-          <RotateCcw /> Reset to default
-        </Button>
-      </div>
-      <textarea
-        id={id}
-        value={prompt}
-        onChange={(e) => {
-          const next = e.target.value;
-          update({
-            prompt: next === DEFAULT_AI_EXPLAIN_PROMPT ? undefined : next,
-          });
-        }}
-        rows={12}
-        spellCheck={false}
-        className={cn(
-          // Like the kanji drawer's study notes editor.
-          "block w-full resize-none bg-background rounded-xl border-[3px] border-dotted border-border p-3.5",
-          "font-mono text-base leading-[1.55rem] whitespace-pre-wrap break-words",
-          "outline-none focus:border-ring focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-        )}
-      />
-      <p className="pt-1 text-xs text-muted-foreground">
-        {prompt.includes(JAPANESE_TEXT_PLACEHOLDER)
-          ? `${JAPANESE_TEXT_PLACEHOLDER} is replaced with the sentence.`
-          : `${JAPANESE_TEXT_PLACEHOLDER} is missing, so the sentence is added at the end.`}
+        Models come from your xAI account.
       </p>
     </div>
   );
@@ -318,10 +319,25 @@ const UsageField = () => {
           />
         </div>
       )}
+      <p className="mb-3 text-xs text-muted-foreground">
+        Search calls: {usage.searchCalls} · Images: {usage.imageRequests} ·
+        Audio generations: {usage.audioRequests} · Speech characters:{" "}
+        {usage.audioCharacters}
+        {usage.unreportedSearchRequests > 0 &&
+          ` · ${usage.unreportedSearchRequests} searched requests without a provider-reported search count`}
+      </p>
+      {usage.reportedCostUsd > 0 && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Provider-reported charges: US${usage.reportedCostUsd.toFixed(4)}.
+          Partial total for requests that returned cost data; check xAI for your
+          full bill.
+        </p>
+      )}
       <label htmlFor={id} className="block mb-1 text-sm font-semibold">
-        Monthly token budget (optional)
+        Monthly text-token budget (optional)
       </label>
       <Input
+        className="rounded-lg"
         id={id}
         type="number"
         inputMode="numeric"
@@ -336,9 +352,10 @@ const UsageField = () => {
       />
       <p className="pt-1 text-xs text-muted-foreground">
         Counted in this browser only, and restarts each month. Requests
-        cancelled by closing the modal aren&apos;t counted. The budget only
-        fills the bar; nothing is blocked. Your exact usage is at{" "}
-        <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        incomplete or cancelled can still be billed. Local counters may omit
+        these requests. This text-token budget is not a total spending limit for
+        search, images, or speech, and nothing is blocked. Your exact usage is
+        at <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
       </p>
     </div>
   );
@@ -365,7 +382,7 @@ const SubsectionItem = ({
         </span>
       </span>
     </AccordionTrigger>
-    <AccordionContent className="pt-1 pb-0 pl-3 border-l-2 border-dotted">
+    <AccordionContent className="pt-1.5 pb-1.5 pl-3 pr-1.5 border-l-2 border-dotted">
       {children}
     </AccordionContent>
   </AccordionItem>
@@ -374,22 +391,48 @@ const SubsectionItem = ({
 const Subsections = () => {
   const [settings] = useAiExplainSettings();
   const usage = useAiExplainUsage();
-  const customized = [
-    settings.prompt !== undefined && "custom prompt",
-    settings.model !== undefined && "custom model",
-  ].filter(Boolean);
+  const editedPrompts = useEditedPromptCount();
 
   return (
     <Accordion type="multiple">
       <SubsectionItem
         value="customizations"
         title="Customizations"
-        subtitle={`Prompt and model · ${
-          customized.length > 0 ? customized.join(", ") : "defaults"
-        }`}
+        subtitle={`Model · ${settings.model ?? DEFAULT_AI_EXPLAIN_MODEL}`}
       >
-        <PromptField />
         <ModelField />
+      </SubsectionItem>
+      <SubsectionItem
+        value="images"
+        title="Visual Mnemonics"
+        subtitle="Image model, size, and quality"
+      >
+        <ImageSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="speech"
+        title="Read Aloud"
+        subtitle="Voice and language"
+      >
+        <SpeechSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="prompts"
+        title="Prompts (advanced)"
+        subtitle={
+          editedPrompts === 0
+            ? "All prompts use the defaults"
+            : `${editedPrompts} edited ${editedPrompts === 1 ? "prompt" : "prompts"}`
+        }
+      >
+        <PromptSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="storage"
+        title="Generated content"
+        subtitle="Saved space and deletion"
+      >
+        <GeneratedStorageSettings />
       </SubsectionItem>
       <SubsectionItem
         value="usage"
@@ -412,11 +455,11 @@ export const AiExplainSection = () => {
   const active = settings.enabled && keyOk;
 
   return (
-    <SimpleAccordion trigger="AI Explain (Experimental)">
+    <SimpleAccordion trigger="AI Study Tools (Experimental)">
       <div className="mx-1 text-left">
         <p className="mb-3 text-xs text-muted-foreground">
-          Adds an AI Explain button to View notes in Fill the Kanji. It asks
-          Grok for the vocabulary, translations and grammar of the sentence.
+          Ask Grok about sentences, anchor words, and kanji essays. Generate
+          visual mnemonics and MP3 narration. Requests use your xAI account.
         </p>
         <ApiKeyField />
         <div className="flex items-center py-2">
@@ -424,7 +467,7 @@ export const AiExplainSection = () => {
             checked={active}
             disabled={!keyOk}
             onCheckedChange={(enabled) => update({ enabled })}
-            aria-label="Enable AI Explain"
+            aria-label="Enable AI Study Tools"
           />
           <span
             className={cn(
@@ -432,7 +475,7 @@ export const AiExplainSection = () => {
               !keyOk && "text-muted-foreground"
             )}
           >
-            Enable AI Explain
+            Enable AI Study Tools
           </span>
         </div>
         {!keyOk && (
