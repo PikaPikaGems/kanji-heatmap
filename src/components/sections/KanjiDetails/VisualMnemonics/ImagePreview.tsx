@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
+/**
+ * Always takes its final size (so nothing collapses while the object URL is
+ * created), and fades the image in once it has loaded.
+ */
 export const ImagePreview = ({
   blob,
   description,
@@ -10,6 +15,7 @@ export const ImagePreview = ({
   thumbnail?: boolean;
 }) => {
   const [url, setUrl] = useState("");
+  const [loadedUrl, setLoadedUrl] = useState("");
 
   // Effect needed: object URLs own browser resources and must be revoked on
   // replacement/unmount; render and event handlers cannot provide that cleanup.
@@ -19,17 +25,25 @@ export const ImagePreview = ({
     return () => URL.revokeObjectURL(next);
   }, [blob]);
 
-  if (!url) return null;
-
   return (
-    <img
-      src={url}
-      alt={description}
+    <div
       className={
         thumbnail
-          ? "aspect-square size-20 max-w-[20vw] rounded-lg object-contain"
-          : "mx-auto aspect-square w-full max-w-lg rounded-3xl border border-foreground/20 object-contain"
+          ? "relative aspect-square size-20 max-w-[20vw] overflow-hidden rounded-lg"
+          : "relative mx-auto aspect-square w-full max-w-lg overflow-hidden rounded-3xl border border-foreground/20"
       }
-    />
+    >
+      {url && (
+        <img
+          src={url}
+          alt={description}
+          onLoad={() => setLoadedUrl(url)}
+          className={cn(
+            "absolute inset-0 size-full object-contain transition-opacity duration-500 ease-out",
+            loadedUrl === url ? "opacity-100" : "opacity-0"
+          )}
+        />
+      )}
+    </div>
   );
 };
