@@ -222,6 +222,20 @@ const MnemonicGallery = ({
               />
             </button>
           ))}
+          {gallery.images.length < 3 && (
+            <button
+              type="button"
+              disabled={pending}
+              aria-label="Add mnemonic"
+              aria-pressed={!selected}
+              className={`rounded-xl border-2 p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${selected ? "border-transparent" : "border-primary"}`}
+              onClick={() => setGallery({ ...gallery, selectedId: null })}
+            >
+              <span className="flex aspect-square size-20 max-w-[20vw] items-center justify-center rounded-lg border-2 border-dashed border-foreground/30 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <Plus className="size-6" />
+              </span>
+            </button>
+          )}
         </div>
       )}
       {selected && (
@@ -256,15 +270,6 @@ const MnemonicGallery = ({
             }}
           />
         </div>
-      )}
-      {gallery.images.length < 3 && selected && (
-        <TextActionButton
-          icon={<Plus size={14} />}
-          disabled={pending}
-          onClick={() => setGallery({ ...gallery, selectedId: null })}
-        >
-          Add mnemonic
-        </TextActionButton>
       )}
       {gallery.images.length === 3 && (
         <p className="text-sm text-muted-foreground">

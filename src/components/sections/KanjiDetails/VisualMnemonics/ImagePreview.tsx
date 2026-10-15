@@ -28,7 +28,7 @@ export const ImagePreview = ({
       className={
         thumbnail
           ? "aspect-square size-20 max-w-[20vw] rounded-lg object-contain"
-          : "mx-auto aspect-square w-full max-w-lg rounded-xl border border-foreground/20 object-contain"
+          : "mx-auto aspect-square w-full max-w-lg rounded-3xl border border-foreground/20 object-contain"
       }
     />
   );
