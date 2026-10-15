@@ -8,6 +8,8 @@ _Last Updated: October 15, 2026_
 
 We do not collect personal information such as names, email addresses, or any other identifiable data directly from you. We also do not use cookies or similar tracking technologies.
 
+We store your settings, study notes and any AI content you generate in your own browser (local storage) so the Site works and remembers your preferences. This data stays on your device; we don’t receive it and don’t use it to track you.
+
 ## Third-Party Services: Cloudflare
 
 We use Cloudflare’s analytics tools to understand how the Site performs and how visitors interact with it. These tools include:
