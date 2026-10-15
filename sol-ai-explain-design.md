@@ -1,7 +1,9 @@
 # AI Explain expansion — feature design
 
-Status: ready for implementation. This document is the plan; it does not change
-the app.
+Status: implemented on PR #368. This document records the intended behavior.
+Validation includes existing automated checks and manual browser checks with
+local provider-response fixtures. Paid xAI output and bilingual voice quality
+still need a live API-key check.
 
 Decisions confirmed on 15 October 2026:
 
@@ -442,6 +444,8 @@ image bytes/base64 where supported rather than saving only a remote URL.
   **No essay for this kanji yet.**
 - A loading or network error is not proof that an essay is missing. Keep its
   error state and retry behavior separate.
+- Recognize the app's own HTML shell as a missing Markdown file on SPA hosts;
+  unrelated HTML error pages remain loading errors.
 - If a saved AI essay exists and the published essay is missing, show it directly.
 - Render AI essays with the existing Markdown renderer and **Highlight kanji**.
 - Show **AI-generated essay**, shared regeneration controls, and MP3 controls.

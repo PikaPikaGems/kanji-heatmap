@@ -176,7 +176,7 @@ const NotesPopover = ({
                     explain.run(japaneseText);
                   }}
                 >
-                  AI Explain
+                  ✨ AI Explain
                 </button>
               </div>
             )}
@@ -184,6 +184,7 @@ const NotesPopover = ({
         }
       />
       <AiExplainDialog
+        key={japaneseText}
         open={view === "explain"}
         onClose={() => {
           explain.cancel();
@@ -191,7 +192,9 @@ const NotesPopover = ({
         }}
         japaneseText={japaneseText}
         state={explain.state}
-        onRegenerate={() => explain.run(japaneseText, { fresh: true })}
+        onRegenerate={(instructions) =>
+          explain.run(japaneseText, { fresh: true, instructions })
+        }
       />
     </>
   );

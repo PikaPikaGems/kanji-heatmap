@@ -1,3 +1,4 @@
+import type { ImageStyle } from "./prompts";
 import { notifyStorage, safeReadJson } from "@/lib/storage";
 
 export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
@@ -49,10 +50,38 @@ export type AiExplainSettings = {
   prompt?: string;
   /** Optional; when set, User Preferences shows usage as a progress bar. */
   monthlyTokenBudget?: number;
+  vocabularyPrompt?: string;
+  kanjiEssayPrompt?: string;
+  imagePrompt?: string;
+  imageStylePrompts?: Partial<Record<ImageStyle, string>>;
+  imagePalettePrompt?: string;
+  imageModel?: string;
+  imageResolution?: "1k" | "2k";
+  imageQuality?: "low" | "medium";
+  speechVoice?: string;
+  speechLanguage?: "auto" | "ja";
 };
 
 const optionalString = (v: unknown) =>
   typeof v === "string" && v.trim() !== "" ? v : undefined;
+
+const readStylePrompts = (
+  value: unknown
+): Partial<Record<ImageStyle, string>> => {
+  if (!value || typeof value !== "object") return {};
+  const result: Partial<Record<ImageStyle, string>> = {};
+  for (const key of [
+    "kanji-heatmap",
+    "watercolor",
+    "pixel-art",
+    "cartoon",
+    "custom",
+  ] as const) {
+    const prompt = optionalString((value as Record<string, unknown>)[key]);
+    if (prompt) result[key] = prompt;
+  }
+  return result;
+};
 
 /** Reads the saved settings, dropping anything malformed. */
 export const readAiExplainSettings = (): AiExplainSettings => {
@@ -68,6 +97,16 @@ export const readAiExplainSettings = (): AiExplainSettings => {
     keyValid: raw.keyValid === true,
     model: optionalString(raw.model),
     prompt: optionalString(raw.prompt),
+    vocabularyPrompt: optionalString(raw.vocabularyPrompt),
+    kanjiEssayPrompt: optionalString(raw.kanjiEssayPrompt),
+    imagePrompt: optionalString(raw.imagePrompt),
+    imagePalettePrompt: optionalString(raw.imagePalettePrompt),
+    imageModel: optionalString(raw.imageModel),
+    imageResolution: raw.imageResolution === "2k" ? "2k" : "1k",
+    imageQuality: raw.imageQuality === "medium" ? "medium" : "low",
+    speechVoice: optionalString(raw.speechVoice),
+    speechLanguage: raw.speechLanguage === "ja" ? "ja" : "auto",
+    imageStylePrompts: readStylePrompts(raw.imageStylePrompts),
     monthlyTokenBudget:
       typeof raw.monthlyTokenBudget === "number" &&
       Number.isFinite(raw.monthlyTokenBudget) &&
@@ -117,6 +156,12 @@ export type AiExplainUsage = {
   month: string;
   tokens: number;
   requests: number;
+  imageRequests: number;
+  audioRequests: number;
+  reportedCostUsd: number;
+  audioCharacters: number;
+  searchCalls: number;
+  unreportedSearchRequests: number;
 };
 
 /** "2026-10" in the user's time zone. */
@@ -135,16 +180,57 @@ export const readAiExplainUsage = (now = new Date()): AiExplainUsage => {
     typeof raw.tokens !== "number" ||
     typeof raw.requests !== "number"
   ) {
-    return { month, tokens: 0, requests: 0 };
+    return {
+      month,
+      tokens: 0,
+      requests: 0,
+      imageRequests: 0,
+      audioRequests: 0,
+      reportedCostUsd: 0,
+      audioCharacters: 0,
+      searchCalls: 0,
+      unreportedSearchRequests: 0,
+    };
   }
-  return { month, tokens: raw.tokens, requests: raw.requests };
+  const count = (key: string) =>
+    typeof raw[key] === "number" && Number.isFinite(raw[key]) && raw[key] >= 0
+      ? (raw[key] as number)
+      : 0;
+  return {
+    month,
+    tokens: count("tokens"),
+    requests: count("requests"),
+    imageRequests: count("imageRequests"),
+    audioRequests: count("audioRequests"),
+    reportedCostUsd: count("reportedCostUsd"),
+    audioCharacters: count("audioCharacters"),
+    searchCalls: count("searchCalls"),
+    unreportedSearchRequests: count("unreportedSearchRequests"),
+  };
 };
 
 /** Counts one finished request. */
-export const addAiExplainUsage = (tokens: number) => {
+export const addAiExplainUsage = (
+  tokens: number,
+  extra: {
+    searchCalls?: number | null;
+    reportedCostUsd?: number | null;
+    imageRequests?: number;
+    audioCharacters?: number;
+  } = {}
+) => {
   const usage = readAiExplainUsage();
   const next: AiExplainUsage = {
+    ...usage,
     month: usage.month,
+    audioRequests:
+      usage.audioRequests + (extra.audioCharacters === undefined ? 0 : 1),
+    reportedCostUsd: usage.reportedCostUsd + (extra.reportedCostUsd ?? 0),
+    imageRequests: usage.imageRequests + (extra.imageRequests ?? 0),
+    audioCharacters: usage.audioCharacters + (extra.audioCharacters ?? 0),
+    searchCalls: usage.searchCalls + (extra.searchCalls ?? 0),
+    unreportedSearchRequests:
+      usage.unreportedSearchRequests + (extra.searchCalls === null ? 1 : 0),
     tokens: usage.tokens + tokens,
     requests: usage.requests + 1,
   };

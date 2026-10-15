@@ -34,6 +34,12 @@ import {
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
 import { cn } from "@/lib/utils";
+import {
+  GeneratedStorageSettings,
+  ImageSettings,
+  SearchedPromptSettings,
+  SpeechSettings,
+} from "./ai-explain/ExpandedAiSettings";
 
 /** A check in progress or its failure; a pass is saved as `keyValid`. */
 type KeyCheck =
@@ -318,8 +324,22 @@ const UsageField = () => {
           />
         </div>
       )}
+      <p className="mb-3 text-xs text-muted-foreground">
+        Search calls: {usage.searchCalls} · Images: {usage.imageRequests} ·
+        Audio generations: {usage.audioRequests} · Speech characters:{" "}
+        {usage.audioCharacters}
+        {usage.unreportedSearchRequests > 0 &&
+          ` · ${usage.unreportedSearchRequests} searched requests without a provider-reported search count`}
+      </p>
+      {usage.reportedCostUsd > 0 && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Provider-reported charges: US${usage.reportedCostUsd.toFixed(4)}.
+          Partial total for requests that returned cost data; check xAI for your
+          full bill.
+        </p>
+      )}
       <label htmlFor={id} className="block mb-1 text-sm font-semibold">
-        Monthly token budget (optional)
+        Monthly text-token budget (optional)
       </label>
       <Input
         id={id}
@@ -336,9 +356,10 @@ const UsageField = () => {
       />
       <p className="pt-1 text-xs text-muted-foreground">
         Counted in this browser only, and restarts each month. Requests
-        cancelled by closing the modal aren&apos;t counted. The budget only
-        fills the bar; nothing is blocked. Your exact usage is at{" "}
-        <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        incomplete or cancelled can still be billed. Local counters may omit
+        these requests. This text-token budget is not a total spending limit for
+        search, images, or speech, and nothing is blocked. Your exact usage is
+        at <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
       </p>
     </div>
   );
@@ -392,6 +413,34 @@ const Subsections = () => {
         <ModelField />
       </SubsectionItem>
       <SubsectionItem
+        value="searched-text"
+        title="Vocabulary and essays"
+        subtitle="Prompts · uses paid web search"
+      >
+        <SearchedPromptSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="images"
+        title="Visual Mnemonics"
+        subtitle="Image size, quality, styles, and palette"
+      >
+        <ImageSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="speech"
+        title="Read Aloud"
+        subtitle="Voice and language"
+      >
+        <SpeechSettings />
+      </SubsectionItem>
+      <SubsectionItem
+        value="storage"
+        title="Generated content"
+        subtitle="Saved space and deletion"
+      >
+        <GeneratedStorageSettings />
+      </SubsectionItem>
+      <SubsectionItem
         value="usage"
         title="Usage"
         subtitle={`This month: ${formatTokens(usage.tokens)} tokens · ${usage.requests} ${
@@ -415,8 +464,8 @@ export const AiExplainSection = () => {
     <SimpleAccordion trigger="AI Explain (Experimental)">
       <div className="mx-1 text-left">
         <p className="mb-3 text-xs text-muted-foreground">
-          Adds an AI Explain button to View notes in Fill the Kanji. It asks
-          Grok for the vocabulary, translations and grammar of the sentence.
+          Ask Grok about sentences, anchor words, and kanji essays. Generate
+          visual mnemonics and MP3 narration. Requests use your xAI account.
         </p>
         <ApiKeyField />
         <div className="flex items-center py-2">
