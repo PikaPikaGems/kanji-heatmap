@@ -4,6 +4,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyButton";
+import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import type { AiExplainState } from "@/hooks/use-ai-explain";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { AiExplanationMarkdown } from "./AiExplanationMarkdown";
@@ -72,14 +73,13 @@ const RegenerationControls = ({
       <label htmlFor={id} className="text-sm font-semibold">
         What should change? (optional)
       </label>
-      <textarea
+      <StudyNotesTextarea
         id={id}
         value={instructions}
         onChange={(event) => setInstructions(event.target.value)}
         rows={2}
         maxLength={4000}
         placeholder="Use simpler words, explain the grammar more, or focus on casual speech."
-        className="w-full p-3 text-sm border border-dotted rounded-xl bg-background"
       />
       <Button
         type="button"

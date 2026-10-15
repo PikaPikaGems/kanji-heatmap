@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef, useState, type ComponentProps } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
+import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import {
   readAiExplainSettings,
   isAiExplainReady,
@@ -23,13 +24,6 @@ type RequestState =
   | { status: "idle" }
   | { status: "pending" }
   | { status: "error"; message: string };
-
-const MnemonicTextarea = (props: ComponentProps<"textarea">) => (
-  <textarea
-    {...props}
-    className="block w-full resize-y rounded-xl border-[3px] border-dotted border-border bg-background p-3.5 font-mono text-base leading-[1.55rem] whitespace-pre-wrap break-words outline-none focus:border-ring focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-  />
-);
 
 export const MnemonicForm = ({
   kanji,
@@ -84,7 +78,7 @@ export const MnemonicForm = ({
       setRequest({
         status: "error",
         message:
-          "Enable AI Explain with a valid API key in User Preferences first.",
+          "Enable AI Study Tools with a valid API key in User Preferences first.",
       });
       return;
     }
@@ -165,7 +159,7 @@ export const MnemonicForm = ({
           <label htmlFor={`${id}-scene`} className="text-sm font-medium">
             Describe your mnemonic
           </label>
-          <MnemonicTextarea
+          <StudyNotesTextarea
             id={`${id}-scene`}
             required
             rows={3}
@@ -217,7 +211,7 @@ export const MnemonicForm = ({
             <label htmlFor={`${id}-custom`} className="text-sm font-medium">
               Custom style description
             </label>
-            <MnemonicTextarea
+            <StudyNotesTextarea
               id={`${id}-custom`}
               required
               rows={2}
@@ -234,7 +228,7 @@ export const MnemonicForm = ({
             <label htmlFor={`${id}-changes`} className="text-sm font-medium">
               What should change? (optional)
             </label>
-            <MnemonicTextarea
+            <StudyNotesTextarea
               id={`${id}-changes`}
               rows={2}
               maxLength={2000}

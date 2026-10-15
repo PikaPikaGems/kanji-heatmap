@@ -14,6 +14,17 @@ import { isAiExplainReady } from "@/lib/ai-explain/preferences";
 
 const AnchorWordDetails = lazy(() => import("./AiContent/AnchorWordDetails"));
 
+const ViewVocabDetails = () => (
+  <GenericPopover
+    trigger={
+      <button className="flex p-1 text-base tracking-widest underline uppercase hover:text-foreground text-muted-foreground decoration-dashed underline-offset-8">
+        View Vocabulary Details
+      </button>
+    }
+    content={<div className="p-3 text-sm">Coming soon!</div>}
+  />
+);
+
 const WhatIsARepresentativeStudyWord = () => {
   return (
     <>
@@ -83,6 +94,11 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <VocabActions word={word} kana={reading} />
         </div>
 
+        {!isAiExplainReady(aiSettings) && (
+          <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
+            <ViewVocabDetails />
+          </div>
+        )}
         {isAiExplainReady(aiSettings) && (
           <Suspense
             fallback={

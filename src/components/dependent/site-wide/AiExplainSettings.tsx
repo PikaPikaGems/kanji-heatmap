@@ -469,7 +469,7 @@ export const AiExplainSection = () => {
   const active = settings.enabled && keyOk;
 
   return (
-    <SimpleAccordion trigger="AI Explain (Experimental)">
+    <SimpleAccordion trigger="AI Study Tools (Experimental)">
       <div className="mx-1 text-left">
         <p className="mb-3 text-xs text-muted-foreground">
           Ask Grok about sentences, anchor words, and kanji essays. Generate
@@ -481,7 +481,7 @@ export const AiExplainSection = () => {
             checked={active}
             disabled={!keyOk}
             onCheckedChange={(enabled) => update({ enabled })}
-            aria-label="Enable AI Explain"
+            aria-label="Enable AI Study Tools"
           />
           <span
             className={cn(
@@ -489,7 +489,7 @@ export const AiExplainSection = () => {
               !keyOk && "text-muted-foreground"
             )}
           >
-            Enable AI Explain
+            Enable AI Study Tools
           </span>
         </div>
         {!keyOk && (

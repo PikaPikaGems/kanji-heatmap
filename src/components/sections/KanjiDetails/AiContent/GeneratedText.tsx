@@ -3,6 +3,7 @@ import { Download, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { CopyButton } from "@/components/common/CopyButton";
+import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import { useAiDrawerText } from "@/hooks/use-ai-drawer-text";
 import type { AiExplainSettings } from "@/lib/ai-explain/preferences";
 import { HighlightKanjiSwitch } from "../KanjiStudyNotes/HighlightKanjiSwitch";
@@ -93,9 +94,9 @@ export const GeneratedText = ({
           )}
           <div className="flex flex-wrap items-center gap-2">
             <CopyButton textToCopy={result.markdown} iconType="clipboard" />
-            <Button variant="outline" size="sm" onClick={() => void download()}>
+            <PracticeButton variant="secondary" onClick={() => void download()}>
               <Download /> Download Markdown
-            </Button>
+            </PracticeButton>
           </div>
           <AiAudio
             key={result.fingerprint}
@@ -105,8 +106,7 @@ export const GeneratedText = ({
           />
           <label className="block space-y-2 text-sm">
             <span>What should change? (optional)</span>
-            <textarea
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            <StudyNotesTextarea
               value={instructions}
               onChange={(event) => setInstructions(event.target.value)}
               placeholder="Make it shorter, add everyday examples, or explain one point more clearly."
@@ -115,22 +115,6 @@ export const GeneratedText = ({
             />
           </label>
         </>
-      )}
-      {busy && (
-        <div role="status" className="space-y-2">
-          <p className="flex items-center gap-2 text-sm">
-            <Loader2 className="size-4 animate-spin" /> Asking Grok and
-            searching the web…
-          </p>
-          {state.preview && (
-            <details>
-              <summary className="cursor-pointer text-xs">
-                Pending answer
-              </summary>
-              <MarkdownPreview source={state.preview} />
-            </details>
-          )}
-        </div>
       )}
       <div className="flex flex-wrap gap-2">
         {result ? (
@@ -153,12 +137,28 @@ export const GeneratedText = ({
             {generateLabel}
           </PracticeButton>
         )}
-        {busy && (
-          <Button variant="ghost" size="sm" onClick={cancel}>
-            Cancel
-          </Button>
-        )}
       </div>
+      {busy && (
+        <div role="status" className="space-y-2">
+          <p className="flex items-center gap-2 text-sm">
+            <Loader2 className="size-4 animate-spin" /> Asking Grok and
+            searching the web…
+          </p>
+          {state.preview && (
+            <details>
+              <summary className="cursor-pointer text-xs">
+                Pending answer
+              </summary>
+              <MarkdownPreview source={state.preview} />
+            </details>
+          )}
+        </div>
+      )}
+      {busy && (
+        <Button variant="ghost" size="sm" onClick={cancel}>
+          Cancel
+        </Button>
+      )}
       {(state.message || downloadError) && (
         <p role="alert" className="text-sm font-bold text-destructive">
           {state.message || downloadError}

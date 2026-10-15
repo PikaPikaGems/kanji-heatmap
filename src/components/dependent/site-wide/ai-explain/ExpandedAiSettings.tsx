@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   DEFAULT_AI_IMAGE_MODEL,
@@ -44,7 +45,7 @@ const PromptEditor = ({
           <RotateCcw /> Reset to default
         </Button>
       </div>
-      <textarea
+      <StudyNotesTextarea
         id={id}
         rows={7}
         value={value ?? defaultValue}
@@ -53,7 +54,6 @@ const PromptEditor = ({
             event.target.value === defaultValue ? undefined : event.target.value
           )
         }
-        className="w-full p-3 font-mono text-sm border border-dotted rounded-xl bg-background"
         spellCheck={false}
       />
       <p className="text-xs text-muted-foreground">

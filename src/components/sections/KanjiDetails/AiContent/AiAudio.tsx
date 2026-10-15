@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, Loader2, Pause, Play, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import {
   addAiExplainUsage,
   isAiExplainReady,
@@ -260,10 +261,9 @@ export const AiAudio = ({
           <Loader2 className="size-4 animate-spin" /> Generating audio…
         </p>
       )}
-      <Button
-        className={state.record ? "" : "w-full"}
-        variant={state.record ? "outline" : "default"}
-        size={state.record ? "sm" : "default"}
+      <PracticeButton
+        variant="secondary"
+        size="md"
         disabled={state.status === "generating"}
         onClick={() => void generate()}
       >
@@ -274,7 +274,7 @@ export const AiAudio = ({
         ) : (
           "Generate MP3 to listen"
         )}
-      </Button>
+      </PracticeButton>
       {state.status === "generating" && (
         <Button
           variant="ghost"
