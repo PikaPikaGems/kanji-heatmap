@@ -35,12 +35,13 @@ import {
 } from "@/lib/fill-the-kanji/progress";
 import { fillTheKanjiBatchHref } from "@/lib/fill-the-kanji/links";
 import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
-import { AccountGatedPanel } from "./AccountGatedPanel";
+import { DashboardPanel } from "./DashboardPanel";
 import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
 import { FillTheKanjiSetProgress } from "./FillTheKanjiSetProgress";
 import { HeatmapLegendRow } from "./HeatmapLegendRow";
+import { useLiveOrEmpty } from "./use-live-or-empty";
 
 const CELL_PX = 13;
 const GAP_PX = 3;
@@ -215,7 +216,7 @@ const GroupTrigger = ({
  * so opening the section doesn't draw every grid at once.
  */
 const FillTheKanjiHeatmapBody = () => {
-  const statsById = useAllSetBatchStats();
+  const statsById = useLiveOrEmpty(useAllSetBatchStats(), new Map());
   const [settings, setSetting] = useLocalStorage<HeatmapSettings>(
     SETTINGS_KEY,
     DEFAULT_SETTINGS
@@ -290,7 +291,7 @@ const FillTheKanjiHeatmapBody = () => {
 };
 
 export const FillTheKanjiHeatmap = () => (
-  <AccountGatedPanel title={fillTheKanjiPageMeta.shortLabel}>
+  <DashboardPanel title={fillTheKanjiPageMeta.shortLabel}>
     <FillTheKanjiHeatmapBody />
-  </AccountGatedPanel>
+  </DashboardPanel>
 );

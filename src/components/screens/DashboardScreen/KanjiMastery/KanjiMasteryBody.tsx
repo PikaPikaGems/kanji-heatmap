@@ -9,6 +9,7 @@ import {
   REVIEW_PILE_ALL_KEY,
   snapshotValue,
 } from "@/lib/engine/store-cache";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,12 @@ const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
   </PanelNotice>
 );
 
-/** Pile snapshot + kanji data -> loading / failed / the mastery view. */
+/**
+ * Pile snapshot + kanji data -> loading / failed / the mastery view. With no
+ * account to read the pile from, the view draws an empty pile.
+ */
 export const KanjiMasteryBody = () => {
+  const loggedIn = useAccountStatus().kind === "active";
   const api = useEngineApi();
   const pile = useEngineQuery(REVIEW_PILE_ALL_KEY, (a) =>
     a.reviews.pile.watchAll()
@@ -43,7 +48,7 @@ export const KanjiMasteryBody = () => {
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
 
-  if (pile.status === "failed") {
+  if (loggedIn && pile.status === "failed") {
     return (
       <LoadFailed
         onRetry={
@@ -58,13 +63,13 @@ export const KanjiMasteryBody = () => {
     );
   }
   if (
-    (pile.status === "ready" && !pile.result.ok) ||
+    (loggedIn && pile.status === "ready" && !pile.result.ok) ||
     search.status === "error"
   ) {
     return <LoadFailed />;
   }
 
-  const rows = snapshotValue(pile);
+  const rows = loggedIn ? snapshotValue(pile) : [];
   if (!rows || !getInfo || !search.data) {
     return (
       <div className="py-8">

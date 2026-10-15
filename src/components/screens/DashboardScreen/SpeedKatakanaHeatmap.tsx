@@ -4,17 +4,18 @@ import { useHeatmapCellMetric } from "@/hooks/use-heatmap-cell-metric";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { HEATMAP_METRIC_GRADIENT_LABELS } from "@/lib/activity";
-import { AccountGatedPanel } from "./AccountGatedPanel";
+import { DashboardPanel } from "./DashboardPanel";
 import { SpeedKatakanaHeatmapGrid } from "./SpeedKatakanaHeatmapGrid";
 import { SpeedKatakanaHeatmapSettingsPopover } from "./SpeedKatakanaHeatmapSettingsPopover";
 import { HeatmapLegendRow } from "./HeatmapLegendRow";
+import { useLiveOrEmpty } from "./use-live-or-empty";
 
 const SETTINGS_KEY = "speed-katakana-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
 const DEFAULT_SETTINGS: HeatmapSettings = { compact: false };
 
 const SpeedKatakanaHeatmapBody = () => {
-  const allStats = useSpeedKatakanaStats();
+  const allStats = useLiveOrEmpty(useSpeedKatakanaStats(), new Map());
   const isCoarsePointer = useCoarsePointer();
   const [metric] = useHeatmapCellMetric();
   const gradientLabels = HEATMAP_METRIC_GRADIENT_LABELS[metric];
@@ -55,7 +56,7 @@ const SpeedKatakanaHeatmapBody = () => {
 };
 
 export const SpeedKatakanaHeatmap = () => (
-  <AccountGatedPanel title={speedKatakanaPageMeta.shortLabel}>
+  <DashboardPanel title={speedKatakanaPageMeta.shortLabel}>
     <SpeedKatakanaHeatmapBody />
-  </AccountGatedPanel>
+  </DashboardPanel>
 );

@@ -1,9 +1,9 @@
-import { AccountGatedPanel } from "../AccountGatedPanel";
+import { DashboardPanel } from "../DashboardPanel";
 import { KanjiMasteryBody } from "./KanjiMasteryBody";
 
 /** Collapsible dashboard section: review stability / difficulty per JLPT level or Jouyou grade. */
 export const KanjiMastery = () => (
-  <AccountGatedPanel title="Kanji Mastery">
+  <DashboardPanel title="Kanji Mastery">
     <KanjiMasteryBody />
-  </AccountGatedPanel>
+  </DashboardPanel>
 );

@@ -6,6 +6,7 @@ import {
   NOT_IN_BUILD_COPY,
 } from "@/lib/engine/engine-copy";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { DashboardAccountBanner } from "./DashboardAccountBanner";
 import { StatsOverview } from "./StatsOverview";
 import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaHeatmap } from "./SpeedKatakanaHeatmap";
@@ -20,7 +21,8 @@ const DashboardScreen = () => {
   useHtmlDocumentTitle("Dashboard");
   const account = useAccountStatus();
 
-  // Every panel reads the account, so with no engine there is nothing to show.
+  // Every panel reads the account. With no engine there is nothing to show;
+  // with no account (logged out, old browser) the panels draw empty data.
   if (account.kind === "unavailable" && isEngineAbsent(account.reason)) {
     return (
       <ScreenShell>
@@ -42,6 +44,8 @@ const DashboardScreen = () => {
           </h1>
         )}
       </header>
+
+      <DashboardAccountBanner />
 
       <HeatmapPopoverProvider>
         <StatsOverview />

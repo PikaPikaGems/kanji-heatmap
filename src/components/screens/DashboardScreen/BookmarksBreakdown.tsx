@@ -12,8 +12,6 @@ import {
   JouyouGradeListItems,
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
-import { AccountRequiredNotice } from "@/components/dependent/account/AccountRequiredNotice";
-import { isAccountUiHidden } from "@/lib/engine/account-ui";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { Progress } from "@/components/ui/progress";
@@ -81,6 +79,7 @@ const BreakdownRows = ({ bands }: { bands: BreakdownBand[] }) => (
 );
 
 const BookmarksBreakdownBody = () => {
+  const loggedIn = useAccountStatus().kind === "active";
   const ready = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
@@ -142,11 +141,12 @@ const BookmarksBreakdownBody = () => {
 
   // Grade now comes from the same synchronous lookup as JLPT, so there is no
   // separate grade-map request to wait on.
+  // Without an account there are no bookmarks to wait for: every band is 0.
   const loading =
     !ready ||
     search.status === "loading" ||
     search.status === "idle" ||
-    bookmarks.status === "loading";
+    (loggedIn && bookmarks.status === "loading");
 
   const bands = showGrade ? gradeBands : jlptBands;
   return (
@@ -182,19 +182,8 @@ const BookmarksBreakdownBody = () => {
   );
 };
 
-export const BookmarksBreakdown = () => {
-  const status = useAccountStatus();
-
-  // Bookmarks belong to the account, which builds without the engine lack.
-  if (isAccountUiHidden(status)) return null;
-
-  return (
-    <DashboardPanel title="Bookmarks">
-      {status.kind === "active" ? (
-        <BookmarksBreakdownBody />
-      ) : (
-        <AccountRequiredNotice status={status} />
-      )}
-    </DashboardPanel>
-  );
-};
+export const BookmarksBreakdown = () => (
+  <DashboardPanel title="Bookmarks">
+    <BookmarksBreakdownBody />
+  </DashboardPanel>
+);

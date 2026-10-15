@@ -1,6 +1,7 @@
 import { Cake, CalendarDays } from "lucide-react";
 import {
   countFillTheKanjiDays,
+  EMPTY_ALL_TIME_SUMMARY,
   firstFillTheKanjiDay,
   formatCakeDay,
   toAllTimeStats,
@@ -12,14 +13,18 @@ import {
   useDailySummaries,
 } from "@/hooks/use-activity-summaries";
 import { formatRawCount } from "@/lib/format-count";
-import { AccountGatedPanel } from "./AccountGatedPanel";
 import { ActivityCountsGrid } from "./ActivityCountsGrid";
 import { OverviewCaption } from "./ActivityStatCard";
+import { DashboardPanel } from "./DashboardPanel";
 import { QueryFallback } from "./QueryFallback";
+import { useLiveOrEmpty } from "./use-live-or-empty";
 
 const StatsOverviewBody = () => {
   const allTimeSnapshot = useAllTimeSummary();
-  const allTime = snapshotValue(allTimeSnapshot);
+  const allTime = useLiveOrEmpty(
+    snapshotValue(allTimeSnapshot),
+    EMPTY_ALL_TIME_SUMMARY
+  );
 
   // Per-set day counts can't be added up, so Fill the Kanji's active days come
   // from the daily summaries between its first attempt and today. Before there
@@ -31,7 +36,10 @@ const StatsOverviewBody = () => {
     start: fillTheKanjiFrom,
     end: today,
   });
-  const fillTheKanjiDaily = snapshotValue(fillTheKanjiDaysSnapshot);
+  const fillTheKanjiDaily = useLiveOrEmpty(
+    snapshotValue(fillTheKanjiDaysSnapshot),
+    []
+  );
 
   if (!allTime || !fillTheKanjiDaily) {
     return (
@@ -66,7 +74,7 @@ const StatsOverviewBody = () => {
 };
 
 export const StatsOverview = () => (
-  <AccountGatedPanel title="All-time Overview" defaultOpen>
+  <DashboardPanel title="All-time Overview" defaultOpen>
     <StatsOverviewBody />
-  </AccountGatedPanel>
+  </DashboardPanel>
 );

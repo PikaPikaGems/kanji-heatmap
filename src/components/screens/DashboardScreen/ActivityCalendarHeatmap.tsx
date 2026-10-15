@@ -21,8 +21,9 @@ import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
 import { DurationNav } from "./DurationNav";
 import { CalendarGrid } from "./CalendarGrid";
 import { VerticalCalendarGrid } from "./VerticalCalendarGrid";
-import { AccountGatedPanel } from "./AccountGatedPanel";
+import { DashboardPanel } from "./DashboardPanel";
 import { QueryFallback } from "./QueryFallback";
+import { useLiveOrEmpty } from "./use-live-or-empty";
 import { OverviewCaption } from "./ActivityStatCard";
 import { formatRawCount } from "@/lib/format-count";
 
@@ -81,7 +82,7 @@ const ActivityCalendarHeatmapBody = () => {
 
   const range = getDurationRange(duration);
   const snapshot = useDailySummaries(range);
-  const summaries = snapshotValue(snapshot);
+  const summaries = useLiveOrEmpty(snapshotValue(snapshot), []);
   const byDay = summaries ? toActivityByDay(summaries) : null;
 
   return (
@@ -132,7 +133,7 @@ const ActivityCalendarHeatmapBody = () => {
 };
 
 export const ActivityCalendarHeatmap = () => (
-  <AccountGatedPanel title="Activity Heatmap" defaultOpen>
+  <DashboardPanel title="Activity Heatmap" defaultOpen>
     <ActivityCalendarHeatmapBody />
-  </AccountGatedPanel>
+  </DashboardPanel>
 );

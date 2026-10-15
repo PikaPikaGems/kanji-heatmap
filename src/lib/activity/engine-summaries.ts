@@ -61,6 +61,22 @@ export const firstFillTheKanjiDay = (
     .filter((day): day is LocalDate => day != null)
     .sort()[0];
 
+/** An account with no activity yet, which the dashboard draws when there is no account to read. */
+export const EMPTY_ALL_TIME_SUMMARY: AllTimeSummary = {
+  totals: {
+    genericChallenges: {},
+    practice: { speedKatakana: 0, reading: 0, writing: 0 },
+    reviews: { reading: {}, writing: {}, newItems: 0 },
+  },
+  daysActive: {
+    genericChallenges: {},
+    totalDaysActive: 0,
+    practice: { speedKatakana: 0, reading: 0, writing: 0 },
+    reviews: { reading: 0, writing: 0, newItems: 0 },
+  },
+  firstAttempts: { genericChallenges: {}, practice: {}, review: {} },
+};
+
 /** All-time days and counts per kind. `fillTheKanjiDays` comes from countFillTheKanjiDays. */
 export const toAllTimeStats = (
   allTime: AllTimeSummary,
