@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Download, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { CopyButton } from "@/components/common/CopyButton";
 import { useAiDrawerText } from "@/hooks/use-ai-drawer-text";
 import type { AiExplainSettings } from "@/lib/ai-explain/preferences";
@@ -142,20 +143,26 @@ export const GeneratedText = ({
         </p>
       )}
       <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={busy}
-          onClick={() => void generate(instructions)}
-        >
-          {result ? (
-            <>
-              <RotateCcw /> Regenerate
-            </>
-          ) : (
-            generateLabel
-          )}
-        </Button>
+        {result ? (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={busy}
+            onClick={() => void generate(instructions)}
+          >
+            <RotateCcw /> Regenerate
+          </Button>
+        ) : (
+          <PracticeButton
+            variant="primary"
+            size="md"
+            className="h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base"
+            disabled={busy}
+            onClick={() => void generate(instructions)}
+          >
+            {generateLabel}
+          </PracticeButton>
+        )}
         {busy && (
           <Button variant="ghost" size="sm" onClick={cancel}>
             Cancel

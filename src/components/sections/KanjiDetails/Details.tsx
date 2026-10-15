@@ -162,19 +162,6 @@ export const KanjiDetails = ({
         </ErrorBoundary>
       </SimpleAccordion>
       <RepresentativeStudyWordAccordion kanji={kanji} />
-      {isAiExplainReady(aiSettings) && (
-        <SimpleAccordion trigger="Visual Mnemonics">
-          <ErrorBoundary details="VisualMnemonics in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
-              <VisualMnemonics
-                key={kanji}
-                kanji={kanji}
-                keyword={data?.keyword ?? ""}
-              />
-            </Suspense>
-          </ErrorBoundary>
-        </SimpleAccordion>
-      )}
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
@@ -193,13 +180,6 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
       </SimpleAccordion>
-      <SimpleAccordion trigger="⭐️ Personal Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
       <SimpleAccordion trigger="Kanji Essay">
         <ErrorBoundary details="KanjiEssay in KanjiDetails">
           <Suspense fallback={<StudyNotesLoadingFallback />}>
@@ -212,6 +192,26 @@ export const KanjiDetails = ({
         </ErrorBoundary>
       </SimpleAccordion>
 
+      {isAiExplainReady(aiSettings) && (
+        <SimpleAccordion trigger="Visual Mnemonics">
+          <ErrorBoundary details="VisualMnemonics in KanjiDetails">
+            <Suspense fallback={<StudyNotesLoadingFallback />}>
+              <VisualMnemonics
+                key={kanji}
+                kanji={kanji}
+                keyword={data?.keyword ?? ""}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </SimpleAccordion>
+      )}
+      <SimpleAccordion trigger="⭐️ Personal Study Notes">
+        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
+          <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <KanjiStudyNotes key={kanji} kanji={kanji} />
+          </Suspense>
+        </ErrorBoundary>
+      </SimpleAccordion>
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />

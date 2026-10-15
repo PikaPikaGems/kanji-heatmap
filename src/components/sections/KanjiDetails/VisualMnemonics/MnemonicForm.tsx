@@ -1,5 +1,7 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
+import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import {
   readAiExplainSettings,
   isAiExplainReady,
@@ -21,6 +23,13 @@ type RequestState =
   | { status: "idle" }
   | { status: "pending" }
   | { status: "error"; message: string };
+
+const MnemonicTextarea = (props: ComponentProps<"textarea">) => (
+  <textarea
+    {...props}
+    className="block w-full resize-y rounded-xl border-[3px] border-dotted border-border bg-background p-3.5 font-mono text-base leading-[1.55rem] whitespace-pre-wrap break-words outline-none focus:border-ring focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+  />
+);
 
 export const MnemonicForm = ({
   kanji,
@@ -156,7 +165,7 @@ export const MnemonicForm = ({
           <label htmlFor={`${id}-scene`} className="text-sm font-medium">
             Describe your mnemonic
           </label>
-          <textarea
+          <MnemonicTextarea
             id={`${id}-scene`}
             required
             rows={3}
@@ -166,53 +175,49 @@ export const MnemonicForm = ({
               setDraft({ ...draft, description: event.target.value })
             }
             placeholder="Describe a scene that helps you remember this kanji."
-            className="w-full rounded-md border border-input bg-background p-3 text-sm"
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="space-y-1 text-sm">
-            Style
-            <select
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <ResponsiveSelect
+              label="Style"
               value={draft.style}
-              onChange={(event) =>
-                setDraft({ ...draft, style: event.target.value as ImageStyle })
+              onChange={(style) =>
+                setDraft({ ...draft, style: style as ImageStyle })
               }
-              className="h-10 w-full rounded-md border border-input bg-background px-2"
-            >
-              <option value="kanji-heatmap">Kanji Heatmap</option>
-              <option value="watercolor">Watercolor</option>
-              <option value="pixel-art">16-bit game art</option>
-              <option value="cartoon">Cartoon or anime</option>
-              <option value="custom">Custom</option>
-            </select>
-          </label>
-          <label className="space-y-1 text-sm">
-            Palette
-            <select
+              options={[
+                { value: "kanji-heatmap", label: "Kanji Heatmap" },
+                { value: "watercolor", label: "Watercolor" },
+                { value: "pixel-art", label: "16-bit game art" },
+                { value: "cartoon", label: "Cartoon or anime" },
+                { value: "custom", label: "Custom" },
+              ]}
+            />
+          </div>
+          <div>
+            <ResponsiveSelect
+              label="Palette"
               value={draft.palette}
-              onChange={(event) =>
-                setDraft({
-                  ...draft,
-                  palette: event.target.value as ImagePalette,
-                })
+              onChange={(palette) =>
+                setDraft({ ...draft, palette: palette as ImagePalette })
               }
-              className="h-10 w-full rounded-md border border-input bg-background px-2"
-            >
-              <option value="kanji-heatmap">Kanji Heatmap</option>
-              <option value="lime">Lime</option>
-              <option value="cyan">Cyan / aqua</option>
-              <option value="blue">Blue</option>
-              <option value="pink">Hot pink</option>
-              <option value="grayscale">Black and white</option>
-            </select>
-          </label>
+              options={[
+                { value: "kanji-heatmap", label: "Kanji Heatmap" },
+                { value: "lime", label: "Lime" },
+                { value: "cyan", label: "Cyan / aqua" },
+                { value: "blue", label: "Blue" },
+                { value: "pink", label: "Hot pink" },
+                { value: "grayscale", label: "Black and white" },
+              ]}
+            />
+          </div>
         </div>
         {draft.style === "custom" && (
           <div className="space-y-1">
             <label htmlFor={`${id}-custom`} className="text-sm font-medium">
               Custom style description
             </label>
-            <textarea
+            <MnemonicTextarea
               id={`${id}-custom`}
               required
               rows={2}
@@ -221,7 +226,6 @@ export const MnemonicForm = ({
               onChange={(event) =>
                 setDraft({ ...draft, customStyle: event.target.value })
               }
-              className="w-full rounded-md border border-input bg-background p-3 text-sm"
             />
           </div>
         )}
@@ -230,7 +234,7 @@ export const MnemonicForm = ({
             <label htmlFor={`${id}-changes`} className="text-sm font-medium">
               What should change? (optional)
             </label>
-            <textarea
+            <MnemonicTextarea
               id={`${id}-changes`}
               rows={2}
               maxLength={2000}
@@ -239,13 +243,14 @@ export const MnemonicForm = ({
                 setDraft({ ...draft, instructions: event.target.value })
               }
               placeholder="Make the subject larger, or simplify the background."
-              className="w-full rounded-md border border-input bg-background p-3 text-sm"
             />
           </div>
         )}
-        <Button
+        <PracticeButton
           type="submit"
-          className="w-full"
+          variant="primary"
+          size="md"
+          className="h-auto min-h-12 whitespace-normal px-3 py-3 text-sm sm:text-base"
           disabled={
             !draft.description.trim() ||
             (draft.style === "custom" && !draft.customStyle.trim())
@@ -256,7 +261,7 @@ export const MnemonicForm = ({
             : image
               ? "Regenerate"
               : "✨ Generate Visual Mnemonic"}
-        </Button>
+        </PracticeButton>
       </fieldset>
       {pending && (
         <Button

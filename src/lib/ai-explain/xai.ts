@@ -18,19 +18,14 @@ export class XaiKeyRejectedError extends Error {
 }
 
 /**
- * The error for a failed response. A bad key is a 401/403, or a 400 whose
- * message is about the key (what xAI sends for a malformed one).
+ * The error for a failed response. xAI uses 401 for invalid credentials and
+ * 403 for a valid key or team that cannot perform the requested action.
  */
 const responseError = async (
   res: Response,
   feature?: "images" | "speech"
 ): Promise<Error> => {
-  if (feature && (res.status === 401 || res.status === 403))
-    return new Error(
-      `The key could not access ${feature}. Check its endpoint and model permissions in xAI. Text generation remains available.`
-    );
-  if (res.status === 401 || res.status === 403)
-    return new XaiKeyRejectedError();
+  if (res.status === 401) return new XaiKeyRejectedError();
   if (res.status === 429) {
     return new Error("Rate limited or out of credits. Try again later.");
   }
@@ -48,8 +43,15 @@ const responseError = async (
   } catch {
     // Not JSON; fall back to the status code.
   }
-  if (res.status === 400 && /api key/i.test(detail)) {
+  if (res.status === 400 && /api key/i.test(detail))
     return new XaiKeyRejectedError();
+  if (res.status === 403) {
+    const access = feature
+      ? `${feature} generation`
+      : "the Responses API request, selected model, or web search";
+    return new Error(
+      `xAI denied access to ${access}. Check the key or team permissions in xAI${detail ? `: ${detail}` : "."}`
+    );
   }
   return new Error(detail || `Request failed (${res.status}).`);
 };
@@ -71,7 +73,7 @@ export const listXaiModels = async (apiKey: string): Promise<string[]> => {
     .sort();
 };
 
-/** Whether xAI accepts the key. Costs no tokens. Throws on network errors. */
+/** Whether xAI accepts the key for model listing. Costs no tokens. */
 export const checkXaiKey = async (
   apiKey: string
 ): Promise<"valid" | "rejected"> => {
