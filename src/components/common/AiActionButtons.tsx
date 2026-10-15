@@ -1,6 +1,5 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
-import { Download, Loader2, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CircleX, Download, Loader2, RotateCcw } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { cn } from "@/lib/utils";
@@ -156,9 +155,11 @@ export const AiRequestFeedback = ({
       </div>
     )}
     {busy && onCancel && (
-      <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-        Cancel
-      </Button>
+      <div className="flex justify-center">
+        <TextActionButton icon={<CircleX size={14} />} onClick={onCancel}>
+          Cancel
+        </TextActionButton>
+      </div>
     )}
     {error && (
       <p role="alert" className="text-sm font-bold text-destructive">
