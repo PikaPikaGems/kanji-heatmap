@@ -86,6 +86,16 @@ const USAGE_INDEX = "[ownerId+lastUsedAt+bytes]";
 const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
 
 /**
+ * Database key for one owner's copy of an item. Callers use plain ids
+ * (`essay:食`); the owner is added here so two people on one device never
+ * read or replace each other's content.
+ */
+const ownedKey = (id: string, ownerId = CURRENT_OWNER_ID) => `${ownerId}:${id}`;
+/** The plain id a caller knows, from an owned database key. */
+const plainId = (key: string, ownerId: string) =>
+  key.startsWith(`${ownerId}:`) ? key.slice(ownerId.length + 1) : key;
+
+/**
  * AI Explain answers used to live in localStorage. Copies them in (without
  * replacing newer ones), then frees localStorage. Runs after open, not in a
  * version upgrade, because a brand-new database skips upgrades.
@@ -103,7 +113,7 @@ const moveLegacyExplanations = async (db: AiDatabase) => {
         const record = { text, model, instructions, createdAt };
         return {
           ...record,
-          id: sentenceKey(sentence),
+          id: ownedKey(sentenceKey(sentence)),
           ownerId: CURRENT_OWNER_ID,
           bytes: textBytes(record),
           lastUsedAt: createdAt,
@@ -174,6 +184,35 @@ export const getAiDatabase = () => {
                   record.bytes = blobRecordBytes(record);
                 }
               );
+          }
+        });
+      // Version 4: keys include the owner (`guest:essay:食`), and MP3s point
+      // at their text by that owned key. Primary keys can't be edited in
+      // place, so each table is rewritten.
+      db.version(4)
+        .stores({})
+        .upgrade(async (tx) => {
+          for (const name of ["textResults", "explanations", "audio"]) {
+            const table = tx.table(name);
+            const records: (Record<string, unknown> & {
+              id: string;
+              ownerId?: string;
+              sourceId?: string;
+            })[] = await table.toArray();
+            await table.clear();
+            await table.bulkAdd(
+              records.map((record) => {
+                const ownerId = record.ownerId ?? CURRENT_OWNER_ID;
+                return {
+                  ...record,
+                  ownerId,
+                  id: ownedKey(record.id, ownerId),
+                  ...(record.sourceId != null && {
+                    sourceId: ownedKey(record.sourceId, ownerId),
+                  }),
+                };
+              })
+            );
           }
         });
       await db.open();
@@ -304,7 +343,7 @@ export const readSentenceExplanation = async (
   sentence: string
 ): Promise<SentenceExplanation | undefined> => {
   const db = await getAiDatabase();
-  const record = await db.explanations.get(sentenceKey(sentence));
+  const record = await db.explanations.get(ownedKey(sentenceKey(sentence)));
   if (!record || typeof record.text !== "string" || !record.text.trim())
     return undefined;
   touch(asTracked(db.explanations), record);
@@ -316,7 +355,7 @@ export const writeSentenceExplanation = async (
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
   const db = await getAiDatabase();
-  const id = sentenceKey(sentence);
+  const id = ownedKey(sentenceKey(sentence));
   await db.transaction("rw", db.explanations, db.textResults, async () => {
     checkEpoch(expectedEpoch);
     await db.explanations.put(tracked({ ...record, id }, textBytes(record)));
@@ -325,16 +364,18 @@ export const writeSentenceExplanation = async (
   changed();
 };
 export const deleteSentenceExplanation = async (sentence: string) => {
-  await (await getAiDatabase()).explanations.delete(sentenceKey(sentence));
+  await (
+    await getAiDatabase()
+  ).explanations.delete(ownedKey(sentenceKey(sentence)));
   changed();
 };
 export const getTextResult = async (
   id: string
 ): Promise<AiTextResult | undefined> => {
   const db = await getAiDatabase();
-  const record = await db.textResults.get(id);
+  const record = await db.textResults.get(ownedKey(id));
   touch(asTracked(db.textResults), record);
-  return record;
+  return record && { ...record, id };
 };
 export const saveTextResult = async (
   result: AiTextResult,
@@ -347,15 +388,18 @@ export const saveTextResult = async (
     [db.textResults, db.audio, db.explanations],
     async () => {
       checkEpoch(expectedEpoch);
-      const old = await db.textResults.get(result.id);
+      const key = ownedKey(result.id);
+      const old = await db.textResults.get(key);
       if (old?.createdAt !== expectedCreatedAt)
         throw new Error(
           "This result changed in another window. Reopen it before regenerating."
         );
-      await db.textResults.put(tracked(result, textBytes(result)));
+      await db.textResults.put(
+        tracked({ ...result, id: key }, textBytes(result))
+      );
       if (old && old.fingerprint !== result.fingerprint)
-        await db.audio.where("sourceId").equals(result.id).delete();
-      await fitTextLimit(db, result.id);
+        await db.audio.where("sourceId").equals(key).delete();
+      await fitTextLimit(db, key);
     }
   );
   changed();
@@ -363,9 +407,10 @@ export const saveTextResult = async (
 /** Deletes an essay or vocabulary details with its narration. */
 export const deleteTextResult = async (id: string) => {
   const db = await getAiDatabase();
+  const key = ownedKey(id);
   await db.transaction("rw", db.textResults, db.audio, async () => {
-    await db.textResults.delete(id);
-    await db.audio.where("sourceId").equals(id).delete();
+    await db.textResults.delete(key);
+    await db.audio.where("sourceId").equals(key).delete();
   });
   changed();
 };
@@ -376,6 +421,7 @@ export const listMnemonicImages = async (
   const images = await db.images
     .where("kanji")
     .equals(kanji)
+    .filter((image) => image.ownerId === CURRENT_OWNER_ID)
     .sortBy("createdAt");
   images.forEach((image) => touch(asTracked(db.images), image));
   return images;
@@ -393,11 +439,15 @@ export const saveMnemonicImage = async (
       throw new Error(
         "This image changed in another window. Reopen it before regenerating."
       );
-    if (old && old.kanji !== image.kanji)
-      throw new Error("Cannot change an image's kanji.");
+    if (old && (old.kanji !== image.kanji || old.ownerId !== CURRENT_OWNER_ID))
+      throw new Error("Cannot change this image.");
     if (
       !old &&
-      (await db.images.where("kanji").equals(image.kanji).count()) >= 3
+      (await db.images
+        .where("kanji")
+        .equals(image.kanji)
+        .filter((saved) => saved.ownerId === CURRENT_OWNER_ID)
+        .count()) >= 3
     )
       throw new Error(
         "Three mnemonics are already saved. Delete one before adding another."
@@ -407,7 +457,11 @@ export const saveMnemonicImage = async (
   changed();
 };
 export const deleteMnemonicImage = async (id: string) => {
-  await (await getAiDatabase()).images.delete(id);
+  const db = await getAiDatabase();
+  await db.transaction("rw", db.images, async () => {
+    const image = await db.images.get(id);
+    if (image?.ownerId === CURRENT_OWNER_ID) await db.images.delete(id);
+  });
   changed();
 };
 export const getAudioForSource = async (
@@ -415,12 +469,21 @@ export const getAudioForSource = async (
   fingerprint: string
 ) => {
   const db = await getAiDatabase();
-  const records = await db.audio.where("sourceId").equals(sourceId).toArray();
+  const records = await db.audio
+    .where("sourceId")
+    .equals(ownedKey(sourceId))
+    .toArray();
   const record: (AiAudioRecord & Tracked) | undefined = records
     .filter((record) => record.fingerprint === fingerprint)
     .sort((a, b) => b.createdAt - a.createdAt)[0];
   touch(asTracked(db.audio), record);
-  return record;
+  return (
+    record && {
+      ...record,
+      id: plainId(record.id, record.ownerId),
+      sourceId,
+    }
+  );
 };
 export const saveAudioRecord = async (
   record: AiAudioRecord,
@@ -429,19 +492,25 @@ export const saveAudioRecord = async (
   const db = await getAiDatabase();
   await db.transaction("rw", db.audio, db.textResults, async () => {
     checkEpoch(expectedEpoch);
-    const text = await db.textResults.get(record.sourceId);
+    const key = ownedKey(record.id);
+    const text = await db.textResults.get(ownedKey(record.sourceId));
     if (text && text.fingerprint !== record.fingerprint)
       throw new Error(
         "The text changed while its audio was generating. Generate audio for the current text."
       );
-    await db.audio.put(tracked(record, blobRecordBytes(record)));
+    await db.audio.put(
+      tracked(
+        { ...record, id: key, sourceId: ownedKey(record.sourceId) },
+        blobRecordBytes(record)
+      )
+    );
     const audio = asTracked(db.audio);
     const rows = await readUsageRows(audio);
     await deleteLeastRecentlyUsed(
       audio,
       rows,
       sumBytes(rows) - AI_STORAGE_LIMITS.audio,
-      record.id
+      key
     );
   });
   changed();
@@ -455,6 +524,7 @@ export const contentFingerprint = async (text: string) => {
     byte.toString(16).padStart(2, "0")
   ).join("");
 };
+/** Deletes everything the current owner generated on this device. */
 export const clearGeneratedContent = async () => {
   const db = await getAiDatabase();
   // Advance before clearing so in-flight paid requests cannot repopulate storage.
@@ -463,15 +533,18 @@ export const clearGeneratedContent = async () => {
     JSON.stringify(getGeneratedContentEpoch() + 1)
   );
   changed(true);
-  await db.transaction(
-    "rw",
-    [db.textResults, db.images, db.audio, db.explanations],
-    async () => {
-      await db.textResults.clear();
-      await db.images.clear();
-      await db.audio.clear();
-      await db.explanations.clear();
+  const tables = [db.textResults, db.images, db.audio, db.explanations];
+  await db.transaction("rw", tables, async () => {
+    for (const table of tables) {
+      // Every key of this owner, read from the index without loading records.
+      await asTracked(table)
+        .where(USAGE_INDEX)
+        .between(
+          [CURRENT_OWNER_ID, -Infinity, -Infinity],
+          [CURRENT_OWNER_ID, Infinity, Infinity]
+        )
+        .delete();
     }
-  );
+  });
   changed(true);
 };

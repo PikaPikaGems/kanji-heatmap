@@ -321,8 +321,9 @@ export const GeneratedStorageSettings = () => {
         .then(({ getAiStorageUsage }) => getAiStorageUsage())
         .then(
           (usage) => {
+            // Only this user's content: it's what Clear deletes.
             const bytes = Object.values(usage).reduce(
-              (sum, kind) => sum + kind.mine + kind.others,
+              (sum, kind) => sum + kind.mine,
               0
             );
             if (active)
