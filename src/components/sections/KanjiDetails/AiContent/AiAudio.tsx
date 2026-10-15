@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pause, Play } from "lucide-react";
-import { PracticeButton } from "@/components/ui/practice-button";
 import { Slider } from "@/components/ui/slider";
 import {
   AiPrimaryButton,
@@ -38,33 +37,19 @@ const formatTime = (seconds: number) => {
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 };
 
-/** A minimal audio bar: play/pause, elapsed / total, and a seek slider. */
+/** A minimal audio bar: elapsed / total and a seek slider. */
 const MiniPlayer = ({
-  playing,
   disabled,
   current,
   duration,
-  onToggle,
   onSeek,
 }: {
-  playing: boolean;
   disabled: boolean;
   current: number;
   duration: number;
-  onToggle: () => void;
   onSeek: (seconds: number) => void;
 }) => (
   <div className="flex items-center gap-3">
-    <PracticeButton
-      variant="secondary"
-      size="icon"
-      disabled={disabled}
-      onClick={onToggle}
-      aria-label={playing ? "Pause narration" : "Play narration"}
-      className="shrink-0 rounded-full"
-    >
-      {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-    </PracticeButton>
     <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
       {formatTime(current)} / {formatTime(duration)}
     </span>
@@ -169,11 +154,9 @@ const SavedAudio = ({
         }
       />
       <MiniPlayer
-        playing={playing}
         disabled={!url}
         current={time.current}
         duration={time.duration}
-        onToggle={() => void toggle()}
         onSeek={(seconds) => {
           if (audioRef.current) audioRef.current.currentTime = seconds;
         }}
