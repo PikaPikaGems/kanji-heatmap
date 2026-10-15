@@ -40,7 +40,10 @@ export const ActiveAccount = ({
         </span>
         <div className="flex items-center gap-1.5">
           <FsrsSettingsItem />
-          <LogoutPopover pendingCount={sync?.pendingOperationsCount ?? 0} />
+          <LogoutPopover
+            pendingCount={sync?.pendingOperationsCount ?? 0}
+            userId={status.userId}
+          />
         </div>
       </div>
       <SyncChip sync={sync} />

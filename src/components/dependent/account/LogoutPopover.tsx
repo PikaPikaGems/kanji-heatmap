@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Loader2, LogOut } from "lucide-react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useHasSavedAiKey } from "@/hooks/use-has-saved-ai-key";
+import { deleteAiOwnerKey } from "@/lib/ai-explain/preferences";
 import { copyForCode, UNSYNCED_LOGOUT_COPY } from "@/lib/engine/engine-copy";
 import {
   openSyncOperations,
@@ -24,6 +27,45 @@ type MenuStatus =
   | { kind: "idle" }
   | { kind: "busy"; action: "logout" | "prepare-clear" }
   | { kind: "error"; message: string };
+
+/** The logging-out account's saved xAI key, and whether to delete it. */
+type AiKeyOption = {
+  userId: string;
+  deleteKey: boolean;
+  onDeleteKeyChange: (deleteKey: boolean) => void;
+};
+
+/** Deletes the key before logging out, while the account is still current. */
+const deleteKeyIfChosen = ({ userId, deleteKey }: AiKeyOption) => {
+  if (deleteKey) deleteAiOwnerKey(userId);
+};
+
+/** Only offered when this account has a key saved on this device. */
+const DeleteAiKeyCheckbox = ({
+  aiKey,
+  disabled,
+}: {
+  aiKey: AiKeyOption;
+  disabled: boolean;
+}) => {
+  const id = useId();
+  const hasKey = useHasSavedAiKey(aiKey.userId);
+  if (!hasKey) return null;
+  return (
+    <div className="flex items-start gap-2 text-left">
+      <Checkbox
+        id={id}
+        className="mt-px"
+        checked={aiKey.deleteKey}
+        disabled={disabled}
+        onCheckedChange={(checked) => aiKey.onDeleteKeyChange(checked === true)}
+      />
+      <label htmlFor={id} className="leading-snug cursor-pointer">
+        Delete my saved xAI API key from this device
+      </label>
+    </div>
+  );
+};
 
 /** Opens the operations modal; it lives outside the drawer, so close that first. */
 const OperationsLink = ({
@@ -48,9 +90,11 @@ const clearDataLabel = "Log out and remove all my data from this device";
 
 const LogoutMenu = ({
   pendingCount,
+  aiKey,
   onAction,
 }: {
   pendingCount: number;
+  aiKey: AiKeyOption;
   onAction: (view: LogoutView) => void;
 }) => {
   const api = useEngineApi();
@@ -60,6 +104,7 @@ const LogoutMenu = ({
   const logout = async () => {
     if (!api || busy) return;
     setStatus({ kind: "busy", action: "logout" });
+    deleteKeyIfChosen(aiKey);
     const result = await api.auth.logout();
     // On success the account status flips to signed out and this unmounts.
     setStatus(
@@ -94,6 +139,7 @@ const LogoutMenu = ({
           <SyncNowButton />
         </>
       )}
+      <DeleteAiKeyCheckbox aiKey={aiKey} disabled={busy} />
       <Button
         variant={pendingCount > 0 ? "outline" : "default"}
         size="sm"
@@ -126,9 +172,11 @@ const LogoutMenu = ({
 
 const ConfirmClear = ({
   hasRejectedNotes,
+  aiKey,
   onAction,
 }: {
   hasRejectedNotes: boolean;
+  aiKey: AiKeyOption;
   onAction: (view: LogoutView) => void;
 }) => {
   const api = useEngineApi();
@@ -138,6 +186,7 @@ const ConfirmClear = ({
   const clear = async () => {
     if (!api || busy) return;
     setStatus({ kind: "busy" });
+    deleteKeyIfChosen(aiKey);
     const result = await api.auth.logout({ clearLocalData: true });
     setStatus(
       result.ok
@@ -156,6 +205,7 @@ const ConfirmClear = ({
           <OperationsLink tab="attention">Review rejected notes</OperationsLink>
         </>
       )}
+      <DeleteAiKeyCheckbox aiKey={aiKey} disabled={busy} />
       <Button
         variant="destructive"
         size="sm"
@@ -183,22 +233,40 @@ const ConfirmClear = ({
   );
 };
 
-const LogoutPopoverBody = ({ pendingCount }: { pendingCount: number }) => {
+const LogoutPopoverBody = ({
+  pendingCount,
+  userId,
+}: {
+  pendingCount: number;
+  userId: string;
+}) => {
   const [view, setView] = useState<LogoutView>({ kind: "menu" });
+  // Checked by default: leaving a key behind should be a choice.
+  const [deleteKey, setDeleteKey] = useState(true);
+  const aiKey = { userId, deleteKey, onDeleteKeyChange: setDeleteKey };
 
   if (view.kind === "confirm-clear") {
     return (
       <ConfirmClear
         hasRejectedNotes={view.hasRejectedNotes}
+        aiKey={aiKey}
         onAction={setView}
       />
     );
   }
-  return <LogoutMenu pendingCount={pendingCount} onAction={setView} />;
+  return (
+    <LogoutMenu pendingCount={pendingCount} aiKey={aiKey} onAction={setView} />
+  );
 };
 
 /** Logout icon button; its popover has the unsynced-changes warning. */
-export const LogoutPopover = ({ pendingCount }: { pendingCount: number }) => (
+export const LogoutPopover = ({
+  pendingCount,
+  userId,
+}: {
+  pendingCount: number;
+  userId: string;
+}) => (
   <Popover>
     <PopoverTrigger asChild>
       <Button variant="outline" size="iconXl" aria-label="Log out">
@@ -206,7 +274,7 @@ export const LogoutPopover = ({ pendingCount }: { pendingCount: number }) => (
       </Button>
     </PopoverTrigger>
     <PopoverContent className="w-60 p-3 text-xs" align="end">
-      <LogoutPopoverBody pendingCount={pendingCount} />
+      <LogoutPopoverBody pendingCount={pendingCount} userId={userId} />
     </PopoverContent>
   </Popover>
 );
