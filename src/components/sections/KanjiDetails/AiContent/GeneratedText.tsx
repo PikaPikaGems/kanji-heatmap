@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Download, Loader2, RotateCcw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { CopyButton } from "@/components/common/CopyButton";
+import {
+  DownloadMarkdownButton,
+  RegenerateButton,
+} from "@/components/common/AiActionButtons";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import { useAiDrawerText } from "@/hooks/use-ai-drawer-text";
 import { normalizeAiMarkdown } from "@/lib/ai-explain/markdown";
-import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import type { AiExplainSettings } from "@/lib/ai-explain/preferences";
 import { HighlightKanjiSwitch } from "../KanjiStudyNotes/HighlightKanjiSwitch";
 import { MarkdownPreview } from "../KanjiStudyNotes/MarkdownPreview";
@@ -26,25 +29,9 @@ export const GeneratedText = ({
 }) => {
   const { state, generate, cancel } = useAiDrawerText(id, makePrompt);
   const [instructions, setInstructions] = useState("");
-  const [downloadError, setDownloadError] = useState("");
   const busy = state.status === "generating";
   const result = state.result;
   const markdown = result ? normalizeAiMarkdown(result.markdown) : "";
-
-  const download = async () => {
-    try {
-      const { downloadBlob } = await import("@/lib/ai-explain/download");
-      downloadBlob(
-        new Blob([markdown], {
-          type: "text/markdown;charset=utf-8",
-        }),
-        `${filename}.md`
-      );
-      setDownloadError("");
-    } catch {
-      setDownloadError("Couldn't download the Markdown. Please try again.");
-    }
-  };
 
   if (state.status === "loading") {
     return (
@@ -90,14 +77,10 @@ export const GeneratedText = ({
           )}
           <div className="flex flex-wrap items-center gap-2">
             <CopyButton textToCopy={markdown} iconType="clipboard" />
-            <button
-              type="button"
-              className={cnDottedUnderlineTrigger}
-              onClick={() => void download()}
-            >
-              <strong>Download Markdown</strong>
-              <Download size={14} />
-            </button>
+            <DownloadMarkdownButton
+              markdown={markdown}
+              filename={`${filename}.md`}
+            />
           </div>
           <AiAudio
             key={result.fingerprint}
@@ -119,15 +102,10 @@ export const GeneratedText = ({
       )}
       <div className="flex flex-wrap gap-2">
         {result ? (
-          <button
-            type="button"
-            className={`${cnDottedUnderlineTrigger} disabled:opacity-50`}
+          <RegenerateButton
             disabled={busy}
             onClick={() => void generate(instructions)}
-          >
-            <strong>Regenerate</strong>
-            <RotateCcw size={14} />
-          </button>
+          />
         ) : (
           <PracticeButton
             variant="primary"
@@ -161,9 +139,9 @@ export const GeneratedText = ({
           Cancel
         </Button>
       )}
-      {(state.message || downloadError) && (
+      {state.message && (
         <p role="alert" className="text-sm font-bold text-destructive">
-          {state.message || downloadError}
+          {state.message}
         </p>
       )}
       {state.warning && (

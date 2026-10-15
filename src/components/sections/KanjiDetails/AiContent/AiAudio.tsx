@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Loader2, Pause, Play, RotateCcw } from "lucide-react";
+import { Loader2, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PracticeButton } from "@/components/ui/practice-button";
+import {
+  DownloadButton,
+  RegenerateButton,
+} from "@/components/common/AiActionButtons";
 import {
   addAiExplainUsage,
   isAiExplainReady,
@@ -16,7 +20,6 @@ import {
   type AiAudioRecord,
 } from "@/lib/ai-explain/storage";
 import { generateXaiSpeech } from "@/lib/ai-explain/xai";
-import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { prepareNarration } from "./narration";
 
 type AudioState = {
@@ -105,9 +108,9 @@ const SavedAudio = ({
         }
       />
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" onClick={() => void download()}>
-          <Download /> Download MP3
-        </Button>
+        <DownloadButton onClick={() => void download()}>
+          Download MP3
+        </DownloadButton>
         <Button
           variant="ghost"
           size="sm"
@@ -263,15 +266,12 @@ export const AiAudio = ({
         </p>
       )}
       {state.record ? (
-        <button
-          type="button"
-          className={`${cnDottedUnderlineTrigger} disabled:opacity-50`}
+        <RegenerateButton
           disabled={state.status === "generating"}
           onClick={() => void generate()}
         >
-          <strong>Regenerate MP3</strong>
-          <RotateCcw size={14} />
-        </button>
+          Regenerate MP3
+        </RegenerateButton>
       ) : (
         <PracticeButton
           variant="primary"

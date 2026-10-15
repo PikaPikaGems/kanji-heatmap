@@ -1,12 +1,14 @@
 import { useId, useState } from "react";
-import { Download, Loader2, RotateCcw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
-import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyButton";
+import {
+  DownloadMarkdownButton,
+  RegenerateButton,
+} from "@/components/common/AiActionButtons";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import type { AiExplainState } from "@/hooks/use-ai-explain";
-import { downloadBlob } from "@/lib/ai-explain/download";
 import { AiExplanationMarkdown } from "./AiExplanationMarkdown";
 
 const ExplanationBody = ({ state }: { state: AiExplainState }) => {
@@ -81,42 +83,10 @@ const RegenerationControls = ({
         maxLength={4000}
         placeholder="Use simpler words, explain the grammar more, or focus on casual speech."
       />
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
+      <RegenerateButton
         onClick={() => onRegenerate(instructions)}
         disabled={loading}
-      >
-        <RotateCcw /> Regenerate
-      </Button>
-    </div>
-  );
-};
-
-const DownloadMarkdown = ({ text }: { text: string }) => {
-  const [error, setError] = useState("");
-  const download = () => {
-    try {
-      downloadBlob(
-        new Blob([text], { type: "text/markdown;charset=utf-8" }),
-        "sentence-explanation.md"
-      );
-      setError("");
-    } catch {
-      setError("Couldn't download. Copy the explanation instead.");
-    }
-  };
-  return (
-    <div>
-      <Button type="button" variant="ghost" size="sm" onClick={download}>
-        <Download /> Download Markdown
-      </Button>
-      {error && (
-        <p role="alert" className="text-xs text-destructive">
-          {error}
-        </p>
-      )}
+      />
     </div>
   );
 };
@@ -166,7 +136,10 @@ export const AiExplainDialog = ({
           {completedText && (
             <div className="flex flex-wrap items-center gap-1">
               <CopyButton textToCopy={completedText} iconType="clipboard" />
-              <DownloadMarkdown text={completedText} />
+              <DownloadMarkdownButton
+                markdown={completedText}
+                filename="sentence-explanation.md"
+              />
             </div>
           )}
           <RegenerationControls
