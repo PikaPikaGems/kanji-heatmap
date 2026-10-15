@@ -1,5 +1,5 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
-import { CircleX, Download, Loader2, RotateCcw } from "lucide-react";
+import { Download, Loader2, RotateCcw } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ export const TextActionButton = ({
   className,
   ...props
 }: ComponentProps<"button"> & {
-  icon: ReactNode;
+  icon?: ReactNode;
   busy?: boolean;
   busyLabel?: ReactNode;
 }) => (
@@ -156,9 +156,7 @@ export const AiRequestFeedback = ({
     )}
     {busy && onCancel && (
       <div className="flex justify-center">
-        <TextActionButton icon={<CircleX size={14} />} onClick={onCancel}>
-          Cancel
-        </TextActionButton>
+        <TextActionButton onClick={onCancel}>Cancel</TextActionButton>
       </div>
     )}
     {error && (
