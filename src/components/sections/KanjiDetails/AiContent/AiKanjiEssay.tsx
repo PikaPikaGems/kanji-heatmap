@@ -18,7 +18,6 @@ export const AiKanjiEssay = ({
       id={`essay:${kanji}`}
       filename={`kanji-essay-${kanji}`}
       generateLabel="✨ Generate AI Essay"
-      emptyMessage="No essay for this kanji yet."
       makePrompt={(settings) =>
         buildKanjiEssayPrompt(settings, {
           kanji,

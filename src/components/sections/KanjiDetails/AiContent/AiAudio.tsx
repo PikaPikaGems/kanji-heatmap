@@ -16,6 +16,7 @@ import {
   type AiAudioRecord,
 } from "@/lib/ai-explain/storage";
 import { generateXaiSpeech } from "@/lib/ai-explain/xai";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { prepareNarration } from "./narration";
 
 type AudioState = {
@@ -261,20 +262,26 @@ export const AiAudio = ({
           <Loader2 className="size-4 animate-spin" /> Generating audio…
         </p>
       )}
-      <PracticeButton
-        variant="secondary"
-        size="md"
-        disabled={state.status === "generating"}
-        onClick={() => void generate()}
-      >
-        {state.record ? (
-          <>
-            <RotateCcw /> Regenerate MP3
-          </>
-        ) : (
-          "Generate MP3 to listen"
-        )}
-      </PracticeButton>
+      {state.record ? (
+        <button
+          type="button"
+          className={`${cnDottedUnderlineTrigger} disabled:opacity-50`}
+          disabled={state.status === "generating"}
+          onClick={() => void generate()}
+        >
+          <strong>Regenerate MP3</strong>
+          <RotateCcw size={14} />
+        </button>
+      ) : (
+        <PracticeButton
+          variant="primary"
+          size="md"
+          disabled={state.status === "generating"}
+          onClick={() => void generate()}
+        >
+          Generate MP3 to listen
+        </PracticeButton>
+      )}
       {state.status === "generating" && (
         <Button
           variant="ghost"

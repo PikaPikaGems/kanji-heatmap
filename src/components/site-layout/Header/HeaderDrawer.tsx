@@ -74,8 +74,6 @@ const HeaderDrawerContent = ({
           </DrawerPrimitive.Close>
         ))}
 
-        <PikaPikaLinks />
-
         <div className="mt-4">
           <div className="flex justify-center space-x-1">
             <LinksOutItems />
@@ -89,6 +87,8 @@ const HeaderDrawerContent = ({
             <SettingsModalTrigger onClick={() => onAction("settings")} />
           </div>
         </div>
+
+        <PikaPikaLinks />
       </div>
 
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">

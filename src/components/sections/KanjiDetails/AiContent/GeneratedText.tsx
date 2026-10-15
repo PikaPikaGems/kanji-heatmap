@@ -5,6 +5,8 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { CopyButton } from "@/components/common/CopyButton";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
 import { useAiDrawerText } from "@/hooks/use-ai-drawer-text";
+import { normalizeAiMarkdown } from "@/lib/ai-explain/markdown";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import type { AiExplainSettings } from "@/lib/ai-explain/preferences";
 import { HighlightKanjiSwitch } from "../KanjiStudyNotes/HighlightKanjiSwitch";
 import { MarkdownPreview } from "../KanjiStudyNotes/MarkdownPreview";
@@ -16,25 +18,24 @@ export const GeneratedText = ({
   filename,
   generateLabel,
   makePrompt,
-  emptyMessage,
 }: {
   id: string;
   filename: string;
   generateLabel: string;
   makePrompt: (settings: AiExplainSettings) => string;
-  emptyMessage?: string;
 }) => {
   const { state, generate, cancel } = useAiDrawerText(id, makePrompt);
   const [instructions, setInstructions] = useState("");
   const [downloadError, setDownloadError] = useState("");
   const busy = state.status === "generating";
   const result = state.result;
+  const markdown = result ? normalizeAiMarkdown(result.markdown) : "";
 
   const download = async () => {
     try {
       const { downloadBlob } = await import("@/lib/ai-explain/download");
       downloadBlob(
-        new Blob([result?.markdown ?? ""], {
+        new Blob([markdown], {
           type: "text/markdown;charset=utf-8",
         }),
         `${filename}.md`
@@ -55,11 +56,6 @@ export const GeneratedText = ({
 
   return (
     <div className="space-y-4 text-left">
-      {!result && emptyMessage && (
-        <p className="p-4 text-center text-sm text-muted-foreground">
-          {emptyMessage}
-        </p>
-      )}
       {result && (
         <>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -69,7 +65,7 @@ export const GeneratedText = ({
             <HighlightKanjiSwitch />
           </div>
           <div className="rounded-xl border border-foreground/20 py-4">
-            <MarkdownPreview source={result.markdown} />
+            <MarkdownPreview source={markdown} />
           </div>
           {result.sources.length > 0 && (
             <details className="text-xs">
@@ -93,10 +89,15 @@ export const GeneratedText = ({
             </details>
           )}
           <div className="flex flex-wrap items-center gap-2">
-            <CopyButton textToCopy={result.markdown} iconType="clipboard" />
-            <PracticeButton variant="secondary" onClick={() => void download()}>
-              <Download /> Download Markdown
-            </PracticeButton>
+            <CopyButton textToCopy={markdown} iconType="clipboard" />
+            <button
+              type="button"
+              className={cnDottedUnderlineTrigger}
+              onClick={() => void download()}
+            >
+              <strong>Download Markdown</strong>
+              <Download size={14} />
+            </button>
           </div>
           <AiAudio
             key={result.fingerprint}
@@ -118,14 +119,15 @@ export const GeneratedText = ({
       )}
       <div className="flex flex-wrap gap-2">
         {result ? (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            type="button"
+            className={`${cnDottedUnderlineTrigger} disabled:opacity-50`}
             disabled={busy}
             onClick={() => void generate(instructions)}
           >
-            <RotateCcw /> Regenerate
-          </Button>
+            <strong>Regenerate</strong>
+            <RotateCcw size={14} />
+          </button>
         ) : (
           <PracticeButton
             variant="primary"
@@ -149,7 +151,7 @@ export const GeneratedText = ({
               <summary className="cursor-pointer text-xs">
                 Pending answer
               </summary>
-              <MarkdownPreview source={state.preview} />
+              <MarkdownPreview source={normalizeAiMarkdown(state.preview)} />
             </details>
           )}
         </div>
