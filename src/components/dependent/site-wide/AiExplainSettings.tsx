@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {
   CircleCheck,
   CircleX,
@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
+import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import {
   useAiExplainSettings,
@@ -202,52 +203,94 @@ type ModelList =
   | { status: "done"; models: string[] }
   | { status: "error"; message: string };
 
+const DEFAULT_MODEL_OPTION = "__default__";
+const CUSTOM_MODEL_OPTION = "__custom__";
+
 const ModelField = () => {
   const [settings, update] = useAiExplainSettings();
   const [list, setList] = useState<ModelList>({ status: "idle" });
+  const [customOpen, setCustomOpen] = useState(false);
   const id = useId();
-  const listId = `${id}-models`;
 
-  // Loaded on first focus, so the key's models are offered as suggestions
-  // without a hardcoded list.
-  const loadModels = () => {
+  // Effect needed: fetches this key's models from xAI when the section opens;
+  // render can't await a request, and the result must be ignored after unmount.
+  useEffect(() => {
     if (settings.apiKey === "") return;
-    if (list.status === "loading" || list.status === "done") return;
+    let active = true;
     setList({ status: "loading" });
     listXaiModels(settings.apiKey).then(
-      (models) => setList({ status: "done", models }),
+      (models) => active && setList({ status: "done", models }),
       (error: unknown) =>
+        active &&
         setList({
           status: "error",
           message: error instanceof Error ? error.message : "",
         })
     );
-  };
+    return () => {
+      active = false;
+    };
+  }, [settings.apiKey]);
+
+  // The default model is already the first option.
+  const models =
+    list.status === "done"
+      ? list.models.filter((model) => model !== DEFAULT_AI_EXPLAIN_MODEL)
+      : [];
+  const current = settings.model;
+  const options = [
+    {
+      value: DEFAULT_MODEL_OPTION,
+      label: `Default (${DEFAULT_AI_EXPLAIN_MODEL})`,
+    },
+    ...models.map((model) => ({ value: model, label: model })),
+    // Keep a saved model that isn't (or isn't yet) in the list selectable.
+    ...(current !== undefined && !models.includes(current)
+      ? [{ value: current, label: current }]
+      : []),
+    { value: CUSTOM_MODEL_OPTION, label: "Type a model name…" },
+  ];
 
   return (
-    <div className="mb-4">
-      <label htmlFor={id} className="block mb-1 text-sm font-semibold">
+    <div className="mb-4 space-y-1">
+      <p aria-hidden className="text-sm font-semibold">
         Model
-      </label>
-      <Input
-        className="rounded-lg"
-        id={id}
-        list={listId}
-        value={settings.model ?? ""}
-        onFocus={loadModels}
-        onChange={(e) => update({ model: e.target.value.trim() || undefined })}
-        placeholder={DEFAULT_AI_EXPLAIN_MODEL}
-        autoComplete="off"
-        spellCheck={false}
+      </p>
+      <ResponsiveSelect
+        isLabelSrOnly
+        label="Model"
+        value={
+          customOpen ? CUSTOM_MODEL_OPTION : (current ?? DEFAULT_MODEL_OPTION)
+        }
+        onChange={(next) => {
+          if (next === CUSTOM_MODEL_OPTION) {
+            setCustomOpen(true);
+            return;
+          }
+          setCustomOpen(false);
+          update({ model: next === DEFAULT_MODEL_OPTION ? undefined : next });
+        }}
+        options={options}
       />
-      <datalist id={listId}>
-        {list.status === "done" &&
-          list.models.map((model) => <option key={model} value={model} />)}
-      </datalist>
+      {customOpen && (
+        <Input
+          className="rounded-lg"
+          id={id}
+          aria-label="Model name"
+          value={current ?? ""}
+          onChange={(e) =>
+            update({ model: e.target.value.trim() || undefined })
+          }
+          placeholder={DEFAULT_AI_EXPLAIN_MODEL}
+          autoComplete="off"
+          spellCheck={false}
+          autoFocus
+        />
+      )}
       <p className="pt-1 text-xs text-muted-foreground">
         {list.status === "loading" && "Loading your models… "}
         {list.status === "error" && `Couldn't load models. ${list.message} `}
-        Leave empty for {DEFAULT_AI_EXPLAIN_MODEL}.
+        Models come from your xAI account.
       </p>
     </div>
   );

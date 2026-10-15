@@ -8,6 +8,7 @@ export const ResponsiveSelect = ({
   onChange,
   options,
   label,
+  isLabelSrOnly = false,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -18,6 +19,8 @@ export const ResponsiveSelect = ({
     description?: string;
   }[];
   label: string;
+  /** Hide the small built-in label when the caller shows its own heading. */
+  isLabelSrOnly?: boolean;
 }) => {
   const isTouchDevice = useIsTouchDevice();
 
@@ -29,7 +32,7 @@ export const ResponsiveSelect = ({
         triggerCN={"h-8 w-full rounded-lg"}
         options={options}
         label={label}
-        isLabelSrOnly={false}
+        isLabelSrOnly={isLabelSrOnly}
       />
     );
   }
@@ -37,7 +40,9 @@ export const ResponsiveSelect = ({
   return (
     <>
       <div className="hidden sm:block">
-        <Label className={"text-xs font-normal"}>{label}</Label>
+        <Label className={isLabelSrOnly ? "sr-only" : "text-xs font-normal"}>
+          {label}
+        </Label>
         <Combobox
           value={value}
           setValue={onChange}
@@ -52,7 +57,7 @@ export const ResponsiveSelect = ({
           triggerCN={"h-8 w-full rounded-lg"}
           options={options}
           label={label}
-          isLabelSrOnly={false}
+          isLabelSrOnly={isLabelSrOnly}
         />
       </div>
     </>
