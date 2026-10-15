@@ -192,6 +192,8 @@ const ApiKeyField = () => {
         Saved only in this browser and sent only to xAI. Requests are billed to
         your xAI account. Get a key at{" "}
         <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        Your key and custom prompts aren&apos;t private: anyone using this
+        browser can see them.
       </p>
     </div>
   );
@@ -412,7 +414,7 @@ const Subsections = () => {
       <SubsectionItem
         value="speech"
         title="Read Aloud"
-        subtitle="Voice and language"
+        subtitle="Voice, language, and MP3 quality"
       >
         <SpeechSettings />
       </SubsectionItem>

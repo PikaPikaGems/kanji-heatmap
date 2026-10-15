@@ -10,6 +10,10 @@ export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
 export const AI_EXPLAIN_USAGE_KEY = "ai-explain-usage";
 export const AI_SPEECH_VOICES = ["ara", "eve", "rex", "sal", "leo"];
 export const DEFAULT_AI_SPEECH_VOICE = "ara";
+/** MP3 bit rates xAI accepts (192 kbps left out: no gain for speech). */
+export const AI_SPEECH_BIT_RATES = [32000, 64000, 96000, 128000] as const;
+export type AiSpeechBitRate = (typeof AI_SPEECH_BIT_RATES)[number];
+export const DEFAULT_AI_SPEECH_BIT_RATE: AiSpeechBitRate = 64000;
 
 /** Replaced with the sentence (furigana stripped) before sending. */
 export const JAPANESE_TEXT_PLACEHOLDER = "{JAPANESE_TEXT}";
@@ -69,6 +73,7 @@ export type AiExplainSettings = {
   imageResolution?: "1k" | "2k";
   imageQuality?: "low" | "medium";
   speechVoice?: string;
+  speechBitRate?: AiSpeechBitRate;
   speechLanguage?: "auto" | "ja";
 };
 
@@ -110,6 +115,9 @@ export const readAiExplainSettings = (): AiExplainSettings => {
     imageResolution: raw.imageResolution === "2k" ? "2k" : "1k",
     imageQuality: raw.imageQuality === "medium" ? "medium" : "low",
     speechVoice: optionalString(raw.speechVoice),
+    speechBitRate: AI_SPEECH_BIT_RATES.find(
+      (rate) => rate === raw.speechBitRate
+    ),
     speechLanguage: raw.speechLanguage === "ja" ? "ja" : "auto",
     imageStylePrompts: readPromptRecord(
       raw.imageStylePrompts,

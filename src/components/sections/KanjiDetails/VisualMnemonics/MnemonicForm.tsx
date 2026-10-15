@@ -4,7 +4,8 @@ import {
   AiRequestFeedback,
 } from "@/components/common/AiActionButtons";
 import BasicSelect from "@/components/common/BasicSelect";
-import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
+import { CollapsibleSection } from "@/components/common/CollapsibleSection";
+import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
 import {
   readAiExplainSettings,
   isAiExplainReady,
@@ -87,6 +88,9 @@ export const MnemonicForm = ({
     onDraftChange(next);
   };
   const [request, setRequest] = useState<RequestState>({ status: "idle" });
+  // Open while there's no image yet; tucked away once one exists, so the
+  // image is what you see after generating.
+  const [detailsOpen, setDetailsOpen] = useState(!image);
   const controller = useRef<AbortController | null>(null);
   const pending = request.status === "pending";
 
@@ -119,6 +123,22 @@ export const MnemonicForm = ({
     }
     if (draft.style === "custom" && !draft.customStyle.trim()) return;
     if (draft.palette === "custom" && !draft.customPalette.trim()) return;
+    // A new image adds to saved storage; regenerating replaces one.
+    if (!image) {
+      try {
+        const storage = await import("@/lib/ai-explain/storage");
+        await storage.assertStorageAvailable("images");
+      } catch (error) {
+        setRequest({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Couldn't check storage. Try again.",
+        });
+        return;
+      }
+    }
     const active = new AbortController();
     const epoch = getGeneratedContentEpoch();
     controller.current = active;
@@ -151,7 +171,6 @@ export const MnemonicForm = ({
         model,
         resolution,
         quality,
-        prompt,
         createdAt: Date.now(),
       };
       let saved = true;
@@ -164,6 +183,7 @@ export const MnemonicForm = ({
       }
       if (active.signal.aborted) return;
       setRequest({ status: "idle" });
+      setDetailsOpen(false);
       onComplete(result, saved);
     } catch (error) {
       if (active.signal.aborted) return;
@@ -191,104 +211,114 @@ export const MnemonicForm = ({
       }}
     >
       <fieldset disabled={pending} className="space-y-3">
-        <div className="space-y-1">
-          <label htmlFor={`${id}-scene`} className="text-sm font-medium">
-            Describe your mnemonic
-          </label>
-          <StudyNotesTextarea
-            id={`${id}-scene`}
-            required
-            rows={12}
-            maxLength={4000}
-            value={draft.description}
-            onChange={(event) =>
-              setDraft({ ...draft, description: event.target.value })
-            }
-            placeholder="Describe a scene that helps you remember this kanji."
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <BasicSelect
-              triggerCN="rounded-lg"
-              label="Style"
-              value={draft.style}
-              onChange={(style) =>
-                setDraft({ ...draft, style: style as ImageStyle })
-              }
-              options={Object.entries(IMAGE_STYLE_LABELS).map(
-                ([value, label]) => ({ value, label })
-              )}
-            />
-          </div>
-          <div>
-            <BasicSelect
-              triggerCN="rounded-lg"
-              label="Palette"
-              value={draft.palette}
-              onChange={(palette) =>
-                setDraft({ ...draft, palette: palette as ImagePalette })
-              }
-              options={Object.entries(IMAGE_PALETTE_LABELS).map(
-                ([value, label]) => ({ value, label })
-              )}
-            />
-          </div>
-        </div>
-        {draft.style === "custom" && (
+        <CollapsibleSection
+          title={image ? "Edit description and style" : "Mnemonic details"}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+        >
           <div className="space-y-1">
-            <label htmlFor={`${id}-custom`} className="text-sm font-medium">
-              Custom style description
+            <label htmlFor={`${id}-scene`} className="text-sm font-medium">
+              Describe your mnemonic
             </label>
-            <StudyNotesTextarea
-              id={`${id}-custom`}
+            <ResponsiveTextarea
+              id={`${id}-scene`}
+              title="Describe your mnemonic"
               required
-              rows={2}
-              maxLength={2000}
-              value={draft.customStyle}
-              onChange={(event) =>
-                setDraft({ ...draft, customStyle: event.target.value })
+              rows={12}
+              maxLength={4000}
+              value={draft.description}
+              onValueChange={(value) =>
+                setDraft({ ...draft, description: value })
               }
+              placeholder="Describe a scene that helps you remember this kanji."
             />
           </div>
-        )}
-        {draft.palette === "custom" && (
-          <div className="space-y-1">
-            <label
-              htmlFor={`${id}-custom-palette`}
-              className="text-sm font-medium"
-            >
-              Custom palette description
-            </label>
-            <StudyNotesTextarea
-              id={`${id}-custom-palette`}
-              required
-              rows={2}
-              maxLength={2000}
-              value={draft.customPalette}
-              onChange={(event) =>
-                setDraft({ ...draft, customPalette: event.target.value })
-              }
-            />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <BasicSelect
+                triggerCN="rounded-lg"
+                label="Style"
+                value={draft.style}
+                onChange={(style) =>
+                  setDraft({ ...draft, style: style as ImageStyle })
+                }
+                options={Object.entries(IMAGE_STYLE_LABELS).map(
+                  ([value, label]) => ({ value, label })
+                )}
+              />
+            </div>
+            <div>
+              <BasicSelect
+                triggerCN="rounded-lg"
+                label="Palette"
+                value={draft.palette}
+                onChange={(palette) =>
+                  setDraft({ ...draft, palette: palette as ImagePalette })
+                }
+                options={Object.entries(IMAGE_PALETTE_LABELS).map(
+                  ([value, label]) => ({ value, label })
+                )}
+              />
+            </div>
           </div>
-        )}
-        {image && (
-          <div className="space-y-1">
-            <label htmlFor={`${id}-changes`} className="text-sm font-medium">
-              What should change? (optional)
-            </label>
-            <StudyNotesTextarea
-              id={`${id}-changes`}
-              rows={2}
-              maxLength={2000}
-              value={draft.instructions}
-              onChange={(event) =>
-                setDraft({ ...draft, instructions: event.target.value })
-              }
-              placeholder="Make the subject larger, or simplify the background."
-            />
-          </div>
-        )}
+          {draft.style === "custom" && (
+            <div className="space-y-1">
+              <label htmlFor={`${id}-custom`} className="text-sm font-medium">
+                Custom style description
+              </label>
+              <ResponsiveTextarea
+                id={`${id}-custom`}
+                title="Custom style description"
+                required
+                rows={2}
+                maxLength={2000}
+                value={draft.customStyle}
+                onValueChange={(value) =>
+                  setDraft({ ...draft, customStyle: value })
+                }
+              />
+            </div>
+          )}
+          {draft.palette === "custom" && (
+            <div className="space-y-1">
+              <label
+                htmlFor={`${id}-custom-palette`}
+                className="text-sm font-medium"
+              >
+                Custom palette description
+              </label>
+              <ResponsiveTextarea
+                id={`${id}-custom-palette`}
+                title="Custom palette description"
+                required
+                rows={2}
+                maxLength={2000}
+                value={draft.customPalette}
+                onValueChange={(value) =>
+                  setDraft({ ...draft, customPalette: value })
+                }
+              />
+            </div>
+          )}
+          {image && (
+            <div className="space-y-1">
+              <label htmlFor={`${id}-changes`} className="text-sm font-medium">
+                What should change? (optional)
+              </label>
+              <ResponsiveTextarea
+                id={`${id}-changes`}
+                title="What should change?"
+                rows={2}
+                maxLength={2000}
+                value={draft.instructions}
+                onValueChange={(value) =>
+                  setDraft({ ...draft, instructions: value })
+                }
+                placeholder="Make the subject larger, or simplify the background."
+              />
+            </div>
+          )}
+        </CollapsibleSection>
         <AiPrimaryButton
           type="submit"
           busy={pending}

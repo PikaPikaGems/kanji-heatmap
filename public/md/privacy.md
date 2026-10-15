@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last Updated: December 12, 2025_
+_Last Updated: October 15, 2026_
 
 [PikaPikaGems Pte Ltd](https://github.com/PikaPikaGems) operates kanjiheatmap.com (the “Site”). This Privacy Policy explains how we handle information related to your use of the Site.
 
@@ -17,6 +17,12 @@ We use Cloudflare’s analytics tools to understand how the Site performs and ho
 - **Real User Measurements (RUM)**: Cloudflare injects a small JavaScript snippet into the Site to measure performance and user experience (e.g. page load times). This may collect limited technical data, such as browser type, device information, or IP addresses, but we only receive this data in an aggregated and anonymized form.
 
 Cloudflare processes this data on our behalf. For more details on how Cloudflare handles information, please refer to [Cloudflare’s Privacy Policy](https://www.cloudflare.com/privacypolicy/).
+
+## Optional AI Study Tools (xAI)
+
+If you turn on AI Study Tools and enter your own xAI API key, your browser sends your requests (for example, a Japanese sentence or kanji, and any instructions you type) directly to xAI. These requests do not pass through our servers, and we never receive your key or the results. xAI handles this data under its own terms and policies for API use ([x.ai/legal](https://x.ai/legal)).
+
+Your key, custom prompts and generated content are stored only in your browser on your device. They are not private from anyone else who can use that device or browser profile. You can delete them at any time in User Preferences or by clearing your browser data.
 
 ## How We Use Information
 

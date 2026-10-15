@@ -2,23 +2,36 @@ import type { Table } from "dexie";
 import type { ImagePalette, ImageStyle } from "./prompts";
 import type { AiSource } from "./xai";
 import { safeReadJson } from "@/lib/storage";
+import {
+  AI_STORAGE_LIMITS,
+  CURRENT_OWNER_ID,
+  type AiStorageUsage,
+  type KindUsage,
+} from "./storage-budgets";
 
-export const AI_SENTENCE_RESULTS_KEY = "ai-explain-sentence-results";
+/** Where AI Explain answers lived before IndexedDB; moved over on first open. */
+const LEGACY_SENTENCE_RESULTS_KEY = "ai-explain-sentence-results";
 export const AI_GENERATED_CONTENT_EVENT = "ai-generated-content-changed";
 const EPOCH_KEY = "ai-generated-content-epoch";
+
+/**
+ * Who owns it, its size, and when it was last opened or played (for
+ * least-recently-used cleanup).
+ */
+type Tracked = { ownerId: string; bytes: number; lastUsedAt: number };
+
 export type SentenceExplanation = {
   text: string;
   model: string;
-  prompt: string;
   instructions: string;
   createdAt: number;
 };
+type StoredExplanation = SentenceExplanation & Tracked & { id: string };
 export type AiTextResult = {
   id: string;
   markdown: string;
   sources: AiSource[];
   model: string;
-  prompt: string;
   instructions: string;
   createdAt: number;
   fingerprint: string;
@@ -35,7 +48,6 @@ export type MnemonicImage = {
   resolution: "1k" | "2k";
   quality: "low" | "medium";
   model: string;
-  prompt: string;
   instructions: string;
   createdAt: number;
 };
@@ -49,20 +61,123 @@ export type AiAudioRecord = {
   createdAt: number;
 };
 type AiDatabase = import("dexie").Dexie & {
-  textResults: Table<AiTextResult, string>;
-  images: Table<MnemonicImage, string>;
-  audio: Table<AiAudioRecord, string>;
+  textResults: Table<AiTextResult & Tracked, string>;
+  images: Table<MnemonicImage & Tracked, string>;
+  audio: Table<AiAudioRecord & Tracked, string>;
+  explanations: Table<StoredExplanation, string>;
 };
+
+/** JavaScript strings take about 2 bytes per character in IndexedDB. */
+const textBytes = (value: unknown) => JSON.stringify(value).length * 2;
+const blobRecordBytes = ({ blob, ...rest }: { blob: Blob }) =>
+  blob.size + textBytes(rest);
+const tracked = <T extends object>(record: T, bytes: number) => ({
+  ...record,
+  ownerId: CURRENT_OWNER_ID,
+  bytes,
+  lastUsedAt: Date.now(),
+});
+/**
+ * Compound index: reading its keys gives owner, last use and size for every
+ * record without loading any text or blob.
+ */
+const USAGE_INDEX = "[ownerId+lastUsedAt+bytes]";
+
+const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
+
+/**
+ * AI Explain answers used to live in localStorage. Copies them in (without
+ * replacing newer ones), then frees localStorage. Runs after open, not in a
+ * version upgrade, because a brand-new database skips upgrades.
+ */
+const moveLegacyExplanations = async (db: AiDatabase) => {
+  const legacy = safeReadJson<Record<
+    string,
+    SentenceExplanation & { prompt?: string }
+  > | null>(LEGACY_SENTENCE_RESULTS_KEY, null);
+  if (legacy == null) return;
+  if (typeof legacy === "object" && !Array.isArray(legacy)) {
+    const records = Object.entries(legacy)
+      .filter(([, record]) => typeof record?.text === "string")
+      .map(([sentence, { text, model, instructions, createdAt }]) => {
+        const record = { text, model, instructions, createdAt };
+        return {
+          ...record,
+          id: sentenceKey(sentence),
+          ownerId: CURRENT_OWNER_ID,
+          bytes: textBytes(record),
+          lastUsedAt: createdAt,
+        };
+      });
+    await db.transaction("rw", db.explanations, async () => {
+      const existing = await db.explanations.bulkGet(
+        records.map(({ id }) => id)
+      );
+      await db.explanations.bulkPut(
+        records.filter((_, index) => existing[index] === undefined)
+      );
+    });
+  }
+  // Only after the copy above has committed.
+  localStorage.removeItem(LEGACY_SENTENCE_RESULTS_KEY);
+};
+
 let database: Promise<AiDatabase> | undefined;
 export const getAiDatabase = () => {
   database ??= import("dexie")
-    .then(({ Dexie }) => {
+    .then(async ({ Dexie }) => {
       const db = new Dexie("kanji-heatmap-ai") as AiDatabase;
       db.version(1).stores({
         textResults: "id",
         images: "id,kanji",
         audio: "id,sourceId",
       });
+      db.version(2).stores({
+        textResults: "id,[lastUsedAt+bytes]",
+        images: "id,kanji,[lastUsedAt+bytes]",
+        audio: "id,sourceId,[lastUsedAt+bytes]",
+        explanations: "id,[lastUsedAt+bytes]",
+      });
+      // Version 3: every record gets an owner, a size and a last-used time,
+      // and stops keeping the full prompt it was made with (never read, and
+      // often larger than the answer).
+      db.version(3)
+        .stores({
+          textResults: `id,${USAGE_INDEX}`,
+          images: `id,kanji,${USAGE_INDEX}`,
+          audio: `id,sourceId,${USAGE_INDEX}`,
+          explanations: `id,${USAGE_INDEX}`,
+        })
+        .upgrade(async (tx) => {
+          for (const name of ["textResults", "explanations"]) {
+            await tx
+              .table(name)
+              .toCollection()
+              .modify((record: Record<string, unknown> & Tracked) => {
+                delete record.prompt;
+                record.ownerId ??= CURRENT_OWNER_ID;
+                record.lastUsedAt ??= record.createdAt as number;
+                record.bytes = textBytes(record);
+              });
+          }
+          for (const name of ["images", "audio"]) {
+            await tx
+              .table(name)
+              .toCollection()
+              .modify(
+                (
+                  record: Record<string, unknown> & Tracked & { blob: Blob }
+                ) => {
+                  delete record.prompt;
+                  record.ownerId ??= CURRENT_OWNER_ID;
+                  record.lastUsedAt ??= record.createdAt as number;
+                  record.bytes = blobRecordBytes(record);
+                }
+              );
+          }
+        });
+      await db.open();
+      await moveLegacyExplanations(db);
       return db;
     })
     .catch((error: unknown) => {
@@ -71,6 +186,104 @@ export const getAiDatabase = () => {
     });
   return database;
 };
+
+type TrackedTable = Table<Tracked & { id: string }, string>;
+const asTracked = (table: unknown) => table as TrackedTable;
+
+/** Marks a record as used now; at most hourly, since it rewrites the record. */
+const touch = (table: TrackedTable, record?: Tracked & { id: string }) => {
+  if (!record || Date.now() - record.lastUsedAt < 60 * 60 * 1000) return;
+  table.update(record.id, { lastUsedAt: Date.now() }).catch(() => {
+    /* Only cleanup order depends on this. */
+  });
+};
+
+type UsageRow = {
+  id: string;
+  ownerId: string;
+  lastUsedAt: number;
+  bytes: number;
+};
+const readUsageRows = async (table: TrackedTable) => {
+  const rows: UsageRow[] = [];
+  await table.orderBy(USAGE_INDEX).eachKey((key, cursor) => {
+    const [ownerId, lastUsedAt, bytes] = key as [string, number, number];
+    rows.push({ id: cursor.primaryKey as string, ownerId, lastUsedAt, bytes });
+  });
+  return rows;
+};
+const sumBytes = (rows: UsageRow[]) =>
+  rows.reduce((total, row) => total + row.bytes, 0);
+const splitByOwner = (rows: UsageRow[]): KindUsage => {
+  const mine = sumBytes(rows.filter((row) => row.ownerId === CURRENT_OWNER_ID));
+  return { mine, others: sumBytes(rows) - mine };
+};
+
+/**
+ * Deletes the least recently used rows, from any owner (all of these can be
+ * remade), until `overBy` bytes are freed. `keepId` is the one just saved.
+ */
+const deleteLeastRecentlyUsed = async (
+  table: TrackedTable,
+  rows: UsageRow[],
+  overBy: number,
+  keepId: string
+) => {
+  if (overBy <= 0) return;
+  const doomed: string[] = [];
+  for (const row of [...rows].sort((a, b) => a.lastUsedAt - b.lastUsedAt)) {
+    if (overBy <= 0) break;
+    if (row.id === keepId) continue;
+    doomed.push(row.id);
+    overBy -= row.bytes;
+  }
+  await table.bulkDelete(doomed);
+};
+
+/** Keeps all text under its limit by removing the oldest AI Explain answers. */
+const fitTextLimit = async (db: AiDatabase, keepId: string) => {
+  const explanations = asTracked(db.explanations);
+  const [essays, answers] = await Promise.all([
+    readUsageRows(asTracked(db.textResults)),
+    readUsageRows(explanations),
+  ]);
+  await deleteLeastRecentlyUsed(
+    explanations,
+    answers,
+    sumBytes(essays) + sumBytes(answers) - AI_STORAGE_LIMITS.text,
+    keepId
+  );
+};
+
+export const getAiStorageUsage = async (): Promise<AiStorageUsage> => {
+  const db = await getAiDatabase();
+  const [essays, answers, audio, images] = await Promise.all(
+    [db.textResults, db.explanations, db.audio, db.images].map((table) =>
+      readUsageRows(asTracked(table))
+    )
+  );
+  return {
+    text: splitByOwner([...essays, ...answers]),
+    audio: splitByOwner(audio),
+    images: splitByOwner(images),
+  };
+};
+
+const FULL_MESSAGES = {
+  text: `Saved AI text has reached its ${AI_STORAGE_LIMITS.text / 1024 / 1024} MB limit on this device. Download what you want to keep, then delete older essays or vocabulary details.`,
+  images: `Saved images have reached their ${AI_STORAGE_LIMITS.images / 1024 / 1024} MB limit on this device. Download what you want to keep, then delete older mnemonics.`,
+};
+/**
+ * Call before generating a new essay, vocabulary details or image. Only what
+ * can't be remade counts: AI Explain answers make room by themselves.
+ */
+export const assertStorageAvailable = async (kind: "text" | "images") => {
+  const db = await getAiDatabase();
+  const table = kind === "text" ? db.textResults : db.images;
+  const used = sumBytes(await readUsageRows(asTracked(table)));
+  if (used >= AI_STORAGE_LIMITS[kind]) throw new Error(FULL_MESSAGES[kind]);
+};
+
 export const getGeneratedContentEpoch = () =>
   safeReadJson<number>(EPOCH_KEY, 0);
 const checkEpoch = (expected: number) => {
@@ -86,63 +299,87 @@ const changed = (cleared = false) =>
 // Module setup keeps clears coordinated across tabs without a React subscription.
 window.addEventListener("storage", (event) => {
   if (event.key === EPOCH_KEY || event.key === null) changed(true);
-  if (event.key === AI_SENTENCE_RESULTS_KEY) changed();
 });
-const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
-const readSentences = () => {
-  const value = safeReadJson<Record<string, SentenceExplanation>>(
-    AI_SENTENCE_RESULTS_KEY,
-    {}
-  );
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value
-    : {};
-};
-export const readSentenceExplanation = (
+export const readSentenceExplanation = async (
   sentence: string
-): SentenceExplanation | undefined => {
-  const record = readSentences()[sentenceKey(sentence)];
+): Promise<SentenceExplanation | undefined> => {
+  const db = await getAiDatabase();
+  const record = await db.explanations.get(sentenceKey(sentence));
   if (!record || typeof record.text !== "string" || !record.text.trim())
     return undefined;
+  touch(asTracked(db.explanations), record);
   return record;
 };
-export const writeSentenceExplanation = (
+export const writeSentenceExplanation = async (
   sentence: string,
   record: SentenceExplanation,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  checkEpoch(expectedEpoch);
-  const records = readSentences();
-  records[sentenceKey(sentence)] = record;
-  localStorage.setItem(AI_SENTENCE_RESULTS_KEY, JSON.stringify(records));
+  const db = await getAiDatabase();
+  const id = sentenceKey(sentence);
+  await db.transaction("rw", db.explanations, db.textResults, async () => {
+    checkEpoch(expectedEpoch);
+    await db.explanations.put(tracked({ ...record, id }, textBytes(record)));
+    await fitTextLimit(db, id);
+  });
   changed();
 };
-export const getTextResult = async (id: string) =>
-  (await getAiDatabase()).textResults.get(id);
+export const deleteSentenceExplanation = async (sentence: string) => {
+  await (await getAiDatabase()).explanations.delete(sentenceKey(sentence));
+  changed();
+};
+export const getTextResult = async (
+  id: string
+): Promise<AiTextResult | undefined> => {
+  const db = await getAiDatabase();
+  const record = await db.textResults.get(id);
+  touch(asTracked(db.textResults), record);
+  return record;
+};
 export const saveTextResult = async (
   result: AiTextResult,
   expectedCreatedAt?: number,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
   const db = await getAiDatabase();
+  await db.transaction(
+    "rw",
+    [db.textResults, db.audio, db.explanations],
+    async () => {
+      checkEpoch(expectedEpoch);
+      const old = await db.textResults.get(result.id);
+      if (old?.createdAt !== expectedCreatedAt)
+        throw new Error(
+          "This result changed in another window. Reopen it before regenerating."
+        );
+      await db.textResults.put(tracked(result, textBytes(result)));
+      if (old && old.fingerprint !== result.fingerprint)
+        await db.audio.where("sourceId").equals(result.id).delete();
+      await fitTextLimit(db, result.id);
+    }
+  );
+  changed();
+};
+/** Deletes an essay or vocabulary details with its narration. */
+export const deleteTextResult = async (id: string) => {
+  const db = await getAiDatabase();
   await db.transaction("rw", db.textResults, db.audio, async () => {
-    checkEpoch(expectedEpoch);
-    const old = await db.textResults.get(result.id);
-    if (old?.createdAt !== expectedCreatedAt)
-      throw new Error(
-        "This result changed in another window. Reopen it before regenerating."
-      );
-    await db.textResults.put(result);
-    if (old && old.fingerprint !== result.fingerprint)
-      await db.audio.where("sourceId").equals(result.id).delete();
+    await db.textResults.delete(id);
+    await db.audio.where("sourceId").equals(id).delete();
   });
   changed();
 };
-export const listMnemonicImages = async (kanji: string) =>
-  (await getAiDatabase()).images
+export const listMnemonicImages = async (
+  kanji: string
+): Promise<MnemonicImage[]> => {
+  const db = await getAiDatabase();
+  const images = await db.images
     .where("kanji")
     .equals(kanji)
     .sortBy("createdAt");
+  images.forEach((image) => touch(asTracked(db.images), image));
+  return images;
+};
 export const saveMnemonicImage = async (
   image: MnemonicImage,
   expectedCreatedAt?: number,
@@ -165,7 +402,7 @@ export const saveMnemonicImage = async (
       throw new Error(
         "Three mnemonics are already saved. Delete one before adding another."
       );
-    await db.images.put(image);
+    await db.images.put(tracked(image, blobRecordBytes(image)));
   });
   changed();
 };
@@ -177,13 +414,13 @@ export const getAudioForSource = async (
   sourceId: string,
   fingerprint: string
 ) => {
-  const records = await (await getAiDatabase()).audio
-    .where("sourceId")
-    .equals(sourceId)
-    .toArray();
-  return records
+  const db = await getAiDatabase();
+  const records = await db.audio.where("sourceId").equals(sourceId).toArray();
+  const record: (AiAudioRecord & Tracked) | undefined = records
     .filter((record) => record.fingerprint === fingerprint)
     .sort((a, b) => b.createdAt - a.createdAt)[0];
+  touch(asTracked(db.audio), record);
+  return record;
 };
 export const saveAudioRecord = async (
   record: AiAudioRecord,
@@ -197,7 +434,15 @@ export const saveAudioRecord = async (
       throw new Error(
         "The text changed while its audio was generating. Generate audio for the current text."
       );
-    await db.audio.put(record);
+    await db.audio.put(tracked(record, blobRecordBytes(record)));
+    const audio = asTracked(db.audio);
+    const rows = await readUsageRows(audio);
+    await deleteLeastRecentlyUsed(
+      audio,
+      rows,
+      sumBytes(rows) - AI_STORAGE_LIMITS.audio,
+      record.id
+    );
   });
   changed();
 };
@@ -210,25 +455,6 @@ export const contentFingerprint = async (text: string) => {
     byte.toString(16).padStart(2, "0")
   ).join("");
 };
-export const getGeneratedContentSize = async () => {
-  const db = await getAiDatabase();
-  const [texts, images, audio] = await Promise.all([
-    db.textResults.toArray(),
-    db.images.toArray(),
-    db.audio.toArray(),
-  ]);
-  const metadata = JSON.stringify([
-    texts,
-    images.map(({ blob, ...record }) => ({ ...record, bytes: blob.size })),
-    audio.map(({ blob, ...record }) => ({ ...record, bytes: blob.size })),
-    readSentences(),
-  ]);
-  return (
-    new Blob([metadata]).size +
-    images.reduce((sum, record) => sum + record.blob.size, 0) +
-    audio.reduce((sum, record) => sum + record.blob.size, 0)
-  );
-};
 export const clearGeneratedContent = async () => {
   const db = await getAiDatabase();
   // Advance before clearing so in-flight paid requests cannot repopulate storage.
@@ -237,11 +463,15 @@ export const clearGeneratedContent = async () => {
     JSON.stringify(getGeneratedContentEpoch() + 1)
   );
   changed(true);
-  await db.transaction("rw", db.textResults, db.images, db.audio, async () => {
-    await db.textResults.clear();
-    await db.images.clear();
-    await db.audio.clear();
-  });
-  localStorage.removeItem(AI_SENTENCE_RESULTS_KEY);
+  await db.transaction(
+    "rw",
+    [db.textResults, db.images, db.audio, db.explanations],
+    async () => {
+      await db.textResults.clear();
+      await db.images.clear();
+      await db.audio.clear();
+      await db.explanations.clear();
+    }
+  );
   changed(true);
 };

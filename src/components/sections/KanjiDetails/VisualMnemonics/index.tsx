@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DownloadButton,
-  TextActionButton,
-} from "@/components/common/AiActionButtons";
+import { DownloadButton } from "@/components/common/AiActionButtons";
+import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
+import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
+import { AiContentNotice } from "@/components/common/AiContentNotice";
 import { downloadBlob } from "@/lib/ai-explain/download";
+import { scrollResultIntoView } from "@/lib/scroll";
 import type { MnemonicImage } from "@/lib/ai-explain/storage";
 import { ImagePreview } from "./ImagePreview";
 import { MnemonicForm, type MnemonicDraft } from "./MnemonicForm";
@@ -28,29 +29,13 @@ const ImageActions = ({
   disabled: boolean;
   onDeleted: () => void;
 }) => {
-  const [action, setAction] = useState<"idle" | "confirm-delete" | "deleting">(
-    "idle"
-  );
   const [error, setError] = useState("");
-
-  const remove = async () => {
-    setAction("deleting");
-    setError("");
-    try {
-      const storage = await import("@/lib/ai-explain/storage");
-      await storage.deleteMnemonicImage(image.id);
-      onDeleted();
-    } catch {
-      setAction("idle");
-      setError("Couldn't delete this image. Try again.");
-    }
-  };
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-center gap-1">
         <DownloadButton
-          disabled={disabled || action === "deleting"}
+          disabled={disabled}
           onClick={() => {
             try {
               const extension =
@@ -72,42 +57,18 @@ const ImageActions = ({
           Download
         </DownloadButton>
         <span aria-hidden>·</span>
-        <TextActionButton
-          icon={<Trash2 size={14} />}
-          className="text-rose-500"
-          disabled={disabled || action === "deleting"}
-          onClick={() => setAction("confirm-delete")}
-        >
-          Delete
-        </TextActionButton>
+        <DeleteWithConfirm
+          question="Delete this mnemonic? Download it first if you want to keep it."
+          confirmLabel="Delete image"
+          cancelLabel="Keep image"
+          disabled={disabled}
+          onDelete={async () => {
+            const storage = await import("@/lib/ai-explain/storage");
+            await storage.deleteMnemonicImage(image.id);
+            onDeleted();
+          }}
+        />
       </div>
-      {action !== "idle" && (
-        <div className="animate-fade-in-fast space-y-2 rounded-lg border p-3 text-center">
-          <p className="text-sm">
-            Delete this mnemonic? Download it first if you want to keep it.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-1">
-            <TextActionButton
-              icon={<Trash2 size={14} />}
-              className="text-rose-500"
-              busy={action === "deleting"}
-              busyLabel="Deleting…"
-              disabled={disabled}
-              onClick={() => void remove()}
-            >
-              Delete image
-            </TextActionButton>
-            <span aria-hidden>·</span>
-            <TextActionButton
-              icon={<X size={14} />}
-              disabled={action === "deleting"}
-              onClick={() => setAction("idle")}
-            >
-              Keep image
-            </TextActionButton>
-          </div>
-        </div>
-      )}
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -154,6 +115,7 @@ const MnemonicGallery = ({
   // Drafts per slot ("new" or an image id), so switching slots keeps typing.
   const [drafts, setDrafts] = useState<Record<string, MnemonicDraft>>({});
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   // Effect needed: read the external IndexedDB database and subscribe to content
   // clearing; render cannot perform asynchronous reads or unsubscribe on unmount.
@@ -227,7 +189,7 @@ const MnemonicGallery = ({
   const slot = selected?.id ?? "new";
 
   return (
-    <div className="space-y-4 p-2 text-left">
+    <div ref={galleryRef} className="space-y-4 p-2 text-left">
       {gallery.images.length > 0 && (
         <div
           className="flex flex-wrap gap-2"
@@ -307,6 +269,7 @@ const MnemonicGallery = ({
           Select an image to regenerate, or delete one before adding another.
         </p>
       )}
+      <SavedStorageNotice kind="images" />
       {(selected || gallery.images.length < 3) && (
         <MnemonicForm
           key={slot}
@@ -347,6 +310,8 @@ const MnemonicGallery = ({
                 : [...current.images, entry];
               return { status: "ready", images, selectedId: image.id };
             });
+            // The gallery's top doesn't move as the new image renders below it.
+            scrollResultIntoView(galleryRef.current);
           }}
         />
       )}
@@ -354,11 +319,7 @@ const MnemonicGallery = ({
         Resolution and quality are set in User Preferences. Regenerate makes a
         fresh interpretation of your scene.
       </p>
-      <p className="text-xs text-muted-foreground">
-        AI can make mistakes. Generated content is saved only in this browser.
-        It may be lost if browser data is cleared. Download anything you want to
-        keep.
-      </p>
+      <AiContentNotice />
       <p className="text-xs text-muted-foreground">
         {gallery.images.filter((image) => !image.unsaved).length} saved ·{" "}
         {gallery.images.length} of 3 slots

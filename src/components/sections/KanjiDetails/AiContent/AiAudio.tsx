@@ -9,6 +9,7 @@ import {
 } from "@/components/common/AiActionButtons";
 import {
   addAiExplainUsage,
+  DEFAULT_AI_SPEECH_BIT_RATE,
   DEFAULT_AI_SPEECH_VOICE,
   isAiExplainReady,
   readAiExplainSettings,
@@ -256,6 +257,7 @@ export const AiAudio = ({
         text,
         voice,
         language,
+        bitRate: settings.speechBitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
         signal: controller.signal,
       });
       addAiExplainUsage(0, { audioCharacters: text.length });

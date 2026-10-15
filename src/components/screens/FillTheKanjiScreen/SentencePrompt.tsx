@@ -114,14 +114,14 @@ export const FuriganaSentence = ({
             if (!reading) return <span key={j}>{text}</span>;
             // The reading is absolutely centered over its kanji
             // (left-1/2 + -translate-x-1/2 needs no intrinsic sizing). The
-            // top padding reserves its height minus the 0.2em it dips into the
-            // line's half-leading; the min width (0.45em per kana) keeps a
+            // top padding reserves its height minus the 0.1em it dips into the
+            // line's half-leading, leaving a small gap above the kanji; the min width (0.45em per kana) keeps a
             // long reading from running over its neighbours. The baseline is
             // still the kanji's.
             return (
               <span
                 key={j}
-                className="relative inline-block pt-[0.25em] text-center"
+                className="relative inline-block pt-[0.35em] text-center"
                 style={{ minWidth: `${Array.from(reading).length * 0.45}em` }}
               >
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 text-[0.45em] font-normal text-muted-foreground leading-none whitespace-nowrap">

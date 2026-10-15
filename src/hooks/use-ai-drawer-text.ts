@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   AI_GENERATED_CONTENT_EVENT,
+  assertStorageAvailable,
   contentFingerprint,
   getTextResult,
   getGeneratedContentEpoch,
@@ -74,10 +75,26 @@ export const useAiDrawerText = (
     };
   }, [id]);
 
-  const generate = async (instructions: string) => {
-    if (request.current || state.status === "loading") return;
+  /** Resolves true when a new result is showing. */
+  const generate = async (instructions: string): Promise<boolean> => {
+    if (request.current || state.status === "loading") return false;
     const settings = readAiExplainSettings();
-    if (!isAiExplainReady(settings)) return;
+    if (!isAiExplainReady(settings)) return false;
+    // New text adds to saved storage; regenerating replaces it.
+    if (!state.result) {
+      try {
+        await assertStorageAvailable("text");
+      } catch (error) {
+        setState({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Couldn't check storage. Please try again.",
+        });
+        return false;
+      }
+    }
     const controller = new AbortController();
     const epoch = getGeneratedContentEpoch();
     request.current = controller;
@@ -107,13 +124,12 @@ export const useAiDrawerText = (
       if (!reply.text.trim())
         throw new Error("Grok returned an empty answer. Please try again.");
       const fingerprint = await contentFingerprint(reply.text);
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted) return false;
       const result: AiTextResult = {
         id,
         markdown: reply.text,
         sources: reply.sources,
         model: modelOf(settings),
-        prompt,
         instructions,
         createdAt: Date.now(),
         fingerprint,
@@ -127,8 +143,9 @@ export const useAiDrawerText = (
             ? "A newer result is already saved. This answer is available here to copy or download."
             : "Generated, but couldn't save on this device.";
       }
-      if (!controller.signal.aborted)
-        setState({ status: "ready", result, warning });
+      if (controller.signal.aborted) return false;
+      setState({ status: "ready", result, warning });
+      return true;
     } catch (error) {
       if (!controller.signal.aborted) {
         setState({
@@ -140,6 +157,7 @@ export const useAiDrawerText = (
               : "Couldn't generate this answer. Please try again.",
         });
       }
+      return false;
     } finally {
       if (request.current === controller) request.current = null;
     }

@@ -27,7 +27,7 @@ export const TextActionButton = ({
     disabled={busy || disabled}
     className={cn(
       // Like cnDottedUnderlineTrigger, but the hover highlight is enabled-only.
-      "inline-flex items-center gap-1 rounded-lg px-1 leading-loose text-foreground underline decoration-dotted underline-offset-4",
+      "inline-flex items-center gap-1 rounded-lg px-1 text-sm leading-loose text-foreground underline decoration-dotted underline-offset-4",
       "enabled:cursor-pointer enabled:hover:bg-neon-accent enabled:hover:text-black",
       "disabled:cursor-not-allowed disabled:opacity-50",
       className,

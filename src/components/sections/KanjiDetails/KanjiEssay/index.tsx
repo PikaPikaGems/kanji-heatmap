@@ -1,13 +1,10 @@
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { getKanjiEssayUrl } from "@/lib/kanji-essays";
-import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { isAiExplainReady } from "@/lib/ai-explain/preferences";
-import {
-  AI_GENERATED_CONTENT_EVENT,
-  getTextResult,
-} from "@/lib/ai-explain/storage";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { DefaultErrorFallback } from "@/components/error/DefaultErrorFallback";
 import { HighlightKanjiSwitch } from "../KanjiStudyNotes/HighlightKanjiSwitch";
 import { MarkdownPreview } from "../KanjiStudyNotes/MarkdownPreview";
 import { AiKanjiEssay } from "../AiContent/AiKanjiEssay";
@@ -18,78 +15,95 @@ type EssayState =
   | { status: "ready"; markdown: string | null }
   | { status: "error"; message: string };
 
-const PublishedEssay = ({
-  kanji,
-  keyword,
-  markdown,
-  aiReady,
+/** Which essay the section shows: the one we publish, or the user's own. */
+type EssaySource = "published" | "mine";
+
+const EssaySourceSwitch = ({
+  source,
+  onSourceChange,
 }: {
-  kanji: string;
-  keyword: string;
-  markdown: string;
-  aiReady: boolean;
+  source: EssaySource;
+  onSourceChange: (source: EssaySource) => void;
 }) => {
-  const [saved, setSaved] = useState(false);
-  const [viewSaved, setViewSaved] = useState(false);
-  // Effect needed: checks IndexedDB and listens for saved essay changes; database
-  // reads are asynchronous and event subscriptions require unmount cleanup.
-  useEffect(() => {
-    if (!aiReady) return;
-    let active = true;
-    let version = 0;
-    const load = async () => {
-      const current = ++version;
-      try {
-        const result = await getTextResult(`essay:${kanji}`);
-        if (active && current === version) setSaved(Boolean(result));
-      } catch {
-        /* Published essays remain readable if local storage is unavailable. */
-      }
-    };
-    void load();
-    window.addEventListener(AI_GENERATED_CONTENT_EVENT, load);
-    return () => {
-      active = false;
-      window.removeEventListener(AI_GENERATED_CONTENT_EVENT, load);
-    };
-  }, [kanji, aiReady]);
-
-  if (aiReady && saved && viewSaved)
-    return (
-      <div className="space-y-4">
-        <Button variant="ghost" size="sm" onClick={() => setViewSaved(false)}>
-          Back to published essay
-        </Button>
-        <AiKanjiEssay kanji={kanji} keyword={keyword} />
-      </div>
-    );
-
+  const id = useId();
   return (
-    <div className="space-y-4">
-      <HighlightKanjiSwitch className="pb-3 pl-2 sm:justify-end" />
-      <div className="rounded-xl border border-foreground/20 py-4">
-        <MarkdownPreview source={markdown} />
-      </div>
-      {aiReady && (
-        <AiAudio
-          key={markdown}
-          sourceId={`published-essay:${kanji}`}
-          markdown={markdown}
-          filename={`kanji-essay-${kanji}`}
-        />
-      )}
-      {aiReady && saved && (
-        <Button variant="ghost" size="sm" onClick={() => setViewSaved(true)}>
-          View saved AI essay
-        </Button>
-      )}
+    <div className="flex items-center gap-2">
+      <Switch
+        id={id}
+        checked={source === "mine"}
+        onCheckedChange={(mine) => onSourceChange(mine ? "mine" : "published")}
+      />
+      <Label htmlFor={id} className="text-xs font-bold cursor-pointer">
+        Show my AI essay
+      </Label>
     </div>
   );
 };
 
+const PublishedEssay = ({
+  kanji,
+  markdown,
+}: {
+  kanji: string;
+  markdown: string;
+}) => (
+  <>
+    <HighlightKanjiSwitch className="pl-2" />
+    <div className="rounded-xl border border-foreground/20 py-4">
+      <MarkdownPreview source={markdown} />
+    </div>
+    <AiAudio
+      key={markdown}
+      sourceId={`published-essay:${kanji}`}
+      markdown={markdown}
+      filename={`kanji-essay-${kanji}`}
+    />
+  </>
+);
+
+const PublishedEssaySection = ({
+  kanji,
+  state,
+  onRetry,
+}: {
+  kanji: string;
+  state: EssayState;
+  onRetry: () => void;
+}) => {
+  if (state.status === "loading")
+    return (
+      <div
+        role="status"
+        aria-label="Loading essay"
+        className="flex h-48 items-center justify-center"
+      >
+        <Loader2 className="size-7 animate-spin" />
+      </div>
+    );
+  if (state.status === "error")
+    return (
+      <div className="space-y-3 p-4 text-center">
+        <p role="alert" className="text-sm text-destructive">
+          {state.message}
+        </p>
+        <Button variant="outline" onClick={onRetry}>
+          Retry loading essay
+        </Button>
+      </div>
+    );
+  if (!state.markdown)
+    return (
+      <DefaultErrorFallback
+        message="No essay for this kanji yet."
+        showDefaultCta={false}
+      />
+    );
+  return <PublishedEssay kanji={kanji} markdown={state.markdown} />;
+};
+
 const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
   const url = getKanjiEssayUrl(kanji, keyword);
-  const [settings] = useAiExplainSettings();
+  const [source, setSource] = useState<EssaySource>("published");
   const [state, setState] = useState<EssayState>(() =>
     url ? { status: "loading" } : { status: "ready", markdown: null }
   );
@@ -148,52 +162,24 @@ const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
     return () => controller.abort();
   }, [url, retry]);
 
-  if (state.status === "loading")
-    return (
-      <div
-        role="status"
-        aria-label="Loading essay"
-        className="flex h-48 items-center justify-center"
-      >
-        <Loader2 className="size-7 animate-spin" />
-      </div>
-    );
-  if (state.status === "error")
-    return (
-      <div className="space-y-3 p-4 text-center">
-        <p role="alert" className="text-sm text-destructive">
-          {state.message}
-        </p>
-        <Button
-          variant="outline"
-          onClick={() => setRetry((value) => value + 1)}
-        >
-          Retry loading essay
-        </Button>
-      </div>
-    );
-  const aiReady = isAiExplainReady(settings);
-  if (!state.markdown)
-    return (
-      <div className="space-y-4">
-        {!aiReady && (
-          <p className="p-4 text-center text-sm text-muted-foreground">
-            No essay for this kanji yet.
-          </p>
-        )}
-        {aiReady && (
-          <AiKanjiEssay key={kanji} kanji={kanji} keyword={keyword} />
-        )}
-      </div>
-    );
   return (
-    <PublishedEssay
-      key={kanji}
-      kanji={kanji}
-      keyword={keyword}
-      markdown={state.markdown}
-      aiReady={aiReady}
-    />
+    <div className="space-y-4">
+      <div className="pl-2">
+        <EssaySourceSwitch source={source} onSourceChange={setSource} />
+      </div>
+      {/* Keyed so each switch remounts and fades in instead of snapping. */}
+      <div key={source} className="space-y-4 animate-fade-in-fast">
+        {source === "mine" ? (
+          <AiKanjiEssay key={kanji} kanji={kanji} keyword={keyword} />
+        ) : (
+          <PublishedEssaySection
+            kanji={kanji}
+            state={state}
+            onRetry={() => setRetry((value) => value + 1)}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 
