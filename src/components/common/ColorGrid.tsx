@@ -8,7 +8,7 @@ export const ColorGrid = ({ onSelect }: { onSelect?: () => void }) => {
   const [colorIndex, setThemeColor] = useCurrentThemeColor();
 
   return (
-    <div className="grid grid-cols-6 gap-2 mx-1">
+    <div className="grid grid-cols-6 gap-2 p-1.5">
       {themeColorsRgb.map((rgb, i) => (
         <button
           key={i}

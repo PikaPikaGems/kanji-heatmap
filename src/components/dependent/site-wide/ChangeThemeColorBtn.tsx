@@ -16,7 +16,7 @@ export const ChangeThemeColorBtn = () => {
         open={isOpen}
         onOpenChange={setIsOpen}
         showArrow={false}
-        contentClassName="z-40 w-72 p-3 pt-6"
+        contentClassName="z-40 w-72 p-3"
         trigger={
           <HoverCardTrigger asChild>
             <button
