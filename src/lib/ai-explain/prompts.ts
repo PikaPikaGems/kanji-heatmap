@@ -13,7 +13,8 @@ export type ImagePalette =
   | "blue"
   | "pink"
   | "pastel"
-  | "grayscale";
+  | "grayscale"
+  | "custom";
 export const IMAGE_STYLE_LABELS: Record<ImageStyle, string> = {
   "kanji-heatmap": "Kanji Heatmap",
   watercolor: "Watercolor",
@@ -29,6 +30,7 @@ export const IMAGE_PALETTE_LABELS: Record<ImagePalette, string> = {
   pink: "Hot pink",
   pastel: "Pastel",
   grayscale: "Black and white",
+  custom: "Custom",
 };
 export const DEFAULT_AI_IMAGE_MODEL = "grok-imagine-image-2.0";
 
@@ -68,6 +70,7 @@ export const DEFAULT_IMAGE_PALETTE_PROMPTS: Record<ImagePalette, string> = {
     "Use a dreamy pastel palette: powder blue, aqua, mint, lavender, lilac, blush pink, peach, and warm butter yellow, with creamy whites for highlights. Keep everything light, airy, and low in contrast, as if lit by warm, glowing light. Give the focal subject a slightly deeper rose or warm cream so it stands out. Iridescent or pearly touches are welcome. Avoid neon, pure black, harsh shadows, and saturated primary colors.",
   grayscale:
     "Use only black, white, and shades of gray. No colored accents. Use strong silhouettes and clear light-dark contrast.",
+  custom: "",
 };
 
 const fillTemplate = (template: string, context: Record<string, string>) => {
@@ -111,6 +114,7 @@ export const buildImagePrompt = (
     style: ImageStyle;
     palette: ImagePalette;
     customStyle?: string;
+    customPalette?: string;
     instructions?: string;
   }
 ) => {
@@ -122,7 +126,10 @@ export const buildImagePrompt = (
   const palette =
     context.palette === "kanji-heatmap"
       ? (settings.imagePalettePrompt ?? DEFAULT_IMAGE_PALETTE_PROMPT)
-      : DEFAULT_IMAGE_PALETTE_PROMPTS[context.palette];
+      : context.palette === "custom"
+        ? context.customPalette || settings.imagePalettePrompts?.custom || ""
+        : (settings.imagePalettePrompts?.[context.palette] ??
+          DEFAULT_IMAGE_PALETTE_PROMPTS[context.palette]);
   const prompt = fillTemplate(settings.imagePrompt ?? DEFAULT_IMAGE_PROMPT, {
     KANJI: context.kanji,
     KEYWORD: context.keyword,

@@ -65,9 +65,11 @@ export const DownloadButton = ({
 export const DownloadMarkdownButton = ({
   markdown,
   filename,
+  label = "Download Markdown",
 }: {
   markdown: string;
   filename: string;
+  label?: string;
 }) => {
   const [error, setError] = useState("");
   return (
@@ -85,7 +87,7 @@ export const DownloadMarkdownButton = ({
           }
         }}
       >
-        Download Markdown
+        {label}
       </DownloadButton>
       {error && (
         <span role="alert" className="text-xs font-bold text-destructive">

@@ -34,6 +34,7 @@ export type MnemonicDraft = {
   style: ImageStyle;
   palette: ImagePalette;
   customStyle: string;
+  customPalette: string;
   instructions: string;
 };
 
@@ -44,6 +45,10 @@ const initialDraft = (image?: MnemonicImage): MnemonicDraft => ({
   customStyle:
     image?.customStyle ??
     readAiExplainSettings().imageStylePrompts?.custom ??
+    "",
+  customPalette:
+    image?.customPalette ??
+    readAiExplainSettings().imagePalettePrompts?.custom ??
     "",
   instructions: "",
 });
@@ -108,6 +113,7 @@ export const MnemonicForm = ({
       return;
     }
     if (draft.style === "custom" && !draft.customStyle.trim()) return;
+    if (draft.palette === "custom" && !draft.customPalette.trim()) return;
     const active = new AbortController();
     const epoch = getGeneratedContentEpoch();
     controller.current = active;
@@ -241,6 +247,26 @@ export const MnemonicForm = ({
             />
           </div>
         )}
+        {draft.palette === "custom" && (
+          <div className="space-y-1">
+            <label
+              htmlFor={`${id}-custom-palette`}
+              className="text-sm font-medium"
+            >
+              Custom palette description
+            </label>
+            <StudyNotesTextarea
+              id={`${id}-custom-palette`}
+              required
+              rows={2}
+              maxLength={2000}
+              value={draft.customPalette}
+              onChange={(event) =>
+                setDraft({ ...draft, customPalette: event.target.value })
+              }
+            />
+          </div>
+        )}
         {image && (
           <div className="space-y-1">
             <label htmlFor={`${id}-changes`} className="text-sm font-medium">
@@ -264,7 +290,8 @@ export const MnemonicForm = ({
           busyLabel={image ? "Regenerating…" : "Generating…"}
           disabled={
             !draft.description.trim() ||
-            (draft.style === "custom" && !draft.customStyle.trim())
+            (draft.style === "custom" && !draft.customStyle.trim()) ||
+            (draft.palette === "custom" && !draft.customPalette.trim())
           }
         >
           {image ? "Regenerate" : "✨ Generate Visual Mnemonic"}

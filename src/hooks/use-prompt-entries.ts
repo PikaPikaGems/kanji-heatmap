@@ -5,11 +5,14 @@ import {
 } from "@/lib/ai-explain/preferences";
 import {
   DEFAULT_IMAGE_PALETTE_PROMPT,
+  DEFAULT_IMAGE_PALETTE_PROMPTS,
   DEFAULT_IMAGE_PROMPT,
   DEFAULT_IMAGE_STYLE_PROMPTS,
   DEFAULT_KANJI_ESSAY_PROMPT,
   DEFAULT_VOCABULARY_PROMPT,
+  IMAGE_PALETTE_LABELS,
   IMAGE_STYLE_LABELS,
+  type ImagePalette,
   type ImageStyle,
 } from "@/lib/ai-explain/prompts";
 
@@ -23,7 +26,7 @@ export type PromptEntry = {
   onChange: (value: string | undefined) => void;
 };
 
-/** Every editable prompt, in menu order (Custom style last). */
+/** Every editable prompt, in menu order (palettes, then styles; Custom style last). */
 export const usePromptEntries = (): PromptEntry[] => {
   const [settings, update] = useAiExplainSettings();
   const styles = (Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]).filter(
@@ -37,6 +40,22 @@ export const usePromptEntries = (): PromptEntry[] => {
     onChange: (value) =>
       update({
         imageStylePrompts: { ...settings.imageStylePrompts, [style]: value },
+      }),
+  });
+  const palettes = (Object.keys(IMAGE_PALETTE_LABELS) as ImagePalette[]).filter(
+    (palette) => palette !== "kanji-heatmap"
+  );
+  const paletteEntry = (palette: ImagePalette): PromptEntry => ({
+    id: `palette:${palette}`,
+    label: `${IMAGE_PALETTE_LABELS[palette]} palette`,
+    value: settings.imagePalettePrompts?.[palette],
+    defaultValue: DEFAULT_IMAGE_PALETTE_PROMPTS[palette],
+    onChange: (value) =>
+      update({
+        imagePalettePrompts: {
+          ...settings.imagePalettePrompts,
+          [palette]: value,
+        },
       }),
   });
   return [
@@ -76,12 +95,13 @@ export const usePromptEntries = (): PromptEntry[] => {
       onChange: (imagePrompt) => update({ imagePrompt }),
     },
     {
-      id: "palette",
+      id: "palette:kanji-heatmap",
       label: "Kanji Heatmap palette",
       value: settings.imagePalettePrompt,
       defaultValue: DEFAULT_IMAGE_PALETTE_PROMPT,
       onChange: (imagePalettePrompt) => update({ imagePalettePrompt }),
     },
+    ...palettes.map(paletteEntry),
     ...styles.map(styleEntry),
     styleEntry("custom"),
   ];

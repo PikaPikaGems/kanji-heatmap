@@ -31,6 +31,7 @@ export type MnemonicImage = {
   style: ImageStyle;
   palette: ImagePalette;
   customStyle?: string;
+  customPalette?: string;
   resolution: "1k" | "2k";
   quality: "low" | "medium";
   model: string;

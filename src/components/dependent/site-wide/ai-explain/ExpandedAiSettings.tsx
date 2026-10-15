@@ -3,7 +3,10 @@ import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StudyNotesTextarea } from "@/components/common/StudyNotesTextarea";
-import { TextActionButton } from "@/components/common/AiActionButtons";
+import {
+  DownloadMarkdownButton,
+  TextActionButton,
+} from "@/components/common/AiActionButtons";
 import BasicSelect from "@/components/common/BasicSelect";
 import {
   AI_SPEECH_VOICES,
@@ -160,6 +163,23 @@ const ImageGenerationSettings = () => {
 export const ImageSettings = ImageGenerationSettings;
 
 /** One picker and one editor for every prompt, instead of a box per prompt. */
+/** Every prompt in one file: a "#" heading per prompt and its text in a fence. */
+const allPromptsMarkdown = (
+  entries: { label: string; value?: string; defaultValue: string }[]
+) =>
+  entries
+    .map((entry) => {
+      const text = entry.value ?? entry.defaultValue;
+      // A longer fence than any backtick run inside keeps the block intact.
+      const longestRun = Math.max(
+        0,
+        ...(text.match(/`+/g) ?? []).map((run) => run.length)
+      );
+      const fence = "`".repeat(Math.max(3, longestRun + 1));
+      return `# ${entry.label}\n${fence}md\n${text}\n${fence}\n`;
+    })
+    .join("\n");
+
 export const PromptSettings = () => {
   const entries = usePromptEntries();
   const [selectedId, setSelectedId] = useState(entries[0].id);
@@ -200,6 +220,13 @@ export const PromptSettings = () => {
         placeholders={selected.placeholders}
         onChange={selected.onChange}
       />
+      <div className="flex justify-center">
+        <DownloadMarkdownButton
+          markdown={allPromptsMarkdown(entries)}
+          filename="kanji-heatmap-ai-prompts.md"
+          label="Download all prompts"
+        />
+      </div>
     </div>
   );
 };

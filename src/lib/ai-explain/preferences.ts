@@ -1,4 +1,9 @@
-import type { ImageStyle } from "./prompts";
+import {
+  IMAGE_PALETTE_LABELS,
+  IMAGE_STYLE_LABELS,
+  type ImagePalette,
+  type ImageStyle,
+} from "./prompts";
 import { notifyStorage, safeReadJson } from "@/lib/storage";
 
 export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
@@ -56,7 +61,10 @@ export type AiExplainSettings = {
   kanjiEssayPrompt?: string;
   imagePrompt?: string;
   imageStylePrompts?: Partial<Record<ImageStyle, string>>;
+  /** The Kanji Heatmap palette prompt (kept under its original key). */
   imagePalettePrompt?: string;
+  /** Edited prompts for the other palettes, including Custom. */
+  imagePalettePrompts?: Partial<Record<ImagePalette, string>>;
   imageModel?: string;
   imageResolution?: "1k" | "2k";
   imageQuality?: "low" | "medium";
@@ -67,18 +75,13 @@ export type AiExplainSettings = {
 const optionalString = (v: unknown) =>
   typeof v === "string" && v.trim() !== "" ? v : undefined;
 
-const readStylePrompts = (
-  value: unknown
-): Partial<Record<ImageStyle, string>> => {
+const readPromptRecord = <K extends string>(
+  value: unknown,
+  keys: K[]
+): Partial<Record<K, string>> => {
   if (!value || typeof value !== "object") return {};
-  const result: Partial<Record<ImageStyle, string>> = {};
-  for (const key of [
-    "kanji-heatmap",
-    "watercolor",
-    "pixel-art",
-    "cartoon",
-    "custom",
-  ] as const) {
+  const result: Partial<Record<K, string>> = {};
+  for (const key of keys) {
     const prompt = optionalString((value as Record<string, unknown>)[key]);
     if (prompt) result[key] = prompt;
   }
@@ -108,7 +111,14 @@ export const readAiExplainSettings = (): AiExplainSettings => {
     imageQuality: raw.imageQuality === "medium" ? "medium" : "low",
     speechVoice: optionalString(raw.speechVoice),
     speechLanguage: raw.speechLanguage === "ja" ? "ja" : "auto",
-    imageStylePrompts: readStylePrompts(raw.imageStylePrompts),
+    imageStylePrompts: readPromptRecord(
+      raw.imageStylePrompts,
+      Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]
+    ),
+    imagePalettePrompts: readPromptRecord(
+      raw.imagePalettePrompts,
+      Object.keys(IMAGE_PALETTE_LABELS) as ImagePalette[]
+    ),
     monthlyTokenBudget:
       typeof raw.monthlyTokenBudget === "number" &&
       Number.isFinite(raw.monthlyTokenBudget) &&
