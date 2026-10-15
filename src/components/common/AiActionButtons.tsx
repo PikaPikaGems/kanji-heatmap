@@ -29,7 +29,7 @@ export const TextActionButton = ({
     disabled={busy || disabled}
     className={cn(
       cnDottedUnderlineTrigger,
-      "disabled:opacity-50",
+      "text-foreground disabled:opacity-50",
       className,
       busy &&
         "cursor-default text-muted-foreground hover:bg-transparent hover:text-muted-foreground disabled:opacity-100"

@@ -48,7 +48,7 @@ const ImageActions = ({
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1">
         <DownloadButton
           disabled={disabled || action === "deleting"}
           onClick={() => {
@@ -74,7 +74,7 @@ const ImageActions = ({
         <span aria-hidden>·</span>
         <TextActionButton
           icon={<Trash2 size={14} />}
-          className="text-destructive"
+          className="text-rose-500"
           disabled={disabled || action === "deleting"}
           onClick={() => setAction("confirm-delete")}
         >
@@ -82,14 +82,14 @@ const ImageActions = ({
         </TextActionButton>
       </div>
       {action !== "idle" && (
-        <div className="space-y-2 rounded-lg border p-3">
+        <div className="space-y-2 rounded-lg border p-3 text-center">
           <p className="text-sm">
             Delete this mnemonic? Download it first if you want to keep it.
           </p>
-          <div className="flex flex-wrap items-center gap-1">
+          <div className="flex flex-wrap items-center justify-center gap-1">
             <TextActionButton
               icon={<Trash2 size={14} />}
-              className="text-destructive"
+              className="text-rose-500"
               busy={action === "deleting"}
               busyLabel="Deleting…"
               disabled={disabled}
@@ -230,7 +230,7 @@ const MnemonicGallery = ({
             blob={selected.blob}
             description={selected.description}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground">
             AI-generated mnemonic · {selected.resolution.toUpperCase()} ·{" "}
             {selected.quality === "low" ? "Standard" : "Higher detail"}
           </p>
