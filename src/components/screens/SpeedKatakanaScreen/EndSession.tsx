@@ -43,7 +43,7 @@ export const EndSession = ({
           />
         </>
       }
-      afterStats={<ProgressNotSavedNotice saveError={saveError} />}
+      belowButtons={<ProgressNotSavedNotice saveError={saveError} />}
       primaryLabel="Next Challenge"
       onPrimary={onNext}
       secondaryLabel="End Session"

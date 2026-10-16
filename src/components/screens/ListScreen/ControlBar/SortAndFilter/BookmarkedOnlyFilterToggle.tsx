@@ -1,4 +1,4 @@
-import { useBookmarkFilterToggle } from "@/lib/engine/use-bookmark-filter-toggle";
+import { useShowBookmarkFilterToggle } from "@/lib/engine/use-bookmark-filter-toggle";
 import { FilterToggleRow } from "./FilterToggleRow";
 
 /** Hidden in builds without the study engine; bookmarks live in the account. */
@@ -9,8 +9,8 @@ export const BookmarkedOnlyFilterToggle = ({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) => {
-  const toggle = useBookmarkFilterToggle(checked);
-  if (toggle == null) return null;
+  const show = useShowBookmarkFilterToggle();
+  if (!show) return null;
 
   return (
     <FilterToggleRow
@@ -18,8 +18,6 @@ export const BookmarkedOnlyFilterToggle = ({
       label="Bookmarked only"
       checked={checked}
       onChange={onChange}
-      disabled={toggle.disabled}
-      hint={toggle.hint}
     />
   );
 };

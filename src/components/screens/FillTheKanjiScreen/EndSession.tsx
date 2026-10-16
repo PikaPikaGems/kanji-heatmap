@@ -5,6 +5,7 @@ import { pickEndCheer } from "@/lib/practice-cheers";
 import { cn, percent } from "@/lib/utils";
 import { Stat } from "@/components/shared-practice";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { TextActionButton } from "@/components/common/AiActionButtons";
 import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { ItemResult, MissedKanji } from "./types";
 
@@ -106,16 +107,10 @@ export const EndSession = ({
           </div>
 
           {correct < results.length && (
-            <button
-              type="button"
-              onClick={onRetryMistakes}
-              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
-            >
+            <TextActionButton onClick={onRetryMistakes}>
               Retry mistakes
-            </button>
+            </TextActionButton>
           )}
-
-          <ProgressNotSavedNotice saveError={saveError} />
         </div>
       </div>
 
@@ -133,6 +128,7 @@ export const EndSession = ({
           <PracticeButton size="md" variant="ghost" onClick={onEnd}>
             End Session
           </PracticeButton>
+          <ProgressNotSavedNotice saveError={saveError} />
         </div>
       </div>
     </div>

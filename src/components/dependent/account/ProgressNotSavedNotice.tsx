@@ -1,26 +1,23 @@
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { cn } from "@/lib/utils";
 
-const SIGNED_OUT_COPY = "⚠️ Progress not saved — you're not logged in";
-const BROWSER_COPY = "⚠️ Progress can't be saved in this browser";
-
-const Notice = ({
+/** "Progress can't be saved in this browser", for browsers the engine can't run in. */
+export const BrowserCantSaveNotice = ({
   className,
-  children,
 }: {
   className?: string;
-  children: ReactNode;
 }) => (
-  <p className={cn("text-xs text-center text-muted-foreground", className)}>
-    {children}
-  </p>
+  <UserNotice className={className}>
+    Progress can&apos;t be saved in this browser.
+  </UserNotice>
 );
 
 /**
- * End-of-round line for games that save progress to the account. Says why
- * nothing was saved (logged out, or a browser that can't save), or shows
- * `saveError` when the account is active but the write failed. Renders
+ * End-of-round notice, shown below the round's main buttons. Says why nothing
+ * was saved (logged out, or a browser that can't save), or shows `saveError`
+ * in bold yellow when the account is active but the write failed. Renders
  * nothing when all is well or when this build has no accounts.
  */
 export const ProgressNotSavedNotice = ({
@@ -34,13 +31,28 @@ export const ProgressNotSavedNotice = ({
   const account = useAccountStatus();
 
   if (account.kind === "signed-out") {
-    return <Notice className={className}>{SIGNED_OUT_COPY}</Notice>;
+    return (
+      <UserNotice className={cn("text-center", className)}>
+        You&apos;re not logged in, so this round wasn&apos;t saved.{" "}
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> to save
+        your next rounds.
+      </UserNotice>
+    );
   }
   if (account.kind === "unavailable" && account.reason !== "not-included") {
-    return <Notice className={className}>{BROWSER_COPY}</Notice>;
+    return <BrowserCantSaveNotice className={cn("text-center", className)} />;
   }
   if (account.kind === "active" && saveError) {
-    return <Notice className={className}>{saveError}</Notice>;
+    return (
+      <p
+        className={cn(
+          "text-sm font-bold text-center text-yellow-600 dark:text-yellow-400",
+          className
+        )}
+      >
+        {saveError}
+      </p>
+    );
   }
   return null;
 };

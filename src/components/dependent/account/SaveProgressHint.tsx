@@ -1,28 +1,26 @@
+import { LoginNotice } from "./LoginNotice";
+import { BrowserCantSaveNotice } from "./ProgressNotSavedNotice";
 import { cn } from "@/lib/utils";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { ProgressNotSavedNotice } from "./ProgressNotSavedNotice";
 
 /**
- * Start-screen line under a game's Start button: a log in link when logged
- * out, the "can't be saved in this browser" notice when the browser can't run
- * the engine, and nothing otherwise.
+ * Start-screen notice under a game's Start button: the logged-out notice
+ * while signed out, "can't be saved in this browser" when the browser can't
+ * run the engine, and nothing otherwise (including builds without accounts).
  */
 export const SaveProgressHint = ({ className }: { className?: string }) => {
   const account = useAccountStatus();
 
-  if (account.kind !== "signed-out") {
-    return <ProgressNotSavedNotice className={className} />;
+  if (account.kind === "signed-out") {
+    return (
+      <LoginNotice
+        to="save your progress"
+        className={cn("text-center", className)}
+      />
+    );
   }
-  return (
-    <div className={cn("text-center", className)}>
-      <button
-        type="button"
-        onClick={openLoginDialog}
-        className="text-xs underline underline-offset-4 text-muted-foreground hover:text-foreground"
-      >
-        Log in so your progress is saved
-      </button>
-    </div>
-  );
+  if (account.kind === "unavailable" && account.reason !== "not-included") {
+    return <BrowserCantSaveNotice className={cn("text-center", className)} />;
+  }
+  return null;
 };

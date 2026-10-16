@@ -1,33 +1,10 @@
 import { isAccountUiHidden } from "./account-ui";
-import { type AccountStatus, useAccountStatus } from "./use-account-status";
-
-export type BookmarkFilterToggle = {
-  disabled: boolean;
-  /** Short reason shown under a disabled toggle. */
-  hint: string | null;
-};
-
-const hintFor = (status: AccountStatus): string | null => {
-  if (status.kind === "loading") return null;
-  if (status.kind === "signed-out") return "Log in to use bookmarks";
-  if (status.kind === "unavailable") {
-    return "Update your browser to use bookmarks";
-  }
-  return "Bookmarks aren't available right now";
-};
+import { useAccountStatus } from "./use-account-status";
 
 /**
- * State for a "Bookmarked only" switch, or null when it should be hidden (no
- * engine in this build). Disabled unless the account is active; a switch that
- * is already on stays usable so it can be turned off.
+ * Whether to show a "Bookmarked only" switch: hidden only when this build has
+ * no study engine (bookmarks live in the account). Logged out, it still works;
+ * no kanji are bookmarked, so none match.
  */
-export const useBookmarkFilterToggle = (
-  checked: boolean
-): BookmarkFilterToggle | null => {
-  const status = useAccountStatus();
-  if (isAccountUiHidden(status)) return null;
-  if (status.kind === "active" || checked) {
-    return { disabled: false, hint: null };
-  }
-  return { disabled: true, hint: hintFor(status) };
-};
+export const useShowBookmarkFilterToggle = (): boolean =>
+  !isAccountUiHidden(useAccountStatus());

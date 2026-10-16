@@ -65,18 +65,16 @@ export const EndSession = ({
           </>
         }
         afterStats={
-          <>
-            {forgottenKanji.length > 0 && (
-              <Link
-                href={multiKanjiSearchHref(forgottenKanji)}
-                className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
-              >
-                View {forgottenKanji.length} kanji you forgot
-              </Link>
-            )}
-            <ProgressNotSavedNotice saveError={saveError} />
-          </>
+          forgottenKanji.length > 0 && (
+            <Link
+              href={multiKanjiSearchHref(forgottenKanji)}
+              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
+            >
+              View {forgottenKanji.length} kanji you forgot
+            </Link>
+          )
         }
+        belowButtons={<ProgressNotSavedNotice saveError={saveError} />}
         primaryLabel="Done"
         onPrimary={onEnd}
       />
@@ -92,9 +90,7 @@ export const EndSession = ({
         </p>
       }
       tiles={results}
-      afterTiles={
-        <ProgressNotSavedNotice saveError={saveError} className="pb-4" />
-      }
+      afterButtons={<ProgressNotSavedNotice saveError={saveError} />}
       primaryLabel="Continue"
       onPrimary={onNext}
       secondaryLabel="End Session"

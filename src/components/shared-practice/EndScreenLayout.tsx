@@ -14,6 +14,7 @@ export const EndScreenLayout = ({
   headingExtra,
   stats,
   afterStats,
+  belowButtons,
   primaryLabel,
   onPrimary,
   secondaryLabel,
@@ -26,6 +27,8 @@ export const EndScreenLayout = ({
   stats: ReactNode;
   /** Optional content between the stats and the buttons (e.g. a link). */
   afterStats?: ReactNode;
+  /** Optional content under the buttons (e.g. a "progress not saved" notice). */
+  belowButtons?: ReactNode;
   primaryLabel: string;
   onPrimary: () => void;
   secondaryLabel?: string;
@@ -54,15 +57,18 @@ export const EndScreenLayout = ({
 
     {afterStats}
 
-    <div className="flex flex-col w-full max-w-xs gap-3">
-      <PracticeButton size="lg" onClick={onPrimary}>
-        {primaryLabel}
-      </PracticeButton>
-      {secondaryLabel && onSecondary && (
-        <PracticeButton variant="ghost" size="md" onClick={onSecondary}>
-          {secondaryLabel}
+    <div className="flex flex-col items-center w-full gap-4">
+      <div className="flex flex-col w-full max-w-xs gap-3">
+        <PracticeButton size="lg" onClick={onPrimary}>
+          {primaryLabel}
         </PracticeButton>
-      )}
+        {secondaryLabel && onSecondary && (
+          <PracticeButton variant="ghost" size="md" onClick={onSecondary}>
+            {secondaryLabel}
+          </PracticeButton>
+        )}
+      </div>
+      {belowButtons && <div className="w-full max-w-md">{belowButtons}</div>}
     </div>
   </div>
 );

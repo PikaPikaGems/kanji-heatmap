@@ -20,6 +20,7 @@ export const RoundRecap = ({
   summary,
   tiles,
   afterTiles,
+  afterButtons,
   primaryLabel,
   onPrimary,
   secondaryLabel,
@@ -31,6 +32,8 @@ export const RoundRecap = ({
   tiles: RoundRecapTile[];
   /** Shown under the tiles, e.g. a "progress not saved" notice. */
   afterTiles?: ReactNode;
+  /** Shown under the buttons, e.g. a "progress not saved" notice. */
+  afterButtons?: ReactNode;
   primaryLabel: string;
   onPrimary: () => void;
   secondaryLabel?: string;
@@ -74,6 +77,7 @@ export const RoundRecap = ({
             {secondaryLabel}
           </PracticeButton>
         )}
+        {afterButtons}
       </div>
     </div>
   </div>
