@@ -1,5 +1,5 @@
 import { Slider } from "@/components/ui/slider";
-import { FieldError, FieldTitle, Warning } from "./FieldParts";
+import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 
 const DAYS_PER_MONTH = 30;
 const MAX_DAYS = 36500;
@@ -76,6 +76,7 @@ export const IntervalField = ({
         }
         thumbLabel="Maximum interval"
       />
+      <SliderEnds min="1 month" max={`${Math.round(MAX_DAYS / 365)} years`} />
       {months > WARN_ABOVE_MONTHS && (
         <Warning>
           Setting the maximum interval above 36 months can create very long gaps

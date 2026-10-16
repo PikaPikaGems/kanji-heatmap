@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Pencil, RotateCcw } from "lucide-react";
+import { TextActionButton } from "@/components/common/AiActionButtons";
+import { DialogActions } from "@/components/common/DialogActions";
+import { UserNotice } from "@/components/common/UserNotice";
 import { Dialog } from "@/components/ui/dialog";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { formatWeights, parseWeights } from "@/lib/engine/fsrs-weights";
 import { FieldError, FieldTitle } from "./FieldParts";
@@ -43,15 +47,15 @@ const WeightsDialog = ({
         titleClassName="text-left"
       >
         <div className="flex flex-col gap-3 px-2 pt-2 text-left">
-          <p className="text-sm">
+          <UserNotice>
             Defaults work well for most users. Don&apos;t tweak these manually
             unless you really know what you&apos;re doing.
-          </p>
+          </UserNotice>
           <textarea
             aria-label="Model weights"
             rows={6}
             spellCheck={false}
-            className="w-full p-3 font-mono text-xs border rounded-md bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full p-3 font-mono text-xs border-2 rounded-2xl bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={text}
             onChange={(e) => {
               setText(e.target.value);
@@ -59,21 +63,22 @@ const WeightsDialog = ({
             }}
           />
           <FieldError message={error} />
-          <div className="flex flex-wrap justify-between gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setText(formatWeights(defaultWeights));
-                setError(undefined);
-              }}
-            >
-              Reset to defaults
-            </Button>
-            <Button type="button" onClick={apply}>
-              Apply weights
-            </Button>
-          </div>
+          <TextActionButton
+            icon={<RotateCcw size={14} />}
+            className="self-start -ml-1"
+            onClick={() => {
+              setText(formatWeights(defaultWeights));
+              setError(undefined);
+            }}
+          >
+            Reset to defaults
+          </TextActionButton>
+          <DialogActions className="pt-3">
+            <PracticeButton variant="secondary" onClick={onClose}>
+              Cancel
+            </PracticeButton>
+            <PracticeButton onClick={apply}>Apply weights</PracticeButton>
+          </DialogActions>
         </div>
       </ScrollableDialogContent>
     </Dialog>
@@ -100,19 +105,16 @@ export const ModelWeightsField = ({
         title="Model weights"
         tip="The numbers FSRS uses to predict how fast you forget. The defaults suit most people."
       />
-      <p className="p-2 font-mono text-xs break-words border rounded-md bg-muted/40 text-muted-foreground">
+      <p className="p-3 font-mono text-xs break-words border-2 border-dashed rounded-xl text-muted-foreground">
         {weights.join(", ")}
       </p>
-      <div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setEditing(true)}
-        >
-          Edit weights
-        </Button>
-      </div>
+      <TextActionButton
+        icon={<Pencil size={14} />}
+        className="self-start -ml-1"
+        onClick={() => setEditing(true)}
+      >
+        Edit weights
+      </TextActionButton>
       <FieldError message={error} />
       {editing && (
         <WeightsDialog

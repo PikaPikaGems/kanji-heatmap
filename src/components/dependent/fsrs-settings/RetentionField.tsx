@@ -1,6 +1,6 @@
 import { Slider } from "@/components/ui/slider";
 import { clamp } from "@/lib/utils";
-import { FieldError, FieldTitle, Warning } from "./FieldParts";
+import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 
 const MIN_PERCENT = 70;
 const MAX_PERCENT = 99;
@@ -33,6 +33,7 @@ export const RetentionField = ({
         onValueChange={(values) => onChange(values[0] / 100)}
         thumbLabel="Request retention"
       />
+      <SliderEnds min={`${MIN_PERCENT}%`} max={`${MAX_PERCENT}%`} />
       {value > WARN_ABOVE && (
         <Warning>
           Above 92% retention will significantly increase your daily workload

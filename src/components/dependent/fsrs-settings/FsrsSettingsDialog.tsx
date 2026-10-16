@@ -1,4 +1,5 @@
 import type { EngineAPI } from "engine-contract";
+import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEngineState } from "@/lib/engine/engine";
@@ -14,8 +15,12 @@ import { snapshotValue } from "@/lib/engine/store-cache";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import { FsrsSettingsForm, type SaveBlocker } from "./FsrsSettingsForm";
 
-const Message = ({ children }: { children: string }) => (
-  <p className="px-6 py-8 text-sm text-center text-muted-foreground">
+const Loading = ({ children }: { children: string }) => (
+  <p
+    role="status"
+    className="flex items-center justify-center gap-2 px-6 py-10 text-sm text-muted-foreground"
+  >
+    <Loader2 className="size-4 animate-spin" aria-hidden />
     {children}
   </p>
 );
@@ -32,7 +37,7 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
   );
   const defaults = api.reviews.settings.defaultSettings;
 
-  if (status.kind === "loading") return <Message>Loading…</Message>;
+  if (status.kind === "loading") return <Loading>Loading…</Loading>;
   if (status.kind === "signed-out") {
     return (
       <FsrsSettingsForm
@@ -87,7 +92,7 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
     );
   }
   if (current.status === "loading") {
-    return <Message>Loading your settings…</Message>;
+    return <Loading>Loading your settings…</Loading>;
   }
   // The read failed; the form still works, but say what it started from.
   return (
@@ -117,7 +122,7 @@ export const FsrsSettingsDialog = () => {
       }}
     >
       <ScrollableDialogContent
-        className="max-w-3xl"
+        size="md"
         title="FSRS Scheduler Settings"
         description="Review scheduling settings for your Kanji Heatmap account"
         titleClassName="text-left"

@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
 import { Info } from "lucide-react";
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -7,6 +12,29 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+
+/**
+ * One collapsible group of fields, styled like the User Preferences sections
+ * (SimpleAccordion). Goes inside the form's `Accordion`.
+ */
+export const SettingsSection = ({
+  value,
+  title,
+  children,
+}: {
+  value: string;
+  title: string;
+  children: ReactNode;
+}) => (
+  <AccordionItem value={value}>
+    <AccordionTrigger className="flex justify-start p-2 space-x-2 text-xl text-left focus:outline-none">
+      {title}
+    </AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-6 px-2 pt-2 pb-6">
+      {children}
+    </AccordionContent>
+  </AccordionItem>
+);
 
 /** Small "i" button; tapping it opens a short explanation. */
 const InfoTip = ({ title, children }: { title: string; children: string }) => (
@@ -40,10 +68,16 @@ export const FieldTitle = ({
       <InfoTip title={title}>{tip}</InfoTip>
     </span>
     {value !== undefined && (
-      <span className="ml-auto text-sm font-semibold tabular-nums">
-        {value}
-      </span>
+      <span className="ml-auto text-sm font-bold tabular-nums">{value}</span>
     )}
+  </div>
+);
+
+/** The lowest and highest values under a slider, like the stroke speeds. */
+export const SliderEnds = ({ min, max }: { min: string; max: string }) => (
+  <div className="flex justify-between text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+    <span>{min}</span>
+    <span>{max}</span>
   </div>
 );
 
@@ -82,7 +116,7 @@ export const SwitchField = ({
   <div className="flex flex-col gap-1">
     <div className="flex items-center justify-between gap-2">
       <span className="flex items-center gap-1.5">
-        <Label htmlFor={id} className="font-semibold">
+        <Label htmlFor={id} className="font-semibold cursor-pointer">
           {title}
         </Label>
         <InfoTip title={title}>{tip}</InfoTip>

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { SubmitInput } from "@/components/dependent/account/SubmitInput";
-import type { ActionStatus } from "@/components/dependent/account/action-status";
+import { DialogActions } from "@/components/common/DialogActions";
 import { Dialog } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { formatSteps, parseSteps, stepWarnings } from "@/lib/engine/fsrs-steps";
-import { Warning } from "./FieldParts";
+import { FieldError, Warning } from "./FieldParts";
 
 /** "Custom steps" dialog: one comma-separated input, applied to the draft. */
 export const CustomStepsDialog = ({
@@ -19,12 +20,12 @@ export const CustomStepsDialog = ({
   onClose: () => void;
 }) => {
   const [text, setText] = useState(formatSteps(initialSteps));
-  const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
+  const [error, setError] = useState<string | undefined>();
   const parsed = parseSteps(text);
 
   const submit = () => {
     if (!parsed.ok) {
-      setStatus({ kind: "error", message: parsed.error });
+      setError(parsed.error);
       return;
     }
     onApply(parsed.steps);
@@ -44,30 +45,46 @@ export const CustomStepsDialog = ({
         description={`Set the ${title.toLowerCase()} as comma-separated values`}
         titleClassName="text-left"
       >
-        <div className="flex flex-col gap-3 px-2 pt-2 text-left">
+        <form
+          className="flex flex-col gap-3 px-2 pt-2 text-left"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
           <p className="text-sm">
-            Use comma-separated values like: 1m, 10m, 1h
+            Enter your {title.toLowerCase()} as comma-separated values, like 1m,
+            10m, 1h.
           </p>
-          <SubmitInput
-            label={title}
-            submitLabel="Use these steps"
+          <Input
+            aria-label={title}
+            placeholder="1m, 10m, 1h"
             autoFocus
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
             value={text}
-            onValueChange={(next) => {
-              setText(next);
-              setStatus({ kind: "idle" });
+            onChange={(e) => {
+              setText(e.target.value);
+              setError(undefined);
             }}
-            status={status}
-            onSubmit={submit}
+            aria-invalid={error !== undefined}
+            className="h-12 px-4 border-2 rounded-2xl focus-visible:ring-offset-0"
           />
+          <FieldError message={error} />
           {parsed.ok &&
             stepWarnings(parsed.steps).map((warning) => (
               <Warning key={warning}>{warning}</Warning>
             ))}
-        </div>
+          <DialogActions className="pt-3">
+            <PracticeButton variant="secondary" onClick={onClose}>
+              Cancel
+            </PracticeButton>
+            <PracticeButton type="submit" disabled={text.trim() === ""}>
+              Use these steps
+            </PracticeButton>
+          </DialogActions>
+        </form>
       </ScrollableDialogContent>
     </Dialog>
   );

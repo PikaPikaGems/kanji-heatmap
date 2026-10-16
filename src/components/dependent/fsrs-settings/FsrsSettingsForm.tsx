@@ -1,21 +1,23 @@
 import { useState } from "react";
 import type { EngineAPI, ReviewSettings } from "engine-contract";
-import { Check, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  copyForCode,
-  copyForWriteBlocker,
-  REVIEW_SETTINGS_UPDATE_COPY,
-} from "@/lib/engine/engine-copy";
+import { Loader2, RotateCcw } from "lucide-react";
+import { TextActionButton } from "@/components/common/AiActionButtons";
+import { DialogActions } from "@/components/common/DialogActions";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { LoginNotice } from "@/components/dependent/account/LoginNotice";
+import { Accordion } from "@/components/ui/accordion";
+import { PracticeButton } from "@/components/ui/practice-button";
+import { copyForCode, copyForWriteBlocker } from "@/lib/engine/engine-copy";
+import { closeFsrsSettings } from "@/lib/engine/fsrs-settings-dialog";
 import {
   LEARNING_PRESETS,
   readSavedSteps,
   RELEARNING_PRESETS,
   writeSavedSteps,
 } from "@/lib/engine/fsrs-steps";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
-import { SwitchField, Warning } from "./FieldParts";
+import { forceHardRefresh } from "@/lib/force-hard-refresh";
+import { SettingsSection, SwitchField } from "./FieldParts";
 import { IntervalField } from "./IntervalField";
 import { ModelWeightsField } from "./ModelWeightsField";
 import { RetentionField } from "./RetentionField";
@@ -30,32 +32,46 @@ export type SaveBlocker =
 type SaveStatus =
   | { kind: "idle" }
   | { kind: "busy" }
-  | { kind: "saved" }
   | { kind: "invalid"; field: keyof ReviewSettings; reason: string }
   | { kind: "error"; message: string };
 
-const BlockerBanner = ({ blocker }: { blocker: SaveBlocker }) => (
-  <p
-    role="status"
-    className="p-3 text-sm border rounded-xl bg-muted/40 text-muted-foreground"
-  >
-    {blocker.kind === "signed-out" && (
-      <>
-        You&apos;re not logged in.{" "}
-        <button
-          type="button"
-          className="font-semibold underline text-foreground underline-offset-4"
-          onClick={openLoginDialog}
-        >
-          Log in
-        </button>{" "}
-        to save your settings.
-      </>
-    )}
-    {blocker.kind === "update-required" && REVIEW_SETTINGS_UPDATE_COPY}
-    {blocker.kind === "write" && copyForWriteBlocker(blocker.reason)}
-  </p>
-);
+type SectionId = "intervals" | "steps" | "advanced";
+
+/** The section that holds each field, so a field error can open it. */
+const SECTION_OF_FIELD: Record<keyof ReviewSettings, SectionId> = {
+  requestRetention: "intervals",
+  maximumIntervalDays: "intervals",
+  enableFuzz: "intervals",
+  learningStepsMinutes: "steps",
+  relearningStepsMinutes: "steps",
+  modelWeights: "advanced",
+};
+
+const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
+  if (blocker.kind === "signed-out") {
+    return <LoginNotice to="save your review settings" />;
+  }
+  if (blocker.kind === "update-required") {
+    return (
+      <UserNotice>
+        This page is out of date.{" "}
+        <NoticeAction onClick={() => void forceHardRefresh()}>
+          Refresh
+        </NoticeAction>{" "}
+        to change your review settings.
+      </UserNotice>
+    );
+  }
+  if (blocker.reason === "premium_lapsed") {
+    return (
+      <UserNotice>
+        Your account can&apos;t save changes right now, so these settings are
+        read-only.
+      </UserNotice>
+    );
+  }
+  return <UserNotice>{copyForWriteBlocker(blocker.reason)}</UserNotice>;
+};
 
 /** Steps to bring back when "Enable short term" is switched on again. */
 const restoredSteps = (defaults: ReviewSettings): Partial<ReviewSettings> => {
@@ -76,8 +92,9 @@ const restoredSteps = (defaults: ReviewSettings): Partial<ReviewSettings> => {
 
 /**
  * The FSRS settings form. Edits a local draft seeded from `initial`; it is
- * deliberately not bound to the settings store, and the settings returned by
- * a save become the new draft (host/guide/REVIEWS.md).
+ * deliberately not bound to the settings store, and a successful save closes
+ * the dialog, so the next open starts from the saved settings
+ * (host/guide/REVIEWS.md).
  */
 export const FsrsSettingsForm = ({
   api,
@@ -94,6 +111,7 @@ export const FsrsSettingsForm = ({
   const defaults = api.reviews.settings.defaultSettings;
   const [draft, setDraft] = useState(initial);
   const [save, setSave] = useState<SaveStatus>({ kind: "idle" });
+  const [openSections, setOpenSections] = useState<string[]>(["intervals"]);
   const busy = save.kind === "busy";
   const shortTermOn =
     draft.learningStepsMinutes.length > 0 ||
@@ -129,16 +147,17 @@ export const FsrsSettingsForm = ({
     if (navigator.onLine) await api.sync.catchUp();
     const result = await api.reviews.settings.update(draft);
     if (result.ok) {
-      setDraft(result.value);
-      setSave({ kind: "saved" });
+      closeFsrsSettings();
       return;
     }
     if (result.error.code === "invalid_settings") {
-      setSave({
-        kind: "invalid",
-        field: result.error.field,
-        reason: result.error.reason,
-      });
+      const { field, reason } = result.error;
+      setSave({ kind: "invalid", field, reason });
+      // Open the field's section so its error is visible.
+      const section = SECTION_OF_FIELD[field];
+      setOpenSections((open) =>
+        open.includes(section) ? open : [...open, section]
+      );
       return;
     }
     setSave({ kind: "error", message: copyForCode(result.error.code) });
@@ -146,116 +165,116 @@ export const FsrsSettingsForm = ({
 
   return (
     <>
-      <div className="flex-1 min-h-0 px-6 pb-4 overflow-y-auto">
-        <div className="flex flex-col gap-5 pt-2 text-left">
-          {blocker !== null && <BlockerBanner blocker={blocker} />}
-          {notice !== null && save.kind !== "saved" && (
-            <Warning>{notice}</Warning>
-          )}
-          <div className="grid items-start gap-x-10 gap-y-5 md:grid-cols-2">
-            <div className="flex flex-col gap-5">
-              <RetentionField
-                value={draft.requestRetention}
-                onChange={(requestRetention) => edit({ requestRetention })}
-                error={errorFor("requestRetention")}
-              />
-              <IntervalField
-                days={draft.maximumIntervalDays}
-                onChange={(maximumIntervalDays) =>
-                  edit({ maximumIntervalDays })
-                }
-                error={errorFor("maximumIntervalDays")}
-              />
-              <SwitchField
-                id="fsrs-enable-fuzz"
-                title="Enable fuzz"
-                tip="Adds a small, repeatable variation to intervals so cards learned together don't all come due on the same day."
-                checked={draft.enableFuzz}
-                onCheckedChange={(enableFuzz) => edit({ enableFuzz })}
-                error={errorFor("enableFuzz")}
-              />
-              <ModelWeightsField
-                weights={draft.modelWeights}
-                defaultWeights={defaults.modelWeights}
-                onChange={(modelWeights) => edit({ modelWeights })}
-                error={errorFor("modelWeights")}
-              />
-            </div>
-            <div className="flex flex-col gap-5">
-              <SwitchField
-                id="fsrs-enable-short-term"
-                title="Enable short term"
-                tip="Repeats a new or forgotten card a few times within the day (the learning steps) before it moves to day-long intervals. Off means no steps."
-                checked={shortTermOn}
-                onCheckedChange={setShortTerm}
-              />
-              <StepsField
-                title="Learning steps"
-                presets={LEARNING_PRESETS}
-                steps={draft.learningStepsMinutes}
-                disabled={!shortTermOn}
-                onChange={(learningStepsMinutes) =>
-                  edit({ learningStepsMinutes })
-                }
-                error={errorFor("learningStepsMinutes")}
-              />
-              <StepsField
-                title="Relearning steps"
-                presets={RELEARNING_PRESETS}
-                steps={draft.relearningStepsMinutes}
-                disabled={!shortTermOn}
-                onChange={(relearningStepsMinutes) =>
-                  edit({ relearningStepsMinutes })
-                }
-                error={errorFor("relearningStepsMinutes")}
-              />
-            </div>
+      <div className="flex-1 min-h-0 px-4 pb-6 overflow-y-auto text-left">
+        {(blocker !== null || notice !== null) && (
+          <div className="flex flex-col gap-2 px-2 pt-2 pb-3">
+            {blocker !== null && <BlockerNotice blocker={blocker} />}
+            {notice !== null && <UserNotice>{notice}</UserNotice>}
           </div>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 px-6 py-3 text-left border-t shrink-0">
-        <p className="text-xs text-muted-foreground">
-          Saving settings does not immediately move existing due dates. Changes
-          normally apply when you next review a card. A full data refresh may
-          also recalculate schedules.
-        </p>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Button
-            type="button"
-            variant="outline"
+        )}
+        <Accordion
+          type="multiple"
+          value={openSections}
+          onValueChange={setOpenSections}
+        >
+          <SettingsSection value="intervals" title="Retention & Intervals">
+            <RetentionField
+              value={draft.requestRetention}
+              onChange={(requestRetention) => edit({ requestRetention })}
+              error={errorFor("requestRetention")}
+            />
+            <IntervalField
+              days={draft.maximumIntervalDays}
+              onChange={(maximumIntervalDays) => edit({ maximumIntervalDays })}
+              error={errorFor("maximumIntervalDays")}
+            />
+            <SwitchField
+              id="fsrs-enable-fuzz"
+              title="Enable fuzz"
+              tip="Adds a small, repeatable variation to intervals so cards learned together don't all come due on the same day."
+              checked={draft.enableFuzz}
+              onCheckedChange={(enableFuzz) => edit({ enableFuzz })}
+              error={errorFor("enableFuzz")}
+            />
+          </SettingsSection>
+          <SettingsSection value="steps" title="Learning Steps">
+            <SwitchField
+              id="fsrs-enable-short-term"
+              title="Enable short term"
+              tip="Repeats a new or forgotten card a few times within the day (the learning steps) before it moves to day-long intervals. Off means no steps."
+              checked={shortTermOn}
+              onCheckedChange={setShortTerm}
+            />
+            {shortTermOn && (
+              <div className="flex flex-col gap-6 animate-fade-in-fast">
+                <StepsField
+                  title="Learning steps"
+                  presets={LEARNING_PRESETS}
+                  steps={draft.learningStepsMinutes}
+                  onChange={(learningStepsMinutes) =>
+                    edit({ learningStepsMinutes })
+                  }
+                  error={errorFor("learningStepsMinutes")}
+                />
+                <StepsField
+                  title="Relearning steps"
+                  presets={RELEARNING_PRESETS}
+                  steps={draft.relearningStepsMinutes}
+                  onChange={(relearningStepsMinutes) =>
+                    edit({ relearningStepsMinutes })
+                  }
+                  error={errorFor("relearningStepsMinutes")}
+                />
+              </div>
+            )}
+          </SettingsSection>
+          <SettingsSection value="advanced" title="Advanced">
+            <ModelWeightsField
+              weights={draft.modelWeights}
+              defaultWeights={defaults.modelWeights}
+              onChange={(modelWeights) => edit({ modelWeights })}
+              error={errorFor("modelWeights")}
+            />
+          </SettingsSection>
+        </Accordion>
+        <div className="flex flex-col items-start gap-2 px-2 pt-4">
+          <TextActionButton
+            icon={<RotateCcw size={14} />}
+            className="-ml-1"
             disabled={busy}
             onClick={() => edit(defaults)}
           >
             Restore all defaults
-          </Button>
-          <div className="flex items-center gap-3">
-            {save.kind === "saved" && (
-              <span
-                role="status"
-                className="flex items-center gap-1 text-sm text-green-600 dark:text-green-500"
-              >
-                <Check className="size-4" aria-hidden />
-                Saved
-              </span>
-            )}
-            <Button
-              type="button"
-              disabled={blocker !== null || busy}
-              onClick={() => void saveSettings()}
-            >
-              {busy && <Loader2 className="animate-spin" />}
-              Save
-            </Button>
-          </div>
+          </TextActionButton>
+          <p className="text-xs text-muted-foreground">
+            Saving settings does not immediately move existing due dates.
+            Changes normally apply when you next review a card. A full data
+            refresh may also recalculate schedules.
+          </p>
         </div>
-        {save.kind === "error" && (
+      </div>
+      <div className="flex flex-col gap-3 px-6 py-4 border-t shrink-0">
+        {/* A blocker notice above already says why saving failed. */}
+        {save.kind === "error" && blocker === null && (
           <p
             role="alert"
-            className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+            className="text-sm font-bold text-left text-yellow-600 dark:text-yellow-400"
           >
             {save.message}
           </p>
         )}
+        <DialogActions>
+          <PracticeButton variant="secondary" onClick={closeFsrsSettings}>
+            Cancel
+          </PracticeButton>
+          <PracticeButton
+            disabled={blocker !== null || busy}
+            onClick={() => void saveSettings()}
+          >
+            {busy && <Loader2 className="size-5 animate-spin" aria-hidden />}
+            {busy ? "Saving…" : "Save"}
+          </PracticeButton>
+        </DialogActions>
       </div>
     </>
   );
