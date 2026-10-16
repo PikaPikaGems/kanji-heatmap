@@ -2,14 +2,13 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { EngineAPI, KanjiNoteView } from "engine-contract";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
-import { Button } from "@/components/ui/button";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { copyForCode, copyForWriteBlocker } from "@/lib/engine/engine-copy";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import { clearNoteDraft, readNoteDraft } from "./draft-storage";
 import { NoteSaveStatus } from "./NoteSaveStatus";
-import { StudyNoteNotice } from "./StudyNoteNotice";
 import { type NotesMode, StudyNotesPanel } from "./StudyNotesPanel";
 import { useNoteEditLock } from "./use-note-edit-lock";
 import { utf8ByteLength } from "./utf8-bytes";
@@ -290,59 +289,52 @@ const LoadedActiveStudyNotes = ({
   const notices: ReactNode[] = [];
   if (editing && lock === "unavailable") {
     notices.push(
-      <StudyNoteNotice key="lock">
-        This note is open for editing in another tab.
-      </StudyNoteNotice>
+      <UserNotice key="lock" icon="🔒">
+        This note is read-only because it&apos;s open for editing in another
+        tab. Edit it there, or close that tab to edit it here.
+      </UserNotice>
     );
   }
   if (editing && writeBlocker != null) {
     notices.push(
-      <StudyNoteNotice key="blocker">
-        {copyForWriteBlocker(writeBlocker)}
-      </StudyNoteNotice>
+      <UserNotice key="blocker">{copyForWriteBlocker(writeBlocker)}</UserNotice>
     );
   }
   if (state.mode === "view" && state.changedElsewhere) {
     notices.push(
-      <StudyNoteNotice key="changed">
+      <UserNotice key="changed">
         This note changed on another device.
         {state.kept != null ? " Your draft is kept." : ""}
-      </StudyNoteNotice>
+      </UserNotice>
     );
   }
   // The banner goes once the person edits: the engine clears the flag when
   // that edit is saved.
   if (note?.hasMergedEdit && !(isHeld && hasUnsavedChanges)) {
     notices.push(
-      <StudyNoteNotice key="merged">
+      <UserNotice key="merged" icon="ℹ️">
         Also edited on another device. Both edits are below.
-      </StudyNoteNotice>
+      </UserNotice>
     );
   }
   if (loginDraft?.kind === "in-editor" && isHeld) {
     notices.push(
-      <StudyNoteNotice key="draft-in-editor">
-        <span>
-          Your draft from before you logged in is in the editor. It isn&apos;t
-          saved yet.
-        </span>
-        <Button variant="outline" size="sm" onClick={discardLoginDraft}>
-          Discard draft
-        </Button>
-      </StudyNoteNotice>
+      <UserNotice key="draft-in-editor">
+        Your draft from before you logged in is in the editor. It isn&apos;t
+        saved yet. <NoticeAction onClick={saveNow}>Save now</NoticeAction> or{" "}
+        <NoticeAction onClick={discardLoginDraft}>discard</NoticeAction> this
+        draft.
+      </UserNotice>
     );
   }
   if (loginDraft?.kind === "offered") {
     notices.push(
-      <StudyNoteNotice key="draft-offered">
-        <span>You have a draft from before you logged in.</span>
-        <Button variant="outline" size="sm" onClick={addLoginDraft}>
-          Add draft to note
-        </Button>
-        <Button variant="outline" size="sm" onClick={discardLoginDraft}>
-          Discard draft
-        </Button>
-      </StudyNoteNotice>
+      <UserNotice key="draft-offered">
+        You have a draft from before you logged in.{" "}
+        <NoticeAction onClick={addLoginDraft}>Add draft to note</NoticeAction>{" "}
+        or{" "}
+        <NoticeAction onClick={discardLoginDraft}>discard draft</NoticeAction>.
+      </UserNotice>
     );
   }
 

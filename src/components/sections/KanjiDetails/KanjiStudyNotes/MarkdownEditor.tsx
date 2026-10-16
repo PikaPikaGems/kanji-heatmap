@@ -65,6 +65,7 @@ export interface MarkdownEditorProps {
   /**
    * Byte budget (UTF-8) for the counter. Typing past it is allowed so a paste
    * isn't cut off mid-way; the owner decides what to do with an over-long note.
+   * 0 means the limit isn't known (logged out): only the size is shown.
    */
   maxBytes: number;
   onChange: (value: string) => void;
@@ -91,7 +92,8 @@ export const MarkdownEditor = ({
   const scrollSyncRafRef = useRef<number | null>(null);
   const segments = useMemo(() => getMarkdownHighlightSegments(value), [value]);
   const bytes = utf8ByteLength(value);
-  const isOverLimit = bytes > maxBytes;
+  const hasLimit = maxBytes > 0;
+  const isOverLimit = hasLimit && bytes > maxBytes;
 
   const syncScrollNow = () => {
     const backdrop = backdropRef.current;
@@ -231,7 +233,7 @@ export const MarkdownEditor = ({
           className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`}
           aria-live="polite"
         >
-          {bytes} / {maxBytes} bytes
+          {hasLimit ? `${bytes} / ${maxBytes} bytes` : `${bytes} bytes`}
         </p>
       </div>
     </div>

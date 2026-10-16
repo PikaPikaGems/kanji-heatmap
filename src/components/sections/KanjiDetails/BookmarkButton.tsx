@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
+import { UserNotice } from "@/components/common/UserNotice";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import {
   copyForCode,
@@ -66,9 +67,9 @@ const ActiveBookmarkButton = ({
         {bookmarked ? "✓ Bookmarked" : "Bookmark"}
       </button>
       {blocker && (
-        <p className="text-xs text-right max-w-48 text-muted-foreground">
+        <UserNotice icon={null} className="text-xs text-right max-w-48">
           {copyForWriteBlocker(blocker)}
-        </p>
+        </UserNotice>
       )}
       {action.kind === "error" && (
         <p
@@ -123,9 +124,9 @@ export const BookmarkButton = ({ kanji }: { kanji: string }) => {
         Bookmark
       </button>
       {blocker && blocker !== "loading" && (
-        <p className="text-xs text-right max-w-48 text-muted-foreground">
+        <UserNotice icon={null} className="text-xs text-right max-w-48">
           {copyForWriteBlocker(blocker)}
-        </p>
+        </UserNotice>
       )}
     </div>
   );

@@ -1,46 +1,100 @@
-import { Eye, Loader2, PenLine } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
+import {
+  getWriteBlocker,
+  useAccountStatus,
+} from "@/lib/engine/use-account-status";
+import { useAddToReviewPile } from "@/lib/engine/use-review-pile-add";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
   refreshReviewPileItem,
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
-import { StudyNoteNotice } from "./KanjiStudyNotes/StudyNoteNotice";
-import { ProgressCard } from "./ProgressCard";
+import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
+import { ProgressCards } from "./ProgressCard";
+import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
 
-const Message = ({ children }: { children: string }) => (
-  <p className="p-3 text-sm text-left text-muted-foreground">{children}</p>
+const Spinner = () => (
+  <div
+    className="flex items-center justify-center w-full h-24"
+    role="status"
+    aria-label="Loading"
+  >
+    <Loader2 className="size-6 animate-spin" />
+  </div>
 );
 
 const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
-  <div className="flex flex-col items-start gap-2 p-3 text-sm text-left text-muted-foreground">
-    <p>Couldn&apos;t load your progress.</p>
-    {onRetry && (
-      <Button variant="outline" size="sm" onClick={onRetry}>
-        Try again
-      </Button>
-    )}
+  <UserNotice className="p-3">
+    Couldn&apos;t load your progress.{" "}
+    {onRetry && <NoticeAction onClick={onRetry}>Try again</NoticeAction>}
+  </UserNotice>
+);
+
+/** Logged out: every card with its defaults, under the log-in notice. */
+const SignedOutKanjiProgress = () => (
+  <div className="flex flex-col gap-3 pb-1">
+    <LoginNotice to="track your progress on this kanji" className="px-1 pt-1" />
+    <ProgressCards item={null} />
   </div>
 );
+
+/** Logged in, not in the review pile: the defaults, plus a way to add it. */
+const NotInPileKanjiProgress = ({
+  kanji,
+  word,
+  blocked,
+}: {
+  kanji: string;
+  /** The kanji's representative word, which the pile stores with it. */
+  word: string | null;
+  blocked: boolean;
+}) => {
+  const { add, action, tooLong, hasApi } = useAddToReviewPile(
+    kanji,
+    word ?? ""
+  );
+  const canAdd = word != null && hasApi && !blocked && !tooLong;
+
+  return (
+    <div className="flex flex-col gap-3 pb-1">
+      <div className="flex flex-col gap-1 px-1 pt-1">
+        <UserNotice icon="📚">
+          This kanji isn&apos;t in your review pile yet.{" "}
+          {word != null && (
+            <NoticeAction
+              onClick={() => void add()}
+              disabled={!canAdd || action.kind === "busy"}
+            >
+              Add {kanji} to your review pile
+            </NoticeAction>
+          )}
+        </UserNotice>
+        {action.kind === "error" && (
+          <p
+            role="alert"
+            className="text-sm font-bold text-left text-yellow-600 dark:text-yellow-400"
+          >
+            {action.message}
+          </p>
+        )}
+      </div>
+      <ProgressCards item={null} />
+    </div>
+  );
+};
 
 /** Logged in: the kanji's reading and writing cards from `pile.watch`. */
 const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
+  const blocker = getWriteBlocker(useAccountStatus());
+  const word = useKanjiRepresentativeWord(kanji)?.word ?? null;
 
   if (snapshot.status === "loading" || snapshot.status === "unavailable") {
-    return (
-      <div
-        className="flex items-center justify-center w-full h-24"
-        role="status"
-        aria-label="Loading"
-      >
-        <Loader2 className="size-6 animate-spin" />
-      </div>
-    );
+    return <Spinner />;
   }
   if (snapshot.status === "failed") {
     return (
@@ -58,53 +112,45 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   const item = snapshot.result.value;
   if (item === null) {
     return (
-      <Message>Add this kanji to your review pile to start tracking.</Message>
+      <NotInPileKanjiProgress
+        kanji={kanji}
+        word={word}
+        blocked={blocker != null}
+      />
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-2 pb-2 sm:gap-3 lg:grid-cols-2">
-      <ProgressCard title="Reading" Icon={Eye} card={item.reading} />
-      <ProgressCard title="Writing" Icon={PenLine} card={item.writing} />
+    <div className="flex flex-col gap-1 pb-1">
+      <ProgressCards item={item} />
+      <div className="px-1 text-left">
+        <RemoveFromReviewPile kanji={kanji} disabled={blocker != null} />
+      </div>
     </div>
   );
 };
 
 /**
  * Review progress for one kanji, from its review-pile item. What shows depends
- * on the account: the cards when logged in, a log-in prompt when logged out,
- * and an explanation otherwise. The caller hides the section in builds
- * without the engine.
+ * on the account: the cards when logged in (with defaults while the kanji is
+ * not in the pile), the same cards with defaults and a log-in notice when
+ * logged out, and an explanation otherwise. The caller hides the section in
+ * builds without the engine.
  */
 const KanjiProgress = ({ kanji }: { kanji: string }) => {
   const status = useAccountStatus();
 
   if (status.kind === "unavailable") {
-    return <Message>{UPDATE_BROWSER_COPY}</Message>;
+    return <UserNotice className="p-3">{UPDATE_BROWSER_COPY}</UserNotice>;
   }
   if (status.kind === "error" || status.kind === "recovery") {
-    return <Message>Your progress isn&apos;t available right now.</Message>;
-  }
-  if (status.kind === "loading") {
     return (
-      <div
-        className="flex items-center justify-center w-full h-24"
-        role="status"
-        aria-label="Loading"
-      >
-        <Loader2 className="size-6 animate-spin" />
-      </div>
+      <UserNotice className="p-3">
+        Your progress isn&apos;t available right now.
+      </UserNotice>
     );
   }
-  if (status.kind === "signed-out") {
-    return (
-      <StudyNoteNotice>
-        <span>⚠️ You&apos;re not logged in. Log in to see your progress.</span>
-        <Button variant="outline" size="sm" onClick={openLoginDialog}>
-          Log in
-        </Button>
-      </StudyNoteNotice>
-    );
-  }
+  if (status.kind === "loading") return <Spinner />;
+  if (status.kind === "signed-out") return <SignedOutKanjiProgress />;
   return <ActiveKanjiProgress kanji={kanji} />;
 };
 

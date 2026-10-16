@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
+import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { readNoteDraft, writeNoteDraft } from "./draft-storage";
-import { StudyNoteNotice } from "./StudyNoteNotice";
 import { type NotesMode, StudyNotesPanel } from "./StudyNotesPanel";
 
 /**
@@ -40,15 +38,10 @@ export const SignedOutStudyNotes = ({
         disabled: false,
       }}
       notices={[
-        <StudyNoteNotice key="not-logged-in">
-          <span>
-            ⚠️ You&apos;re not logged in. This note isn&apos;t saved and will be
-            lost when you close this tab.
-          </span>
-          <Button variant="outline" size="sm" onClick={openLoginDialog}>
-            Log in
-          </Button>
-        </StudyNoteNotice>,
+        <LoginNotice
+          key="not-logged-in"
+          to="save this note, or it will be lost when you close this tab"
+        />,
       ]}
     />
   );

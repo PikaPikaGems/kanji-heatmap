@@ -1,3 +1,4 @@
+import { NoticeAction } from "@/components/common/UserNotice";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 
 /** Save progress shown beside the byte counter of the note editor. */
@@ -36,13 +37,7 @@ export const NoteSaveStatus = ({
     return (
       <>
         <span className="text-muted-foreground">Not saved yet</span>
-        <button
-          type="button"
-          onClick={onSaveNow}
-          className="font-bold underline underline-offset-2"
-        >
-          Save now
-        </button>
+        <NoticeAction onClick={onSaveNow}>Save now</NoticeAction>
       </>
     );
   }

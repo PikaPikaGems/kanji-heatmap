@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { Loader2, PlusCircle } from "lucide-react";
-import { REVIEW_PILE_ADD_WORD_MAX_UTF8_BYTES } from "engine-contract";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import type { ActionStatus } from "@/components/dependent/account/action-status";
-import { Button } from "@/components/ui/button";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import {
   copyForCode,
   copyForWriteBlocker,
@@ -14,15 +11,14 @@ import { snapshotValue } from "@/lib/engine/store-cache";
 import {
   type AccountStatus,
   getWriteBlocker,
-  type WriteBlocker,
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { useAddToReviewPile } from "@/lib/engine/use-review-pile-add";
 import {
   refreshReviewPileItem,
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
-import { utf8ByteLength } from "./KanjiStudyNotes/utf8-bytes";
 
 const addCn =
   "flex text-left gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-4 hover:text-green-400 text-green-500 hover:decoration-solid disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline";
@@ -34,125 +30,33 @@ const AddLabel = ({ word }: { word: string }) => (
   </>
 );
 
+/** A short line under the button: why it is disabled, or why a call failed. */
 const Note = ({
   children,
   tone,
 }: {
   children: string;
-  tone: "muted" | "error";
-}) => (
-  <p
-    role={tone === "error" ? "alert" : undefined}
-    className={`px-2 max-w-56 text-xs text-left ${
-      tone === "error"
-        ? "font-bold text-yellow-600 dark:text-yellow-400"
-        : "text-muted-foreground"
-    }`}
-  >
-    {children}
-  </p>
-);
+  tone: "info" | "error";
+}) =>
+  tone === "error" ? (
+    <p
+      role="alert"
+      className="px-2 text-xs font-bold text-left text-yellow-600 max-w-56 dark:text-yellow-400"
+    >
+      {children}
+    </p>
+  ) : (
+    <UserNotice icon={null} className="px-2 text-xs max-w-56">
+      {children}
+    </UserNotice>
+  );
 
 const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
-  <p className="px-2 text-xs text-left max-w-64 text-muted-foreground">
+  <UserNotice className="px-2 text-xs max-w-64">
     Couldn&apos;t load your review pile.{" "}
-    {onRetry && (
-      <button
-        type="button"
-        className="underline rounded decoration-dotted underline-offset-4 hover:text-foreground hover:decoration-solid"
-        onClick={onRetry}
-      >
-        Try again
-      </button>
-    )}
-  </p>
+    {onRetry && <NoticeAction onClick={onRetry}>Try again</NoticeAction>}
+  </UserNotice>
 );
-
-/** The confirmation inside the Remove popover; it owns the remove call. */
-const ConfirmRemove = ({
-  kanji,
-  onCancel,
-}: {
-  kanji: string;
-  onCancel: () => void;
-}) => {
-  const api = useEngineApi();
-  const [action, setAction] = useState<ActionStatus>({ kind: "idle" });
-  const busy = action.kind === "busy";
-
-  const remove = async () => {
-    if (!api || busy) return;
-    setAction({ kind: "busy" });
-    const result = await api.reviews.pile.remove(kanji);
-    // On success the pile watch flips to "not in pile" and this unmounts.
-    setAction(
-      result.ok
-        ? { kind: "idle" }
-        : { kind: "error", message: copyForCode(result.error.code) }
-    );
-  };
-
-  return (
-    <div className="flex flex-col gap-3 p-4 text-sm text-left w-64">
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold">Remove {kanji} from your review pile?</p>
-        <p className="text-muted-foreground">
-          Removing and adding it again later restarts both reading and writing
-          from scratch.
-        </p>
-      </div>
-      <div className="flex gap-2">
-        <Button
-          variant="destructive"
-          size="sm"
-          disabled={!api || busy}
-          onClick={() => void remove()}
-        >
-          {busy && <Loader2 className="animate-spin" />}
-          Remove
-        </Button>
-        <Button variant="outline" size="sm" disabled={busy} onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-      {action.kind === "error" && (
-        <p
-          role="alert"
-          className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
-        >
-          {action.message}
-        </p>
-      )}
-    </div>
-  );
-};
-
-const RemoveFromPile = ({
-  kanji,
-  blocker,
-}: {
-  kanji: string;
-  blocker: WriteBlocker | null;
-}) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <GenericPopover
-      open={open}
-      onOpenChange={setOpen}
-      trigger={
-        <button
-          type="button"
-          disabled={!!blocker}
-          className="text-xs underline rounded decoration-dotted underline-offset-4 text-muted-foreground hover:text-destructive hover:decoration-solid disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline"
-        >
-          Remove
-        </button>
-      }
-      content={<ConfirmRemove kanji={kanji} onCancel={() => setOpen(false)} />}
-    />
-  );
-};
 
 /** Logged in: reads `reviews.pile.watch(kanji)`, adds with the anchor word. */
 const ActiveReviewPileButton = ({
@@ -166,7 +70,7 @@ const ActiveReviewPileButton = ({
 }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
-  const [action, setAction] = useState<ActionStatus>({ kind: "idle" });
+  const { add, action, tooLong } = useAddToReviewPile(kanji, word);
 
   const current = snapshotValue(snapshot);
   const blocker = getWriteBlocker(status);
@@ -174,28 +78,13 @@ const ActiveReviewPileButton = ({
   if (current) {
     return (
       <div className="flex flex-col items-start min-w-0">
-        <div className="flex flex-wrap items-center px-2 py-2 text-sm gap-x-3 gap-y-1">
-          <span className="font-bold text-green-500">✓ In review pile</span>
-          <RemoveFromPile kanji={kanji} blocker={blocker} />
-        </div>
-        {blocker && <Note tone="muted">{copyForWriteBlocker(blocker)}</Note>}
+        <span className="px-2 py-2 text-sm font-bold text-green-500">
+          ✓ In review pile
+        </span>
+        {blocker && <Note tone="info">{copyForWriteBlocker(blocker)}</Note>}
       </div>
     );
   }
-
-  const tooLong = utf8ByteLength(word) > REVIEW_PILE_ADD_WORD_MAX_UTF8_BYTES;
-
-  const add = async () => {
-    if (!api || action.kind === "busy") return;
-    setAction({ kind: "busy" });
-    const result = await api.reviews.pile.add({ kanji, word });
-    // On success the pile watch flips to "in pile" and this view is replaced.
-    setAction(
-      result.ok
-        ? { kind: "idle" }
-        : { kind: "error", message: copyForCode(result.error.code) }
-    );
-  };
 
   return (
     <div className="flex flex-col items-start min-w-0">
@@ -228,7 +117,7 @@ const ActiveReviewPileButton = ({
         />
       )}
       {snapshot.status === "ready" && !snapshot.result.ok && <LoadFailedNote />}
-      {blocker && <Note tone="muted">{copyForWriteBlocker(blocker)}</Note>}
+      {blocker && <Note tone="info">{copyForWriteBlocker(blocker)}</Note>}
       {tooLong && <Note tone="error">{copyForCode("validation_failed")}</Note>}
       {action.kind === "error" && <Note tone="error">{action.message}</Note>}
     </div>
@@ -237,8 +126,8 @@ const ActiveReviewPileButton = ({
 
 /**
  * Review-pile control in the kanji drawer: add the anchor word, or see that
- * it is in the pile and remove it. The caller hides it in builds without the
- * engine.
+ * it is in the pile (removing it lives in Your Progress). The caller hides it
+ * in builds without the engine.
  */
 export const ReviewPileButton = ({
   kanji,
@@ -289,7 +178,7 @@ export const ReviewPileButton = ({
         <AddLabel word={word} />
       </button>
       {blocker && blocker !== "loading" && (
-        <Note tone="muted">{copyForWriteBlocker(blocker)}</Note>
+        <Note tone="info">{copyForWriteBlocker(blocker)}</Note>
       )}
     </div>
   );

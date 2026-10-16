@@ -1,5 +1,5 @@
-import type { LucideIcon } from "lucide-react";
-import type { CardProgress } from "engine-contract";
+import { Eye, PenLine, type LucideIcon } from "lucide-react";
+import type { CardProgress, ReviewPileItemView } from "engine-contract";
 import { formatDaysHuman, formatInterval } from "@/lib/engine/format-interval";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
@@ -11,6 +11,7 @@ import {
 import { relativeTime } from "@/lib/engine/relative-time";
 
 const NONE = "—";
+const NOT_APPLICABLE = "N/A";
 
 const capitalize = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);
@@ -33,6 +34,28 @@ type ProgressRow = {
   /** Fill of a small swatch before the value, as on the /mastery heatmap. */
   swatchCn?: string;
 };
+
+/**
+ * What a card shows while there is no card yet (logged out, or the kanji is
+ * not in the review pile): the same rows with "nothing yet" values.
+ */
+const EMPTY_ROWS: ProgressRow[] = [
+  {
+    label: "Mastery",
+    value: NOT_STARTED_LABEL,
+    swatchCn: getBandFillCn("mastery", null),
+  },
+  { label: "Stability", value: NOT_APPLICABLE },
+  { label: "Difficulty", value: NOT_APPLICABLE },
+  { label: "State", value: NOT_APPLICABLE },
+  { label: "Seen", value: "0" },
+  { label: "Correct", value: "0" },
+  { label: "Accuracy", value: NOT_APPLICABLE },
+  { label: "Lapses", value: "0" },
+  { label: "First studied", value: NOT_APPLICABLE },
+  { label: "Last review", value: NOT_APPLICABLE },
+  { label: "Recall now", value: NOT_APPLICABLE },
+];
 
 /** The rows under "Next review in", for one card (design doc 5.4). */
 const progressRows = (card: CardProgress, now: number): ProgressRow[] => {
@@ -86,15 +109,18 @@ const progressRows = (card: CardProgress, now: number): ProgressRow[] => {
   ];
 };
 
-/** Reading or writing progress of one kanji, styled like a dashboard stat card. */
-export const ProgressCard = ({
+/**
+ * Reading or writing progress of one kanji, styled like a dashboard stat
+ * card. With no `card` it shows the defaults ("0", "N/A", "Not started").
+ */
+const ProgressCard = ({
   title,
   Icon,
   card,
 }: {
   title: string;
   Icon: LucideIcon;
-  card: CardProgress;
+  card: CardProgress | null;
 }) => {
   const now = Date.now();
 
@@ -108,31 +134,49 @@ export const ProgressCard = ({
       </div>
       <div className="flex flex-wrap items-baseline pl-0.5 gap-x-2 gap-y-0.5">
         <span className="text-[1.75rem] font-extrabold leading-none tabular-nums">
-          {nextReviewIn(card.dueAt, now)}
+          {card ? nextReviewIn(card.dueAt, now) : NOT_APPLICABLE}
         </span>
         <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
           Next review
         </span>
       </div>
       <dl className="flex flex-col">
-        {progressRows(card, now).map(({ label, value, swatchCn }) => (
-          <div
-            key={label}
-            className="flex items-baseline justify-between gap-3 py-1 border-t border-dotted border-foreground/15"
-          >
-            <dt className="text-xs text-muted-foreground">{label}</dt>
-            <dd className="flex items-center justify-end gap-1.5 text-sm font-bold text-right tabular-nums">
-              {swatchCn ? (
-                <span
-                  className={`inline-block size-3 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
-                  aria-hidden
-                />
-              ) : null}
-              {value}
-            </dd>
-          </div>
-        ))}
+        {(card ? progressRows(card, now) : EMPTY_ROWS).map(
+          ({ label, value, swatchCn }) => (
+            <div
+              key={label}
+              className="flex items-baseline justify-between gap-3 py-1 border-t border-dotted border-foreground/15"
+            >
+              <dt className="text-xs text-muted-foreground">{label}</dt>
+              <dd className="flex items-center justify-end gap-1.5 text-sm font-bold text-right tabular-nums">
+                {swatchCn ? (
+                  <span
+                    className={`inline-block size-3 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
+                    aria-hidden
+                  />
+                ) : null}
+                {value}
+              </dd>
+            </div>
+          )
+        )}
       </dl>
     </section>
   );
 };
+
+/**
+ * The Reading and Writing cards side by side. `item` is null when there is
+ * nothing to show yet (logged out, or not in the review pile), which renders
+ * every card with its defaults.
+ */
+export const ProgressCards = ({
+  item,
+}: {
+  item: ReviewPileItemView | null;
+}) => (
+  <div className="grid grid-cols-1 gap-2 pb-2 sm:gap-3 lg:grid-cols-2">
+    <ProgressCard title="Reading" Icon={Eye} card={item?.reading ?? null} />
+    <ProgressCard title="Writing" Icon={PenLine} card={item?.writing ?? null} />
+  </div>
+);

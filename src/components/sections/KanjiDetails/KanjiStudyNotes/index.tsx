@@ -1,4 +1,5 @@
 import { Loader2 } from "lucide-react";
+import { UserNotice } from "@/components/common/UserNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import {
   getWriteBlocker,
@@ -9,7 +10,7 @@ import { ActiveStudyNotes } from "./ActiveStudyNotes";
 import { SignedOutStudyNotes } from "./SignedOutStudyNotes";
 
 const Message = ({ children }: { children: string }) => (
-  <p className="p-3 text-sm text-left">{children}</p>
+  <UserNotice className="p-3">{children}</UserNotice>
 );
 
 /**
