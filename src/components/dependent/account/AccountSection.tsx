@@ -50,7 +50,11 @@ export const AccountSection = () => {
       )}
       {status.kind === "recovery" && (
         <DrawerPrimitive.Close asChild>
-          <PracticeButton size="md" onClick={openRecoveryDialog}>
+          <PracticeButton
+            size="md"
+            className="h-auto px-3 py-2 text-sm min-h-12"
+            onClick={openRecoveryDialog}
+          >
             Fix saved data on this device
           </PracticeButton>
         </DrawerPrimitive.Close>
