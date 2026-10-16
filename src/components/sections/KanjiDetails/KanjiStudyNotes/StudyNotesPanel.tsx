@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { HighlightKanjiSwitch } from "./HighlightKanjiSwitch";
 import { MarkdownEditor, type MarkdownEditorProps } from "./MarkdownEditor";
@@ -76,31 +77,15 @@ export const StudyNotesPanel = ({
       ) : null}
       <Tabs value={mode} onValueChange={handleModeChange}>
         <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5">
-          <TabsList
-            aria-label="Kanji study notes mode"
-            className="relative h-10 gap-0.5 p-0.5 rounded-full border border-border bg-muted/70 mb-2"
-          >
-            <div className="absolute inset-0.5 pointer-events-none" aria-hidden>
-              <div
-                className="w-1/2 h-full transition-transform duration-300 ease-out rounded-full shadow-sm bg-background"
-                style={{
-                  transform: `translateX(${mode === "view" ? 100 : 0}%)`,
-                }}
-              />
-            </div>
-            <TabsTrigger
-              value="edit"
-              className="relative z-10 flex-1 px-4 rounded-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              Edit Mode
-            </TabsTrigger>
-            <TabsTrigger
-              value="view"
-              className="relative z-10 flex-1 px-4 rounded-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              View Mode
-            </TabsTrigger>
-          </TabsList>
+          <SegmentedTabsList
+            value={mode}
+            label="Kanji study notes mode"
+            className="mb-2"
+            options={[
+              { value: "edit", label: "Edit Mode" },
+              { value: "view", label: "View Mode" },
+            ]}
+          />
           {mode === "view" ? (
             <HighlightKanjiSwitch className="mb-2 pl-2 sm:ml-auto" />
           ) : null}

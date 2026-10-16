@@ -1,0 +1,20 @@
+---
+description: Every dialog lays out its buttons the same way with DialogActions
+alwaysApply: true
+---
+
+# Dialog buttons: one layout everywhere
+
+Put a dialog's buttons in `DialogActions` (`@/components/common/DialogActions`), main action last:
+
+- Wider screens: right-aligned, main action rightmost.
+- Phones: stacked full width, main action on top.
+
+```tsx
+<DialogActions>
+  <PracticeButton variant="secondary" onClick={onCancel}>Cancel</PracticeButton>
+  <PracticeButton variant="danger" onClick={onDelete}>Delete</PracticeButton>
+</DialogActions>
+```
+
+A screen with a single way out ("You're logged out" → Close) uses one full-width `PracticeButton size="md"` instead. Low-key extras ("Reset to defaults") go in the dialog body as a `TextActionButton`, not in the button row.

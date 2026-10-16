@@ -93,7 +93,7 @@ const LogoutForm = ({ userId }: { userId: string }) => {
       )}
       {pending > 0 && (
         <div className="flex flex-col gap-1.5 p-3 border rounded-xl border-amber-500/50 bg-amber-500/10">
-          <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
             ⚠️ {pending} {changeWord} {pending === 1 ? "hasn't" : "haven't"}{" "}
             synced yet
           </p>

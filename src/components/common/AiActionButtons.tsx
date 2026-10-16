@@ -167,7 +167,10 @@ export const AiRequestFeedback = ({
       </p>
     )}
     {warning && (
-      <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+      <p
+        role="status"
+        className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+      >
         {warning}
       </p>
     )}

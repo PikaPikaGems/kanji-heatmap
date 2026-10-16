@@ -15,7 +15,9 @@ import { FsrsSettingsItem } from "./FsrsSettingsItem";
 import { SyncChip } from "./SyncChip";
 
 const Notice = ({ children }: { children: string }) => (
-  <p className="text-xs text-amber-600 dark:text-amber-400">{children}</p>
+  <p className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
+    {children}
+  </p>
 );
 
 /** Sidebar row for a logged-in account: who, sync state, logout, notices. */

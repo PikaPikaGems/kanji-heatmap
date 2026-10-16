@@ -36,7 +36,7 @@ export const RefreshPageBtn = ({ cnOverride }: { cnOverride?: string }) => {
       {offlineHint != null && (
         <span
           key={offlineHintKey}
-          className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-xs font-semibold border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background dark:text-amber-300 text-amber-600 animate-search-type-hint"
+          className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-xs font-bold border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background text-yellow-600 dark:text-yellow-400 animate-search-type-hint"
           role="status"
           aria-live="polite"
           onAnimationEnd={() => setOfflineHint(null)}

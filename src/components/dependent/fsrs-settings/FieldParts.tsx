@@ -48,7 +48,9 @@ export const FieldTitle = ({
 );
 
 export const Warning = ({ children }: { children: string }) => (
-  <p className="text-xs text-amber-600 dark:text-amber-400">{children}</p>
+  <p className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
+    {children}
+  </p>
 );
 
 /** An engine `invalid_settings` reason, shown next to its field. */
