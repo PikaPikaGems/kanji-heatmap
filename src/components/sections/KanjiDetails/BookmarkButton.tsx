@@ -73,7 +73,7 @@ const ActiveBookmarkButton = ({
       {action.kind === "error" && (
         <p
           role="alert"
-          className="text-xs text-right max-w-48 text-destructive"
+          className="text-xs text-right max-w-48 font-bold text-yellow-600 dark:text-yellow-400"
         >
           {action.message}
         </p>

@@ -119,7 +119,7 @@ const LogoutForm = ({ userId }: { userId: string }) => {
           onCheckedChange={choose("studyData")}
         />
         {(losesUnsynced || losesRejectedNotes) && (
-          <div className="flex flex-col gap-1 text-xs pl-7 text-rose-600 dark:text-rose-400">
+          <div className="flex flex-col gap-1 text-xs pl-7 font-bold text-yellow-600 dark:text-yellow-400">
             {losesUnsynced && (
               <p>
                 ⚠️ Your {pending} unsynced {changeWord} will be lost for good.

@@ -14,7 +14,10 @@ export const LoginDownloadingStep = ({
   if (error !== null) {
     return (
       <div className="flex flex-col gap-3 py-2">
-        <p role="alert" className="text-sm text-destructive">
+        <p
+          role="alert"
+          className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+        >
           {error}
         </p>
         <div className="flex gap-2">

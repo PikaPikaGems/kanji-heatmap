@@ -17,13 +17,17 @@ export const NoteSaveStatus = ({
 }) => {
   if (overLimit) {
     return (
-      <span className="font-bold text-red-500">
+      <span className="font-bold text-yellow-600 dark:text-yellow-400">
         Too long to save. Shorten it to keep your changes.
       </span>
     );
   }
   if (save.kind === "error") {
-    return <span className="font-bold text-red-500">{save.message}</span>;
+    return (
+      <span className="font-bold text-yellow-600 dark:text-yellow-400">
+        {save.message}
+      </span>
+    );
   }
   if (save.kind === "busy") {
     return <span className="text-muted-foreground">Saving…</span>;

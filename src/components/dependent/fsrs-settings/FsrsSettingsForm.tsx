@@ -249,7 +249,10 @@ export const FsrsSettingsForm = ({
           </div>
         </div>
         {save.kind === "error" && (
-          <p role="alert" className="text-sm text-destructive">
+          <p
+            role="alert"
+            className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+          >
             {save.message}
           </p>
         )}

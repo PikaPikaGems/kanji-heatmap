@@ -228,7 +228,7 @@ export const MarkdownEditor = ({
           {status}
         </div>
         <p
-          className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? "text-red-500" : "text-muted-foreground"}`}
+          className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`}
           aria-live="polite"
         >
           {bytes} / {maxBytes} bytes

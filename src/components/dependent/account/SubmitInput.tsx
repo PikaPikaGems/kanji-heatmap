@@ -65,7 +65,10 @@ export const SubmitInput = ({
         </Button>
       </div>
       {status.kind === "error" && (
-        <p role="alert" className="px-1 text-sm text-destructive">
+        <p
+          role="alert"
+          className="px-1 text-sm font-bold text-yellow-600 dark:text-yellow-400"
+        >
           {status.message}
         </p>
       )}

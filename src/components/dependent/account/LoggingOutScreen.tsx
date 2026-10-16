@@ -63,7 +63,8 @@ const StepList = ({
             className={cn(
               "flex items-start gap-2",
               progress === "waiting" && "text-muted-foreground",
-              progress === "failed" && "text-destructive"
+              progress === "failed" &&
+                "font-bold text-yellow-600 dark:text-yellow-400"
             )}
           >
             <span className="mt-0.5 shrink-0" aria-hidden>

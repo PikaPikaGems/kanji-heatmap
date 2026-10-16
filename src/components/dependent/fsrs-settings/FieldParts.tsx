@@ -54,7 +54,10 @@ export const Warning = ({ children }: { children: string }) => (
 /** An engine `invalid_settings` reason, shown next to its field. */
 export const FieldError = ({ message }: { message: string | undefined }) =>
   message === undefined ? null : (
-    <p role="alert" className="text-xs text-destructive">
+    <p
+      role="alert"
+      className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
+    >
       {message}
     </p>
   );

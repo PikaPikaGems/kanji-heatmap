@@ -44,7 +44,9 @@ const Note = ({
   <p
     role={tone === "error" ? "alert" : undefined}
     className={`px-2 max-w-56 text-xs text-left ${
-      tone === "error" ? "text-destructive" : "text-muted-foreground"
+      tone === "error"
+        ? "font-bold text-yellow-600 dark:text-yellow-400"
+        : "text-muted-foreground"
     }`}
   >
     {children}
@@ -114,7 +116,10 @@ const ConfirmRemove = ({
         </Button>
       </div>
       {action.kind === "error" && (
-        <p role="alert" className="text-xs text-destructive">
+        <p
+          role="alert"
+          className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
+        >
           {action.message}
         </p>
       )}

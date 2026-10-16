@@ -34,7 +34,10 @@ export const SyncNowButton = ({ label = "Sync now" }: { label?: string }) => {
         {label}
       </Button>
       {status.kind === "error" && (
-        <p role="alert" className="text-xs text-destructive">
+        <p
+          role="alert"
+          className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
+        >
           {status.message}
         </p>
       )}
