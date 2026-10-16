@@ -54,32 +54,24 @@ export const MasteryEndScreen = ({
   useEnterAction(done, !drawerOpen, ["Escape"]);
 
   return (
-    <div className="h-full animate-fade-in">
-      <RoundRecap
-        cheer={cheer}
-        summary={
-          <p className="mt-2 text-sm font-bold text-center text-muted-foreground">
-            {hasMore ? `${moreDue} more due now` : nextDueCopy(nextDueAt)}
-          </p>
-        }
-        tiles={results.map(({ kanji, keyword, rating }) => ({
-          kanji,
-          keyword,
-          correct: rating !== "again",
-          rating,
-        }))}
-        afterTiles={
-          saveError && (
-            <UserNotice className="pb-4 font-bold text-center text-yellow-600 dark:text-yellow-400">
-              Some answers weren&apos;t saved. {saveError}
-            </UserNotice>
-          )
-        }
-        primaryLabel={hasMore ? "Next round" : "Done"}
-        onPrimary={hasMore ? more : done}
-        secondaryLabel={hasMore ? "End Session" : undefined}
-        onSecondary={hasMore ? done : undefined}
-      />
-    </div>
+    <RoundRecap
+      cheer={cheer}
+      subtitle={hasMore ? `${moreDue} more due now` : nextDueCopy(nextDueAt)}
+      tiles={results.map(({ kanji, keyword, rating }) => ({
+        kanji,
+        keyword,
+        correct: rating !== "again",
+        rating,
+      }))}
+      onContinue={hasMore ? more : done}
+      onEnd={hasMore ? done : undefined}
+      notice={
+        saveError && (
+          <UserNotice className="font-bold text-center text-yellow-600 dark:text-yellow-400">
+            Some answers weren&apos;t saved. {saveError}
+          </UserNotice>
+        )
+      }
+    />
   );
 };

@@ -1,7 +1,7 @@
 import type { CardType } from "engine-contract";
 import { UserNotice } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { Stat } from "@/components/shared-practice";
+import { PracticeBottomBar, Stat } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useOpenedParam } from "@/hooks/routing-hooks";
 import { useEnterAction } from "@/hooks/use-enter-action";
@@ -58,20 +58,18 @@ export const MasteryStartScreen = ({
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-        <div className="flex flex-col w-full max-w-md gap-2 mx-auto">
-          {(blocker ?? error) && (
-            <div role="status">
-              <UserNotice className="font-bold text-yellow-600 dark:text-yellow-400">
-                {blocker ?? error}
-              </UserNotice>
-            </div>
-          )}
-          <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
-            Start
-          </PracticeButton>
-        </div>
-      </div>
+      <PracticeBottomBar>
+        {(blocker ?? error) && (
+          <div role="status">
+            <UserNotice className="font-bold text-yellow-600 dark:text-yellow-400">
+              {blocker ?? error}
+            </UserNotice>
+          </div>
+        )}
+        <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
+          Start
+        </PracticeButton>
+      </PracticeBottomBar>
     </div>
   );
 };

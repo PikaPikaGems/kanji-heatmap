@@ -7,6 +7,7 @@ import { JLTPTtypes } from "@/lib/jlpt";
 import { JOUYOU_GRADE_TYPE_ARR, JouyouGradeType } from "@/lib/jouyou-grade";
 import { BookmarkedOnlyToggle } from "./BookmarkedOnlyToggle";
 import { LeavePractice } from "./EndSessionButton";
+import { PracticeBottomBar } from "./PracticeBottomBar";
 import { ToggleRow } from "./ToggleRow";
 import { DeckFilterSettings } from "./types";
 
@@ -104,23 +105,21 @@ export const PracticeInitialScreen = ({
       </div>
     </div>
 
-    <div className="shrink-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-      <div className="flex flex-col w-full max-w-md gap-2 mx-auto">
-        <p className="text-sm text-left text-muted-foreground">
-          {loading ? (
-            "Loading…"
-          ) : (
-            <>
-              <span className="font-bold text-foreground">{deckSize}</span>{" "}
-              kanji match your filters
-            </>
-          )}
-        </p>
-        <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
-          Start
-        </PracticeButton>
-        <SaveProgressHint />
-      </div>
-    </div>
+    <PracticeBottomBar>
+      <p className="text-sm text-left text-muted-foreground">
+        {loading ? (
+          "Loading…"
+        ) : (
+          <>
+            <span className="font-bold text-foreground">{deckSize}</span> kanji
+            match your filters
+          </>
+        )}
+      </p>
+      <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
+        Start
+      </PracticeButton>
+      <SaveProgressHint />
+    </PracticeBottomBar>
   </div>
 );

@@ -54,8 +54,7 @@ export const EndSession = ({
 
     return (
       <EndScreenLayout
-        className="px-4"
-        heading={`🎉 ${cheer}`}
+        cheer={cheer}
         subtitle="All words complete"
         stats={
           <>
@@ -64,37 +63,29 @@ export const EndSession = ({
             <Stat value={results.length} unit="" label="Attempts" />
           </>
         }
-        afterStats={
-          forgottenKanji.length > 0 && (
-            <Link
-              href={multiKanjiSearchHref(forgottenKanji)}
-              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
-            >
-              View {forgottenKanji.length} kanji you forgot
-            </Link>
-          )
-        }
-        belowButtons={<ProgressNotSavedNotice saveError={saveError} />}
-        primaryLabel="Done"
-        onPrimary={onEnd}
-      />
+        onContinue={onEnd}
+        notice={<ProgressNotSavedNotice saveError={saveError} />}
+      >
+        {forgottenKanji.length > 0 && (
+          <Link
+            href={multiKanjiSearchHref(forgottenKanji)}
+            className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
+          >
+            View {forgottenKanji.length} kanji you forgot
+          </Link>
+        )}
+      </EndScreenLayout>
     );
   }
 
   return (
     <RoundRecap
       cheer={cheer}
-      summary={
-        <p className="mt-2 text-sm font-bold text-center text-muted-foreground">
-          {correctCount}/{results.length} correct this round
-        </p>
-      }
+      subtitle={`${correctCount}/${results.length} correct this round`}
       tiles={results}
-      afterButtons={<ProgressNotSavedNotice saveError={saveError} />}
-      primaryLabel="Continue"
-      onPrimary={onNext}
-      secondaryLabel="End Session"
-      onSecondary={onEnd}
+      onContinue={onNext}
+      onEnd={onEnd}
+      notice={<ProgressNotSavedNotice saveError={saveError} />}
     />
   );
 };

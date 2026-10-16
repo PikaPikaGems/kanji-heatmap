@@ -26,13 +26,8 @@ export const EndSession = ({
 
   return (
     <EndScreenLayout
-      heading={cheer}
-      subtitle=""
-      headingExtra={
-        <div className="mt-2">
-          <SpeedKatakanaStatsSummary completed={completedSets} />
-        </div>
-      }
+      cheer={cheer}
+      headingExtra={<SpeedKatakanaStatsSummary completed={completedSets} />}
       stats={
         <>
           <Stat value={stats.accuracy} unit="%" label="Accuracy" />
@@ -43,11 +38,9 @@ export const EndSession = ({
           />
         </>
       }
-      belowButtons={<ProgressNotSavedNotice saveError={saveError} />}
-      primaryLabel="Next Challenge"
-      onPrimary={onNext}
-      secondaryLabel="End Session"
-      onSecondary={onEnd}
+      onContinue={onNext}
+      onEnd={onEnd}
+      notice={<ProgressNotSavedNotice saveError={saveError} />}
     />
   );
 };

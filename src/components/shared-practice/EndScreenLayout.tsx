@@ -1,74 +1,75 @@
 import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { cn } from "@/lib/utils";
+import { PracticeBottomBar } from "./PracticeBottomBar";
 
 /**
- * Centered end-of-session layout shared by the practice modes and the
- * speed-katakana game: cheer heading + uppercase subtitle, a wrapping stat
- * row, and a stacked primary / optional ghost button column. Keyboard
- * handling and cheer selection stay with the callers.
+ * The one end-of-round / end-of-session screen for every practice and mastery
+ * game: cheer heading, optional stat row and content scrolling above the
+ * bottom bar (the same bar the start screens use) with Continue, an optional
+ * End Session, and an optional notice under them. Keyboard handling and cheer
+ * selection stay with the callers.
  */
 export const EndScreenLayout = ({
-  heading,
+  cheer,
   subtitle,
   headingExtra,
   stats,
-  afterStats,
-  belowButtons,
-  primaryLabel,
-  onPrimary,
-  secondaryLabel,
-  onSecondary,
-  className,
+  children,
+  onContinue,
+  onEnd,
+  notice,
 }: {
-  heading: string;
-  subtitle: string;
+  cheer: string;
+  /** One line under the cheer, e.g. "7/10 correct this round". */
+  subtitle?: string;
   headingExtra?: ReactNode;
-  stats: ReactNode;
-  /** Optional content between the stats and the buttons (e.g. a link). */
-  afterStats?: ReactNode;
-  /** Optional content under the buttons (e.g. a "progress not saved" notice). */
-  belowButtons?: ReactNode;
-  primaryLabel: string;
-  onPrimary: () => void;
-  secondaryLabel?: string;
-  onSecondary?: () => void;
-  className?: string;
+  /** Big numbers shown in a wrapping row under the heading. */
+  stats?: ReactNode;
+  /** Anything else for the scrolling area: recap tiles, links. */
+  children?: ReactNode;
+  onContinue: () => void;
+  /** Leaves the game; omit when Continue already does. */
+  onEnd?: () => void;
+  /** Under the buttons, e.g. "progress not saved". */
+  notice?: ReactNode;
 }) => (
-  <div
-    className={cn(
-      "flex flex-col items-center justify-center w-full h-full gap-10 animate-fade-in",
-      className
-    )}
-  >
-    <div className="text-center">
-      <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
-        {heading}
-      </h2>
-      <p className="mt-1 text-xs font-bold tracking-wide uppercase text-muted-foreground">
-        {subtitle}
-      </p>
-      {headingExtra}
-    </div>
+  <div className="flex flex-col w-full h-full animate-fade-in">
+    {/* m-auto centers the content in the space above the bar and, unlike
+        justify-center, still scrolls from the top when it overflows. */}
+    <div className="flex flex-col flex-1 min-h-0 px-4 pt-4 overflow-y-auto">
+      <div className="flex flex-col items-center w-full max-w-md gap-10 pb-6 m-auto">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
+            🎉 {cheer}
+          </h2>
+          {subtitle && (
+            <p className="mt-1 text-sm font-bold text-muted-foreground">
+              {subtitle}
+            </p>
+          )}
+          {headingExtra}
+        </div>
 
-    <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16 gap-y-8">
-      {stats}
-    </div>
-
-    {afterStats}
-
-    <div className="flex flex-col items-center w-full gap-4">
-      <div className="flex flex-col w-full max-w-xs gap-3">
-        <PracticeButton size="lg" onClick={onPrimary}>
-          {primaryLabel}
-        </PracticeButton>
-        {secondaryLabel && onSecondary && (
-          <PracticeButton variant="ghost" size="md" onClick={onSecondary}>
-            {secondaryLabel}
-          </PracticeButton>
+        {stats && (
+          <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8">
+            {stats}
+          </div>
         )}
+
+        {children}
       </div>
-      {belowButtons && <div className="w-full max-w-md">{belowButtons}</div>}
     </div>
+
+    <PracticeBottomBar>
+      <PracticeButton size="lg" onClick={onContinue}>
+        Continue
+      </PracticeButton>
+      {onEnd && (
+        <PracticeButton size="md" variant="ghost" onClick={onEnd}>
+          End Session
+        </PracticeButton>
+      )}
+      {notice}
+    </PracticeBottomBar>
   </div>
 );

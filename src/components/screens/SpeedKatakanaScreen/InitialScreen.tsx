@@ -1,7 +1,11 @@
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { RadioRow, ToggleRow } from "@/components/shared-practice";
+import {
+  PracticeBottomBar,
+  RadioRow,
+  ToggleRow,
+} from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { useEnterAction } from "@/hooks/use-enter-action";
@@ -190,14 +194,12 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-        <div className="w-full max-w-lg mx-auto">
-          <PracticeButton size="lg" onClick={onStart}>
-            Start
-          </PracticeButton>
-          <SaveProgressHint className="pt-2" />
-        </div>
-      </div>
+      <PracticeBottomBar>
+        <PracticeButton size="lg" onClick={onStart}>
+          Start
+        </PracticeButton>
+        <SaveProgressHint />
+      </PracticeBottomBar>
     </div>
   );
 };
