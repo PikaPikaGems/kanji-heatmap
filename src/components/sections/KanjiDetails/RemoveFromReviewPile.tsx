@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
@@ -68,9 +68,10 @@ const ConfirmRemove = ({
 };
 
 /**
- * The low-key "Remove from review pile" action at the bottom of Your
- * progress, and the dialog that asks first. Removing deletes the pile item's
- * reading and writing cards' history (a later add starts both from scratch).
+ * The low-key red "Remove {kanji} from review pile" action at the bottom of
+ * Your progress, and the dialog that asks first. Removing deletes the pile
+ * item's reading and writing cards' history (a later add starts both from
+ * scratch).
  */
 export const RemoveFromReviewPile = ({
   kanji,
@@ -83,8 +84,13 @@ export const RemoveFromReviewPile = ({
 
   return (
     <>
-      <TextActionButton disabled={disabled} onClick={() => setOpen(true)}>
-        Remove from review pile
+      <TextActionButton
+        icon={<Trash2 size={14} />}
+        className="text-rose-500"
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
+        Remove {kanji} from review pile
       </TextActionButton>
       <Dialog open={open} onOpenChange={setOpen}>
         <ScrollableDialogContent

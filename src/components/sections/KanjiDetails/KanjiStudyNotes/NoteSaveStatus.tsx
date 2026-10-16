@@ -35,10 +35,12 @@ export const NoteSaveStatus = ({
   }
   if (hasUnsavedChanges) {
     return (
-      <>
-        <span className="text-muted-foreground">Not saved yet</span>
+      // One element with a real space, so the two never run together where
+      // the parent has no gap (the "Continue writing" box on touch screens).
+      <span>
+        <span className="text-muted-foreground">Not saved yet</span>{" "}
         <NoticeAction onClick={onSaveNow}>Save now</NoticeAction>
-      </>
+      </span>
     );
   }
   if (syncStatus === "pending-sync") {
