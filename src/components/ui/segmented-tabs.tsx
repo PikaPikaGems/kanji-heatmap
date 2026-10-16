@@ -33,7 +33,9 @@ export const SegmentedTabsList = <T extends string>({
     <TabsList
       aria-label={label}
       className={cn(
-        "relative h-10 gap-0.5 p-0.5 rounded-full border border-border bg-muted/70",
+        // Equal-width columns (as wide as the longest label), so the sliding
+        // highlight, 1/n of the width, always lines up with the active tab.
+        "relative inline-grid grid-flow-col auto-cols-fr h-10 p-0.5 rounded-full border border-border bg-muted/70",
         className
       )}
     >
@@ -50,7 +52,7 @@ export const SegmentedTabsList = <T extends string>({
         <TabsTrigger
           key={option.value}
           value={option.value}
-          className="relative z-10 flex-1 px-4 rounded-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+          className="relative z-10 px-4 rounded-full data-[state=active]:bg-transparent data-[state=active]:shadow-none"
         >
           {option.label}
         </TabsTrigger>
