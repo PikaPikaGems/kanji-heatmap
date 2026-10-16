@@ -1,12 +1,16 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
-import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { MasteryBarsLegend } from "./MasteryBarsLegend";
+import {
+  MASTERY_METRIC_TITLES,
+  MASTERY_METRICS,
+  type MasteryMetric,
+} from "@/lib/engine/mastery-metrics";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { MasteryScaleLegend } from "@/components/screens/MasteryScreen/MasteryLegend";
+import { TwoWaySwitch } from "../TwoWaySwitch";
 import { MasteryCard } from "./MasteryCard";
-import { MasteryMetricToggle } from "./MasteryMetricToggle";
 import {
   JLPT_GROUPING,
   JOUYOU_GROUPING,
@@ -14,7 +18,13 @@ import {
   tallyMastery,
 } from "./mastery-tally";
 
-/** JLPT / Jouyou and metric toggles, one legend, and a segmented-bar card per card kind. */
+const isMasteryMetric = (value: string): value is MasteryMetric =>
+  MASTERY_METRICS.some((metric) => metric === value);
+
+/**
+ * The JLPT / Jouyou switch, then the Mastery / Stability / Difficulty tabs,
+ * then a card of thin segmented bars per card kind and the color scale.
+ */
 export const MasteryBars = ({
   pile,
   allKanji,
@@ -26,51 +36,59 @@ export const MasteryBars = ({
 }) => {
   const [showJouyou, setShowJouyou] = useState(false);
   const [metric, setMetric] = useState<MasteryMetric>("mastery");
-  const switchId = useId();
 
   const grouping = showJouyou ? JOUYOU_GROUPING : JLPT_GROUPING;
   // Read at render: levels shift over weeks, so no ticking timer is needed.
   const tallies = tallyMastery(allKanji, pile, getInfo, grouping, Date.now());
 
   return (
-    <>
-      <div className="flex flex-wrap items-center justify-center mb-3 gap-x-6 gap-y-2">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Label
-            htmlFor={switchId}
-            className={
-              !showJouyou ? "text-foreground font-semibold" : undefined
-            }
-          >
-            JLPT
-          </Label>
-          <Switch
-            id={switchId}
-            checked={showJouyou}
-            onCheckedChange={setShowJouyou}
-            aria-label="Toggle between JLPT and Jouyou grade breakdown"
-          />
-          <Label
-            htmlFor={switchId}
-            className={showJouyou ? "text-foreground font-semibold" : undefined}
-          >
-            Jouyou
-          </Label>
-        </div>
-        <MasteryMetricToggle value={metric} onChange={setMetric} />
+    <Tabs
+      value={metric}
+      onValueChange={(next) => {
+        if (isMasteryMetric(next)) setMetric(next);
+      }}
+    >
+      <div className="flex flex-col items-center gap-4 mb-4">
+        <TwoWaySwitch
+          left="JLPT"
+          right="Jouyou"
+          checked={showJouyou}
+          onCheckedChange={setShowJouyou}
+          ariaLabel="Toggle between JLPT and Jouyou grade breakdown"
+        />
+        <SegmentedTabsList
+          value={metric}
+          label="Kanji mastery metric"
+          className="w-full max-w-sm"
+          options={MASTERY_METRICS.map((value) => ({
+            value,
+            label: MASTERY_METRIC_TITLES[value],
+          }))}
+        />
       </div>
-      <MasteryBarsLegend metric={metric} />
-      <div className="grid gap-3 md:grid-cols-3">
-        {MASTERY_CARD_KINDS.map((kind) => (
-          <MasteryCard
-            key={kind}
-            kind={kind}
-            metric={metric}
-            groups={grouping.groups}
-            tallies={tallies}
-          />
-        ))}
-      </div>
-    </>
+      {MASTERY_METRICS.map((value) => (
+        <TabsContent key={value} value={value} className="mt-0">
+          <div
+            key={grouping === JLPT_GROUPING ? "jlpt" : "jouyou"}
+            className="animate-fade-in-fast"
+          >
+            <div className="grid gap-3 md:grid-cols-3">
+              {MASTERY_CARD_KINDS.map((kind) => (
+                <MasteryCard
+                  key={kind}
+                  kind={kind}
+                  metric={value}
+                  groups={grouping.groups}
+                  tallies={tallies}
+                />
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <MasteryScaleLegend measure={value} className="mt-4 mb-0" />
+            </div>
+          </div>
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 };

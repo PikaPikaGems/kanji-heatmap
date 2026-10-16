@@ -30,11 +30,11 @@ const FILL_CN: Record<MasteryMetric, string[]> = {
   ],
 };
 
-/** `band` is 0-based; null (Not started) is an uncolored tile. */
+/** `band` is 0-based; null (Not started) is an uncolored, see-through tile. */
 export const getBandFillCn = (
   measure: MasteryMetric,
   band: number | null
-): string => (band == null ? "bg-background" : FILL_CN[measure][band]);
+): string => (band == null ? "bg-transparent" : FILL_CN[measure][band]);
 
 /** Text on that fill: white once the fill is strong enough. */
 export const getBandTextCn = (

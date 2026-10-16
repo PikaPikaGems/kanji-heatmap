@@ -182,11 +182,13 @@ const cardsWhere = (
     }))
   );
 
-/** Started cards, hardest first. */
+/** Started cards of one type, hardest first. */
 export const topDifficultCards = (
-  pile: readonly ReviewPileItemView[]
+  pile: readonly ReviewPileItemView[],
+  cardType: CardType
 ): TopCard[] =>
   cardsWhere(pile, isCardStarted)
+    .filter((card) => card.cardType === cardType)
     .sort((a, b) => b.difficulty - a.difficulty)
     .slice(0, TOP_COUNT);
 

@@ -16,7 +16,7 @@ export const QueryFallback = ({
 }) => {
   if (snapshots.some(isFailed)) {
     return (
-      <p className="py-6 text-sm text-center text-muted-foreground">
+      <p className="py-6 text-sm font-bold text-center text-yellow-600 dark:text-yellow-400">
         Couldn&apos;t load your progress. Try again in a moment.
       </p>
     );

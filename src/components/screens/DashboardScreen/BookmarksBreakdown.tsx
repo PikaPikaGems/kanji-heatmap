@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useGetKanjiInfoFn,
   useIsKanjiWorkerReady,
@@ -16,10 +16,9 @@ import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { DashboardPanel } from "./DashboardPanel";
+import { TwoWaySwitch } from "./TwoWaySwitch";
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
@@ -85,7 +84,6 @@ const BookmarksBreakdownBody = () => {
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
   const bookmarks = useBookmarkedKanji();
   const [showGrade, setShowGrade] = useState(false);
-  const switchId = useId();
 
   const jlptBands = useMemo((): BreakdownBand[] => {
     const next = emptyJlptCounts();
@@ -151,32 +149,26 @@ const BookmarksBreakdownBody = () => {
   const bands = showGrade ? gradeBands : jlptBands;
   return (
     <>
-      <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
-        <Label
-          htmlFor={switchId}
-          className={!showGrade ? "text-foreground font-semibold" : undefined}
-        >
-          JLPT
-        </Label>
-        <Switch
-          id={switchId}
+      <div className="mb-4">
+        <TwoWaySwitch
+          left="JLPT"
+          right="Grade"
           checked={showGrade}
           onCheckedChange={setShowGrade}
-          aria-label="Toggle between JLPT and grade breakdown"
+          ariaLabel="Toggle between JLPT and grade breakdown"
         />
-        <Label
-          htmlFor={switchId}
-          className={showGrade ? "text-foreground font-semibold" : undefined}
-        >
-          Grade
-        </Label>
       </div>
       {loading ? (
         <div className="py-8">
           <KaomojiAnimation />
         </div>
       ) : (
-        <BreakdownRows bands={bands} />
+        <div
+          key={showGrade ? "grade" : "jlpt"}
+          className="animate-fade-in-fast"
+        >
+          <BreakdownRows bands={bands} />
+        </div>
       )}
     </>
   );

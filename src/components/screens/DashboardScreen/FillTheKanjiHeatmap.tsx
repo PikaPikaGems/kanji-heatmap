@@ -1,5 +1,3 @@
-import { Link } from "@/components/dependent/routing";
-import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
@@ -36,6 +34,7 @@ import {
 import { fillTheKanjiBatchHref } from "@/lib/fill-the-kanji/links";
 import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
 import { DashboardPanel } from "./DashboardPanel";
+import { PracticeNowLink } from "./PracticeNowLink";
 import { HeatmapCell } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 import { AttemptCountScaleOptions } from "./AttemptCountScaleOptions";
@@ -102,15 +101,8 @@ const BatchDetail = ({
       ) : (
         <div className="text-muted-foreground">Not attempted yet</div>
       )}
-      <div className="border-t border-dotted border-border">
-        <Button
-          asChild
-          size="sm"
-          variant="ghost"
-          className="w-full text-xs font-semibold underline underline-offset-4 decoration-dotted"
-        >
-          <Link to={fillTheKanjiBatchHref(setId, batch)}>Practice Now</Link>
-        </Button>
+      <div className="pt-2.5 border-t border-dotted border-border">
+        <PracticeNowLink to={fillTheKanjiBatchHref(setId, batch)} />
       </div>
       {stats && (
         <div className="text-center text-muted-foreground">

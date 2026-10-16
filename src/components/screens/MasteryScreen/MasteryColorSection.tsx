@@ -2,6 +2,7 @@ import BasicSelect from "@/components/common/BasicSelect";
 import { H2 } from "../ListScreen/ControlBar/ItemPresentation/ItemPresentationContent";
 import {
   getHeatmapMeasure,
+  getHeatmapMetricDescription,
   getHeatmapMetricLabel,
   HEATMAP_METRICS,
   type HeatmapMetric,
@@ -11,7 +12,7 @@ import {
   MASTERY_RULES_HINT,
   type MasteryMetric,
 } from "@/lib/engine/mastery-metrics";
-import { MasteryLegend } from "./MasteryLegend";
+import { MasteryScaleLegend } from "./MasteryLegend";
 import { useHeatmapMetric } from "./use-heatmap-metric";
 
 const getMeasureHint = (measure: MasteryMetric): string => {
@@ -47,10 +48,16 @@ export const MasteryColorSection = () => {
         options={HEATMAP_METRICS.map((value) => ({
           value,
           label: getHeatmapMetricLabel(value),
+          description: getHeatmapMetricDescription(value),
         }))}
       />
-      <MasteryLegend metric={metric} />
-      <p className="text-xs text-muted-foreground">{getMetricHint(metric)}</p>
+      <MasteryScaleLegend measure={getHeatmapMeasure(metric)} />
+      <p
+        key={metric}
+        className="text-xs text-muted-foreground animate-fade-in-fast"
+      >
+        {getMetricHint(metric)}
+      </p>
     </>
   );
 };

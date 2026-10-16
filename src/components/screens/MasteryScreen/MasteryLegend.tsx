@@ -1,34 +1,54 @@
-import { SquareListItem } from "@/components/common/SquareListItem";
+import { FreqSquare } from "@/components/common/freq/FreqSquare";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
   getBandLabels,
-  getHeatmapMeasure,
-  type HeatmapMetric,
   NOT_STARTED_LABEL,
+  SCALE_END_LABELS,
 } from "@/lib/engine/mastery-heatmap-metrics";
+import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
+import { cn } from "@/lib/utils";
 
-/** Swatch and label per band, from Not started up to the strongest band. */
-export const MasteryLegend = ({ metric }: { metric: HeatmapMetric }) => {
-  const measure = getHeatmapMeasure(metric);
-  const entries = [
-    { label: NOT_STARTED_LABEL, band: null },
-    ...getBandLabels(measure).map((label, band) => ({ label, band })),
-  ];
+/** One square of the scale, named on hover and for screen readers. */
+const ScaleSquare = ({ label, cn }: { label: string; cn: string }) => (
+  <span title={label} className="inline-flex">
+    <FreqSquare srOnly={label} cn={cn} />
+  </span>
+);
 
+/**
+ * The site's heatmap legend (like "Less [] [] [] [] [] More") for a mastery
+ * measure: "Not Started [] [] [] [] [] Burned". The first square is
+ * see-through like a tile that isn't started, then one square per band.
+ */
+export const MasteryScaleLegend = ({
+  measure,
+  className,
+}: {
+  measure: MasteryMetric;
+  className?: string;
+}) => {
+  const { from, to } = SCALE_END_LABELS[measure];
   return (
-    <ul
-      key={metric}
-      className="flex flex-wrap my-3 gap-x-3 gap-y-1.5 animate-fade-in"
-      aria-label="Color legend"
+    <div
+      key={measure}
+      className={cn(
+        "flex items-center my-3 space-x-1 animate-fade-in",
+        className
+      )}
     >
-      {entries.map(({ label, band }) => (
-        <SquareListItem
+      <div className="text-xs">{from}</div>
+      <ScaleSquare
+        label={NOT_STARTED_LABEL}
+        cn={getBandFillCn(measure, null)}
+      />
+      {getBandLabels(measure).map((label, band) => (
+        <ScaleSquare
           key={label}
-          cn={`${getBandFillCn(measure, band)} border border-black/20 dark:border-white/25`}
-          color=""
           label={label}
+          cn={getBandFillCn(measure, band)}
         />
       ))}
-    </ul>
+      <div className="text-xs">{to}</div>
+    </div>
   );
 };

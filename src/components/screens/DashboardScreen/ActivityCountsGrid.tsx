@@ -12,11 +12,48 @@ import {
 } from "@/lib/pages/practice-pages";
 import { ActivityStatCard } from "./ActivityStatCard";
 
-/** One card per activity: its days, then its rounds / batches / sessions. */
+/**
+ * One card per activity: its days, then its reviews / rounds / batches /
+ * sessions. The two mastery games come first, then the four practice games.
+ */
 export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => {
   const { kinds } = stats;
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <ActivityStatCard
+          title={READING_MASTERY_LABEL}
+          Icon={Brain}
+          counts={[
+            {
+              value: kinds.readingMastery.days,
+              unit: "Days",
+              unitSingular: "Day",
+            },
+            {
+              value: kinds.readingMastery.count,
+              unit: "Reviews",
+              unitSingular: "Review",
+            },
+          ]}
+        />
+        <ActivityStatCard
+          title={WRITING_MASTERY_LABEL}
+          Icon={Brush}
+          counts={[
+            {
+              value: kinds.writingMastery.days,
+              unit: "Days",
+              unitSingular: "Day",
+            },
+            {
+              value: kinds.writingMastery.count,
+              unit: "Reviews",
+              unitSingular: "Review",
+            },
+          ]}
+        />
+      </div>
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
         <ActivityStatCard
           title={recognitionPracticePageMeta.shortLabel}
@@ -75,40 +112,6 @@ export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => {
               value: kinds.speedKatakana.count,
               unit: "Sessions",
               unitSingular: "Session",
-            },
-          ]}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <ActivityStatCard
-          title={READING_MASTERY_LABEL}
-          Icon={Brain}
-          counts={[
-            {
-              value: kinds.readingMastery.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.readingMastery.count,
-              unit: "Reviews",
-              unitSingular: "Review",
-            },
-          ]}
-        />
-        <ActivityStatCard
-          title={WRITING_MASTERY_LABEL}
-          Icon={Brush}
-          counts={[
-            {
-              value: kinds.writingMastery.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.writingMastery.count,
-              unit: "Reviews",
-              unitSingular: "Review",
             },
           ]}
         />

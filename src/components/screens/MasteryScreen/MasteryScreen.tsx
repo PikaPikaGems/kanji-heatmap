@@ -1,9 +1,10 @@
 import { lazy } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useIsKanjiWorkerReady } from "@/kanji-worker/kanji-worker-hooks";
 import { AccountGateMessage } from "@/components/mastery-review/MasteryGateScreen";
+import { isEngineAbsent } from "@/lib/engine/account-ui";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
 import { ControlBar } from "../ListScreen/ControlBar";
@@ -13,7 +14,7 @@ import { SuspendedKanjiList } from "../ListScreen/KanjiList/LazyKanjiList";
 import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
 import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
-import { MasterySignedOutBanner } from "./MasterySignedOutBanner";
+import { MasteryAccountBanner } from "./MasteryAccountBanner";
 import { MasteryTileColors } from "./MasteryTileColors";
 
 const MasteryPresentationPopover = lazy(
@@ -22,8 +23,9 @@ const MasteryPresentationPopover = lazy(
 
 /**
  * The `/` grid, search, sort and filter, colored by mastery (design 5.9).
- * Signed out, nothing is in the pile, so the tiles stay uncolored and a
- * bottom banner asks to log in.
+ * Without a pile to read (signed out, a browser that can't save progress, or
+ * a build without the engine) every tile stays uncolored ("Not started");
+ * a bottom banner says why, except in builds without the engine.
  */
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
@@ -43,7 +45,7 @@ const MasteryScreen = () => {
     );
   }
 
-  if (account.kind !== "active" && account.kind !== "signed-out") {
+  if (account.kind === "error" || account.kind === "recovery") {
     return (
       <MasteryCenteredMessage>
         <AccountGateMessage status={account} />
@@ -54,17 +56,20 @@ const MasteryScreen = () => {
   if (account.kind === "active" && pile.status === "failed") {
     return (
       <MasteryCenteredMessage>
-        <p className="max-w-sm text-sm text-muted-foreground">
+        <p className="max-w-sm text-sm font-bold text-yellow-600 dark:text-yellow-400">
           Couldn&apos;t load your progress.
         </p>
         {pile.retry && (
-          <Button variant="outline" onClick={pile.retry}>
+          <PracticeButton variant="secondary" onClick={pile.retry}>
             Try again
-          </Button>
+          </PracticeButton>
         )}
       </MasteryCenteredMessage>
     );
   }
+
+  const unsupportedBrowser =
+    account.kind === "unavailable" && !isEngineAbsent(account.reason);
 
   return (
     <>
@@ -85,7 +90,12 @@ const MasteryScreen = () => {
           <LoadingKanjis />
         )}
       </ListScreenLayout>
-      {account.kind === "signed-out" && <MasterySignedOutBanner />}
+      {account.kind === "signed-out" && (
+        <MasteryAccountBanner reason="signed-out" />
+      )}
+      {unsupportedBrowser && (
+        <MasteryAccountBanner reason="unsupported-browser" />
+      )}
     </>
   );
 };

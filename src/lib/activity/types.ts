@@ -80,12 +80,13 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
   newKanji: "New Kanji Added",
 };
 
+/** The order the heatmap's checkboxes and day popovers list them in. */
 export const ALL_ACTIVITY_KINDS: ActivityKind[] = [
+  "readingMastery",
+  "writingMastery",
   "recognition",
   "production",
   "fillTheKanji",
   "speedKatakana",
-  "readingMastery",
-  "writingMastery",
   "newKanji",
 ];

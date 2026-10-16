@@ -12,12 +12,12 @@ import {
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { PanelNotice } from "../PanelNotice";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
 
-// The `?open=` links in the top lists open the kanji drawer on this page.
+// The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
 const KanjiDrawerGlobal = lazy(
   () => import("@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal")
 );
@@ -26,11 +26,13 @@ const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
 const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
   <PanelNotice>
-    <p>Couldn&apos;t load your kanji mastery.</p>
+    <p className="font-bold text-yellow-600 dark:text-yellow-400">
+      Couldn&apos;t load your kanji mastery.
+    </p>
     {onRetry ? (
-      <Button variant="outline" size="sm" onClick={onRetry}>
+      <PracticeButton variant="secondary" onClick={onRetry}>
         Try again
-      </Button>
+      </PracticeButton>
     ) : null}
   </PanelNotice>
 );
@@ -81,7 +83,7 @@ export const KanjiMasteryBody = () => {
   return (
     <>
       <MasteryBars pile={rows} allKanji={search.data} getInfo={getInfo} />
-      <MasteryTopLists pile={rows} />
+      <MasteryTopLists pile={rows} getInfo={getInfo} />
       <Suspense fallback={null}>
         <KanjiDrawerGlobal />
       </Suspense>

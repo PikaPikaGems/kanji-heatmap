@@ -6,8 +6,6 @@ import {
   setFromLevelAndPos,
 } from "@/components/screens/SpeedKatakanaScreen/constants";
 import { speedKatakanaChallengeHref } from "@/components/screens/SpeedKatakanaScreen/challenge-search-param";
-import { Link } from "@/components/dependent/routing";
-import { Button } from "@/components/ui/button";
 import {
   AttemptCountShading,
   attemptCountLabel,
@@ -22,6 +20,7 @@ import type {
   AllChallengeSetStats,
   ChallengeSetStats,
 } from "@/lib/speed-katakana/stats";
+import { PracticeNowLink } from "./PracticeNowLink";
 import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 
@@ -94,15 +93,8 @@ const SetDetail = ({
       ) : (
         <div className="text-muted-foreground">Not attempted yet</div>
       )}
-      <div className="border-t border-dotted border-border">
-        <Button
-          asChild
-          size="sm"
-          variant="ghost"
-          className="w-full text-xs font-semibold underline underline-offset-4 decoration-dotted"
-        >
-          <Link to={speedKatakanaChallengeHref(setNumber)}>Practice Now</Link>
-        </Button>
+      <div className="pt-2.5 border-t border-dotted border-border">
+        <PracticeNowLink to={speedKatakanaChallengeHref(setNumber)} />
       </div>
       {stats && (
         <div className="text-center text-muted-foreground">

@@ -1,57 +1,39 @@
-import { ReactNode } from "react";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
+import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 
-const Banner = ({ children }: { children: ReactNode }) => (
-  <Alert
-    role="status"
-    className="flex flex-col items-center gap-3 border-2 border-dashed border-amber-500/60 bg-amber-500/10 sm:flex-row sm:justify-between"
-  >
-    {children}
-  </Alert>
-);
-
-const BannerText = ({ children }: { children: ReactNode }) => (
-  <p className="text-sm font-semibold text-center sm:text-left">{children}</p>
-);
-
 /**
- * Tells why the dashboard below shows an empty account: logged out (with a
- * Log in button), a browser that can't save progress, or an account that
- * can't be read. Renders nothing while loading or logged in.
+ * Tells why the dashboard below shows an empty account: logged out, a
+ * browser that can't save progress, or an account that can't be read right
+ * now. Renders nothing while loading or logged in.
  */
 export const DashboardAccountBanner = () => {
   const account = useAccountStatus();
 
   if (account.kind === "signed-out") {
-    return (
-      <Banner>
-        <BannerText>
-          ⚠️ You&apos;re not logged in. Log in to view your progress statistics.
-        </BannerText>
-        <Button size="sm" onClick={openLoginDialog}>
-          Log in
-        </Button>
-      </Banner>
-    );
+    return <LoginNotice to="see your progress" className="text-center" />;
   }
   if (account.kind === "unavailable") {
     return (
-      <Banner>
-        <BannerText>⚠️ {UPDATE_BROWSER_COPY}</BannerText>
-      </Banner>
+      <UserNotice className="text-center">{UPDATE_BROWSER_COPY}</UserNotice>
     );
   }
-  if (account.kind === "error" || account.kind === "recovery") {
+  if (account.kind === "recovery") {
     return (
-      <Banner>
-        <BannerText>
-          ⚠️ Your progress isn&apos;t available right now.
-        </BannerText>
-      </Banner>
+      <UserNotice className="text-center">
+        This device&apos;s saved data needs attention.{" "}
+        <NoticeAction onClick={openRecoveryDialog}>Fix it</NoticeAction> to see
+        your progress.
+      </UserNotice>
+    );
+  }
+  if (account.kind === "error") {
+    return (
+      <UserNotice className="text-center">
+        Your progress isn&apos;t available right now.
+      </UserNotice>
     );
   }
   return null;
