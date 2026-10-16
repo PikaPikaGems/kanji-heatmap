@@ -1,5 +1,4 @@
 import {
-  ChartLine,
   Eye,
   GraduationCap,
   Keyboard,
@@ -29,6 +28,14 @@ export type NavLinkItem = {
   title: string;
   description: string;
   Icon: NavLinkIcon;
+  /** Appends a ⭐️ after the title in the sidebar and FAB menus. */
+  starred?: boolean;
+};
+
+/** A group of menu links under an optional small heading. */
+export type NavLinkSection = {
+  heading?: string;
+  links: NavLinkItem[];
 };
 
 export const exploreKanjiPageMeta = {
@@ -55,16 +62,6 @@ export const masteryPageMeta = {
   description: "See how well you know each kanji — coming soon",
 } as const;
 
-/** Practice destinations shown in the FAB menu. */
-export const practiceNavLinks: NavLinkItem[] = [
-  { ...recognitionPracticePageMeta, Icon: Eye },
-  { ...productionPracticePageMeta, Icon: PenLine },
-  { ...readingMasteryPageMeta, Icon: ScanEye },
-  { ...writingMasteryPageMeta, Icon: PencilLine },
-  { ...fillTheKanjiPageMeta, Icon: Puzzle },
-  { ...speedKatakanaPageMeta, Icon: Keyboard },
-];
-
 /** Bottom floating island tabs (Dashboard / Explore / Mastery). */
 export const floatingIslandNavLinks: NavLinkItem[] = [
   { ...dashboardPageMeta, Icon: LayoutDashboard },
@@ -72,16 +69,51 @@ export const floatingIslandNavLinks: NavLinkItem[] = [
   { ...masteryPageMeta, Icon: GraduationCap },
 ];
 
+// Menu entries (sidebar + practice FAB). `starred` appends the ⭐️ after the
+// title; the floating island tabs above stay plain.
+const visualizeMasteryNavLink: NavLinkItem = {
+  ...masteryPageMeta,
+  Icon: GraduationCap,
+  starred: true,
+};
+
+const readingMasteryNavLink: NavLinkItem = {
+  ...readingMasteryPageMeta,
+  Icon: ScanEye,
+  starred: true,
+};
+
+const writingMasteryNavLink: NavLinkItem = {
+  ...writingMasteryPageMeta,
+  Icon: PencilLine,
+  starred: true,
+};
+
+/** Practice destinations in the FAB menu; the sidebar repeats them. */
+export const practiceNavSections: NavLinkSection[] = [
+  {
+    heading: "Kanji Mastery",
+    links: [readingMasteryNavLink, writingMasteryNavLink],
+  },
+  {
+    heading: "Practice Games",
+    links: [
+      { ...recognitionPracticePageMeta, Icon: Eye },
+      { ...productionPracticePageMeta, Icon: PenLine },
+      { ...fillTheKanjiPageMeta, Icon: Puzzle },
+      { ...speedKatakanaPageMeta, Icon: Keyboard },
+    ],
+  },
+];
+
 /** Primary destinations in the header drawer. */
-export const headerNavLinks: NavLinkItem[] = [
-  { ...exploreKanjiPageMeta, Icon: SearchIcon },
-  { ...dashboardPageMeta, Icon: LayoutDashboard },
-  { ...masteryPageMeta, Icon: GraduationCap },
-  { ...recognitionPracticePageMeta, Icon: Eye },
-  { ...productionPracticePageMeta, Icon: PenLine },
-  { ...readingMasteryPageMeta, Icon: ScanEye },
-  { ...writingMasteryPageMeta, Icon: PencilLine },
-  { ...fillTheKanjiPageMeta, Icon: Puzzle },
-  { ...speedKatakanaPageMeta, Icon: Keyboard },
-  { ...cumUseGraphPageMeta, Icon: ChartLine },
+export const headerNavSections: NavLinkSection[] = [
+  {
+    links: [
+      { ...exploreKanjiPageMeta, Icon: SearchIcon },
+      { ...dashboardPageMeta, Icon: LayoutDashboard },
+      visualizeMasteryNavLink,
+    ],
+  },
+  ...practiceNavSections,
 ];

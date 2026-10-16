@@ -1,6 +1,6 @@
 import { useEngineState } from "@/lib/engine/engine";
 import type { DueCounts } from "@/lib/engine/use-due-count";
-import type { NavLinkItem } from "@/lib/pages/nav-links";
+import type { NavLinkSection } from "@/lib/pages/nav-links";
 import {
   readingMasteryPageMeta,
   writingMasteryPageMeta,
@@ -12,15 +12,23 @@ const MASTERY_HREFS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Drops the mastery links when this build has no study engine; nav-links.ts
+ * Drops the mastery links when this build has no study engine, and any section
+ * that leaves empty (so "Kanji Mastery" disappears with them); nav-links.ts
  * itself stays static.
  */
-export const useVisibleNavLinks = (links: NavLinkItem[]): NavLinkItem[] => {
+export const useVisibleNavSections = (
+  sections: NavLinkSection[]
+): NavLinkSection[] => {
   const engine = useEngineState();
   if (engine.status === "unavailable" && engine.reason === "not-included") {
-    return links.filter((link) => !MASTERY_HREFS.has(link.href));
+    return sections
+      .map((section) => ({
+        ...section,
+        links: section.links.filter((link) => !MASTERY_HREFS.has(link.href)),
+      }))
+      .filter((section) => section.links.length > 0);
   }
-  return links;
+  return sections;
 };
 
 /** Mastery links whose card type has reviews due (they get the due dot). */

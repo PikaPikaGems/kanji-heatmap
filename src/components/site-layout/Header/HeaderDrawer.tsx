@@ -4,8 +4,8 @@ import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
-import { headerNavLinks } from "@/lib/pages/nav-links";
-import { dueNavHrefs, useVisibleNavLinks } from "@/lib/pages/mode-nav-links";
+import { cumUseGraphPageMeta, headerNavSections } from "@/lib/pages/nav-links";
+import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
 import {
   type DueCounts,
   totalDue,
@@ -13,7 +13,7 @@ import {
 } from "@/lib/engine/use-due-count";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
 import { NotificationDot } from "@/components/common/NotificationDot";
-import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
+import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -33,6 +33,7 @@ import { AccountSection } from "@/components/dependent/account/AccountSection";
 import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 
 const infoLinks = [
+  { href: cumUseGraphPageMeta.href, title: cumUseGraphPageMeta.title },
   { href: docPages.about.href, title: docPages.about.title },
   { href: docPages.terms.href, title: docPages.terms.title },
   { href: docPages.privacy.href, title: docPages.privacy.title },
@@ -47,7 +48,7 @@ const HeaderDrawerContent = ({
   due: DueCounts | null;
   onAction: (modal: OpenedModal) => void;
 }) => {
-  const navLinks = useVisibleNavLinks(headerNavLinks);
+  const navSections = useVisibleNavSections(headerNavSections);
 
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
@@ -64,11 +65,10 @@ const HeaderDrawerContent = ({
           </div>
         </div>
         <AccountSection />
-        <DashedNavLinkList
-          items={navLinks}
+        <DashedNavLinkSections
+          sections={navSections}
           dotHrefs={dueNavHrefs(due)}
-          className="flex flex-col gap-2"
-          iconClassName="mt-0 mr-1"
+          listClassName="flex flex-col gap-2"
           onItemPointerDown={(e) => e.stopPropagation()}
           wrapItem={(link) => (
             <DrawerPrimitive.Close asChild>{link}</DrawerPrimitive.Close>
@@ -148,9 +148,7 @@ const HeaderDrawer = ({
             className="relative"
           >
             <Menu className="w-7 h-7" />
-            {totalDue(due) > 0 && (
-              <NotificationDot className="-top-1 -right-1" />
-            )}
+            {totalDue(due) > 0 && <NotificationDot corner />}
           </Button>
         </DrawerPrimitive.Trigger>
         <DrawerPrimitive.Portal>

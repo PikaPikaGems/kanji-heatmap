@@ -15,8 +15,9 @@ type DashedNavLinkProps = {
   onClick?: () => void;
   onPointerDown?: (e: React.PointerEvent) => void;
   className?: string;
-  iconClassName?: string;
-  /** Shows the due dot in the top-right corner. */
+  /** Appends a ⭐️ after the title. */
+  starred?: boolean;
+  /** Shows the due dot right after the title. */
   showDot?: boolean;
 };
 
@@ -33,12 +34,14 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       onClick,
       onPointerDown,
       className,
-      iconClassName,
+      starred,
       showDot,
       ...rest
     },
     ref
   ) => {
+    const lastWordStart = title.lastIndexOf(" ") + 1;
+
     return (
       <Link
         ref={ref}
@@ -46,25 +49,30 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
         onClick={onClick}
         onPointerDown={onPointerDown}
         className={cn(
-          "relative block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent",
+          "block p-3 transition-colors border border-dashed rounded-lg hover:bg-accent",
           className
         )}
         {...rest}
       >
         <div className="flex text-sm font-semibold text-left">
-          {Icon && (
-            <Icon
-              className={cn("mr-2 mt-0.5 size-4 shrink-0", iconClassName)}
-            />
-          )}
-          {title}
+          {Icon && <Icon className="mt-0.5 mr-2 size-4 shrink-0" />}
+          {/* Star and dot stay glued to the title's last word when it wraps. */}
+          <span>
+            {title.slice(0, lastWordStart)}
+            <span className="whitespace-nowrap">
+              {title.slice(lastWordStart)}
+              {starred && <span aria-hidden> ⭐️</span>}
+              {showDot && (
+                <NotificationDot className="inline-block ml-2 align-middle" />
+              )}
+            </span>
+          </span>
         </div>
         {description && (
           <p className="mt-1 text-xs text-left text-muted-foreground">
             {description}
           </p>
         )}
-        {showDot && <NotificationDot />}
       </Link>
     );
   }

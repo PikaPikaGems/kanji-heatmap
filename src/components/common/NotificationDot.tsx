@@ -1,13 +1,21 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Small "something is waiting" dot. Absolutely positioned: the parent must be
- * `relative`; pass `className` to move it off the default top-right corner.
+ * Small pulsing "something is waiting" dot in the site's theme color. Flows
+ * inline by default (put it after the text it belongs to); `corner` pins it
+ * to the top-right of a `relative` parent, e.g. the hamburger button.
  */
-export const NotificationDot = ({ className }: { className?: string }) => (
+export const NotificationDot = ({
+  corner,
+  className,
+}: {
+  corner?: boolean;
+  className?: string;
+}) => (
   <span
     className={cn(
-      "absolute top-1 right-1 block size-2.5 rounded-full bg-rose-500 ring-2 ring-background",
+      "block size-2.5 shrink-0 animate-pulse rounded-full background-theme-color-with-opacity-100 shadow-[0_0_6px_2px_rgba(var(--theme-color-selected),0.7)]",
+      corner && "absolute -top-1 -right-1 ring-2 ring-background",
       className
     )}
   >

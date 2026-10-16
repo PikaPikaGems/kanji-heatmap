@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import type { StudyEngineMockControls } from "kh-study-engine/mock";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { useEngineState } from "@/lib/engine/engine";
 import {
@@ -68,9 +68,9 @@ const FailNextOperation = ({
           </option>
         ))}
       </select>
-      <Button
-        variant="outline"
-        size="sm"
+      <PracticeButton
+        variant="secondary"
+        className="h-8 px-3 text-xs border-b-[3px] active:border-b-2"
         disabled={operationId === undefined}
         onClick={() => {
           if (operationId === undefined) return;
@@ -78,7 +78,7 @@ const FailNextOperation = ({
         }}
       >
         Fail next pending operation
-      </Button>
+      </PracticeButton>
     </div>
   );
 };

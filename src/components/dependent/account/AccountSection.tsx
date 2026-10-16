@@ -1,9 +1,11 @@
 import { Drawer as DrawerPrimitive } from "vaul";
-import { Button } from "@/components/ui/button";
+import { LogIn } from "lucide-react";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { AccountCard } from "./AccountCard";
 import { ActiveAccount } from "./ActiveAccount";
 import { FsrsSettingsItem } from "./FsrsSettingsItem";
 
@@ -36,29 +38,21 @@ export const AccountSection = () => {
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
       {status.kind === "signed-out" && (
-        <div className="flex items-center gap-2">
+        <AccountCard name="Guest" actions={<FsrsSettingsItem />}>
           {/* The dialog lives outside the drawer, so close the drawer first. */}
           <DrawerPrimitive.Close asChild>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={openLoginDialog}
-            >
+            <PracticeButton size="md" onClick={openLoginDialog}>
+              <LogIn aria-hidden />
               Log in
-            </Button>
+            </PracticeButton>
           </DrawerPrimitive.Close>
-          <FsrsSettingsItem />
-        </div>
+        </AccountCard>
       )}
       {status.kind === "recovery" && (
         <DrawerPrimitive.Close asChild>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={openRecoveryDialog}
-          >
+          <PracticeButton size="md" onClick={openRecoveryDialog}>
             Fix saved data on this device
-          </Button>
+          </PracticeButton>
         </DrawerPrimitive.Close>
       )}
       {status.kind === "active" && <ActiveAccount status={status} />}

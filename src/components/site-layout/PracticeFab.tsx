@@ -6,13 +6,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
+import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { NotificationDot } from "@/components/common/NotificationDot";
 import {
   floatingIslandNavLinks,
-  practiceNavLinks,
+  practiceNavSections,
 } from "@/lib/pages/nav-links";
-import { dueNavHrefs, useVisibleNavLinks } from "@/lib/pages/mode-nav-links";
+import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
 import { totalDue, useDueCount } from "@/lib/engine/use-due-count";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
@@ -40,7 +40,7 @@ export const PracticeFab = () => {
 
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
   const due = useDueCount();
-  const modeLinks = useVisibleNavLinks(practiceNavLinks);
+  const modeSections = useVisibleNavSections(practiceNavSections);
 
   if (!fabHrefs.has(location)) {
     return null;
@@ -70,7 +70,9 @@ export const PracticeFab = () => {
           onFocus={prefetchPracticeRoutes}
         >
           <NotebookPen />
-          {totalDue(due) > 0 && <NotificationDot className="top-2 right-2" />}
+          {totalDue(due) > 0 && (
+            <NotificationDot className="absolute top-1/2 left-[calc(50%+1.2rem)] -translate-y-1/2 ring-2 ring-white" />
+          )}
         </PracticeButton>
       </PopoverTrigger>
       <PopoverContent
@@ -79,13 +81,11 @@ export const PracticeFab = () => {
         sideOffset={12}
         className="z-50 w-[min(100vw-1.5rem,28rem)] p-3"
       >
-        <p className="px-1 mb-2 text-sm font-semibold text-left">
-          Select a mode
-        </p>
-        <DashedNavLinkList
-          items={modeLinks}
+        <p className="px-1 text-sm font-semibold text-left">Select a mode</p>
+        <DashedNavLinkSections
+          sections={modeSections}
           dotHrefs={dueNavHrefs(due)}
-          className="grid grid-cols-2 gap-2"
+          listClassName="grid grid-cols-2 gap-2"
           onItemClick={() => setOpen(false)}
         />
       </PopoverContent>

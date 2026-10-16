@@ -29,7 +29,7 @@ const OpenMenuButton = ({ onClick }: { onClick: () => void }) => {
       onClick={onClick}
     >
       <Menu className="w-7 h-7" />
-      {totalDue(due) > 0 && <NotificationDot className="-top-1 -right-1" />}
+      {totalDue(due) > 0 && <NotificationDot corner />}
     </Button>
   );
 };
