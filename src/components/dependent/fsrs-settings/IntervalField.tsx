@@ -1,53 +1,22 @@
 import { Slider } from "@/components/ui/slider";
+import { clamp } from "@/lib/utils";
 import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 
 const DAYS_PER_MONTH = 30;
-const MAX_DAYS = 36500;
-const MAX_MONTHS = Math.ceil(MAX_DAYS / DAYS_PER_MONTH);
-const WARN_ABOVE_MONTHS = 36;
-
-const stopSize = (month: number) => {
-  if (month < 12) return 1;
-  if (month < 36) return 3;
-  if (month < 60) return 6;
-  if (month < 120) return 12;
-  if (month < 360) return 60;
-  return 240;
-};
-
-/**
- * Month values the slider can land on. A linear slider can't cover one month
- * to a hundred years (the engine default) and still be usable, so the steps get
- * wider as the interval grows; every step changes the value.
- */
-const MONTH_STOPS = (() => {
-  const stops: number[] = [];
-  for (let month = 1; month < MAX_MONTHS; month += stopSize(month)) {
-    stops.push(month);
-  }
-  stops.push(MAX_MONTHS);
-  return stops;
-})();
-
-const nearestStopIndex = (months: number) => {
-  let best = 0;
-  for (let index = 1; index < MONTH_STOPS.length; index++) {
-    if (
-      Math.abs(MONTH_STOPS[index] - months) <
-      Math.abs(MONTH_STOPS[best] - months)
-    ) {
-      best = index;
-    }
-  }
-  return best;
-};
+const MAX_MONTHS = 60;
+const WARN_ABOVE_MONTHS = 14;
 
 const describeMonths = (months: number, days: number) =>
   months < 24
     ? `${months} ${months === 1 ? "month" : "months"}`
     : `${months} months (~${Math.round(days / 365)} years)`;
 
-/** "Maximum interval" slider: shown in months, stored as `maximumIntervalDays`. */
+/**
+ * "Maximum interval" slider: shown in months, stored as `maximumIntervalDays`.
+ * A saved value above the slider's range (the engine default is 100 years)
+ * keeps its own label and puts the thumb at the end; it only changes when the
+ * slider moves.
+ */
 export const IntervalField = ({
   days,
   onChange,
@@ -67,20 +36,17 @@ export const IntervalField = ({
         value={describeMonths(months, days)}
       />
       <Slider
-        min={0}
-        max={MONTH_STOPS.length - 1}
+        min={1}
+        max={MAX_MONTHS}
         step={1}
-        value={[nearestStopIndex(months)]}
-        onValueChange={(values) =>
-          onChange(Math.min(MAX_DAYS, MONTH_STOPS[values[0]] * DAYS_PER_MONTH))
-        }
+        value={[clamp(months, 1, MAX_MONTHS)]}
+        onValueChange={(values) => onChange(values[0] * DAYS_PER_MONTH)}
         thumbLabel="Maximum interval"
       />
-      <SliderEnds min="1 month" max={`${Math.round(MAX_DAYS / 365)} years`} />
+      <SliderEnds min="1 month" max={`${MAX_MONTHS / 12} years`} />
       {months > WARN_ABOVE_MONTHS && (
         <Warning>
-          Setting the maximum interval above 36 months can create very long gaps
-          between reviews, increasing the risk of forgetting.
+          {`Setting the maximum interval above ${WARN_ABOVE_MONTHS} months can create very long gaps between reviews, increasing the risk of forgetting.`}
         </Warning>
       )}
       <FieldError message={error} />

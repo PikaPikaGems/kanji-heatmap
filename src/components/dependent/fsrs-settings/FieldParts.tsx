@@ -87,14 +87,17 @@ export const Warning = ({ children }: { children: string }) => (
   </p>
 );
 
-/** An engine `invalid_settings` reason, shown next to its field. */
+/**
+ * An engine `invalid_settings` reason, shown next to its field. The engine's
+ * reasons start lowercase, so the first letter is capitalized.
+ */
 export const FieldError = ({ message }: { message: string | undefined }) =>
   message === undefined ? null : (
     <p
       role="alert"
       className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
     >
-      {message}
+      {message.charAt(0).toUpperCase() + message.slice(1)}
     </p>
   );
 

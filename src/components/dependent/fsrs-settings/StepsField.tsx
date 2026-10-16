@@ -29,14 +29,16 @@ const StepTile = ({
     aria-pressed={selected}
     onClick={onClick}
     className={cn(
-      "flex-col w-full h-auto gap-0.5 px-2 py-2 rounded-xl",
+      "flex-col w-full min-w-0 h-auto gap-0.5 px-2 py-2 rounded-xl",
       !selected && "border-dashed"
     )}
   >
     <span className="text-sm">{label}</span>
+    {/* One line; a long custom value ends in "…" with the full value on hover. */}
     <span
+      title={detail}
       className={cn(
-        "text-xs font-normal tracking-normal",
+        "max-w-full text-xs font-normal tracking-normal truncate",
         selected ? "opacity-80" : "text-muted-foreground"
       )}
     >
