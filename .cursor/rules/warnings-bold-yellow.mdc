@@ -1,0 +1,20 @@
+---
+description: Warning and error messages are bold yellow text, never thin red text
+alwaysApply: true
+---
+
+# Warnings are bold yellow, never thin red
+
+Thin, small red text is hard to read on the dark theme. Any text that warns the user or reports an error (validation errors, "couldn't save", "will be lost for good", over-limit notices) is bold yellow:
+
+```tsx
+// ❌ BAD — thin red text
+<p role="alert" className="text-xs text-destructive">{message}</p>
+
+// ✅ GOOD — bold yellow text, readable in both themes
+<p role="alert" className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
+  {message}
+</p>
+```
+
+Red is still fine where it isn't text to read: destructive buttons (e.g. "Delete", "Log out and delete"), status dots, and "Again" rating borders.
