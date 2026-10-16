@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 /** One square of the scale, named on hover and for screen readers. */
 const ScaleSquare = ({ label, cn }: { label: string; cn: string }) => (
-  <span title={label} className="inline-flex">
+  <span title={label} className="inline-flex shrink-0">
     <FreqSquare srOnly={label} cn={cn} />
   </span>
 );
@@ -18,7 +18,8 @@ const ScaleSquare = ({ label, cn }: { label: string; cn: string }) => (
 /**
  * The site's heatmap legend (like "Less [] [] [] [] [] More") for a mastery
  * measure: "Not Started [] [] [] [] [] Burned". The first square is
- * see-through like a tile that isn't started, then one square per band.
+ * see-through like a tile that isn't started, then one square per band. In
+ * a narrow popover the end labels wrap onto two lines, hugging the squares.
  */
 export const MasteryScaleLegend = ({
   measure,
@@ -36,7 +37,7 @@ export const MasteryScaleLegend = ({
         className
       )}
     >
-      <div className="text-xs">{from}</div>
+      <div className="text-xs leading-tight text-right">{from}</div>
       <ScaleSquare
         label={NOT_STARTED_LABEL}
         cn={getBandFillCn(measure, null)}
@@ -48,7 +49,7 @@ export const MasteryScaleLegend = ({
           cn={getBandFillCn(measure, band)}
         />
       ))}
-      <div className="text-xs">{to}</div>
+      <div className="text-xs leading-tight">{to}</div>
     </div>
   );
 };
