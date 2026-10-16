@@ -1,15 +1,51 @@
 import type { SyncStatus } from "engine-contract";
 import { Drawer as DrawerPrimitive } from "vaul";
-import { SpanBadge } from "@/components/ui/badge";
 import { useNetworkState } from "@/hooks/use-network-state";
 import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useFailedOpsCount } from "@/lib/engine/sync-queries";
 import { cn } from "@/lib/utils";
 import { syncDotClassName, syncLabel } from "./sync-display";
 
+/** "2 pending · ⚠️ 2 failed" under the pill; nothing when both are 0. */
+const SyncCounts = ({
+  pending,
+  failed,
+}: {
+  pending: number;
+  failed: number;
+}) => {
+  if (pending === 0 && failed === 0) return null;
+
+  return (
+    <p className="flex flex-wrap items-center gap-x-1.5 px-1 text-xs">
+      {pending > 0 && (
+        <span className="text-muted-foreground">{pending} pending</span>
+      )}
+      {pending > 0 && failed > 0 && (
+        <span aria-hidden className="text-muted-foreground">
+          ·
+        </span>
+      )}
+      {failed > 0 && (
+        // The modal lives outside the drawer, so close the drawer first.
+        <DrawerPrimitive.Close asChild>
+          <button
+            type="button"
+            className="font-bold text-yellow-600 underline rounded-sm dark:text-yellow-400 underline-offset-4 decoration-dotted hover:decoration-solid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() => openSyncOperations("attention")}
+          >
+            ⚠️ {failed} failed
+          </button>
+        </DrawerPrimitive.Close>
+      )}
+    </p>
+  );
+};
+
 /**
- * Sync state pill for the sidebar account row, with a badge for failed
- * operations. Opens the pending / failed operations modal (design 5.7).
+ * Sync state for the sidebar account row: the state pill (opens the pending /
+ * failed operations modal, design 5.7) and, under it, how many changes are
+ * pending and how many failed (opens the modal on Needs attention).
  */
 export const SyncChip = ({ sync }: { sync: SyncStatus | undefined }) => {
   const { online } = useNetworkState();
@@ -18,8 +54,7 @@ export const SyncChip = ({ sync }: { sync: SyncStatus | undefined }) => {
   const label = syncLabel(sync, online);
 
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-      {/* The modal lives outside the drawer, so close the drawer first. */}
+    <div className="flex flex-col items-start gap-1">
       <DrawerPrimitive.Close asChild>
         <button
           type="button"
@@ -35,22 +70,9 @@ export const SyncChip = ({ sync }: { sync: SyncStatus | undefined }) => {
             )}
           />
           {label}
-          {failedCount > 0 && (
-            <SpanBadge
-              variant="destructive"
-              className="px-1.5 py-0 text-[10px]"
-              title={`${failedCount} failed ${failedCount === 1 ? "operation" : "operations"}`}
-            >
-              {failedCount}
-            </SpanBadge>
-          )}
         </button>
       </DrawerPrimitive.Close>
-      {pendingCount > 0 && (
-        <span className="text-xs text-muted-foreground">
-          {pendingCount} pending
-        </span>
-      )}
+      <SyncCounts pending={pendingCount} failed={failedCount} />
     </div>
   );
 };

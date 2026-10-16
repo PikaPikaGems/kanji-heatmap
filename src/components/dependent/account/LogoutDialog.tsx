@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { WifiOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, type ReactNode } from "react";
+import { DialogActions } from "@/components/common/DialogActions";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { Dialog } from "@/components/ui/dialog";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useRecentFailedOperations } from "@/components/dependent/sync-operations/use-recent-failed-operations";
 import { useAiStorageUsage } from "@/hooks/use-ai-storage-usage";
@@ -26,20 +27,11 @@ type RemovalChoices = {
   aiKey: boolean;
 };
 
-const OperationsLink = ({
-  tab,
-  children,
-}: {
-  tab: "pending" | "attention";
-  children: string;
-}) => (
-  <button
-    type="button"
-    className="self-start text-xs font-semibold text-left underline underline-offset-4"
-    onClick={() => openSyncOperations(tab)}
-  >
+/** Bold yellow "lost for good" lines under a ticked checkbox. */
+const RemovalWarning = ({ children }: { children: ReactNode }) => (
+  <div className="flex flex-col items-start gap-1.5 text-sm font-bold text-yellow-600 pl-7 text-pretty dark:text-yellow-400 animate-fade-in-fast">
     {children}
-  </button>
+  </div>
 );
 
 const LogoutForm = ({ userId }: { userId: string }) => {
@@ -73,94 +65,102 @@ const LogoutForm = ({ userId }: { userId: string }) => {
         op.operationType === "note-save" && op.state === "permanently-rejected"
     );
   const changeWord = pending === 1 ? "change" : "changes";
+  const deletes = choices.studyData || deleteAiContent;
 
   return (
-    <div className="flex flex-col gap-4 px-2 pt-2 text-left">
+    <div className="flex flex-col gap-5 px-2 pt-1 text-left">
       {/* The dialog's own description is for screen readers only. */}
       <p aria-hidden className="text-sm break-words text-muted-foreground">
-        You&apos;re logged in as {name}
+        You&apos;re logged in as{" "}
+        <span className="font-semibold text-foreground">{name}</span>
       </p>
       {!online && (
-        <p className="flex items-start gap-2 p-3 text-xs border rounded-xl bg-muted/50 text-muted-foreground">
-          <WifiOff aria-hidden className="mt-px size-4 shrink-0" />
-          <span>
-            <strong>You&apos;re offline.</strong> You can still log out on this
-            device.
-            {pending > 0 &&
-              " Changes that haven't synced can't sync until you're back online."}
-          </span>
-        </p>
+        <UserNotice>
+          <strong>You&apos;re offline.</strong> You can still log out on this
+          device.
+          {pending > 0 &&
+            " Changes that haven't synced can't sync until you're back online."}
+        </UserNotice>
       )}
       {pending > 0 && (
-        <div className="flex flex-col gap-1.5 p-3 border rounded-xl border-amber-500/50 bg-amber-500/10">
-          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+        <section className="flex flex-col gap-2">
+          <h3 className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
             ⚠️ {pending} {changeWord} {pending === 1 ? "hasn't" : "haven't"}{" "}
             synced yet
-          </p>
-          <p className="text-xs">
+          </h3>
+          <p className="text-sm text-pretty">
             They sync automatically while you&apos;re logged in and online. If
             you log out now, they stay on this device but could be deleted
-            before they sync.
+            before they sync.{" "}
+            <NoticeAction onClick={() => openSyncOperations("pending")}>
+              View unsynced changes
+            </NoticeAction>
           </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            {online && <SyncNowButton />}
-            <OperationsLink tab="pending">View unsynced changes</OperationsLink>
-          </div>
-        </div>
+          {online && <SyncNowButton className="mt-1" />}
+        </section>
       )}
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-sm font-semibold">
-          Also remove from this device
-        </legend>
-        <LogoutRemovalOption
-          label="My study data"
-          details="Notes, bookmarks, review pile and progress. They're saved to your account and come back when you log in again."
-          checked={choices.studyData}
-          onCheckedChange={choose("studyData")}
-        />
-        {(losesUnsynced || losesRejectedNotes) && (
-          <div className="flex flex-col gap-1 text-xs pl-7 font-bold text-yellow-600 dark:text-yellow-400">
-            {losesUnsynced && (
-              <p>
-                ⚠️ Your {pending} unsynced {changeWord} will be lost for good.
-              </p>
-            )}
-            {losesRejectedNotes && (
-              <>
+      <div className="pt-4 border-t-2 border-dashed">
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-3 text-sm font-bold">
+            Also remove from this device
+          </legend>
+          <LogoutRemovalOption
+            label="My study data"
+            details="Notes, bookmarks, review pile and progress. They're saved to your account and come back when you log in again."
+            checked={choices.studyData}
+            onCheckedChange={choose("studyData")}
+          />
+          {(losesUnsynced || losesRejectedNotes) && (
+            <RemovalWarning>
+              {losesUnsynced && (
+                <p>
+                  ⚠️ Your {pending} unsynced {changeWord} will be lost forever
+                  if you log out.{" "}
+                  <NoticeAction onClick={() => openSyncOperations("pending")}>
+                    View unsynced changes
+                  </NoticeAction>
+                </p>
+              )}
+              {losesRejectedNotes && (
                 <p>
                   ⚠️ Some rejected notes may have no server copy. They&apos;ll
-                  be lost for good.
+                  be lost for good.{" "}
+                  <NoticeAction onClick={() => openSyncOperations("attention")}>
+                    Review rejected notes
+                  </NoticeAction>
                 </p>
-                <OperationsLink tab="attention">
-                  Review rejected notes
-                </OperationsLink>
-              </>
-            )}
-          </div>
-        )}
-        {aiBytes > 0 && (
-          <LogoutRemovalOption
-            label={`My AI-generated content (${formatMegabytes(aiBytes)})`}
-            details="AI text, images and MP3s. These are saved only in this browser and can't be recovered. Download anything you want to keep first."
-            checked={choices.aiContent}
-            onCheckedChange={choose("aiContent")}
-          />
-        )}
-        {hasAiKey && (
-          <LogoutRemovalOption
-            label="My saved xAI API key"
-            details="You'll need to paste it again next time."
-            checked={choices.aiKey}
-            onCheckedChange={choose("aiKey")}
-          />
-        )}
-      </fieldset>
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button variant="outline" onClick={closeLogoutDialog}>
+              )}
+            </RemovalWarning>
+          )}
+          {aiBytes > 0 && (
+            <LogoutRemovalOption
+              label={`My AI-generated content (${formatMegabytes(aiBytes)})`}
+              details="AI text, images and MP3s. These are saved only in this browser and can't be recovered. Download anything you want to keep first."
+              checked={choices.aiContent}
+              onCheckedChange={choose("aiContent")}
+            />
+          )}
+          {deleteAiContent && (
+            <RemovalWarning>
+              <p>⚠️ This can&apos;t be undone.</p>
+            </RemovalWarning>
+          )}
+          {hasAiKey && (
+            <LogoutRemovalOption
+              label="My saved xAI API key"
+              details="You'll need to paste it again next time."
+              checked={choices.aiKey}
+              onCheckedChange={choose("aiKey")}
+            />
+          )}
+        </fieldset>
+      </div>
+      <DialogActions className="pt-1">
+        <PracticeButton variant="secondary" onClick={closeLogoutDialog}>
           Cancel
-        </Button>
-        <Button
-          variant={deleteAiContent || losesUnsynced ? "destructive" : "default"}
+        </PracticeButton>
+        <PracticeButton
+          variant={deletes ? "danger" : "primary"}
           onClick={() =>
             startLogout({
               clearLocalData: choices.studyData,
@@ -172,9 +172,9 @@ const LogoutForm = ({ userId }: { userId: string }) => {
             })
           }
         >
-          {deleteAiContent || losesUnsynced ? "Log out and delete" : "Log out"}
-        </Button>
-      </div>
+          {deletes ? "Log out and delete" : "Log out"}
+        </PracticeButton>
+      </DialogActions>
     </div>
   );
 };

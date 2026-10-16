@@ -1,7 +1,10 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Check, Circle, Loader2, XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, Circle, CircleCheckBig, Loader2, XCircle } from "lucide-react";
+import { DialogActions } from "@/components/common/DialogActions";
+import { UserNotice } from "@/components/common/UserNotice";
+import { PracticeButton } from "@/components/ui/practice-button";
 import {
+  closeLoggedOut,
   dismissLogoutError,
   logoutSteps,
   retryLogout,
@@ -53,7 +56,7 @@ const StepList = ({
   };
 
   return (
-    <ul className="flex flex-col gap-2 text-sm text-left">
+    <ul className="flex flex-col gap-2.5 p-4 text-sm text-left border rounded-2xl border-foreground/20 bg-muted/15">
       {steps.map((candidate) => {
         const progress = progressOf(candidate);
         const copy = stepCopy(candidate, request);
@@ -85,12 +88,37 @@ const StepList = ({
   );
 };
 
+/** "✓ You're logged out" with the one way out: Close. */
+const LoggedOut = () => (
+  <div className="flex flex-col items-center gap-2 text-center">
+    <CircleCheckBig
+      aria-hidden
+      className="mb-1 text-green-600 size-12 dark:text-green-400"
+    />
+    <DialogPrimitive.Title className="text-xl font-bold">
+      You&apos;re logged out
+    </DialogPrimitive.Title>
+    <DialogPrimitive.Description className="text-sm text-pretty">
+      You can keep using Kanji Heatmap as a guest.
+    </DialogPrimitive.Description>
+    <PracticeButton
+      size="md"
+      className="mt-4"
+      autoFocus
+      onClick={closeLoggedOut}
+    >
+      Close
+    </PracticeButton>
+  </div>
+);
+
 /**
  * Full-screen "Logging you out…" screen (design 5.3.1), mounted once in App
- * because the sidebar that starts a logout unmounts mid-way. It can't be
- * dismissed: Escape and clicks outside do nothing, and there is no close
- * button. It is a Radix dialog so it traps focus and sits above any dialog
- * that was open when the logout started.
+ * because the sidebar that starts a logout unmounts mid-way. While it runs it
+ * can't be dismissed: Escape and clicks outside do nothing, and there is no
+ * close button. "You're logged out" stays until Close (or Escape). It is a
+ * Radix dialog so it traps focus and sits above any dialog that was open when
+ * the logout started.
  */
 export const LoggingOutScreen = () => {
   const flow = useLogoutFlow();
@@ -101,32 +129,30 @@ export const LoggingOutScreen = () => {
       <DialogPrimitive.Portal>
         <DialogPrimitive.Content
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none bg-background/95 backdrop-blur-sm"
-          onEscapeKeyDown={(event) => event.preventDefault()}
+          onEscapeKeyDown={(event) => {
+            event.preventDefault();
+            closeLoggedOut();
+          }}
           onPointerDownOutside={(event) => event.preventDefault()}
           onInteractOutside={(event) => event.preventDefault()}
         >
           <div
             key={flow.phase}
-            className="w-full max-w-sm p-6 text-center border-2 shadow-lg rounded-3xl bg-card animate-fade-in-fast"
+            className="w-full max-w-sm p-6 text-left border-2 shadow-lg rounded-3xl bg-card animate-fade-in-fast"
           >
-            {flow.phase === "done" && (
-              <>
-                <DialogPrimitive.Title className="text-lg font-semibold text-green-600 dark:text-green-400">
-                  ✓ You&apos;re logged out
-                </DialogPrimitive.Title>
-                <DialogPrimitive.Description className="sr-only">
-                  Your session has ended
-                </DialogPrimitive.Description>
-              </>
-            )}
+            {flow.phase === "done" && <LoggedOut />}
             {flow.phase === "running" && (
               <div className="flex flex-col gap-4">
-                <DialogPrimitive.Title className="text-lg font-semibold">
+                <DialogPrimitive.Title className="text-xl font-bold">
                   Logging you out…
                 </DialogPrimitive.Title>
-                <DialogPrimitive.Description className="text-sm text-muted-foreground">
-                  Please don&apos;t close or reload this tab until we&apos;re
-                  done.
+                <DialogPrimitive.Description asChild>
+                  <div>
+                    <UserNotice>
+                      Please don&apos;t close or reload this tab until
+                      we&apos;re done.
+                    </UserNotice>
+                  </div>
                 </DialogPrimitive.Description>
                 <StepList
                   request={flow.request}
@@ -134,32 +160,39 @@ export const LoggingOutScreen = () => {
                   failed={false}
                 />
                 {flow.slow && (
-                  <p role="status" className="text-xs text-muted-foreground">
-                    This can take up to 30 seconds while we finish up with the
-                    server.
-                  </p>
+                  <div role="status" className="animate-fade-in-fast">
+                    <UserNotice icon="⏳">
+                      This can take up to 30 seconds while we finish up with the
+                      server.
+                    </UserNotice>
+                  </div>
                 )}
               </div>
             )}
             {flow.phase === "error" && (
               <div className="flex flex-col gap-4">
-                <DialogPrimitive.Title className="text-lg font-semibold">
+                <DialogPrimitive.Title className="text-xl font-bold">
                   We couldn&apos;t log you out
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Description
                   role="alert"
-                  className="text-sm text-muted-foreground"
+                  className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
                 >
-                  {flow.message.replace(/[.!]+$/, "")}. You&apos;re still logged
-                  in.
+                  ⚠️ {flow.message.replace(/[.!]+$/, "")}. You&apos;re still
+                  logged in.
                 </DialogPrimitive.Description>
                 <StepList request={flow.request} step={flow.step} failed />
-                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-center">
-                  <Button variant="outline" onClick={dismissLogoutError}>
+                <DialogActions className="pt-2">
+                  <PracticeButton
+                    variant="secondary"
+                    onClick={dismissLogoutError}
+                  >
                     Stay logged in
-                  </Button>
-                  <Button onClick={retryLogout}>Try again</Button>
-                </div>
+                  </PracticeButton>
+                  <PracticeButton onClick={retryLogout}>
+                    Try again
+                  </PracticeButton>
+                </DialogActions>
               </div>
             )}
           </div>

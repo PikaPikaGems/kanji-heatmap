@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { EngineAPI } from "engine-contract";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { TextActionButton } from "@/components/common/AiActionButtons";
 import { outLinks } from "@/lib/external-links";
 import { rememberAccountEmail } from "@/lib/engine/account-email";
 import type { ActionStatus } from "./action-status";
@@ -34,15 +34,13 @@ export const LoginCodeStep = ({
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="self-start -ml-2"
+      <TextActionButton
+        className="self-start -ml-1"
+        icon={<ArrowLeft aria-hidden size={14} />}
         onClick={() => onAction("back")}
       >
-        <ArrowLeft />
         Back
-      </Button>
+      </TextActionButton>
       <p className="text-sm">
         Check your email (or Spam folder) — your verification code should arrive
         within 5 minutes.
@@ -61,11 +59,11 @@ export const LoginCodeStep = ({
         status={status}
         onSubmit={() => void verifyPin()}
       />
-      <p className="text-xs text-muted-foreground">
+      <p className="pt-4 text-sm border-t-2 border-dashed text-pretty">
         If you can&apos;t log in, email us at{" "}
         <a
           href={outLinks.email}
-          className="underline rounded-md hover:bg-neon-accent hover:text-black"
+          className="font-bold underline rounded-md underline-offset-4 hover:bg-neon-accent hover:text-black"
         >
           admin@pikapikagems.com
         </a>

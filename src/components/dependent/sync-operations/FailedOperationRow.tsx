@@ -1,19 +1,22 @@
 import { useState } from "react";
 import type { RecentFailedOperation } from "engine-contract";
-import { Loader2 } from "lucide-react";
-import { SpanBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Copy, ExternalLink, Trash2 } from "lucide-react";
+import { TextActionButton } from "@/components/common/AiActionButtons";
+import { DialogActions } from "@/components/common/DialogActions";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { cn } from "@/lib/utils";
 import {
   describeSubject,
   operationIcon,
   operationLabel,
   recoverableText,
 } from "./operation-info";
+import { OperationIcon, OperationKanji } from "./OperationList";
 
 type RowStatus =
   | { kind: "idle" }
@@ -25,6 +28,20 @@ const failedDate = (failedAt: number) =>
     month: "short",
     day: "numeric",
   });
+
+/** "● Rejected" (the server won't take it) or "● Retrying". */
+const StatePill = ({ rejected }: { rejected: boolean }) => (
+  <span className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap">
+    <span
+      aria-hidden
+      className={cn(
+        "size-1.5 rounded-full",
+        rejected ? "bg-destructive" : "bg-amber-500 animate-pulse"
+      )}
+    />
+    {rejected ? "Rejected" : "Retrying"}
+  </span>
+);
 
 /**
  * One operation the engine could not upload. Rejected notes and pile words
@@ -42,7 +59,6 @@ export const FailedOperationRow = ({
   const openKanji = useSetOpenedParam();
   const { copy, status: copyStatus } = useCopyToClipboard(1500);
   const [status, setStatus] = useState<RowStatus>({ kind: "idle" });
-  const Icon = operationIcon(op.operationType);
   const kanji = op.subject?.kanji;
   const subject = describeSubject(op.subject);
   const text = recoverableText(op);
@@ -58,23 +74,16 @@ export const FailedOperationRow = ({
   };
 
   return (
-    <li className="flex flex-col gap-2 p-3 border rounded-lg">
+    <li className="flex flex-col gap-2.5 px-3 py-3">
       <div className="flex items-start gap-3">
-        <Icon
-          className="mt-1 size-4 shrink-0 text-muted-foreground"
-          aria-hidden
-        />
-        <div className="flex-1 min-w-0">
-          <p className="flex flex-wrap items-center gap-x-2 text-sm font-semibold">
+        <OperationIcon Icon={operationIcon(op.operationType)} />
+        <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+          <p className="flex flex-wrap items-center text-sm font-semibold gap-x-2 gap-y-1">
             {operationLabel(op.operationType)}
-            {kanji !== undefined && (
-              <span className="text-xl leading-none">{kanji}</span>
-            )}
-            {subject !== "" && (
-              <span className="text-xs font-normal text-muted-foreground">
-                {subject}
-              </span>
-            )}
+            <StatePill rejected={rejected} />
+          </p>
+          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+            {copyForCode(op.code)}
           </p>
           <p className="text-xs text-muted-foreground">
             <time
@@ -82,8 +91,8 @@ export const FailedOperationRow = ({
               dateTime={new Date(op.failedAt).toISOString()}
             >
               {failedDate(op.failedAt)}
-            </time>{" "}
-            · {copyForCode(op.code)}
+            </time>
+            {subject !== "" && ` · ${subject}`}
           </p>
           {op.diagnosticId !== undefined && (
             <p className="font-mono text-[10px] break-all text-muted-foreground">
@@ -91,67 +100,57 @@ export const FailedOperationRow = ({
             </p>
           )}
         </div>
-        <SpanBadge variant={rejected ? "destructive" : "secondary"}>
-          {rejected ? "Rejected" : "Retrying"}
-        </SpanBadge>
+        {kanji !== undefined && <OperationKanji kanji={kanji} />}
       </div>
       {status.kind === "confirm-dismiss" ? (
-        <div className="flex flex-col gap-2 text-xs ml-7">
-          <p>
-            Dismissing removes this note&apos;s text from this device. Copy it
-            first if you still need it.
+        <div
+          key={status.kind}
+          className="flex flex-col gap-3 pt-1 animate-fade-in-fast"
+        >
+          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+            ⚠️ Dismissing removes this note&apos;s text from this device. Copy
+            it first if you still need it.
           </p>
-          <div className="flex gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              className="h-8 px-2.5 text-xs"
-              onClick={() => void dismiss()}
-            >
-              Dismiss anyway
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-2.5 text-xs"
+          <DialogActions>
+            <PracticeButton
+              variant="secondary"
               onClick={() => setStatus({ kind: "idle" })}
             >
               Cancel
-            </Button>
-          </div>
+            </PracticeButton>
+            <PracticeButton variant="danger" onClick={() => void dismiss()}>
+              Dismiss anyway
+            </PracticeButton>
+          </DialogActions>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 ml-7">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pl-12">
           {text !== null && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-2.5 text-xs"
+            <TextActionButton
+              icon={<Copy aria-hidden size={14} />}
               onClick={(e) => void copy(text, e)}
             >
               {copyStatus === "copied" && "Copied"}
               {copyStatus === "failed" && "Copy failed"}
               {copyStatus === "inactive" && "Copy text"}
-            </Button>
+            </TextActionButton>
           )}
           {text !== null && kanji !== undefined && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-2.5 text-xs"
+            <TextActionButton
+              icon={<ExternalLink aria-hidden size={14} />}
               onClick={() => {
                 openKanji(kanji);
                 closeSyncOperations();
               }}
             >
               {op.operationType === "note-save" ? "Open note" : "Open kanji"}
-            </Button>
+            </TextActionButton>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2.5 text-xs"
-            disabled={!api || status.kind === "busy"}
+          <TextActionButton
+            icon={<Trash2 aria-hidden size={14} />}
+            busy={status.kind === "busy"}
+            busyLabel="Dismissing…"
+            disabled={!api}
             onClick={() => {
               if (needsConfirm) {
                 setStatus({ kind: "confirm-dismiss" });
@@ -160,9 +159,8 @@ export const FailedOperationRow = ({
               void dismiss();
             }}
           >
-            {status.kind === "busy" && <Loader2 className="animate-spin" />}
             Dismiss
-          </Button>
+          </TextActionButton>
         </div>
       )}
     </li>

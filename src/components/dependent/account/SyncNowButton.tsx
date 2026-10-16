@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { cn } from "@/lib/utils";
 import type { ActionStatus } from "./action-status";
 
-/** Runs `sync.catchUp()` and shows its failure under the button. */
-export const SyncNowButton = ({ label = "Sync now" }: { label?: string }) => {
+/**
+ * Runs `sync.catchUp()` and shows its failure under the button: a full-width
+ * secondary button.
+ */
+export const SyncNowButton = ({
+  label = "Sync now",
+  className,
+}: {
+  label?: string;
+  className?: string;
+}) => {
   const api = useEngineApi();
   const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
   const busy = status.kind === "busy";
@@ -23,22 +33,24 @@ export const SyncNowButton = ({ label = "Sync now" }: { label?: string }) => {
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={!api || busy}
+    <div className={cn("flex flex-col gap-1.5", className)}>
+      <PracticeButton
+        variant="secondary"
+        size="md"
+        // Not disabled while busy: a disabled secondary button fades to 20%.
+        disabled={!api}
+        aria-busy={busy}
         onClick={() => void syncNow()}
       >
-        {busy && <Loader2 className="animate-spin" />}
+        {busy && <Loader2 aria-hidden className="size-4 animate-spin" />}
         {label}
-      </Button>
+      </PracticeButton>
       {status.kind === "error" && (
         <p
           role="alert"
-          className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
+          className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
         >
-          {status.message}
+          ⚠️ {status.message}
         </p>
       )}
     </div>

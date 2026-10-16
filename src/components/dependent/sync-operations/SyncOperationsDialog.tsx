@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useEngineState } from "@/lib/engine/engine";
 import {
   closeSyncOperations,
@@ -9,9 +10,35 @@ import {
   useSyncOperationsDialog,
 } from "@/lib/engine/sync-operations-dialog";
 import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
+import { cn } from "@/lib/utils";
 import { NeedsAttentionTab } from "./NeedsAttentionTab";
 import { PendingTab } from "./PendingTab";
 import { SyncHeader } from "./SyncHeader";
+
+/** A tab's name with its count in a small pill; yellow when failures wait. */
+const TabLabel = ({
+  text,
+  count,
+  warn = false,
+}: {
+  text: string;
+  count: number;
+  warn?: boolean;
+}) => (
+  <span className="inline-flex items-center gap-1.5">
+    {text}
+    <span
+      className={cn(
+        "min-w-5 rounded-full px-1.5 text-xs leading-5 tabular-nums",
+        warn && count > 0
+          ? "bg-yellow-500/20 font-bold text-yellow-700 dark:text-yellow-400"
+          : "bg-foreground/10"
+      )}
+    >
+      {count}
+    </span>
+  </span>
+);
 
 const SyncOperationsBody = ({
   requestedTab,
@@ -27,7 +54,7 @@ const SyncOperationsBody = ({
   );
 
   return (
-    <div className="flex flex-col gap-4 px-2 pt-2 text-left">
+    <div className="flex flex-col gap-4 px-2 pt-1 text-left">
       <SyncHeader sync={sync} />
       <Tabs
         value={tab}
@@ -35,16 +62,28 @@ const SyncOperationsBody = ({
           setTab(next === "attention" ? "attention" : "pending")
         }
       >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
-          <TabsTrigger value="attention">
-            Needs attention ({failedCount})
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="pending">
+        <SegmentedTabsList
+          value={tab}
+          label="Unsynced changes"
+          className="w-full"
+          options={[
+            {
+              value: "pending",
+              label: <TabLabel text="Pending" count={pendingCount} />,
+            },
+            {
+              value: "attention",
+              label: (
+                <TabLabel text="Needs attention" count={failedCount} warn />
+              ),
+            },
+          ]}
+        />
+        {/* Radix mounts only the open tab, so each switch fades in. */}
+        <TabsContent value="pending" className="mt-4 animate-fade-in-fast">
           <PendingTab total={pendingCount} />
         </TabsContent>
-        <TabsContent value="attention">
+        <TabsContent value="attention" className="mt-4 animate-fade-in-fast">
           <NeedsAttentionTab />
         </TabsContent>
       </Tabs>
@@ -70,8 +109,8 @@ export const SyncOperationsDialog = () => {
       }}
     >
       <ScrollableDialogContent
-        className="max-w-2xl"
-        title="Sync"
+        className="max-w-xl"
+        title="Unsynced changes"
         description="Changes waiting to upload and operations that need attention"
         titleClassName="text-left"
       >

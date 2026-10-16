@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { DialogActions } from "@/components/common/DialogActions";
 import { Dialog } from "@/components/ui/dialog";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEngineState } from "@/lib/engine/engine";
 import { startLogout } from "@/lib/engine/logout-flow";
@@ -24,42 +25,50 @@ const RecoveryDialogSteps = () => {
 
   if (step.kind === "confirm-delete") {
     return (
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-semibold">
-          Unsynced changes on this device will be lost.
+      <div key={step.kind} className="flex flex-col gap-5 animate-fade-in-fast">
+        <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+          ⚠️ Unsynced changes on this device will be lost.
         </p>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="destructive" onClick={() => logOut(true)}>
-            Delete and resync
-          </Button>
-          <Button variant="outline" onClick={() => setStep({ kind: "choose" })}>
+        <DialogActions>
+          <PracticeButton
+            variant="secondary"
+            onClick={() => setStep({ kind: "choose" })}
+          >
             Cancel
-          </Button>
-        </div>
+          </PracticeButton>
+          <PracticeButton variant="danger" onClick={() => logOut(true)}>
+            Delete and resync
+          </PracticeButton>
+        </DialogActions>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm">
-        The data saved on this device for your account couldn&apos;t be opened.
-        Keep it and retry later, or delete it and download your data again.
-      </p>
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={() => logOut(false)}>Keep and retry</Button>
-        <Button
-          variant="outline"
+    <div key={step.kind} className="flex flex-col gap-5 animate-fade-in-fast">
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-pretty">
+          The data saved on this device for your account couldn&apos;t be
+          opened. Keep it and retry later, or delete it and download your data
+          again.
+        </p>
+        {account.kind === "recovery" && (
+          <p className="font-mono text-xs break-all text-muted-foreground">
+            Diagnostic id: {account.diagnosticId}
+          </p>
+        )}
+      </div>
+      <DialogActions>
+        <PracticeButton
+          variant="secondary"
           onClick={() => setStep({ kind: "confirm-delete" })}
         >
           Delete and resync
-        </Button>
-      </div>
-      {account.kind === "recovery" && (
-        <p className="text-[10px] text-muted-foreground">
-          Diagnostic id: {account.diagnosticId}
-        </p>
-      )}
+        </PracticeButton>
+        <PracticeButton onClick={() => logOut(false)}>
+          Keep and retry
+        </PracticeButton>
+      </DialogActions>
     </div>
   );
 };
@@ -86,7 +95,7 @@ export const RecoveryDialog = () => {
         description="Keep or delete the data saved on this device after it could not be opened"
         titleClassName="text-left"
       >
-        <div className="px-2 pt-2 text-left">
+        <div className="px-2 pt-1 text-left">
           <RecoveryDialogSteps />
         </div>
       </ScrollableDialogContent>

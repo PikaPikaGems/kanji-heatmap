@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DialogActions } from "@/components/common/DialogActions";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { closeLoginDialog } from "@/lib/engine/login-dialog";
 
 /** Shown while `sync.catchUp()` runs after a successful login. */
@@ -13,21 +14,19 @@ export const LoginDownloadingStep = ({
 }) => {
   if (error !== null) {
     return (
-      <div className="flex flex-col gap-3 py-2">
+      <div className="flex flex-col gap-5 py-2 animate-fade-in-fast">
         <p
           role="alert"
           className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
         >
-          {error}
+          ⚠️ {error}
         </p>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={onRetry}>
-            Try again
-          </Button>
-          <Button size="sm" variant="outline" onClick={closeLoginDialog}>
+        <DialogActions>
+          <PracticeButton variant="secondary" onClick={closeLoginDialog}>
             Continue anyway
-          </Button>
-        </div>
+          </PracticeButton>
+          <PracticeButton onClick={onRetry}>Try again</PracticeButton>
+        </DialogActions>
       </div>
     );
   }
@@ -35,9 +34,9 @@ export const LoginDownloadingStep = ({
   return (
     <p
       role="status"
-      className="flex items-center justify-center gap-2 py-6 text-sm"
+      className="flex items-center justify-center gap-2 py-8 text-sm font-semibold"
     >
-      <Loader2 className="size-4 animate-spin" />
+      <Loader2 aria-hidden className="size-5 animate-spin" />
       Downloading your data…
     </p>
   );

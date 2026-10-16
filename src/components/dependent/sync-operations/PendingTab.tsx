@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { SyncOperation } from "engine-contract";
-import { Button } from "@/components/ui/button";
+import { TextActionButton } from "@/components/common/AiActionButtons";
 import { relativeTime } from "@/lib/engine/relative-time";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
@@ -9,35 +9,34 @@ import {
   operationIcon,
   operationKanji,
 } from "./operation-info";
+import {
+  EmptyOperations,
+  OperationIcon,
+  OperationKanji,
+  OperationList,
+} from "./OperationList";
 
 const PAGE_SIZE = 50;
 
 const PendingRow = ({ op }: { op: SyncOperation }) => {
-  const Icon = operationIcon(op.type);
   const kanji = operationKanji(op);
   const queuedAt = Date.parse(op.clientUpdatedAt);
 
   return (
-    <li className="flex items-center gap-3 p-2.5 border rounded-lg">
-      <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-      <span className="flex-1 min-w-0 text-sm font-medium">
-        {describeOperation(op)}
-      </span>
-      {kanji !== undefined && (
-        <span className="text-xl leading-none">{kanji}</span>
-      )}
-      {!Number.isNaN(queuedAt) && (
-        <span className="text-xs whitespace-nowrap text-muted-foreground">
-          {relativeTime(queuedAt)}
-        </span>
-      )}
+    <li className="flex items-center gap-3 px-3 py-2.5">
+      <OperationIcon Icon={operationIcon(op.type)} />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold">{describeOperation(op)}</p>
+        {!Number.isNaN(queuedAt) && (
+          <p className="text-xs text-muted-foreground">
+            {relativeTime(queuedAt)}
+          </p>
+        )}
+      </div>
+      {kanji !== undefined && <OperationKanji kanji={kanji} />}
     </li>
   );
 };
-
-const PendingMessage = ({ children }: { children: string }) => (
-  <li className="px-1 py-2 text-sm text-muted-foreground">{children}</li>
-);
 
 /** One page of the outbox; each page is its own cached store. */
 const PendingPage = ({ offset }: { offset: number }) => {
@@ -47,11 +46,17 @@ const PendingPage = ({ offset }: { offset: number }) => {
   );
 
   if (snapshot.status === "loading") {
-    return <PendingMessage>Loading…</PendingMessage>;
+    return (
+      <li className="px-3 py-3 text-sm text-muted-foreground">Loading…</li>
+    );
   }
   const outbox = snapshotValue(snapshot);
   if (!outbox) {
-    return <PendingMessage>Couldn&apos;t load pending changes.</PendingMessage>;
+    return (
+      <li className="px-3 py-3 text-sm font-bold text-yellow-600 dark:text-yellow-400">
+        ⚠️ Couldn&apos;t load pending changes.
+      </li>
+    );
   }
   return (
     <>
@@ -68,27 +73,23 @@ export const PendingTab = ({ total }: { total: number }) => {
 
   if (total === 0) {
     return (
-      <p className="px-1 py-4 text-sm text-muted-foreground">
-        Nothing is waiting to upload.
-      </p>
+      <EmptyOperations icon="✅">Nothing is waiting to upload.</EmptyOperations>
     );
   }
   return (
-    <div className="flex flex-col gap-2">
-      <ul className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
+      <OperationList>
         {Array.from({ length: pages }, (_, page) => (
           <PendingPage key={page} offset={page * PAGE_SIZE} />
         ))}
-      </ul>
+      </OperationList>
       {total > pages * PAGE_SIZE && (
-        <Button
-          variant="outline"
-          size="sm"
+        <TextActionButton
           className="self-center"
           onClick={() => setPages(pages + 1)}
         >
           Load more
-        </Button>
+        </TextActionButton>
       )}
     </div>
   );

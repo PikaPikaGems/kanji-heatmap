@@ -42,8 +42,6 @@ const CLOSED: LogoutFlow = { phase: "closed" };
 
 /** Shows "this can take up to 30 seconds" after this long. */
 const SLOW_AFTER_MS = 10_000;
-/** How long "You're logged out" stays before the screen closes. */
-const DONE_SHOWN_MS = 1_000;
 
 const AI_CONTENT_FAILED_COPY = "Couldn't delete your AI-generated content";
 const NOT_READY_COPY = "Your account isn't ready yet";
@@ -137,10 +135,8 @@ const runFrom = async (request: LogoutRequest, from: LogoutStep) => {
     return;
   }
   stopWatching();
+  // "You're logged out" stays until the person closes it.
   setState({ phase: "done", request });
-  setTimeout(() => {
-    if (state.phase === "done") setState(CLOSED);
-  }, DONE_SHOWN_MS);
 };
 
 export const openLogoutDialog = (userId: string) => {
@@ -166,6 +162,11 @@ export const retryLogout = () => {
 /** "Stay logged in": closes the error screen. */
 export const dismissLogoutError = () => {
   if (state.phase === "error") setState(CLOSED);
+};
+
+/** "Close" on "You're logged out": back to the app as a guest. */
+export const closeLoggedOut = () => {
+  if (state.phase === "done") setState(CLOSED);
 };
 
 const subscribe = (listener: () => void) => {

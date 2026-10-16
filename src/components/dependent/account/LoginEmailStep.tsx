@@ -1,10 +1,36 @@
 import { useState } from "react";
 import type { EngineAPI } from "engine-contract";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import LinkOutIcon from "@/components/common/LinkOutIcon";
+import { linksOutItems } from "@/components/items/links-out-items";
 import { outLinks } from "@/lib/external-links";
 import type { ActionStatus } from "./action-status";
 import { loginFailureMessage } from "./login-failure";
 import { SubmitInput } from "./SubmitInput";
+
+/** The site's X/Twitter, Discord, Instagram and Mail icon links. */
+const CONTACT_ITEMS = [
+  linksOutItems.twitterItem,
+  linksOutItems.discordItem,
+  linksOutItems.instagramItem,
+  linksOutItems.emailItem,
+];
+
+/** An emoji and its link, kept together on one line. */
+const WaitlistLink = ({
+  emoji,
+  href,
+  text,
+}: {
+  emoji: string;
+  href: string;
+  text: string;
+}) => (
+  <span className="whitespace-nowrap">
+    <span aria-hidden>{emoji}</span>{" "}
+    <ExternalTextLink href={href} text={text} className="p-0" />
+  </span>
+);
 
 export const LoginEmailStep = ({
   api,
@@ -51,27 +77,27 @@ export const LoginEmailStep = ({
         status={status}
         onSubmit={() => void requestPin()}
       />
-      <p className="text-xs text-muted-foreground">
-        New? Message us on{" "}
-        <ExternalTextLink
-          href={outLinks.twitter}
-          text="X/Twitter"
-          className="p-0"
-        />
-        ,{" "}
-        <ExternalTextLink
-          href={outLinks.discord}
-          text="Discord"
-          className="p-0"
-        />
-        , or{" "}
-        <ExternalTextLink
-          href={outLinks.instagram}
-          text="Instagram"
-          className="p-0"
-        />{" "}
-        to join the waitlist.
-      </p>
+      <div className="flex flex-col gap-3 pt-4 border-t-2 border-dashed">
+        <p className="text-sm font-bold text-foreground text-pretty">
+          New? Message us on{" "}
+          <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />
+          , <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,
+          or{" "}
+          <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />{" "}
+          to join the waitlist.
+        </p>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {CONTACT_ITEMS.map((item) => (
+            <LinkOutIcon
+              key={item.href}
+              href={item.href}
+              hoverText={item.text}
+              srOnlyText={item.text}
+              icon={item.icon}
+            />
+          ))}
+        </div>
+      </div>
     </>
   );
 };
