@@ -34,8 +34,7 @@ export const ProgressNotSavedNotice = ({
     return (
       <UserNotice className={cn("text-center", className)}>
         You&apos;re not logged in, so this round wasn&apos;t saved.{" "}
-        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> to save
-        your next rounds.
+        <NoticeAction onClick={openLoginDialog}>Log in now</NoticeAction>.
       </UserNotice>
     );
   }
