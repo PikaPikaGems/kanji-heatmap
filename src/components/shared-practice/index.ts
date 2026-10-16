@@ -8,11 +8,10 @@ export { PracticeShell } from "./PracticeShell";
 export { RadioRow } from "./RadioRow";
 export { RatingButtons } from "./RatingButtons";
 export {
-  FORGOT_KEY,
   FORGOT_KEYS,
-  GRADE_DIGIT_KEYS,
   RATING_KEYS,
   ratingForKey,
+  ratingForKeyEvent,
 } from "./rating-keys";
 export { RecapTile } from "./RecapTile";
 export { RoundRecap } from "./RoundRecap";

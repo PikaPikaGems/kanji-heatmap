@@ -19,7 +19,7 @@ import {
 const PREVIEW_SIZE = 130;
 
 const ENTER_OR_SPACE = ["Enter", " "] as const;
-/** Mastery: the "Next" keys plus 1 / 2 / 3, all of which rate. */
+/** Mastery: the "Next" keys plus H / G / E, all of which rate. */
 const RATING_OR_SPACE = [...RATING_KEYS, " "] as const;
 
 export const FeedbackDrawer = ({
@@ -49,7 +49,7 @@ export const FeedbackDrawer = ({
 
   // Enter/Space → Next Kanji. Arm after a beat so the key that opened
   // feedback (e.g. Enter on Select → Next) doesn't also advance. When
-  // rating, Enter/Space mean Good and 1 / 2 / 3 mean Hard / Good / Easy.
+  // rating, Enter/Space mean Good and H / G / E mean Hard / Good / Easy.
   useArmedConfirmKey({
     onConfirm: (key) => {
       if (!rating) {

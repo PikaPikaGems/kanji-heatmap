@@ -1,10 +1,12 @@
 import type { CardType } from "engine-contract";
+import { UserNotice } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Stat } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
+import { useOpenedParam } from "@/hooks/routing-hooks";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useDueCount } from "@/lib/engine/use-due-count";
-import { nextDueCopy } from "./next-due-copy";
+import { NothingDue } from "./NothingDue";
 import { useNextDueAt } from "./use-next-due-at";
 
 /** Start screen of a mastery game: how many cards are due, then Start. */
@@ -31,8 +33,10 @@ export const MasteryStartScreen = ({
   const due = useDueCount()?.[cardType] ?? null;
   const nextDueAt = useNextDueAt(cardType);
   const canStart = ready && blocker == null && due != null && due > 0;
+  // A suggested kanji's drawer can be open; its buttons own Enter then.
+  const drawerOpen = useOpenedParam() != null;
 
-  useEnterAction(canStart ? onStart : null, canStart);
+  useEnterAction(canStart && !drawerOpen ? onStart : null, canStart);
 
   return (
     <div className="relative flex flex-col h-full">
@@ -50,21 +54,18 @@ export const MasteryStartScreen = ({
           {due != null && due > 0 && (
             <Stat value={due} unit="" label="Due now" />
           )}
-          {due === 0 && (
-            <p className="text-sm font-bold">{nextDueCopy(nextDueAt)}</p>
-          )}
+          {due === 0 && <NothingDue nextDueAt={nextDueAt} />}
         </div>
       </div>
 
       <div className="shrink-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
         <div className="flex flex-col w-full max-w-md gap-2 mx-auto">
           {(blocker ?? error) && (
-            <p
-              className="text-sm text-left text-muted-foreground"
-              role="status"
-            >
-              {blocker ?? error}
-            </p>
+            <div role="status">
+              <UserNotice className="font-bold text-yellow-600 dark:text-yellow-400">
+                {blocker ?? error}
+              </UserNotice>
+            </div>
           )}
           <PracticeButton size="lg" disabled={!canStart} onClick={onStart}>
             Start

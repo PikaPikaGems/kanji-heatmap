@@ -1,54 +1,45 @@
 import type { FsrsRating } from "engine-contract";
 import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { cn } from "@/lib/utils";
 import type { PassingRating } from "./rating-keys";
 
 const BUTTONS: readonly {
   rating: PassingRating;
   label: string;
-  variant: "primary" | "secondary";
-  /** Keyboard hint shown on fine-pointer devices. */
+  variant: "orange" | "blue" | "green";
+  /** Key shown as the hint on fine-pointer devices (see rating-keys.ts). */
   hint: string;
   shortcut: string;
 }[] = [
   {
     rating: "hard",
     label: "Hard",
-    variant: "secondary",
-    hint: "2",
-    shortcut: "2",
+    variant: "orange",
+    hint: "H",
+    shortcut: "H",
   },
   {
     rating: "good",
     label: "Good",
-    variant: "primary",
-    hint: "3 ↵",
-    shortcut: "3 Enter",
+    variant: "blue",
+    hint: "G",
+    shortcut: "G Enter",
   },
-  {
-    rating: "easy",
-    label: "Easy",
-    variant: "secondary",
-    hint: "4",
-    shortcut: "4",
-  },
+  { rating: "easy", label: "Easy", variant: "green", hint: "E", shortcut: "E" },
 ];
 
 /**
  * Hard / Good / Easy buttons for a correct answer in a mastery game, as
  * grid children (the caller owns the grid). Each carries the interval it
- * would schedule, e.g. "Good · 5d", and a key hint (2 / 3 ↵ / 4). "Again"
- * has no button: Forgot and wrong answers grade it.
+ * would schedule, e.g. "Good · 5d", and its key as a tiny hint (H / G / E).
+ * "Again" has no button here: Forgot and wrong answers grade it.
  */
 export const RatingButtons = ({
   intervals,
   onRate,
-  buttonClassName,
 }: {
   intervals: Record<FsrsRating, string>;
   onRate: (rating: PassingRating) => void;
-  buttonClassName?: string;
 }) => (
   <>
     {BUTTONS.map(({ rating, label, variant, hint, shortcut }) => (
@@ -56,7 +47,7 @@ export const RatingButtons = ({
         key={rating}
         variant={variant}
         size="md"
-        className={cn("px-1 text-sm whitespace-nowrap", buttonClassName)}
+        className="gap-1.5 px-1 text-xs sm:text-sm whitespace-nowrap"
         aria-keyshortcuts={shortcut}
         onClick={() => onRate(rating)}
       >

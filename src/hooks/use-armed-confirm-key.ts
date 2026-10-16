@@ -38,6 +38,8 @@ export const useArmedConfirmKey = ({
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (!armed || !keys.includes(e.key) || e.isComposing) return;
+      // Ctrl / Cmd / Alt + letter is a browser shortcut (find, history), not ours.
+      if (e.key.length === 1 && (e.ctrlKey || e.metaKey || e.altKey)) return;
       const el = e.target as HTMLElement | null;
       if (!el) return;
       const tag = el.tagName;

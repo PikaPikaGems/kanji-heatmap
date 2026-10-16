@@ -125,7 +125,10 @@ const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
         />
       </PracticeShell>
 
-      {session.state.status === "ended" && <KanjiDrawerGlobal />}
+      {/* The start screen suggests a kanji and the end screen's tiles link to
+          theirs; both open the kanji drawer. */}
+      {(session.state.status === "start" ||
+        session.state.status === "ended") && <KanjiDrawerGlobal />}
     </>
   );
 };
@@ -138,7 +141,10 @@ const ReadingMastery = () => {
   if (status.kind !== "active") {
     return (
       <PracticeShell progress={0}>
-        <MasteryGateScreen status={status} />
+        <MasteryGateScreen
+          status={status}
+          feature={readingMasteryPageMeta.title}
+        />
       </PracticeShell>
     );
   }

@@ -138,7 +138,7 @@ export const Game = ({
     [step.type, strokes, padSize]
   );
   useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
-  // Mastery: key 1 is Forgot while the draw step's Forgot button is enabled.
+  // Mastery: key F is Forgot while the draw step's Forgot button is enabled.
   useEnterAction(
     grading && step.type === "draw" ? () => forgotFromDrawRef.current() : null,
     true,
@@ -330,7 +330,6 @@ export const Game = ({
             setStrokes={setStrokes}
             showForgotBtn
             onClickForgot={onForgotFromDraw}
-            forgotHint={grading ? "1" : undefined}
             forgotDisabled={recognizing || step.type !== "draw"}
             showSubmitBtn
             submitIcon={<Rocket />}

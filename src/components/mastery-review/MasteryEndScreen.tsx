@@ -1,23 +1,15 @@
 import { useState } from "react";
-import type { CardType, FsrsRating } from "engine-contract";
+import type { CardType } from "engine-contract";
+import { UserNotice } from "@/components/common/UserNotice";
 import { RoundRecap } from "@/components/shared-practice";
-import { RATING_BORDER } from "@/components/shared-practice/rating-border";
 import { useEnterAction } from "@/hooks/use-enter-action";
-import { useSetOpenedParam } from "@/hooks/routing-hooks";
+import { useOpenedParam, useSetOpenedParam } from "@/hooks/routing-hooks";
 import { pickEndCheer } from "@/lib/practice-cheers";
-import { cn } from "@/lib/utils";
 import { nextDueCopy } from "./next-due-copy";
 import type { MasteryResult } from "./use-mastery-session";
 import { useNextDueAt } from "./use-next-due-at";
 
 const CONTINUE_KEYS = ["Enter", " "] as const;
-
-const LEGEND: readonly { rating: FsrsRating; label: string }[] = [
-  { rating: "easy", label: "Easy" },
-  { rating: "good", label: "Good" },
-  { rating: "hard", label: "Hard" },
-  { rating: "again", label: "Again" },
-];
 
 /**
  * End of a mastery round, laid out like the practice games' round recap: the
@@ -41,6 +33,7 @@ export const MasteryEndScreen = ({
   onDone: () => void;
 }) => {
   const [cheer] = useState(pickEndCheer);
+  const openedKanji = useOpenedParam();
   const setOpenedKanji = useSetOpenedParam();
   const nextDueAt = useNextDueAt(cardType);
   const hasMore = moreDue > 0;
@@ -55,36 +48,19 @@ export const MasteryEndScreen = ({
     onDone();
   };
 
-  useEnterAction(hasMore ? more : done, true, CONTINUE_KEYS);
-  useEnterAction(done, true, ["Escape"]);
+  // While a tile's drawer is open, Enter and Escape belong to the drawer.
+  const drawerOpen = openedKanji != null;
+  useEnterAction(hasMore ? more : done, !drawerOpen, CONTINUE_KEYS);
+  useEnterAction(done, !drawerOpen, ["Escape"]);
 
   return (
     <div className="h-full animate-fade-in">
       <RoundRecap
         cheer={cheer}
         summary={
-          <>
-            <p className="mt-2 text-sm font-bold text-center text-muted-foreground">
-              {hasMore ? `${moreDue} more due now` : nextDueCopy(nextDueAt)}
-            </p>
-            <ul
-              className="flex flex-wrap justify-center mt-3 text-xs font-bold gap-x-3 gap-y-1 text-muted-foreground"
-              aria-label="Tile border colors"
-            >
-              {LEGEND.map(({ rating, label }) => (
-                <li key={rating} className="flex items-center gap-1">
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "size-3 rounded border-2 border-dashed",
-                      RATING_BORDER[rating]
-                    )}
-                  />
-                  {label}
-                </li>
-              ))}
-            </ul>
-          </>
+          <p className="mt-2 text-sm font-bold text-center text-muted-foreground">
+            {hasMore ? `${moreDue} more due now` : nextDueCopy(nextDueAt)}
+          </p>
         }
         tiles={results.map(({ kanji, keyword, rating }) => ({
           kanji,
@@ -94,9 +70,9 @@ export const MasteryEndScreen = ({
         }))}
         afterTiles={
           saveError && (
-            <p className="pb-4 text-xs text-center text-muted-foreground">
-              ⚠️ Some answers weren&apos;t saved. {saveError}
-            </p>
+            <UserNotice className="pb-4 font-bold text-center text-yellow-600 dark:text-yellow-400">
+              Some answers weren&apos;t saved. {saveError}
+            </UserNotice>
           )
         }
         primaryLabel={hasMore ? "Next round" : "Done"}

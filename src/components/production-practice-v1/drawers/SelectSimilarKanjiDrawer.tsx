@@ -31,7 +31,7 @@ export const SelectSimilarKanjiDrawer = ({
   gradingEnabled?: boolean;
   /** Mid-session recognize failure — quiet pick-only notice for this card. */
   recognitionSkipped?: boolean;
-  /** Mastery game: key 1 is Forgot while nothing is selected. */
+  /** Mastery game: key F is Forgot while nothing is selected. */
   forgotShortcut?: boolean;
   onSelect: (k: string | null) => void;
   onForgot: () => void;
@@ -70,7 +70,7 @@ export const SelectSimilarKanjiDrawer = ({
             onClick={onForgot}
           >
             Forgot
-            {forgotShortcut && !hasSelection && <KeyHint>1</KeyHint>}
+            {forgotShortcut && !hasSelection && <KeyHint>F</KeyHint>}
           </PracticeButton>
           <PracticeButton
             variant="primary"

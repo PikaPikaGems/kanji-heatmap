@@ -1,27 +1,42 @@
 import { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { Sumimasen } from "@/components/error/Sumimasen";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import {
-  copyForCode,
+  ENGINE_FAILED_COPY,
   NOT_IN_BUILD_COPY,
   UPDATE_BROWSER_COPY,
 } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import type { AccountStatus } from "@/lib/engine/use-account-status";
+import { cn } from "@/lib/utils";
 import { MasteryLoading } from "./MasteryLoading";
 
+/**
+ * The site's empty-state look (Sumimasen emoji, then one bold centered
+ * line), as in "No Kanji match your search." `problem` turns the line into a
+ * warning (bold yellow) for states that are broken, not just logged out.
+ */
 const GateMessage = ({
   children,
-  action,
+  problem = false,
 }: {
   children: ReactNode;
-  action?: ReactNode;
+  problem?: boolean;
 }) => (
-  <>
-    <p className="max-w-sm text-sm text-muted-foreground">{children}</p>
-    {action}
-  </>
+  <div className="flex flex-col items-center w-full max-w-md gap-5">
+    <Sumimasen />
+    <UserNotice
+      icon={null}
+      className={cn(
+        "text-base font-bold text-center",
+        problem && "text-yellow-600 dark:text-yellow-400"
+      )}
+    >
+      {children}
+    </UserNotice>
+  </div>
 );
 
 /**
@@ -30,22 +45,25 @@ const GateMessage = ({
  */
 export const AccountGateMessage = ({
   status,
+  feature = "this page",
 }: {
   status: Exclude<AccountStatus, { kind: "active" | "loading" }>;
+  /** What logging in unlocks, e.g. "Reading Mastery". */
+  feature?: string;
 }) => {
   if (status.kind === "unavailable") {
     if (status.reason === "not-included") {
       return <GateMessage>{NOT_IN_BUILD_COPY}</GateMessage>;
     }
     if (status.reason === "failed") {
-      return <GateMessage>{copyForCode(status.reason)}</GateMessage>;
+      return <GateMessage problem>{ENGINE_FAILED_COPY}</GateMessage>;
     }
-    return <GateMessage>{UPDATE_BROWSER_COPY}</GateMessage>;
+    return <GateMessage problem>{UPDATE_BROWSER_COPY}</GateMessage>;
   }
 
   if (status.kind === "error") {
     return (
-      <GateMessage>
+      <GateMessage problem>
         Account status unavailable ({status.diagnosticId})
       </GateMessage>
     );
@@ -53,27 +71,18 @@ export const AccountGateMessage = ({
 
   if (status.kind === "recovery") {
     return (
-      <GateMessage
-        action={
-          <Button variant="outline" onClick={openRecoveryDialog}>
-            Fix saved data on this device
-          </Button>
-        }
-      >
-        This device&apos;s saved data needs attention.
+      <GateMessage problem>
+        This device&apos;s saved data needs attention.{" "}
+        <NoticeAction onClick={openRecoveryDialog}>Fix it</NoticeAction> to
+        continue.
       </GateMessage>
     );
   }
 
   return (
-    <GateMessage
-      action={
-        <Button variant="outline" onClick={openLoginDialog}>
-          Log in
-        </Button>
-      }
-    >
-      You need to log in to access this
+    <GateMessage>
+      You need to <NoticeAction onClick={openLoginDialog}>log in</NoticeAction>{" "}
+      to use {feature}.
     </GateMessage>
   );
 };
@@ -84,15 +93,17 @@ export const AccountGateMessage = ({
  */
 export const MasteryGateScreen = ({
   status,
+  feature,
 }: {
   status: Exclude<AccountStatus, { kind: "active" }>;
+  feature: string;
 }) => {
   if (status.kind === "loading") return <MasteryLoading />;
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-full gap-4 px-6 text-center animate-fade-in">
+    <div className="relative flex flex-col items-center justify-center w-full h-full gap-4 px-4 py-8 text-center animate-fade-in">
       <LeavePractice />
-      <AccountGateMessage status={status} />
+      <AccountGateMessage status={status} feature={feature} />
     </div>
   );
 };

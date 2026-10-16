@@ -27,16 +27,12 @@ export const AnswerActions = ({
         <PracticeButton
           variant="danger"
           size="md"
-          className="px-1 text-sm"
+          className="px-1 text-xs sm:text-sm"
           disabled
         >
           Forgot
         </PracticeButton>
-        <RatingButtons
-          intervals={grading.intervals}
-          onRate={onRate}
-          buttonClassName="text-xs sm:text-sm"
-        />
+        <RatingButtons intervals={grading.intervals} onRate={onRate} />
       </div>
     );
   }
@@ -50,7 +46,7 @@ export const AnswerActions = ({
         onClick={onForgot}
       >
         Forgot
-        {grading && !matched && <KeyHint>1</KeyHint>}
+        {grading && !matched && <KeyHint>Esc</KeyHint>}
       </PracticeButton>
       <PracticeButton
         variant="primary"

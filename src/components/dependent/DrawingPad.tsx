@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import { useGetStrokeFn } from "@/hooks/use-get-stroke-fn";
-import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Undo2, Trash2, Search } from "@/components/icons";
 import { SquareX } from "lucide-react";
@@ -27,7 +26,6 @@ export const DrawingPad = ({
   showForgotBtn = false,
   onClickForgot,
   forgotDisabled = false,
-  forgotHint,
   overlay,
 }: {
   svgSize: number;
@@ -46,8 +44,6 @@ export const DrawingPad = ({
   showForgotBtn?: boolean;
   onClickForgot?: () => void;
   forgotDisabled?: boolean;
-  /** Keyboard shortcut badge on the Forgot button. */
-  forgotHint?: string;
   /** Rendered over the pad square (e.g. a short-viewport grade banner). */
   overlay?: ReactNode;
 }) => {
@@ -218,7 +214,6 @@ export const DrawingPad = ({
           >
             <SquareX />
             <span className="sr-only">Forgot</span>
-            {forgotHint && !forgotDisabled && <KeyHint>{forgotHint}</KeyHint>}
           </PracticeButton>
         )}
         <PracticeButton

@@ -2,9 +2,10 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Small keyboard-shortcut badge hanging off a button's top-right corner.
- * The parent must be `relative`. Only shown on fine pointers: touch screens
- * have no keyboard to hint at.
+ * A button's keyboard shortcut as a tiny muted hint after its label, e.g.
+ * "Forgot · F". Sits inline in the button (vertically centered by the
+ * button's flex row) and only shows on fine pointers: touch screens have no
+ * keyboard to hint at.
  */
 export const KeyHint = ({
   children,
@@ -16,10 +17,10 @@ export const KeyHint = ({
   <kbd
     aria-hidden="true"
     className={cn(
-      "absolute hidden px-1 text-[10px] font-semibold leading-4 border rounded pointer-events-none -top-2 right-1.5 bg-background text-muted-foreground [@media(pointer:fine)]:block",
+      "-ml-1 hidden font-sans text-[9px] font-semibold leading-none opacity-60 pointer-events-none [@media(pointer:fine)]:inline",
       className
     )}
   >
-    {children}
+    · {children}
   </kbd>
 );

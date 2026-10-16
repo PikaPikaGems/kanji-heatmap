@@ -16,7 +16,11 @@ export const useEnterAction = (
     if (!enabled || !action) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (!keys.includes(e.key) || e.isComposing) return;
+      // defaultPrevented: another layer took the key (a drawer or dialog
+      // dismissing on Escape) before it reached the window.
+      if (!keys.includes(e.key) || e.isComposing || e.defaultPrevented) return;
+      // Ctrl / Cmd / Alt + letter is a browser shortcut (find, history), not ours.
+      if (e.key.length === 1 && (e.ctrlKey || e.metaKey || e.altKey)) return;
       const el = e.target as HTMLElement | null;
       if (!el) return;
       const tag = el.tagName;
