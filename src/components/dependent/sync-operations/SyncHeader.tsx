@@ -16,10 +16,15 @@ const Notice = ({ children }: { children: string }) => (
   <p className="text-xs text-amber-600 dark:text-amber-400">{children}</p>
 );
 
-/** Sync state, its remedies (Retry / Refresh data / Sync now) and warnings. */
+/**
+ * Sync state, its remedies and warnings. Retry follows a failure, Refresh data
+ * replaces it when a refresh is needed, and Sync now only shows when it can
+ * help: online with changes waiting.
+ */
 export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
   const api = useEngineApi();
   const { online } = useNetworkState();
+  const pending = sync?.pendingOperationsCount ?? 0;
   const failure = sync?.state === "failed" ? sync.error : null;
   const needsRefresh = failure?.code === "catch_up_required";
   const label =
@@ -48,7 +53,8 @@ export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
             </Button>
           )}
         </div>
-        <SyncNowButton label={needsRefresh ? "Refresh data" : "Sync now"} />
+        {needsRefresh && <SyncNowButton label="Refresh data" />}
+        {!needsRefresh && online && pending > 0 && <SyncNowButton />}
       </div>
       {sync?.pushBlocked && <Notice>{PUSH_BLOCKED_COPY}</Notice>}
       {(sync?.oldestPendingOperationAgeMs ?? 0) > OLD_PENDING_MS && (

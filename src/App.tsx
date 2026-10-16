@@ -29,6 +29,8 @@ import { LoginDialog } from "@/components/dependent/account/LoginDialog";
 import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
 import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
 import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
+import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
+import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
 
 const {
   kanjiPage,
@@ -158,6 +160,8 @@ const App = () => {
             {/* Also outside the Switch: any screen can open these. */}
             <LoginDialog />
             <RecoveryDialog />
+            <LogoutDialog />
+            <LoggingOutScreen />
             <FsrsSettingsDialog />
             <SyncOperationsDialog />
           </KanjiFunctionalityProvider>

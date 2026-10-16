@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Open state of the app-wide pending / failed operations dialog (design 5.7).
- * Opened from the sidebar sync chip and the logout popover; mounted once in
+ * Opened from the sidebar sync chip and the Log out modal; mounted once in
  * App. `tab` asks for a specific tab; without it the dialog picks one.
  */
 export type SyncOperationsTab = "pending" | "attention";

@@ -1,15 +1,17 @@
-import { User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
+import { Drawer as DrawerPrimitive } from "vaul";
+import { Button } from "@/components/ui/button";
 import {
   copyForWriteBlocker,
   PUSH_BLOCKED_COPY,
   REVIEW_SETTINGS_UPDATE_COPY,
 } from "@/lib/engine/engine-copy";
 import { useAccountEmail } from "@/lib/engine/account-email";
+import { openLogoutDialog } from "@/lib/engine/logout-flow";
 import { SYNC_STATUS_KEY, snapshotValue } from "@/lib/engine/store-cache";
 import type { AccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import { FsrsSettingsItem } from "./FsrsSettingsItem";
-import { LogoutPopover } from "./LogoutPopover";
 import { SyncChip } from "./SyncChip";
 
 const Notice = ({ children }: { children: string }) => (
@@ -40,10 +42,17 @@ export const ActiveAccount = ({
         </span>
         <div className="flex items-center gap-1.5">
           <FsrsSettingsItem />
-          <LogoutPopover
-            pendingCount={sync?.pendingOperationsCount ?? 0}
-            userId={status.userId}
-          />
+          {/* The modal lives outside the drawer, so close the drawer first. */}
+          <DrawerPrimitive.Close asChild>
+            <Button
+              variant="outline"
+              size="iconXl"
+              aria-label="Log out"
+              onClick={() => openLogoutDialog(status.userId)}
+            >
+              <LogOut className="w-[1.2rem] h-[1.2rem]" />
+            </Button>
+          </DrawerPrimitive.Close>
         </div>
       </div>
       <SyncChip sync={sync} />
