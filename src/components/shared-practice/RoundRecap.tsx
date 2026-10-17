@@ -27,8 +27,8 @@ export const RoundRecap = ({
   /** Shown under the cheer, e.g. "7/10 correct this round". */
   subtitle: string;
   tiles: RoundRecapTile[];
-  onContinue: () => void;
-  onEnd?: () => void;
+  onContinue?: () => void;
+  onEnd: () => void;
   /** Under the buttons, e.g. a "progress not saved" notice. */
   notice?: ReactNode;
 }) => (

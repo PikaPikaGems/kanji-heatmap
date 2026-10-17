@@ -63,8 +63,8 @@ export const MasteryEndScreen = ({
         correct: rating !== "again",
         rating,
       }))}
-      onContinue={hasMore ? more : done}
-      onEnd={hasMore ? done : undefined}
+      onContinue={hasMore ? more : undefined}
+      onEnd={done}
       notice={
         saveError && (
           <UserNotice className="font-bold text-center text-yellow-600 dark:text-yellow-400">

@@ -63,7 +63,7 @@ export const EndSession = ({
             <Stat value={results.length} unit="" label="Attempts" />
           </>
         }
-        onContinue={onEnd}
+        onEnd={onEnd}
         notice={<ProgressNotSavedNotice saveError={saveError} />}
       >
         {forgottenKanji.length > 0 && (

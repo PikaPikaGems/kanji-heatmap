@@ -5,9 +5,10 @@ import { PracticeBottomBar } from "./PracticeBottomBar";
 /**
  * The one end-of-round / end-of-session screen for every practice and mastery
  * game: cheer heading, optional stat row and content scrolling above the
- * bottom bar (the same bar the start screens use) with Continue, an optional
- * End Session, and an optional notice under them. Keyboard handling and cheer
- * selection stay with the callers.
+ * bottom bar (the same bar the start screens use) with Continue and "I'm
+ * done", or a single "Done" when there is nothing left to do, and an optional
+ * notice under them. Keyboard handling and cheer selection stay with the
+ * callers.
  */
 export const EndScreenLayout = ({
   cheer,
@@ -27,9 +28,10 @@ export const EndScreenLayout = ({
   stats?: ReactNode;
   /** Anything else for the scrolling area: recap tiles, links. */
   children?: ReactNode;
-  onContinue: () => void;
-  /** Leaves the game; omit when Continue already does. */
-  onEnd?: () => void;
+  /** The next round; omit when there is nothing left to do. */
+  onContinue?: () => void;
+  /** Leaves the game: "I'm done" next to Continue, otherwise "Done". */
+  onEnd: () => void;
   /** Under the buttons, e.g. "progress not saved". */
   notice?: ReactNode;
 }) => (
@@ -61,12 +63,18 @@ export const EndScreenLayout = ({
     </div>
 
     <PracticeBottomBar>
-      <PracticeButton size="lg" onClick={onContinue}>
-        Continue
-      </PracticeButton>
-      {onEnd && (
-        <PracticeButton size="md" variant="ghost" onClick={onEnd}>
-          End Session
+      {onContinue ? (
+        <>
+          <PracticeButton size="lg" onClick={onContinue}>
+            Continue
+          </PracticeButton>
+          <PracticeButton size="md" variant="ghost" onClick={onEnd}>
+            I&apos;m done
+          </PracticeButton>
+        </>
+      ) : (
+        <PracticeButton size="lg" onClick={onEnd}>
+          Done
         </PracticeButton>
       )}
       {notice}
