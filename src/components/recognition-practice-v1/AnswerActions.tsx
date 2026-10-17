@@ -1,7 +1,7 @@
 import type { FsrsRating } from "engine-contract";
 import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { RatingButtons } from "@/components/shared-practice";
+import { FORGOT_HINT, RatingButtons } from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
 
 /**
@@ -46,7 +46,7 @@ export const AnswerActions = ({
         onClick={onForgot}
       >
         Forgot
-        {grading && !matched && <KeyHint>Esc</KeyHint>}
+        {grading && !matched && <KeyHint>{FORGOT_HINT}</KeyHint>}
       </PracticeButton>
       <PracticeButton
         variant="primary"

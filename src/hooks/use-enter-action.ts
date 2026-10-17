@@ -3,10 +3,10 @@ import { useEffect } from "react";
 /**
  * Fire `action` on the given keys when focus isn't in a text field / select.
  * Skips while IME is composing. Default key is Enter; pass `["Enter", " "]`
- * to also accept Space.
+ * to also accept Space. `action` gets the key, for callers that map several.
  */
 export const useEnterAction = (
-  action: (() => void) | null,
+  action: ((key: string) => void) | null,
   enabled = true,
   keys: readonly string[] = ["Enter"]
 ) => {
@@ -30,7 +30,7 @@ export const useEnterAction = (
         return;
       }
       e.preventDefault();
-      action();
+      action(e.key);
     };
 
     window.addEventListener("keydown", onKeyDown);

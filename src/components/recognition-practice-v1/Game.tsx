@@ -6,7 +6,12 @@ import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
 import { useKanaInput } from "@/hooks/use-kana-input";
-import { BlurredGloss, ratingForKeyEvent } from "@/components/shared-practice";
+import {
+  BlurredGloss,
+  hasForgotKey,
+  isForgotKeyEvent,
+  ratingForKeyEvent,
+} from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
@@ -53,6 +58,17 @@ export const Game = ({
   const playCorrect = useCorrectSound();
 
   const handleChange = (raw: string) => {
+    // Mastery: "?" is Forgot. The key handler catches it on keyboards; soft
+    // keyboards and IME commits ("？") only show up here. Never typed in.
+    if (grading && hasForgotKey(raw)) {
+      const rest = raw.replace(/[?？]/g, "");
+      if (current && !isReadingCorrect(rest, current.reading)) {
+        openFeedback(false, "again");
+        return;
+      }
+      setInputValue(rest);
+      return;
+    }
     // Keep "forgot" / "skip" as latin so the command stays typable.
     if (isForgotCommandPrefix(raw)) {
       setInputValue(raw.replace(/\s+/g, ""));
@@ -115,16 +131,24 @@ export const Game = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (feedback != null || e.nativeEvent.isComposing) return;
 
-    if (e.key === "Escape") {
+    // Reading Practice: Esc is Forgot.
+    if (!grading && e.key === "Escape") {
       e.preventDefault();
       if (!matched) openFeedback(false, "again");
       return;
     }
 
+    // Mastery: "?" is Forgot, as on every rating screen. No reading contains
+    // it, so it works from the answer box and is never typed into it.
+    if (grading && isForgotKeyEvent(e)) {
+      e.preventDefault();
+      if (!matched && !e.repeat) openFeedback(false, "again");
+      return;
+    }
+
     // Mastery shortcuts: once the reading matches, H / G / E = Hard / Good /
     // Easy and Enter = Good. Matched means the answer is complete, so these
-    // letters never belong to it. Forgot has no letter here (F is typed into
-    // the answer): Esc, or typing "forgot", does it.
+    // letters never belong to it. Typing "forgot" is Forgot too.
     const rating = grading && matched ? ratingForKeyEvent(e) : null;
     if (rating) {
       e.preventDefault();

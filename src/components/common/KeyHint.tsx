@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * A button's keyboard shortcut as a tiny muted hint after its label, e.g.
- * "Forgot · F". Sits inline in the button (vertically centered by the
+ * "Forgot · ?". Sits inline in the button (vertically centered by the
  * button's flex row) and only shows on fine pointers: touch screens have no
  * keyboard to hint at.
  */

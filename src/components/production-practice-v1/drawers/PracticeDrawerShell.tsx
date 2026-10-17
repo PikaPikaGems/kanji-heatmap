@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { RatingButtons } from "@/components/shared-practice";
 import {
   Drawer,
   DrawerContent,
@@ -59,25 +57,16 @@ export const PracticeDrawerShell = ({
   );
 };
 
-export const NextKanjiFooter = ({ onNext }: { onNext: () => void }) => (
-  <div className="px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-md mx-auto w-full">
-    <PracticeButton size="lg" onClick={onNext}>
-      Next Kanji →
-    </PracticeButton>
-  </div>
-);
-
-/** Mastery game, correct answer: Hard / Good / Easy instead of "Next Kanji". */
-export const RatingFooter = ({
-  intervals,
-  onRate,
+export const NextKanjiFooter = ({
+  label = "Next Kanji →",
+  onNext,
 }: {
-  intervals: Record<FsrsRating, string>;
-  onRate: (rating: FsrsRating) => void;
+  label?: string;
+  onNext: () => void;
 }) => (
   <div className="px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-md mx-auto w-full">
-    <div className="grid grid-cols-3 gap-2">
-      <RatingButtons intervals={intervals} onRate={onRate} />
-    </div>
+    <PracticeButton size="lg" onClick={onNext}>
+      {label}
+    </PracticeButton>
   </div>
 );

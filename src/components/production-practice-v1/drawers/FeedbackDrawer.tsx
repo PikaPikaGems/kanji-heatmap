@@ -1,26 +1,18 @@
 import { useState } from "react";
-import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
-import { RATING_KEYS, ratingForKey } from "@/components/shared-practice";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
 import { StrokePreview } from "../StrokePreview";
 import { WritingPracticeModal } from "../WritingPracticeModal";
 import type { DrawingSnapshot, GradeRankInfo, PracticeItem } from "../types";
 import { ItemReveal } from "./ItemReveal";
-import {
-  NextKanjiFooter,
-  PracticeDrawerShell,
-  RatingFooter,
-} from "./PracticeDrawerShell";
+import { NextKanjiFooter, PracticeDrawerShell } from "./PracticeDrawerShell";
 
 /** Side-by-side preview size; stays under ~42vw so 320px phones don't overflow. */
 const PREVIEW_SIZE = 130;
 
 const ENTER_OR_SPACE = ["Enter", " "] as const;
-/** Mastery: the "Next" keys plus H / G / E, all of which rate. */
-const RATING_OR_SPACE = [...RATING_KEYS, " "] as const;
 
 export const FeedbackDrawer = ({
   open,
@@ -29,7 +21,7 @@ export const FeedbackDrawer = ({
   grade,
   drawing,
   gradingEnabled = true,
-  rating,
+  nextLabel,
   onNext,
 }: {
   open: boolean;
@@ -38,28 +30,18 @@ export const FeedbackDrawer = ({
   grade: GradeRankInfo;
   drawing: DrawingSnapshot | null;
   gradingEnabled?: boolean;
-  /** Mastery game, correct answer: rating buttons replace "Next Kanji". */
-  rating?: {
-    intervals: Record<FsrsRating, string>;
-    onRate: (rating: FsrsRating) => void;
-  };
+  /** Mastery game: "Continue" (the card was rated on the draw step). */
+  nextLabel?: string;
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
 
   // Enter/Space → Next Kanji. Arm after a beat so the key that opened
-  // feedback (e.g. Enter on Select → Next) doesn't also advance. When
-  // rating, Enter/Space mean Good and H / G / E mean Hard / Good / Easy.
+  // feedback (e.g. Enter on Select → Next) doesn't also advance.
   useArmedConfirmKey({
-    onConfirm: (key) => {
-      if (!rating) {
-        onNext();
-        return;
-      }
-      rating.onRate(ratingForKey(key) ?? "good");
-    },
+    onConfirm: onNext,
     enabled: open && !practiceOpen,
-    keys: rating ? RATING_OR_SPACE : ENTER_OR_SPACE,
+    keys: ENTER_OR_SPACE,
   });
 
   const title =
@@ -83,13 +65,7 @@ export const FeedbackDrawer = ({
         title={title}
         titleClassName={bounce ? "animate-practice-bounce-soft" : undefined}
         description={<ItemReveal item={item} />}
-        footer={
-          rating ? (
-            <RatingFooter intervals={rating.intervals} onRate={rating.onRate} />
-          ) : (
-            <NextKanjiFooter onNext={onNext} />
-          )
-        }
+        footer={<NextKanjiFooter label={nextLabel} onNext={onNext} />}
       >
         {kind === "noKanji" ? (
           <div className="flex flex-col items-center gap-2 px-3 pb-2 mt-4 overflow-y-auto sm:px-4">

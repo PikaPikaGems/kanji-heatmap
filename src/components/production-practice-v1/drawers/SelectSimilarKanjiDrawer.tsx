@@ -1,6 +1,6 @@
 import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { FORGOT_KEYS } from "@/components/shared-practice";
+import { FORGOT_HINT, FORGOT_KEYS } from "@/components/shared-practice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { gradeHeadline } from "@/lib/dakanji-grade";
 import {
@@ -31,7 +31,7 @@ export const SelectSimilarKanjiDrawer = ({
   gradingEnabled?: boolean;
   /** Mid-session recognize failure — quiet pick-only notice for this card. */
   recognitionSkipped?: boolean;
-  /** Mastery game: key F is Forgot while nothing is selected. */
+  /** Mastery game: "?" is Forgot while nothing is selected. */
   forgotShortcut?: boolean;
   onSelect: (k: string | null) => void;
   onForgot: () => void;
@@ -70,7 +70,9 @@ export const SelectSimilarKanjiDrawer = ({
             onClick={onForgot}
           >
             Forgot
-            {forgotShortcut && !hasSelection && <KeyHint>F</KeyHint>}
+            {forgotShortcut && !hasSelection && (
+              <KeyHint>{FORGOT_HINT}</KeyHint>
+            )}
           </PracticeButton>
           <PracticeButton
             variant="primary"

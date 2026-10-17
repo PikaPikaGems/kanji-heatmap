@@ -36,9 +36,12 @@ const BUTTONS: readonly {
  */
 export const RatingButtons = ({
   intervals,
+  disabled = false,
   onRate,
 }: {
   intervals: Record<FsrsRating, string>;
+  /** E.g. Writing Mastery before anything is drawn. */
+  disabled?: boolean;
   onRate: (rating: PassingRating) => void;
 }) => (
   <>
@@ -49,6 +52,7 @@ export const RatingButtons = ({
         size="md"
         className="gap-1.5 px-1 text-xs sm:text-sm whitespace-nowrap"
         aria-keyshortcuts={shortcut}
+        disabled={disabled}
         onClick={() => onRate(rating)}
       >
         {label} · {intervals[rating]}
