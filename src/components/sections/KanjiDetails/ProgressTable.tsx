@@ -14,9 +14,12 @@ import { formatDaysHuman, formatInterval } from "@/lib/engine/format-interval";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import {
+  difficultyBand,
   isCardStarted,
   MASTERY_LEVEL_LABELS,
   masteryLevel,
+  type MasteryMetric,
+  stabilityBand,
 } from "@/lib/engine/mastery-metrics";
 import { relativeTime } from "@/lib/engine/relative-time";
 
@@ -67,17 +70,26 @@ const valueField = (
   cell: (card, now) => ({ text: card ? value(card, now) : fallback }),
 });
 
-/** Like `valueField`, for values a card only has once it has been graded. */
+/**
+ * Like `valueField`, for values a card only has once it has been graded.
+ * With `band`, a swatch in the card's /mastery heatmap color for that
+ * measure goes before the value.
+ */
 const studiedField = (
   label: string,
   definition: string,
-  value: (card: CardProgress, now: number) => string
+  value: (card: CardProgress, now: number) => string,
+  band?: { measure: MasteryMetric; of: (card: CardProgress) => number }
 ): Field => ({
   label,
   definition,
   cell: (card, now) => {
     if (card == null) return { text: NOT_APPLICABLE };
-    return { text: isCardStarted(card) ? value(card, now) : NONE };
+    if (!isCardStarted(card)) return { text: NONE };
+    return {
+      text: value(card, now),
+      swatchCn: band && getBandFillCn(band.measure, band.of(card)),
+    };
   },
 });
 
@@ -113,12 +125,14 @@ const FIELDS: Field[] = [
   studiedField(
     "Stability",
     "About how long the memory lasts before you're likely to start forgetting it. It grows each time you remember.",
-    (card) => formatDaysHuman(card.stability)
+    (card) => formatDaysHuman(card.stability),
+    { measure: "stability", of: (card) => stabilityBand(card.stability) }
   ),
   studiedField(
     "Difficulty",
-    "How hard it is for you, from 1 (easy) to 10 (hard). Forgetting raises it; easy answers lower it.",
-    (card) => `${card.difficulty.toFixed(1)} / 10`
+    "How hard it is for you, from 1 (easy) to 10 (hard). Forgetting raises it; easy answers lower it. A brighter square means easier.",
+    (card) => `${card.difficulty.toFixed(1)} / 10`,
+    { measure: "difficulty", of: (card) => difficultyBand(card.difficulty) }
   ),
   valueField(
     "State",
