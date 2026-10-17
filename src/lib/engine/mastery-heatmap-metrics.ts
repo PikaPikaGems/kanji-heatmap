@@ -1,11 +1,12 @@
 import type { ReviewPileItemView } from "engine-contract";
 import {
-  DIFFICULTY_BAND_LABELS,
+  type BandInfo,
+  DIFFICULTY_BANDS,
   itemBand,
   type MasteryCardKind,
-  MASTERY_LEVEL_LABELS,
+  MASTERY_LEVELS,
   type MasteryMetric,
-  STABILITY_BAND_LABELS,
+  STABILITY_BANDS,
 } from "./mastery-metrics";
 
 /**
@@ -45,7 +46,7 @@ const METRIC_INFO: Record<
 > = {
   "reading-mastery": {
     label: "Reading mastery",
-    description: "How far along each reading is, from Fresh to Burned.",
+    description: "How far along each reading is, from Fresh to Mastered.",
     card: "reading",
     measure: "mastery",
   },
@@ -63,7 +64,7 @@ const METRIC_INFO: Record<
   },
   "writing-mastery": {
     label: "Writing mastery",
-    description: "How far along writing each kanji is, from Fresh to Burned.",
+    description: "How far along writing each kanji is, from Fresh to Mastered.",
     card: "writing",
     measure: "mastery",
   },
@@ -115,28 +116,51 @@ export const isCombinedHeatmapMetric = (metric: HeatmapMetric): boolean =>
   METRIC_INFO[metric].card === "combined";
 
 /**
- * The words at the two ends of a measure's color scale ("Not Started … Burned"),
- * for legends that only label the ends.
+ * The words at the two ends of a measure's colored squares, dullest first
+ * ("Fresh … Mastered", "Hard … Easy"); "Not started" is its own blank square
+ * before them.
  */
 export const SCALE_END_LABELS: Record<
   MasteryMetric,
   { from: string; to: string }
 > = {
-  mastery: { from: "Not Started", to: "Burned" },
-  stability: { from: "Not Started", to: "Extremely Stable" },
-  difficulty: { from: "Not Started", to: "Extremely Difficult" },
+  mastery: { from: "Fresh", to: "Mastered" },
+  stability: { from: "Low", to: "High" },
+  difficulty: { from: "Hard", to: "Easy" },
 };
 
-/** Band labels from lowest to highest value (not including "Not started"). */
-export const getBandLabels = (measure: MasteryMetric): readonly string[] => {
-  if (measure === "mastery") return MASTERY_LEVEL_LABELS;
-  return measure === "stability"
-    ? STABILITY_BAND_LABELS
-    : DIFFICULTY_BAND_LABELS;
+/** One line on what a measure means, above its bands in the legend. */
+export const MEASURE_INTROS: Record<MasteryMetric, string> = {
+  mastery: "How settled each card is in your memory.",
+  stability: "Days until recall drops to target retention.",
+  difficulty: "FSRS difficulty, 1 to 10. Brighter is easier.",
 };
 
 /**
- * 0-based band (lowest value first) a pile row falls in for this metric, or
+ * Why a card is "Not started" for a measure. FSRS has no stability or
+ * difficulty before the first review, so it is never a low or high band.
+ */
+export const NOT_STARTED_RULES: Record<MasteryMetric, string> = {
+  mastery: "Not in your review pile, or never reviewed",
+  stability: "Never reviewed, so no stability yet",
+  difficulty: "Never reviewed, so no difficulty yet",
+};
+
+/**
+ * A measure's bands, dullest color first (not including "Not started"):
+ * brighter is always better, so difficulty runs from hardest to easiest.
+ */
+export const getBands = (measure: MasteryMetric): readonly BandInfo[] => {
+  if (measure === "mastery") return MASTERY_LEVELS;
+  return measure === "stability" ? STABILITY_BANDS : DIFFICULTY_BANDS;
+};
+
+/** Band labels in `getBands` order (not including "Not started"). */
+export const getBandLabels = (measure: MasteryMetric): string[] =>
+  getBands(measure).map(({ label }) => label);
+
+/**
+ * 0-based band (in `getBands` order) a pile row falls in for this metric, or
  * null for "Not started": not in the pile, or a needed card is still new.
  * `now` (ms) is only used by the mastery levels.
  */

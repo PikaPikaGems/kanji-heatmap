@@ -1,6 +1,5 @@
 import { JLPTListItems } from "@/lib/jlpt";
 import { SquareListItem } from "@/components/common/SquareListItem";
-import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { UserNotice } from "@/components/common/UserNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
@@ -31,9 +30,6 @@ export const StudyStatusBorderMeanings = () => {
           />
         ))}
       </ul>
-      {status.kind === "signed-out" && (
-        <LoginNotice to="see which kanji you bookmarked or are reviewing" />
-      )}
       {status.kind === "unavailable" && (
         <UserNotice>{UPDATE_BROWSER_COPY}</UserNotice>
       )}

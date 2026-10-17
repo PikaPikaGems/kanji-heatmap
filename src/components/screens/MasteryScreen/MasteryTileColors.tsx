@@ -39,7 +39,7 @@ const getLookup = (
     const band = getHeatmapBand(metric, pile.get(kanji), Date.now());
     return {
       bgCn: getBandFillCn(measure, band),
-      textCn: getBandTextCn(measure, band),
+      textCn: getBandTextCn(band),
     };
   };
   byMetric.set(metric, lookup);

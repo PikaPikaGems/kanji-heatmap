@@ -51,12 +51,15 @@ const BackgroundColorSection = () => {
       {shouldAttachMeaning && (
         <div className="animate-fade-in">
           <GradientLegend />
-          <FrequencyRankDataSource
-            value={initialState}
-            setValue={(v) => {
-              dispatch(v as FrequencyType);
-            }}
-          />
+          {/* mx-1.5: room for the select's focus ring, which the popover clips. */}
+          <div className="mx-1.5">
+            <FrequencyRankDataSource
+              value={initialState}
+              setValue={(v) => {
+                dispatch(v as FrequencyType);
+              }}
+            />
+          </div>
         </div>
       )}
     </>

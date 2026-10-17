@@ -18,7 +18,7 @@ export const ItemPresentationPopoverShell = ({
       open={isOpen}
       onOpenChange={setIsOpen}
       showArrow={false}
-      contentClassName="mx-4 max-h-[80svh] overflow-y-auto overflow-x-hidden z-40"
+      contentClassName="w-80 mx-4 max-h-[80svh] overflow-y-auto overflow-x-hidden z-40"
       trigger={
         <Button
           variant="outline"
