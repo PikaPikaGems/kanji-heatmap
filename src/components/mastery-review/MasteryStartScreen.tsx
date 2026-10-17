@@ -8,6 +8,7 @@ import { useEnterAction } from "@/hooks/use-enter-action";
 import { useDueCount } from "@/lib/engine/use-due-count";
 import { NothingDue } from "./NothingDue";
 import { useNextDueAt } from "./use-next-due-at";
+import { cnWarningText } from "@/lib/generic-cn";
 
 /** Start screen of a mastery game: how many cards are due, then Start. */
 export const MasteryStartScreen = ({
@@ -61,7 +62,7 @@ export const MasteryStartScreen = ({
       <PracticeBottomBar>
         {(blocker ?? error) && (
           <div role="status">
-            <UserNotice className="font-bold text-yellow-600 dark:text-yellow-400">
+            <UserNotice className={cnWarningText}>
               {blocker ?? error}
             </UserNotice>
           </div>

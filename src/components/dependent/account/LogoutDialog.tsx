@@ -19,6 +19,8 @@ import { useSyncStatus } from "@/lib/engine/sync-queries";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { formatMegabytes } from "@/lib/format-bytes";
 import { LogoutRemovalOption } from "./LogoutRemovalOption";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 type RemovalChoices = {
   studyData: boolean;
@@ -28,7 +30,12 @@ type RemovalChoices = {
 
 /** Bold yellow "lost for good" lines under a ticked checkbox. */
 const RemovalWarning = ({ children }: { children: ReactNode }) => (
-  <div className="flex flex-col items-start gap-1.5 text-sm font-bold text-yellow-600 pl-7 text-pretty dark:text-yellow-400 animate-fade-in-fast">
+  <div
+    className={cn(
+      "flex flex-col items-start gap-1.5 text-sm pl-7 text-pretty animate-fade-in-fast",
+      cnWarningText
+    )}
+  >
     {children}
   </div>
 );
@@ -83,7 +90,7 @@ const LogoutForm = ({ userId }: { userId: string }) => {
       )}
       {pending > 0 && (
         <section className="flex flex-col gap-2">
-          <h3 className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+          <h3 className={cn("text-sm", cnWarningText)}>
             ⚠️ {pending} {changeWord} {pending === 1 ? "hasn't" : "haven't"}{" "}
             synced yet
           </h3>

@@ -23,6 +23,8 @@ import { fitIntervalToSlider, sliderMaxMonths } from "./interval-limits";
 import { ModelWeightsField } from "./ModelWeightsField";
 import { RetentionField } from "./RetentionField";
 import { StepsField } from "./StepsField";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /** Why Save is disabled; `null` when saving is possible. */
 export type SaveBlocker =
@@ -262,10 +264,7 @@ export const FsrsSettingsForm = ({
       <div className="flex flex-col gap-3 px-6 py-4 border-t shrink-0">
         {/* A blocker notice above already says why saving failed. */}
         {save.kind === "error" && blocker === null && (
-          <p
-            role="alert"
-            className="text-sm font-bold text-left text-yellow-600 dark:text-yellow-400"
-          >
+          <p role="alert" className={cn("text-sm text-left", cnWarningText)}>
             {save.message}
           </p>
         )}

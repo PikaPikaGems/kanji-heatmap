@@ -4,6 +4,7 @@ import { useNetworkState } from "@/hooks/use-network-state";
 import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { cn } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
+import { cnWarningText } from "@/lib/generic-cn";
 
 const OFFLINE_HINT = "You're offline";
 
@@ -38,7 +39,10 @@ export const RefreshPageBtn = ({ cnOverride }: { cnOverride?: string }) => {
           key={offlineHintKey}
           // right-0, not centered: the hint animation owns `transform`, and the
           // button sits at the sidebar's right edge.
-          className="pointer-events-none absolute right-0 z-20 whitespace-nowrap px-2 py-0.5 text-xs font-bold border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background text-yellow-600 dark:text-yellow-400 animate-search-type-hint"
+          className={cn(
+            "pointer-events-none absolute right-0 z-20 whitespace-nowrap px-2 py-0.5 text-xs border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background animate-search-type-hint",
+            cnWarningText
+          )}
           role="status"
           aria-live="polite"
           onAnimationEnd={() => setOfflineHint(null)}

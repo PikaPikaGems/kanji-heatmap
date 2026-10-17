@@ -8,6 +8,8 @@ import { pickEndCheer } from "@/lib/practice-cheers";
 import { nextDueCopy } from "./next-due-copy";
 import type { MasteryResult } from "./use-mastery-session";
 import { useNextDueAt } from "./use-next-due-at";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const CONTINUE_KEYS = ["Enter", " "] as const;
 
@@ -67,7 +69,7 @@ export const MasteryEndScreen = ({
       onEnd={done}
       notice={
         saveError && (
-          <UserNotice className="font-bold text-center text-yellow-600 dark:text-yellow-400">
+          <UserNotice className={cn("text-center", cnWarningText)}>
             Some answers weren&apos;t saved. {saveError}
           </UserNotice>
         )

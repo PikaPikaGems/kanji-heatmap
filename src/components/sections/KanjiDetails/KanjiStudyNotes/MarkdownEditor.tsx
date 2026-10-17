@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { EDITOR_HIGHLIGHT_CLASSES } from "./editorHighlightClasses";
 import { getMarkdownHighlightSegments } from "./markdown";
 import { utf8ByteLength } from "./utf8-bytes";
+import { cnWarningTextColor } from "@/lib/generic-cn";
 
 /*
  * HOW THIS EDITOR WORKS — and why the iOS-specific code below exists.
@@ -230,7 +231,7 @@ export const MarkdownEditor = ({
           {status}
         </div>
         <p
-          className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`}
+          className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? cnWarningTextColor : "text-muted-foreground"}`}
           aria-live="polite"
         >
           {hasLimit ? `${bytes} / ${maxBytes} bytes` : `${bytes} bytes`}

@@ -32,7 +32,7 @@ import {
 } from "@/lib/ai-explain/preferences";
 import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
 import { GUEST_OWNER_ID, useCurrentOwner } from "@/lib/engine/content-owner";
-import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
+import { cnDottedUnderlineTrigger, cnWarningText } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
 import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
 import { cn } from "@/lib/utils";
@@ -490,7 +490,10 @@ const OwnedAiExplainControls = ({ ownerId }: { ownerId: string }) => {
       {active && (
         <p
           role="note"
-          className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 font-bold text-yellow-600 dark:text-yellow-400"
+          className={cn(
+            "p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50",
+            cnWarningText
+          )}
         >
           Heads up: what you generate is saved only in this browser. It
           isn&apos;t backed up and can be lost if browser data is cleared, and

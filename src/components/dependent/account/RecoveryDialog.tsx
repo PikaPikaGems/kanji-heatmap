@@ -11,6 +11,8 @@ import {
   useRecoveryDialogOpen,
 } from "@/lib/engine/recovery-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 type RecoveryStep = { kind: "choose" } | { kind: "confirm-delete" };
 
@@ -27,7 +29,7 @@ const RecoveryDialogSteps = () => {
   if (step.kind === "confirm-delete") {
     return (
       <div key={step.kind} className="flex flex-col gap-5 animate-fade-in-fast">
-        <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+        <p className={cn("text-sm", cnWarningText)}>
           ⚠️ Unsynced changes on this device will be lost.
         </p>
         <DialogActions>

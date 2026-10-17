@@ -3,6 +3,8 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ActionStatus } from "./action-status";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /**
  * One text input with a submit arrow inside its right edge, plus the error
@@ -65,10 +67,7 @@ export const SubmitInput = ({
         </Button>
       </div>
       {status.kind === "error" && (
-        <p
-          role="alert"
-          className="px-1 text-sm font-bold text-yellow-600 dark:text-yellow-400"
-        >
+        <p role="alert" className={cn("px-1 text-sm", cnWarningText)}>
           {status.message}
         </p>
       )}

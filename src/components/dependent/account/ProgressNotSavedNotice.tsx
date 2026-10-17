@@ -2,6 +2,7 @@ import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 
 /** "Progress can't be saved in this browser", for browsers the engine can't run in. */
 export const BrowserCantSaveNotice = ({
@@ -43,12 +44,7 @@ export const ProgressNotSavedNotice = ({
   }
   if (account.kind === "active" && saveError) {
     return (
-      <p
-        className={cn(
-          "text-sm font-bold text-center text-yellow-600 dark:text-yellow-400",
-          className
-        )}
-      >
+      <p className={cn("text-sm text-center", cnWarningText, className)}>
         {saveError}
       </p>
     );

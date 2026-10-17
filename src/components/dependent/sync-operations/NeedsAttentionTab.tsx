@@ -5,6 +5,8 @@ import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { FailedOperationRow } from "./FailedOperationRow";
 import { EmptyOperations, OperationList } from "./OperationList";
 import type { RecentFailedOperations } from "./use-recent-failed-operations";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /** Rows for a bug report: everything but the user's own text (`payload`). */
 const bugReport = (operations: readonly RecentFailedOperation[]) =>
@@ -60,10 +62,7 @@ export const NeedsAttentionTab = ({
   }
   if (result.kind === "error") {
     return (
-      <p
-        role="alert"
-        className="px-1 py-4 text-sm font-bold text-yellow-600 dark:text-yellow-400"
-      >
+      <p role="alert" className={cn("px-1 py-4 text-sm", cnWarningText)}>
         ⚠️ Couldn&apos;t load failed operations.
       </p>
     );

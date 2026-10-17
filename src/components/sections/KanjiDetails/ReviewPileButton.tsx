@@ -19,6 +19,8 @@ import {
   refreshReviewPileItem,
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const addCn =
   "flex text-left gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-4 hover:text-green-400 text-green-500 hover:decoration-solid disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline";
@@ -41,7 +43,7 @@ const Note = ({
   tone === "error" ? (
     <p
       role="alert"
-      className="px-2 text-xs font-bold text-left text-yellow-600 max-w-56 dark:text-yellow-400"
+      className={cn("px-2 text-xs text-left max-w-56", cnWarningText)}
     >
       {children}
     </p>

@@ -5,6 +5,7 @@ import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useFailedOpsCount } from "@/lib/engine/sync-queries";
 import { cn } from "@/lib/utils";
 import { syncDotClassName, syncLabel } from "./sync-display";
+import { cnWarningText } from "@/lib/generic-cn";
 
 /** "2 pending · ⚠️ 2 failed" under the pill; nothing when both are 0. */
 const SyncCounts = ({
@@ -31,7 +32,10 @@ const SyncCounts = ({
         <DrawerPrimitive.Close asChild>
           <button
             type="button"
-            className="font-bold text-yellow-600 rounded-sm dark:text-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={cn(
+              "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              cnWarningText
+            )}
             onClick={() => openSyncOperations("attention")}
           >
             {/* Only the words are underlined, not the emoji. */}

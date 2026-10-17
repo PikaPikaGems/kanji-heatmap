@@ -16,11 +16,11 @@ import { AccountCard } from "./AccountCard";
 import { hasOldPendingChanges } from "./old-pending";
 import { OldPendingNotice } from "./OldPendingNotice";
 import { SyncChip } from "./SyncChip";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const Notice = ({ children }: { children: string }) => (
-  <p className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
-    {children}
-  </p>
+  <p className={cn("text-xs", cnWarningText)}>{children}</p>
 );
 
 /** Sidebar card for a logged-in account: who, sync state, logout, notices. */

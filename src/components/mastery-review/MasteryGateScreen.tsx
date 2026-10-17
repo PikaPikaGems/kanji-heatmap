@@ -13,6 +13,7 @@ import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import type { AccountStatus } from "@/lib/engine/use-account-status";
 import { cn } from "@/lib/utils";
 import { MasteryLoading } from "./MasteryLoading";
+import { cnWarningTextColor } from "@/lib/generic-cn";
 
 /**
  * The site's empty-state look (Sumimasen emoji, then one bold centered
@@ -32,7 +33,7 @@ const GateMessage = ({
       icon={null}
       className={cn(
         "text-base font-bold text-center",
-        problem && "text-yellow-600 dark:text-yellow-400"
+        problem && cnWarningTextColor
       )}
     >
       {children}

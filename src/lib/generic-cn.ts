@@ -12,3 +12,12 @@ export const themeColors = {
   neonAccent: "#2effff",
   lime: "#a3e635",
 };
+
+/**
+ * The one warning / error text color (warnings-bold-yellow.mdc). Change it
+ * here to restyle every warning on the site.
+ */
+export const cnWarningTextColor = "text-yellow-600 dark:text-yellow-400";
+
+/** Warning / error text: always bold, in the warning color. */
+export const cnWarningText = `font-bold ${cnWarningTextColor}`;

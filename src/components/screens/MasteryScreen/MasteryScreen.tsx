@@ -16,6 +16,8 @@ import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
 import { MasteryAccountBanner } from "./MasteryAccountBanner";
 import { MasteryTileColors } from "./MasteryTileColors";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const MasteryPresentationPopover = lazy(
   () => import("./MasteryPresentationPopover")
@@ -56,7 +58,7 @@ const MasteryScreen = () => {
   if (account.kind === "active" && pile.status === "failed") {
     return (
       <MasteryCenteredMessage>
-        <p className="max-w-sm text-sm font-bold text-yellow-600 dark:text-yellow-400">
+        <p className={cn("max-w-sm text-sm", cnWarningText)}>
           Couldn&apos;t load your progress.
         </p>
         {pile.retry && (

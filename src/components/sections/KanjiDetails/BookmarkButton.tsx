@@ -15,6 +15,8 @@ import {
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
 import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const pillCn = (bookmarked: boolean) =>
   `inline-flex items-center gap-1.5 px-2 py-1 my-1 text-xs font-semibold rounded-full transition-colors whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60 ${
@@ -74,7 +76,7 @@ const ActiveBookmarkButton = ({
       {action.kind === "error" && (
         <p
           role="alert"
-          className="text-xs text-right max-w-48 font-bold text-yellow-600 dark:text-yellow-400"
+          className={cn("text-xs text-right max-w-48", cnWarningText)}
         >
           {action.message}
         </p>

@@ -18,6 +18,7 @@ import {
   recoverableText,
 } from "./operation-info";
 import { OperationIcon, OperationKanji } from "./OperationList";
+import { cnWarningText } from "@/lib/generic-cn";
 
 type RowStatus =
   | { kind: "idle" }
@@ -90,9 +91,7 @@ export const FailedOperationRow = ({
             {operationLabel(op.operationType)}
             <StatePill rejected={rejected} />
           </p>
-          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
-            {copyForCode(op.code)}
-          </p>
+          <p className={cn("text-sm", cnWarningText)}>{copyForCode(op.code)}</p>
           <p className="text-xs text-muted-foreground">
             <time
               className="whitespace-nowrap"
@@ -115,7 +114,7 @@ export const FailedOperationRow = ({
           key={status.kind}
           className="flex flex-col gap-3 pt-1 animate-fade-in-fast"
         >
-          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
+          <p className={cn("text-sm", cnWarningText)}>
             ⚠️ Dismissing removes this note&apos;s text from this device.
             {text !== null && (
               <>

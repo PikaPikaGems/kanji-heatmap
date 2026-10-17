@@ -16,6 +16,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { PanelNotice } from "../PanelNotice";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
+import { cnWarningText } from "@/lib/generic-cn";
 
 // The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
 const KanjiDrawerGlobal = lazy(
@@ -26,9 +27,7 @@ const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
 const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
   <PanelNotice>
-    <p className="font-bold text-yellow-600 dark:text-yellow-400">
-      Couldn&apos;t load your kanji mastery.
-    </p>
+    <p className={cnWarningText}>Couldn&apos;t load your kanji mastery.</p>
     {onRetry ? (
       <PracticeButton variant="secondary" onClick={onRetry}>
         Try again

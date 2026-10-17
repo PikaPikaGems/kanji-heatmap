@@ -8,6 +8,8 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { useNetworkState } from "@/hooks/use-network-state";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /**
  * The dialog's buttons on one row: "Dismiss all (keeps notes)" when the
@@ -88,10 +90,7 @@ export const SyncActions = ({
         )}
       </DialogActions>
       {syncStatus.kind === "error" && (
-        <p
-          role="alert"
-          className="text-sm font-bold text-yellow-600 sm:text-right dark:text-yellow-400"
-        >
+        <p role="alert" className={cn("text-sm sm:text-right", cnWarningText)}>
           ⚠️ {syncStatus.message}
         </p>
       )}

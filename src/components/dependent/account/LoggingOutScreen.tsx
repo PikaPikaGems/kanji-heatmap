@@ -13,6 +13,7 @@ import {
   useLogoutFlow,
 } from "@/lib/engine/logout-flow";
 import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 
 type StepProgress = "done" | "current" | "failed" | "waiting";
 
@@ -66,8 +67,7 @@ const StepList = ({
             className={cn(
               "flex items-start gap-2",
               progress === "waiting" && "text-muted-foreground",
-              progress === "failed" &&
-                "font-bold text-yellow-600 dark:text-yellow-400"
+              progress === "failed" && cnWarningText
             )}
           >
             <span className="mt-0.5 shrink-0" aria-hidden>
@@ -176,7 +176,7 @@ export const LoggingOutScreen = () => {
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Description
                   role="alert"
-                  className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
+                  className={cn("text-sm", cnWarningText)}
                 >
                   ⚠️ {flow.message.replace(/[.!]+$/, "")}. You&apos;re still
                   logged in.

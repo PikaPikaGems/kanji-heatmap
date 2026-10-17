@@ -15,6 +15,8 @@ import {
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { ProgressTable } from "./ProgressTable";
 import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const Spinner = () => (
   <div
@@ -73,10 +75,7 @@ const NotInPileKanjiProgress = ({
           )}
         </UserNotice>
         {action.kind === "error" && (
-          <p
-            role="alert"
-            className="text-sm font-bold text-left text-yellow-600 dark:text-yellow-400"
-          >
+          <p role="alert" className={cn("text-sm text-left", cnWarningText)}>
             {action.message}
           </p>
         )}

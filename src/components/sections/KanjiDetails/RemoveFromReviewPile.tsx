@@ -8,6 +8,8 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /** The confirmation inside the dialog; it owns the remove call. */
 const ConfirmRemove = ({
@@ -43,10 +45,7 @@ const ConfirmRemove = ({
         <p className="font-bold">You can&apos;t undo this.</p>
       </div>
       {action.kind === "error" && (
-        <p
-          role="alert"
-          className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
-        >
+        <p role="alert" className={cn("text-sm", cnWarningText)}>
           {action.message}
         </p>
       )}

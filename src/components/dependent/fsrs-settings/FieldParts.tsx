@@ -12,6 +12,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /**
  * One collapsible group of fields, styled like the User Preferences sections
@@ -82,9 +84,7 @@ export const SliderEnds = ({ min, max }: { min: string; max: string }) => (
 );
 
 export const Warning = ({ children }: { children: string }) => (
-  <p className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
-    {children}
-  </p>
+  <p className={cn("text-xs", cnWarningText)}>{children}</p>
 );
 
 /**
@@ -93,10 +93,7 @@ export const Warning = ({ children }: { children: string }) => (
  */
 export const FieldError = ({ message }: { message: string | undefined }) =>
   message === undefined ? null : (
-    <p
-      role="alert"
-      className="text-xs font-bold text-yellow-600 dark:text-yellow-400"
-    >
+    <p role="alert" className={cn("text-xs", cnWarningText)}>
       {message.charAt(0).toUpperCase() + message.slice(1)}
     </p>
   );

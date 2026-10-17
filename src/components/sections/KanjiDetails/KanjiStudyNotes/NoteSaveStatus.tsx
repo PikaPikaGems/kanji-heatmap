@@ -1,5 +1,6 @@
 import { NoticeAction } from "@/components/common/UserNotice";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
+import { cnWarningText } from "@/lib/generic-cn";
 
 /** Save progress shown beside the byte counter of the note editor. */
 export const NoteSaveStatus = ({
@@ -18,17 +19,13 @@ export const NoteSaveStatus = ({
 }) => {
   if (overLimit) {
     return (
-      <span className="font-bold text-yellow-600 dark:text-yellow-400">
+      <span className={cnWarningText}>
         Too long to save. Shorten it to keep your changes.
       </span>
     );
   }
   if (save.kind === "error") {
-    return (
-      <span className="font-bold text-yellow-600 dark:text-yellow-400">
-        {save.message}
-      </span>
-    );
+    return <span className={cnWarningText}>{save.message}</span>;
   }
   if (save.kind === "busy") {
     return <span className="text-muted-foreground">Saving…</span>;

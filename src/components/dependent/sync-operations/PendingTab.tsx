@@ -15,6 +15,8 @@ import {
   OperationKanji,
   OperationList,
 } from "./OperationList";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 50;
 
@@ -53,7 +55,7 @@ const PendingPage = ({ offset }: { offset: number }) => {
   const outbox = snapshotValue(snapshot);
   if (!outbox) {
     return (
-      <li className="px-3 py-3 text-sm font-bold text-yellow-600 dark:text-yellow-400">
+      <li className={cn("px-3 py-3 text-sm", cnWarningText)}>
         ⚠️ Couldn&apos;t load pending changes.
       </li>
     );

@@ -2,6 +2,8 @@ import { Loader2 } from "lucide-react";
 import { DialogActions } from "@/components/common/DialogActions";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { closeLoginDialog } from "@/lib/engine/login-dialog";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 /** Shown while `sync.catchUp()` runs after a successful login. */
 export const LoginDownloadingStep = ({
@@ -15,10 +17,7 @@ export const LoginDownloadingStep = ({
   if (error !== null) {
     return (
       <div className="flex flex-col gap-5 py-2 animate-fade-in-fast">
-        <p
-          role="alert"
-          className="text-sm font-bold text-yellow-600 dark:text-yellow-400"
-        >
+        <p role="alert" className={cn("text-sm", cnWarningText)}>
           ⚠️ {error}
         </p>
         <DialogActions>
