@@ -17,6 +17,7 @@ import { SpeakButtons } from "./SpeakButtons";
 import { AiExplainDialog } from "./AiExplainDialog";
 import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { useCurrentOwner } from "@/lib/engine/content-owner";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
 /** "almost": wrong, but at least half the blanks were right. */
@@ -221,6 +222,7 @@ export const AnswerDrawer = ({
   const open = answer?.open ?? false;
   const getKanjiInfo = useGetKanjiInfoFn();
   const [aiExplainSettings] = useAiExplainSettings();
+  const owner = useCurrentOwner();
 
   // Don't treat the Enter that submitted the answer as "Continue".
   useArmedConfirmKey({
@@ -232,7 +234,9 @@ export const AnswerDrawer = ({
   if (!answer) return null;
   const { item, kind, puzzle, tiles, filled, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
-  const showAiExplain = isAiExplainReady(aiExplainSettings);
+  // Nobody's saved answers show until the owner is known.
+  const showAiExplain =
+    owner.status === "known" && isAiExplainReady(aiExplainSettings);
 
   return (
     <PracticeDrawerShell
@@ -274,6 +278,8 @@ export const AnswerDrawer = ({
         <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
         {(hasNotes || showAiExplain) && (
           <NotesPopover
+            // Remounts on login/logout: the open answer belongs to one owner.
+            key={owner.status === "known" ? owner.ownerId : undefined}
             item={item}
             showAiExplain={showAiExplain}
             speech={speech}

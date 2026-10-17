@@ -1,3 +1,4 @@
+import type { FsrsRating } from "engine-contract";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { JouyouGradeType } from "@/lib/jouyou-grade";
 
@@ -26,4 +27,15 @@ export type DeckFilterSettings = {
   bookmarkedOnly: boolean;
   randomizeOrder: boolean;
   randomizeFont: boolean;
+};
+
+/**
+ * Review wiring for a practice card UI used as a mastery game
+ * (/reading-mastery, /writing-mastery). Plain practice omits it.
+ */
+export type MasteryGrading = {
+  /** Frozen next-review interval per rating, e.g. `{ good: "5d" }`. */
+  intervals: Record<FsrsRating, string>;
+  /** Called once per card with the rating the user ended up giving. */
+  onGrade: (rating: FsrsRating) => void;
 };

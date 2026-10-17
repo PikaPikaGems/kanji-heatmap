@@ -217,7 +217,12 @@ const DebugInfoBody = () => {
 export const DebugInfo = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline" size="iconXl" aria-label="Debug info">
+      <Button
+        variant="outline"
+        size="iconXl"
+        aria-label="Debug info"
+        title="Debug Info"
+      >
         <Info className="w-[1.2rem] h-[1.2rem]" />
       </Button>
     </DialogTrigger>

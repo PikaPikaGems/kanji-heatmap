@@ -4,9 +4,11 @@ import { Link } from "@/components/dependent/routing";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
-import { headerNavLinks } from "@/lib/pages/nav-links";
+import { cumUseGraphPageMeta, headerNavSections } from "@/lib/pages/nav-links";
+import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
+import { type DueCounts, useDueCount } from "@/lib/engine/use-due-count";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
-import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
+import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -22,6 +24,8 @@ import {
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
+import { AccountSection } from "@/components/dependent/account/AccountSection";
+import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -29,13 +33,29 @@ const infoLinks = [
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
 
+const InfoLink = ({ href, title }: { href: string; title: string }) => (
+  <DrawerPrimitive.Close asChild>
+    <Link
+      href={href}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={`${cnTextLink} whitespace-nowrap text-xs`}
+    >
+      {title}
+    </Link>
+  </DrawerPrimitive.Close>
+);
+
 type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
 const HeaderDrawerContent = ({
+  due,
   onAction,
 }: {
+  due: DueCounts | null;
   onAction: (modal: OpenedModal) => void;
 }) => {
+  const navSections = useVisibleNavSections(headerNavSections);
+
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="flex flex-col gap-2 mb-4">
@@ -46,14 +66,29 @@ const HeaderDrawerContent = ({
           >
             <HeaderTitle />
           </div>
-          <div onPointerDown={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-1.5"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <RefreshPageBtn />
             <ModeToggle />
           </div>
         </div>
-        <DashedNavLinkList
-          items={headerNavLinks}
-          className="flex flex-col gap-2"
-          iconClassName="mt-0 mr-1"
+        <AccountSection
+          tools={
+            <>
+              <DebugInfo />
+              <SettingsModalTrigger
+                title="User Preferences"
+                onClick={() => onAction("settings")}
+              />
+            </>
+          }
+        />
+        <DashedNavLinkSections
+          sections={navSections}
+          dotHrefs={dueNavHrefs(due)}
+          listClassName="flex flex-col gap-2"
           onItemPointerDown={(e) => e.stopPropagation()}
           wrapItem={(link) => (
             <DrawerPrimitive.Close asChild>{link}</DrawerPrimitive.Close>
@@ -62,29 +97,19 @@ const HeaderDrawerContent = ({
       </div>
 
       <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
+        <div className="flex justify-center w-full">
+          <InfoLink
+            href={cumUseGraphPageMeta.href}
+            title={cumUseGraphPageMeta.title}
+          />
+        </div>
         {infoLinks.map((item) => (
-          <DrawerPrimitive.Close key={item.href} asChild>
-            <Link
-              href={item.href}
-              onPointerDown={(e) => e.stopPropagation()}
-              className={`${cnTextLink} whitespace-nowrap text-xs`}
-            >
-              {item.title}
-            </Link>
-          </DrawerPrimitive.Close>
+          <InfoLink key={item.href} href={item.href} title={item.title} />
         ))}
 
         <div className="mt-4">
           <div className="flex justify-center space-x-1">
             <LinksOutItems />
-          </div>
-          <div
-            className="flex justify-center w-full pt-1 mt-auto gap-x-1"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <RefreshPageBtn />
-            <DebugInfo />
-            <SettingsModalTrigger onClick={() => onAction("settings")} />
           </div>
         </div>
 
@@ -94,6 +119,7 @@ const HeaderDrawerContent = ({
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
         <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
         <NetworkStatusBadge />
+        <MockBackendPanel />
       </div>
     </div>
   );
@@ -107,6 +133,7 @@ const HeaderDrawer = ({
   const [openedModal, setOpenedModal] = useState<OpenedModal>(
     initiallyOpen ? "sidebar" : "none"
   );
+  const due = useDueCount();
 
   return (
     <>
@@ -137,7 +164,7 @@ const HeaderDrawer = ({
             <DrawerPrimitive.Description className="sr-only">
               Site navigation links and settings
             </DrawerPrimitive.Description>
-            <HeaderDrawerContent onAction={setOpenedModal} />
+            <HeaderDrawerContent due={due} onAction={setOpenedModal} />
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       </DrawerPrimitive.Root>

@@ -1,11 +1,12 @@
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { LocalStorageWarning } from "@/components/common/LocalStorageWarning";
 import { ScreenShell } from "@/components/common/ScreenShell";
+import { DashboardAccountBanner } from "./DashboardAccountBanner";
 import { StatsOverview } from "./StatsOverview";
 import { ActivityCalendarHeatmap } from "./ActivityCalendarHeatmap";
 import { SpeedKatakanaHeatmap } from "./SpeedKatakanaHeatmap";
 import { FillTheKanjiHeatmap } from "./FillTheKanjiHeatmap";
 import { BookmarksBreakdown } from "./BookmarksBreakdown";
+import { KanjiMastery } from "./KanjiMastery";
 import { HeatmapPopoverProvider } from "./HeatmapGrid";
 
 const showTitle = false;
@@ -20,12 +21,14 @@ const DashboardScreen = () => {
             Your Progress
           </h1>
         )}
-        <LocalStorageWarning className="mt-2 text-sm" />
       </header>
+
+      <DashboardAccountBanner />
 
       <HeatmapPopoverProvider>
         <StatsOverview />
         <ActivityCalendarHeatmap />
+        <KanjiMastery />
         <FillTheKanjiHeatmap />
         <SpeedKatakanaHeatmap />
       </HeatmapPopoverProvider>

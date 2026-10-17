@@ -11,6 +11,7 @@ import { VocabActions } from "@/components/common/VocabActions";
 import { lazy, Suspense } from "react";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { useCurrentOwner } from "@/lib/engine/content-owner";
 
 const AnchorWordDetails = lazy(() => import("./AiContent/AnchorWordDetails"));
 
@@ -58,6 +59,7 @@ const WhatIsARepresentativeStudyWord = () => {
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   const data = useKanjiRepresentativeWordDetails(kanji);
   const [aiSettings] = useAiExplainSettings();
+  const owner = useCurrentOwner();
 
   if (!data) {
     return (
@@ -94,7 +96,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           <VocabActions word={word} kana={reading} />
         </div>
 
-        {!isAiExplainReady(aiSettings) && (
+        {owner.status === "known" && !isAiExplainReady(aiSettings) && (
           <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
             <ViewVocabDetails />
           </div>

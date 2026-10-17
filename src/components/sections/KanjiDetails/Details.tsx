@@ -19,6 +19,8 @@ import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
+import { StudyNotesAccordion } from "./StudyNotesAccordion";
+import { YourProgressAccordion } from "./YourProgressAccordion";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
@@ -108,7 +110,6 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
-const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 const KanjiEssay = lazy(() => import("./KanjiEssay"));
 const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
@@ -206,13 +207,8 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
-      <SimpleAccordion trigger="Personal Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
+      <StudyNotesAccordion kanji={kanji} />
+      <YourProgressAccordion kanji={kanji} />
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
           <ReadingFrequencyCategory kanji={kanji} />

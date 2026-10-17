@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import {
   addAiExplainUsage,
+  AI_EXPLAIN_KEYS_KEY,
   AI_EXPLAIN_SETTINGS_KEY,
   AI_EXPLAIN_USAGE_KEY,
   readAiExplainUsage,
   buildAiExplainPrompt,
   modelOf,
+  readAiExplainPreferences,
   readAiExplainSettings,
-  writeAiExplainSettings,
-  type AiExplainSettings,
+  rejectAiOwnerKey,
+  writeAiExplainPreferences,
+  type AiExplainPreferences,
 } from "@/lib/ai-explain/preferences";
+import { getCurrentOwner, useCurrentOwner } from "@/lib/engine/content-owner";
 import { streamXaiCompletion, XaiKeyRejectedError } from "@/lib/ai-explain/xai";
 import { useStorageValue } from "./use-storage-value";
 import {
@@ -19,14 +23,24 @@ import {
   getGeneratedContentEpoch,
 } from "@/lib/ai-explain/storage";
 
-/** Reactive AI Explain settings + a setter that merges a partial update. */
+/**
+ * Reactive AI Explain settings (the shared preferences plus the current
+ * owner's key) and a setter that merges a partial update of the preferences.
+ * The key itself is edited with `writeAiOwnerKey`.
+ */
 export const useAiExplainSettings = () => {
+  const owner = useCurrentOwner();
   const settings = useStorageValue(
-    readAiExplainSettings,
-    (key) => key === null || key === AI_EXPLAIN_SETTINGS_KEY
+    () => readAiExplainSettings(owner),
+    (key) =>
+      key === null ||
+      key === AI_EXPLAIN_SETTINGS_KEY ||
+      key === AI_EXPLAIN_KEYS_KEY,
+    // Another owner has another key, so login and logout re-read at once.
+    owner.status === "known" ? owner.ownerId : undefined
   );
-  const update = (patch: Partial<AiExplainSettings>) =>
-    writeAiExplainSettings({ ...readAiExplainSettings(), ...patch });
+  const update = (patch: Partial<AiExplainPreferences>) =>
+    writeAiExplainPreferences({ ...readAiExplainPreferences(), ...patch });
   return [settings, update] as const;
 };
 
@@ -84,9 +98,18 @@ export const useAiExplain = () => {
     { fresh = false, instructions = "" } = {}
   ) => {
     cancel();
+    const owner = getCurrentOwner();
+    const settings = readAiExplainSettings(owner);
+    // No key means no owner yet, or an owner who hasn't added one.
+    if (owner.status !== "known" || settings.apiKey === "") {
+      setState({
+        status: "error",
+        message: "Add a Grok API key in User Preferences first.",
+      });
+      return;
+    }
     const controller = new AbortController();
     controllerRef.current = controller;
-    const settings = readAiExplainSettings();
     const model = modelOf(settings);
     const sentence = japaneseText.trim();
     const expectedEpoch = getGeneratedContentEpoch();
@@ -156,10 +179,7 @@ export const useAiExplain = () => {
         // The key stopped working (expired or revoked): hide the button
         // until a working key is entered.
         if (error instanceof XaiKeyRejectedError) {
-          writeAiExplainSettings({
-            ...readAiExplainSettings(),
-            keyValid: false,
-          });
+          rejectAiOwnerKey(owner.ownerId, settings.apiKey);
         }
         if (
           controller.signal.aborted ||

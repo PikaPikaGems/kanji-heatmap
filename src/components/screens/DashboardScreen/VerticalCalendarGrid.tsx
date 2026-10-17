@@ -20,7 +20,7 @@ export const VerticalCalendarGrid = ({
   maxN,
 }: {
   columns: (string | null)[][];
-  byDay: ActivityByDay;
+  byDay: ActivityByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {

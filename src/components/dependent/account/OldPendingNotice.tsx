@@ -1,0 +1,60 @@
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import {
+  copyForCode,
+  OLD_PENDING_WARNING_COPY,
+} from "@/lib/engine/engine-copy";
+import { useEngineApi } from "@/lib/engine/use-engine-query";
+import type { ActionStatus } from "./action-status";
+
+/**
+ * "⚠️ Some changes haven't synced in a week. Go online and **sync now**, or
+ * saving will pause." "sync now" runs `sync.catchUp()`; while it runs the
+ * line reads "Syncing…", and a failure shows under the sentence. The caller
+ * decides when to show it (see `useHasOldPendingChanges`).
+ */
+export const OldPendingNotice = ({ className }: { className?: string }) => {
+  const api = useEngineApi();
+  const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
+
+  const syncNow = async () => {
+    if (!api || status.kind === "busy") return;
+    setStatus({ kind: "busy" });
+    const result = await api.sync.catchUp();
+    setStatus(
+      result.ok
+        ? { kind: "idle" }
+        : { kind: "error", message: copyForCode(result.error.code) }
+    );
+  };
+
+  if (status.kind === "busy") {
+    return (
+      <UserNotice icon={null} className={className}>
+        <span role="status">
+          <Loader2
+            aria-hidden
+            className="inline mr-1.5 -mt-0.5 size-4 animate-spin"
+          />
+          Syncing…
+        </span>
+      </UserNotice>
+    );
+  }
+
+  return (
+    <UserNotice className={className}>
+      {OLD_PENDING_WARNING_COPY.before}
+      <NoticeAction disabled={!api} onClick={() => void syncNow()}>
+        {OLD_PENDING_WARNING_COPY.action}
+      </NoticeAction>
+      {OLD_PENDING_WARNING_COPY.after}
+      {status.kind === "error" && (
+        <span role="alert" className="block font-bold">
+          {status.message}
+        </span>
+      )}
+    </UserNotice>
+  );
+};

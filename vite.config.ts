@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { defineConfig, UserConfig, Plugin, type Connect } from "vite";
+import {
+  defineConfig,
+  searchForWorkspaceRoot,
+  UserConfig,
+  Plugin,
+  type Connect,
+} from "vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
@@ -106,6 +112,40 @@ const kanjiCanvasRefPatternsPlugin: Plugin = {
     return id === KANJI_CANVAS_STUB
       ? 'throw new Error("kanjicanvas is not installed in this build");'
       : null;
+  },
+};
+
+// The study engine (accounts, sync, review piles) is optional and is not an
+// npm dependency. KH_STUDY_ENGINE_ENTRY points at a built experimental-engine
+// `dist` directory; otherwise the one scripts/fetch-study-engine.mjs builds
+// into .study-engine/ is used when present (deploys with
+// KH_STUDY_ENGINE_TOKEN). Without either, `kh-study-engine` and
+// `kh-study-engine/mock` resolve to a stub and the app runs with accounts
+// unavailable.
+const FETCHED_STUDY_ENGINE_DIST = path.resolve(__dirname, ".study-engine/dist");
+const STUDY_ENGINE_DIST = process.env.KH_STUDY_ENGINE_ENTRY
+  ? path.resolve(process.env.KH_STUDY_ENGINE_ENTRY)
+  : fs.existsSync(path.join(FETCHED_STUDY_ENGINE_DIST, "engine/index.js"))
+    ? FETCHED_STUDY_ENGINE_DIST
+    : null;
+const STUDY_ENGINE_STUB = path.resolve(
+  __dirname,
+  "src/lib/engine/not-included.ts"
+);
+const STUDY_ENGINE_FILES: Record<string, string> = {
+  "kh-study-engine": "engine/index.js",
+  "kh-study-engine/mock": "mock/index.js",
+};
+
+const studyEnginePlugin: Plugin = {
+  name: "kh-study-engine",
+  enforce: "pre",
+  resolveId(id) {
+    const file = STUDY_ENGINE_FILES[id];
+    if (!file) return null;
+    return STUDY_ENGINE_DIST
+      ? path.join(STUDY_ENGINE_DIST, file)
+      : STUDY_ENGINE_STUB;
   },
 };
 
@@ -449,6 +489,7 @@ const visualizer_templates: TemplateType[] = [
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [
+    studyEnginePlugin,
     kanjiCanvasRefPatternsPlugin,
     yomiageFilesPlugin,
     process.env.CF_PAGES
@@ -479,6 +520,7 @@ export default defineConfig(() => ({
   ] as UserConfig["plugins"],
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify(String(Date.now())),
+    __STUDY_ENGINE_INCLUDED__: JSON.stringify(STUDY_ENGINE_DIST !== null),
   },
   build: {
     target: "esnext", // Needed for module workers
@@ -542,5 +584,15 @@ export default defineConfig(() => ({
       // Point the specifier at the installed package dir explicitly.
       kanjicanvas: path.resolve(__dirname, "./node_modules/kanjicanvas"),
     },
+    // The engine's dist imports these bare; resolve them from this app so an
+    // engine directory without its own node_modules still builds.
+    dedupe: ["dexie", "ts-fsrs", "engine-contract"],
   },
+  server: STUDY_ENGINE_DIST
+    ? {
+        fs: {
+          allow: [searchForWorkspaceRoot(process.cwd()), STUDY_ENGINE_DIST],
+        },
+      }
+    : undefined,
 }));

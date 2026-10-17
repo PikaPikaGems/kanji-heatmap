@@ -7,6 +7,7 @@ import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
 import { AiContentNotice } from "@/components/common/AiContentNotice";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { scrollResultIntoView } from "@/lib/scroll";
+import { OwnedAiContent } from "@/components/common/OwnedAiContent";
 import type { MnemonicImage } from "@/lib/ai-explain/storage";
 import { ImagePreview } from "./ImagePreview";
 import { MnemonicForm, type MnemonicDraft } from "./MnemonicForm";
@@ -329,7 +330,9 @@ const MnemonicGallery = ({
 };
 
 const VisualMnemonics = (props: { kanji: string; keyword: string }) => (
-  <MnemonicGallery key={props.kanji} {...props} />
+  <OwnedAiContent>
+    <MnemonicGallery key={props.kanji} {...props} />
+  </OwnedAiContent>
 );
 
 export default VisualMnemonics;

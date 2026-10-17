@@ -19,12 +19,3 @@ export const CPM_BAND_LABELS: Record<FreqCategory, string> = {
   3: "70–119 CPM",
   4: "120+ CPM",
 };
-
-/** Count of challenges per CPM band (bands 0–4). */
-export const countBands = (bands: FreqCategory[]): number[] => {
-  const counts = [0, 0, 0, 0, 0];
-  for (const band of bands) {
-    counts[band] += 1;
-  }
-  return counts;
-};

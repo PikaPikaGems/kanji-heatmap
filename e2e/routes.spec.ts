@@ -1,16 +1,6 @@
 import { expect, test } from "./fixtures";
 
 test.describe("route smoke coverage", () => {
-  test("mastery page renders coming-soon state", async ({ page }) => {
-    await page.goto("/mastery");
-    await expect(page.getByText("Coming soon")).toBeVisible({
-      timeout: 30_000,
-    });
-    await expect(
-      page.getByRole("link", { name: /Reading Practice/ })
-    ).toBeVisible();
-  });
-
   test("cumulative use graph renders its chart heading", async ({ page }) => {
     await page.goto("/cumulative-use-graph");
     await expect(

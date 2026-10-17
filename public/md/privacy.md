@@ -6,9 +6,22 @@ _Last Updated: October 15, 2026_
 
 ## Information We Collect
 
-We do not collect personal information such as names, email addresses, or any other identifiable data directly from you. We also do not use cookies or similar tracking technologies.
+If you use the Site without an account, we do not collect personal information such as names, email addresses, or any other identifiable data directly from you, and we do not use cookies or similar tracking technologies.
 
-We store your settings, study notes and any AI content you generate in your own browser (local storage) so the Site works and remembers your preferences. This data stays on your device; we don’t receive it and don’t use it to track you.
+We store your settings and any AI content you generate in your own browser (local storage) so the Site works and remembers your preferences. This data stays on your device; we don’t receive it and don’t use it to track you.
+
+## Kanji Heatmap Premium Accounts
+
+If you log in to a Kanji Heatmap Premium account:
+
+- **Email address**: we store it to identify your account and to send you login codes.
+- **Study data**: we store your study notes, bookmarks, review pile and review history (reading and writing progress), review settings, and practice activity (such as games completed, scores and dates) on our servers so they sync across your devices.
+- **Session cookie**: we use one cookie to keep you logged in. It is used only for that, not for tracking or advertising.
+- **On your device**: a copy of your study data is also kept in your browser so the Site works offline. When you log out you can remove it from that device.
+
+AI content you generate is not part of your account: it stays in your browser, kept separate for each account that logs in on that device.
+
+To delete your account and its data, email [admin@pikapikagems.com](mailto:admin@pikapikagems.com).
 
 ## Third-Party Services: Cloudflare
 
@@ -30,13 +43,15 @@ Your key, custom prompts and generated content are stored only in your browser o
 
 The anonymized data from Cloudflare helps us monitor the Site’s performance and improve its functionality. We do not use this data to identify or track individual visitors.
 
+If you have an account, we use your email address and study data only to log you in and sync your study data across your devices.
+
 ## Sharing of Information
 
-We do not sell, trade, or share any personal information with third parties because we don’t collect it. The aggregated analytics data from Cloudflare is used solely by us for the purposes described above.
+We do not sell, trade, or share any personal information with third parties. If you have an account, your email address and study data are handled by the service providers that host our servers and send login emails, only to run your account. The aggregated analytics data from Cloudflare is used solely by us for the purposes described above.
 
 ## Your Choices
 
-Since we don’t collect personal information or use cookies, there are no specific privacy settings for you to manage on the Site. If you have concerns about Cloudflare’s analytics, you can review their practices directly or use browser tools (like Do Not Track settings) to limit data collection, though this may not fully apply to aggregated analytics.
+Without an account, we don’t collect personal information or use cookies, so there are no specific privacy settings for you to manage on the Site. With an account, you can log out (and remove its data from a device) at any time, and ask us to delete your account by email. If you have concerns about Cloudflare’s analytics, you can review their practices directly or use browser tools (like Do Not Track settings) to limit data collection, though this may not fully apply to aggregated analytics.
 
 ## Changes to This Policy
 

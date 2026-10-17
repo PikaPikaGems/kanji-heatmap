@@ -25,6 +25,12 @@ import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
+import { LoginDialog } from "@/components/dependent/account/LoginDialog";
+import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
+import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
+import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
+import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
+import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
 
 const {
   kanjiPage,
@@ -38,6 +44,8 @@ const {
   fillTheKanjiPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  writingMasteryPage,
 } = pageItems;
 
 const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
@@ -80,6 +88,15 @@ const App = () => {
               <Route
                 path={productionPracticeV1Page.href}
                 component={ProductionPracticeV1}
+              />
+              {/* Mastery games (review pile) share the practice shell. */}
+              <Route
+                path={readingMasteryPage.href}
+                component={readingMasteryPage.Component}
+              />
+              <Route
+                path={writingMasteryPage.href}
+                component={writingMasteryPage.Component}
               />
               <Route>
                 <Header />
@@ -140,6 +157,13 @@ const App = () => {
             </Switch>
             {/* Outside the Switch so it also shows on the game screens. */}
             <BottomBanner />
+            {/* Also outside the Switch: any screen can open these. */}
+            <LoginDialog />
+            <RecoveryDialog />
+            <LogoutDialog />
+            <LoggingOutScreen />
+            <FsrsSettingsDialog />
+            <SyncOperationsDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

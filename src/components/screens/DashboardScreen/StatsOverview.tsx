@@ -1,48 +1,97 @@
 import { Cake, CalendarDays } from "lucide-react";
-import { formatCakeDay } from "@/lib/activity";
-import { useActivityData } from "@/hooks/use-activity-data";
+import {
+  countFillTheKanjiDays,
+  EMPTY_ALL_TIME_SUMMARY,
+  firstFillTheKanjiDay,
+  formatCakeDay,
+  toAllTimeStats,
+  toLocalDateKey,
+} from "@/lib/activity";
+import { snapshotValue } from "@/lib/engine/store-cache";
+import {
+  useAllTimeSummary,
+  useDailySummaries,
+} from "@/hooks/use-activity-summaries";
 import { formatRawCount } from "@/lib/format-count";
-import { ActivityCountsGrid } from "./ActivityCountsGrid";
+import {
+  ActivityCountsGrid,
+  ActivityCountsGridSkeleton,
+} from "./ActivityCountsGrid";
+import { OverviewCaption, OverviewCaptionSkeleton } from "./ActivityStatCard";
 import { DashboardPanel } from "./DashboardPanel";
-import { OverviewCaption } from "./ActivityStatCard";
+import { QueryFallback } from "./QueryFallback";
+import { useLiveOrEmpty } from "./use-live-or-empty";
 
-export const StatsOverview = () => {
-  const {
+/** The overview's cards and its two captions as pulsing placeholders. */
+const StatsOverviewSkeleton = () => (
+  <>
+    <ActivityCountsGridSkeleton />
+    <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row sm:gap-8">
+      <OverviewCaptionSkeleton />
+      <OverviewCaptionSkeleton />
+    </div>
+  </>
+);
+
+const StatsOverviewBody = () => {
+  const allTimeSnapshot = useAllTimeSummary();
+  const allTime = useLiveOrEmpty(
+    snapshotValue(allTimeSnapshot),
+    EMPTY_ALL_TIME_SUMMARY
+  );
+
+  // Per-set day counts can't be added up, so Fill the Kanji's active days come
+  // from the daily summaries between its first attempt and today. Before there
+  // is an attempt this reads just today and the result isn't used.
+  const today = toLocalDateKey();
+  const fillTheKanjiFrom =
+    (allTime && firstFillTheKanjiDay(allTime.firstAttempts)) || today;
+  const fillTheKanjiDaysSnapshot = useDailySummaries({
+    start: fillTheKanjiFrom,
+    end: today,
+  });
+  const fillTheKanjiDaily = useLiveOrEmpty(
+    snapshotValue(fillTheKanjiDaysSnapshot),
+    []
+  );
+
+  if (!allTime || !fillTheKanjiDaily) {
+    return (
+      <QueryFallback
+        snapshots={[allTimeSnapshot, fillTheKanjiDaysSnapshot]}
+        skeleton={<StatsOverviewSkeleton />}
+      />
+    );
+  }
+
+  const stats = toAllTimeStats(
     allTime,
-    daysActive,
-    speedKatakanaDays,
-    productionDays,
-    recognitionDays,
-    fillTheKanjiDays,
-  } = useActivityData();
+    countFillTheKanjiDays(fillTheKanjiDaily)
+  );
+  const { cakeDay } = allTime.firstAttempts;
 
   return (
-    <DashboardPanel title="All-time Overview" defaultOpen>
-      <ActivityCountsGrid
-        stats={{
-          speedKatakanaDays,
-          productionDays,
-          recognitionDays,
-          fillTheKanjiDays,
-          speedKatakanaSessions: allTime.speedKatakanaSessions,
-          productionRounds: allTime.productionRounds,
-          recognitionRounds: allTime.recognitionRounds,
-          fillTheKanjiBatches: allTime.fillTheKanjiBatches ?? 0,
-        }}
-      />
+    <>
+      <ActivityCountsGrid stats={stats} />
       <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row">
         <OverviewCaption
           Icon={CalendarDays}
           label="Days active"
-          value={formatRawCount(daysActive)}
+          value={formatRawCount(stats.daysActive)}
         />
         <div className="hidden sm:flex">·</div>
         <OverviewCaption
           Icon={Cake}
           label="Cake day"
-          value={allTime.cakeDay ? formatCakeDay(allTime.cakeDay) : "Not yet"}
+          value={cakeDay ? formatCakeDay(cakeDay) : "Not yet"}
         />
       </div>
-    </DashboardPanel>
+    </>
   );
 };
+
+export const StatsOverview = () => (
+  <DashboardPanel title="All-time Overview" defaultOpen>
+    <StatsOverviewBody />
+  </DashboardPanel>
+);

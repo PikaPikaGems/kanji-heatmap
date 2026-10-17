@@ -9,7 +9,16 @@ import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { BlurredGloss } from "@/components/shared-practice";
+import {
+  BlurredGloss,
+  FORGOT_KEYS,
+  RATING_KEYS,
+  ratingForKey,
+} from "@/components/shared-practice";
+import type {
+  MasteryGrading,
+  PassingRating,
+} from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   useGetKanjiInfoFn,
@@ -18,6 +27,7 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { ClozeWord } from "./ClozeWord";
+import { DrawRatingActions } from "./DrawRatingActions";
 import { buildCandidateGrid } from "./build-candidates";
 import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
@@ -31,6 +41,9 @@ import {
 } from "./types";
 
 const ENTER_OR_SPACE = ["Enter", " "] as const;
+/** Mastery draw step: H / G / E rate; Enter and Space, like Submit, are Good. */
+const RATING_OR_SPACE = [...RATING_KEYS, " "] as const;
+const NO_GRADE: GradeRankInfo = { rank: -1, topGuess: null, inTop10: false };
 
 type CardStep =
   | { type: "draw" }
@@ -41,6 +54,8 @@ type CardStep =
       candidates: string[];
       /** True when recognize threw; pick-only for this card. */
       recognitionSkipped?: boolean;
+      /** Mastery game: the rating pressed on the draw step; a right pick keeps it. */
+      rating?: PassingRating;
     }
   | {
       type: "feedback";
@@ -54,6 +69,7 @@ export const Game = ({
   settings,
   randomKanjiPool,
   gradingEnabled = true,
+  grading,
   recognize,
   onProgress,
   onComplete,
@@ -64,6 +80,11 @@ export const Game = ({
   randomKanjiPool: string[];
   /** When false, skip recognition and score by pick only. */
   gradingEnabled?: boolean;
+  /**
+   * Mastery game only: Forgot / Hard / Good / Easy on the draw step, where a
+   * rating submits the drawing. A wrong kanji grades "again" instead.
+   */
+  grading?: MasteryGrading;
   recognize: (payload: DrawingSubmitPayload) => Promise<string[]>;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
@@ -75,9 +96,10 @@ export const Game = ({
   const [step, setStep] = useState<CardStep>({ type: "draw" });
   const [selected, setSelected] = useState<string | null>(null);
   const resultsRef = useRef<SessionResult[]>([]);
-  const drawSubmitRef = useRef<(payload: DrawingSubmitPayload) => void>(
-    () => {}
-  );
+  const drawSubmitRef = useRef<
+    (payload: DrawingSubmitPayload, rating?: PassingRating) => void
+  >(() => {});
+  const forgotFromDrawRef = useRef<() => void>(() => {});
   const padSize = useFitPadSize(DRAW_SVG_SIZE);
 
   const current = sessionItems[index];
@@ -120,16 +142,32 @@ export const Game = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- speak on card load only
   }, [index, settings.hearPronunciationOnLoad]);
 
-  // Enter/Space grades when there are strokes. Never Forgot via keyboard.
+  // Enter/Space grades when there are strokes. In a mastery game H / G / E
+  // do too, as that rating (Enter and Space are Good). Practice never
+  // Forgets via keyboard.
+  const mastery = grading != null;
   const submitViaKeyboard = useMemo(
     () =>
       step.type === "draw" && strokes.length > 0
-        ? () =>
-            drawSubmitRef.current({ strokes, width: padSize, height: padSize })
+        ? (key: string) =>
+            drawSubmitRef.current(
+              { strokes, width: padSize, height: padSize },
+              mastery ? (ratingForKey(key) ?? "good") : undefined
+            )
         : null,
-    [step.type, strokes, padSize]
+    [step.type, strokes, padSize, mastery]
   );
-  useEnterAction(submitViaKeyboard, true, ENTER_OR_SPACE);
+  useEnterAction(
+    submitViaKeyboard,
+    true,
+    mastery ? RATING_OR_SPACE : ENTER_OR_SPACE
+  );
+  // Mastery: "?" is Forgot while the draw step's Forgot button is enabled.
+  useEnterAction(
+    grading && step.type === "draw" ? () => forgotFromDrawRef.current() : null,
+    true,
+    FORGOT_KEYS
+  );
 
   if (!current) {
     return null;
@@ -156,18 +194,43 @@ export const Game = ({
 
   const onForgotFromDraw = () => {
     if (step.type !== "draw") return;
+    grading?.onGrade("again");
     pushResult(false, -1);
-    setStep({
-      type: "feedback",
-      kind: "noKanji",
-      grade: { rank: -1, topGuess: null, inTop10: false },
-    });
+    setStep({ type: "feedback", kind: "noKanji", grade: NO_GRADE });
+  };
+
+  forgotFromDrawRef.current = onForgotFromDraw;
+
+  /** Records the answer and opens the feedback drawer. */
+  const showFeedback = ({
+    kind,
+    correct,
+    grade,
+    rating,
+    recognitionSkipped,
+  }: {
+    kind: "correct" | "incorrect";
+    /** Counted correct for the session (and, in mastery, keeps `rating`). */
+    correct: boolean;
+    grade: GradeRankInfo;
+    rating?: PassingRating;
+    recognitionSkipped?: boolean;
+  }) => {
+    if (correct) {
+      playCorrect({ enabled: settings.celebratorySoundOnCorrect });
+    }
+    // Mastery: a wrong kanji is "again", whatever rating was pressed. Every
+    // mastery submit carries a rating; "good" (Enter's) is only a fallback.
+    grading?.onGrade(correct ? (rating ?? "good") : "again");
+    pushResult(correct, grade.rank);
+    setStep({ type: "feedback", kind, grade, recognitionSkipped });
   };
 
   const openSelectStep = (
     grade: GradeRankInfo,
     modelGuesses: string[],
-    recognitionSkipped = false
+    recognitionSkipped = false,
+    rating?: PassingRating
   ) => {
     // Require a kanji_main entry (jlpt) or a place in the similar map.
     // getKanjiInfo also returns radical part-keywords (e.g. 囗 → "closed
@@ -188,16 +251,21 @@ export const Game = ({
       grade,
       candidates: grid,
       recognitionSkipped,
+      rating,
     });
   };
 
-  const onSubmit = async (payload: DrawingSubmitPayload) => {
+  /** `rating`: mastery game, the button (or key) that submitted the drawing. */
+  const onSubmit = async (
+    payload: DrawingSubmitPayload,
+    rating?: PassingRating
+  ) => {
     if (step.type !== "draw" || payload.strokes.length === 0) return;
     setDrawing(payload);
 
     // No handwriting model — skip recognition and go straight to lookalike pick.
     if (!gradingEnabled) {
-      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, []);
+      openSelectStep(NO_GRADE, [], false, rating);
       return;
     }
 
@@ -205,18 +273,26 @@ export const Game = ({
     try {
       const candidates = await recognize(payload);
       const rank = candidates.indexOf(current.kanji);
-      const inTop10 = rank >= 0 && rank < GRADE_TOP_K;
-      openSelectStep(
-        {
-          rank,
-          topGuess: candidates[0] ?? null,
-          inTop10,
-        },
-        candidates
-      );
+      const grade = {
+        rank,
+        topGuess: candidates[0] ?? null,
+        inTop10: rank >= 0 && rank < GRADE_TOP_K,
+      };
+      // Mastery: the recognizer is the judge, so no pick step. Recognized
+      // as the wrong kanji, it is "again" whatever was pressed.
+      if (grading) {
+        showFeedback({
+          kind: grade.inTop10 ? "correct" : "incorrect",
+          correct: grade.inTop10,
+          grade,
+          rating,
+        });
+        return;
+      }
+      openSelectStep(grade, candidates);
     } catch {
       // Keep the session moving — pick-only for this card, with a quiet notice.
-      openSelectStep({ rank: -1, topGuess: null, inTop10: false }, [], true);
+      openSelectStep(NO_GRADE, [], true, rating);
     }
   };
 
@@ -224,6 +300,7 @@ export const Game = ({
 
   const onSelectForgot = () => {
     if (step.type !== "select") return;
+    grading?.onGrade("again");
     pushResult(false, step.grade.rank);
     setStep({
       type: "feedback",
@@ -239,17 +316,13 @@ export const Game = ({
     // With grading: drawing must also land in the model top-10.
     // Without (session-wide or this card's recognize failure): pick is enough.
     const gradeThisCard = gradingEnabled && !step.recognitionSkipped;
-    const sessionCorrect = gradeThisCard
-      ? pickedCorrect && step.grade.inTop10
-      : pickedCorrect;
-    if (sessionCorrect) {
-      playCorrect({ enabled: settings.celebratorySoundOnCorrect });
-    }
-    pushResult(sessionCorrect, step.grade.rank);
-    setStep({
-      type: "feedback",
+    showFeedback({
       kind: pickedCorrect ? "correct" : "incorrect",
+      correct: gradeThisCard
+        ? pickedCorrect && step.grade.inTop10
+        : pickedCorrect,
       grade: step.grade,
+      rating: step.rating,
       recognitionSkipped: step.recognitionSkipped,
     });
   };
@@ -303,14 +376,15 @@ export const Game = ({
           className="relative w-full mx-auto mt-2"
           style={{ maxWidth: padSize + 32 }}
         >
+          {/* A mastery game has Forgot and the ratings as text buttons below. */}
           <DrawingPad
             svgSize={padSize}
             strokes={strokes}
             setStrokes={setStrokes}
-            showForgotBtn
+            showForgotBtn={!grading}
             onClickForgot={onForgotFromDraw}
             forgotDisabled={recognizing || step.type !== "draw"}
-            showSubmitBtn
+            showSubmitBtn={!grading}
             submitIcon={<Rocket />}
             submitLabel="Submit"
             submitDisabled={recognizing || step.type !== "draw"}
@@ -324,19 +398,31 @@ export const Game = ({
             </div>
           )}
         </div>
+
+        {grading && (
+          <DrawRatingActions
+            intervals={grading.intervals}
+            forgotDisabled={step.type !== "draw"}
+            rateDisabled={step.type !== "draw" || strokes.length === 0}
+            onForgot={onForgotFromDraw}
+            onRate={(rating) =>
+              void onSubmit(
+                { strokes, width: padSize, height: padSize },
+                rating
+              )
+            }
+          />
+        )}
       </div>
 
       <SelectSimilarKanjiDrawer
         open={selectOpen}
-        grade={
-          step.type === "select"
-            ? step.grade
-            : { rank: -1, topGuess: null, inTop10: false }
-        }
+        grade={step.type === "select" ? step.grade : NO_GRADE}
         candidates={step.type === "select" ? step.candidates : []}
         selected={selected}
         gradingEnabled={selectGradingEnabled}
         recognitionSkipped={recognitionSkippedOnSelect}
+        forgotShortcut={grading != null}
         onSelect={setSelected}
         onForgot={onSelectForgot}
         onNext={onSelectNext}
@@ -346,9 +432,10 @@ export const Game = ({
         open={feedback != null}
         kind={feedback?.kind ?? "noKanji"}
         item={current}
-        grade={feedback?.grade ?? { rank: -1, topGuess: null, inTop10: false }}
+        grade={feedback?.grade ?? NO_GRADE}
         drawing={drawing}
         gradingEnabled={feedbackGradingEnabled}
+        nextLabel={grading ? "Continue" : undefined}
         onNext={advance}
       />
     </div>
