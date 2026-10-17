@@ -34,8 +34,12 @@ export const StudyNotesPanel = ({
     MarkdownEditorProps,
     "value" | "maxBytes" | "onChange" | "disabled" | "status"
   >;
-  /** Messages above the note; also shown above the full-screen editor. */
-  notices?: ReactNode;
+  /**
+   * Messages above the note; also shown above the full-screen editor. Gets
+   * `openEditor`, which enters Edit Mode like the Edit Mode tab does (and
+   * opens the full-screen editor on touch screens).
+   */
+  notices?: (openEditor: () => void) => ReactNode;
 }) => {
   const isCoarsePointer = useCoarsePointer();
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
@@ -51,6 +55,8 @@ export const StudyNotesPanel = ({
       setFullscreenOpen(true);
     }
   };
+
+  const noticeNodes = notices?.(openEditor);
 
   const handleModeChange = (value: string) => {
     const next = value as NotesMode;
@@ -72,8 +78,8 @@ export const StudyNotesPanel = ({
       className="px-1 pt-2 pb-3"
       onKeyDown={(event) => event.stopPropagation()}
     >
-      {notices ? (
-        <div className="flex flex-col gap-2 mb-3">{notices}</div>
+      {noticeNodes ? (
+        <div className="flex flex-col gap-2 mb-3">{noticeNodes}</div>
       ) : null}
       <Tabs value={mode} onValueChange={handleModeChange}>
         <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5">
@@ -135,7 +141,7 @@ export const StudyNotesPanel = ({
           open={fullscreenVisible}
           onOpenChange={handleFullscreenOpenChange}
           kanji={kanji}
-          notices={notices}
+          notices={noticeNodes}
           {...editor}
         />
       ) : null}

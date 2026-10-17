@@ -37,12 +37,9 @@ export const SignedOutStudyNotes = ({
         maxBytes,
         disabled: false,
       }}
-      notices={[
-        <LoginNotice
-          key="not-logged-in"
-          to="save this note, or it will be lost when you close this tab"
-        />,
-      ]}
+      notices={() => (
+        <LoginNotice to="save this note, or it will be lost when you close this tab" />
+      )}
     />
   );
 };

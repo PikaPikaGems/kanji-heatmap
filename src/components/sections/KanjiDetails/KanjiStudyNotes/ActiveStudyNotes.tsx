@@ -13,8 +13,11 @@ import { type NotesMode, StudyNotesPanel } from "./StudyNotesPanel";
 import { useNoteEditLock } from "./use-note-edit-lock";
 import { utf8ByteLength } from "./utf8-bytes";
 
-/** Quiet time after the last keystroke before a note is saved. */
-const SAVE_DELAY_MS = 800;
+/**
+ * Quiet time after the last keystroke before a note is saved. Leaving Edit
+ * Mode, closing the drawer and moving to another kanji save at once.
+ */
+const SAVE_DELAY_MS = 3000;
 
 type NoteBase = { revision: number; content: string };
 
@@ -32,7 +35,7 @@ type EditSession = {
 /**
  * `kept` is the draft that was interrupted (another device edited the note,
  * or save() said `stale_version`). It is never saved on its own: entering edit
- * mode again merges it into the current text so the person decides.
+ * mode again puts it above the current text so the person decides.
  */
 type NotesState =
   | { mode: "view"; kept: string | null; changedElsewhere: boolean }
@@ -50,22 +53,38 @@ const baseOf = (note: KanjiNoteView | null): NoteBase => ({
 });
 
 /** `current`, a blank line, then `extra`; either side may be empty. */
-const appendDraft = (current: string, extra: string | null) => {
+const appendDraft = (current: string, extra: string) => {
   if (!extra) return current;
   if (!current) return extra;
   return `${current}\n\n${extra}`;
 };
 
-const startEdit = (
-  note: KanjiNoteView | null,
-  extra: string | null
-): NotesState => ({
+// Plain marker lines around an interrupted draft and the other device's text.
+const HELD_DRAFT_MARKER = "====== YOUR DRAFT ======";
+const OTHER_DEVICE_MARKER = "====== OTHER DEVICE'S TEXT ======";
+
+/** Whether `held` goes into the editor above other text (not on its own). */
+const heldDraftHasCompany = (current: string, held: string) =>
+  current !== "" && current !== held;
+
+/**
+ * The editor text when an interrupted draft comes back: the draft on top,
+ * then the note's current text (what the other device saved), each under a
+ * marker line.
+ */
+const withHeldDraft = (current: string, held: string | null) => {
+  if (!held) return current;
+  if (!heldDraftHasCompany(current, held)) return held;
+  return [HELD_DRAFT_MARKER, held, OTHER_DEVICE_MARKER, current].join("\n\n");
+};
+
+/**
+ * Edit mode on top of the watched note, with `draft` in the editor. A draft
+ * that differs from the note is unsaved until the person edits or saves it.
+ */
+const startEdit = (note: KanjiNoteView | null, draft: string): NotesState => ({
   mode: "edit",
-  session: {
-    base: baseOf(note),
-    draft: appendDraft(note?.content ?? "", extra),
-    sent: null,
-  },
+  session: { base: baseOf(note), draft, sent: null },
 });
 
 const leaveForRemoteChange = (kept: string | null): NotesState => ({
@@ -105,7 +124,7 @@ const initialState = (
   storedDraft: string
 ): NotesState =>
   (note?.content ?? "").length === 0
-    ? startEdit(note, storedDraft || null)
+    ? startEdit(note, storedDraft)
     : { mode: "view", kept: null, changedElsewhere: false };
 
 const LoadedActiveStudyNotes = ({
@@ -248,7 +267,7 @@ const LoadedActiveStudyNotes = ({
       return;
     }
     setSave({ kind: "idle" });
-    setState(startEdit(note, state.kept));
+    setState(startEdit(note, withHeldDraft(note?.content ?? "", state.kept)));
   };
 
   const discardLoginDraft = () => {
@@ -269,7 +288,9 @@ const LoadedActiveStudyNotes = ({
   const addLoginDraft = () => {
     if (loginDraft?.kind !== "offered") return;
     setSave({ kind: "idle" });
-    setState(startEdit(note, loginDraft.text));
+    setState(
+      startEdit(note, appendDraft(note?.content ?? "", loginDraft.text))
+    );
     setLoginDraft({ kind: "in-editor" });
   };
 
@@ -286,57 +307,71 @@ const LoadedActiveStudyNotes = ({
       ? session.draft
       : (note?.content ?? "");
 
-  const notices: ReactNode[] = [];
-  if (editing && lock === "unavailable") {
-    notices.push(
-      <UserNotice key="lock" icon="🔒">
-        This note is read-only because it&apos;s open for editing in another
-        tab. Edit it there, or close that tab to edit it here.
-      </UserNotice>
-    );
-  }
-  if (editing && writeBlocker != null) {
-    notices.push(
-      <UserNotice key="blocker">{copyForWriteBlocker(writeBlocker)}</UserNotice>
-    );
-  }
-  if (state.mode === "view" && state.changedElsewhere) {
-    notices.push(
-      <UserNotice key="changed">
-        This note changed on another device.
-        {state.kept != null ? " Your draft is kept." : ""}
-      </UserNotice>
-    );
-  }
-  // The banner goes once the person edits: the engine clears the flag when
-  // that edit is saved.
-  if (note?.hasMergedEdit && !(isHeld && hasUnsavedChanges)) {
-    notices.push(
-      <UserNotice key="merged" icon="ℹ️">
-        Also edited on another device. Both edits are below.
-      </UserNotice>
-    );
-  }
-  if (loginDraft?.kind === "in-editor" && isHeld) {
-    notices.push(
-      <UserNotice key="draft-in-editor">
-        Your draft from before you logged in is in the editor. It isn&apos;t
-        saved yet. <NoticeAction onClick={saveNow}>Save now</NoticeAction> or{" "}
-        <NoticeAction onClick={discardLoginDraft}>discard</NoticeAction> this
-        draft.
-      </UserNotice>
-    );
-  }
-  if (loginDraft?.kind === "offered") {
-    notices.push(
-      <UserNotice key="draft-offered">
-        You have a draft from before you logged in.{" "}
-        <NoticeAction onClick={addLoginDraft}>Add draft to note</NoticeAction>{" "}
-        or{" "}
-        <NoticeAction onClick={discardLoginDraft}>discard draft</NoticeAction>.
-      </UserNotice>
-    );
-  }
+  // `openEditor` enters Edit Mode the way the Edit Mode tab does.
+  const renderNotices = (openEditor: () => void) => {
+    const notices: ReactNode[] = [];
+    if (editing && lock === "unavailable") {
+      notices.push(
+        <UserNotice key="lock" icon="🔒">
+          This note is read-only because it&apos;s open for editing in another
+          tab. Edit it there, or close that tab to edit it here.
+        </UserNotice>
+      );
+    }
+    if (editing && writeBlocker != null) {
+      notices.push(
+        <UserNotice key="blocker">
+          {copyForWriteBlocker(writeBlocker)}
+        </UserNotice>
+      );
+    }
+    if (state.mode === "view" && state.changedElsewhere) {
+      notices.push(
+        <UserNotice key="changed">
+          This note changed on another device.{" "}
+          {state.kept != null ? (
+            <>
+              {heldDraftHasCompany(note?.content ?? "", state.kept)
+                ? "Your draft is in Edit Mode, above the other device's text."
+                : "Your draft is in Edit Mode."}{" "}
+              <NoticeAction onClick={openEditor}>Edit note</NoticeAction>
+            </>
+          ) : null}
+        </UserNotice>
+      );
+    }
+    // The banner goes once the person edits: the engine clears the flag when
+    // that edit is saved.
+    if (note?.hasMergedEdit && !(isHeld && hasUnsavedChanges)) {
+      notices.push(
+        <UserNotice key="merged" icon="ℹ️">
+          Also edited on another device. Both edits are below.
+        </UserNotice>
+      );
+    }
+    if (loginDraft?.kind === "in-editor" && isHeld) {
+      notices.push(
+        <UserNotice key="draft-in-editor">
+          Your draft from before you logged in is in the editor. It isn&apos;t
+          saved yet. <NoticeAction onClick={saveNow}>Save now</NoticeAction> or{" "}
+          <NoticeAction onClick={discardLoginDraft}>discard</NoticeAction> this
+          draft.
+        </UserNotice>
+      );
+    }
+    if (loginDraft?.kind === "offered") {
+      notices.push(
+        <UserNotice key="draft-offered">
+          You have a draft from before you logged in.{" "}
+          <NoticeAction onClick={addLoginDraft}>Add draft to note</NoticeAction>{" "}
+          or{" "}
+          <NoticeAction onClick={discardLoginDraft}>discard draft</NoticeAction>
+          .
+        </UserNotice>
+      );
+    }
+    return notices.length > 0 ? notices : null;
+  };
 
   return (
     <StudyNotesPanel
@@ -344,7 +379,7 @@ const LoadedActiveStudyNotes = ({
       mode={state.mode}
       onModeChange={handleModeChange}
       viewSource={note?.content ?? ""}
-      notices={notices.length > 0 ? notices : null}
+      notices={renderNotices}
       editor={{
         value: editorValue,
         onChange: handleEditorChange,
