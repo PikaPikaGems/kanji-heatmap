@@ -6,13 +6,8 @@ import { Menu } from "lucide-react";
 import { docPages } from "@/components/items/nav-items";
 import { cumUseGraphPageMeta, headerNavSections } from "@/lib/pages/nav-links";
 import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
-import {
-  type DueCounts,
-  totalDue,
-  useDueCount,
-} from "@/lib/engine/use-due-count";
+import { type DueCounts, useDueCount } from "@/lib/engine/use-due-count";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
-import { NotificationDot } from "@/components/common/NotificationDot";
 import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
@@ -33,11 +28,22 @@ import { AccountSection } from "@/components/dependent/account/AccountSection";
 import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 
 const infoLinks = [
-  { href: cumUseGraphPageMeta.href, title: cumUseGraphPageMeta.title },
   { href: docPages.about.href, title: docPages.about.title },
   { href: docPages.terms.href, title: docPages.terms.title },
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
+
+const InfoLink = ({ href, title }: { href: string; title: string }) => (
+  <DrawerPrimitive.Close asChild>
+    <Link
+      href={href}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={`${cnTextLink} whitespace-nowrap text-xs`}
+    >
+      {title}
+    </Link>
+  </DrawerPrimitive.Close>
+);
 
 type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
 
@@ -60,11 +66,25 @@ const HeaderDrawerContent = ({
           >
             <HeaderTitle />
           </div>
-          <div onPointerDown={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-1.5"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <RefreshPageBtn />
             <ModeToggle />
           </div>
         </div>
-        <AccountSection />
+        <AccountSection
+          tools={
+            <>
+              <DebugInfo />
+              <SettingsModalTrigger
+                title="User Preferences"
+                onClick={() => onAction("settings")}
+              />
+            </>
+          }
+        />
         <DashedNavLinkSections
           sections={navSections}
           dotHrefs={dueNavHrefs(due)}
@@ -77,29 +97,19 @@ const HeaderDrawerContent = ({
       </div>
 
       <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
+        <div className="flex justify-center w-full">
+          <InfoLink
+            href={cumUseGraphPageMeta.href}
+            title={cumUseGraphPageMeta.title}
+          />
+        </div>
         {infoLinks.map((item) => (
-          <DrawerPrimitive.Close key={item.href} asChild>
-            <Link
-              href={item.href}
-              onPointerDown={(e) => e.stopPropagation()}
-              className={`${cnTextLink} whitespace-nowrap text-xs`}
-            >
-              {item.title}
-            </Link>
-          </DrawerPrimitive.Close>
+          <InfoLink key={item.href} href={item.href} title={item.title} />
         ))}
 
         <div className="mt-4">
           <div className="flex justify-center space-x-1">
             <LinksOutItems />
-          </div>
-          <div
-            className="flex justify-center w-full pt-1 mt-auto gap-x-1"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <RefreshPageBtn />
-            <DebugInfo />
-            <SettingsModalTrigger onClick={() => onAction("settings")} />
           </div>
         </div>
 
@@ -141,14 +151,8 @@ const HeaderDrawer = ({
         }}
       >
         <DrawerPrimitive.Trigger asChild>
-          <Button
-            variant="outline"
-            size="iconXl"
-            aria-label="Open menu"
-            className="relative"
-          >
+          <Button variant="outline" size="iconXl" aria-label="Open menu">
             <Menu className="w-7 h-7" />
-            {totalDue(due) > 0 && <NotificationDot corner />}
           </Button>
         </DrawerPrimitive.Trigger>
         <DrawerPrimitive.Portal>

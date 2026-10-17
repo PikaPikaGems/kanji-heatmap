@@ -36,7 +36,9 @@ export const RefreshPageBtn = ({ cnOverride }: { cnOverride?: string }) => {
       {offlineHint != null && (
         <span
           key={offlineHintKey}
-          className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-xs font-bold border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background text-yellow-600 dark:text-yellow-400 animate-search-type-hint"
+          // right-0, not centered: the hint animation owns `transform`, and the
+          // button sits at the sidebar's right edge.
+          className="pointer-events-none absolute right-0 z-20 whitespace-nowrap px-2 py-0.5 text-xs font-bold border rounded-md shadow-sm -bottom-7 border-amber-500 bg-background text-yellow-600 dark:text-yellow-400 animate-search-type-hint"
           role="status"
           aria-live="polite"
           onAnimationEnd={() => setOfflineHint(null)}

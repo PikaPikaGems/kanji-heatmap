@@ -28,13 +28,13 @@ export type NavLinkItem = {
   title: string;
   description: string;
   Icon: NavLinkIcon;
-  /** Appends a ⭐️ after the title in the sidebar and FAB menus. */
-  starred?: boolean;
 };
 
 /** A group of menu links under an optional small heading. */
 export type NavLinkSection = {
   heading?: string;
+  /** Appends a ⭐️ after the heading (the section needs the study engine). */
+  starred?: boolean;
   links: NavLinkItem[];
 };
 
@@ -69,41 +69,36 @@ export const floatingIslandNavLinks: NavLinkItem[] = [
   { ...masteryPageMeta, Icon: GraduationCap },
 ];
 
-// Menu entries (sidebar + practice FAB). `starred` appends the ⭐️ after the
-// title; the floating island tabs above stay plain.
-const visualizeMasteryNavLink: NavLinkItem = {
-  ...masteryPageMeta,
-  Icon: GraduationCap,
-  starred: true,
-};
-
+// Menu entries (sidebar + practice FAB). The mastery links carry no star of
+// their own; their "Kanji Mastery" section heading does.
 const readingMasteryNavLink: NavLinkItem = {
   ...readingMasteryPageMeta,
   Icon: ScanEye,
-  starred: true,
 };
 
 const writingMasteryNavLink: NavLinkItem = {
   ...writingMasteryPageMeta,
   Icon: PencilLine,
-  starred: true,
+};
+
+const practiceGamesSection: NavLinkSection = {
+  heading: "Practice Games",
+  links: [
+    { ...recognitionPracticePageMeta, Icon: Eye },
+    { ...productionPracticePageMeta, Icon: PenLine },
+    { ...fillTheKanjiPageMeta, Icon: Puzzle },
+    { ...speedKatakanaPageMeta, Icon: Keyboard },
+  ],
 };
 
 /** Practice destinations in the FAB menu; the sidebar repeats them. */
 export const practiceNavSections: NavLinkSection[] = [
   {
     heading: "Kanji Mastery",
+    starred: true,
     links: [readingMasteryNavLink, writingMasteryNavLink],
   },
-  {
-    heading: "Practice Games",
-    links: [
-      { ...recognitionPracticePageMeta, Icon: Eye },
-      { ...productionPracticePageMeta, Icon: PenLine },
-      { ...fillTheKanjiPageMeta, Icon: Puzzle },
-      { ...speedKatakanaPageMeta, Icon: Keyboard },
-    ],
-  },
+  practiceGamesSection,
 ];
 
 /** Primary destinations in the header drawer. */
@@ -112,8 +107,16 @@ export const headerNavSections: NavLinkSection[] = [
     links: [
       { ...exploreKanjiPageMeta, Icon: SearchIcon },
       { ...dashboardPageMeta, Icon: LayoutDashboard },
-      visualizeMasteryNavLink,
     ],
   },
-  ...practiceNavSections,
+  {
+    heading: "Kanji Mastery",
+    starred: true,
+    links: [
+      { ...masteryPageMeta, Icon: GraduationCap },
+      readingMasteryNavLink,
+      writingMasteryNavLink,
+    ],
+  },
+  practiceGamesSection,
 ];

@@ -24,7 +24,6 @@ test.describe("site chrome", () => {
     await expect(page.getByText(/\d+ Items/)).toBeVisible({ timeout: 30_000 });
 
     await page.getByRole("button", { name: "Open practice menu" }).click();
-    await expect(page.getByText("Select a mode")).toBeVisible();
 
     await page.getByRole("link", { name: /Reading Practice/ }).click();
     // Trailing "?" is fine — wouter can leave an empty query string.

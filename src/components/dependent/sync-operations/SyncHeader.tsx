@@ -12,7 +12,7 @@ import { OLD_PENDING_COPY, PUSH_BLOCKED_COPY } from "@/lib/engine/engine-copy";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import { cn } from "@/lib/utils";
 
-const OLD_PENDING_MS = 7 * 24 * 60 * 60 * 1000;
+export const OLD_PENDING_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Sync state and its warnings. The status takes only the width its content

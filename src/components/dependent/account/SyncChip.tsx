@@ -31,10 +31,14 @@ const SyncCounts = ({
         <DrawerPrimitive.Close asChild>
           <button
             type="button"
-            className="font-bold text-yellow-600 underline rounded-sm dark:text-yellow-400 underline-offset-4 decoration-dotted hover:decoration-solid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="font-bold text-yellow-600 rounded-sm dark:text-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => openSyncOperations("attention")}
           >
-            ⚠️ {failed} failed
+            {/* Only the words are underlined, not the emoji. */}
+            ⚠️{" "}
+            <span className="underline underline-offset-4">
+              {failed} failed
+            </span>
           </button>
         </DrawerPrimitive.Close>
       )}
@@ -54,7 +58,7 @@ export const SyncChip = ({ sync }: { sync: SyncStatus | undefined }) => {
   const label = syncLabel(sync, online);
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-start gap-1 pb-1.5">
       <DrawerPrimitive.Close asChild>
         <button
           type="button"

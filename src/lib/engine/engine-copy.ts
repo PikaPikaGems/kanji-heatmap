@@ -75,3 +75,10 @@ export const copyForCode = (code: string): string =>
 
 export const copyForWriteBlocker = (blocker: WriteBlocker): string =>
   BLOCKER_COPY[blocker];
+
+/** The week-old-changes warning; `action` is an inline button in the sentence. */
+export const OLD_PENDING_WARNING_COPY = {
+  before: "Some changes haven't synced in a week. Go online and ",
+  action: "sync now",
+  after: ", or saving will pause.",
+} as const;

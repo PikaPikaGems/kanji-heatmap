@@ -15,8 +15,6 @@ type DashedNavLinkProps = {
   onClick?: () => void;
   onPointerDown?: (e: React.PointerEvent) => void;
   className?: string;
-  /** Appends a ⭐️ after the title. */
-  starred?: boolean;
   /** Shows the due dot right after the title. */
   showDot?: boolean;
 };
@@ -34,7 +32,6 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       onClick,
       onPointerDown,
       className,
-      starred,
       showDot,
       ...rest
     },
@@ -56,12 +53,11 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       >
         <div className="flex text-sm font-semibold text-left">
           {Icon && <Icon className="mt-0.5 mr-2 size-4 shrink-0" />}
-          {/* Star and dot stay glued to the title's last word when it wraps. */}
+          {/* The dot stays glued to the title's last word when it wraps. */}
           <span>
             {title.slice(0, lastWordStart)}
             <span className="whitespace-nowrap">
               {title.slice(lastWordStart)}
-              {starred && <span aria-hidden> ⭐️</span>}
               {showDot && (
                 <NotificationDot className="inline-block ml-2 align-middle" />
               )}

@@ -71,7 +71,7 @@ export const PracticeFab = () => {
         >
           <NotebookPen />
           {totalDue(due) > 0 && (
-            <NotificationDot className="absolute top-1/2 left-[calc(50%+1.2rem)] -translate-y-1/2 ring-2 ring-white" />
+            <NotificationDot className="absolute top-1/2 left-[calc(50%+1.2rem)] -translate-y-1/2" />
           )}
         </PracticeButton>
       </PopoverTrigger>
@@ -79,9 +79,9 @@ export const PracticeFab = () => {
         side="top"
         align="end"
         sideOffset={12}
-        className="z-50 w-[min(100vw-1.5rem,28rem)] p-3"
+        className="z-50 w-[min(100vw-1.5rem,28rem)] p-3 pt-0"
+        aria-label="Practice menu"
       >
-        <p className="px-1 text-sm font-semibold text-left">Select a mode</p>
         <DashedNavLinkSections
           sections={modeSections}
           dotHrefs={dueNavHrefs(due)}

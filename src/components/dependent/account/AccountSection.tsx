@@ -1,22 +1,24 @@
+import type { ReactNode } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { LogIn } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
+import {
+  useAccountStatus,
+  type AccountStatus,
+} from "@/lib/engine/use-account-status";
 import { AccountCard } from "./AccountCard";
 import { ActiveAccount } from "./ActiveAccount";
 import { FsrsSettingsItem } from "./FsrsSettingsItem";
 
 /**
- * Account area of the sidebar. Renders nothing when this build has no study
- * engine, so the default app looks as it did before accounts existed.
+ * What stands in for the card when there is no account to show: an update
+ * hint, a diagnostic, the recovery button, or nothing (loading, or a build
+ * without the engine).
  */
-export const AccountSection = () => {
-  const status = useAccountStatus();
-
-  if (status.kind === "loading") return null;
+const NoCardNotice = ({ status }: { status: AccountStatus }) => {
   if (status.kind === "unavailable") {
     if (status.reason === "not-included" || status.reason === "failed") {
       return null;
@@ -34,32 +36,87 @@ export const AccountSection = () => {
       </p>
     );
   }
+  if (status.kind === "recovery") {
+    return (
+      <DrawerPrimitive.Close asChild>
+        <PracticeButton
+          size="md"
+          className="h-auto px-3 py-2 text-sm min-h-12"
+          onClick={openRecoveryDialog}
+        >
+          Fix saved data on this device
+        </PracticeButton>
+      </DrawerPrimitive.Close>
+    );
+  }
+  return null;
+};
 
-  return (
-    <div onPointerDown={(e) => e.stopPropagation()}>
-      {status.kind === "signed-out" && (
-        <AccountCard name="Guest" actions={<FsrsSettingsItem />}>
-          {/* The dialog lives outside the drawer, so close the drawer first. */}
-          <DrawerPrimitive.Close asChild>
-            <PracticeButton size="md" onClick={openLoginDialog}>
-              <LogIn aria-hidden />
-              Log in
-            </PracticeButton>
-          </DrawerPrimitive.Close>
-        </AccountCard>
-      )}
-      {status.kind === "recovery" && (
+const AccountBody = ({
+  status,
+  tools,
+}: {
+  status: AccountStatus;
+  tools: ReactNode;
+}) => {
+  if (status.kind === "signed-out") {
+    return (
+      <AccountCard
+        name="Guest"
+        tools={
+          <>
+            {tools}
+            <FsrsSettingsItem />
+          </>
+        }
+      >
+        {/* The dialog lives outside the drawer, so close the drawer first. */}
         <DrawerPrimitive.Close asChild>
-          <PracticeButton
-            size="md"
-            className="h-auto px-3 py-2 text-sm min-h-12"
-            onClick={openRecoveryDialog}
-          >
-            Fix saved data on this device
+          <PracticeButton size="md" onClick={openLoginDialog}>
+            <LogIn aria-hidden />
+            Log in
           </PracticeButton>
         </DrawerPrimitive.Close>
-      )}
-      {status.kind === "active" && <ActiveAccount status={status} />}
+      </AccountCard>
+    );
+  }
+  if (status.kind === "active") {
+    return (
+      <ActiveAccount
+        status={status}
+        tools={
+          <>
+            {tools}
+            <FsrsSettingsItem />
+          </>
+        }
+      />
+    );
+  }
+
+  return (
+    <>
+      <NoCardNotice status={status} />
+      <div className="flex items-center justify-center gap-1.5">{tools}</div>
+    </>
+  );
+};
+
+/**
+ * Account area of the sidebar. `tools` are the icon buttons every build shows
+ * (Debug Info, User Preferences): they sit in the card's bottom row, or on
+ * their own where the card would be when there is no account to show (e.g. a
+ * build without the study engine).
+ */
+export const AccountSection = ({ tools }: { tools: ReactNode }) => {
+  const status = useAccountStatus();
+
+  return (
+    <div
+      className="flex flex-col gap-2"
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      <AccountBody status={status} tools={tools} />
     </div>
   );
 };

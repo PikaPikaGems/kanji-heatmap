@@ -33,6 +33,7 @@ export const DashedNavLinkSections = ({
           {section.heading && (
             <h3 className="pt-3 pb-1 pl-3 mb-2 text-sm font-bold text-left uppercase border-b border-dashed text-foreground/50">
               {section.heading}
+              {section.starred && <span aria-hidden> ⭐️</span>}
             </h3>
           )}
           <div className={cn(listClassName)}>
@@ -43,7 +44,6 @@ export const DashedNavLinkSections = ({
                   title={item.title}
                   description={item.description}
                   Icon={item.Icon}
-                  starred={item.starred}
                   onClick={onItemClick}
                   onPointerDown={onItemPointerDown}
                   showDot={dotHrefs?.has(item.href)}

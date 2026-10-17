@@ -1,18 +1,22 @@
 import type { ReactNode } from "react";
 import { User } from "lucide-react";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
 
 /**
- * Sidebar account card: user icon + name on the left, icon actions on the
- * right, and whatever belongs under that row (sync state, login button,
- * notices) as children. Logged in and logged out share it.
+ * Sidebar account card: user icon + name (and an optional icon action on the
+ * right), whatever belongs under that row (sync state, login button, notices)
+ * as children, then a dotted divider and the row of icon tools (Debug Info,
+ * User Preferences, FSRS settings). Logged in and logged out share it.
  */
 export const AccountCard = ({
   name,
   actions,
+  tools,
   children,
 }: {
   name: string;
-  actions: ReactNode;
+  actions?: ReactNode;
+  tools: ReactNode;
   children?: ReactNode;
 }) => (
   <div className="flex flex-col gap-2 p-2 text-left border rounded-xl">
@@ -23,8 +27,10 @@ export const AccountCard = ({
           {name}
         </span>
       </span>
-      <div className="flex items-center gap-1.5">{actions}</div>
+      {actions && <div className="flex items-center gap-1.5">{actions}</div>}
     </div>
     {children}
+    <DottedSeparator className="mt-1" />
+    <div className="flex items-center justify-center gap-1.5">{tools}</div>
   </div>
 );
