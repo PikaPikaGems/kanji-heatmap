@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { PageNotAvailable } from "@/components/error/PageNotAvailable";
 import { Sumimasen } from "@/components/error/Sumimasen";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import {
@@ -89,7 +90,8 @@ export const AccountGateMessage = ({
 
 /**
  * What /reading-mastery and /writing-mastery show instead of the game while
- * the account can't review (design 5.1 and 5.8).
+ * the account can't review (design 5.1 and 5.8). A build without the study
+ * engine has no such pages: Not Available, as for a missing page.
  */
 export const MasteryGateScreen = ({
   status,
@@ -99,6 +101,15 @@ export const MasteryGateScreen = ({
   feature: string;
 }) => {
   if (status.kind === "loading") return <MasteryLoading />;
+
+  if (status.kind === "unavailable" && status.reason === "not-included") {
+    return (
+      <div className="relative w-full h-full">
+        <LeavePractice />
+        <PageNotAvailable />
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full h-full gap-4 px-4 py-8 text-center animate-fade-in">

@@ -21,7 +21,7 @@ export const RecapTile = ({
     <div
       className={
         rating
-          ? `relative rounded-xl border-2 border-dashed ${RATING_BORDER[rating]}`
+          ? `relative rounded-xl border-2 border-dotted ${RATING_BORDER[rating]}`
           : `relative rounded-xl border border-dashed ${
               correct ? "border-foreground" : " "
             }`
