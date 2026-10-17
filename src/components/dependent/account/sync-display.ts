@@ -1,6 +1,10 @@
 import type { SyncStatus } from "engine-contract";
 import { relativeTime } from "@/lib/engine/relative-time";
 
+/** The server asked for a full data refresh; `sync.catchUp()` does it. */
+export const needsDataRefresh = (sync: SyncStatus | undefined) =>
+  sync?.state === "failed" && sync.error.code === "catch_up_required";
+
 /** Sync state as the chip and the operations modal word it. */
 export const syncLabel = (sync: SyncStatus | undefined, online: boolean) => {
   if (!online) return "Offline";

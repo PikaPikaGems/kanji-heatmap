@@ -13,7 +13,9 @@ import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
 import { cn } from "@/lib/utils";
 import { NeedsAttentionTab } from "./NeedsAttentionTab";
 import { PendingTab } from "./PendingTab";
+import { SyncActions } from "./SyncActions";
 import { SyncHeader } from "./SyncHeader";
+import { useRecentFailedOperations } from "./use-recent-failed-operations";
 
 /** A tab's name with its count in a small pill; yellow when failures wait. */
 const TabLabel = ({
@@ -48,14 +50,28 @@ const SyncOperationsBody = ({
   const sync = useSyncStatus();
   const failedCount = useFailedOpsCount()?.count ?? 0;
   const pendingCount = sync?.pendingOperationsCount ?? 0;
+  const failed = useRecentFailedOperations();
   const [tab, setTab] = useState<SyncOperationsTab>(
     requestedTab ??
       (failedCount > 0 && pendingCount === 0 ? "attention" : "pending")
   );
+  // Rejected notes may be the only copy of the text, so they are only
+  // dismissed one at a time.
+  const dismissable =
+    tab === "attention" && failed.result.kind === "ready"
+      ? failed.result.operations.filter(
+          (op) => op.operationType !== "note-save"
+        )
+      : [];
 
   return (
     <div className="flex flex-col gap-4 px-2 pt-1 text-left">
       <SyncHeader sync={sync} />
+      <SyncActions
+        sync={sync}
+        dismissable={dismissable}
+        onDismissed={failed.reload}
+      />
       <Tabs
         value={tab}
         onValueChange={(next) =>
@@ -84,7 +100,10 @@ const SyncOperationsBody = ({
           <PendingTab total={pendingCount} />
         </TabsContent>
         <TabsContent value="attention" className="mt-4 animate-fade-in-fast">
-          <NeedsAttentionTab />
+          <NeedsAttentionTab
+            result={failed.result}
+            onDismissed={failed.reload}
+          />
         </TabsContent>
       </Tabs>
     </div>

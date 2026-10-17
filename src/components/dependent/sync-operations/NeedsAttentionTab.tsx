@@ -1,14 +1,10 @@
-import { useState } from "react";
 import type { RecentFailedOperation } from "engine-contract";
-import { ClipboardCopy, Loader2 } from "lucide-react";
+import { ClipboardCopy } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
-import { DialogActions } from "@/components/common/DialogActions";
-import { PracticeButton } from "@/components/ui/practice-button";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { useEngineApi } from "@/lib/engine/use-engine-query";
 import { FailedOperationRow } from "./FailedOperationRow";
 import { EmptyOperations, OperationList } from "./OperationList";
-import { useRecentFailedOperations } from "./use-recent-failed-operations";
+import type { RecentFailedOperations } from "./use-recent-failed-operations";
 
 /** Rows for a bug report: everything but the user's own text (`payload`). */
 const bugReport = (operations: readonly RecentFailedOperation[]) =>
@@ -30,65 +26,35 @@ const bugReport = (operations: readonly RecentFailedOperation[]) =>
     2
   );
 
-/** "Copy bug report" (low-key, in the body) and "Dismiss all (keeps notes)". */
-const Footer = ({
+/** "Copy bug report": low-key, under the list. */
+const BugReportButton = ({
   operations,
-  onDismissed,
 }: {
   operations: readonly RecentFailedOperation[];
-  onDismissed: () => void;
 }) => {
-  const api = useEngineApi();
-  const { copy, status: copyStatus } = useCopyToClipboard(1500);
-  const [busy, setBusy] = useState(false);
-  // Rejected notes may be the only copy of the text, so they are only
-  // dismissed one at a time.
-  const dismissable = operations.filter(
-    (op) => op.operationType !== "note-save"
-  );
-
-  const dismissAll = async () => {
-    if (!api || busy) return;
-    setBusy(true);
-    await api.sync.dismissFailedOperations(
-      dismissable.map((op) => op.operationId)
-    );
-    setBusy(false);
-    onDismissed();
-  };
+  const { copy, status } = useCopyToClipboard(1500);
 
   return (
-    <>
-      <TextActionButton
-        className="self-start"
-        icon={<ClipboardCopy aria-hidden size={14} />}
-        onClick={(e) => void copy(bugReport(operations), e)}
-      >
-        {copyStatus === "copied" && "Copied"}
-        {copyStatus === "failed" && "Copy failed"}
-        {copyStatus === "inactive" && "Copy bug report"}
-      </TextActionButton>
-      {dismissable.length > 0 && (
-        <DialogActions className="pt-2">
-          <PracticeButton
-            variant="secondary"
-            disabled={!api}
-            aria-busy={busy}
-            onClick={() => void dismissAll()}
-          >
-            {busy && <Loader2 aria-hidden className="size-4 animate-spin" />}
-            Dismiss all (keeps notes)
-          </PracticeButton>
-        </DialogActions>
-      )}
-    </>
+    <TextActionButton
+      className="self-start"
+      icon={<ClipboardCopy aria-hidden size={14} />}
+      onClick={(e) => void copy(bugReport(operations), e)}
+    >
+      {status === "copied" && "Copied"}
+      {status === "failed" && "Copy failed"}
+      {status === "inactive" && "Copy bug report"}
+    </TextActionButton>
   );
 };
 
 /** Operations the engine rejected or keeps failing to upload. */
-export const NeedsAttentionTab = () => {
-  const { result, reload } = useRecentFailedOperations();
-
+export const NeedsAttentionTab = ({
+  result,
+  onDismissed,
+}: {
+  result: RecentFailedOperations;
+  onDismissed: () => void;
+}) => {
   if (result.kind === "loading") {
     return <p className="px-1 py-4 text-sm text-muted-foreground">Loading…</p>;
   }
@@ -118,11 +84,11 @@ export const NeedsAttentionTab = () => {
           <FailedOperationRow
             key={op.operationId}
             op={op}
-            onDismissed={reload}
+            onDismissed={onDismissed}
           />
         ))}
       </OperationList>
-      <Footer operations={newestFirst} onDismissed={reload} />
+      <BugReportButton operations={newestFirst} />
     </div>
   );
 };

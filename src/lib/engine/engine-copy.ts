@@ -49,6 +49,14 @@ export const UPDATE_BROWSER_COPY =
 
 export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
+/**
+ * A failed engine logout step. The server call is best effort and the local
+ * logout goes ahead without it (RUNTIME.md "Offline logout"), so a failure
+ * here is a problem on this device, never the network.
+ */
+export const LOGOUT_FAILED_COPY =
+  "This device couldn't finish logging you out. Try again. If it keeps happening, reload the page.";
+
 export const ENGINE_FAILED_COPY =
   "Your progress couldn't be loaded. Refresh the page to try again.";
 

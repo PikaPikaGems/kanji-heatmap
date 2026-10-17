@@ -19,7 +19,6 @@ import { useSyncStatus } from "@/lib/engine/sync-queries";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { formatMegabytes } from "@/lib/format-bytes";
 import { LogoutRemovalOption } from "./LogoutRemovalOption";
-import { SyncNowButton } from "./SyncNowButton";
 
 type RemovalChoices = {
   studyData: boolean;
@@ -96,7 +95,6 @@ const LogoutForm = ({ userId }: { userId: string }) => {
               View unsynced changes
             </NoticeAction>
           </p>
-          {online && <SyncNowButton className="mt-1" />}
         </section>
       )}
       <div className="pt-4 border-t-2 border-dashed">

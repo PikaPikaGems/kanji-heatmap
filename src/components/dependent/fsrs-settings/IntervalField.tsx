@@ -1,9 +1,8 @@
 import { Slider } from "@/components/ui/slider";
 import { clamp } from "@/lib/utils";
 import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
+import { DAYS_PER_MONTH } from "./interval-limits";
 
-const DAYS_PER_MONTH = 30;
-const MAX_MONTHS = 60;
 const WARN_ABOVE_MONTHS = 14;
 
 const describeMonths = (months: number, days: number) =>
@@ -11,22 +10,29 @@ const describeMonths = (months: number, days: number) =>
     ? `${months} ${months === 1 ? "month" : "months"}`
     : `${months} months (~${Math.round(days / 365)} years)`;
 
+/** The slider's last stop as a short label: "5 years", "1 year", "9 months". */
+const describeEnd = (months: number) => {
+  if (months % 12 !== 0) return `${months} months`;
+  const years = months / 12;
+  return `${years} ${years === 1 ? "year" : "years"}`;
+};
+
 /**
  * "Maximum interval" slider: shown in months, stored as `maximumIntervalDays`.
- * A saved value above the slider's range (the engine default is 100 years)
- * keeps its own label and puts the thumb at the end; it only changes when the
- * slider moves.
+ * Its range ends at `maxMonths`; a value above it is shown at the end.
  */
 export const IntervalField = ({
   days,
+  maxMonths,
   onChange,
   error,
 }: {
   days: number;
+  maxMonths: number;
   onChange: (days: number) => void;
   error: string | undefined;
 }) => {
-  const months = Math.max(1, Math.round(days / DAYS_PER_MONTH));
+  const months = clamp(Math.round(days / DAYS_PER_MONTH), 1, maxMonths);
 
   return (
     <div className="flex flex-col gap-2">
@@ -37,13 +43,13 @@ export const IntervalField = ({
       />
       <Slider
         min={1}
-        max={MAX_MONTHS}
+        max={maxMonths}
         step={1}
-        value={[clamp(months, 1, MAX_MONTHS)]}
+        value={[months]}
         onValueChange={(values) => onChange(values[0] * DAYS_PER_MONTH)}
         thumbLabel="Maximum interval"
       />
-      <SliderEnds min="1 month" max={`${MAX_MONTHS / 12} years`} />
+      <SliderEnds min="1 month" max={describeEnd(maxMonths)} />
       {months > WARN_ABOVE_MONTHS && (
         <Warning>
           {`Setting the maximum interval above ${WARN_ABOVE_MONTHS} months can create very long gaps between reviews, increasing the risk of forgetting.`}

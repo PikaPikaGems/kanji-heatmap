@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DialogActions } from "@/components/common/DialogActions";
+import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
@@ -46,18 +47,21 @@ const RecoveryDialogSteps = () => {
 
   return (
     <div key={step.kind} className="flex flex-col gap-5 animate-fade-in-fast">
-      <div className="flex flex-col gap-2">
-        <p className="text-sm text-pretty">
-          The data saved on this device for your account couldn&apos;t be
-          opened. Keep it and retry later, or delete it and download your data
-          again.
-        </p>
-        {account.kind === "recovery" && (
-          <p className="font-mono text-xs break-all text-muted-foreground">
-            Diagnostic id: {account.diagnosticId}
+      <p className="text-sm text-pretty">
+        The data saved on this device for your account couldn&apos;t be opened.
+        Keep it and retry later, or delete it and download your data again.
+      </p>
+      {account.kind === "recovery" && (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-pretty">
+            If this keeps happening, copy this and send it to us.
           </p>
-        )}
-      </div>
+          <ErrorTerminal
+            filename="recovery.log"
+            content={`status: local_cache_recovery_required\ndiagnosticId: ${account.diagnosticId}`}
+          />
+        </div>
+      )}
       <DialogActions>
         <PracticeButton
           variant="secondary"

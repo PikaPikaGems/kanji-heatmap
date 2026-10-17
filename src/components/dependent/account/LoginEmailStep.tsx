@@ -77,8 +77,8 @@ export const LoginEmailStep = ({
         status={status}
         onSubmit={() => void requestPin()}
       />
-      <div className="flex flex-col gap-3 pt-4 border-t-2 border-dashed">
-        <p className="text-sm font-bold text-foreground text-pretty">
+      <div className="flex flex-col items-center gap-3 pt-4 border-t-2 border-dashed">
+        <p className="text-sm font-bold text-center text-foreground text-pretty">
           New? Message us on{" "}
           <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />
           , <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,
@@ -86,7 +86,7 @@ export const LoginEmailStep = ({
           <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />{" "}
           to join the waitlist.
         </p>
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
           {CONTACT_ITEMS.map((item) => (
             <LinkOutIcon
               key={item.href}

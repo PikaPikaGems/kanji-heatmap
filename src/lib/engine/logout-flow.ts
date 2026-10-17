@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { deleteAiOwnerKey } from "@/lib/ai-explain/preferences";
 import { getCurrentOwner } from "./content-owner";
 import { getEngineState } from "./engine";
-import { copyForCode } from "./engine-copy";
+import { LOGOUT_FAILED_COPY } from "./engine-copy";
 
 /**
  * The app-wide logout flow (design 5.3.1): the "Log out?" modal, then the
@@ -115,7 +115,7 @@ const runStep = async (
   const result = request.clearLocalData
     ? await engine.api.auth.logout({ clearLocalData: true })
     : await engine.api.auth.logout();
-  return result.ok ? null : copyForCode(result.error.code);
+  return result.ok ? null : LOGOUT_FAILED_COPY;
 };
 
 const runFrom = async (request: LogoutRequest, from: LogoutStep) => {

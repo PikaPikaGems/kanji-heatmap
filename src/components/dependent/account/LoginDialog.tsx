@@ -4,10 +4,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEngineState } from "@/lib/engine/engine";
 import { copyForCode } from "@/lib/engine/engine-copy";
-import {
-  closeLoginDialog,
-  useLoginDialogOpen,
-} from "@/lib/engine/login-dialog";
+import { closeLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
 import { LoginCodeStep } from "./LoginCodeStep";
 import { LoginDownloadingStep } from "./LoginDownloadingStep";
 import { LoginEmailStep } from "./LoginEmailStep";
@@ -17,8 +14,60 @@ type LoginStep =
   | { kind: "code"; email: string }
   | { kind: "downloading"; error: string | null };
 
-const LoginDialogSteps = ({ api }: { api: EngineAPI }) => {
+/**
+ * How the dialog can be dismissed: "free" (X, Escape, click outside),
+ * "no-outside" while a code is being typed (a stray click would lose it) and
+ * "locked" while the data downloads after logging in (no way out at all).
+ */
+type Dismissal = "free" | "no-outside" | "locked";
+
+const dismissalOf = (step: LoginStep): Dismissal => {
+  if (step.kind === "downloading" && step.error === null) return "locked";
+  if (step.kind === "code") return "no-outside";
+  return "free";
+};
+
+const LoginStepScreen = ({
+  api,
+  step,
+  onStep,
+  onDownload,
+}: {
+  api: EngineAPI;
+  step: LoginStep;
+  onStep: (step: LoginStep) => void;
+  onDownload: () => void;
+}) => {
+  if (step.kind === "downloading") {
+    return <LoginDownloadingStep error={step.error} onRetry={onDownload} />;
+  }
+  if (step.kind === "code") {
+    return (
+      <LoginCodeStep
+        api={api}
+        email={step.email}
+        onAction={(action) => {
+          if (action === "back") {
+            onStep({ kind: "email", email: step.email });
+            return;
+          }
+          onDownload();
+        }}
+      />
+    );
+  }
+  return (
+    <LoginEmailStep
+      api={api}
+      initialEmail={step.email}
+      onSent={(email) => onStep({ kind: "code", email })}
+    />
+  );
+};
+
+const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
   const [step, setStep] = useState<LoginStep>({ kind: "email", email: "" });
+  const dismissal = dismissalOf(step);
 
   const download = async () => {
     setStep({ kind: "downloading", error: null });
@@ -30,35 +79,33 @@ const LoginDialogSteps = ({ api }: { api: EngineAPI }) => {
     setStep({ kind: "downloading", error: copyForCode(result.error.code) });
   };
 
-  if (step.kind === "downloading") {
-    return (
-      <LoginDownloadingStep
-        error={step.error}
-        onRetry={() => void download()}
-      />
-    );
-  }
-  if (step.kind === "code") {
-    return (
-      <LoginCodeStep
-        api={api}
-        email={step.email}
-        onAction={(action) => {
-          if (action === "back") {
-            setStep({ kind: "email", email: step.email });
-            return;
-          }
-          void download();
-        }}
-      />
-    );
-  }
   return (
-    <LoginEmailStep
-      api={api}
-      initialEmail={step.email}
-      onSent={(email) => setStep({ kind: "code", email })}
-    />
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && dismissal !== "locked") closeLoginDialog();
+      }}
+    >
+      <ScrollableDialogContent
+        size="md"
+        title="Login required"
+        description="Log in to your Kanji Heatmap Premium account with an email code"
+        titleClassName="text-left"
+        hideClose={dismissal === "locked"}
+        onInteractOutside={(event) => {
+          if (dismissal !== "free") event.preventDefault();
+        }}
+      >
+        <div className="flex flex-col gap-4 px-2 pt-2 text-left">
+          <LoginStepScreen
+            api={api}
+            step={step}
+            onStep={setStep}
+            onDownload={() => void download()}
+          />
+        </div>
+      </ScrollableDialogContent>
+    </Dialog>
   );
 };
 
@@ -68,27 +115,10 @@ const LoginDialogSteps = ({ api }: { api: EngineAPI }) => {
  * so builds and browsers without the engine never show it.
  */
 export const LoginDialog = () => {
-  const open = useLoginDialogOpen();
+  const { open, session } = useLoginDialog();
   const engine = useEngineState();
   if (engine.status !== "ready") return null;
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) closeLoginDialog();
-      }}
-    >
-      <ScrollableDialogContent
-        size="md"
-        title="Login required"
-        description="Log in to your Kanji Heatmap Premium account with an email code"
-        titleClassName="text-left"
-      >
-        <div className="flex flex-col gap-4 px-2 pt-2 text-left">
-          <LoginDialogSteps api={engine.api} />
-        </div>
-      </ScrollableDialogContent>
-    </Dialog>
-  );
+  // A new key per opening, so the steps start over each time.
+  return <LoginDialogFlow key={session} api={engine.api} open={open} />;
 };

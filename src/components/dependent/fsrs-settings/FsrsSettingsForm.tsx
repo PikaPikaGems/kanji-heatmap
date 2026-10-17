@@ -19,6 +19,7 @@ import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { SettingsSection, SwitchField } from "./FieldParts";
 import { IntervalField } from "./IntervalField";
+import { fitIntervalToSlider, sliderMaxMonths } from "./interval-limits";
 import { ModelWeightsField } from "./ModelWeightsField";
 import { RetentionField } from "./RetentionField";
 import { StepsField } from "./StepsField";
@@ -109,7 +110,11 @@ export const FsrsSettingsForm = ({
   notice: string | null;
 }) => {
   const defaults = api.reviews.settings.defaultSettings;
-  const [draft, setDraft] = useState(initial);
+  const engineMaxDays = defaults.maximumIntervalDays;
+  // A maximum interval above the slider's range is shown (and saved) at its end.
+  const [draft, setDraft] = useState(() =>
+    fitIntervalToSlider(initial, engineMaxDays)
+  );
   const [save, setSave] = useState<SaveStatus>({ kind: "idle" });
   const [openSections, setOpenSections] = useState<string[]>(["intervals"]);
   const busy = save.kind === "busy";
@@ -185,6 +190,7 @@ export const FsrsSettingsForm = ({
             />
             <IntervalField
               days={draft.maximumIntervalDays}
+              maxMonths={sliderMaxMonths(engineMaxDays)}
               onChange={(maximumIntervalDays) => edit({ maximumIntervalDays })}
               error={errorFor("maximumIntervalDays")}
             />
@@ -242,7 +248,7 @@ export const FsrsSettingsForm = ({
             icon={<RotateCcw size={14} />}
             className="-ml-1"
             disabled={busy}
-            onClick={() => edit(defaults)}
+            onClick={() => edit(fitIntervalToSlider(defaults, engineMaxDays))}
           >
             Restore all defaults
           </TextActionButton>

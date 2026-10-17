@@ -3,6 +3,7 @@ import type { RecentFailedOperation } from "engine-contract";
 import { Copy, ExternalLink, Trash2 } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
+import { NoticeAction } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
@@ -22,6 +23,13 @@ type RowStatus =
   | { kind: "idle" }
   | { kind: "confirm-dismiss" }
   | { kind: "busy" };
+
+/** "Copy it first…" in the dismiss warning, and what it says after a click. */
+const COPY_NOTICE = {
+  inactive: { label: "Copy", after: " it first if you still need it." },
+  copied: { label: "Copied", after: " to your clipboard." },
+  failed: { label: "Copy failed", after: ". Try again." },
+};
 
 const failedDate = (failedAt: number) =>
   new Date(failedAt).toLocaleDateString(undefined, {
@@ -108,8 +116,16 @@ export const FailedOperationRow = ({
           className="flex flex-col gap-3 pt-1 animate-fade-in-fast"
         >
           <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
-            ⚠️ Dismissing removes this note&apos;s text from this device. Copy
-            it first if you still need it.
+            ⚠️ Dismissing removes this note&apos;s text from this device.
+            {text !== null && (
+              <>
+                {" "}
+                <NoticeAction onClick={() => void copy(text)}>
+                  {COPY_NOTICE[copyStatus].label}
+                </NoticeAction>
+                {COPY_NOTICE[copyStatus].after}
+              </>
+            )}
           </p>
           <DialogActions>
             <PracticeButton
