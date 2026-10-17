@@ -13,7 +13,7 @@ import {
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
-import { ProgressCards } from "./ProgressCard";
+import { ProgressTable } from "./ProgressTable";
 import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
 
 const Spinner = () => (
@@ -33,11 +33,11 @@ const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
   </UserNotice>
 );
 
-/** Logged out: every card with its defaults, under the log-in notice. */
+/** Logged out: the table with its defaults, under the log-in notice. */
 const SignedOutKanjiProgress = () => (
   <div className="flex flex-col gap-3 pb-1">
     <LoginNotice to="track your progress on this kanji" className="px-1 pt-1" />
-    <ProgressCards item={null} />
+    <ProgressTable item={null} />
   </div>
 );
 
@@ -81,7 +81,7 @@ const NotInPileKanjiProgress = ({
           </p>
         )}
       </div>
-      <ProgressCards item={null} />
+      <ProgressTable item={null} />
     </div>
   );
 };
@@ -121,7 +121,7 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   }
   return (
     <div className="flex flex-col gap-1 pb-1">
-      <ProgressCards item={item} />
+      <ProgressTable item={item} />
       <div className="px-1 text-left">
         <RemoveFromReviewPile kanji={kanji} disabled={blocker != null} />
       </div>
@@ -131,8 +131,8 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
 
 /**
  * Review progress for one kanji, from its review-pile item. What shows depends
- * on the account: the cards when logged in (with defaults while the kanji is
- * not in the pile), the same cards with defaults and a log-in notice when
+ * on the account: the table when logged in (with defaults while the kanji is
+ * not in the pile), the same table with defaults and a log-in notice when
  * logged out, and an explanation otherwise. The caller hides the section in
  * builds without the engine.
  */
