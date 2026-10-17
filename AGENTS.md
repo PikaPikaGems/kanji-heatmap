@@ -16,7 +16,7 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Fade-ins: content that appears or swaps because of a toggle, switch or tab fades in (`animate-fade-in-fast` on a wrapper keyed by the control's value) so it isn't jarring. See `fade-in-swapped-content.mdc`.
 - Warnings: warning and error text is bold yellow (`font-bold text-yellow-600 dark:text-yellow-400`), never thin red; red stays for destructive buttons, dots and borders. See `warnings-bold-yellow.mdc`.
 - Buttons: text buttons never use the default shadcn `Button`; use `PracticeButton`, the dotted `TextActionButton`, an inline `NoticeAction`, or a pill. See `text-buttons-not-shadcn.mdc`.
-- Dialogs: buttons go in `DialogActions` (right-aligned, main action rightmost; stacked full width on phones, main action on top). See `dialog-buttons.mdc`.
+- Dialogs: buttons go in `DialogActions` (right-aligned, main action rightmost; stacked full width on phones, main action on top; Cancel is a `ghost` PracticeButton). See `dialog-buttons.mdc`.
 - Notices: messages users must read use `UserNotice` (⚠️ + normal text color, inline underlined actions); logged-out states use `LoginNotice`. See `user-notices.mdc`.
 - Tailwind: colocate `className` strings; do not extract `_CN` (or similar) constants unless the same string is reused in multiple places. See `inline-tailwind-classes.mdc`.
 

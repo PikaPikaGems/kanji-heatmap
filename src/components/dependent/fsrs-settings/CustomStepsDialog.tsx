@@ -77,7 +77,7 @@ export const CustomStepsDialog = ({
               <Warning key={warning}>{warning}</Warning>
             ))}
           <DialogActions className="pt-3">
-            <PracticeButton variant="secondary" onClick={onClose}>
+            <PracticeButton variant="ghost" onClick={onClose}>
               Cancel
             </PracticeButton>
             <PracticeButton type="submit" disabled={text.trim() === ""}>

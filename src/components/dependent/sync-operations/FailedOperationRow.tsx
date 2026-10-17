@@ -113,7 +113,7 @@ export const FailedOperationRow = ({
           </p>
           <DialogActions>
             <PracticeButton
-              variant="secondary"
+              variant="ghost"
               onClick={() => setStatus({ kind: "idle" })}
             >
               Cancel

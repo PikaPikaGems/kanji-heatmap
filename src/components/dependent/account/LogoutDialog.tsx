@@ -156,7 +156,7 @@ const LogoutForm = ({ userId }: { userId: string }) => {
         </fieldset>
       </div>
       <DialogActions className="pt-1">
-        <PracticeButton variant="secondary" onClick={closeLogoutDialog}>
+        <PracticeButton variant="ghost" onClick={closeLogoutDialog}>
           Cancel
         </PracticeButton>
         <PracticeButton

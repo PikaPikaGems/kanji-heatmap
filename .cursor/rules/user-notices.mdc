@@ -11,7 +11,7 @@ A notice the user should read (not logged in, read-only, unsaved draft, can't sa
 - Actions are underlined words inside the sentence (`NoticeAction`), not separate boxed buttons.
 - No bordered boxes with big buttons.
 
-For logged-out states always use `LoginNotice` (`@/components/dependent/account/LoginNotice`): "⚠️ You're not logged in. **Log in** to {what it unlocks}."
+For logged-out states always use `LoginNotice` (`@/components/dependent/account/LoginNotice`): "⚠️ You're not logged in. **Log in** to {what it unlocks}." On phones it shortens itself to "**Log in** to {what it unlocks}." (no ⚠️).
 
 ```tsx
 // ❌ BAD

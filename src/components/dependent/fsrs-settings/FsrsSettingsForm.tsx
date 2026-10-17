@@ -264,7 +264,7 @@ export const FsrsSettingsForm = ({
           </p>
         )}
         <DialogActions>
-          <PracticeButton variant="secondary" onClick={closeFsrsSettings}>
+          <PracticeButton variant="ghost" onClick={closeFsrsSettings}>
             Cancel
           </PracticeButton>
           <PracticeButton

@@ -31,7 +31,7 @@ const RecoveryDialogSteps = () => {
         </p>
         <DialogActions>
           <PracticeButton
-            variant="secondary"
+            variant="ghost"
             onClick={() => setStep({ kind: "choose" })}
           >
             Cancel

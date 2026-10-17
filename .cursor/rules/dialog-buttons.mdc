@@ -12,9 +12,11 @@ Put a dialog's buttons in `DialogActions` (`@/components/common/DialogActions`),
 
 ```tsx
 <DialogActions>
-  <PracticeButton variant="secondary" onClick={onCancel}>Cancel</PracticeButton>
+  <PracticeButton variant="ghost" onClick={onCancel}>Cancel</PracticeButton>
   <PracticeButton variant="danger" onClick={onDelete}>Delete</PracticeButton>
 </DialogActions>
 ```
+
+Cancel is always a borderless `ghost` PracticeButton: the corner close button already offers a way out, so Cancel stays quiet next to the main action.
 
 A screen with a single way out ("You're logged out" → Close) uses one full-width `PracticeButton size="md"` instead. Low-key extras ("Reset to defaults") go in the dialog body as a `TextActionButton`, not in the button row.

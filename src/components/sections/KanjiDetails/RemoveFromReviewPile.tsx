@@ -51,7 +51,7 @@ const ConfirmRemove = ({
         </p>
       )}
       <DialogActions>
-        <PracticeButton variant="secondary" disabled={busy} onClick={onCancel}>
+        <PracticeButton variant="ghost" disabled={busy} onClick={onCancel}>
           Cancel
         </PracticeButton>
         <PracticeButton

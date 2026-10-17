@@ -74,7 +74,7 @@ const WeightsDialog = ({
             Reset to defaults
           </TextActionButton>
           <DialogActions className="pt-3">
-            <PracticeButton variant="secondary" onClick={onClose}>
+            <PracticeButton variant="ghost" onClick={onClose}>
               Cancel
             </PracticeButton>
             <PracticeButton onClick={apply}>Apply weights</PracticeButton>
