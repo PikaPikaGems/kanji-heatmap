@@ -266,6 +266,9 @@ const LoadedActiveStudyNotes = ({
       setState({ mode: "view", kept: null, changedElsewhere: false });
       return;
     }
+    // An autosave still waiting from the interrupted draft must not save the
+    // text this starts with: it stays unsaved until the person edits it.
+    cancelTimer();
     setSave({ kind: "idle" });
     setState(startEdit(note, withHeldDraft(note?.content ?? "", state.kept)));
   };
@@ -287,6 +290,7 @@ const LoadedActiveStudyNotes = ({
 
   const addLoginDraft = () => {
     if (loginDraft?.kind !== "offered") return;
+    cancelTimer();
     setSave({ kind: "idle" });
     setState(
       startEdit(note, appendDraft(note?.content ?? "", loginDraft.text))
