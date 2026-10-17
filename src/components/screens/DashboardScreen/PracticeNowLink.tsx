@@ -1,16 +1,15 @@
 import { Link } from "@/components/dependent/routing";
-import { practiceButtonVariants } from "@/components/ui/practice-button-variants";
-import { cn } from "@/lib/utils";
 
 /**
- * A heatmap cell's way into that batch or challenge: a primary
- * PracticeButton, as a link because it navigates.
+ * A heatmap cell's way into that batch or challenge: the low-key dotted
+ * underline text action (TextActionButton's look), as a link because it
+ * navigates.
  */
 export const PracticeNowLink = ({ to }: { to: string }) => (
   <Link
     to={to}
-    className={cn(practiceButtonVariants({ size: "md" }), "h-10 text-sm")}
+    className="flex items-center justify-center w-full gap-1 px-1 text-xs leading-loose underline rounded-lg text-foreground decoration-dotted underline-offset-4 hover:bg-neon-accent hover:text-black"
   >
-    Practice Now
+    <strong>Practice Now</strong>
   </Link>
 );

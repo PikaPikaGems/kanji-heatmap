@@ -193,14 +193,16 @@ export const topDifficultCards = (
     .slice(0, TOP_COUNT);
 
 /**
- * Cards that fell back to relearning, newest review first. Pile rows keep
- * running totals rather than the last rating, so relearning is what a recent
- * mistake looks like.
+ * Cards of one type that fell back to relearning, newest review first. Pile
+ * rows keep running totals rather than the last rating, so relearning is what
+ * a recent mistake looks like.
  */
 export const recentMistakeCards = (
-  pile: readonly ReviewPileItemView[]
+  pile: readonly ReviewPileItemView[],
+  cardType: CardType
 ): TopCard[] =>
   cardsWhere(pile, (card) => card.learningState === "relearning")
+    .filter((card) => card.cardType === cardType)
     // UTCTimestamp is fixed-width RFC 3339, so strings sort chronologically.
     .sort((a, b) => {
       const aAt = a.lastReviewedAt ?? "";

@@ -71,6 +71,13 @@ export const OverviewCaption = ({
   </div>
 );
 
+/** Stands in for an OverviewCaption while its value loads. */
+export const OverviewCaptionSkeleton = () => (
+  <div className="flex justify-center">
+    <div className="w-40 h-5 rounded-full bg-muted animate-pulse" />
+  </div>
+);
+
 export type StatCount = {
   value: number;
   /** e.g. "Days", "Rounds", "Batches", "Sessions". */
@@ -139,6 +146,20 @@ export const ActivityStatCard = ({
       {counts.map((count, i) => (
         <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}
+    </div>
+  </div>
+);
+
+/** Stands in for an ActivityStatCard while its counts load. */
+export const ActivityStatCardSkeleton = () => (
+  <div className="flex flex-col w-full min-w-0 gap-2 px-2.5 py-2 border rounded-xl border-foreground/5 bg-muted/10 animate-pulse sm:px-3 sm:py-2.5">
+    <div className="flex items-center min-w-0 gap-2">
+      <div className="rounded-lg size-7 shrink-0 bg-muted" />
+      <div className="w-24 h-3 rounded-full bg-muted" />
+    </div>
+    <div className="flex flex-col items-start pl-0.5 gap-x-4 gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline">
+      <div className="w-14 h-7 rounded-lg bg-muted" />
+      <div className="h-[18px] w-16 rounded-lg bg-muted" />
     </div>
   </div>
 );

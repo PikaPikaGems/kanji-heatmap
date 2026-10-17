@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import type { CardType, FsrsRating, ReviewPileItemView } from "engine-contract";
+import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
 import { TwoWaySwitch } from "../TwoWaySwitch";
@@ -23,22 +23,19 @@ const TopListHeader = ({ title, about }: { title: string; about: string }) => (
 );
 
 /**
- * The cards as round-recap tiles (each opens the kanji drawer), with a small
- * caption under each one.
+ * The cards as round-recap tiles (each opens the kanji drawer), with an
+ * optional small caption under each one.
  */
 const TopTiles = ({
   cards,
   getInfo,
   empty,
   caption,
-  rating,
 }: {
   cards: TopCard[];
   getInfo: GetBasicKanjiInfo;
   empty: string;
-  caption: (card: TopCard) => ReactNode;
-  /** Border every tile as a mastery recap shows this rating. */
-  rating?: FsrsRating;
+  caption?: (card: TopCard) => ReactNode;
 }) => {
   if (cards.length === 0) {
     return (
@@ -56,31 +53,49 @@ const TopTiles = ({
             kanji={card.kanji}
             keyword={getInfo(card.kanji)?.keyword ?? "..."}
             correct={false}
-            rating={rating}
           />
-          <span className="text-[10px] font-semibold leading-none text-muted-foreground tabular-nums">
-            {caption(card)}
-          </span>
+          {caption && (
+            <span className="text-[10px] font-semibold leading-none text-muted-foreground tabular-nums">
+              {caption(card)}
+            </span>
+          )}
         </li>
       ))}
     </ol>
   );
 };
 
-const MostDifficult = ({
+/**
+ * One top list with a Reading / Writing switch: the heading, the switch, and
+ * the tiles for the side that is on. Swapped content fades in.
+ */
+const TopListByCardType = ({
   pile,
   getInfo,
+  title,
+  about,
+  cardsFor,
+  empty,
+  caption,
 }: {
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
+  title: (cardType: CardType) => string;
+  about: string;
+  cardsFor: (
+    pile: readonly ReviewPileItemView[],
+    cardType: CardType
+  ) => TopCard[];
+  empty: (cardType: CardType) => string;
+  caption?: (card: TopCard) => ReactNode;
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
+  const heading = title(cardType);
   return (
     <section>
-      <TopListHeader
-        title="Top 10 Most Difficult"
-        about="Your hardest cards by difficulty, from 1 (easy) to 10 (hard)."
-      />
+      <div key={heading} className="animate-fade-in-fast">
+        <TopListHeader title={heading} about={about} />
+      </div>
       <div className="mt-3">
         <TwoWaySwitch
           left="Reading"
@@ -94,37 +109,15 @@ const MostDifficult = ({
       </div>
       <div key={cardType} className="animate-fade-in-fast">
         <TopTiles
-          cards={topDifficultCards(pile, cardType)}
+          cards={cardsFor(pile, cardType)}
           getInfo={getInfo}
-          empty={`No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards studied yet.`}
-          caption={(card) => card.difficulty.toFixed(1)}
+          empty={empty(cardType)}
+          caption={caption}
         />
       </div>
     </section>
   );
 };
-
-const RecentMistakes = ({
-  pile,
-  getInfo,
-}: {
-  pile: readonly ReviewPileItemView[];
-  getInfo: GetBasicKanjiInfo;
-}) => (
-  <section>
-    <TopListHeader
-      title="Top 10 Recent Mistakes"
-      about="Cards you missed lately that are being relearned, newest first."
-    />
-    <TopTiles
-      cards={recentMistakeCards(pile)}
-      getInfo={getInfo}
-      empty="No cards are being relearned."
-      caption={(card) => CARD_TYPE_LABELS[card.cardType]}
-      rating="again"
-    />
-  </section>
-);
 
 /** Top 10 hardest cards and top 10 recent mistakes, one row each. */
 export const MasteryTopLists = ({
@@ -135,7 +128,26 @@ export const MasteryTopLists = ({
   getInfo: GetBasicKanjiInfo;
 }) => (
   <div className="flex flex-col gap-8 pt-6 mt-8 border-t border-dotted">
-    <MostDifficult pile={pile} getInfo={getInfo} />
-    <RecentMistakes pile={pile} getInfo={getInfo} />
+    <TopListByCardType
+      pile={pile}
+      getInfo={getInfo}
+      title={() => "Top 10 Most Difficult"}
+      about="Your hardest cards by difficulty, from 1 (easy) to 10 (hard)."
+      cardsFor={topDifficultCards}
+      empty={(cardType) =>
+        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards studied yet.`
+      }
+      caption={(card) => card.difficulty.toFixed(1)}
+    />
+    <TopListByCardType
+      pile={pile}
+      getInfo={getInfo}
+      title={(cardType) => `Top 10 ${CARD_TYPE_LABELS[cardType]} Mistakes`}
+      about="Cards you missed lately that are being relearned, newest first."
+      cardsFor={recentMistakeCards}
+      empty={(cardType) =>
+        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards are being relearned.`
+      }
+    />
   </div>
 );

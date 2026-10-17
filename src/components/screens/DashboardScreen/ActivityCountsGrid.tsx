@@ -10,7 +10,7 @@ import {
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
 } from "@/lib/pages/practice-pages";
-import { ActivityStatCard } from "./ActivityStatCard";
+import { ActivityStatCard, ActivityStatCardSkeleton } from "./ActivityStatCard";
 
 /**
  * One card per activity: its days, then its reviews / rounds / batches /
@@ -119,3 +119,19 @@ export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => {
     </div>
   );
 };
+
+/** The same grid of cards as pulsing placeholders, while the counts load. */
+export const ActivityCountsGridSkeleton = () => (
+  <div className="flex flex-col gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      {Array.from({ length: 2 }, (_, i) => (
+        <ActivityStatCardSkeleton key={i} />
+      ))}
+    </div>
+    <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
+      {Array.from({ length: 4 }, (_, i) => (
+        <ActivityStatCardSkeleton key={i} />
+      ))}
+    </div>
+  </div>
+);

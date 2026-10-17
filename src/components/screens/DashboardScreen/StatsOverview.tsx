@@ -13,11 +13,25 @@ import {
   useDailySummaries,
 } from "@/hooks/use-activity-summaries";
 import { formatRawCount } from "@/lib/format-count";
-import { ActivityCountsGrid } from "./ActivityCountsGrid";
-import { OverviewCaption } from "./ActivityStatCard";
+import {
+  ActivityCountsGrid,
+  ActivityCountsGridSkeleton,
+} from "./ActivityCountsGrid";
+import { OverviewCaption, OverviewCaptionSkeleton } from "./ActivityStatCard";
 import { DashboardPanel } from "./DashboardPanel";
 import { QueryFallback } from "./QueryFallback";
 import { useLiveOrEmpty } from "./use-live-or-empty";
+
+/** The overview's cards and its two captions as pulsing placeholders. */
+const StatsOverviewSkeleton = () => (
+  <>
+    <ActivityCountsGridSkeleton />
+    <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row sm:gap-8">
+      <OverviewCaptionSkeleton />
+      <OverviewCaptionSkeleton />
+    </div>
+  </>
+);
 
 const StatsOverviewBody = () => {
   const allTimeSnapshot = useAllTimeSummary();
@@ -43,7 +57,10 @@ const StatsOverviewBody = () => {
 
   if (!allTime || !fillTheKanjiDaily) {
     return (
-      <QueryFallback snapshots={[allTimeSnapshot, fillTheKanjiDaysSnapshot]} />
+      <QueryFallback
+        snapshots={[allTimeSnapshot, fillTheKanjiDaysSnapshot]}
+        skeleton={<StatsOverviewSkeleton />}
+      />
     );
   }
 

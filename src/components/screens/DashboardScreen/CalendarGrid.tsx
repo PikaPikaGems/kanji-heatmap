@@ -19,7 +19,8 @@ const CELL_PX = 12;
 
 type CellProps = {
   dateKey: string | null;
-  byDay: ActivityByDay;
+  /** null while the activity is still loading: pulsing placeholder squares. */
+  byDay: ActivityByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
   todayKey: string;
@@ -70,6 +71,15 @@ export const CalendarDayCell = ({
   if (dateKey == null) {
     return <div aria-hidden style={{ width: CELL_PX, height: CELL_PX }} />;
   }
+  if (byDay == null) {
+    return (
+      <div
+        aria-hidden
+        className="rounded-[2px] bg-muted animate-pulse"
+        style={{ width: CELL_PX, height: CELL_PX }}
+      />
+    );
+  }
 
   const isToday = dateKey === todayKey;
   const n = dayTotalForFilters(getDayCounts(byDay, dateKey), filters);
@@ -109,7 +119,7 @@ export const CalendarGrid = ({
 }: {
   weeks: (string | null)[][];
   monthLabels: { weekIndex: number; label: string }[];
-  byDay: ActivityByDay;
+  byDay: ActivityByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {

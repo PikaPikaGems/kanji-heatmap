@@ -16,15 +16,19 @@ import { snapshotValue } from "@/lib/engine/store-cache";
 import { useDailySummaries } from "@/hooks/use-activity-summaries";
 import { useActivityHeatmapSettings } from "@/hooks/use-activity-heatmap-settings";
 import { HeatmapLegendRow } from "./HeatmapLegendRow";
-import { ActivityCountsGrid } from "./ActivityCountsGrid";
+import {
+  ActivityCountsGrid,
+  ActivityCountsGridSkeleton,
+} from "./ActivityCountsGrid";
 import { ActivityKindFiltersRow } from "./ActivityKindFiltersRow";
 import { DurationNav } from "./DurationNav";
 import { CalendarGrid } from "./CalendarGrid";
 import { VerticalCalendarGrid } from "./VerticalCalendarGrid";
 import { DashboardPanel } from "./DashboardPanel";
+import { isQueryFailed } from "./is-query-failed";
 import { QueryFallback } from "./QueryFallback";
 import { useLiveOrEmpty } from "./use-live-or-empty";
-import { OverviewCaption } from "./ActivityStatCard";
+import { OverviewCaption, OverviewCaptionSkeleton } from "./ActivityStatCard";
 import { formatRawCount } from "@/lib/format-count";
 
 const ActivityHeatmapGrid = ({
@@ -36,7 +40,8 @@ const ActivityHeatmapGrid = ({
 }: {
   vertical: boolean;
   range: DateRange;
-  byDay: ActivityByDay;
+  /** null while loading: the same grid with pulsing placeholder squares. */
+  byDay: ActivityByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {
@@ -76,6 +81,15 @@ const PeriodSummary = ({ stats }: { stats: ActivityStats }) => (
   </>
 );
 
+const PeriodSummarySkeleton = () => (
+  <>
+    <ActivityCountsGridSkeleton />
+    <div className="mt-4">
+      <OverviewCaptionSkeleton />
+    </div>
+  </>
+);
+
 const ActivityCalendarHeatmapBody = () => {
   const [{ duration, filters, vertical }, setSetting] =
     useActivityHeatmapSettings();
@@ -101,7 +115,18 @@ const ActivityCalendarHeatmapBody = () => {
           maxN={maxDayTotalInRange(byDay, range, filters)}
         />
       ) : (
-        <QueryFallback snapshots={[snapshot]} />
+        <QueryFallback
+          snapshots={[snapshot]}
+          skeleton={
+            <ActivityHeatmapGrid
+              vertical={vertical}
+              range={range}
+              byDay={null}
+              filters={filters}
+              maxN={0}
+            />
+          }
+        />
       )}
 
       <div className="mt-2">
@@ -118,14 +143,19 @@ const ActivityCalendarHeatmapBody = () => {
         onCompactChange={(v) => setSetting("vertical", v)}
       />
 
-      {byDay && (
+      {/* Nothing under a failed read; its note is shown above. */}
+      {(byDay || !isQueryFailed(snapshot)) && (
         <div className="mt-6">
           <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
             In this period
           </p>
-          <PeriodSummary
-            stats={summarizeActivityInRange(byDay, range, filters)}
-          />
+          {byDay ? (
+            <PeriodSummary
+              stats={summarizeActivityInRange(byDay, range, filters)}
+            />
+          ) : (
+            <PeriodSummarySkeleton />
+          )}
         </div>
       )}
     </div>
