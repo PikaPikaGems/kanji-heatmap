@@ -9,6 +9,7 @@ import {
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { MasteryScaleLegend } from "@/components/screens/MasteryScreen/MasteryLegend";
+import { MeasureIntro } from "@/components/screens/MasteryScreen/MeasureIntro";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import { MasteryCard } from "./MasteryCard";
 import {
@@ -23,7 +24,8 @@ const isMasteryMetric = (value: string): value is MasteryMetric =>
 
 /**
  * The JLPT / Jouyou switch, then the Mastery / Stability / Difficulty tabs,
- * then a card of thin segmented bars per card kind and the color scale.
+ * then what the picked metric means (its ⓘ opens the bands), a card of thin
+ * segmented bars per card kind and the color scale.
  */
 export const MasteryBars = ({
   pile,
@@ -72,6 +74,13 @@ export const MasteryBars = ({
             key={grouping === JLPT_GROUPING ? "jlpt" : "jouyou"}
             className="animate-fade-in-fast"
           >
+            <div className="flex justify-center mb-3">
+              <MeasureIntro
+                measure={value}
+                combined={true}
+                className="text-center text-balance"
+              />
+            </div>
             <div className="grid gap-3 md:grid-cols-3">
               {MASTERY_CARD_KINDS.map((kind) => (
                 <MasteryCard
