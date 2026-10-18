@@ -8,16 +8,10 @@
  * set-sizes.json.
  */
 export const FILL_THE_KANJI_SETS = [
-  {
-    id: "everyday-phrases-onomatopoeia",
-    label: "💬 Everyday Phrases",
-    unit: "sentences",
-  },
-  {
-    id: "short-phrases",
-    label: "⚡ Short Phrases",
-    unit: "phrases",
-  },
+  { id: "everyday-1", label: "💬 Everyday 1", unit: "sentences" },
+  { id: "everyday-2", label: "💬 Everyday 2", unit: "sentences" },
+  { id: "everyday-3", label: "💬 Everyday 3", unit: "sentences" },
+  { id: "short-phrases-2", label: "⚡ Short Phrases", unit: "phrases" },
   { id: "n5", label: "🥚 N5 Grammar", unit: "sentences" },
   { id: "n4", label: "🐣 N4 Grammar", unit: "sentences" },
   { id: "n3", label: "🐥 N3 Grammar", unit: "sentences" },
@@ -43,11 +37,10 @@ export const FILL_THE_KANJI_SETS = [
     label: "🌷 Fluent",
     unit: "sentences",
   },
-  {
-    id: "verb-focused",
-    label: "🏃 Verbs",
-    unit: "sentences",
-  },
+  { id: "verb-1", label: "🏃 Verbs I", unit: "sentences" },
+  { id: "verb-2", label: "🏃 Verbs II", unit: "sentences" },
+  { id: "verb-3", label: "🏃 Verbs III", unit: "sentences" },
+  { id: "verb-4", label: "🏃 Verbs IV", unit: "sentences" },
   { id: "emoji", label: "😀 Emoji", unit: "emoji" },
 ] as const;
 
@@ -60,7 +53,7 @@ export const FILL_THE_KANJI_SET_GROUPS: {
 }[] = [
   {
     title: "Everyday Japanese",
-    setIds: ["everyday-phrases-onomatopoeia", "short-phrases"],
+    setIds: ["everyday-1", "everyday-2", "everyday-3", "short-phrases-2"],
   },
   {
     title: "Grammar Sentences",
@@ -70,5 +63,8 @@ export const FILL_THE_KANJI_SET_GROUPS: {
     title: "Basic to Fluent",
     setIds: ["beginner-1", "beginner-2", "beginner-3"],
   },
-  { title: "Verbs and Emoji", setIds: ["verb-focused", "emoji"] },
+  {
+    title: "Verbs and Emoji",
+    setIds: ["verb-1", "verb-2", "verb-3", "verb-4", "emoji"],
+  },
 ];
