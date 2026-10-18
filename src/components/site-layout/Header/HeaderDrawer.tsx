@@ -26,6 +26,7 @@ import {
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { AccountSection } from "@/components/dependent/account/AccountSection";
 import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
+import { CumUseGraphModal } from "@/components/screens/CumUseScreen/CumUseGraphModal";
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
@@ -45,7 +46,12 @@ const InfoLink = ({ href, title }: { href: string; title: string }) => (
   </DrawerPrimitive.Close>
 );
 
-type OpenedModal = "none" | "sidebar" | "install-guide" | "settings";
+type OpenedModal =
+  | "none"
+  | "sidebar"
+  | "install-guide"
+  | "settings"
+  | "cum-use-graph";
 
 const HeaderDrawerContent = ({
   due,
@@ -98,10 +104,14 @@ const HeaderDrawerContent = ({
 
       <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
         <div className="flex justify-center w-full">
-          <InfoLink
-            href={cumUseGraphPageMeta.href}
-            title={cumUseGraphPageMeta.title}
-          />
+          <button
+            type="button"
+            onClick={() => onAction("cum-use-graph")}
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`${cnTextLink} whitespace-nowrap text-xs`}
+          >
+            {cumUseGraphPageMeta.title}
+          </button>
         </div>
         {infoLinks.map((item) => (
           <InfoLink key={item.href} href={item.href} title={item.title} />
@@ -173,6 +183,12 @@ const HeaderDrawer = ({
       <SettingsModal
         open={openedModal === "settings"}
         onOpenChange={(open) => setOpenedModal(open ? "settings" : "sidebar")}
+      />
+      <CumUseGraphModal
+        open={openedModal === "cum-use-graph"}
+        onOpenChange={(open) =>
+          setOpenedModal(open ? "cum-use-graph" : "sidebar")
+        }
       />
       <InstallAppModal
         open={openedModal === "install-guide"}

@@ -50,19 +50,11 @@ const SetDetail = ({
           <div className="text-muted-foreground">
             {metric === "attemptCount"
               ? attemptCountLabel(stats.timesTaken)
-              : band === 0 && metric === "bestSpeedOver70"
-                ? "No run above 70% accuracy"
-                : HEATMAP_METRIC_BAND_LABELS[metric][band]}
+              : HEATMAP_METRIC_BAND_LABELS[metric][band]}
           </div>
           <div className="flex justify-between gap-4">
             <span>Best speed</span>
             <span className="font-bold tabular-nums">{stats.bestCpm} CPM</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Best speed (&gt;70%)</span>
-            <span className="font-bold tabular-nums">
-              {stats.bestCpmWithAccuracyOver70 ?? "—"}
-            </span>
           </div>
           <div className="flex justify-between gap-4">
             <span>Best accuracy</span>

@@ -1,5 +1,10 @@
 import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
 import type { ReactNode } from "react";
+import type { ReviewPileItemView } from "engine-contract";
+import { FreqSquare } from "@/components/common/freq/FreqSquare";
+import { getBandFillCn } from "@/lib/engine/mastery-colors";
+import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import { itemBand, MASTERY_LEVEL_LABELS } from "@/lib/engine/mastery-metrics";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
@@ -58,6 +63,22 @@ const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
   </UserNotice>
 );
 
+/**
+ * "Mastery [] Fresh" next to "✓ In review pile": the kanji's combined mastery
+ * (the weaker of reading and writing), "Not started" until both are reviewed.
+ */
+const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
+  const band = itemBand(item, "combined", "mastery", Date.now());
+  const label = band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band];
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2 text-xs text-muted-foreground">
+      Mastery
+      <FreqSquare srOnly="" cn={getBandFillCn("mastery", band)} />
+      <span className="font-bold text-foreground">{label}</span>
+    </span>
+  );
+};
+
 /** Logged in: reads `reviews.pile.watch(kanji)`, adds with the anchor word. */
 const ActiveReviewPileButton = ({
   kanji,
@@ -78,9 +99,10 @@ const ActiveReviewPileButton = ({
   if (current) {
     return (
       <div className="flex flex-col items-start min-w-0">
-        <span className="px-2 py-2 text-sm font-bold text-green-500">
+        <span className="px-2 pt-2 pb-1 text-sm font-bold text-green-500">
           ✓ In review pile
         </span>
+        <PileMastery item={current} />
         {blocker && (
           <Note tone="info">
             <WriteBlockerCopy blocker={blocker} />

@@ -17,9 +17,8 @@ const ScaleSquare = ({ label, cn }: { label: string; cn: string }) => (
 
 /**
  * The site's heatmap legend (like "Less [] [] [] [] [] More") for a mastery
- * measure: the see-through "Not started" square on its own, then the four
- * bands between the measure's end words, "[] Not started  Fresh [][][][]
- * Mastered". Wraps the two halves onto two lines when space runs out.
+ * measure: the see-through "Not started" square, then the four bands, in one
+ * run: "Not started [][][][][] Mastered".
  */
 export const MasteryScaleLegend = ({
   measure,
@@ -27,32 +26,19 @@ export const MasteryScaleLegend = ({
 }: {
   measure: MasteryMetric;
   className?: string;
-}) => {
-  const { from, to } = SCALE_END_LABELS[measure];
-  return (
-    <div
-      className={cn(
-        "flex flex-wrap items-center gap-x-3 gap-y-1 my-3 text-xs",
-        className
-      )}
-    >
-      <div className="flex items-center gap-1">
-        <span aria-hidden className="inline-flex shrink-0">
-          <FreqSquare srOnly="" cn={getBandFillCn(measure, null)} />
-        </span>
-        {NOT_STARTED_LABEL}
-      </div>
-      <div className="flex items-center gap-1">
-        {from}
-        {getBandLabels(measure).map((label, band) => (
-          <ScaleSquare
-            key={label}
-            label={label}
-            cn={getBandFillCn(measure, band)}
-          />
-        ))}
-        {to}
-      </div>
-    </div>
-  );
-};
+}) => (
+  <div
+    className={cn("flex flex-wrap items-center gap-1 my-3 text-xs", className)}
+  >
+    {NOT_STARTED_LABEL}
+    <ScaleSquare label={NOT_STARTED_LABEL} cn={getBandFillCn(measure, null)} />
+    {getBandLabels(measure).map((label, band) => (
+      <ScaleSquare
+        key={label}
+        label={label}
+        cn={getBandFillCn(measure, band)}
+      />
+    ))}
+    {SCALE_END_LABELS[measure]}
+  </div>
+);

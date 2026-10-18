@@ -5,26 +5,23 @@ import { getActivityLevel } from "./queries";
 
 /** Which stat a Speed Katakana heatmap cell's color represents. */
 export type HeatmapCellMetric =
-  | "bestSpeedOver70"
   | "attemptCount"
   | "bestAccuracy"
   | "bestSpeed"
   | "currentAccuracy"
   | "currentSpeed";
 
-export const DEFAULT_HEATMAP_CELL_METRIC: HeatmapCellMetric = "bestSpeedOver70";
+export const DEFAULT_HEATMAP_CELL_METRIC: HeatmapCellMetric = "bestSpeed";
 
 export const HEATMAP_CELL_METRICS: HeatmapCellMetric[] = [
-  "bestSpeedOver70",
+  "bestSpeed",
   "attemptCount",
   "bestAccuracy",
-  "bestSpeed",
   "currentAccuracy",
   "currentSpeed",
 ];
 
 export const HEATMAP_METRIC_LABELS: Record<HeatmapCellMetric, string> = {
-  bestSpeedOver70: "Best speed with accuracy over 70%",
   attemptCount: "Attempt count",
   bestAccuracy: "Best accuracy",
   bestSpeed: "Best speed",
@@ -37,7 +34,6 @@ export const HEATMAP_METRIC_GRADIENT_LABELS: Record<
   HeatmapCellMetric,
   { less: string; more: string }
 > = {
-  bestSpeedOver70: { less: "Slow", more: "Fast" },
   bestSpeed: { less: "Slow", more: "Fast" },
   currentSpeed: { less: "Slow", more: "Fast" },
   attemptCount: { less: "Less", more: "More" },
@@ -114,7 +110,6 @@ export const HEATMAP_METRIC_BAND_LABELS: Record<
   Exclude<HeatmapCellMetric, "attemptCount">,
   Record<FreqCategory, string>
 > = {
-  bestSpeedOver70: CPM_BAND_LABELS,
   bestSpeed: CPM_BAND_LABELS,
   currentSpeed: CPM_BAND_LABELS,
   bestAccuracy: ACCURACY_BAND_LABELS,
@@ -128,9 +123,6 @@ export const metricToBand = (
   attemptShading: AttemptCountShading
 ): FreqCategory => {
   if (!stats) return 0;
-  if (metric === "bestSpeedOver70") {
-    return cpmToBand(stats.bestCpmWithAccuracyOver70);
-  }
   if (metric === "bestSpeed") {
     return cpmToBand(stats.bestCpm);
   }
@@ -153,11 +145,6 @@ export const metricValueText = (
   metric: HeatmapCellMetric
 ): string => {
   if (!stats) return "not attempted";
-  if (metric === "bestSpeedOver70") {
-    return stats.bestCpmWithAccuracyOver70 != null
-      ? `${stats.bestCpmWithAccuracyOver70} CPM`
-      : "no run above 70% accuracy";
-  }
   if (metric === "bestSpeed") {
     return `${stats.bestCpm} CPM`;
   }

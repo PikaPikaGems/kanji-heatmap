@@ -1,10 +1,8 @@
 import type { FreqCategory } from "@/lib/freq/freq-category";
 
-/** Map qualified CPM to opacity band 0–4 (0 = never qualified). */
-export const cpmToBand = (
-  bestCpmWithAccuracyOver70: number | null | undefined
-): FreqCategory => {
-  const cpm = bestCpmWithAccuracyOver70 ?? 0;
+/** Map CPM to opacity band 0–4 (0 = not attempted). */
+export const cpmToBand = (value: number | null | undefined): FreqCategory => {
+  const cpm = value ?? 0;
   if (cpm <= 0) return 0;
   if (cpm < 30) return 1;
   if (cpm < 70) return 2;

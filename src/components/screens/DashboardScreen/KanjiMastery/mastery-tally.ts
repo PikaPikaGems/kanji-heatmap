@@ -182,13 +182,19 @@ const cardsWhere = (
     }))
   );
 
-/** Started cards of one type, hardest first. */
+/** FSRS difficulty (1–10) a card must exceed to count as "most difficult". */
+export const MOST_DIFFICULT_ABOVE = 7;
+
+/** Started cards of one type with difficulty above 7, hardest first. */
 export const topDifficultCards = (
   pile: readonly ReviewPileItemView[],
   cardType: CardType
 ): TopCard[] =>
   cardsWhere(pile, isCardStarted)
-    .filter((card) => card.cardType === cardType)
+    .filter(
+      (card) =>
+        card.cardType === cardType && card.difficulty > MOST_DIFFICULT_ABOVE
+    )
     .sort((a, b) => b.difficulty - a.difficulty)
     .slice(0, TOP_COUNT);
 

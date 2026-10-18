@@ -1,4 +1,6 @@
 import BasicSelect from "@/components/common/BasicSelect";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { InfoIcon } from "@/components/icons";
 import { FreqSquare } from "@/components/common/freq/FreqSquare";
 import { H2 } from "../ListScreen/ControlBar/ItemPresentation/ItemPresentationContent";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
@@ -41,7 +43,7 @@ const BandRow = ({
 
 /** "Not started", then the measure's four bands, dullest first. */
 const BandRows = ({ measure }: { measure: MasteryMetric }) => (
-  <ul className="flex flex-col gap-1.5 mt-2">
+  <ul className="flex flex-col gap-1.5">
     <BandRow
       label={NOT_STARTED_LABEL}
       rule={NOT_STARTED_RULES[measure]}
@@ -62,6 +64,42 @@ const getCombinedNote = (measure: MasteryMetric): string => {
   const pick = measure === "difficulty" ? "harder" : "weaker";
   return `Combined counts once both reading and writing are reviewed, and shows the ${pick} of the two.`;
 };
+
+/**
+ * The measure's one-line meaning; its ⓘ opens what each square means (and,
+ * for a combined metric, how reading and writing combine).
+ */
+const MeasureIntro = ({
+  measure,
+  combined,
+}: {
+  measure: MasteryMetric;
+  combined: boolean;
+}) => (
+  <GenericPopover
+    trigger={
+      <button
+        type="button"
+        className="text-xs text-left rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {MEASURE_INTROS[measure]}
+        {/* No-break space: the icon never wraps onto a line of its own. */}
+        {"\u00a0"}
+        <InfoIcon className="inline-block -translate-y-px" size={12} />
+      </button>
+    }
+    content={
+      <div className="px-4 py-3 text-left w-72">
+        <BandRows measure={measure} />
+        {combined && (
+          <p className="pt-2 mt-3 text-xs border-t border-dotted text-muted-foreground">
+            {getCombinedNote(measure)}
+          </p>
+        )}
+      </div>
+    }
+  />
+);
 
 /** Mastery's stand-in for the frequency "Background Color Meaning" section. */
 export const MasteryColorSection = () => {
@@ -87,15 +125,10 @@ export const MasteryColorSection = () => {
       </div>
       <div key={metric} className="animate-fade-in-fast">
         <MasteryScaleLegend measure={measure} />
-        <p className="text-xs text-muted-foreground">
-          {MEASURE_INTROS[measure]}
-        </p>
-        <BandRows measure={measure} />
-        {isCombinedHeatmapMetric(metric) && (
-          <p className="mt-3 text-xs text-muted-foreground">
-            {getCombinedNote(measure)}
-          </p>
-        )}
+        <MeasureIntro
+          measure={measure}
+          combined={isCombinedHeatmapMetric(metric)}
+        />
       </div>
     </>
   );

@@ -116,17 +116,13 @@ export const isCombinedHeatmapMetric = (metric: HeatmapMetric): boolean =>
   METRIC_INFO[metric].card === "combined";
 
 /**
- * The words at the two ends of a measure's colored squares, dullest first
- * ("Fresh … Mastered", "Hard … Easy"); "Not started" is its own blank square
- * before them.
+ * The word at the bright end of a measure's scale: "Not started [] [] [] []
+ * [] Mastered" (the blank Not started square comes first).
  */
-export const SCALE_END_LABELS: Record<
-  MasteryMetric,
-  { from: string; to: string }
-> = {
-  mastery: { from: "Fresh", to: "Mastered" },
-  stability: { from: "Low", to: "High" },
-  difficulty: { from: "Hard", to: "Easy" },
+export const SCALE_END_LABELS: Record<MasteryMetric, string> = {
+  mastery: "Mastered",
+  stability: "High stability",
+  difficulty: "Very easy",
 };
 
 /** One line on what a measure means, above its bands in the legend. */

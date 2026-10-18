@@ -90,28 +90,19 @@ export const masteryLevel = (card: CardProgress, now: number): number => {
 };
 
 /**
- * Upper bounds (exclusive, in days) of every stability band but the last.
- * Stability is "days until recall probability drops to the target retention".
+ * Upper bounds (exclusive, in days) of every stability band but the last:
+ * 45 days, 8 months, 1 year. Stability is "days until recall probability
+ * drops to the target retention".
  */
-const STABILITY_BAND_MAX_DAYS = [7, 45, 180] as const;
-
-const STABILITY_BAND_RULES = [
-  "Fades within a week",
-  "Lasts a few weeks",
-  "Lasts a few months",
-  "Lasts half a year or more",
-] as const;
+const STABILITY_BAND_MAX_DAYS = [45, 240, 365] as const;
 
 /** Lowest stability first. */
-export const STABILITY_BANDS: readonly BandInfo[] = STABILITY_BAND_RULES.map(
-  (rule, band) => {
-    const min = STABILITY_BAND_MAX_DAYS[band - 1];
-    const max = STABILITY_BAND_MAX_DAYS[band];
-    if (min == null) return { label: `Under ${max} days`, rule };
-    if (max == null) return { label: `${min}+ days`, rule };
-    return { label: `${min}–${max} days`, rule };
-  }
-);
+export const STABILITY_BANDS: readonly BandInfo[] = [
+  { label: "Under 45 days", rule: "Fades within weeks" },
+  { label: "45 days – 8 months", rule: "Lasts a few months" },
+  { label: "8 months – 1 year", rule: "Lasts most of a year" },
+  { label: "At least 1 year", rule: "Lasts a year or more" },
+];
 
 /** 0-based band of a stability in days. */
 export const stabilityBand = (stability: number): number => {

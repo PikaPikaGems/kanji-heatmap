@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
+  MOST_DIFFICULT_ABOVE,
   recentMistakeCards,
   topDifficultCards,
   type TopCard,
@@ -22,20 +23,15 @@ const TopListHeader = ({ title, about }: { title: string; about: string }) => (
   </div>
 );
 
-/**
- * The cards as round-recap tiles (each opens the kanji drawer), with an
- * optional small caption under each one.
- */
+/** The cards as round-recap tiles (each opens the kanji drawer). */
 const TopTiles = ({
   cards,
   getInfo,
   empty,
-  caption,
 }: {
   cards: TopCard[];
   getInfo: GetBasicKanjiInfo;
   empty: string;
-  caption?: (card: TopCard) => ReactNode;
 }) => {
   if (cards.length === 0) {
     return (
@@ -45,20 +41,12 @@ const TopTiles = ({
   return (
     <ol className="flex flex-wrap justify-center gap-2 mt-3">
       {cards.map((card) => (
-        <li
-          key={`${card.kanji}-${card.cardType}`}
-          className="flex flex-col items-center gap-1"
-        >
+        <li key={`${card.kanji}-${card.cardType}`}>
           <RecapTile
             kanji={card.kanji}
             keyword={getInfo(card.kanji)?.keyword ?? "..."}
             correct={false}
           />
-          {caption && (
-            <span className="text-[10px] font-semibold leading-none text-muted-foreground tabular-nums">
-              {caption(card)}
-            </span>
-          )}
         </li>
       ))}
     </ol>
@@ -76,7 +64,6 @@ const TopListByCardType = ({
   about,
   cardsFor,
   empty,
-  caption,
 }: {
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
@@ -87,7 +74,6 @@ const TopListByCardType = ({
     cardType: CardType
   ) => TopCard[];
   empty: (cardType: CardType) => string;
-  caption?: (card: TopCard) => ReactNode;
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
   const heading = title(cardType);
@@ -112,7 +98,6 @@ const TopListByCardType = ({
           cards={cardsFor(pile, cardType)}
           getInfo={getInfo}
           empty={empty(cardType)}
-          caption={caption}
         />
       </div>
     </section>
@@ -132,12 +117,11 @@ export const MasteryTopLists = ({
       pile={pile}
       getInfo={getInfo}
       title={() => "Top 10 Most Difficult"}
-      about="Your hardest cards by difficulty, from 1 (easy) to 10 (hard)."
+      about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard).`}
       cardsFor={topDifficultCards}
       empty={(cardType) =>
-        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards studied yet.`
+        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards are that difficult. Nice!`
       }
-      caption={(card) => card.difficulty.toFixed(1)}
     />
     <TopListByCardType
       pile={pile}
