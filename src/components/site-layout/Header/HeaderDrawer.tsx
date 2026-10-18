@@ -23,7 +23,6 @@ import {
   InstallAppModal,
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
-import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { AccountSection } from "@/components/dependent/account/AccountSection";
 import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 import { CumUseGraphModal } from "@/components/screens/CumUseScreen/CumUseGraphModal";
@@ -88,7 +87,6 @@ const HeaderDrawerContent = ({
                 title="User Preferences"
                 onClick={() => onAction("settings")}
               />
-              <NetworkStatusBadge />
             </>
           }
         />

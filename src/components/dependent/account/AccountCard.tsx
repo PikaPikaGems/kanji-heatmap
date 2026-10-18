@@ -1,3 +1,4 @@
+import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import type { ReactNode } from "react";
 import { User } from "lucide-react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
@@ -65,8 +66,9 @@ const Avatar = ({ initial }: { initial: string | null }) =>
  * Sidebar account card: an avatar, the name with a status line under it
  * (sync state, or "Not logged in") and an optional icon action on the right;
  * whatever belongs under that row (login button, sync problems, notices) as
- * children; then a dotted divider and the row of icon tools (App & Device Info,
- * User Preferences, FSRS settings). Logged in and logged out share it.
+ * children; then a dotted divider, the row of icon tools (App & Device Info,
+ * User Preferences, FSRS settings) and the Online / Offline chip under them.
+ * Logged in and logged out share it.
  */
 export const AccountCard = ({
   name,
@@ -99,5 +101,8 @@ export const AccountCard = ({
     {children}
     <DottedSeparator />
     <div className="flex items-center justify-center gap-1.5">{tools}</div>
+    <div className="flex justify-center">
+      <NetworkStatusBadge />
+    </div>
   </div>
 );

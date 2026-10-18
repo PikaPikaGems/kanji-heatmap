@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { LogIn } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
@@ -101,6 +102,9 @@ const AccountBody = ({
     <>
       <NoCardNotice status={status} />
       <div className="flex items-center justify-center gap-1.5">{tools}</div>
+      <div className="flex justify-center">
+        <NetworkStatusBadge />
+      </div>
     </>
   );
 };
