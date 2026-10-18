@@ -29,13 +29,16 @@ TILES = [
     ("風", "#7c9fff", DARK_TEXT),
 ]
 
-# Variants on a 512 canvas: grid = width of the 2x2 grid, radius = background
+# Variants on a 512 canvas: grid = width of the tile grid, radius = background
 # corner radius. Maskable keeps the grid inside the 80% safe-zone circle;
-# apple-touch is full bleed because iOS rounds the corners itself.
+# apple-touch is full bleed because iOS rounds the corners itself. The tiny
+# favicon.ico is just the 火 tile, edge to edge, with no background and a
+# bigger glyph so it stays legible at 16px.
 VARIANTS = {
     "app-icon": {"grid": 416, "radius": 112},
     "app-icon-maskable": {"grid": 312, "radius": 0},
     "apple-touch-icon": {"grid": 384, "radius": 0},
+    "favicon": {"grid": 512, "radius": 0, "tiles": [TILES[1]], "bg": None, "font": 0.72},
 }
 
 
@@ -52,24 +55,25 @@ def glyph_path(ch, x, y, size):
     return pen.getCommands()
 
 
-def svg(grid, radius):
+def svg(grid, radius, tiles=TILES, bg=BG, font=0.54):
     size = 512
-    gap = grid * 0.06
-    tile = (grid - gap) / 2
-    shadow = tile * 0.065
+    cols = 2 if len(tiles) == 4 else 1
+    gap = grid * 0.06 if cols == 2 else 0
+    tile = (grid - gap) / cols
+    shadow = tile * 0.065 if bg else 0
     tile_r = tile * 0.196
-    font = tile * 0.54
+    font = tile * font
     x0 = (size - grid) / 2
     y0 = (size - grid - shadow) / 2
-    out = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}">',
-        f'<rect width="{size}" height="{size}" rx="{radius}" fill="{BG}"/>',
-    ]
-    for i, (ch, fill, color) in enumerate(TILES):
-        x = x0 + (i % 2) * (tile + gap)
-        y = y0 + (i // 2) * (tile + gap)
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}">']
+    if bg:
+        out.append(f'<rect width="{size}" height="{size}" rx="{radius}" fill="{bg}"/>')
+    for i, (ch, fill, color) in enumerate(tiles):
+        x = x0 + (i % cols) * (tile + gap)
+        y = y0 + (i // cols) * (tile + gap)
         box = f'x="{x:.1f}" width="{tile:.1f}" height="{tile:.1f}" rx="{tile_r:.1f}"'
-        out.append(f'<rect {box} y="{y + shadow:.1f}" fill="{SHADOW}"/>')
+        if shadow:
+            out.append(f'<rect {box} y="{y + shadow:.1f}" fill="{SHADOW}"/>')
         out.append(f'<rect {box} y="{y:.1f}" fill="{fill}"/>')
         d = glyph_path(ch, x + tile / 2, y + tile / 2, font)
         out.append(f'<path fill="{color}" d="{d}"/>')

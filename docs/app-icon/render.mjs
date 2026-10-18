@@ -29,7 +29,7 @@ for (const [name, size, file] of PNGS) {
 }
 // ICO with PNG-encoded entries: 6-byte header, 16-byte directory per image.
 const images = [];
-for (const size of ICO_SIZES) images.push(await png("app-icon", size));
+for (const size of ICO_SIZES) images.push(await png("favicon", size));
 const header = Buffer.alloc(6 + 16 * images.length);
 header.writeUInt16LE(1, 2);
 header.writeUInt16LE(images.length, 4);
