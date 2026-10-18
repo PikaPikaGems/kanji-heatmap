@@ -33,11 +33,13 @@ TILES = [
 # corner radius. Maskable keeps the grid inside the 80% safe-zone circle;
 # apple-touch is full bleed because iOS rounds the corners itself. The tiny
 # favicon.ico is just the 火 tile, edge to edge, with no background and a
-# bigger glyph so it stays legible at 16px.
+# bigger glyph so it stays legible at 16px. app-logo is the in-app header logo:
+# the 2x2 grid edge to edge with no background, so it sits on light and dark.
 VARIANTS = {
     "app-icon": {"grid": 416, "radius": 112},
     "app-icon-maskable": {"grid": 312, "radius": 0},
     "apple-touch-icon": {"grid": 384, "radius": 0},
+    "app-logo": {"grid": 512, "radius": 0, "bg": None},
     "favicon": {"grid": 512, "radius": 0, "tiles": [TILES[1]], "bg": None, "font": 0.72},
 }
 
