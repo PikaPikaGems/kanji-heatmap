@@ -1,5 +1,6 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { lazy, ReactNode, Suspense } from "react";
-import { Bug, Loader2, Volume2 } from "lucide-react";
+import { Bug, Volume2 } from "lucide-react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -26,16 +27,6 @@ import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
-
-const StudyNotesLoadingFallback = () => (
-  <div
-    className="flex items-center justify-center w-full h-48"
-    role="status"
-    aria-label="Loading"
-  >
-    <Loader2 className="size-7 animate-spin" />
-  </div>
-);
 
 export const RirikkuCTABadge = () => {
   return (
@@ -184,7 +175,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Kanji Essay">
           <ErrorBoundary details="KanjiEssay in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <KanjiEssay
                 key={kanji}
                 kanji={kanji}
@@ -197,7 +188,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Visual Mnemonics">
           <ErrorBoundary details="VisualMnemonics in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <VisualMnemonics
                 key={kanji}
                 kanji={kanji}

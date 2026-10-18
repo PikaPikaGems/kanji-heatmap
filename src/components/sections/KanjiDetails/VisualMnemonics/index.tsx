@@ -1,3 +1,4 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -160,11 +161,7 @@ const MnemonicGallery = ({
   }, [kanji, loadAttempt]);
 
   if (gallery.status === "loading")
-    return (
-      <p role="status" className="p-3 text-sm">
-        Loading saved mnemonics…
-      </p>
-    );
+    return <SectionLoading label="Loading saved mnemonics" />;
   if (gallery.status === "error")
     return (
       <div className="space-y-3 p-3">

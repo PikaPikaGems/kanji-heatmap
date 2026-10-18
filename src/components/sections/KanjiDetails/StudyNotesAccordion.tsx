@@ -1,5 +1,5 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { lazy, Suspense } from "react";
-import { Loader2 } from "lucide-react";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { isAccountUiHidden } from "@/lib/engine/account-ui";
@@ -15,17 +15,7 @@ export const StudyNotesAccordion = ({ kanji }: { kanji: string }) => {
   return (
     <SimpleAccordion trigger="Personal Study Notes">
       <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-        <Suspense
-          fallback={
-            <div
-              className="flex items-center justify-center w-full h-48"
-              role="status"
-              aria-label="Loading"
-            >
-              <Loader2 className="size-7 animate-spin" />
-            </div>
-          }
-        >
+        <Suspense fallback={<SectionLoading />}>
           <KanjiStudyNotes key={kanji} kanji={kanji} />
         </Suspense>
       </ErrorBoundary>

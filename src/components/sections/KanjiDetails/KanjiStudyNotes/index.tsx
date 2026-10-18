@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { UserNotice } from "@/components/common/UserNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import {
@@ -30,15 +30,7 @@ const KanjiStudyNotes = ({ kanji }: { kanji: string }) => {
     return <Message>Your notes aren&apos;t available right now.</Message>;
   }
   if (status.kind === "loading" || api == null) {
-    return (
-      <div
-        className="flex items-center justify-center w-full h-48"
-        role="status"
-        aria-label="Loading"
-      >
-        <Loader2 className="size-7 animate-spin" />
-      </div>
-    );
+    return <SectionLoading />;
   }
   if (status.kind === "signed-out") {
     return (

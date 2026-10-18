@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useEffect, useId, useState } from "react";
 import { getKanjiEssayUrl } from "@/lib/kanji-essays";
 import { OwnedAiContent } from "@/components/common/OwnedAiContent";
@@ -72,15 +72,7 @@ const PublishedEssaySection = ({
   onRetry: () => void;
 }) => {
   if (state.status === "loading")
-    return (
-      <div
-        role="status"
-        aria-label="Loading essay"
-        className="flex h-48 items-center justify-center"
-      >
-        <Loader2 className="size-7 animate-spin" />
-      </div>
-    );
+    return <SectionLoading label="Loading essay" />;
   if (state.status === "error")
     return (
       <div className="space-y-3 p-4 text-center">

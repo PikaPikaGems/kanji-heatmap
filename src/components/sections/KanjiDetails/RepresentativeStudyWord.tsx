@@ -1,3 +1,4 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
@@ -102,13 +103,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           </div>
         )}
         {isAiExplainReady(aiSettings) && (
-          <Suspense
-            fallback={
-              <p className="text-xs text-muted-foreground">
-                Loading AI controls…
-              </p>
-            }
-          >
+          <Suspense fallback={<SectionLoading label="Loading AI controls" />}>
             <AnchorWordDetails
               word={word}
               reading={reading}

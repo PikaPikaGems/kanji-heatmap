@@ -1,6 +1,6 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 import type { EngineAPI, KanjiNoteView } from "engine-contract";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
@@ -447,15 +447,7 @@ export const ActiveStudyNotes = ({
         </p>
       );
     }
-    return (
-      <div
-        className="flex items-center justify-center w-full h-48"
-        role="status"
-        aria-label="Loading"
-      >
-        <Loader2 className="size-7 animate-spin" />
-      </div>
-    );
+    return <SectionLoading />;
   }
 
   return (

@@ -1,3 +1,4 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useRef, useState } from "react";
 import { CopyButton } from "@/components/common/CopyButton";
 import {
@@ -8,7 +9,6 @@ import {
 } from "@/components/common/AiActionButtons";
 import { CollapsibleSection } from "@/components/common/CollapsibleSection";
 import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
-import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
 import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
 import { deleteTextResult } from "@/lib/ai-explain/storage";
 import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
@@ -46,7 +46,7 @@ export const GeneratedText = ({
   const result = state.result;
   const markdown = result ? normalizeAiMarkdown(result.markdown) : "";
 
-  if (state.status === "loading") return <SavedAiContentLoading />;
+  if (state.status === "loading") return <SectionLoading />;
 
   return (
     <div ref={topRef} className="space-y-4 text-left">
