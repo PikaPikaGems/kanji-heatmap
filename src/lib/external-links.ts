@@ -282,29 +282,6 @@ export const structureSourceLinks = [
   },
 ];
 
-export const textbookVocabSourceLinks = [
-  {
-    text: "Anki Deck: 1564742924",
-    url: otherOutLinks.ankiDeck1564742924,
-  },
-  {
-    text: "Anki Deck: 779483253",
-    url: otherOutLinks.ankiDeck779483253,
-  },
-  {
-    text: "Anki Deck: 2106223612",
-    url: otherOutLinks.ankiDeck2106223612,
-  },
-  {
-    text: "Anki Deck: 1468618470",
-    url: otherOutLinks.ankiDeck1468618470,
-  },
-  {
-    text: "Kanji Mastery Blog",
-    url: otherOutLinks.kanjiMasteryBlog,
-  },
-];
-
 export const sampleVocabSourceLinks = [
   {
     text: "JP Word Ranks Lookup",

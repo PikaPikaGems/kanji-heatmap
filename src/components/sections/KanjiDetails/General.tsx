@@ -40,11 +40,12 @@ const TableCellFixed = ({
   </TableCell>
 );
 
-const TableCellGrow = ({ children }: { children: ReactNode }) => (
+export const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell className="min-w-0">{children}</TableCell>
 );
 
-const LabelCell = ({
+/** A row label with an ⓘ popover (General Information, Anchor Word). */
+export const LabelCell = ({
   label,
   description,
 }: {

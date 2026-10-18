@@ -5,11 +5,13 @@ import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
 import { vocabExternalLinksCore } from "@/lib/external-links";
-import { DotIcon, InfoIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
+import { Table, TableBody, TableRow } from "@/components/ui/table";
+import { LabelCell, TableCellGrow } from "./General";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 
 import { VocabActions } from "@/components/common/VocabActions";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
@@ -72,64 +74,94 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
 
   const { word, reading, englishGloss, tags } = data;
 
+  const rows: { label: string; description: string; content: ReactNode }[] = [
+    {
+      label: "Word",
+      description:
+        "This kanji's Anchor Word. Tap it for its kanji, meaning and more links.",
+      content: (
+        <ExampleWordPopover
+          word={word}
+          wordTranslationOverride={englishGloss}
+          readingOverride={reading}
+          className="text-4xl"
+        />
+      ),
+    },
+    {
+      label: "Readings",
+      description: "How the word is read.",
+      content: reading
+        .split("・")
+        .map((r) => <RomajiBadge key={r} kana={r} className="text-lg" />),
+    },
+    {
+      label: "Tags",
+      description: "How common the word is, by the word lists it is in.",
+      content: tags.length > 0 ? <FreqTagBadges tags={tags} /> : null,
+    },
+    {
+      label: "English gloss",
+      description: "A short English meaning of the word.",
+      content: <span className="text-sm font-bold">{englishGloss}</span>,
+    },
+    {
+      label: "Actions",
+      description: "Hear, copy or share the word.",
+      content: <VocabActions word={word} kana={reading} />,
+    },
+    {
+      label: "Links",
+      description: `Look up ${word} in dictionaries and see it used in the wild.`,
+      content: vocabExternalLinksCore.map(({ name, url }) => (
+        <a
+          key={name}
+          href={url(word)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center px-3 py-1 text-xs transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
+        >
+          {name}
+        </a>
+      )),
+    },
+  ];
+
   return (
-    <div className="py-3 space-y-3 ">
-      <div className="flex flex-col gap-3 pt-6">
-        <div className="overflow-auto">
-          <ExampleWordPopover
+    <div className="py-3 space-y-3 text-left">
+      <Table className="table-fixed">
+        <TableBody>
+          {rows.map(({ label, description, content }) => (
+            <TableRow key={label} className="text-left">
+              <LabelCell label={label} description={description} />
+              <TableCellGrow>
+                {content == null ? (
+                  <div> - </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-1">
+                    {content}
+                  </div>
+                )}
+              </TableCellGrow>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {owner.status === "known" && !isAiExplainReady(aiSettings) && (
+        <div className="flex flex-wrap items-center gap-1 pt-2">
+          <ViewVocabDetails />
+        </div>
+      )}
+      {isAiExplainReady(aiSettings) && (
+        <Suspense fallback={<SectionLoading label="Loading AI controls" />}>
+          <AnchorWordDetails
             word={word}
-            wordTranslationOverride={englishGloss}
-            readingOverride={reading}
-            className="text-7xl sm:text-[100px]/[1] p-8"
+            reading={reading}
+            englishGloss={englishGloss}
           />
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <span className="text-base font-bold">{englishGloss}</span>
-          {tags.length > 0 && <FreqTagBadges tags={tags} />}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-1">
-          {reading.split("・").map((r) => (
-            <RomajiBadge key={r} kana={r} />
-          ))}
-          <DotIcon className="w-3 p-0 m-0" />
-          <VocabActions word={word} kana={reading} />
-        </div>
-
-        {owner.status === "known" && !isAiExplainReady(aiSettings) && (
-          <div className="flex flex-wrap items-center justify-center gap-1 mt-4">
-            <ViewVocabDetails />
-          </div>
-        )}
-        {isAiExplainReady(aiSettings) && (
-          <Suspense fallback={<SectionLoading label="Loading AI controls" />}>
-            <AnchorWordDetails
-              word={word}
-              reading={reading}
-              englishGloss={englishGloss}
-            />
-          </Suspense>
-        )}
-
-        <div className="mt-6 text-sm">
-          👇 Explore <span className="font-bold">{word}</span> in the wild
-          👇{" "}
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {vocabExternalLinksCore.map(({ name, url }) => (
-            <a
-              key={name}
-              href={url(word)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center px-3 py-1 text-sm transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
-            >
-              {name}
-            </a>
-          ))}
-        </div>
-      </div>
+        </Suspense>
+      )}
       <div className="pt-16 pl-2 text-left">
         <WhatIsARepresentativeStudyWord />
       </div>

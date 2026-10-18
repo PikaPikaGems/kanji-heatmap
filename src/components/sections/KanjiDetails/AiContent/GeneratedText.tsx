@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { SectionLoading } from "@/components/common/SectionLoading";
 import { useRef, useState } from "react";
 import { CopyButton } from "@/components/common/CopyButton";
@@ -116,7 +117,8 @@ export const GeneratedText = ({
         </>
       )}
       <SavedStorageNotice kind="text" />
-      <div className="flex flex-wrap gap-2">
+      {/* Regenerate sits centered under the answer; Generate stays left. */}
+      <div className={cn("flex flex-wrap gap-2", result && "justify-center")}>
         {result ? (
           <RegenerateButton busy={busy} onClick={() => void runGenerate()} />
         ) : (
