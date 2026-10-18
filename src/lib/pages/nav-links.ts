@@ -107,6 +107,7 @@ export const practiceNavSections: NavLinkSection[] = [
 /** Primary destinations in the header drawer. */
 export const headerNavSections: NavLinkSection[] = [
   {
+    heading: "Explore & Track",
     links: [
       { ...exploreKanjiPageMeta, Icon: SearchIcon },
       { ...dashboardPageMeta, Icon: LayoutDashboard },

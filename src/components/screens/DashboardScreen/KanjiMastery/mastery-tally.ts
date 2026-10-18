@@ -163,6 +163,7 @@ export type TopCard = {
   kanji: string;
   cardType: CardType;
   difficulty: number;
+  stability: number;
   lastReviewedAt: UTCTimestamp | undefined;
 };
 
@@ -178,6 +179,7 @@ const cardsWhere = (
       kanji: item.kanji,
       cardType,
       difficulty: item[cardType].difficulty,
+      stability: item[cardType].stability,
       lastReviewedAt: item[cardType].lastReviewedAt,
     }))
   );
@@ -215,4 +217,17 @@ export const recentMistakeCards = (
       const bAt = b.lastReviewedAt ?? "";
       return aAt < bAt ? 1 : aAt > bAt ? -1 : 0;
     })
+    .slice(0, TOP_COUNT);
+
+/**
+ * Cards of one type in FSRS review (past learning), lowest stability first.
+ * Relearning cards are left out: Recent Mistakes lists those.
+ */
+export const leastStableCards = (
+  pile: readonly ReviewPileItemView[],
+  cardType: CardType
+): TopCard[] =>
+  cardsWhere(pile, (card) => card.learningState === "review")
+    .filter((card) => card.cardType === cardType)
+    .sort((a, b) => a.stability - b.stability)
     .slice(0, TOP_COUNT);

@@ -2,9 +2,11 @@ import { useState } from "react";
 import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
+import { formatInterval } from "@/lib/engine/format-interval";
 import { MasterySubsection } from "./MasterySubsection";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
+  leastStableCards,
   MOST_DIFFICULT_ABOVE,
   recentMistakeCards,
   topDifficultCards,
@@ -19,15 +21,22 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
 /** What an empty list shows: an emoji, a short title, and what shows up here. */
 type EmptyList = { emoji: string; title: string; hint: string };
 
-/** The cards as round-recap tiles (each opens the kanji drawer). */
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The cards as round-recap tiles (each opens the kanji drawer), each with an
+ * optional short caption under it.
+ */
 const TopTiles = ({
   cards,
   getInfo,
   empty,
+  captionFor,
 }: {
   cards: TopCard[];
   getInfo: GetBasicKanjiInfo;
   empty: EmptyList;
+  captionFor?: (card: TopCard) => string;
 }) => {
   if (cards.length === 0) {
     return (
@@ -46,12 +55,20 @@ const TopTiles = ({
   return (
     <ol className="flex flex-wrap gap-2 mt-3">
       {cards.map((card) => (
-        <li key={`${card.kanji}-${card.cardType}`}>
+        <li
+          key={`${card.kanji}-${card.cardType}`}
+          className="flex flex-col items-center gap-0.5"
+        >
           <RecapTile
             kanji={card.kanji}
             keyword={getInfo(card.kanji)?.keyword ?? "..."}
             correct={false}
           />
+          {captionFor && (
+            <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+              {captionFor(card)}
+            </span>
+          )}
         </li>
       ))}
     </ol>
@@ -70,6 +87,7 @@ const TopListItem = ({
   about,
   cardsFor,
   empty,
+  captionFor,
 }: {
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
@@ -80,6 +98,7 @@ const TopListItem = ({
     cardType: CardType
   ) => TopCard[];
   empty: (cardType: CardType) => EmptyList;
+  captionFor?: (card: TopCard) => string;
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
   return (
@@ -100,6 +119,7 @@ const TopListItem = ({
           cards={cardsFor(pile, cardType)}
           getInfo={getInfo}
           empty={empty(cardType)}
+          captionFor={captionFor}
         />
       </div>
     </MasterySubsection>
@@ -107,8 +127,8 @@ const TopListItem = ({
 };
 
 /**
- * Top 10 hardest cards and top 10 recent mistakes, each collapsible; they go
- * in the Kanji Mastery accordion.
+ * Top 10 hardest cards, least stable cards and recent mistakes, each
+ * collapsible; they go in the Kanji Mastery accordion.
  */
 export const MasteryTopLists = ({
   pile,
@@ -128,6 +148,19 @@ export const MasteryTopLists = ({
         emoji: "🎯",
         title: "Nothing that hard",
         hint: `${CARD_TYPE_LABELS[cardType]} cards above difficulty ${MOST_DIFFICULT_ABOVE} show up here.`,
+      })}
+    />
+    <TopListItem
+      pile={pile}
+      getInfo={getInfo}
+      title="Top 10 Least Stable"
+      about="The cards you'll forget soonest, lowest stability first; under each, its stability: about how long until recall drops to your target retention. Cards being relearned are left out, since Recent Mistakes covers those."
+      cardsFor={leastStableCards}
+      captionFor={(card) => formatInterval(card.stability * DAY_MS)}
+      empty={(cardType) => ({
+        emoji: "🌱",
+        title: "Nothing to show yet",
+        hint: `${CARD_TYPE_LABELS[cardType]} cards show up here once they're past learning.`,
       })}
     />
     <TopListItem
