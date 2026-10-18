@@ -76,7 +76,7 @@ export const MasteryEndScreen = ({
         saveError && (
           <>
             <UserNotice className={cn("text-center", cnWarningText)}>
-              Some answers weren&apos;t saved. {saveError}{" "}
+              Some answers weren&apos;t saved.{" "}
               <NoticeAction onClick={() => setReportOpen(true)}>
                 View more
               </NoticeAction>

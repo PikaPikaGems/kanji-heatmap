@@ -107,7 +107,7 @@ const AccountBody = ({
 
 /**
  * Account area of the sidebar. `tools` are the icon buttons every build shows
- * (Debug Info, User Preferences): they sit in the card's bottom row, or on
+ * (App & Device Info, User Preferences): they sit in the card's bottom row, or on
  * their own where the card would be when there is no account to show (e.g. a
  * build without the study engine).
  */

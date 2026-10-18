@@ -3,14 +3,10 @@ import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
-import { useAiStorageUsage } from "@/hooks/use-ai-storage-usage";
-import { useAiVoiceState } from "@/hooks/use-ai-voice";
-import {
-  formatCaptureTimestamp,
-  formatDebugInfoForClipboard,
-  formatStorageForClipboard,
-  useDebugInfo,
-} from "@/hooks/use-debug-info";
+import { useEffect, useState } from "react";
+import { formatCaptureTimestamp } from "@/hooks/use-debug-info";
+import { useDebugReport } from "@/hooks/use-debug-report";
+import { formatMegabytes } from "@/lib/format-bytes";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
 import {
@@ -54,6 +50,79 @@ const syncLines = (
   return lines;
 };
 
+type NavigatorExtras = Navigator & { deviceMemory?: number };
+type EstimateWithDetails = StorageEstimate & {
+  usageDetails?: Record<string, number>;
+};
+
+/**
+ * What the browser itself says about storage and the device, read when the
+ * report opens: quota and usage (per kind where the browser shares it),
+ * whether storage is persistent, this site's databases, memory and cores.
+ * Most useful when a grade failed because the device was out of storage.
+ */
+const useBrowserStorageLines = (): string[] => {
+  const [lines, setLines] = useState<string[]>(["Browser storage: checking…"]);
+
+  // Effect needed: the Storage and IndexedDB APIs are async browser calls,
+  // read once when the report opens.
+  useEffect(() => {
+    let active = true;
+    const read = async () => {
+      const nav = navigator as NavigatorExtras;
+      const out = ["Browser storage"];
+      try {
+        const estimate = (await navigator.storage?.estimate?.()) as
+          | EstimateWithDetails
+          | undefined;
+        if (estimate?.usage != null && estimate.quota) {
+          const pct = ((estimate.usage / estimate.quota) * 100).toFixed(1);
+          out.push(
+            `Used: ${formatMegabytes(estimate.usage)} of ${formatMegabytes(estimate.quota)} (${pct}%)`
+          );
+        } else {
+          out.push("Used: not reported by this browser");
+        }
+        for (const [kind, bytes] of Object.entries(
+          estimate?.usageDetails ?? {}
+        )) {
+          out.push(`  ${kind}: ${formatMegabytes(bytes)}`);
+        }
+      } catch {
+        out.push("Used: couldn't read");
+      }
+      try {
+        const persisted = await navigator.storage?.persisted?.();
+        out.push(
+          `Persistent storage: ${persisted == null ? "unknown" : persisted ? "yes" : "no"}`
+        );
+      } catch {
+        out.push("Persistent storage: couldn't read");
+      }
+      try {
+        const dbs = (await indexedDB.databases?.()) ?? [];
+        out.push(
+          `Databases: ${dbs.map((db) => `${db.name} v${db.version}`).join(", ") || "none listed"}`
+        );
+      } catch {
+        out.push("Databases: couldn't list");
+      }
+      out.push(
+        `Device memory: ${nav.deviceMemory != null ? `${nav.deviceMemory} GB` : "not reported"} · CPU cores: ${nav.hardwareConcurrency ?? "not reported"}`,
+        `Language: ${navigator.language} · Cookies: ${navigator.cookieEnabled ? "on" : "off"}`,
+        `User agent: ${navigator.userAgent}`
+      );
+      if (active) setLines(out);
+    };
+    void read();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return lines;
+};
+
 /** Mounted only while the dialog is open, so the storage checks run on open. */
 const ReportBody = ({
   cardType,
@@ -62,9 +131,8 @@ const ReportBody = ({
   cardType: CardType;
   failures: SaveFailure[];
 }) => {
-  const info = useDebugInfo();
-  const storage = useAiStorageUsage();
-  const voice = useAiVoiceState();
+  const { text: debugReport } = useDebugReport();
+  const browserStorage = useBrowserStorageLines();
   const account = useAccountStatus();
   const sync = useSyncStatus();
   const failedOps = useFailedOpsCount()?.count;
@@ -84,8 +152,9 @@ const ReportBody = ({
     "",
     ...syncLines(sync, failedOps),
     "",
-    formatDebugInfoForClipboard(info),
-    ...formatStorageForClipboard(storage, voice),
+    ...browserStorage,
+    "",
+    debugReport,
   ].join("\n");
 
   return (

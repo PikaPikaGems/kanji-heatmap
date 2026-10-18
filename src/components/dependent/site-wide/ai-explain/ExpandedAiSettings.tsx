@@ -1,3 +1,5 @@
+import { CheckCircle, Copy } from "@/components/icons";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useId, useState } from "react";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -34,12 +36,25 @@ const PromptEditor = ({
   onChange,
 }: PromptEditorProps) => {
   const id = useId();
+  const { copy, status } = useCopyToClipboard(1500);
+  const current = value ?? defaultValue;
   return (
     <div className="mb-4 space-y-1">
-      <div className="flex flex-wrap items-center justify-between gap-1">
-        <label htmlFor={id} className="text-sm font-semibold">
-          {title}
-        </label>
+      <label htmlFor={id} className="block text-sm font-semibold">
+        {title}
+      </label>
+      <ResponsiveTextarea
+        id={id}
+        title={title}
+        rows={10}
+        value={current}
+        onValueChange={(next) =>
+          onChange(next === defaultValue ? undefined : next)
+        }
+        spellCheck={false}
+      />
+      {/* Under the editor, left-aligned: reset · copy. */}
+      <div className="flex flex-wrap items-center gap-1">
         <TextActionButton
           icon={<RotateCcw size={14} />}
           onClick={() => onChange(undefined)}
@@ -47,17 +62,22 @@ const PromptEditor = ({
         >
           Reset to default
         </TextActionButton>
+        <span aria-hidden className="text-muted-foreground">
+          ·
+        </span>
+        <TextActionButton
+          icon={
+            status === "copied" ? (
+              <CheckCircle className="size-3.5 text-green-500" />
+            ) : (
+              <Copy className="size-3.5" />
+            )
+          }
+          onClick={(e) => void copy(current, e)}
+        >
+          {status === "copied" ? "Copied" : "Copy prompt"}
+        </TextActionButton>
       </div>
-      <ResponsiveTextarea
-        id={id}
-        title={title}
-        rows={10}
-        value={value ?? defaultValue}
-        onValueChange={(next) =>
-          onChange(next === defaultValue ? undefined : next)
-        }
-        spellCheck={false}
-      />
       {placeholders && (
         <p className="text-xs text-muted-foreground">
           Placeholders: {placeholders}
@@ -311,7 +331,7 @@ type StorageStatus =
 
 /**
  * Deletes this owner's saved AI text, images and MP3s. How much is saved is
- * in Debug Info (Storage on this device).
+ * in App & Device Info (Storage on this device).
  */
 const OwnedGeneratedStorage = () => {
   const [state, setState] = useState<StorageStatus>({ status: "idle" });
@@ -362,7 +382,8 @@ const OwnedGeneratedStorage = () => {
       <p className="text-xs text-muted-foreground">
         Saved only on this device and browser, and not private: anyone with
         access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep. See how much is saved in Debug Info.
+        Download content you want to keep. See how much is saved in App & Device
+        Info.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}

@@ -1,28 +1,22 @@
-import { Wifi, WifiOff, Info } from "lucide-react";
+import { MonitorSmartphone, Wifi, WifiOff } from "lucide-react";
+import SimpleAccordion from "@/components/common/SimpleAccordion";
+import { OfflineDownloads } from "@/components/common/OfflineDownloads";
+import { useDebugReport } from "@/hooks/use-debug-report";
+import type { AiExplainUsage } from "@/lib/ai-explain/preferences";
 import { Copy, CheckCircle } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEffect, type ReactNode } from "react";
-import {
-  useAiStorageUsage,
-  type AiStorageUsageState,
-} from "@/hooks/use-ai-storage-usage";
-import { useAiVoiceState } from "@/hooks/use-ai-voice";
+import { type AiStorageUsageState } from "@/hooks/use-ai-storage-usage";
 import { initAiVoice, type AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { StorageUsageBar } from "./StorageUsageBar";
 import { Progress } from "@/components/ui/progress";
-import {
-  useAiExplainSettings,
-  useAiExplainUsage,
-} from "@/hooks/use-ai-explain";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import {
-  formatDebugInfoForClipboard,
-  formatStorageForClipboard,
-  useDebugInfo,
   voiceModelStatus,
   type DebugInfoSnapshot,
 } from "@/hooks/use-debug-info";
@@ -60,20 +54,7 @@ const DebugRow = ({
   </>
 );
 
-const DebugSection = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => (
-  <section className="space-y-3">
-    <h3 className="text-sm font-semibold">{title}</h3>
-    {children}
-  </section>
-);
-
-const CopyDebugButton = ({ getText }: { getText: () => string }) => {
+const CopyDebugButton = ({ text }: { text: string }) => {
   const { copy, status } = useCopyToClipboard();
   const copied = status === "copied";
 
@@ -89,7 +70,7 @@ const CopyDebugButton = ({ getText }: { getText: () => string }) => {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void copy(getText(), e);
+        void copy(text, e);
       }}
     >
       {copied ? "Copied" : "Copy debug info"}
@@ -158,9 +139,8 @@ const StorageUsage = ({
 const formatCount = (n: number) => n.toLocaleString("en-US");
 
 /** This month's AI usage, counted in this browser. */
-const AiUsage = () => {
+const AiUsage = ({ usage }: { usage: AiExplainUsage }) => {
   const [settings] = useAiExplainSettings();
-  const usage = useAiExplainUsage();
   const budget = settings.monthlyTokenBudget;
 
   return (
@@ -205,10 +185,7 @@ const AiUsage = () => {
 
 /** Mounted only while the modal is open, so the checks below run on open. */
 const DebugInfoBody = () => {
-  const info = useDebugInfo();
-  const storage = useAiStorageUsage();
-  const voice = useAiVoiceState();
-  const aiUsage = useAiExplainUsage();
+  const { info, storage, voice, aiUsage, text } = useDebugReport();
 
   // Effect needed: asks the voice engine (outside React, async) whether its
   // files are downloaded; otherwise it only knows after Japanese Voice is used.
@@ -219,9 +196,9 @@ const DebugInfoBody = () => {
   const device = info.device;
 
   return (
-    <div className="space-y-5 text-left">
-      <DebugSection title="App & device">
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs">
+    <div className="text-left">
+      <SimpleAccordion trigger="App and device" defaultOpen>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 px-2 pb-2 text-xs">
           <DebugRow label="Network">
             <span className="inline-flex justify-end w-full">
               <NetworkStatus
@@ -248,29 +225,24 @@ const DebugInfoBody = () => {
             </>
           )}
         </dl>
-      </DebugSection>
-      <div className="pt-5 border-t border-dashed">
-        <DebugSection title="Storage on this device">
+      </SimpleAccordion>
+      <SimpleAccordion trigger="Storage on this device">
+        <div className="px-2 pb-2">
           <StorageUsage state={storage} voice={voice} />
-        </DebugSection>
-      </div>
-      <div className="pt-5 border-t border-dashed">
-        <DebugSection title="AI usage this month">
-          <AiUsage />
-        </DebugSection>
-      </div>
-      <div className="flex justify-center pt-3 border-t border-dotted">
-        <CopyDebugButton
-          getText={() =>
-            [
-              formatDebugInfoForClipboard(info),
-              ...formatStorageForClipboard(storage, voice),
-              "",
-              "AI usage this month",
-              `Text tokens: ${aiUsage.tokens} · Requests: ${aiUsage.requests} · Search calls: ${aiUsage.searchCalls} · Images: ${aiUsage.imageRequests} · Audio generations: ${aiUsage.audioRequests} · Speech characters: ${aiUsage.audioCharacters}`,
-            ].join("\n")
-          }
-        />
+        </div>
+      </SimpleAccordion>
+      <SimpleAccordion trigger="AI usage this month">
+        <div className="px-2 pb-2">
+          <AiUsage usage={aiUsage} />
+        </div>
+      </SimpleAccordion>
+      <SimpleAccordion trigger="Offline downloads">
+        <div className="px-2 pb-2">
+          <OfflineDownloads />
+        </div>
+      </SimpleAccordion>
+      <div className="flex justify-center pt-4">
+        <CopyDebugButton text={text} />
       </div>
     </div>
   );
@@ -282,16 +254,16 @@ export const DebugInfo = () => (
       <Button
         variant="outline"
         size="iconXl"
-        aria-label="Debug info"
-        title="Debug Info"
+        aria-label="App and device info"
+        title="App & Device Info"
       >
-        <Info className="w-[1.2rem] h-[1.2rem]" />
+        <MonitorSmartphone className="w-[1.2rem] h-[1.2rem]" />
       </Button>
     </DialogTrigger>
     <ScrollableDialogContent
       size="md"
-      title="Debug Info"
-      description="App version, device, network and storage details"
+      title="App & Device Info"
+      description="App version, device, network, storage, AI usage and offline downloads"
       titleClassName="text-left"
     >
       <DebugInfoBody />

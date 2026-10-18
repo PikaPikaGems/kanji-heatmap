@@ -302,7 +302,7 @@ const ModelField = () => {
 
 const formatTokens = (n: number) => n.toLocaleString("en-US");
 
-/** The budget only; this month's usage is in Debug Info. */
+/** The budget only; this month's usage is in App & Device Info. */
 const BudgetField = () => {
   const [settings, update] = useAiExplainSettings();
   const budget = settings.monthlyTokenBudget;
@@ -331,7 +331,7 @@ const BudgetField = () => {
         incomplete or cancelled can still be billed. Local counters may omit
         these requests. This text-token budget is not a total spending limit for
         search, images, or speech, and nothing is blocked. This month&apos;s
-        usage is in Debug Info; your exact usage is at{" "}
+        usage is in App & Device Info; your exact usage is at{" "}
         <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
       </p>
     </div>
