@@ -149,15 +149,6 @@ const BookmarksBreakdownBody = () => {
   const bands = showGrade ? gradeBands : jlptBands;
   return (
     <>
-      <div className="mb-4">
-        <TwoWaySwitch
-          left="JLPT"
-          right="Grade"
-          checked={showGrade}
-          onCheckedChange={setShowGrade}
-          ariaLabel="Toggle between JLPT and grade breakdown"
-        />
-      </div>
       {loading ? (
         <div className="py-8">
           <KaomojiAnimation />
@@ -170,6 +161,15 @@ const BookmarksBreakdownBody = () => {
           <BreakdownRows bands={bands} />
         </div>
       )}
+      {/* Under the rows, like the switch under Kanji Mastery's bars. */}
+      <TwoWaySwitch
+        className="mt-4"
+        left="JLPT"
+        right="Grade"
+        checked={showGrade}
+        onCheckedChange={setShowGrade}
+        ariaLabel="Toggle between JLPT and grade breakdown"
+      />
     </>
   );
 };
