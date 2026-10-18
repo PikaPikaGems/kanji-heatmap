@@ -141,6 +141,7 @@ const WritingMasteryPhase = ({
       <MasteryEndScreen
         results={session.results}
         saveError={session.saveError}
+        saveFailures={session.saveFailures}
         cardType="writing"
         moreDue={state.moreDue}
         onMore={onStart}

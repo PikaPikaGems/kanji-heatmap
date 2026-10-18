@@ -77,7 +77,11 @@ export const EndScreenLayout = ({
           Done
         </PracticeButton>
       )}
-      {notice}
+      {/* Dotted line between the buttons and the notice; `empty:hidden`
+          drops it when the notice renders nothing. */}
+      <div className="pt-3 mt-1 border-t border-dotted empty:hidden">
+        {notice}
+      </div>
     </PracticeBottomBar>
   </div>
 );

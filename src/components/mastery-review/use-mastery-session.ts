@@ -20,6 +20,14 @@ export type MasteryResult = {
   rating: FsrsRating;
 };
 
+/** A grade the engine refused, for the "weren't saved" report. */
+export type SaveFailure = {
+  kanji: string;
+  rating: FsrsRating;
+  code: string;
+  at: Date;
+};
+
 /**
  * - `preparing`: the host screen is getting ready (writing loads its
  *   handwriting model); it calls `markPreparing()` then `start()`.
@@ -63,6 +71,7 @@ export const useMasterySession = ({
   const [state, setState] = useState<MasteryState>({ status: "start" });
   const [results, setResults] = useState<MasteryResult[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveFailures, setSaveFailures] = useState<SaveFailure[]>([]);
 
   const queueRef = useRef<{ cards: DueCard[]; next: number }>({
     cards: [],
@@ -136,6 +145,7 @@ export const useMasterySession = ({
     const run = runRef.current;
     setResults([]);
     setSaveError(null);
+    setSaveFailures([]);
     setState({ status: "opening" });
 
     const due = await api.reviews.getDue({
@@ -173,6 +183,10 @@ export const useMasterySession = ({
       if (result.error.code === "stale_version") return;
       setResults((prev) => [...prev, answered]);
       setSaveError(copyForCode(result.error.code));
+      setSaveFailures((prev) => [
+        ...prev,
+        { kanji: item.kanji, rating, code: result.error.code, at: new Date() },
+      ]);
     })();
   };
 
@@ -207,6 +221,7 @@ export const useMasterySession = ({
     state,
     results,
     saveError,
+    saveFailures,
     progress: progress(),
     start,
     grade,

@@ -64,6 +64,7 @@ const ReadingMasteryPhase = ({
       <MasteryEndScreen
         results={session.results}
         saveError={session.saveError}
+        saveFailures={session.saveFailures}
         cardType="reading"
         moreDue={state.moreDue}
         onMore={onStart}
