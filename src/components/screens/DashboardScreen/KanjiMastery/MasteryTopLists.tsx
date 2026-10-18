@@ -2,8 +2,12 @@ import { useState } from "react";
 import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
-import { InfoIcon } from "@/components/icons";
-import { GenericPopover } from "@/components/common/GenericPopover";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
   MOST_DIFFICULT_ABOVE,
@@ -19,27 +23,6 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
 
 /** What an empty list shows: an emoji, a short title, and what shows up here. */
 type EmptyList = { emoji: string; title: string; hint: string };
-
-/** A heading centered like the bars; what the list is opens from its ⓘ. */
-const TopListHeader = ({ title, about }: { title: string; about: string }) => (
-  <h3 className="flex items-center justify-center gap-1.5 text-sm font-bold">
-    {title}
-    <GenericPopover
-      trigger={
-        <button
-          type="button"
-          aria-label={`About ${title}`}
-          className="rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <InfoIcon size={14} />
-        </button>
-      }
-      content={
-        <p className="px-4 py-3 text-xs font-normal text-left w-60">{about}</p>
-      }
-    />
-  </h3>
-);
 
 /** The cards as round-recap tiles (each opens the kanji drawer). */
 const TopTiles = ({
@@ -80,10 +63,11 @@ const TopTiles = ({
 };
 
 /**
- * One top list with a Reading / Writing switch: the heading, the switch, and
- * the tiles for the side that is on. Swapped content fades in.
+ * One top list: what it is under its title (like the Fill in the Kanji
+ * groups), and inside, a Reading / Writing switch and that side's tiles.
+ * Swapped content fades in.
  */
-const TopListByCardType = ({
+const TopListItem = ({
   pile,
   getInfo,
   title,
@@ -93,7 +77,7 @@ const TopListByCardType = ({
 }: {
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
-  title: (cardType: CardType) => string;
+  title: string;
   about: string;
   cardsFor: (
     pile: readonly ReviewPileItemView[],
@@ -102,13 +86,20 @@ const TopListByCardType = ({
   empty: (cardType: CardType) => EmptyList;
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
-  const heading = title(cardType);
   return (
-    <section>
-      <div key={heading} className="animate-fade-in-fast">
-        <TopListHeader title={heading} about={about} />
-      </div>
-      <div className="mt-3">
+    <AccordionItem
+      value={title}
+      className="border-b-2 border-dashed last:border-b-0"
+    >
+      <AccordionTrigger className="py-3 text-left hover:no-underline">
+        <span className="flex flex-col">
+          <span className="text-sm font-semibold">{title}</span>
+          <span className="text-xs font-normal text-muted-foreground">
+            {about}
+          </span>
+        </span>
+      </AccordionTrigger>
+      <AccordionContent className="pt-2 pl-3 border-l-2 border-dotted">
         <TwoWaySwitch
           left="Reading"
           right="Writing"
@@ -118,19 +109,19 @@ const TopListByCardType = ({
           }
           ariaLabel="Toggle between reading and writing cards"
         />
-      </div>
-      <div key={cardType} className="animate-fade-in-fast">
-        <TopTiles
-          cards={cardsFor(pile, cardType)}
-          getInfo={getInfo}
-          empty={empty(cardType)}
-        />
-      </div>
-    </section>
+        <div key={cardType} className="animate-fade-in-fast">
+          <TopTiles
+            cards={cardsFor(pile, cardType)}
+            getInfo={getInfo}
+            empty={empty(cardType)}
+          />
+        </div>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
-/** Top 10 hardest cards and top 10 recent mistakes, one row each. */
+/** Top 10 hardest cards and top 10 recent mistakes, each collapsible. */
 export const MasteryTopLists = ({
   pile,
   getInfo,
@@ -138,12 +129,12 @@ export const MasteryTopLists = ({
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
 }) => (
-  <div className="flex flex-col gap-8 pt-6 mt-8 border-t border-dotted">
-    <TopListByCardType
+  <Accordion type="multiple" className="pt-2 mt-8 border-t border-dotted">
+    <TopListItem
       pile={pile}
       getInfo={getInfo}
-      title={() => "Top 10 Most Difficult"}
-      about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard).`}
+      title="Top 10 Most Difficult"
+      about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard)`}
       cardsFor={topDifficultCards}
       empty={(cardType) => ({
         emoji: "🎯",
@@ -151,11 +142,11 @@ export const MasteryTopLists = ({
         hint: `${CARD_TYPE_LABELS[cardType]} cards above difficulty ${MOST_DIFFICULT_ABOVE} show up here.`,
       })}
     />
-    <TopListByCardType
+    <TopListItem
       pile={pile}
       getInfo={getInfo}
-      title={(cardType) => `Top 10 ${CARD_TYPE_LABELS[cardType]} Mistakes`}
-      about="Cards you missed lately that are being relearned, newest first."
+      title="Top 10 Recent Mistakes"
+      about="Cards you missed lately that are being relearned, newest first"
       cardsFor={recentMistakeCards}
       empty={(cardType) => ({
         emoji: "✨",
@@ -163,5 +154,5 @@ export const MasteryTopLists = ({
         hint: `${CARD_TYPE_LABELS[cardType]} cards you missed lately show up here.`,
       })}
     />
-  </div>
+  </Accordion>
 );

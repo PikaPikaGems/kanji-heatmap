@@ -2,9 +2,11 @@ import { Slider } from "@/components/ui/slider";
 import { clamp } from "@/lib/utils";
 import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 
-const MIN_PERCENT = 70;
+// The engine accepts anything in (0, 1]; these are the slider's own bounds.
+const MIN_PERCENT = 50;
 const MAX_PERCENT = 99;
 const WARN_ABOVE = 0.92;
+const WARN_BELOW = 0.7;
 
 /** "Request retention" slider, shown as a percentage. */
 export const RetentionField = ({
@@ -38,6 +40,13 @@ export const RetentionField = ({
         <Warning>
           Above 92% retention will significantly increase your daily workload
           and may reduce the efficiency of spaced repetition.
+        </Warning>
+      )}
+      {value < WARN_BELOW && (
+        <Warning>
+          Below 70% retention you&apos;ll have fewer reviews, but you&apos;ll
+          forget many more cards before they come back. Missing that often can
+          feel discouraging, and forgotten cards need relearning.
         </Warning>
       )}
       <FieldError message={error} />

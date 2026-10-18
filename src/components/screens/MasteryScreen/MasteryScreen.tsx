@@ -92,12 +92,7 @@ const MasteryScreen = () => {
           <LoadingKanjis />
         )}
       </ListScreenLayout>
-      {account.kind === "signed-out" && (
-        <MasteryAccountBanner reason="signed-out" />
-      )}
-      {unsupportedBrowser && (
-        <MasteryAccountBanner reason="unsupported-browser" />
-      )}
+      {unsupportedBrowser && <MasteryAccountBanner />}
     </>
   );
 };

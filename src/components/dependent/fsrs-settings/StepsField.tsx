@@ -28,10 +28,7 @@ const StepTile = ({
     variant={selected ? "primary" : "secondary"}
     aria-pressed={selected}
     onClick={onClick}
-    className={cn(
-      "flex-col w-full min-w-0 h-auto gap-0.5 px-2 py-2 rounded-xl",
-      !selected && "border-dashed"
-    )}
+    className="flex-col w-full min-w-0 h-auto gap-0.5 px-2 py-2 rounded-xl"
   >
     <span className="text-sm">{label}</span>
     {/* One line; a long custom value ends in "…" with the full value on hover. */}

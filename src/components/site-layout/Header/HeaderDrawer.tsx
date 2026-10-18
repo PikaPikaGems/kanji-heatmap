@@ -8,7 +8,7 @@ import { cumUseGraphPageMeta, headerNavSections } from "@/lib/pages/nav-links";
 import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
 import { type DueCounts, useDueCount } from "@/lib/engine/use-due-count";
 import { LinksOutItems } from "@/components/common/LinksOutItems";
-import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
+import { CollapsibleNavLinkSections } from "@/components/common/CollapsibleNavLinkSections";
 import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
@@ -91,7 +91,7 @@ const HeaderDrawerContent = ({
             </>
           }
         />
-        <DashedNavLinkSections
+        <CollapsibleNavLinkSections
           sections={navSections}
           dotHrefs={dueNavHrefs(due)}
           listClassName="flex flex-col gap-2"

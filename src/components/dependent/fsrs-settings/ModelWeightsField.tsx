@@ -55,7 +55,8 @@ const WeightsDialog = ({
             aria-label="Model weights"
             rows={6}
             spellCheck={false}
-            className="w-full p-3 font-mono text-xs border-2 rounded-2xl bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            // 16px on phones: iOS zooms into any field with smaller text.
+            className="w-full p-3 font-mono text-base border-2 md:text-xs rounded-2xl bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={text}
             onChange={(e) => {
               setText(e.target.value);
@@ -105,7 +106,7 @@ export const ModelWeightsField = ({
         title="Model weights"
         tip="The numbers FSRS uses to predict how fast you forget. The defaults suit most people."
       />
-      <p className="p-3 font-mono text-xs break-words border-2 border-dashed rounded-xl text-muted-foreground">
+      <p className="p-3 font-mono text-xs break-words border-2 rounded-xl text-muted-foreground">
         {weights.join(", ")}
       </p>
       <TextActionButton
