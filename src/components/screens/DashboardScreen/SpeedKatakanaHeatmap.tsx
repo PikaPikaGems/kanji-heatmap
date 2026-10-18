@@ -6,7 +6,7 @@ import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { HEATMAP_METRIC_GRADIENT_LABELS } from "@/lib/activity";
 import { DashboardPanel } from "./DashboardPanel";
 import { SpeedKatakanaHeatmapGrid } from "./SpeedKatakanaHeatmapGrid";
-import { SpeedKatakanaHeatmapSettingsPopover } from "./SpeedKatakanaHeatmapSettingsPopover";
+import { SpeedKatakanaMetricOptions } from "./SpeedKatakanaMetricOptions";
 import { HeatmapLegendRow } from "./HeatmapLegendRow";
 import { useLiveOrEmpty } from "./use-live-or-empty";
 
@@ -30,9 +30,6 @@ const SpeedKatakanaHeatmapBody = () => {
 
   return (
     <>
-      <div className="flex justify-center mb-6 animate-fade-in">
-        <SpeedKatakanaHeatmapSettingsPopover />
-      </div>
       <div key={compact ? "compact" : "wide"} className="animate-fade-in">
         <SpeedKatakanaHeatmapGrid
           allStats={allStats}
@@ -40,6 +37,7 @@ const SpeedKatakanaHeatmapBody = () => {
           compact={compact}
         />
       </div>
+      <SpeedKatakanaMetricOptions />
       <HeatmapLegendRow
         name="Speed Katakana"
         lessLabel={gradientLabels.less}

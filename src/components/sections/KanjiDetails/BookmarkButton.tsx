@@ -1,7 +1,6 @@
-import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
+import { WriteBlockedPopover } from "@/components/dependent/account/WriteBlockedDialog";
 import { useState } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { UserNotice } from "@/components/common/UserNotice";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
@@ -53,22 +52,28 @@ const ActiveBookmarkButton = ({
     );
   };
 
+  const label = bookmarked ? "✓ Bookmarked" : "Bookmark";
   return (
     <div className="flex flex-col items-end">
-      <button
-        type="button"
-        className={pillCn(bookmarked)}
-        disabled={
-          !api || current === undefined || action.kind === "busy" || !!blocker
-        }
-        onClick={() => void toggle()}
-      >
-        {bookmarked ? "✓ Bookmarked" : "Bookmark"}
-      </button>
-      {blocker && (
-        <UserNotice icon={null} className="text-xs text-right max-w-48">
-          <WriteBlockerCopy blocker={blocker} />
-        </UserNotice>
+      {blocker ? (
+        // Can't save right now: the pill opens the reason instead.
+        <WriteBlockedPopover
+          blocker={blocker}
+          trigger={
+            <button type="button" className={pillCn(bookmarked)}>
+              {label}
+            </button>
+          }
+        />
+      ) : (
+        <button
+          type="button"
+          className={pillCn(bookmarked)}
+          disabled={!api || current === undefined || action.kind === "busy"}
+          onClick={() => void toggle()}
+        >
+          {label}
+        </button>
       )}
       {action.kind === "error" && (
         <p
@@ -117,16 +122,21 @@ export const BookmarkButton = ({ kanji }: { kanji: string }) => {
 
   // Still loading, or the account is in an error / recovery state.
   const blocker = getWriteBlocker(status);
+  if (blocker && blocker !== "loading") {
+    return (
+      <WriteBlockedPopover
+        blocker={blocker}
+        trigger={
+          <button type="button" className={pillCn(false)}>
+            Bookmark
+          </button>
+        }
+      />
+    );
+  }
   return (
-    <div className="flex flex-col items-end">
-      <button type="button" className={pillCn(false)} disabled>
-        Bookmark
-      </button>
-      {blocker && blocker !== "loading" && (
-        <UserNotice icon={null} className="text-xs text-right max-w-48">
-          <WriteBlockerCopy blocker={blocker} />
-        </UserNotice>
-      )}
-    </div>
+    <button type="button" className={pillCn(false)} disabled>
+      Bookmark
+    </button>
   );
 };

@@ -91,14 +91,17 @@ const practiceGamesSection: NavLinkSection = {
   ],
 };
 
-/** Practice destinations in the FAB menu; the sidebar repeats them. */
+/**
+ * Practice destinations in the FAB menu, games first; the sidebar repeats
+ * them with Kanji Mastery first.
+ */
 export const practiceNavSections: NavLinkSection[] = [
+  practiceGamesSection,
   {
     heading: "Kanji Mastery",
     starred: true,
     links: [readingMasteryNavLink, writingMasteryNavLink],
   },
-  practiceGamesSection,
 ];
 
 /** Primary destinations in the header drawer. */

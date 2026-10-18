@@ -12,14 +12,17 @@ import { useCurrentOwner } from "@/lib/engine/content-owner";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
-/** "✨ AI Explain" on its own line, when AI study tools are set up. */
+/**
+ * "✨ AI Explain" on its own line between the gloss and the action icons,
+ * when AI study tools are set up.
+ */
 const WordAiExplain = ({ word }: { word: string }) => {
   const [settings] = useAiExplainSettings();
   const owner = useCurrentOwner();
   // Nobody's saved answers show until the owner is known.
   if (owner.status !== "known" || !isAiExplainReady(settings)) return null;
   return (
-    <div className="flex justify-center pt-2">
+    <div className="flex justify-center py-3">
       <button
         type="button"
         className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
@@ -84,9 +87,9 @@ export const VocabPopoverContent = ({
           </div>
         </>
       )}
+      <WordAiExplain word={word} />
       <DottedSeparator />
       <VocabActions kana={kana ?? ""} word={word} />
-      <WordAiExplain word={word} />
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore {word} in the wild ↓

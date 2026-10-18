@@ -115,7 +115,8 @@ export const StrokeAnimationSettingsFields = () => {
       />
 
       <TextActionButton
-        className="flex mx-auto"
+        // Closer to the slider above than the section's space-y-6.
+        className="flex mx-auto -mt-4"
         icon={<RotateCcw size={14} />}
         disabled={isDefault}
         onClick={reset}

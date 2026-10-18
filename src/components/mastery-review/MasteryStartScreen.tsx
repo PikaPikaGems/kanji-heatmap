@@ -1,3 +1,5 @@
+import { WriteBlockedLearnMore } from "@/components/dependent/account/WriteBlockedDialog";
+import { PREMIUM_LAPSED_COPY } from "@/lib/engine/engine-copy";
 import type { CardType } from "engine-contract";
 import { UserNotice } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -64,6 +66,12 @@ export const MasteryStartScreen = ({
           <div role="status">
             <UserNotice className={cnWarningText}>
               {blocker ?? error}
+              {blocker === PREMIUM_LAPSED_COPY && (
+                <>
+                  {" "}
+                  <WriteBlockedLearnMore />
+                </>
+              )}
             </UserNotice>
           </div>
         )}

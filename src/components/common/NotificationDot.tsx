@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const NotificationDot = ({ className }: { className?: string }) => (
   <span
     className={cn(
-      "block size-2 shrink-0 animate-pulse rounded-full bg-yellow-500 dark:bg-yellow-400",
+      "block size-1.5 shrink-0 animate-pulse rounded-full bg-yellow-500 dark:bg-yellow-400",
       className
     )}
   >

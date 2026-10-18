@@ -1,3 +1,6 @@
+import type { ReactNode } from "react";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { UserNotice } from "@/components/common/UserNotice";
 import LinkOutIcon from "@/components/common/LinkOutIcon";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -57,8 +60,8 @@ export const WriteBlockedDialog = () => {
               device.
             </li>
             <li>
-              New reviews, notes, bookmarks and review pile changes aren&apos;t
-              saved until your membership is active again.
+              You can&apos;t review, edit notes or update bookmarks and your
+              review pile until your membership is active again.
             </li>
             <li>
               You can keep practicing. Those rounds just aren&apos;t recorded.
@@ -100,4 +103,29 @@ export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
       </>
     )}
   </>
+);
+
+/**
+ * A write action the account can't do right now (premium lapsed, saving
+ * paused, out of storage): the button stays tappable and opens a popover
+ * with the reason (and "Learn more" when premium lapsed) instead of a line
+ * of text under it.
+ */
+export const WriteBlockedPopover = ({
+  blocker,
+  trigger,
+}: {
+  blocker: WriteBlocker;
+  trigger: ReactNode;
+}) => (
+  <GenericPopover
+    // Inside the kanji drawer: modal, or the popover can't be clicked.
+    modal
+    trigger={trigger}
+    content={
+      <UserNotice className="px-4 py-3 text-sm max-w-64">
+        <WriteBlockerCopy blocker={blocker} />
+      </UserNotice>
+    }
+  />
 );

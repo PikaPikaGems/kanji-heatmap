@@ -15,6 +15,9 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
   writing: "Writing",
 };
 
+/** What an empty list shows: an emoji, a short title, and what shows up here. */
+type EmptyList = { emoji: string; title: string; hint: string };
+
 /** A heading and a short line on what the list is, centered like the bars. */
 const TopListHeader = ({ title, about }: { title: string; about: string }) => (
   <div className="text-center">
@@ -31,11 +34,19 @@ const TopTiles = ({
 }: {
   cards: TopCard[];
   getInfo: GetBasicKanjiInfo;
-  empty: string;
+  empty: EmptyList;
 }) => {
   if (cards.length === 0) {
     return (
-      <p className="py-4 text-xs text-center text-muted-foreground">{empty}</p>
+      <div className="flex flex-col items-center max-w-xs gap-1 px-4 py-5 mx-auto mt-3 text-center border-2 border-dotted rounded-2xl">
+        <span aria-hidden className="text-2xl">
+          {empty.emoji}
+        </span>
+        <p className="text-sm font-bold">{empty.title}</p>
+        <p className="text-xs text-muted-foreground text-pretty">
+          {empty.hint}
+        </p>
+      </div>
     );
   }
   return (
@@ -73,7 +84,7 @@ const TopListByCardType = ({
     pile: readonly ReviewPileItemView[],
     cardType: CardType
   ) => TopCard[];
-  empty: (cardType: CardType) => string;
+  empty: (cardType: CardType) => EmptyList;
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
   const heading = title(cardType);
@@ -119,9 +130,11 @@ export const MasteryTopLists = ({
       title={() => "Top 10 Most Difficult"}
       about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard).`}
       cardsFor={topDifficultCards}
-      empty={(cardType) =>
-        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards are that difficult. Nice!`
-      }
+      empty={(cardType) => ({
+        emoji: "🎯",
+        title: "Nothing that hard",
+        hint: `${CARD_TYPE_LABELS[cardType]} cards above difficulty ${MOST_DIFFICULT_ABOVE} show up here.`,
+      })}
     />
     <TopListByCardType
       pile={pile}
@@ -129,9 +142,11 @@ export const MasteryTopLists = ({
       title={(cardType) => `Top 10 ${CARD_TYPE_LABELS[cardType]} Mistakes`}
       about="Cards you missed lately that are being relearned, newest first."
       cardsFor={recentMistakeCards}
-      empty={(cardType) =>
-        `No ${CARD_TYPE_LABELS[cardType].toLowerCase()} cards are being relearned.`
-      }
+      empty={(cardType) => ({
+        emoji: "✨",
+        title: "No mistakes to relearn",
+        hint: `${CARD_TYPE_LABELS[cardType]} cards you missed lately show up here.`,
+      })}
     />
   </div>
 );

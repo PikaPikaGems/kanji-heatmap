@@ -34,6 +34,7 @@ const COPY_NOTICE = {
 
 const failedDate = (failedAt: number) =>
   new Date(failedAt).toLocaleDateString(undefined, {
+    year: "numeric",
     month: "short",
     day: "numeric",
   });
