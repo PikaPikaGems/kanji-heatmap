@@ -1,4 +1,5 @@
 import {
+  ChartSpline,
   Eye,
   GraduationCap,
   Keyboard,
@@ -111,6 +112,7 @@ export const headerNavSections: NavLinkSection[] = [
     links: [
       { ...exploreKanjiPageMeta, Icon: SearchIcon },
       { ...dashboardPageMeta, Icon: LayoutDashboard },
+      { ...cumUseGraphPageMeta, Icon: ChartSpline },
     ],
   },
   {

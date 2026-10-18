@@ -88,6 +88,7 @@ const HeaderDrawerContent = ({
                 title="User Preferences"
                 onClick={() => onAction("settings")}
               />
+              <NetworkStatusBadge />
             </>
           }
         />
@@ -96,24 +97,30 @@ const HeaderDrawerContent = ({
           dotHrefs={dueNavHrefs(due)}
           listClassName="flex flex-col gap-2"
           onItemPointerDown={(e) => e.stopPropagation()}
-          wrapItem={(link) => (
-            <DrawerPrimitive.Close asChild>{link}</DrawerPrimitive.Close>
-          )}
+          wrapItem={(link, item) => {
+            // The graph opens in its modal over the current page, as it did
+            // from its old text link, instead of navigating away.
+            if (item.href === cumUseGraphPageMeta.href) {
+              return (
+                <div
+                  onClickCapture={(e) => {
+                    e.preventDefault();
+                    onAction("cum-use-graph");
+                  }}
+                >
+                  {link}
+                </div>
+              );
+            }
+            return (
+              <DrawerPrimitive.Close asChild>{link}</DrawerPrimitive.Close>
+            );
+          }}
         />
       </div>
 
       {/* Dotted line: these links are apart from the menu sections above. */}
       <div className="flex flex-wrap justify-center w-full gap-2 pt-5 border-t-2 border-dotted">
-        <div className="flex justify-center w-full">
-          <button
-            type="button"
-            onClick={() => onAction("cum-use-graph")}
-            onPointerDown={(e) => e.stopPropagation()}
-            className={`${cnTextLink} whitespace-nowrap text-xs`}
-          >
-            {cumUseGraphPageMeta.title}
-          </button>
-        </div>
         {infoLinks.map((item) => (
           <InfoLink key={item.href} href={item.href} title={item.title} />
         ))}
@@ -131,7 +138,6 @@ const HeaderDrawerContent = ({
 
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
         <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
-        <NetworkStatusBadge />
         <MockBackendPanel />
       </div>
     </div>
