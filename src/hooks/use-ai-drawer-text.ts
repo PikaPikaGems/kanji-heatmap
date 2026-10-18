@@ -1,3 +1,4 @@
+import { describeAiError } from "@/lib/ai-explain/describe-error";
 import { useEffect, useRef, useState } from "react";
 import {
   AI_GENERATED_CONTENT_EVENT,
@@ -171,10 +172,10 @@ export const useAiDrawerText = (
         setState({
           status: "error",
           result: previous,
-          message:
-            error instanceof Error
-              ? error.message
-              : "Couldn't generate this answer. Please try again.",
+          message: describeAiError(
+            error,
+            "Couldn't generate this answer. Please try again."
+          ),
         });
       }
       return false;

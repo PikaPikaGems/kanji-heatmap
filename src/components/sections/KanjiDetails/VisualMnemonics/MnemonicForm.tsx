@@ -1,3 +1,4 @@
+import { describeAiError } from "@/lib/ai-explain/describe-error";
 import {
   abortInFlight,
   getInFlight,
@@ -207,10 +208,10 @@ export const MnemonicForm = ({
       if (active.signal.aborted) return;
       setRequest({
         status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Couldn't generate the image. Try again.",
+        message: describeAiError(
+          error,
+          "Couldn't generate the image. Try again."
+        ),
       });
     } finally {
       finish();

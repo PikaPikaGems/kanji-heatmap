@@ -1,3 +1,4 @@
+import { describeAiError } from "@/lib/ai-explain/describe-error";
 import {
   abortInFlight,
   getInFlight,
@@ -61,15 +62,6 @@ export type AiExplainState =
   | { status: "loading"; text: string; previousText?: string }
   | { status: "success"; text: string; saveWarning?: string }
   | { status: "error"; message: string; text?: string };
-
-const describeError = (error: unknown) => {
-  // fetch() rejects with a TypeError when the request never got a response.
-  if (error instanceof TypeError) {
-    return "Couldn't reach xAI. Check your connection and try again.";
-  }
-  if (error instanceof Error) return error.message;
-  return "Something went wrong.";
-};
 
 /**
  * Shows one explanation at a time. Closing the dialog or starting another
@@ -216,7 +208,7 @@ export const useAiExplain = () => {
         if (!showing() || getGeneratedContentEpoch() !== expectedEpoch) return;
         setState({
           status: "error",
-          message: describeError(error),
+          message: describeAiError(error, "Something went wrong."),
           text: previousText,
         });
       }

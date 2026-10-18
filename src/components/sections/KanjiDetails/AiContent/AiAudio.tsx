@@ -1,3 +1,4 @@
+import { describeAiError } from "@/lib/ai-explain/describe-error";
 import {
   abortInFlight,
   getInFlight,
@@ -37,6 +38,8 @@ type AudioState = {
   status: "loading" | "ready" | "generating" | "error";
   record?: AiAudioRecord;
   message?: string;
+  /** The saved MP3 couldn't be read (not a failed generation): offer a reload. */
+  loadFailed?: boolean;
   warning?: string;
 };
 
@@ -235,6 +238,7 @@ export const AiAudio = ({
             status: "error",
             message:
               "Couldn't load saved audio. You can try generating it again.",
+            loadFailed: true,
           });
       }
     };
@@ -310,10 +314,10 @@ export const AiAudio = ({
         setState({
           status: "error",
           record: previous,
-          message:
-            error instanceof Error
-              ? error.message
-              : "Couldn't generate audio. Please try again.",
+          message: describeAiError(
+            error,
+            "Couldn't generate audio. Please try again."
+          ),
         });
     } finally {
       finish();
@@ -360,10 +364,17 @@ export const AiAudio = ({
         error={
           state.message && (
             <>
-              {state.message}{" "}
-              <NoticeAction onClick={() => setRevision((value) => value + 1)}>
-                Reload saved audio
-              </NoticeAction>
+              {state.message}
+              {state.loadFailed && (
+                <>
+                  {" "}
+                  <NoticeAction
+                    onClick={() => setRevision((value) => value + 1)}
+                  >
+                    Reload saved audio
+                  </NoticeAction>
+                </>
+              )}
             </>
           )
         }
