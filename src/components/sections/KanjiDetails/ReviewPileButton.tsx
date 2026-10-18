@@ -76,6 +76,9 @@ const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   const label = band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band];
   return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 my-1 ml-2 text-xs font-semibold border rounded-full whitespace-nowrap">
+      <span aria-hidden className="mr-0.5">
+        {bandEmoji(band)}
+      </span>
       <span
         aria-hidden
         className={cn(
@@ -85,7 +88,6 @@ const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
       />
       <span className="sr-only">Mastery:</span>
       {label}
-      <span aria-hidden>{bandEmoji(band)}</span>
     </span>
   );
 };

@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
+import { InfoIcon } from "@/components/icons";
+import { GenericPopover } from "@/components/common/GenericPopover";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
   MOST_DIFFICULT_ABOVE,
@@ -18,12 +20,25 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
 /** What an empty list shows: an emoji, a short title, and what shows up here. */
 type EmptyList = { emoji: string; title: string; hint: string };
 
-/** A heading and a short line on what the list is, centered like the bars. */
+/** A heading centered like the bars; what the list is opens from its ⓘ. */
 const TopListHeader = ({ title, about }: { title: string; about: string }) => (
-  <div className="text-center">
-    <h3 className="text-sm font-bold">{title}</h3>
-    <p className="mt-0.5 text-xs text-muted-foreground">{about}</p>
-  </div>
+  <h3 className="flex items-center justify-center gap-1.5 text-sm font-bold">
+    {title}
+    <GenericPopover
+      trigger={
+        <button
+          type="button"
+          aria-label={`About ${title}`}
+          className="rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <InfoIcon size={14} />
+        </button>
+      }
+      content={
+        <p className="px-4 py-3 text-xs font-normal text-left w-60">{about}</p>
+      }
+    />
+  </h3>
 );
 
 /** The cards as round-recap tiles (each opens the kanji drawer). */

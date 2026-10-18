@@ -83,6 +83,12 @@ export const buildKanjiEssayPrompt = (
     KANJI: context.kanji,
     KANJI_CONTEXT: context.kanjiContext,
   });
+/**
+ * Added to a Kanji Essay or Anchor Word prompt when web search is off: the
+ * default prompts ask for searching and sources, which the model can't do.
+ */
+export const withoutWebSearch = (prompt: string) =>
+  `${prompt}\n\nWeb search is turned off for this request. Answer from your own knowledge only. Where the instructions above ask you to search, verify, or link sources, include only what you are confident is accurate, leave out source links, and skip any part you can't answer reliably.`;
 export const buildRegenerationPrompt = (
   prompt: string,
   previousResult: string,

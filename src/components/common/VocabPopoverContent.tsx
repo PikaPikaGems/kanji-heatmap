@@ -24,7 +24,7 @@ const WordAiExplain = ({ word }: { word: string }) => {
   return (
     <>
       <DottedSeparator />
-      <div className="flex justify-center pt-2 pb-3">
+      <div className="flex justify-center py-4">
         <button
           type="button"
           className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}

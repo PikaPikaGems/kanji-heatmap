@@ -100,6 +100,8 @@ export type AiExplainPreferences = {
   wordPrompt?: string;
   /** Optional; when set, User Preferences shows usage as a progress bar. */
   monthlyTokenBudget?: number;
+  /** Kanji Essay and Anchor Word answer from memory, without web search. */
+  noWebSearch?: boolean;
   vocabularyPrompt?: string;
   kanjiEssayPrompt?: string;
   imagePrompt?: string;
@@ -159,6 +161,7 @@ export const readAiExplainPreferences = (): AiExplainPreferences => {
       (rate) => rate === raw.speechBitRate
     ),
     speechLanguage: raw.speechLanguage === "ja" ? "ja" : "auto",
+    noWebSearch: raw.noWebSearch === true || undefined,
     imageStylePrompts: readPromptRecord(
       raw.imageStylePrompts,
       Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]
@@ -282,6 +285,10 @@ export const hasValidAiExplainKey = (settings: AiExplainSettings) =>
 /** The button shows only when switched on with a key xAI accepted. */
 export const isAiExplainReady = (settings: AiExplainSettings) =>
   settings.enabled && hasValidAiExplainKey(settings);
+
+/** Kanji Essay and Anchor Word search the web unless switched off. */
+export const usesWebSearch = (settings: AiExplainPreferences) =>
+  settings.noWebSearch !== true;
 
 export const modelOf = (settings: AiExplainSettings) =>
   settings.model ?? DEFAULT_AI_EXPLAIN_MODEL;

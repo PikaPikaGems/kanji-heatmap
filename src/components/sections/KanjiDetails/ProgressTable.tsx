@@ -46,7 +46,7 @@ type Cell = {
   text: string;
   /** Fill of a small swatch before the text, as on the /mastery heatmap. */
   swatchCn?: string;
-  /** The band's emoji after the text (see `bandEmoji`). */
+  /** The band's emoji before the swatch (see `bandEmoji`). */
   emoji?: string;
 };
 
@@ -276,6 +276,11 @@ export const ProgressTable = ({
                     className="px-2 py-1.5 text-[13px] font-bold text-left break-words tabular-nums sm:px-3 sm:text-sm"
                   >
                     <span className="flex items-center gap-1.5">
+                      {emoji ? (
+                        <span aria-hidden className="mr-0.5 shrink-0">
+                          {emoji}
+                        </span>
+                      ) : null}
                       {swatchCn ? (
                         <span
                           className={`inline-block size-3 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
@@ -283,7 +288,6 @@ export const ProgressTable = ({
                         />
                       ) : null}
                       {text}
-                      {emoji ? <span aria-hidden>{emoji}</span> : null}
                     </span>
                   </TableCell>
                 );

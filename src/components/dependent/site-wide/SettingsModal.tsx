@@ -60,10 +60,7 @@ const FontGrid = () => {
           onClick={() => setFont(i)}
           aria-pressed={fontIndex === i}
           title={name}
-          className={cn(
-            "flex-col w-full h-auto gap-1 p-2 rounded-xl",
-            fontIndex !== i && "border-dotted"
-          )}
+          className="flex-col w-full h-auto gap-1 p-2 rounded-xl"
         >
           <span
             className="text-xl leading-none"

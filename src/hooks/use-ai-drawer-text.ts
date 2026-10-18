@@ -14,9 +14,13 @@ import {
   addAiExplainUsage,
   modelOf,
   readAiExplainSettings,
+  usesWebSearch,
   type AiExplainSettings,
 } from "@/lib/ai-explain/preferences";
-import { buildRegenerationPrompt } from "@/lib/ai-explain/prompts";
+import {
+  buildRegenerationPrompt,
+  withoutWebSearch,
+} from "@/lib/ai-explain/prompts";
 import { streamXaiSearchedCompletion } from "@/lib/ai-explain/xai";
 import {
   abortInFlight,
@@ -115,7 +119,10 @@ export const useAiDrawerText = (
     request.current = controller;
     readVersion.current++;
     const previous = state.result;
-    const basePrompt = makePrompt(settings);
+    const webSearch = usesWebSearch(settings);
+    const basePrompt = webSearch
+      ? makePrompt(settings)
+      : withoutWebSearch(makePrompt(settings));
     const prompt = previous
       ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
       : basePrompt;
@@ -131,6 +138,7 @@ export const useAiDrawerText = (
         apiKey: settings.apiKey,
         model: modelOf(settings),
         prompt,
+        webSearch,
         signal: controller.signal,
         onText: (preview) => {
           if (!controller.signal.aborted) {

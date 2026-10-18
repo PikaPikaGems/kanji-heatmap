@@ -24,6 +24,7 @@ import {
   DEFAULT_AI_EXPLAIN_MODEL,
   hasValidAiExplainKey,
   readAiOwnerKey,
+  usesWebSearch,
   writeAiOwnerKey,
 } from "@/lib/ai-explain/preferences";
 import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
@@ -338,6 +339,32 @@ const BudgetField = () => {
   );
 };
 
+/** Kanji Essay and Anchor Word can answer from memory instead of searching. */
+const WebSearchField = () => {
+  const [settings, update] = useAiExplainSettings();
+  return (
+    <div className="mb-3">
+      <div className="flex items-center py-2">
+        <Switch
+          checked={usesWebSearch(settings)}
+          onCheckedChange={(on) =>
+            update({ noWebSearch: on ? undefined : true })
+          }
+          aria-label="Use web search for Kanji Essay and Anchor Word"
+        />
+        <span className="px-2 text-sm font-semibold">
+          Use web search for Kanji Essay and Anchor Word
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Search finds sources and real-world examples, and is billed per search.
+        Turn it off to have Grok answer from its own memory: cheaper, but with
+        no source links and a higher chance of mistakes.
+      </p>
+    </div>
+  );
+};
+
 /** A collapsible group inside the section, styled like Fill in the Kanji downloads. */
 const SubsectionItem = ({
   value,
@@ -471,6 +498,7 @@ const OwnedAiExplainControls = ({ ownerId }: { ownerId: string }) => {
           keep.
         </p>
       )}
+      {active && <WebSearchField />}
       {active && <Subsections />}
     </>
   );

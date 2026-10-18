@@ -29,7 +29,7 @@ const MissedKanjiList = ({
   onOpen: (kanji: string) => void;
 }) => (
   <p
-    className="flex flex-wrap justify-center gap-x-2 text-sm kanji-font"
+    className="flex flex-wrap justify-center gap-x-2 text-base kanji-font"
     lang="ja"
   >
     {missed.map(({ kanji, kind }) => (
@@ -99,14 +99,17 @@ export const EndSession = ({
       onEnd={onEnd}
       notice={<ProgressNotSavedNotice saveError={saveError} />}
     >
-      {correct < results.length && (
-        <TextActionButton onClick={onRetryMistakes}>
-          Retry mistakes
-        </TextActionButton>
-      )}
-      {missed.length > 0 && (
-        <MissedKanjiList missed={missed} onOpen={setOpenedKanji} />
-      )}
+      {/* The missed kanji sit right under Retry mistakes. */}
+      <div className="flex flex-col items-center gap-2 empty:hidden">
+        {correct < results.length && (
+          <TextActionButton onClick={onRetryMistakes}>
+            Retry mistakes
+          </TextActionButton>
+        )}
+        {missed.length > 0 && (
+          <MissedKanjiList missed={missed} onOpen={setOpenedKanji} />
+        )}
+      </div>
     </EndScreenLayout>
   );
 };

@@ -15,6 +15,7 @@ import {
   DEFAULT_AI_SPEECH_BIT_RATE,
   type AiSpeechBitRate,
   DEFAULT_AI_SPEECH_VOICE,
+  usesWebSearch,
 } from "@/lib/ai-explain/preferences";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
@@ -201,6 +202,7 @@ const allPromptsMarkdown = (
 
 export const PromptSettings = () => {
   const entries = usePromptEntries();
+  const [settings] = useAiExplainSettings();
   const [selectedId, setSelectedId] = useState(entries[0].id);
   const selected =
     entries.find((entry) => entry.id === selectedId) ?? entries[0];
@@ -227,8 +229,9 @@ export const PromptSettings = () => {
       </div>
       {selected.usesSearch && (
         <p className="text-xs text-muted-foreground">
-          Uses paid web search. Search calls and model tokens are billed to your
-          xAI account.
+          {usesWebSearch(settings)
+            ? "Uses paid web search. Search calls and model tokens are billed to your xAI account."
+            : "Web search is off, so this prompt is sent without it and Grok answers from memory."}
         </p>
       )}
       <PromptEditor

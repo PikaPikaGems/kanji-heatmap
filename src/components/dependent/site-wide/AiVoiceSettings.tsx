@@ -110,10 +110,7 @@ export const VoiceEngineChoice = () => {
           variant={engine === value ? "primary" : "secondary"}
           aria-pressed={engine === value}
           onClick={() => choose(value)}
-          className={cn(
-            "w-full h-auto px-2 py-2 text-sm rounded-xl",
-            engine !== value && "border-dotted"
-          )}
+          className="w-full h-auto px-2 py-2 text-sm rounded-xl"
         >
           {label}
           {value === "ai" && (
@@ -381,10 +378,7 @@ const PresetTiles = <T extends string>({
         variant={selected === name ? "primary" : "secondary"}
         aria-pressed={selected === name}
         onClick={() => onSelect(name)}
-        className={cn(
-          "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
-          selected !== name && "border-dotted"
-        )}
+        className="w-full h-auto px-2 py-2 text-sm capitalize rounded-xl"
       >
         {name}
       </PracticeButton>
