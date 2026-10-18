@@ -1,3 +1,11 @@
+import {
+  abortInFlight,
+  getInFlight,
+  trackInFlight,
+} from "@/lib/ai-explain/in-flight";
+import { NoticeAction } from "@/components/common/UserNotice";
+import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Pause, Play } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -174,7 +182,7 @@ const SavedAudio = ({
         {record.language === "ja" ? "Japanese" : "Automatic language"}
       </p>
       {message && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
           {message}
         </p>
       )}
@@ -195,12 +203,21 @@ export const AiAudio = ({
   const request = useRef<AbortController | null>(null);
   const [revision, setRevision] = useState(0);
 
-  // Effect needed: loads a recording from IndexedDB, listens for external clears,
-  // and aborts TTS when leaving the source; none can be done during render.
+  const flightKey = `audio:${sourceId}`;
+
+  // Effect needed: loads a recording from IndexedDB and listens for external
+  // clears; none can be done during render. An MP3 still generating from an
+  // earlier mount (the drawer was closed) shows as generating until it lands.
   useEffect(() => {
     let active = true;
     let loadVersion = 0;
     const load = async () => {
+      const running = getInFlight(flightKey);
+      if (running && !request.current) {
+        if (active) setState({ status: "generating" });
+        await running.settled;
+        if (!active) return;
+      }
       const version = ++loadVersion;
       const epoch = getGeneratedContentEpoch();
       try {
@@ -224,22 +241,23 @@ export const AiAudio = ({
     const changed = (event: Event) => {
       if (!(event as CustomEvent<{ cleared: boolean }>).detail?.cleared) return;
       loadVersion++;
-      request.current?.abort();
+      abortInFlight(flightKey);
       request.current = null;
       if (active) setState({ status: "ready" });
     };
     void load();
     window.addEventListener(AI_GENERATED_CONTENT_EVENT, changed);
+    // No abort on unmount: the MP3 is still saved when it arrives.
     return () => {
       active = false;
-      request.current?.abort();
       request.current = null;
       window.removeEventListener(AI_GENERATED_CONTENT_EVENT, changed);
     };
-  }, [sourceId, markdown, revision]);
+  }, [sourceId, markdown, revision, flightKey]);
 
   const generate = async () => {
-    if (request.current || state.status === "loading") return;
+    if (request.current || getInFlight(flightKey) || state.status === "loading")
+      return;
     const settings = readAiExplainSettings();
     if (!isAiExplainReady(settings)) return;
     const controller = new AbortController();
@@ -247,6 +265,12 @@ export const AiAudio = ({
     request.current = controller;
     const previous = state.record;
     setState({ status: "generating", record: previous });
+    let finish: () => void = () => {};
+    trackInFlight(
+      flightKey,
+      controller,
+      new Promise<void>((resolve) => (finish = resolve))
+    );
     try {
       const text = prepareNarration(markdown);
       if (!text) throw new Error("There is no text to read aloud.");
@@ -292,6 +316,7 @@ export const AiAudio = ({
               : "Couldn't generate audio. Please try again.",
         });
     } finally {
+      finish();
       if (request.current === controller) request.current = null;
     }
   };
@@ -328,7 +353,7 @@ export const AiAudio = ({
       <AiRequestFeedback
         busy={state.status === "generating"}
         onCancel={() => {
-          request.current?.abort();
+          abortInFlight(flightKey);
           request.current = null;
           setState({ status: "ready", record: state.record });
         }}
@@ -336,12 +361,9 @@ export const AiAudio = ({
           state.message && (
             <>
               {state.message}{" "}
-              <button
-                className="underline"
-                onClick={() => setRevision((value) => value + 1)}
-              >
+              <NoticeAction onClick={() => setRevision((value) => value + 1)}>
                 Reload saved audio
-              </button>
+              </NoticeAction>
             </>
           )
         }

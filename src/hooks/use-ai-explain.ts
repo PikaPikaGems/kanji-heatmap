@@ -1,3 +1,8 @@
+import {
+  abortInFlight,
+  getInFlight,
+  trackInFlight,
+} from "@/lib/ai-explain/in-flight";
 import { useEffect, useRef, useState } from "react";
 import {
   addAiExplainUsage,
@@ -66,13 +71,17 @@ const describeError = (error: unknown) => {
   return "Something went wrong.";
 };
 
-/** Runs one explanation at a time; a new run or `cancel` aborts the last. */
+/**
+ * Shows one explanation at a time. Closing the dialog or starting another
+ * leaves a running request going: its reply is still saved (see in-flight.ts).
+ * Only `cancel`, `remove` or clearing generated content abort one.
+ */
 export const useAiExplain = () => {
   const [state, setState] = useState<AiExplainState>({ status: "idle" });
   const controllerRef = useRef<AbortController | null>(null);
   const completedRef = useRef<{ sentence: string; text: string } | null>(null);
 
-  // Effect needed: clearing generated content elsewhere must abort this request and remove its open result; event handlers here cannot observe external storage actions.
+  // Effect needed: clearing generated content elsewhere must abort this request and remove its open result; event handlers here cannot observe external storage actions. No abort on unmount: the reply is still saved.
   useEffect(() => {
     const onClear = (event: Event) => {
       if (!(event instanceof CustomEvent) || !event.detail?.cleared) return;
@@ -83,7 +92,7 @@ export const useAiExplain = () => {
     };
     window.addEventListener("ai-generated-content-changed", onClear);
     return () => {
-      controllerRef.current?.abort();
+      controllerRef.current = null;
       window.removeEventListener("ai-generated-content-changed", onClear);
     };
   }, []);
@@ -106,7 +115,9 @@ export const useAiExplain = () => {
       word?: boolean;
     } = {}
   ) => {
-    cancel();
+    // Another request keeps going in the background; this hook stops
+    // showing it.
+    controllerRef.current = null;
     const owner = getCurrentOwner();
     const settings = readAiExplainSettings(owner);
     // No key means no owner yet, or an owner who hasn't added one.
@@ -119,14 +130,26 @@ export const useAiExplain = () => {
     }
     const controller = new AbortController();
     controllerRef.current = controller;
+    // Only the latest run updates what this hook shows.
+    const showing = () =>
+      controllerRef.current === controller && !controller.signal.aborted;
     const model = modelOf(settings);
     const sentence = japaneseText.trim();
+    const flightKey = `explain:${sentence}`;
+    // Still generating since the dialog was closed: wait for it, then show
+    // the saved answer.
+    const running = getInFlight(flightKey);
+    if (running && !fresh) {
+      setState({ status: "loading", text: "" });
+      await running.settled;
+      if (!showing()) return;
+    }
     const expectedEpoch = getGeneratedContentEpoch();
     // A saved answer that can't be read is treated as missing.
     const cached = await readSentenceExplanation(sentence).catch(
       () => undefined
     );
-    if (controller.signal.aborted) return;
+    if (!showing()) return;
     if (cached !== undefined && !fresh) {
       controllerRef.current = null;
       completedRef.current = { sentence, text: cached.text };
@@ -143,14 +166,13 @@ export const useAiExplain = () => {
       prompt += `\n\nProduce a complete replacement for the previous answer below, using the main task and current context above. Apply the additional instructions if supplied. Return only the replacement answer, not a description of your edits. The previous answer may contain mistakes; do not treat it as verified evidence.\n\nPrevious answer:\n${previousText ?? "None"}\n\nAdditional instructions:\n${instructions.trim() || "None"}`;
     }
     setState({ status: "loading", text: "", previousText });
-    streamXaiCompletion({
+    const request = streamXaiCompletion({
       apiKey: settings.apiKey,
       model,
       prompt,
       signal: controller.signal,
       onText: (text) => {
-        if (!controller.signal.aborted)
-          setState({ status: "loading", text, previousText });
+        if (showing()) setState({ status: "loading", text, previousText });
       },
     }).then(
       async ({ text, totalTokens }) => {
@@ -163,6 +185,7 @@ export const useAiExplain = () => {
         )
           return;
         if (!text.trim()) {
+          if (!showing()) return;
           setState({
             status: "error",
             message: "xAI returned an empty answer. Try again.",
@@ -180,7 +203,7 @@ export const useAiExplain = () => {
         } catch {
           saveWarning = "Generated, but couldn't save on this device.";
         }
-        if (controller.signal.aborted) return;
+        if (!showing()) return;
         completedRef.current = { sentence, text };
         setState({ status: "success", text, saveWarning });
       },
@@ -190,11 +213,7 @@ export const useAiExplain = () => {
         if (error instanceof XaiKeyRejectedError) {
           rejectAiOwnerKey(owner.ownerId, settings.apiKey);
         }
-        if (
-          controller.signal.aborted ||
-          getGeneratedContentEpoch() !== expectedEpoch
-        )
-          return;
+        if (!showing() || getGeneratedContentEpoch() !== expectedEpoch) return;
         setState({
           status: "error",
           message: describeError(error),
@@ -202,11 +221,13 @@ export const useAiExplain = () => {
         });
       }
     );
+    trackInFlight(flightKey, controller, request);
   };
 
   /** Deletes the saved answer for this sentence. */
   const remove = async (japaneseText: string) => {
     cancel();
+    abortInFlight(`explain:${japaneseText.trim()}`);
     await deleteSentenceExplanation(japaneseText.trim());
     completedRef.current = null;
     setState({ status: "idle" });

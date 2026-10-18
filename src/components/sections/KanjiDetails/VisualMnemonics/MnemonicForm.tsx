@@ -1,3 +1,8 @@
+import {
+  abortInFlight,
+  getInFlight,
+  trackInFlight,
+} from "@/lib/ai-explain/in-flight";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   AiPrimaryButton,
@@ -94,24 +99,31 @@ export const MnemonicForm = ({
   const controller = useRef<AbortController | null>(null);
   const pending = request.status === "pending";
 
-  // Effect needed: abort external paid requests on unmount or storage clearing;
-  // render/event handlers cannot observe external clearing or reliably clean up.
+  const flightKey = `mnemonic:${kanji}`;
+
+  // Effect needed: aborts the paid request when all generated content is
+  // deleted, which render and event handlers can't observe. No abort on
+  // unmount: the image is still saved when it arrives.
   useEffect(() => {
     const onChanged = (event: Event) => {
       if (!(event as CustomEvent<{ cleared: boolean }>).detail?.cleared) return;
-      controller.current?.abort();
+      abortInFlight(flightKey);
       controller.current = null;
       setRequest({ status: "idle" });
     };
     window.addEventListener("ai-generated-content-changed", onChanged);
     return () => {
-      controller.current?.abort();
       window.removeEventListener("ai-generated-content-changed", onChanged);
     };
-  }, []);
+  }, [flightKey]);
 
   const generate = async () => {
-    if (controller.current || !draft.description.trim()) return;
+    if (
+      controller.current ||
+      getInFlight(flightKey) ||
+      !draft.description.trim()
+    )
+      return;
     const settings = readAiExplainSettings();
     if (!isAiExplainReady(settings)) {
       setRequest({
@@ -144,6 +156,12 @@ export const MnemonicForm = ({
     controller.current = active;
     setRequest({ status: "pending" });
     onPending(true);
+    let finish: () => void = () => {};
+    trackInFlight(
+      flightKey,
+      active,
+      new Promise<void>((resolve) => (finish = resolve))
+    );
     try {
       const prompt = buildImagePrompt(settings, { kanji, keyword, ...draft });
       const model = settings.imageModel ?? DEFAULT_AI_IMAGE_MODEL;
@@ -195,6 +213,7 @@ export const MnemonicForm = ({
             : "Couldn't generate the image. Try again.",
       });
     } finally {
+      finish();
       if (controller.current === active) {
         controller.current = null;
         if (!active.signal.aborted) onPending(false);
@@ -335,7 +354,7 @@ export const MnemonicForm = ({
       <AiRequestFeedback
         busy={pending}
         onCancel={() => {
-          controller.current?.abort();
+          abortInFlight(flightKey);
           controller.current = null;
           setRequest({ status: "idle" });
           onPending(false);

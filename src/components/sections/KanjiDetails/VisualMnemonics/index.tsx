@@ -1,7 +1,10 @@
+import { getInFlight } from "@/lib/ai-explain/in-flight";
+import { NoticeAction } from "@/components/common/UserNotice";
+import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 import { SectionLoading } from "@/components/common/SectionLoading";
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Loader2, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { DownloadButton } from "@/components/common/AiActionButtons";
 import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
 import { SavedStorageNotice } from "@/components/common/SavedStorageNotice";
@@ -72,7 +75,7 @@ const ImageActions = ({
         />
       </div>
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
           {error}
         </p>
       )}
@@ -131,6 +134,17 @@ const MnemonicGallery = ({
       setPending(false);
     };
     window.addEventListener("ai-generated-content-changed", onChanged);
+    // An image still generating since the drawer was closed: show it as
+    // pending, then list again once it has been saved.
+    const running = getInFlight(`mnemonic:${kanji}`);
+    if (running) {
+      setPending(true);
+      void running.settled.then(() => {
+        if (!active) return;
+        setPending(false);
+        setLoadAttempt((attempt) => attempt + 1);
+      });
+    }
     void import("@/lib/ai-explain/storage")
       .then((storage) => storage.listMnemonicImages(kanji))
       .then(
@@ -164,21 +178,17 @@ const MnemonicGallery = ({
     return <SectionLoading label="Loading saved mnemonics" />;
   if (gallery.status === "error")
     return (
-      <div className="space-y-3 p-3">
-        <p role="alert" className="text-sm">
-          {gallery.message}
-        </p>
-        <Button
-          type="button"
-          variant="outline"
+      <p role="alert" className={cn("p-3 text-sm text-center", cnWarningText)}>
+        ⚠️ {gallery.message}{" "}
+        <NoticeAction
           onClick={() => {
             setGallery({ status: "loading" });
             setLoadAttempt(loadAttempt + 1);
           }}
         >
-          Retry
-        </Button>
-      </div>
+          Try again
+        </NoticeAction>
+      </p>
     );
 
   const selected = gallery.images.find(
@@ -240,7 +250,10 @@ const MnemonicGallery = ({
             {selected.quality === "low" ? "Standard" : "Higher detail"}
           </p>
           {selected.unsaved && (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              role="alert"
+              className={cn("text-sm text-center", cnWarningText)}
+            >
               Generated, but couldn&apos;t save on this device. Download this
               image to keep it.
             </p>

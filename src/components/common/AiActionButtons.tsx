@@ -91,7 +91,7 @@ export const DownloadMarkdownButton = ({
         {label}
       </DownloadButton>
       {error && (
-        <span role="alert" className="text-xs font-bold text-destructive">
+        <span role="alert" className={cn("text-xs", cnWarningText)}>
           {error}
         </span>
       )}
@@ -163,8 +163,8 @@ export const AiRequestFeedback = ({
       </div>
     )}
     {error && (
-      <p role="alert" className="text-sm font-bold text-destructive">
-        {error}
+      <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
+        ⚠️ {error}
       </p>
     )}
     {warning && (

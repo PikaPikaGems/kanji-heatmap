@@ -191,10 +191,8 @@ const NotesPopover = ({
       <AiExplainDialog
         key={japaneseText}
         open={view === "explain"}
-        onClose={() => {
-          explain.cancel();
-          setView("closed");
-        }}
+        // Closing doesn't cancel: the answer is still saved when it arrives.
+        onClose={() => setView("closed")}
         japaneseText={japaneseText}
         word={isWord}
         speakButtons={<SpeakButtons speech={speech} />}

@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 import { useId, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
@@ -18,7 +20,7 @@ const ExplanationBody = ({ state }: { state: AiExplainState }) => {
   if (state.status === "error") {
     return (
       <>
-        <p role="alert" className="mb-3 text-sm text-destructive">
+        <p role="alert" className={cn("mb-3 text-sm", cnWarningText)}>
           {state.message}
         </p>
         {state.text && <AiExplanationMarkdown text={state.text} />}
@@ -54,7 +56,7 @@ const ExplanationBody = ({ state }: { state: AiExplainState }) => {
   return (
     <>
       {state.saveWarning && (
-        <p role="alert" className="mb-3 text-sm text-destructive">
+        <p role="alert" className={cn("mb-3 text-sm", cnWarningText)}>
           {state.saveWarning}
         </p>
       )}

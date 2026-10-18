@@ -21,10 +21,8 @@ const WordExplainFlow = ({ word, open }: { word: string; open: boolean }) => {
   return (
     <AiExplainDialog
       open={open}
-      onClose={() => {
-        explain.cancel();
-        closeWordExplain();
-      }}
+      // Closing doesn't cancel: the answer is still saved when it arrives.
+      onClose={closeWordExplain}
       japaneseText={word}
       word
       speakButtons={<SpeakButton word={word} iconType="volume-2" />}
