@@ -1,3 +1,5 @@
+import { RotateCcw } from "lucide-react";
+import { TextActionButton } from "@/components/common/AiActionButtons";
 import {
   useCallback,
   useEffect,
@@ -485,14 +487,13 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
 
   return (
     <div className="pt-3">
-      {/* Full width like Stroke Order's "Reset to defaults"; becomes Stop
-          while the preview plays. */}
+      {/* Becomes Stop while the preview plays. */}
       <div className="pb-3">
         {previewing ? (
-          <Button
+          <PracticeButton
             variant="secondary"
-            size="sm"
-            className="w-full text-xs font-bold"
+            size="md"
+            className="h-10"
             onClick={preview.stop}
             aria-busy={preview.status === "preparing"}
           >
@@ -502,12 +503,12 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
               <Square />
             )}
             Stop
-          </Button>
+          </PracticeButton>
         ) : (
-          <Button
+          <PracticeButton
             variant="secondary"
-            size="sm"
-            className="w-full text-xs font-bold"
+            size="md"
+            className="h-10"
             disabled={!ready}
             onClick={() =>
               preview.play({
@@ -519,7 +520,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
           >
             <Play />
             Test Voice
-          </Button>
+          </PracticeButton>
         )}
       </div>
       <span className={cn(subheadingCn, "block")}>Voice Presets</span>
@@ -551,11 +552,9 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
         <CustomizationSection title="Delivery Customization">
           {sliders("delivery")}
           {/* Unset fields mean yomiage's defaults. */}
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="w-full mt-2 text-xs font-bold"
+          <TextActionButton
+            className="flex mx-auto mt-2"
+            icon={<RotateCcw size={14} />}
             disabled={
               settings.speed === undefined &&
               settings.expressiveness === undefined &&
@@ -570,7 +569,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
             }
           >
             Reset to defaults
-          </Button>
+          </TextActionButton>
         </CustomizationSection>
       )}
     </div>

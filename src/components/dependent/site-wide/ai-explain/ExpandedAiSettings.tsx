@@ -1,6 +1,5 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { RotateCcw, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
 import {
@@ -41,16 +40,13 @@ const PromptEditor = ({
         <label htmlFor={id} className="text-sm font-semibold">
           {title}
         </label>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="rounded-lg"
+        <TextActionButton
+          icon={<RotateCcw size={14} />}
           onClick={() => onChange(undefined)}
           disabled={value === undefined}
         >
-          <RotateCcw /> Reset to default
-        </Button>
+          Reset to default
+        </TextActionButton>
       </div>
       <ResponsiveTextarea
         id={id}
@@ -307,53 +303,18 @@ export const SpeechSettings = () => {
 };
 
 type StorageStatus =
-  | { status: "loading" }
-  | { status: "ready"; bytes: number }
-  | { status: "confirm"; bytes?: number }
+  | { status: "idle" }
+  | { status: "confirm" }
   | { status: "clearing" }
+  | { status: "cleared" }
   | { status: "error"; message: string };
+
+/**
+ * Deletes this owner's saved AI text, images and MP3s. How much is saved is
+ * in Debug Info (Storage on this device).
+ */
 const OwnedGeneratedStorage = () => {
-  const [state, setState] = useState<StorageStatus>({ status: "loading" });
-  // Effect needed: database sizes and clear events come from browser storage, not render-time data or this component's own buttons.
-  useEffect(() => {
-    let active = true;
-    const refresh = () => {
-      import("@/lib/ai-explain/storage")
-        .then(({ getAiStorageUsage }) => getAiStorageUsage())
-        .then(
-          (usage) => {
-            // Only this user's content: it's what Clear deletes.
-            const bytes = Object.values(usage).reduce(
-              (sum, kind) => sum + kind.mine,
-              0
-            );
-            if (active)
-              setState((previous) =>
-                previous.status === "confirm" || previous.status === "clearing"
-                  ? previous
-                  : { status: "ready", bytes }
-              );
-          },
-          () => {
-            if (active)
-              setState((previous) =>
-                previous.status === "confirm" || previous.status === "clearing"
-                  ? previous
-                  : {
-                      status: "error",
-                      message: "Couldn't read generated content storage.",
-                    }
-              );
-          }
-        );
-    };
-    refresh();
-    window.addEventListener("ai-generated-content-changed", refresh);
-    return () => {
-      active = false;
-      window.removeEventListener("ai-generated-content-changed", refresh);
-    };
-  }, []);
+  const [state, setState] = useState<StorageStatus>({ status: "idle" });
   const clear = async () => {
     setState({ status: "clearing" });
     try {
@@ -361,7 +322,7 @@ const OwnedGeneratedStorage = () => {
         "@/lib/ai-explain/storage"
       );
       await clearGeneratedContent();
-      setState({ status: "ready", bytes: 0 });
+      setState({ status: "cleared" });
     } catch {
       setState({
         status: "error",
@@ -386,11 +347,7 @@ const OwnedGeneratedStorage = () => {
             Delete generated content
           </TextActionButton>
           <span aria-hidden>·</span>
-          <TextActionButton
-            onClick={() =>
-              setState({ status: "ready", bytes: state.bytes ?? 0 })
-            }
-          >
+          <TextActionButton onClick={() => setState({ status: "idle" })}>
             Cancel
           </TextActionButton>
         </div>
@@ -398,32 +355,21 @@ const OwnedGeneratedStorage = () => {
     );
   return (
     <div className="mb-4 space-y-2">
-      <p className="text-sm">
-        {state.status === "ready"
-          ? `Estimated generated content: ${(state.bytes / 1024 / 1024).toFixed(2)} MB`
-          : state.status === "loading"
-            ? "Checking saved content…"
-            : state.status === "clearing"
-              ? "Clearing saved content…"
-              : state.message}
-      </p>
+      {state.status === "cleared" && (
+        <p className="text-sm">Generated content deleted.</p>
+      )}
+      {state.status === "error" && <p className="text-sm">{state.message}</p>}
       <p className="text-xs text-muted-foreground">
         Saved only on this device and browser, and not private: anyone with
         access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep.
+        Download content you want to keep. See how much is saved in Debug Info.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}
         className="text-rose-500"
         busy={state.status === "clearing"}
         busyLabel="Clearing…"
-        onClick={() =>
-          setState({
-            status: "confirm",
-            bytes: state.status === "ready" ? state.bytes : undefined,
-          })
-        }
-        disabled={state.status === "loading"}
+        onClick={() => setState({ status: "confirm" })}
       >
         Clear generated content
       </TextActionButton>

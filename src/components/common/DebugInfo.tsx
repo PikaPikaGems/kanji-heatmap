@@ -13,6 +13,11 @@ import { useAiVoiceState } from "@/hooks/use-ai-voice";
 import { initAiVoice, type AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { StorageUsageBar } from "./StorageUsageBar";
+import { Progress } from "@/components/ui/progress";
+import {
+  useAiExplainSettings,
+  useAiExplainUsage,
+} from "@/hooks/use-ai-explain";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import {
   formatDebugInfoForClipboard,
@@ -150,11 +155,60 @@ const StorageUsage = ({
   );
 };
 
+const formatCount = (n: number) => n.toLocaleString("en-US");
+
+/** This month's AI usage, counted in this browser. */
+const AiUsage = () => {
+  const [settings] = useAiExplainSettings();
+  const usage = useAiExplainUsage();
+  const budget = settings.monthlyTokenBudget;
+
+  return (
+    <div className="space-y-3 text-xs">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+        <DebugRow label="Text tokens">
+          <span className="tabular-nums">
+            {formatCount(usage.tokens)}
+            {budget !== undefined && ` / ${formatCount(budget)}`}
+          </span>
+        </DebugRow>
+        <DebugRow label="Requests">{formatCount(usage.requests)}</DebugRow>
+        <DebugRow label="Search calls">{usage.searchCalls}</DebugRow>
+        <DebugRow label="Images">{usage.imageRequests}</DebugRow>
+        <DebugRow label="Audio generations">{usage.audioRequests}</DebugRow>
+        <DebugRow label="Speech characters">
+          {formatCount(usage.audioCharacters)}
+        </DebugRow>
+        {usage.reportedCostUsd > 0 && (
+          <DebugRow label="Provider-reported charges">
+            US${usage.reportedCostUsd.toFixed(4)}
+          </DebugRow>
+        )}
+      </dl>
+      {budget !== undefined && (
+        <Progress
+          value={Math.min(100, (usage.tokens / budget) * 100)}
+          className="h-2"
+          primitiveCn={usage.tokens > budget ? "bg-red-500" : undefined}
+          aria-label="Tokens used of the monthly budget"
+        />
+      )}
+      <p className="text-muted-foreground">
+        Counted in this browser only; restarts each month.
+        {usage.unreportedSearchRequests > 0 &&
+          ` ${usage.unreportedSearchRequests} searched requests had no provider-reported search count.`}{" "}
+        Partial totals: check console.x.ai for your full bill.
+      </p>
+    </div>
+  );
+};
+
 /** Mounted only while the modal is open, so the checks below run on open. */
 const DebugInfoBody = () => {
   const info = useDebugInfo();
   const storage = useAiStorageUsage();
   const voice = useAiVoiceState();
+  const aiUsage = useAiExplainUsage();
 
   // Effect needed: asks the voice engine (outside React, async) whether its
   // files are downloaded; otherwise it only knows after Japanese Voice is used.
@@ -200,12 +254,20 @@ const DebugInfoBody = () => {
           <StorageUsage state={storage} voice={voice} />
         </DebugSection>
       </div>
+      <div className="pt-5 border-t border-dashed">
+        <DebugSection title="AI usage this month">
+          <AiUsage />
+        </DebugSection>
+      </div>
       <div className="flex justify-center pt-3 border-t border-dotted">
         <CopyDebugButton
           getText={() =>
             [
               formatDebugInfoForClipboard(info),
               ...formatStorageForClipboard(storage, voice),
+              "",
+              "AI usage this month",
+              `Text tokens: ${aiUsage.tokens} · Requests: ${aiUsage.requests} · Search calls: ${aiUsage.searchCalls} · Images: ${aiUsage.imageRequests} · Audio generations: ${aiUsage.audioRequests} · Speech characters: ${aiUsage.audioCharacters}`,
             ].join("\n")
           }
         />

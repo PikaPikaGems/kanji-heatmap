@@ -1,3 +1,5 @@
+import { RotateCcw } from "lucide-react";
+import { TextActionButton } from "@/components/common/AiActionButtons";
 import { useId, type ReactNode } from "react";
 import { PlayCircle, Snail } from "@/components/icons";
 import { Label } from "@/components/ui/label";
@@ -12,7 +14,6 @@ import {
   SLOW_SPEED_MIN,
   SPEED_STEP,
 } from "@/lib/stroke-animation-settings";
-import { Button } from "@/components/ui/button";
 
 const formatSpeed = (n: number) => `${n.toFixed(1)}×`;
 
@@ -113,16 +114,14 @@ export const StrokeAnimationSettingsFields = () => {
         onChange={(value) => setSetting("fastSpeed", value)}
       />
 
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        className="w-full text-xs font-bold"
+      <TextActionButton
+        className="flex mx-auto"
+        icon={<RotateCcw size={14} />}
         disabled={isDefault}
         onClick={reset}
       >
         Reset to defaults
-      </Button>
+      </TextActionButton>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
@@ -12,8 +12,6 @@ import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
 import { AiContentNotice } from "@/components/common/AiContentNotice";
 import type { AiExplainState } from "@/hooks/use-ai-explain";
 import { AiExplanationMarkdown } from "./AiExplanationMarkdown";
-import { SpeakButtons } from "./SpeakButtons";
-import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
 const ExplanationBody = ({ state }: { state: AiExplainState }) => {
   if (state.status === "idle") return null;
@@ -100,7 +98,8 @@ export const AiExplainDialog = ({
   open,
   onClose,
   japaneseText,
-  speech,
+  word = false,
+  speakButtons,
   state,
   onRegenerate,
   onDelete,
@@ -108,8 +107,10 @@ export const AiExplainDialog = ({
   open: boolean;
   onClose: () => void;
   japaneseText: string;
-  /** The game's speech for this sentence, so shortcuts and taps share a spinner. */
-  speech: SentenceSpeech;
+  /** A single word: explained without grammar. */
+  word?: boolean;
+  /** Next to the text, e.g. the game's speak buttons for this sentence. */
+  speakButtons: ReactNode;
   state: AiExplainState;
   onRegenerate: (instructions: string) => void;
   onDelete: () => Promise<void>;
@@ -125,7 +126,11 @@ export const AiExplainDialog = ({
       <ScrollableDialogContent
         size="md"
         title="✨ AI Explain"
-        description="An AI explanation of the sentence's vocabulary, translation and grammar"
+        description={
+          word
+            ? "An AI explanation of the word's kanji, usage and examples"
+            : "An AI explanation of the sentence's vocabulary, translation and grammar"
+        }
         titleClassName="text-left"
       >
         <div className="pb-3 mb-3 space-y-2 text-left border-b border-dotted">
@@ -133,7 +138,7 @@ export const AiExplainDialog = ({
             text={japaneseText}
             className="text-2xl leading-10"
           />
-          <SpeakButtons speech={speech} />
+          {speakButtons}
         </div>
         <div className="text-left">
           <ExplanationBody state={state} />
@@ -146,7 +151,9 @@ export const AiExplainDialog = ({
               <CopyButton textToCopy={completedText} iconType="clipboard" />
               <DownloadMarkdownButton
                 markdown={completedText}
-                filename="sentence-explanation.md"
+                filename={
+                  word ? "word-explanation.md" : "sentence-explanation.md"
+                }
               />
               <DeleteWithConfirm
                 question="Delete this saved explanation?"

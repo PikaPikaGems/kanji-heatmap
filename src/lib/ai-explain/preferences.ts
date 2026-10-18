@@ -55,6 +55,31 @@ Rules:
   Natural: It looks like rain, so you'd better take an umbrella.
 - Grammar: 3 to 5 patterns at JLPT N4 level or above only, each one short sentence under 15 words. Never explain N5 basics: particles (は, が, を, に, で, へ, と, も, の, か, よ, ね), です, だ, ます forms, plain past or negative forms, この/その/あの. If the text has fewer than 3 N4+ patterns, list only those; if it has none, write "No N4+ grammar here."`;
 
+/** AI Explain for a single word (e.g. the emoji set): no grammar section. */
+export const DEFAULT_AI_EXPLAIN_WORD_PROMPT = `You are a Japanese tutor helping an English-speaking learner.
+Explain the Japanese word below. No greeting, preamble or closing remarks.
+
+Japanese word: ${JAPANESE_TEXT_PLACEHOLDER}
+
+Reply in Markdown, in exactly this format (keep the blank lines):
+
+**Word:** <word in dictionary form> · <reading in kana> · <short English gloss>
+
+**Kanji**
+- <kanji> · <its meaning in this word> · <the reading it takes here>
+
+**Usage:** <one or two sentences on when and how the word is used, and its nuance>
+
+**Examples**
+1. <short natural Japanese sentence> · <English translation>
+2. ...
+
+Rules:
+- Kanji: one line per kanji in the word, in order. Leave the section out for a word written only in kana.
+- Usage: mention politeness, register or easily confused words only when they matter.
+- Examples: 2 short everyday sentences around JLPT N4 level, each under 15 words.
+- This is a single word, not a sentence: no grammar section and no literal translation.`;
+
 /** The xAI key of one owner (a logged-in account, or the guest). */
 export type AiOwnerKey = {
   apiKey: string;
@@ -71,6 +96,8 @@ export type AiExplainPreferences = {
   enabled: boolean;
   model?: string;
   prompt?: string;
+  /** AI Explain's prompt for a single word. */
+  wordPrompt?: string;
   /** Optional; when set, User Preferences shows usage as a progress bar. */
   monthlyTokenBudget?: number;
   vocabularyPrompt?: string;
@@ -119,6 +146,7 @@ export const readAiExplainPreferences = (): AiExplainPreferences => {
     enabled: raw.enabled === true,
     model: optionalString(raw.model),
     prompt: optionalString(raw.prompt),
+    wordPrompt: optionalString(raw.wordPrompt),
     vocabularyPrompt: optionalString(raw.vocabularyPrompt),
     kanjiEssayPrompt: optionalString(raw.kanjiEssayPrompt),
     imagePrompt: optionalString(raw.imagePrompt),
@@ -258,12 +286,18 @@ export const isAiExplainReady = (settings: AiExplainSettings) =>
 export const modelOf = (settings: AiExplainSettings) =>
   settings.model ?? DEFAULT_AI_EXPLAIN_MODEL;
 
-/** The prompt to send. A prompt without the placeholder gets the text appended. */
+/**
+ * The prompt to send: the sentence prompt, or the word prompt when `word`.
+ * A prompt without the placeholder gets the text appended.
+ */
 export const buildAiExplainPrompt = (
   settings: AiExplainSettings,
-  japaneseText: string
+  japaneseText: string,
+  word = false
 ) => {
-  const template = settings.prompt ?? DEFAULT_AI_EXPLAIN_PROMPT;
+  const template = word
+    ? (settings.wordPrompt ?? DEFAULT_AI_EXPLAIN_WORD_PROMPT)
+    : (settings.prompt ?? DEFAULT_AI_EXPLAIN_PROMPT);
   if (!template.includes(JAPANESE_TEXT_PLACEHOLDER)) {
     return `${template}\n\nJapanese text: ${japaneseText}`;
   }

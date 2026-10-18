@@ -13,11 +13,7 @@ import { Button } from "@/components/ui/button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import {
-  useAiExplainSettings,
-  useAiExplainUsage,
-} from "@/hooks/use-ai-explain";
-import { Progress } from "@/components/ui/progress";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   Accordion,
   AccordionContent,
@@ -306,41 +302,13 @@ const ModelField = () => {
 
 const formatTokens = (n: number) => n.toLocaleString("en-US");
 
-const UsageField = () => {
+/** The budget only; this month's usage is in Debug Info. */
+const BudgetField = () => {
   const [settings, update] = useAiExplainSettings();
-  const usage = useAiExplainUsage();
   const budget = settings.monthlyTokenBudget;
   const id = useId();
   return (
     <div className="mb-4">
-      {/* The token and request counts are in the subsection's subtitle. */}
-      {budget !== undefined && (
-        <div className="mb-3">
-          <p className="text-sm tabular-nums">
-            {formatTokens(usage.tokens)} / {formatTokens(budget)} tokens
-          </p>
-          <Progress
-            value={Math.min(100, (usage.tokens / budget) * 100)}
-            className="h-2 mt-2"
-            primitiveCn={usage.tokens > budget ? "bg-red-500" : undefined}
-            aria-label="Tokens used of the monthly budget"
-          />
-        </div>
-      )}
-      <p className="mb-3 text-xs text-muted-foreground">
-        Search calls: {usage.searchCalls} · Images: {usage.imageRequests} ·
-        Audio generations: {usage.audioRequests} · Speech characters:{" "}
-        {usage.audioCharacters}
-        {usage.unreportedSearchRequests > 0 &&
-          ` · ${usage.unreportedSearchRequests} searched requests without a provider-reported search count`}
-      </p>
-      {usage.reportedCostUsd > 0 && (
-        <p className="mb-3 text-xs text-muted-foreground">
-          Provider-reported charges: US${usage.reportedCostUsd.toFixed(4)}.
-          Partial total for requests that returned cost data; check xAI for your
-          full bill.
-        </p>
-      )}
       <label htmlFor={id} className="block mb-1 text-sm font-semibold">
         Monthly text-token budget (optional)
       </label>
@@ -362,8 +330,9 @@ const UsageField = () => {
         Counted in this browser only, and restarts each month. Requests
         incomplete or cancelled can still be billed. Local counters may omit
         these requests. This text-token budget is not a total spending limit for
-        search, images, or speech, and nothing is blocked. Your exact usage is
-        at <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        search, images, or speech, and nothing is blocked. This month&apos;s
+        usage is in Debug Info; your exact usage is at{" "}
+        <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
       </p>
     </div>
   );
@@ -398,7 +367,6 @@ const SubsectionItem = ({
 
 const Subsections = () => {
   const [settings] = useAiExplainSettings();
-  const usage = useAiExplainUsage();
   const editedPrompts = useEditedPromptCount();
 
   return (
@@ -438,18 +406,20 @@ const Subsections = () => {
       <SubsectionItem
         value="storage"
         title="Generated content"
-        subtitle="Saved space and deletion"
+        subtitle="Delete what's saved on this device"
       >
         <GeneratedStorageSettings />
       </SubsectionItem>
       <SubsectionItem
         value="usage"
-        title="Usage"
-        subtitle={`This month: ${formatTokens(usage.tokens)} tokens · ${usage.requests} ${
-          usage.requests === 1 ? "request" : "requests"
-        }`}
+        title="Monthly budget"
+        subtitle={
+          settings.monthlyTokenBudget === undefined
+            ? "No text-token budget set"
+            : `${formatTokens(settings.monthlyTokenBudget)} text tokens a month`
+        }
       >
-        <UsageField />
+        <BudgetField />
       </SubsectionItem>
     </Accordion>
   );

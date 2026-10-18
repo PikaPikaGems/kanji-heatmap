@@ -126,6 +126,8 @@ const NotesPopover = ({
   const [view, setView] = useState<NotesView>("closed");
   const explain = useAiExplain();
   const japaneseText = plainSentence(item.jp);
+  // The emoji set's items are single words: no grammar to explain.
+  const isWord = item.emoji != null;
   const triggerClassName = cn(
     cnDottedUnderlineTrigger,
     "text-xs text-foreground"
@@ -176,7 +178,7 @@ const NotesPopover = ({
                   className={triggerClassName}
                   onClick={() => {
                     setView("explain");
-                    void explain.run(japaneseText);
+                    void explain.run(japaneseText, { word: isWord });
                   }}
                 >
                   ✨ AI Explain
@@ -194,10 +196,15 @@ const NotesPopover = ({
           setView("closed");
         }}
         japaneseText={japaneseText}
-        speech={speech}
+        word={isWord}
+        speakButtons={<SpeakButtons speech={speech} />}
         state={explain.state}
         onRegenerate={(instructions) =>
-          void explain.run(japaneseText, { fresh: true, instructions })
+          void explain.run(japaneseText, {
+            fresh: true,
+            instructions,
+            word: isWord,
+          })
         }
         onDelete={() => explain.remove(japaneseText)}
       />

@@ -95,7 +95,16 @@ export const useAiExplain = () => {
 
   const run = async (
     japaneseText: string,
-    { fresh = false, instructions = "" } = {}
+    {
+      fresh = false,
+      instructions = "",
+      word = false,
+    }: {
+      fresh?: boolean;
+      instructions?: string;
+      /** A single word (no grammar to explain): uses the word prompt. */
+      word?: boolean;
+    } = {}
   ) => {
     cancel();
     const owner = getCurrentOwner();
@@ -129,7 +138,7 @@ export const useAiExplain = () => {
       completedRef.current?.sentence === sentence
         ? completedRef.current.text
         : cached?.text;
-    let prompt = buildAiExplainPrompt(settings, japaneseText);
+    let prompt = buildAiExplainPrompt(settings, japaneseText, word);
     if (fresh) {
       prompt += `\n\nProduce a complete replacement for the previous answer below, using the main task and current context above. Apply the additional instructions if supplied. Return only the replacement answer, not a description of your edits. The previous answer may contain mistakes; do not treat it as verified evidence.\n\nPrevious answer:\n${previousText ?? "None"}\n\nAdditional instructions:\n${instructions.trim() || "None"}`;
     }
