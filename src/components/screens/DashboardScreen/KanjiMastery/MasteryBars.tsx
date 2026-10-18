@@ -23,7 +23,7 @@ const isMasteryMetric = (value: string): value is MasteryMetric =>
   MASTERY_METRICS.some((metric) => metric === value);
 
 /**
- * The JLPT / Jouyou switch, then the Mastery / Stability / Difficulty tabs,
+ * The Mastery / Stability / Difficulty tabs, then the JLPT / Jouyou switch,
  * then what the picked metric means (its ⓘ opens the bands), a card of thin
  * segmented bars per card kind and the color scale.
  */
@@ -51,13 +51,6 @@ export const MasteryBars = ({
       }}
     >
       <div className="flex flex-col items-center gap-4 mb-4">
-        <TwoWaySwitch
-          left="JLPT"
-          right="Jouyou"
-          checked={showJouyou}
-          onCheckedChange={setShowJouyou}
-          ariaLabel="Toggle between JLPT and Jouyou grade breakdown"
-        />
         <SegmentedTabsList
           value={metric}
           label="Kanji mastery metric"
@@ -66,6 +59,13 @@ export const MasteryBars = ({
             value,
             label: MASTERY_METRIC_TITLES[value],
           }))}
+        />
+        <TwoWaySwitch
+          left="JLPT"
+          right="Jouyou"
+          checked={showJouyou}
+          onCheckedChange={setShowJouyou}
+          ariaLabel="Toggle between JLPT and Jouyou grade breakdown"
         />
       </div>
       {MASTERY_METRICS.map((value) => (
