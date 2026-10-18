@@ -24,6 +24,11 @@ import {
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
 import { AccountSection } from "@/components/dependent/account/AccountSection";
+import {
+  hasNoAccounts,
+  useAccountStatus,
+} from "@/lib/engine/use-account-status";
+import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { MockBackendPanel } from "@/components/dependent/account/MockBackendPanel";
 import { CumUseGraphModal } from "@/components/screens/CumUseScreen/CumUseGraphModal";
 
@@ -60,6 +65,16 @@ const HeaderDrawerContent = ({
   onAction: (modal: OpenedModal) => void;
 }) => {
   const navSections = useVisibleNavSections(headerNavSections);
+  const noAccounts = hasNoAccounts(useAccountStatus());
+  const tools = (
+    <>
+      <DebugInfo />
+      <SettingsModalTrigger
+        title="User Preferences"
+        onClick={() => onAction("settings")}
+      />
+    </>
+  );
 
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
@@ -79,17 +94,7 @@ const HeaderDrawerContent = ({
             <ModeToggle />
           </div>
         </div>
-        <AccountSection
-          tools={
-            <>
-              <DebugInfo />
-              <SettingsModalTrigger
-                title="User Preferences"
-                onClick={() => onAction("settings")}
-              />
-            </>
-          }
-        />
+        <AccountSection tools={tools} />
         <CollapsibleNavLinkSections
           sections={navSections}
           dotHrefs={dueNavHrefs(due)}
@@ -135,6 +140,16 @@ const HeaderDrawerContent = ({
       </div>
 
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
+        {/* Without accounts there is no account card to hold these tools. */}
+        {noAccounts && (
+          <div
+            className="flex items-center justify-center gap-3 pt-3 pb-1"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-1.5">{tools}</div>
+            <NetworkStatusBadge />
+          </div>
+        )}
         <InstallAppModalTrigger onClick={() => onAction("install-guide")} />
         <MockBackendPanel />
       </div>

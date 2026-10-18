@@ -7,6 +7,7 @@ import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import {
+  hasNoAccounts,
   useAccountStatus,
   type AccountStatus,
 } from "@/lib/engine/use-account-status";
@@ -15,15 +16,11 @@ import { ActiveAccount } from "./ActiveAccount";
 import { FsrsSettingsItem } from "./FsrsSettingsItem";
 
 /**
- * What stands in for the card when there is no account to show: an update
- * hint, a diagnostic, the recovery button, or nothing (loading, or a build
- * without the engine).
+ * What stands in for the card while there is no account to show: an update
+ * hint, a diagnostic, the recovery button, or nothing (loading).
  */
 const NoCardNotice = ({ status }: { status: AccountStatus }) => {
   if (status.kind === "unavailable") {
-    if (status.reason === "not-included" || status.reason === "failed") {
-      return null;
-    }
     return (
       <p className="p-2 text-xs text-left border border-dashed rounded-xl text-muted-foreground">
         {UPDATE_BROWSER_COPY}
@@ -112,11 +109,12 @@ const AccountBody = ({
 /**
  * Account area of the sidebar. `tools` are the icon buttons every build shows
  * (App & Device Info, User Preferences): they sit in the card's bottom row, or on
- * their own where the card would be when there is no account to show (e.g. a
- * build without the study engine).
+ * their own where the card would be while there is no account to show. Renders
+ * nothing in a build without accounts (see `hasNoAccounts`).
  */
 export const AccountSection = ({ tools }: { tools: ReactNode }) => {
   const status = useAccountStatus();
+  if (hasNoAccounts(status)) return null;
 
   return (
     <div

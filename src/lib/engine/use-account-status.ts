@@ -84,3 +84,12 @@ export const getWriteBlocker = (status: AccountStatus): WriteBlocker | null => {
   if (status.kind === "error") return "unavailable";
   return status.kind;
 };
+
+/**
+ * True when this build has no accounts at all (no study engine, or it failed
+ * to start): the sidebar then drops the account area and shows its tools at
+ * the bottom instead.
+ */
+export const hasNoAccounts = (status: AccountStatus): boolean =>
+  status.kind === "unavailable" &&
+  (status.reason === "not-included" || status.reason === "failed");
