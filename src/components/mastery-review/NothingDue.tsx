@@ -6,12 +6,15 @@ import { useSuggestedKanji } from "./use-suggested-kanji";
 
 /**
  * Start screen with no card due: says so, suggests a kanji to add to the
- * review pile (opens its drawer), and shows when the next review is.
+ * review pile (opens its drawer; not while saving is blocked, since it
+ * couldn't be added), and shows when the next review is.
  */
 export const NothingDue = ({
   nextDueAt,
+  canAdd,
 }: {
   nextDueAt: UTCTimestamp | null | undefined;
+  canAdd: boolean;
 }) => {
   const suggestion = useSuggestedKanji();
   const setOpenedKanji = useSetOpenedParam();
@@ -21,7 +24,7 @@ export const NothingDue = ({
     <div className="flex flex-col items-center gap-2">
       <UserNotice icon={null} className="text-base font-bold text-center">
         Nothing due right now.
-        {suggestion != null && (
+        {canAdd && suggestion != null && (
           <span key={suggestion} className="animate-fade-in-fast">
             {" "}
             How about adding{" "}

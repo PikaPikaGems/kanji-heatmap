@@ -57,7 +57,9 @@ export const MasteryStartScreen = ({
           {due != null && due > 0 && (
             <Stat value={due} unit="" label="Due now" />
           )}
-          {due === 0 && <NothingDue nextDueAt={nextDueAt} />}
+          {due === 0 && (
+            <NothingDue nextDueAt={nextDueAt} canAdd={blocker == null} />
+          )}
         </div>
       </div>
 

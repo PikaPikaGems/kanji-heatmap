@@ -26,7 +26,6 @@ const AvatarButton = ({ initial }: { initial: string }) => {
           "rounded-full size-11 border-b-4 active:border-b-2 text-lg font-extrabold",
           hint.hint && "animate-practice-bounce-soft"
         )}
-        key={hint.hint?.key}
         aria-label="Copy debug info"
         title="Copy debug info"
         onClick={(e) => {

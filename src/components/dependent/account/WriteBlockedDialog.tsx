@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { UserNotice } from "@/components/common/UserNotice";
 import LinkOutIcon from "@/components/common/LinkOutIcon";
@@ -117,15 +117,23 @@ export const WriteBlockedPopover = ({
 }: {
   blocker: WriteBlocker;
   trigger: ReactNode;
-}) => (
-  <GenericPopover
-    // Inside the kanji drawer: modal, or the popover can't be clicked.
-    modal
-    trigger={trigger}
-    content={
-      <UserNotice className="px-4 py-3 text-sm max-w-64">
-        <WriteBlockerCopy blocker={blocker} />
-      </UserNotice>
-    }
-  />
-);
+}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <GenericPopover
+      // Inside the kanji drawer: modal, or the popover can't be clicked.
+      modal
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger}
+      content={
+        // "Learn more" opens the dialog: close the popover behind it.
+        <div onClickCapture={() => setOpen(false)}>
+          <UserNotice className="px-4 py-3 text-sm max-w-64">
+            <WriteBlockerCopy blocker={blocker} />
+          </UserNotice>
+        </div>
+      }
+    />
+  );
+};
