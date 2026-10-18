@@ -113,7 +113,9 @@ const HeaderDrawerContent = ({
           </div>
         </div>
 
-        <PikaPikaLinks />
+        <div className="w-full pt-4">
+          <PikaPikaLinks />
+        </div>
       </div>
 
       <div className="flex flex-col items-center w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">

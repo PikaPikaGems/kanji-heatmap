@@ -5,6 +5,7 @@ import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-conte
 import { useEngineState } from "@/lib/engine/engine";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
+import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { LoginCodeStep } from "./LoginCodeStep";
 import { LoginDownloadingStep } from "./LoginDownloadingStep";
 import { LoginEmailStep } from "./LoginEmailStep";
@@ -15,17 +16,12 @@ type LoginStep =
   | { kind: "downloading"; error: string | null };
 
 /**
- * How the dialog can be dismissed: "free" (X, Escape, click outside),
- * "no-outside" while a code is being typed (a stray click would lose it) and
- * "locked" while the data downloads after logging in (no way out at all).
+ * A click outside never closes the dialog (a stray click would lose a typed
+ * email or code). It is "locked" while the data downloads after logging in
+ * (no X and no Escape either).
  */
-type Dismissal = "free" | "no-outside" | "locked";
-
-const dismissalOf = (step: LoginStep): Dismissal => {
-  if (step.kind === "downloading" && step.error === null) return "locked";
-  if (step.kind === "code") return "no-outside";
-  return "free";
-};
+const isLocked = (step: LoginStep) =>
+  step.kind === "downloading" && step.error === null;
 
 const LoginStepScreen = ({
   api,
@@ -67,7 +63,7 @@ const LoginStepScreen = ({
 
 const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
   const [step, setStep] = useState<LoginStep>({ kind: "email", email: "" });
-  const dismissal = dismissalOf(step);
+  const locked = isLocked(step);
 
   const download = async () => {
     setStep({ kind: "downloading", error: null });
@@ -83,7 +79,7 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next && dismissal !== "locked") closeLoginDialog();
+        if (!next && !locked) closeLoginDialog();
       }}
     >
       <ScrollableDialogContent
@@ -91,10 +87,8 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
         title="Login required"
         description="Log in to your Kanji Heatmap Premium account with an email code"
         titleClassName="text-left"
-        hideClose={dismissal === "locked"}
-        onInteractOutside={(event) => {
-          if (dismissal !== "free") event.preventDefault();
-        }}
+        hideClose={locked}
+        onInteractOutside={(event) => event.preventDefault()}
       >
         <div className="flex flex-col gap-4 px-2 pt-2 text-left">
           <LoginStepScreen
@@ -103,6 +97,9 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
             onStep={setStep}
             onDownload={() => void download()}
           />
+          <div className="pt-4 border-t border-dotted">
+            <PikaPikaLinks />
+          </div>
         </div>
       </ScrollableDialogContent>
     </Dialog>

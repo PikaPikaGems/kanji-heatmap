@@ -3,6 +3,8 @@ import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
+import { PREMIUM_LAPSED_COPY } from "@/lib/engine/engine-copy";
+import { WriteBlockedLearnMore } from "./WriteBlockedDialog";
 
 /** "Progress can't be saved in this browser", for browsers the engine can't run in. */
 export const BrowserCantSaveNotice = ({
@@ -46,6 +48,12 @@ export const ProgressNotSavedNotice = ({
     return (
       <p className={cn("text-sm text-center", cnWarningText, className)}>
         {saveError}
+        {saveError === PREMIUM_LAPSED_COPY && (
+          <>
+            {" "}
+            <WriteBlockedLearnMore />
+          </>
+        )}
       </p>
     );
   }

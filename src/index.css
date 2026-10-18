@@ -196,6 +196,27 @@ button {
   animation: fade-in 0.8s ease-out;
 }
 
+/* A small "Copied" toast: fades in, holds, fades out (1.5 s, the copy reset). */
+.animate-toast-fade {
+  animation: toast-fade 1.5s ease-out both;
+}
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  12%,
+  75% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -28,6 +28,7 @@ import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
 import { LoginDialog } from "@/components/dependent/account/LoginDialog";
 import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
 import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
+import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
 import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
 import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
 import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
@@ -164,6 +165,7 @@ const App = () => {
             <LoggingOutScreen />
             <FsrsSettingsDialog />
             <SyncOperationsDialog />
+            <WriteBlockedDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

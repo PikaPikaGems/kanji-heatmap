@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Small pulsing yellow "something is waiting" dot. Flows inline (put it after
- * the text it belongs to); position it through `className` where needed.
+ * Small pulsing yellow "something is waiting" dot: the one due dot of the
+ * FAB, the FAB menu and the sidebar (change its color here). Flows inline
+ * (put it after the text it belongs to); position it through `className`
+ * where needed.
  */
 export const NotificationDot = ({ className }: { className?: string }) => (
   <span

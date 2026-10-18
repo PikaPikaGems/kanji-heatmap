@@ -119,10 +119,15 @@ export const FailedOperationRow = ({
             {text !== null && (
               <>
                 {" "}
-                <NoticeAction onClick={() => void copy(text)}>
-                  {COPY_NOTICE[copyStatus].label}
-                </NoticeAction>
-                {COPY_NOTICE[copyStatus].after}
+                {/* Once copied it is no longer a warning: normal text color. */}
+                <span
+                  className={cn(copyStatus === "copied" && "text-foreground")}
+                >
+                  <NoticeAction onClick={() => void copy(text)}>
+                    {COPY_NOTICE[copyStatus].label}
+                  </NoticeAction>
+                  {COPY_NOTICE[copyStatus].after}
+                </span>
               </>
             )}
           </p>

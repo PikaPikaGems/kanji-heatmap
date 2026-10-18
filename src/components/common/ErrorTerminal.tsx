@@ -17,7 +17,7 @@ export const ErrorTerminal = ({
   return (
     <div
       className={cn(
-        "w-full max-w-md overflow-hidden text-left rounded-xl border border-neutral-700 bg-[#0d1117] shadow-lg",
+        "relative w-full max-w-md overflow-hidden text-left rounded-xl border border-neutral-700 bg-[#0d1117] shadow-lg",
         className
       )}
     >
@@ -59,6 +59,14 @@ export const ErrorTerminal = ({
       >
         {content}
       </pre>
+      {copied && (
+        <span
+          role="status"
+          className="absolute px-3 py-1 font-sans text-xs font-semibold text-white rounded-full shadow-lg pointer-events-none left-1/2 bottom-3 bg-emerald-600 animate-toast-fade"
+        >
+          Copied to clipboard
+        </span>
+      )}
     </div>
   );
 };

@@ -73,6 +73,9 @@ export const REVIEW_SETTINGS_UPDATE_COPY =
 export const copyForCode = (code: string): string =>
   CODE_COPY[code] ?? "Something went wrong. Try again.";
 
+/** "Your account can't save changes right now.", the premium-lapsed copy. */
+export const PREMIUM_LAPSED_COPY = CODE_COPY.premium_lapsed;
+
 export const copyForWriteBlocker = (blocker: WriteBlocker): string =>
   BLOCKER_COPY[blocker];
 
@@ -81,4 +84,11 @@ export const OLD_PENDING_WARNING_COPY = {
   before: "Some changes haven't synced in a week. Go online and ",
   action: "sync now",
   after: ", or saving will pause.",
+} as const;
+
+/** The same warning, short enough for one line on phones. */
+export const OLD_PENDING_WARNING_SHORT_COPY = {
+  before: "Week-old changes haven't synced. ",
+  action: "Sync now",
+  after: "",
 } as const;

@@ -67,11 +67,6 @@ const SyncOperationsBody = ({
   return (
     <div className="flex flex-col gap-4 px-2 pt-1 text-left">
       <SyncHeader sync={sync} />
-      <SyncActions
-        sync={sync}
-        dismissable={dismissable}
-        onDismissed={failed.reload}
-      />
       <Tabs
         value={tab}
         onValueChange={(next) =>
@@ -106,6 +101,11 @@ const SyncOperationsBody = ({
           />
         </TabsContent>
       </Tabs>
+      <SyncActions
+        sync={sync}
+        dismissable={dismissable}
+        onDismissed={failed.reload}
+      />
     </div>
   );
 };

@@ -20,7 +20,10 @@ const BottomBanner = () => {
           <OldPendingNotice className="text-sm font-extrabold text-center text-background" />
         }
         narrow={
-          <OldPendingNotice className="text-xs font-extrabold text-center text-background" />
+          <OldPendingNotice
+            short
+            className="text-xs font-extrabold text-center text-background"
+          />
         }
       />
     );

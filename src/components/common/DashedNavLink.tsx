@@ -53,14 +53,13 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       >
         <div className="flex text-sm font-semibold text-left">
           {Icon && <Icon className="mt-0.5 mr-2 size-4 shrink-0" />}
-          {/* The dot stays glued to the title's last word when it wraps. */}
+          {/* The dot stays glued to the title's last word when it wraps,
+              centered on the text's height. */}
           <span>
             {title.slice(0, lastWordStart)}
-            <span className="whitespace-nowrap">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap">
               {title.slice(lastWordStart)}
-              {showDot && (
-                <NotificationDot className="inline-block ml-2 align-middle" />
-              )}
+              {showDot && <NotificationDot />}
             </span>
           </span>
         </div>

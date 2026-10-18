@@ -4,6 +4,7 @@ import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import {
   copyForCode,
   OLD_PENDING_WARNING_COPY,
+  OLD_PENDING_WARNING_SHORT_COPY,
 } from "@/lib/engine/engine-copy";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import type { ActionStatus } from "./action-status";
@@ -14,7 +15,14 @@ import type { ActionStatus } from "./action-status";
  * line reads "Syncing…", and a failure shows under the sentence. The caller
  * decides when to show it (see `useHasOldPendingChanges`).
  */
-export const OldPendingNotice = ({ className }: { className?: string }) => {
+export const OldPendingNotice = ({
+  short = false,
+  className,
+}: {
+  /** Phones: "Week-old changes haven't synced. **Sync now**". */
+  short?: boolean;
+  className?: string;
+}) => {
   const api = useEngineApi();
   const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
 
@@ -43,13 +51,16 @@ export const OldPendingNotice = ({ className }: { className?: string }) => {
     );
   }
 
+  const copy = short
+    ? OLD_PENDING_WARNING_SHORT_COPY
+    : OLD_PENDING_WARNING_COPY;
   return (
     <UserNotice className={className}>
-      {OLD_PENDING_WARNING_COPY.before}
+      {copy.before}
       <NoticeAction disabled={!api} onClick={() => void syncNow()}>
-        {OLD_PENDING_WARNING_COPY.action}
+        {copy.action}
       </NoticeAction>
-      {OLD_PENDING_WARNING_COPY.after}
+      {copy.after}
       {status.kind === "error" && (
         <span role="alert" className="block font-bold">
           {status.message}

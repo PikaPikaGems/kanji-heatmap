@@ -63,6 +63,9 @@ const AccountBody = ({
     return (
       <AccountCard
         name="Guest"
+        status={
+          <span className="text-xs text-muted-foreground">Not logged in</span>
+        }
         tools={
           <>
             {tools}

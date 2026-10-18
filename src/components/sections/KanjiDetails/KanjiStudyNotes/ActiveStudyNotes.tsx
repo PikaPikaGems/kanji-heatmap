@@ -1,9 +1,10 @@
+import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { EngineAPI, KanjiNoteView } from "engine-contract";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import { copyForCode, copyForWriteBlocker } from "@/lib/engine/engine-copy";
+import { copyForCode } from "@/lib/engine/engine-copy";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
@@ -325,7 +326,7 @@ const LoadedActiveStudyNotes = ({
     if (editing && writeBlocker != null) {
       notices.push(
         <UserNotice key="blocker">
-          {copyForWriteBlocker(writeBlocker)}
+          <WriteBlockerCopy blocker={writeBlocker} />
         </UserNotice>
       );
     }

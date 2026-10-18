@@ -1,11 +1,9 @@
+import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
+import type { ReactNode } from "react";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import {
-  copyForCode,
-  copyForWriteBlocker,
-  UPDATE_BROWSER_COPY,
-} from "@/lib/engine/engine-copy";
+import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import {
@@ -37,7 +35,7 @@ const Note = ({
   children,
   tone,
 }: {
-  children: string;
+  children: ReactNode;
   tone: "info" | "error";
 }) =>
   tone === "error" ? (
@@ -83,7 +81,11 @@ const ActiveReviewPileButton = ({
         <span className="px-2 py-2 text-sm font-bold text-green-500">
           ✓ In review pile
         </span>
-        {blocker && <Note tone="info">{copyForWriteBlocker(blocker)}</Note>}
+        {blocker && (
+          <Note tone="info">
+            <WriteBlockerCopy blocker={blocker} />
+          </Note>
+        )}
       </div>
     );
   }
@@ -119,7 +121,11 @@ const ActiveReviewPileButton = ({
         />
       )}
       {snapshot.status === "ready" && !snapshot.result.ok && <LoadFailedNote />}
-      {blocker && <Note tone="info">{copyForWriteBlocker(blocker)}</Note>}
+      {blocker && (
+        <Note tone="info">
+          <WriteBlockerCopy blocker={blocker} />
+        </Note>
+      )}
       {tooLong && <Note tone="error">{copyForCode("validation_failed")}</Note>}
       {action.kind === "error" && <Note tone="error">{action.message}</Note>}
     </div>
@@ -180,7 +186,9 @@ export const ReviewPileButton = ({
         <AddLabel word={word} />
       </button>
       {blocker && blocker !== "loading" && (
-        <Note tone="info">{copyForWriteBlocker(blocker)}</Note>
+        <Note tone="info">
+          <WriteBlockerCopy blocker={blocker} />
+        </Note>
       )}
     </div>
   );

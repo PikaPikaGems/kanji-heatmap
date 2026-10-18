@@ -1,12 +1,9 @@
+import { WriteBlockerCopy } from "@/components/dependent/account/WriteBlockedDialog";
 import { useState } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { UserNotice } from "@/components/common/UserNotice";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
-import {
-  copyForCode,
-  copyForWriteBlocker,
-  UPDATE_BROWSER_COPY,
-} from "@/lib/engine/engine-copy";
+import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import {
@@ -70,7 +67,7 @@ const ActiveBookmarkButton = ({
       </button>
       {blocker && (
         <UserNotice icon={null} className="text-xs text-right max-w-48">
-          {copyForWriteBlocker(blocker)}
+          <WriteBlockerCopy blocker={blocker} />
         </UserNotice>
       )}
       {action.kind === "error" && (
@@ -127,7 +124,7 @@ export const BookmarkButton = ({ kanji }: { kanji: string }) => {
       </button>
       {blocker && blocker !== "loading" && (
         <UserNotice icon={null} className="text-xs text-right max-w-48">
-          {copyForWriteBlocker(blocker)}
+          <WriteBlockerCopy blocker={blocker} />
         </UserNotice>
       )}
     </div>

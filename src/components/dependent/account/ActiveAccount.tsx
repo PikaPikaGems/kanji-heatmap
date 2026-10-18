@@ -15,11 +15,12 @@ import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import { AccountCard } from "./AccountCard";
 import { hasOldPendingChanges } from "./old-pending";
 import { OldPendingNotice } from "./OldPendingNotice";
-import { SyncChip } from "./SyncChip";
+import { SyncFailures, SyncStatusLine } from "./SyncStatusLine";
+import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
-const Notice = ({ children }: { children: string }) => (
+const Notice = ({ children }: { children: ReactNode }) => (
   <p className={cn("text-xs", cnWarningText)}>{children}</p>
 );
 
@@ -41,6 +42,8 @@ export const ActiveAccount = ({
   return (
     <AccountCard
       name={name}
+      initial={name.charAt(0).toUpperCase() || null}
+      status={<SyncStatusLine sync={sync} />}
       tools={tools}
       actions={
         // The modal lives outside the drawer, so close the drawer first.
@@ -57,10 +60,27 @@ export const ActiveAccount = ({
         </DrawerPrimitive.Close>
       }
     >
-      <SyncChip sync={sync} />
+      <SyncFailures />
       {hasOldPendingChanges(sync) && <OldPendingNotice className="text-xs" />}
       {!status.writeAccess.allowed && (
-        <Notice>{copyForWriteBlocker(status.writeAccess.reason)}</Notice>
+        <Notice>
+          {copyForWriteBlocker(status.writeAccess.reason)}
+          {status.writeAccess.reason === "premium_lapsed" && (
+            <>
+              {" "}
+              {/* The modal lives outside the drawer, so close the drawer first. */}
+              <DrawerPrimitive.Close asChild>
+                <button
+                  type="button"
+                  className="underline rounded-sm underline-offset-4 decoration-2 hover-text-theme-color-with-opacity-100"
+                  onClick={openWriteBlockedDialog}
+                >
+                  Learn more
+                </button>
+              </DrawerPrimitive.Close>
+            </>
+          )}
+        </Notice>
       )}
       {sync?.pushBlocked && <Notice>{PUSH_BLOCKED_COPY}</Notice>}
       {status.reviewSettings.status === "update_required" && (

@@ -5,6 +5,7 @@ import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { LoginNotice } from "@/components/dependent/account/LoginNotice";
+import { WriteBlockedLearnMore } from "@/components/dependent/account/WriteBlockedDialog";
 import { Accordion } from "@/components/ui/accordion";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { copyForCode, copyForWriteBlocker } from "@/lib/engine/engine-copy";
@@ -69,7 +70,7 @@ const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
     return (
       <UserNotice>
         Your account can&apos;t save changes right now, so these settings are
-        read-only.
+        read-only. <WriteBlockedLearnMore />
       </UserNotice>
     );
   }

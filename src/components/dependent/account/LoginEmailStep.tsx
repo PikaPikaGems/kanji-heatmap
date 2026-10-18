@@ -2,19 +2,11 @@ import { useState } from "react";
 import type { EngineAPI } from "engine-contract";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import LinkOutIcon from "@/components/common/LinkOutIcon";
-import { linksOutItems } from "@/components/items/links-out-items";
+import { CONTACT_ITEMS } from "./contact-items";
 import { outLinks } from "@/lib/external-links";
 import type { ActionStatus } from "./action-status";
 import { loginFailureMessage } from "./login-failure";
 import { SubmitInput } from "./SubmitInput";
-
-/** The site's X/Twitter, Discord, Instagram and Mail icon links. */
-const CONTACT_ITEMS = [
-  linksOutItems.twitterItem,
-  linksOutItems.discordItem,
-  linksOutItems.instagramItem,
-  linksOutItems.emailItem,
-];
 
 /** An emoji and its link, kept together on one line. */
 const WaitlistLink = ({

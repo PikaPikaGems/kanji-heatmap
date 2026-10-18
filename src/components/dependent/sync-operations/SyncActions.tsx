@@ -12,10 +12,10 @@ import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
 /**
- * The dialog's buttons on one row: "Dismiss all (keeps notes)" when the
- * Needs attention tab has something to dismiss, and "Sync now" (or "Refresh
- * data") when it can help: online with changes waiting, or a refresh needed.
- * Sync now is the main action, so it comes last.
+ * The dialog's buttons, at the bottom of the modal: "Dismiss all (keeps
+ * notes)" when the Needs attention tab has something to dismiss, and "Sync
+ * now" (or "Refresh data") when it can help: online with changes waiting, or
+ * a refresh needed. Sync now is the main action (primary), so it comes last.
  */
 export const SyncActions = ({
   sync,
@@ -60,7 +60,7 @@ export const SyncActions = ({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 pt-4 border-t border-dotted">
       <DialogActions>
         {dismissable.length > 0 && (
           <PracticeButton
@@ -78,8 +78,7 @@ export const SyncActions = ({
         )}
         {showSync && (
           <PracticeButton
-            variant="secondary"
-            // Not disabled while busy: a disabled secondary button fades to 20%.
+            // Not disabled while busy: a disabled button fades out.
             disabled={!api}
             aria-busy={syncing}
             onClick={() => void syncNow()}
