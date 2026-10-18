@@ -1,14 +1,7 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { useTapGuard } from "@/hooks/use-tap-guard";
 import { PracticeBottomBar } from "./PracticeBottomBar";
-
-/**
- * How long after the screen appears its buttons ignore taps (the length of
- * its fade-in). On touch screens a second tap on the previous screen's
- * Continue (the answer drawer's, say) lands here, often on "I'm done", and
- * would end the session by accident.
- */
-const TAP_GUARD_MS = 500;
 
 /**
  * The one end-of-round / end-of-session screen for every practice and mastery
@@ -43,11 +36,9 @@ export const EndScreenLayout = ({
   /** Under the buttons, e.g. "progress not saved". */
   notice?: ReactNode;
 }) => {
-  const [shownAt] = useState(() => Date.now());
-  const guarded = (action: () => void) => () => {
-    if (Date.now() - shownAt < TAP_GUARD_MS) return;
-    action();
-  };
+  // Its buttons ignore taps while it fades in, so a double tap on the
+  // answer drawer's Continue can't hit "I'm done".
+  const guarded = useTapGuard();
 
   return (
     <div className="flex flex-col w-full h-full animate-fade-in">
