@@ -75,11 +75,18 @@ const App = () => {
                 path={speedKatakanaPage.href}
                 component={speedKatakanaPage.Component}
               />
-              {/* Fill the Kanji uses the shared practice shell + header. */}
+              {/* Fill in the Kanji uses the shared practice shell + header. */}
               <Route
                 path={fillTheKanjiPage.href}
                 component={fillTheKanjiPage.Component}
               />
+              {/* The game's old URL (bookmarks, installed shortcuts). */}
+              <Route path="/fill-the-kanji">
+                <Redirect
+                  to={`${fillTheKanjiPage.href}${window.location.search}`}
+                  replace
+                />
+              </Route>
               {/* Recognition practice has its own header. */}
               <Route
                 path={recognitionPracticeV1Page.href}

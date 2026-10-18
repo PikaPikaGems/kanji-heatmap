@@ -11,7 +11,7 @@ import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 const ALL_SETS_KEY = "activity.watchAllGenericChallenges:fill_the_kanji_*";
 
 /**
- * Every Fill the Kanji set's per-batch stats from the engine, or null when
+ * Every Fill in the Kanji set's per-batch stats from the engine, or null when
  * they aren't available (loading, logged out, no engine, or a failed read).
  * Each set is one `activity.watchAllGenericChallenges(activityType)` watch,
  * combined into one query so views over all sets need no hook per set.

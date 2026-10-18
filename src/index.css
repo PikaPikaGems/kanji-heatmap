@@ -284,7 +284,7 @@ button {
   }
 }
 
-/* Fill the Kanji: a picked kanji falls into its blank and lands with a
+/* Fill in the Kanji: a picked kanji falls into its blank and lands with a
    squash-and-stretch, like a jelly hitting the table. */
 .animate-practice-fill-land {
   animation: practice-fill-land 0.5s ease-out both;
@@ -312,7 +312,7 @@ button {
   }
 }
 
-/* Fill the Kanji: a removed kanji shrinks and fades out of its blank. */
+/* Fill in the Kanji: a removed kanji shrinks and fades out of its blank. */
 .animate-practice-fade-out {
   animation: practice-fade-out 0.22s ease-in both;
 }
@@ -328,7 +328,7 @@ button {
   }
 }
 
-/* Fill the Kanji: correct blanks hop and send out a green ring that fades
+/* Fill in the Kanji: correct blanks hop and send out a green ring that fades
    as it grows (staggered per blank with animation-delay, so it ripples
    across the sentence). */
 .animate-practice-correct-pop {
@@ -353,7 +353,7 @@ button {
   }
 }
 
-/* Fill the Kanji: a wrong blank fades in red and shakes. */
+/* Fill in the Kanji: a wrong blank fades in red and shakes. */
 .animate-practice-shake {
   animation:
     fade-in 0.25s ease-out both,

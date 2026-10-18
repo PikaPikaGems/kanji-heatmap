@@ -369,7 +369,7 @@ const UsageField = () => {
   );
 };
 
-/** A collapsible group inside the section, styled like Fill the Kanji downloads. */
+/** A collapsible group inside the section, styled like Fill in the Kanji downloads. */
 const SubsectionItem = ({
   value,
   title,

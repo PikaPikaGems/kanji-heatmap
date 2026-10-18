@@ -41,10 +41,10 @@ export const speedKatakanaPageMeta = {
 } as const;
 
 export const fillTheKanjiPageMeta = {
-  href: "/fill-the-kanji",
-  title: "Fill the Kanji",
-  shortLabel: "Fill the Kanji",
-  heading: "🧩 Fill the Kanji",
+  href: "/fill-in-the-kanji",
+  title: "Fill in the Kanji",
+  shortLabel: "Fill in the Kanji",
+  heading: "🧩 Fill in the Kanji",
   description: "Complete sentences by picking the missing kanji",
 } as const;
 

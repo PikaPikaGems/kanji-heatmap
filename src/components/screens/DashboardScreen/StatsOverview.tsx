@@ -40,7 +40,7 @@ const StatsOverviewBody = () => {
     EMPTY_ALL_TIME_SUMMARY
   );
 
-  // Per-set day counts can't be added up, so Fill the Kanji's active days come
+  // Per-set day counts can't be added up, so Fill in the Kanji's active days come
   // from the daily summaries between its first attempt and today. Before there
   // is an attempt this reads just today and the result isn't used.
   const today = toLocalDateKey();

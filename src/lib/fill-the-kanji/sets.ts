@@ -1,5 +1,5 @@
 /**
- * The Fill the Kanji challenge sets, in display order.
+ * The Fill in the Kanji challenge sets, in display order.
  *
  * `id` must match the set's folder, public/json/fill-the-kanji/<id>/, and also
  * names the set's engine activity type (see activity.ts), so renaming an id

@@ -359,7 +359,7 @@ const VoiceSlider = ({
   );
 };
 
-/** A row of preset tiles, the same as the writing-practice / Fill the Kanji kanji pickers. */
+/** A row of preset tiles, the same as the writing-practice / Fill in the Kanji kanji pickers. */
 const PresetTiles = <T extends string>({
   label,
   options,

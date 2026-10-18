@@ -269,7 +269,7 @@ const FillTheKanjiHeatmapBody = () => {
         that has it. Complete is the share of the set (or group) seen.
       </p>
       <HeatmapLegendRow
-        name="Fill the Kanji"
+        name="Fill in the Kanji"
         compact={compact}
         onCompactChange={(v) => setSetting("compact", v)}
       >

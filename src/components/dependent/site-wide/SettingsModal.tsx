@@ -223,7 +223,7 @@ const FillTheKanjiDownloads = () => {
         <AccordionTrigger className="py-3 text-left hover:no-underline">
           <span className="flex flex-col">
             <span className="text-sm font-semibold">
-              Download Fill the Kanji Challenges
+              Download Fill in the Kanji Challenges
             </span>
             <span className="text-xs font-normal text-muted-foreground">
               {downloaded}/{FILL_THE_KANJI_SETS.length} challenge sets
@@ -258,7 +258,7 @@ const FontGrid = () => {
   return (
     <div className="grid grid-cols-5 gap-2">
       {FONT_NAMES.map((name, i) => (
-        // Same tiles as the writing-practice / Fill the Kanji kanji pickers.
+        // Same tiles as the writing-practice / Fill in the Kanji kanji pickers.
         <PracticeButton
           key={i}
           size="icon"

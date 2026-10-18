@@ -17,7 +17,7 @@ const sumReviews = (reviews: ReviewSummary): number =>
   (reviews.good ?? 0) +
   (reviews.easy ?? 0);
 
-/** Fill the Kanji batches across every set (one generic activity type per set). */
+/** Fill in the Kanji batches across every set (one generic activity type per set). */
 const sumFillTheKanji = (
   genericChallenges: ActivityRecordSummary["genericChallenges"]
 ): number =>
@@ -43,7 +43,7 @@ export const toActivityByDay = (summaries: DailySummary[]): ActivityByDay =>
   );
 
 /**
- * Distinct days with Fill the Kanji activity. Per-set day counts can't be
+ * Distinct days with Fill in the Kanji activity. Per-set day counts can't be
  * summed (a day can have several sets), so this counts days across the daily
  * summaries.
  */
@@ -51,7 +51,7 @@ export const countFillTheKanjiDays = (summaries: DailySummary[]): number =>
   summaries.filter((summary) => sumFillTheKanji(summary.genericChallenges) > 0)
     .length;
 
-/** The earliest day any Fill the Kanji set was attempted, if one was. */
+/** The earliest day any Fill in the Kanji set was attempted, if one was. */
 export const firstFillTheKanjiDay = (
   firstAttempts: FirstAttemptsSummary
 ): LocalDate | undefined =>

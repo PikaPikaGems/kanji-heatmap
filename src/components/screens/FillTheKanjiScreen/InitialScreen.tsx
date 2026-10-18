@@ -59,7 +59,7 @@ const SetSelect = ({
   onSelect: (setId: FillTheKanjiSetId) => void;
 }) => (
   <ResponsiveSelect
-    label="Select a Challenge"
+    label="Select a Challenge Set"
     value={selected}
     onChange={(v) => {
       if (isFillTheKanjiSetId(v)) onSelect(v);
@@ -251,7 +251,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             onSelect={(level, pos) =>
               selectBatch(setId, batchFromLevelAndPos(level, pos))
             }
-            levelHeading="Select a Level"
+            levelHeading="Select a Challenge"
             itemHeading="Select a Batch"
           />
           <BatchSummary setId={setId} batch={batch} setStats={setStats} />

@@ -27,7 +27,7 @@ const combineSnapshots = <T>(
 
 /**
  * One store over a fixed list of stores, so a view that needs many watches
- * (e.g. one per Fill the Kanji set) takes a single useEngineQuery instead of
+ * (e.g. one per Fill in the Kanji set) takes a single useEngineQuery instead of
  * a hook per part. Ready only once every part is ready; the first failure wins.
  * Values come back in the order of `parts`.
  */

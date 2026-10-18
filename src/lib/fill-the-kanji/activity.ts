@@ -12,7 +12,7 @@ const FILL_THE_KANJI_ACTIVITY_PREFIX = "fill_the_kanji_";
 export const fillTheKanjiActivityType = (setId: FillTheKanjiSetId): string =>
   `${FILL_THE_KANJI_ACTIVITY_PREFIX}${setId.replace(/-/g, "_")}`;
 
-/** Whether an engine generic activity type is one of the Fill the Kanji sets. */
+/** Whether an engine generic activity type is one of the Fill in the Kanji sets. */
 export const isFillTheKanjiActivityType = (activityType: string): boolean =>
   activityType.startsWith(FILL_THE_KANJI_ACTIVITY_PREFIX);
 
