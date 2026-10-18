@@ -38,7 +38,7 @@ const TopTiles = ({
 }) => {
   if (cards.length === 0) {
     return (
-      <div className="flex flex-col items-center max-w-xs gap-1 px-4 py-5 mx-auto mt-3 text-center border-2 border-dotted rounded-2xl">
+      <div className="flex flex-col items-center w-full gap-1 px-4 py-8 mt-3 text-center border-2 border-dotted rounded-2xl">
         <span aria-hidden className="text-2xl">
           {empty.emoji}
         </span>

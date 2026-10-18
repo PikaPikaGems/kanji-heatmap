@@ -191,3 +191,15 @@ export const itemBand = (
   const writing = cardBand(item.writing, measure, now);
   return Math.min(reading, writing);
 };
+
+/**
+ * One emoji per band, weakest first, shared by every measure since band 0 is
+ * always the weakest: a waxing moon that ends in a flame. Not started is the
+ * new moon.
+ */
+const NOT_STARTED_EMOJI = "🌑";
+const BAND_EMOJIS = ["🌒", "🌓", "🌖", "🔥"] as const;
+
+/** The emoji of a band from `itemBand` and friends; `null` is Not started. */
+export const bandEmoji = (band: number | null): string =>
+  band == null ? NOT_STARTED_EMOJI : BAND_EMOJIS[band];

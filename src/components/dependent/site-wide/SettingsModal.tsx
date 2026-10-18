@@ -62,7 +62,7 @@ const FontGrid = () => {
           title={name}
           className={cn(
             "flex-col w-full h-auto gap-1 p-2 rounded-xl",
-            fontIndex !== i && "border-dashed"
+            fontIndex !== i && "border-dotted"
           )}
         >
           <span

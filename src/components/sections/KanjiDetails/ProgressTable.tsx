@@ -14,6 +14,7 @@ import { formatDaysHuman, formatInterval } from "@/lib/engine/format-interval";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import {
+  bandEmoji,
   difficultyBand,
   isCardStarted,
   MASTERY_LEVEL_LABELS,
@@ -45,6 +46,8 @@ type Cell = {
   text: string;
   /** Fill of a small swatch before the text, as on the /mastery heatmap. */
   swatchCn?: string;
+  /** The band's emoji after the text (see `bandEmoji`). */
+  emoji?: string;
 };
 
 type Field = {
@@ -86,9 +89,12 @@ const studiedField = (
   cell: (card, now) => {
     if (card == null) return { text: NOT_APPLICABLE };
     if (!isCardStarted(card)) return { text: NONE };
+    if (!band) return { text: value(card, now) };
+    const of = band.of(card);
     return {
       text: value(card, now),
-      swatchCn: band && getBandFillCn(band.measure, band.of(card)),
+      swatchCn: getBandFillCn(band.measure, of),
+      emoji: bandEmoji(of),
     };
   },
 });
@@ -98,6 +104,7 @@ const masteryCell = (card: CardProgress | null, now: number): Cell => {
   return {
     text: level == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[level],
     swatchCn: getBandFillCn("mastery", level),
+    emoji: bandEmoji(level),
   };
 };
 
@@ -229,7 +236,7 @@ export const ProgressTable = ({
   const now = Date.now();
 
   return (
-    <div className="overflow-hidden border rounded-xl border-foreground/10 bg-muted/10">
+    <div className="mt-4 overflow-hidden border rounded-xl border-foreground/10 bg-muted/10">
       <Table className="table-fixed">
         <TableHeader>
           <TableRow className="border-foreground/10 bg-muted/30 hover:bg-muted/30">
@@ -259,7 +266,10 @@ export const ProgressTable = ({
                 <FieldLabel label={label} definition={definition} />
               </TableCell>
               {COLUMNS.map(({ kind }) => {
-                const { text, swatchCn } = cell(item?.[kind] ?? null, now);
+                const { text, swatchCn, emoji } = cell(
+                  item?.[kind] ?? null,
+                  now
+                );
                 return (
                   <TableCell
                     key={kind}
@@ -273,6 +283,7 @@ export const ProgressTable = ({
                         />
                       ) : null}
                       {text}
+                      {emoji ? <span aria-hidden>{emoji}</span> : null}
                     </span>
                   </TableCell>
                 );

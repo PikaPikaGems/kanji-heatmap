@@ -59,7 +59,7 @@ export const dashboardPageMeta = {
 export const masteryPageMeta = {
   href: "/mastery",
   title: "Visualize Mastery",
-  description: "See how well you know each kanji — coming soon",
+  description: "See how well you know each kanji",
 } as const;
 
 /** Bottom floating island tabs (Dashboard / Explore / Mastery). */

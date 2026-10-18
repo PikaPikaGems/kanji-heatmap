@@ -75,7 +75,7 @@ export const KanjiPopover = ({
             </div>
             <button
               type="button"
-              className="pt-2 mt-1 mb-1.5 text-xs underline border-t border-dotted text-muted-foreground decoration-dotted underline-offset-4 hover:text-foreground"
+              className="mt-1 mb-1.5 text-xs underline text-muted-foreground decoration-dotted underline-offset-4 hover:text-foreground"
               onClick={() => setView("practice")}
             >
               Practice writing now

@@ -112,7 +112,7 @@ export const VoiceEngineChoice = () => {
           onClick={() => choose(value)}
           className={cn(
             "w-full h-auto px-2 py-2 text-sm rounded-xl",
-            engine !== value && "border-dashed"
+            engine !== value && "border-dotted"
           )}
         >
           {label}
@@ -383,7 +383,7 @@ const PresetTiles = <T extends string>({
         onClick={() => onSelect(name)}
         className={cn(
           "w-full h-auto px-2 py-2 text-sm capitalize rounded-xl",
-          selected !== name && "border-dashed"
+          selected !== name && "border-dotted"
         )}
       >
         {name}

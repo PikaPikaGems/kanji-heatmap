@@ -3,7 +3,11 @@ import type { ReactNode } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
-import { itemBand, MASTERY_LEVEL_LABELS } from "@/lib/engine/mastery-metrics";
+import {
+  bandEmoji,
+  itemBand,
+  MASTERY_LEVEL_LABELS,
+} from "@/lib/engine/mastery-metrics";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
@@ -79,11 +83,9 @@ const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
           getBandFillCn("mastery", band)
         )}
       />
-      <span className="text-muted-foreground">Mastery</span>
-      <span aria-hidden className="text-muted-foreground">
-        ·
-      </span>
+      <span className="sr-only">Mastery:</span>
       {label}
+      <span aria-hidden>{bandEmoji(band)}</span>
     </span>
   );
 };

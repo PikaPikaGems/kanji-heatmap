@@ -101,7 +101,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
       content: tags.length > 0 ? <FreqTagBadges tags={tags} /> : null,
     },
     {
-      label: "English gloss",
+      label: "Gloss",
       description: "A short English meaning of the word.",
       content: <span className="text-sm font-bold">{englishGloss}</span>,
     },

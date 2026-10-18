@@ -22,15 +22,18 @@ const WordAiExplain = ({ word }: { word: string }) => {
   // Nobody's saved answers show until the owner is known.
   if (owner.status !== "known" || !isAiExplainReady(settings)) return null;
   return (
-    <div className="flex justify-center py-3">
-      <button
-        type="button"
-        className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
-        onClick={() => openWordExplain(word)}
-      >
-        ✨ AI Explain
-      </button>
-    </div>
+    <>
+      <DottedSeparator />
+      <div className="flex justify-center pt-2 pb-3">
+        <button
+          type="button"
+          className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
+          onClick={() => openWordExplain(word)}
+        >
+          ✨ AI Explain
+        </button>
+      </div>
+    </>
   );
 };
 
