@@ -16,12 +16,16 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { PanelNotice } from "../PanelNotice";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
+import { MasterySubsection } from "./MasterySubsection";
+import { Accordion } from "@/components/ui/accordion";
 import { cnWarningText } from "@/lib/generic-cn";
 
 // The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
 const KanjiDrawerGlobal = lazy(
   () => import("@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal")
 );
+
+const BARS_TITLE = "Progress by Level";
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
@@ -81,8 +85,17 @@ export const KanjiMasteryBody = () => {
 
   return (
     <>
-      <MasteryBars pile={rows} allKanji={search.data} getInfo={getInfo} />
-      <MasteryTopLists pile={rows} getInfo={getInfo} />
+      {/* The bars start open, like the first Fill in the Kanji group. */}
+      <Accordion
+        type="multiple"
+        defaultValue={[BARS_TITLE]}
+        className="animate-fade-in"
+      >
+        <MasterySubsection title={BARS_TITLE}>
+          <MasteryBars pile={rows} allKanji={search.data} getInfo={getInfo} />
+        </MasterySubsection>
+        <MasteryTopLists pile={rows} getInfo={getInfo} />
+      </Accordion>
       <Suspense fallback={null}>
         <KanjiDrawerGlobal />
       </Suspense>

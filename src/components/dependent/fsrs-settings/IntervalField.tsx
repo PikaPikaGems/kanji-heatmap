@@ -4,6 +4,7 @@ import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 import { DAYS_PER_MONTH } from "./interval-limits";
 
 const WARN_ABOVE_MONTHS = 14;
+const WARN_BELOW_MONTHS = 6;
 
 const describeMonths = (months: number, days: number) =>
   months < 24
@@ -53,6 +54,11 @@ export const IntervalField = ({
       {months > WARN_ABOVE_MONTHS && (
         <Warning>
           {`Setting the maximum interval above ${WARN_ABOVE_MONTHS} months can create very long gaps between reviews, increasing the risk of forgetting.`}
+        </Warning>
+      )}
+      {months < WARN_BELOW_MONTHS && (
+        <Warning>
+          {`A maximum interval under ${WARN_BELOW_MONTHS} months keeps bringing back cards you already know well. That's extra reviews for little gain, and it works against what FSRS is for: spacing reviews out as your memory gets stronger.`}
         </Warning>
       )}
       <FieldError message={error} />

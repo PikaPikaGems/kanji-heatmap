@@ -2,12 +2,7 @@ import { useState } from "react";
 import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { MasterySubsection } from "./MasterySubsection";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
   MOST_DIFFICULT_ABOVE,
@@ -36,7 +31,8 @@ const TopTiles = ({
 }) => {
   if (cards.length === 0) {
     return (
-      <div className="flex flex-col items-center w-full gap-1 px-4 py-8 mt-3 text-center border-2 border-dotted rounded-2xl">
+      // Muted dashed border with square corners.
+      <div className="flex flex-col items-center w-full gap-1 px-4 py-6 mt-3 text-center border-2 border-dashed border-foreground/15">
         <span aria-hidden className="text-2xl">
           {empty.emoji}
         </span>
@@ -48,7 +44,7 @@ const TopTiles = ({
     );
   }
   return (
-    <ol className="flex flex-wrap justify-center gap-2 mt-3">
+    <ol className="flex flex-wrap gap-2 mt-3">
       {cards.map((card) => (
         <li key={`${card.kanji}-${card.cardType}`}>
           <RecapTile
@@ -63,9 +59,9 @@ const TopTiles = ({
 };
 
 /**
- * One top list: what it is under its title (like the Fill in the Kanji
- * groups), and inside, a Reading / Writing switch and that side's tiles.
- * Swapped content fades in.
+ * One top list, collapsible like the Fill in the Kanji groups: inside, what
+ * it is, a Reading / Writing switch and that side's tiles. Swapped content
+ * fades in.
  */
 const TopListItem = ({
   pile,
@@ -87,41 +83,33 @@ const TopListItem = ({
 }) => {
   const [cardType, setCardType] = useState<CardType>("reading");
   return (
-    <AccordionItem
-      value={title}
-      className="border-b-2 border-dashed last:border-b-0"
-    >
-      <AccordionTrigger className="py-3 text-left hover:no-underline">
-        <span className="flex flex-col">
-          <span className="text-sm font-semibold">{title}</span>
-          <span className="text-xs font-normal text-muted-foreground">
-            {about}
-          </span>
-        </span>
-      </AccordionTrigger>
-      <AccordionContent className="pt-2 pl-3 border-l-2 border-dotted">
-        <TwoWaySwitch
-          left="Reading"
-          right="Writing"
-          checked={cardType === "writing"}
-          onCheckedChange={(writing) =>
-            setCardType(writing ? "writing" : "reading")
-          }
-          ariaLabel="Toggle between reading and writing cards"
+    <MasterySubsection title={title}>
+      <p className="mb-3 text-xs text-left text-muted-foreground">{about}</p>
+      <TwoWaySwitch
+        className="justify-start"
+        left="Reading"
+        right="Writing"
+        checked={cardType === "writing"}
+        onCheckedChange={(writing) =>
+          setCardType(writing ? "writing" : "reading")
+        }
+        ariaLabel="Toggle between reading and writing cards"
+      />
+      <div key={cardType} className="animate-fade-in-fast">
+        <TopTiles
+          cards={cardsFor(pile, cardType)}
+          getInfo={getInfo}
+          empty={empty(cardType)}
         />
-        <div key={cardType} className="animate-fade-in-fast">
-          <TopTiles
-            cards={cardsFor(pile, cardType)}
-            getInfo={getInfo}
-            empty={empty(cardType)}
-          />
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+      </div>
+    </MasterySubsection>
   );
 };
 
-/** Top 10 hardest cards and top 10 recent mistakes, each collapsible. */
+/**
+ * Top 10 hardest cards and top 10 recent mistakes, each collapsible; they go
+ * in the Kanji Mastery accordion.
+ */
 export const MasteryTopLists = ({
   pile,
   getInfo,
@@ -129,12 +117,12 @@ export const MasteryTopLists = ({
   pile: readonly ReviewPileItemView[];
   getInfo: GetBasicKanjiInfo;
 }) => (
-  <Accordion type="multiple" className="pt-2 mt-8 border-t border-dotted">
+  <>
     <TopListItem
       pile={pile}
       getInfo={getInfo}
       title="Top 10 Most Difficult"
-      about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard)`}
+      about={`Your hardest cards: difficulty above ${MOST_DIFFICULT_ABOVE} on a scale of 1 (easy) to 10 (hard).`}
       cardsFor={topDifficultCards}
       empty={(cardType) => ({
         emoji: "🎯",
@@ -146,7 +134,7 @@ export const MasteryTopLists = ({
       pile={pile}
       getInfo={getInfo}
       title="Top 10 Recent Mistakes"
-      about="Cards you missed lately that are being relearned, newest first"
+      about="Cards you missed lately that are being relearned, newest first."
       cardsFor={recentMistakeCards}
       empty={(cardType) => ({
         emoji: "✨",
@@ -154,5 +142,5 @@ export const MasteryTopLists = ({
         hint: `${CARD_TYPE_LABELS[cardType]} cards you missed lately show up here.`,
       })}
     />
-  </Accordion>
+  </>
 );

@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 /**
  * A switch between two named sides ("JLPT ○ Jouyou"); the side that is on
@@ -12,16 +13,24 @@ export const TwoWaySwitch = ({
   checked,
   onCheckedChange,
   ariaLabel,
+  className,
 }: {
   left: string;
   right: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   ariaLabel: string;
+  /** Centered by default; e.g. `justify-start` to left-align. */
+  className?: string;
 }) => {
   const id = useId();
   return (
-    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+    <div
+      className={cn(
+        "flex items-center justify-center gap-2 text-xs text-muted-foreground",
+        className
+      )}
+    >
       <Label
         htmlFor={id}
         className={!checked ? "text-foreground font-semibold" : undefined}

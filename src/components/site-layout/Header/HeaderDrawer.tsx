@@ -102,7 +102,8 @@ const HeaderDrawerContent = ({
         />
       </div>
 
-      <div className="flex flex-wrap justify-center w-full gap-2 pt-4">
+      {/* Dotted line: these links are apart from the menu sections above. */}
+      <div className="flex flex-wrap justify-center w-full gap-2 pt-5 border-t-2 border-dotted">
         <div className="flex justify-center w-full">
           <button
             type="button"
