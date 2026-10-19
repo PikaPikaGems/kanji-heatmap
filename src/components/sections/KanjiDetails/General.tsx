@@ -134,7 +134,7 @@ export const General = ({ kanji }: { kanji: string }) => {
     items: ReactNode[];
   }[] = [
     {
-      label: "Meanings",
+      label: "Core Ideas",
       description: (
         <>
           Words in english associated with this kanji. e.g., 山 →

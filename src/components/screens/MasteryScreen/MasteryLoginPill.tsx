@@ -24,10 +24,11 @@ export const MasteryLoginPill = () => {
     >
       {/* One span, so the badge's flex layout keeps the space after "Log in". */}
       <span>
+        👀{" "}
         <span className="underline underline-offset-2 decoration-2">
           Log in
         </span>{" "}
-        to see mastery
+        to see mastery 💪
       </span>
     </button>
   );
