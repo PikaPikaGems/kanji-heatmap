@@ -20,6 +20,8 @@ import { MasterySubsection } from "./MasterySubsection";
 import { Accordion } from "@/components/ui/accordion";
 import { cnWarningText } from "@/lib/generic-cn";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import type { MasteryKindFilter } from "./MasteryKindFilters";
 
 // The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
 const KanjiDrawerGlobal = lazy(
@@ -32,6 +34,14 @@ const STATS_SECTIONS: readonly { metric: MasteryMetric; title: string }[] = [
   { metric: "difficulty", title: "Difficulty Statistics" },
   { metric: "stability", title: "Stability Statistics" },
 ];
+
+/** Card types the statistics show; every section shares (and remembers) it. */
+const SHOWN_KINDS_KEY = "dashboard-mastery-card-kinds";
+const ALL_KINDS_SHOWN: MasteryKindFilter = {
+  reading: true,
+  writing: true,
+  combined: true,
+};
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
@@ -58,6 +68,10 @@ export const KanjiMasteryBody = () => {
   );
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
+  const [shownKinds, setShownKind] = useLocalStorage<MasteryKindFilter>(
+    SHOWN_KINDS_KEY,
+    ALL_KINDS_SHOWN
+  );
 
   if (loggedIn && pile.status === "failed") {
     return (
@@ -102,6 +116,8 @@ export const KanjiMasteryBody = () => {
           <MasterySubsection key={metric} title={title}>
             <MasteryBars
               metric={metric}
+              shownKinds={shownKinds}
+              onKindChange={setShownKind}
               pile={rows}
               allKanji={allKanji}
               getInfo={getInfo}

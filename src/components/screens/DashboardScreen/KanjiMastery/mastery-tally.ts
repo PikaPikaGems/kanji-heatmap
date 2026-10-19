@@ -26,6 +26,12 @@ export const MASTERY_CARD_KINDS: readonly MasteryCardKind[] = [
   "combined",
 ];
 
+export const KIND_TITLES: Record<MasteryCardKind, string> = {
+  reading: "Reading",
+  writing: "Writing",
+  combined: "Combined",
+};
+
 type KanjiInfo = ReturnType<GetBasicKanjiInfo>;
 
 export type MasteryGroup = { key: string; label: string; cn: string };

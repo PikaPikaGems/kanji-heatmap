@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { FreqSquare } from "@/components/common/freq/FreqSquare";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { InfoIcon } from "@/components/icons";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
@@ -8,7 +9,6 @@ import {
   NOT_STARTED_LABEL,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
-import { cn } from "@/lib/utils";
 import { SegmentedBandBar } from "../SegmentedBandBar";
 import type { BandCounts } from "./mastery-tally";
 
@@ -29,118 +29,122 @@ const percent = (count: number, total: number) => {
 
 /** Every segment of a bar as a square, its name, its count and its share. */
 const BandBreakdown = ({
+  title,
   counts,
   total,
   measure,
 }: {
+  title: string;
   counts: BandCounts;
   total: number;
   measure: MasteryMetric;
 }) => {
   const { labels } = segmentsOf(measure);
   return (
-    <ul className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-1 px-3 py-2 mx-1 mb-2 text-[11px] border border-dotted rounded-lg animate-fade-in-fast">
-      {counts.map((count, segment) => (
-        <li key={labels[segment]} className="contents">
-          <span aria-hidden className="inline-flex">
-            <FreqSquare
-              srOnly=""
-              cn={getBandFillCn(measure, segment === 0 ? null : segment - 1)}
-            />
-          </span>
-          <span className="font-semibold">{labels[segment]}</span>
-          <span className="text-right tabular-nums">{count}</span>
-          <span className="text-right tabular-nums text-muted-foreground min-w-10">
-            {percent(count, total)}
-          </span>
-        </li>
-      ))}
-    </ul>
+    <div className="px-4 py-3 text-left w-64">
+      <p className="mb-2 text-xs font-bold">{title}</p>
+      <ul className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-1 text-[11px]">
+        {counts.map((count, segment) => (
+          <li key={labels[segment]} className="contents">
+            <span aria-hidden className="inline-flex">
+              <FreqSquare
+                srOnly=""
+                cn={getBandFillCn(measure, segment === 0 ? null : segment - 1)}
+              />
+            </span>
+            <span className="font-semibold">{labels[segment]}</span>
+            <span className="text-right tabular-nums">{count}</span>
+            <span className="text-right tabular-nums text-muted-foreground min-w-10">
+              {percent(count, total)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
 /**
- * One bar in a table row (a level, or a card type's total): its label, the
- * segmented bar and "started / total". Tapping the row opens its breakdown
- * under it.
+ * One level's bar (or "All"): its label with an ⓘ, the segmented bar and
+ * "started / total". Tapping the bar or the label opens its breakdown in a
+ * popover pointing at the bar.
  */
 export const MasteryBarRow = ({
   label,
+  title,
   dotCn,
   counts,
   total,
   measure,
-  thick = false,
 }: {
   label: string;
-  /** Level color dot; none for card-type totals. */
+  /** The breakdown popover's heading, e.g. "N5 · Reading Mastery". */
+  title: string;
+  /** Level color dot; none for the "All" row. */
   dotCn?: string;
   counts: BandCounts;
   total: number;
   measure: MasteryMetric;
-  /** The totals use a thicker bar than the level rows. */
-  thick?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const { labels, fills } = segmentsOf(measure);
   const started = total - counts[0];
 
   return (
-    <>
-      <TableRow
-        className="p-0 my-1 text-left cursor-pointer"
-        onClick={() => setOpen((was) => !was)}
-      >
-        <TableCell className="p-0">
-          <button
-            type="button"
-            aria-expanded={open}
-            className="flex items-center py-1 pl-2 text-xs rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {dotCn && (
-              <span
-                className={`inline-block w-3 h-3 rounded-full shrink-0 ${dotCn}`}
-              />
-            )}
-            <span
-              className={cn(
-                "font-extrabold whitespace-nowrap",
-                dotCn ? "mx-2" : "mr-2"
-              )}
-            >
-              {label}
-            </span>
-            <ChevronDown
-              aria-hidden
-              className={cn(
-                "size-3 shrink-0 text-muted-foreground transition-transform",
-                open && "rotate-180"
-              )}
-            />
-          </button>
-        </TableCell>
-        <TableCell className="w-full px-0 py-2">
-          <SegmentedBandBar
-            counts={counts}
-            totalUnits={total}
-            bandCn={fills}
-            bandLabels={labels}
-            className={thick ? "h-2" : undefined}
+    <TableRow className="p-0 my-1 text-left">
+      <TableCell className="p-0">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex items-center py-1 pl-2 text-xs rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span
+            className={`inline-block w-3 h-3 rounded-full shrink-0 ${dotCn ?? ""}`}
           />
-        </TableCell>
-        <TableCell className="p-0 text-[10px] tabular-nums">
-          <span className="inline-block min-w-16 text-end">
-            {started} / {total}
+          <span className="ml-2 mr-1 font-extrabold whitespace-nowrap">
+            {label}
           </span>
-        </TableCell>
-      </TableRow>
-      {open && (
-        <TableRow className="hover:bg-transparent">
-          <TableCell colSpan={3} className="p-0">
-            <BandBreakdown counts={counts} total={total} measure={measure} />
-          </TableCell>
-        </TableRow>
-      )}
-    </>
+          <InfoIcon
+            aria-hidden
+            size={11}
+            className="mr-2 shrink-0 text-muted-foreground"
+          />
+        </button>
+      </TableCell>
+      <TableCell className="w-full px-0 py-0">
+        <GenericPopover
+          open={open}
+          onOpenChange={setOpen}
+          focusOnOpen={false}
+          trigger={
+            <button
+              type="button"
+              aria-label={`${title}: breakdown`}
+              className="block w-full py-2.5 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <SegmentedBandBar
+                counts={counts}
+                totalUnits={total}
+                bandCn={fills}
+                bandLabels={labels}
+              />
+            </button>
+          }
+          content={
+            <BandBreakdown
+              title={title}
+              counts={counts}
+              total={total}
+              measure={measure}
+            />
+          }
+        />
+      </TableCell>
+      <TableCell className="p-0 text-[10px] tabular-nums">
+        <span className="inline-block min-w-16 text-end">
+          {started} / {total}
+        </span>
+      </TableCell>
+    </TableRow>
   );
 };

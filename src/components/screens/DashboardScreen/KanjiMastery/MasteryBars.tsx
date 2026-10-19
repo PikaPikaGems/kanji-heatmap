@@ -1,11 +1,18 @@
 import { useState } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
-import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
+import type {
+  MasteryCardKind,
+  MasteryMetric,
+} from "@/lib/engine/mastery-metrics";
 import { MasteryScaleLegend } from "@/components/screens/MasteryScreen/MasteryLegend";
 import { MeasureIntro } from "@/components/screens/MasteryScreen/MeasureIntro";
 import { TwoWaySwitch } from "../TwoWaySwitch";
-import { MasteryCard, MasteryTotalsCard } from "./MasteryCard";
+import { MasteryCard } from "./MasteryCard";
+import {
+  MasteryKindFilters,
+  type MasteryKindFilter,
+} from "./MasteryKindFilters";
 import {
   JLPT_GROUPING,
   JOUYOU_GROUPING,
@@ -13,19 +20,26 @@ import {
   tallyMastery,
 } from "./mastery-tally";
 
+/** Cards side by side on wider screens: one column per card shown. */
+const GRID_COLUMNS_CN = ["", "", "md:grid-cols-2", "md:grid-cols-3"];
+
 /**
  * One measure's statistics: what it means (its ⓘ opens the bands), the
- * all-kanji totals per card type, a card of bars per level for each card
- * type, the color scale, and the JLPT / Jouyou switch under it all. Every
- * bar opens its breakdown when tapped.
+ * card-type checkboxes, a card of bars per level (and "All") for each card
+ * type shown, the color scale, and the JLPT / Jouyou switch under it all.
+ * Tapping a bar opens its breakdown.
  */
 export const MasteryBars = ({
   metric,
+  shownKinds,
+  onKindChange,
   pile,
   allKanji,
   getInfo,
 }: {
   metric: MasteryMetric;
+  shownKinds: MasteryKindFilter;
+  onKindChange: (kind: MasteryCardKind, checked: boolean) => void;
   pile: readonly ReviewPileItemView[];
   allKanji: readonly string[];
   getInfo: GetBasicKanjiInfo;
@@ -35,6 +49,7 @@ export const MasteryBars = ({
   const grouping = showJouyou ? JOUYOU_GROUPING : JLPT_GROUPING;
   // Read at render: levels shift over weeks, so no ticking timer is needed.
   const tallies = tallyMastery(allKanji, pile, getInfo, grouping, Date.now());
+  const kinds = MASTERY_CARD_KINDS.filter((kind) => shownKinds[kind]);
 
   return (
     <>
@@ -45,12 +60,12 @@ export const MasteryBars = ({
           className="text-center text-balance"
         />
       </div>
-      <MasteryTotalsCard metric={metric} tallies={tallies} />
+      <MasteryKindFilters shown={shownKinds} onChange={onKindChange} />
       <div
-        key={showJouyou ? "jouyou" : "jlpt"}
-        className="grid gap-3 mt-3 md:grid-cols-3 animate-fade-in-fast"
+        key={`${showJouyou ? "jouyou" : "jlpt"}-${kinds.join("-")}`}
+        className={`grid gap-3 animate-fade-in-fast ${GRID_COLUMNS_CN[kinds.length]}`}
       >
-        {MASTERY_CARD_KINDS.map((kind) => (
+        {kinds.map((kind) => (
           <MasteryCard
             key={kind}
             kind={kind}
