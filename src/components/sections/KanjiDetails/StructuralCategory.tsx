@@ -47,11 +47,7 @@ const structuralTypeIconsB: Record<
   Ideograph: <Lightbulb size={ICON_SIZE} />,
 };
 
-const formatStructuralTypeName = (type: StructuralType): string => {
-  const info = structuralTypeInfo[type];
   return `${info.name ?? "unknown"}`;
-};
-
 const NoInfo = () => {
   return <span className="text-[10px] uppercase">Not available</span>;
 };

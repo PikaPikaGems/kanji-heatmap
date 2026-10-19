@@ -1,6 +1,4 @@
 // Types for the kanji reading data
-// Types for the kanji reading data
-export type ReadingType = "ON" | "KUN";
 export type FrequencyCategory = "↑" | "↔" | "↓" | "↑↑" | "↑↑↑";
 
 export interface KanjiReadingEntrySmall {
@@ -10,37 +8,10 @@ export interface KanjiReadingEntrySmall {
   w: string | null;
 }
 
-export interface KanjiReadingEntry {
-  reading: string;
-  type: ReadingType;
-  frequency: FrequencyCategory;
-  example_word: string | null;
-}
-
-export type KanjiReadingsData = Record<string, KanjiReadingEntry[]>;
-
-// Frequency display mappings
-export const frequencyLabels: Record<FrequencyCategory, string> = {
-  "↑": "Often Used",
   "↑↑": "Very Often Used",
   "↑↑↑": "Very Often Used",
-  "↔": "Sometimes Used",
-  "↓": "Almost Never Used",
-};
-
-export const frequencyColors: Record<FrequencyCategory, string> = {
-  "↑": "text-green-500",
   "↑↑": "text-cyan-500",
   "↑↑↑": "text-cyan-300",
-  "↔": "text-yellow-500",
-  "↓": "text-red-500",
-};
-
-export const readingTypeLabels: Record<ReadingType, string> = {
-  ON: "On'yomi",
-  KUN: "Kun'yomi",
-};
-
 export type StructuralType =
   | "shiji"
   | "shoukei"

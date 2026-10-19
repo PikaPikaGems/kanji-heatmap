@@ -26,18 +26,9 @@ import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
-const TableCellFixed = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
   <TableCell
     className={`w-28 sm:w-32 text-[10px] uppercase ${className ?? ""}`}
   >
-    {children}
-  </TableCell>
 );
 
 export const TableCellGrow = ({ children }: { children: ReactNode }) => (

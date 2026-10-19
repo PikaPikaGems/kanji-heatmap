@@ -231,15 +231,6 @@ export const useKanjiSearchResult = () => {
 };
 
 // Vocab types
-export type WordPartDetail = [string, string?]; // [kanji/kana, reading?]
-
-export interface VocabInfo {
-  meaning: string;
-  parts: WordPartDetail[];
-}
-
-// Hook to get vocab info for a specific word
-export const useVocabDetails = (word: string) => {
   const state = useWorkerQuery<VocabInfo | null>(
     word
       ? () =>

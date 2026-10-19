@@ -1,9 +1,6 @@
 import { ReactNode, useState } from "react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { SeeMore } from "@/components/common/SeeMore";
-import { VocabActions } from "@/components/common/VocabActions";
-import { GlobalKanjiLink } from "@/components/dependent/routing";
 import { vocabExternalLinks } from "@/lib/external-links";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
@@ -62,17 +59,7 @@ export const VocabPopoverContent = ({
 
   return (
     <div className="p-2 w-72">
-      {wordKanjis.length > 0 && (
         <div className="flex flex-wrap justify-center p-1">
-          {wordKanjis.map((item, index) => (
-            <GlobalKanjiLink
-              key={`${item.kanji}-${index}`}
-              keyword={item.keyword}
-              kanji={item.kanji}
-            />
-          ))}
-        </div>
-      )}
 
       {(definition || optionalSection) && (
         <>

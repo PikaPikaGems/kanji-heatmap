@@ -8,7 +8,6 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
-import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
 import { SampleVocabulary } from "./SampleVocabulary";
 import { TextbookVocabulary } from "./TextbookVocabulary";
 import { Badge } from "@/components/ui/badge";
@@ -202,9 +201,7 @@ export const KanjiDetails = ({
       <YourProgressAccordion kanji={kanji} />
       <SimpleAccordion trigger={"Reading Usefulness"}>
         <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
-          <ReadingFrequencyCategory kanji={kanji} />
         </ErrorBoundary>
-      </SimpleAccordion>
       <SimpleAccordion
         trigger={`External Links for ${kanji}`}
         defaultOpen={true}

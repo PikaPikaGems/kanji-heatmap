@@ -5,7 +5,6 @@ import {
   KanjiStructuralDataKanjium,
   KanjiStructuralDataYagays,
   KanjiStructuralDataScott,
-} from "@/components/sections/KanjiDetails/StructuralCategory";
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import {
@@ -19,16 +18,6 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
 import { useResolvedComponent } from "./use-resolved-component";
 
-const TableCellFixed = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
-  <TableCell className={`w-24 sm:w-32 ${className ?? ""}`}>
-    {children}
-  </TableCell>
 );
 
 const TableCellGrow = ({ children }: { children: ReactNode }) => (
