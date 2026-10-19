@@ -1,5 +1,35 @@
+import type { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
+import { cn } from "@/lib/utils";
+
+/**
+ * One numbered square in either grid. Every challenge picker (Speed Katakana,
+ * Fill in the Kanji) draws its squares here, so their shape lives in one place.
+ */
+const GridButton = ({
+  fillCn,
+  selected,
+  onClick,
+  children,
+}: {
+  fillCn: string;
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      "py-1 text-xs font-bold transition-colors border-2 rounded-md hover:opacity-80",
+      fillCn,
+      selected && "border-primary"
+    )}
+  >
+    {children}
+  </button>
+);
 
 /**
  * Level grid + item grid for picking one item inside numbered levels (speed
@@ -68,15 +98,14 @@ export const LevelGridSelector = ({
           const bgCn = freqCategoryCn[category];
           const textCn = category > 3 ? "text-white" : "text-foreground";
           return (
-            <button
+            <GridButton
               key={level}
+              fillCn={`${bgCn} ${textCn}`}
+              selected={currentLevel === level}
               onClick={() => selectLevel(level)}
-              className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded-md font-bold transition-colors border-2 ${
-                currentLevel === level ? "border-primary" : ""
-              }`}
             >
               {level}
-            </button>
+            </GridButton>
           );
         })}
       </div>
@@ -89,15 +118,14 @@ export const LevelGridSelector = ({
             const bgCn = completed ? freqCategoryCn[4] : freqCategoryCn[0];
             const textCn = completed ? "text-white" : "text-foreground";
             return (
-              <button
+              <GridButton
                 key={pos}
+                fillCn={`${bgCn} ${textCn}`}
+                selected={currentPos === pos}
                 onClick={() => onSelect(currentLevel, pos)}
-                className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded-md font-bold transition-colors border-2 ${
-                  currentPos === pos ? "border-primary" : ""
-                }`}
               >
                 {pos}
-              </button>
+              </GridButton>
             );
           }
         )}

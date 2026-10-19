@@ -30,9 +30,9 @@ const KanjiDrawerGlobal = lazy(
 
 /** One collapsible statistics section per measure, Mastery first (open). */
 const STATS_SECTIONS: readonly { metric: MasteryMetric; title: string }[] = [
-  { metric: "mastery", title: "Mastery Statistics" },
-  { metric: "difficulty", title: "Difficulty Statistics" },
-  { metric: "stability", title: "Stability Statistics" },
+  { metric: "mastery", title: "Mastery by Level" },
+  { metric: "difficulty", title: "Difficulty by Level" },
+  { metric: "stability", title: "Stability by Level" },
 ];
 
 /** Card types the statistics show; every section shares (and remembers) it. */
