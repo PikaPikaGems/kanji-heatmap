@@ -17,16 +17,22 @@ import {
   ActivityCountsGrid,
   ActivityCountsGridSkeleton,
 } from "./ActivityCountsGrid";
-import { OverviewCaption, OverviewCaptionSkeleton } from "./ActivityStatCard";
+import {
+  KanjiAddedCaption,
+  OverviewCaption,
+  OverviewCaptionSkeleton,
+} from "./ActivityStatCard";
+import { ReviewRatings } from "./ReviewRatings";
 import { DashboardPanel } from "./DashboardPanel";
 import { QueryFallback } from "./QueryFallback";
 import { useLiveOrEmpty } from "./use-live-or-empty";
 
-/** The overview's cards and its two captions as pulsing placeholders. */
+/** The overview's cards and its three captions as pulsing placeholders. */
 const StatsOverviewSkeleton = () => (
   <>
     <ActivityCountsGridSkeleton />
     <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row sm:gap-8">
+      <OverviewCaptionSkeleton />
       <OverviewCaptionSkeleton />
       <OverviewCaptionSkeleton />
     </div>
@@ -75,17 +81,20 @@ const StatsOverviewBody = () => {
       <ActivityCountsGrid stats={stats} />
       <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row">
         <OverviewCaption
+          Icon={Cake}
+          label="Cake day"
+          value={cakeDay ? formatCakeDay(cakeDay) : "Not yet"}
+        />
+        <div className="hidden sm:flex">·</div>
+        <OverviewCaption
           Icon={CalendarDays}
           label="Days active"
           value={formatRawCount(stats.daysActive)}
         />
         <div className="hidden sm:flex">·</div>
-        <OverviewCaption
-          Icon={Cake}
-          label="Cake day"
-          value={cakeDay ? formatCakeDay(cakeDay) : "Not yet"}
-        />
+        <KanjiAddedCaption count={stats.kinds.newKanji.count} />
       </div>
+      <ReviewRatings ratings={allTime.totals.reviews} />
     </>
   );
 };

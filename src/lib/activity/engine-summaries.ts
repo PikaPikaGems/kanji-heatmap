@@ -4,18 +4,11 @@ import type {
   DailySummary,
   FirstAttemptsSummary,
   LocalDate,
-  ReviewSummary,
 } from "engine-contract";
 import { isFillTheKanjiActivityType } from "@/lib/fill-the-kanji/activity";
 import { emptyActivityStats } from "./queries";
+import { totalRatings } from "./ratings";
 import { ActivityByDay, ActivityStats, DayCounts } from "./types";
-
-/** Reviews graded in total, whatever the rating. */
-const sumReviews = (reviews: ReviewSummary): number =>
-  (reviews.again ?? 0) +
-  (reviews.hard ?? 0) +
-  (reviews.good ?? 0) +
-  (reviews.easy ?? 0);
 
 /** Fill in the Kanji batches across every set (one generic activity type per set). */
 const sumFillTheKanji = (
@@ -31,8 +24,8 @@ export const toDayCounts = (summary: ActivityRecordSummary): DayCounts => ({
   production: summary.practice.writing,
   fillTheKanji: sumFillTheKanji(summary.genericChallenges),
   speedKatakana: summary.practice.speedKatakana,
-  readingMastery: sumReviews(summary.reviews.reading),
-  writingMastery: sumReviews(summary.reviews.writing),
+  readingMastery: totalRatings(summary.reviews.reading),
+  writingMastery: totalRatings(summary.reviews.writing),
   newKanji: summary.reviews.newItems,
 });
 

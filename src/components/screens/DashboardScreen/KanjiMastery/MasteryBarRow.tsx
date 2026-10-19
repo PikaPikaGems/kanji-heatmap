@@ -9,6 +9,7 @@ import {
   NOT_STARTED_LABEL,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
+import { formatShare } from "@/lib/format-count";
 import { SegmentedBandBar } from "../SegmentedBandBar";
 import type { BandCounts } from "./mastery-tally";
 
@@ -19,12 +20,6 @@ const segmentsOf = (measure: MasteryMetric) => {
     labels: [NOT_STARTED_LABEL, ...labels],
     fills: ["", ...labels.map((_, band) => getBandFillCn(measure, band))],
   };
-};
-
-const percent = (count: number, total: number) => {
-  if (total === 0) return "0%";
-  const value = (count / total) * 100;
-  return `${value < 10 && value > 0 ? value.toFixed(1) : Math.round(value)}%`;
 };
 
 /** Every segment of a bar as a square, its name, its count and its share. */
@@ -55,7 +50,7 @@ const BandBreakdown = ({
             <span className="font-semibold">{labels[segment]}</span>
             <span className="text-right tabular-nums">{count}</span>
             <span className="text-right tabular-nums text-muted-foreground min-w-10">
-              {percent(count, total)}
+              {formatShare(count, total)}
             </span>
           </li>
         ))}

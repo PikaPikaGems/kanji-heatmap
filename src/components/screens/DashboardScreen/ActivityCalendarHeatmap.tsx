@@ -9,8 +9,12 @@ import {
   getDurationRange,
   maxDayTotalInRange,
   monthLabelsForWeeks,
+  type DayRatings,
+  ratingsInRange,
+  type RatingsByDay,
   summarizeActivityInRange,
   toActivityByDay,
+  toRatingsByDay,
 } from "@/lib/activity";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import { useDailySummaries } from "@/hooks/use-activity-summaries";
@@ -28,13 +32,19 @@ import { DashboardPanel } from "./DashboardPanel";
 import { isQueryFailed } from "./is-query-failed";
 import { QueryFallback } from "./QueryFallback";
 import { useLiveOrEmpty } from "./use-live-or-empty";
-import { OverviewCaption, OverviewCaptionSkeleton } from "./ActivityStatCard";
+import {
+  KanjiAddedCaption,
+  OverviewCaption,
+  OverviewCaptionSkeleton,
+} from "./ActivityStatCard";
+import { ReviewRatings } from "./ReviewRatings";
 import { formatRawCount } from "@/lib/format-count";
 
 const ActivityHeatmapGrid = ({
   vertical,
   range,
   byDay,
+  ratingsByDay,
   filters,
   maxN,
 }: {
@@ -42,6 +52,7 @@ const ActivityHeatmapGrid = ({
   range: DateRange;
   /** null while loading: the same grid with pulsing placeholder squares. */
   byDay: ActivityByDay | null;
+  ratingsByDay: RatingsByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {
@@ -50,6 +61,7 @@ const ActivityHeatmapGrid = ({
       <VerticalCalendarGrid
         columns={buildMonthHalfColumns(range)}
         byDay={byDay}
+        ratingsByDay={ratingsByDay}
         filters={filters}
         maxN={maxN}
       />
@@ -62,22 +74,46 @@ const ActivityHeatmapGrid = ({
       weeks={weeks}
       monthLabels={monthLabelsForWeeks(weeks, "japanese-numbers")}
       byDay={byDay}
+      ratingsByDay={ratingsByDay}
       filters={filters}
       maxN={maxN}
     />
   );
 };
 
-const PeriodSummary = ({ stats }: { stats: ActivityStats }) => (
+/**
+ * The period's cards, its captions and its review ratings. Kanji added and
+ * each ratings row follow their activity filter.
+ */
+const PeriodSummary = ({
+  stats,
+  ratings,
+  filters,
+}: {
+  stats: ActivityStats;
+  ratings: DayRatings;
+  filters: ActivityKindFilters;
+}) => (
   <>
     <ActivityCountsGrid stats={stats} />
-    <div className="mt-4">
+    <div className="flex flex-col justify-center w-full gap-2 mt-4 sm:flex-row">
       <OverviewCaption
         Icon={CalendarDays}
         label="Days active"
         value={formatRawCount(stats.daysActive)}
       />
+      {filters.newKanji && (
+        <>
+          <div className="hidden sm:flex">·</div>
+          <KanjiAddedCaption count={stats.kinds.newKanji.count} />
+        </>
+      )}
     </div>
+    <ReviewRatings
+      ratings={ratings}
+      showReading={filters.readingMastery}
+      showWriting={filters.writingMastery}
+    />
   </>
 );
 
@@ -98,6 +134,7 @@ const ActivityCalendarHeatmapBody = () => {
   const snapshot = useDailySummaries(range);
   const summaries = useLiveOrEmpty(snapshotValue(snapshot), []);
   const byDay = summaries ? toActivityByDay(summaries) : null;
+  const ratingsByDay = summaries ? toRatingsByDay(summaries) : null;
 
   return (
     <div key={vertical ? "compact" : "wide"} className="animate-fade-in">
@@ -111,6 +148,7 @@ const ActivityCalendarHeatmapBody = () => {
           vertical={vertical}
           range={range}
           byDay={byDay}
+          ratingsByDay={ratingsByDay}
           filters={filters}
           maxN={maxDayTotalInRange(byDay, range, filters)}
         />
@@ -122,6 +160,7 @@ const ActivityCalendarHeatmapBody = () => {
               vertical={vertical}
               range={range}
               byDay={null}
+              ratingsByDay={null}
               filters={filters}
               maxN={0}
             />
@@ -149,9 +188,11 @@ const ActivityCalendarHeatmapBody = () => {
           <p className="mb-3 text-xs tracking-wide text-center text-muted-foreground">
             In this period
           </p>
-          {byDay ? (
+          {byDay && ratingsByDay ? (
             <PeriodSummary
               stats={summarizeActivityInRange(byDay, range, filters)}
+              ratings={ratingsInRange(ratingsByDay, range)}
+              filters={filters}
             />
           ) : (
             <PeriodSummarySkeleton />

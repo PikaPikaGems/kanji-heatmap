@@ -7,8 +7,13 @@ import {
   formatActivityDay,
   getActivityLevel,
   getDayCounts,
+  addRatings,
+  EMPTY_DAY_RATINGS,
+  type RatingsByDay,
   toLocalDateKey,
+  totalRatings,
 } from "@/lib/activity";
+import { RatingsBar, RatingsLine } from "./ReviewRatings";
 import { HeatmapCell, HeatmapGrid } from "./HeatmapGrid";
 import { heatmapFillCn } from "./heatmap-fill";
 
@@ -21,6 +26,7 @@ type CellProps = {
   dateKey: string | null;
   /** null while the activity is still loading: pulsing placeholder squares. */
   byDay: ActivityByDay | null;
+  ratingsByDay: RatingsByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
   todayKey: string;
@@ -29,16 +35,24 @@ type CellProps = {
 const DayDetail = ({
   dateKey,
   byDay,
+  ratingsByDay,
   filters,
   isToday,
 }: {
   dateKey: string;
   byDay: ActivityByDay;
+  ratingsByDay: RatingsByDay;
   filters: ActivityKindFilters;
   isToday: boolean;
 }) => {
   const day = getDayCounts(byDay, dateKey);
   const total = dayTotalForFilters(day, filters);
+  // The day's review ratings, for the mastery kinds the filters show.
+  const dayRatings = ratingsByDay[dateKey] ?? EMPTY_DAY_RATINGS;
+  const ratings = addRatings(
+    filters.readingMastery ? dayRatings.reading : {},
+    filters.writingMastery ? dayRatings.writing : {}
+  );
 
   return (
     <div className="space-y-1.5 text-xs">
@@ -57,6 +71,12 @@ const DayDetail = ({
           </div>
         ) : null
       )}
+      {totalRatings(ratings) > 0 && (
+        <div className="pt-1.5 space-y-1 border-t border-dotted">
+          <RatingsBar ratings={ratings} />
+          <RatingsLine ratings={ratings} />
+        </div>
+      )}
     </div>
   );
 };
@@ -64,6 +84,7 @@ const DayDetail = ({
 export const CalendarDayCell = ({
   dateKey,
   byDay,
+  ratingsByDay,
   filters,
   maxN,
   todayKey,
@@ -71,7 +92,7 @@ export const CalendarDayCell = ({
   if (dateKey == null) {
     return <div aria-hidden style={{ width: CELL_PX, height: CELL_PX }} />;
   }
-  if (byDay == null) {
+  if (byDay == null || ratingsByDay == null) {
     return (
       <div
         aria-hidden
@@ -98,6 +119,7 @@ export const CalendarDayCell = ({
         <DayDetail
           dateKey={dateKey}
           byDay={byDay}
+          ratingsByDay={ratingsByDay}
           filters={filters}
           isToday={isToday}
         />
@@ -114,12 +136,14 @@ export const CalendarGrid = ({
   weeks,
   monthLabels,
   byDay,
+  ratingsByDay,
   filters,
   maxN,
 }: {
   weeks: (string | null)[][];
   monthLabels: { weekIndex: number; label: string }[];
   byDay: ActivityByDay | null;
+  ratingsByDay: RatingsByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {
@@ -139,6 +163,7 @@ export const CalendarGrid = ({
             key={`${weekIndex}-${dayIndex}`}
             dateKey={dateKey}
             byDay={byDay}
+            ratingsByDay={ratingsByDay}
             filters={filters}
             maxN={maxN}
             todayKey={todayKey}

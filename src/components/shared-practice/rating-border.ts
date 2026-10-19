@@ -10,3 +10,11 @@ export const RATING_BORDER: Record<FsrsRating, string> = {
   again: "border-rose-500",
   hard: "border-orange-500",
 };
+
+/** The same rating colors as fills, for the dashboard's rating bars. */
+export const RATING_FILL: Record<FsrsRating, string> = {
+  easy: "bg-green-500",
+  good: "bg-blue-500",
+  again: "bg-rose-500",
+  hard: "bg-orange-500",
+};

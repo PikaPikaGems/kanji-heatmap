@@ -1,4 +1,7 @@
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { SquarePlus, type LucideIcon } from "lucide-react";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { InfoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import {
   HoverCard,
@@ -58,17 +61,46 @@ export const OverviewCaption = ({
   Icon,
   label,
   value,
+  info,
 }: {
   Icon: LucideIcon;
   label: string;
   value: string;
+  /** What the number means, behind an ⓘ after the value. */
+  info?: ReactNode;
 }) => (
   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
     <Icon className="size-4 shrink-0" aria-hidden />
     <span>
       {label}: <span className="font-bold text-foreground">{value}</span>
     </span>
+    {info && (
+      <GenericPopover
+        trigger={
+          <button
+            type="button"
+            aria-label={`About ${label}`}
+            className="rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <InfoIcon className="size-3.5" aria-hidden />
+          </button>
+        }
+        content={
+          <p className="px-4 py-3 text-xs text-left w-60 text-pretty">{info}</p>
+        }
+      />
+    )}
   </div>
+);
+
+/** "Kanji added" with its ⓘ: what counts as an addition. */
+export const KanjiAddedCaption = ({ count }: { count: number }) => (
+  <OverviewCaption
+    Icon={SquarePlus}
+    label="Kanji added"
+    value={formatRawCount(count)}
+    info="Each time a kanji goes into your review pile. Removing a kanji and adding it back counts as 2."
+  />
 );
 
 /** Stands in for an OverviewCaption while its value loads. */
