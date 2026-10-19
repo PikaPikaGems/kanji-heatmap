@@ -71,7 +71,7 @@ export const LevelGridSelector = ({
             <button
               key={level}
               onClick={() => selectLevel(level)}
-              className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
+              className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded-md font-bold transition-colors border-2 ${
                 currentLevel === level ? "border-primary" : ""
               }`}
             >
@@ -92,7 +92,7 @@ export const LevelGridSelector = ({
               <button
                 key={pos}
                 onClick={() => onSelect(currentLevel, pos)}
-                className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
+                className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded-md font-bold transition-colors border-2 ${
                   currentPos === pos ? "border-primary" : ""
                 }`}
               >
