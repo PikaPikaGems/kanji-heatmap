@@ -1,4 +1,6 @@
-// Types for the kanji reading data
+// Kanji reading data: each reading of a kanji, how often it shows up in
+// common vocabulary, and a sample word that uses it.
+export type ReadingType = "KUN" | "ON";
 export type FrequencyCategory = "↑" | "↔" | "↓" | "↑↑" | "↑↑↑";
 
 export interface KanjiReadingEntrySmall {
@@ -8,10 +10,43 @@ export interface KanjiReadingEntrySmall {
   w: string | null;
 }
 
-  "↑↑": "Very Often Used",
-  "↑↑↑": "Very Often Used",
-  "↑↑": "text-cyan-500",
+/** The long-key form of `KanjiReadingEntrySmall`. */
+export type KanjiReadingEntry = {
+  reading: string;
+  example_word: string | null;
+  frequency: FrequencyCategory;
+  type: ReadingType;
+};
+
+/** Reading entries keyed by kanji. */
+export type KanjiReadingsData = { [kanji: string]: KanjiReadingEntry[] };
+
+const OFTEN = "Often Used";
+const VERY_OFTEN = "Very Often Used";
+
+/** Text shown after the arrow, e.g. "↑ Often Used". */
+export const frequencyLabels: Record<FrequencyCategory, string> = {
+  "↑↑↑": VERY_OFTEN,
+  "↑↑": VERY_OFTEN,
+  "↑": OFTEN,
+  "↔": "Sometimes Used",
+  "↓": "Almost Never Used",
+};
+
+/** Text colour for each category: cyan (most used) through red (least). */
+export const frequencyColors: Record<FrequencyCategory, string> = {
   "↑↑↑": "text-cyan-300",
+  "↑↑": "text-cyan-500",
+  "↑": "text-green-500",
+  "↔": "text-yellow-500",
+  "↓": "text-red-500",
+};
+
+export const readingTypeLabels: Record<ReadingType, string> = {
+  KUN: "Kun'yomi",
+  ON: "On'yomi",
+};
+
 export type StructuralType =
   | "shiji"
   | "shoukei"

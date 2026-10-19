@@ -23,13 +23,9 @@ import {
   otherOutLinks,
 } from "@/lib/external-links";
 import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
+import { TableCellFixed } from "./TableCellFixed";
 
 const hasData = (data?: number) => data != null && data !== -1;
-
-  <TableCell
-    className={`w-28 sm:w-32 text-[10px] uppercase ${className ?? ""}`}
-  >
-);
 
 export const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell className="min-w-0">{children}</TableCell>
@@ -43,7 +39,7 @@ export const LabelCell = ({
   label: ReactNode;
   description: ReactNode;
 }) => (
-  <TableCellFixed>
+  <TableCellFixed className="w-28 text-[10px] uppercase">
     <GenericPopover
       trigger={
         <span className="cursor-pointer">

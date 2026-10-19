@@ -5,6 +5,7 @@ import {
   KanjiStructuralDataKanjium,
   KanjiStructuralDataYagays,
   KanjiStructuralDataScott,
+} from "./StructuralCategory";
 import { ReactNode } from "react";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import {
@@ -17,8 +18,7 @@ import { dedupe } from "@/lib/utils";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
 import { useResolvedComponent } from "./use-resolved-component";
-
-);
+import { TableCellFixed } from "./TableCellFixed";
 
 const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell>{children}</TableCell>

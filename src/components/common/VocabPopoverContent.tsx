@@ -1,6 +1,9 @@
 import { ReactNode, useState } from "react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
+import { VocabActions as WordActionIcons } from "@/components/common/VocabActions";
+import { SeeMore as ExpandableGloss } from "@/components/common/SeeMore";
 import { vocabExternalLinks } from "@/lib/external-links";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
@@ -34,6 +37,23 @@ const WordAiExplain = ({ word }: { word: string }) => {
   );
 };
 
+/** Each kanji in the word, as a link with its keyword. */
+const WordKanjiLinks = ({
+  wordKanjis,
+}: {
+  wordKanjis: VocabPopoverContentProps["wordKanjis"];
+}) => {
+  if (wordKanjis.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap justify-center p-1">
+      {wordKanjis.map(({ kanji, keyword }) => (
+        <GlobalKanjiLink kanji={kanji} keyword={keyword} key={kanji} />
+      ))}
+    </div>
+  );
+};
+
 interface VocabPopoverContentProps {
   word: string;
   kana?: string;
@@ -59,7 +79,7 @@ export const VocabPopoverContent = ({
 
   return (
     <div className="p-2 w-72">
-        <div className="flex flex-wrap justify-center p-1">
+      <WordKanjiLinks wordKanjis={wordKanjis} />
 
       {(definition || optionalSection) && (
         <>
@@ -68,7 +88,7 @@ export const VocabPopoverContent = ({
             {optionalSection}
             {definition && (
               <>
-                <SeeMore
+                <ExpandableGloss
                   definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
                   maxLen={120}
                 />
@@ -79,7 +99,7 @@ export const VocabPopoverContent = ({
       )}
       <WordAiExplain word={word} />
       <DottedSeparator />
-      <VocabActions kana={kana ?? ""} word={word} />
+      <WordActionIcons kana={kana ?? ""} word={word} />
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore {word} in the wild ↓

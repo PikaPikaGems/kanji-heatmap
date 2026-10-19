@@ -8,6 +8,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
+import { ReadingFrequencyCategory as ReadingUsefulnessTable } from "./ReadingFrequencyCategory";
 import { SampleVocabulary } from "./SampleVocabulary";
 import { TextbookVocabulary } from "./TextbookVocabulary";
 import { Badge } from "@/components/ui/badge";
@@ -118,6 +119,14 @@ const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
   );
 };
 
+const ReadingUsefulnessAccordion = ({ kanji }: { kanji: string }) => (
+  <SimpleAccordion trigger="Reading Usefulness">
+    <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
+      <ReadingUsefulnessTable kanji={kanji} />
+    </ErrorBoundary>
+  </SimpleAccordion>
+);
+
 export const KanjiDetails = ({
   kanji,
   smallScreenNode,
@@ -199,9 +208,7 @@ export const KanjiDetails = ({
       )}
       <StudyNotesAccordion kanji={kanji} />
       <YourProgressAccordion kanji={kanji} />
-      <SimpleAccordion trigger={"Reading Usefulness"}>
-        <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
-        </ErrorBoundary>
+      <ReadingUsefulnessAccordion kanji={kanji} />
       <SimpleAccordion
         trigger={`External Links for ${kanji}`}
         defaultOpen={true}

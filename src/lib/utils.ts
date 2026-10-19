@@ -40,7 +40,19 @@ export const checkIfInputField = (target: HTMLElement) => {
   );
 };
 
+/** CJK Unified Ideographs (U+4E00–U+9FAF) and Extension A (U+3400–U+4DBF). */
+const KANJI_RANGES: [number, number][] = [
+  [0x4e00, 0x9faf],
+  [0x3400, 0x4dbf],
+];
+
+/** Whether the first character of `char` is a kanji. */
 export const isKanji = (char: string) => {
+  const point = char.codePointAt(0);
+  if (point == null) return false;
+  return KANJI_RANGES.some(([low, high]) => point >= low && point <= high);
+};
+
 export const dedupe = <T>(items: T[]): T[] => {
   const seen = new Set<T>();
   return items.filter((item) => {
