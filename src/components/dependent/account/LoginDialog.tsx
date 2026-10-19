@@ -84,19 +84,25 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
     >
       <ScrollableDialogContent
         size="md"
-        title="Login required"
+        title="Log in to Continue"
         description="Log in to your Kanji Heatmap Premium account with an email code"
         titleClassName="text-left"
         hideClose={locked}
         onInteractOutside={(event) => event.preventDefault()}
       >
         <div className="flex flex-col gap-4 px-2 pt-2 text-left">
-          <LoginStepScreen
-            api={api}
-            step={step}
-            onStep={setStep}
-            onDownload={() => void download()}
-          />
+          {/* Each step fades in as it replaces the last. */}
+          <div
+            key={step.kind}
+            className="flex flex-col gap-4 animate-fade-in-fast"
+          >
+            <LoginStepScreen
+              api={api}
+              step={step}
+              onStep={setStep}
+              onDownload={() => void download()}
+            />
+          </div>
           <div className="pt-4 border-t border-dotted">
             <PikaPikaLinks />
           </div>
@@ -107,7 +113,7 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
 };
 
 /**
- * The one app-wide "Login required" dialog (design 5.2), mounted once in App.
+ * The one app-wide "Log in to Continue" dialog (design 5.2), mounted once in App.
  * Opened with `openLoginDialog()`. Renders nothing until the engine is ready,
  * so builds and browsers without the engine never show it.
  */

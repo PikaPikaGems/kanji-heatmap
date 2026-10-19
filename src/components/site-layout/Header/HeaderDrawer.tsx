@@ -218,7 +218,14 @@ const HeaderDrawer = ({
         </DrawerPrimitive.Trigger>
         <DrawerPrimitive.Portal>
           <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
-          <DrawerPrimitive.Content className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background">
+          <DrawerPrimitive.Content
+            className="fixed top-0 bottom-0 right-0 z-50 border-l-4 border-dashed shadow-lg outline-none w-72 sm:w-80 bg-background"
+            onCloseAutoFocus={(e) => {
+              // Closing for a dialog: leave focus to it (e.g. the login
+              // input), instead of handing it back to the menu button.
+              if (openedModal !== "none") e.preventDefault();
+            }}
+          >
             <DrawerPrimitive.Title className="sr-only">
               Navigation menu
             </DrawerPrimitive.Title>

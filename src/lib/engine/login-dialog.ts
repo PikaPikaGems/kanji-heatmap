@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Open state of the app-wide "Login required" dialog. Module-level so any
+ * Open state of the app-wide "Log in to Continue" dialog. Module-level so any
  * screen (drawer, games, sidebar, gated routes) can open it without prop
  * drilling; the dialog itself is mounted once in App. `session` counts the
  * openings, so every opening starts on the first step.
