@@ -8,7 +8,12 @@ import { Button } from "@/components/ui/button";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
-import { useEffect, type ReactNode } from "react";
+import {
+  forwardRef,
+  useEffect,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { type AiStorageUsageState } from "@/hooks/use-ai-storage-usage";
 import { initAiVoice, type AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
@@ -248,25 +253,62 @@ const DebugInfoBody = () => {
   );
 };
 
+// forwardRef needed: `DialogTrigger asChild` hands its ref to the button.
+const DebugInfoButton = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<typeof Button>
+>((props, ref) => (
+  <Button
+    ref={ref}
+    variant="outline"
+    size="iconXl"
+    aria-label="App and device info"
+    title="App & Device Info"
+    {...props}
+  >
+    <MonitorSmartphone className="w-[1.2rem] h-[1.2rem]" />
+  </Button>
+));
+DebugInfoButton.displayName = "DebugInfoButton";
+
+const DebugInfoContent = () => (
+  <ScrollableDialogContent
+    size="md"
+    title="App & Device Info"
+    description="App version, device, network, storage, AI usage and offline downloads"
+    titleClassName="text-left"
+  >
+    <DebugInfoBody />
+  </ScrollableDialogContent>
+);
+
+/** The App & Device Info icon button, opening its own dialog. */
 export const DebugInfo = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button
-        variant="outline"
-        size="iconXl"
-        aria-label="App and device info"
-        title="App & Device Info"
-      >
-        <MonitorSmartphone className="w-[1.2rem] h-[1.2rem]" />
-      </Button>
+      <DebugInfoButton />
     </DialogTrigger>
-    <ScrollableDialogContent
-      size="md"
-      title="App & Device Info"
-      description="App version, device, network, storage, AI usage and offline downloads"
-      titleClassName="text-left"
-    >
-      <DebugInfoBody />
-    </ScrollableDialogContent>
+    <DebugInfoContent />
+  </Dialog>
+);
+
+/**
+ * The icon button alone, for a parent that owns the dialog's open state (the
+ * sidebar closes itself first, then reopens when the dialog closes).
+ */
+export const DebugInfoTrigger = ({ onClick }: { onClick: () => void }) => (
+  <DebugInfoButton onClick={onClick} />
+);
+
+/** The App & Device Info dialog, controlled by its parent. */
+export const DebugInfoModal = ({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DebugInfoContent />
   </Dialog>
 );

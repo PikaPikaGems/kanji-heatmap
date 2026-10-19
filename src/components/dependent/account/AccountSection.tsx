@@ -4,7 +4,6 @@ import { LogIn } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import {
   hasNoAccounts,
@@ -50,13 +49,19 @@ const NoCardNotice = ({ status }: { status: AccountStatus }) => {
   return null;
 };
 
+/** Dialogs the account area opens; the sidebar closes for them, then returns. */
+export type AccountDialog = "login" | "fsrs";
+
 const AccountBody = ({
   status,
   tools,
+  onAction,
 }: {
   status: AccountStatus;
   tools: ReactNode;
+  onAction: (dialog: AccountDialog) => void;
 }) => {
+  const fsrsItem = <FsrsSettingsItem onClick={() => onAction("fsrs")} />;
   if (status.kind === "signed-out") {
     return (
       <AccountCard
@@ -67,17 +72,14 @@ const AccountBody = ({
         tools={
           <>
             {tools}
-            <FsrsSettingsItem />
+            {fsrsItem}
           </>
         }
       >
-        {/* The dialog lives outside the drawer, so close the drawer first. */}
-        <DrawerPrimitive.Close asChild>
-          <PracticeButton size="md" onClick={openLoginDialog}>
-            <LogIn aria-hidden />
-            Log in
-          </PracticeButton>
-        </DrawerPrimitive.Close>
+        <PracticeButton size="md" onClick={() => onAction("login")}>
+          <LogIn aria-hidden />
+          Log in
+        </PracticeButton>
       </AccountCard>
     );
   }
@@ -88,7 +90,7 @@ const AccountBody = ({
         tools={
           <>
             {tools}
-            <FsrsSettingsItem />
+            {fsrsItem}
           </>
         }
       />
@@ -98,8 +100,8 @@ const AccountBody = ({
   return (
     <>
       <NoCardNotice status={status} />
-      <div className="flex items-center justify-center gap-1.5">{tools}</div>
-      <div className="flex justify-center">
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        {tools}
         <NetworkStatusBadge />
       </div>
     </>
@@ -112,7 +114,13 @@ const AccountBody = ({
  * their own where the card would be while there is no account to show. Renders
  * nothing in a build without accounts (see `hasNoAccounts`).
  */
-export const AccountSection = ({ tools }: { tools: ReactNode }) => {
+export const AccountSection = ({
+  tools,
+  onAction,
+}: {
+  tools: ReactNode;
+  onAction: (dialog: AccountDialog) => void;
+}) => {
   const status = useAccountStatus();
   if (hasNoAccounts(status)) return null;
 
@@ -121,7 +129,7 @@ export const AccountSection = ({ tools }: { tools: ReactNode }) => {
       className="flex flex-col gap-2"
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <AccountBody status={status} tools={tools} />
+      <AccountBody status={status} tools={tools} onAction={onAction} />
     </div>
   );
 };

@@ -13,7 +13,7 @@ import { cnTextLink } from "@/lib/generic-cn";
 import { HeaderTitle } from "./HeaderTitle";
 import { ModeToggle } from "@/components/dependent/site-wide/ModeToggle";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
-import { DebugInfo } from "../../common/DebugInfo";
+import { DebugInfoModal, DebugInfoTrigger } from "../../common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import {
   SettingsModal,
@@ -23,7 +23,16 @@ import {
   InstallAppModal,
   InstallAppModalTrigger,
 } from "@/components/common/InstallAppModal";
-import { AccountSection } from "@/components/dependent/account/AccountSection";
+import {
+  type AccountDialog,
+  AccountSection,
+} from "@/components/dependent/account/AccountSection";
+import { openLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
+import {
+  openFsrsSettings,
+  useFsrsSettingsOpen,
+} from "@/lib/engine/fsrs-settings-dialog";
+import { useRecoveryDialogOpen } from "@/lib/engine/recovery-dialog";
 import {
   hasNoAccounts,
   useAccountStatus,
@@ -50,12 +59,19 @@ const InfoLink = ({ href, title }: { href: string; title: string }) => (
   </DrawerPrimitive.Close>
 );
 
+/**
+ * What the sidebar has open: itself, or one of the dialogs it closes for and
+ * returns to when that dialog closes. "login" and "fsrs" are app-wide dialogs
+ * with their own open state (see `isSidebarShown`).
+ */
 type OpenedModal =
   | "none"
   | "sidebar"
   | "install-guide"
   | "settings"
-  | "cum-use-graph";
+  | "cum-use-graph"
+  | "debug-info"
+  | AccountDialog;
 
 const HeaderDrawerContent = ({
   due,
@@ -68,7 +84,7 @@ const HeaderDrawerContent = ({
   const noAccounts = hasNoAccounts(useAccountStatus());
   const tools = (
     <>
-      <DebugInfo />
+      <DebugInfoTrigger onClick={() => onAction("debug-info")} />
       <SettingsModalTrigger
         title="User Preferences"
         onClick={() => onAction("settings")}
@@ -94,7 +110,7 @@ const HeaderDrawerContent = ({
             <ModeToggle />
           </div>
         </div>
-        <AccountSection tools={tools} />
+        <AccountSection tools={tools} onAction={onAction} />
         <CollapsibleNavLinkSections
           sections={navSections}
           dotHrefs={dueNavHrefs(due)}
@@ -166,20 +182,33 @@ const HeaderDrawer = ({
     initiallyOpen ? "sidebar" : "none"
   );
   const due = useDueCount();
+  // The login and FSRS dialogs are app-wide: the sidebar comes back once they
+  // (and the recovery dialog the login can hand over to) have all closed.
+  const loginOpen = useLoginDialog().open;
+  const fsrsOpen = useFsrsSettingsOpen();
+  const recoveryOpen = useRecoveryDialogOpen();
+  const appDialogOpen = loginOpen || fsrsOpen || recoveryOpen;
+  const isSidebarShown =
+    openedModal === "sidebar" ||
+    ((openedModal === "login" || openedModal === "fsrs") && !appDialogOpen);
+
+  const onAction = (modal: OpenedModal) => {
+    if (modal === "login") openLoginDialog();
+    if (modal === "fsrs") openFsrsSettings();
+    setOpenedModal(modal);
+  };
 
   return (
     <>
       <DrawerPrimitive.Root
         direction="right"
-        open={openedModal === "sidebar"}
+        open={isSidebarShown}
         onOpenChange={(open) => {
           if (open) {
             setOpenedModal("sidebar");
             return;
           }
-          setOpenedModal((current) =>
-            current === "sidebar" ? "none" : current
-          );
+          if (isSidebarShown) setOpenedModal("none");
         }}
       >
         <DrawerPrimitive.Trigger asChild>
@@ -196,13 +225,17 @@ const HeaderDrawer = ({
             <DrawerPrimitive.Description className="sr-only">
               Site navigation links and settings
             </DrawerPrimitive.Description>
-            <HeaderDrawerContent due={due} onAction={setOpenedModal} />
+            <HeaderDrawerContent due={due} onAction={onAction} />
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       </DrawerPrimitive.Root>
       <SettingsModal
         open={openedModal === "settings"}
         onOpenChange={(open) => setOpenedModal(open ? "settings" : "sidebar")}
+      />
+      <DebugInfoModal
+        open={openedModal === "debug-info"}
+        onOpenChange={(open) => setOpenedModal(open ? "debug-info" : "sidebar")}
       />
       <CumUseGraphModal
         open={openedModal === "cum-use-graph"}
