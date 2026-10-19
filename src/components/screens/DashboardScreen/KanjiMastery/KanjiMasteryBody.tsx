@@ -19,13 +19,19 @@ import { MasteryTopLists } from "./MasteryTopLists";
 import { MasterySubsection } from "./MasterySubsection";
 import { Accordion } from "@/components/ui/accordion";
 import { cnWarningText } from "@/lib/generic-cn";
+import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 
 // The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
 const KanjiDrawerGlobal = lazy(
   () => import("@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal")
 );
 
-const BARS_TITLE = "Progress by Level";
+/** One collapsible statistics section per measure, Mastery first (open). */
+const STATS_SECTIONS: readonly { metric: MasteryMetric; title: string }[] = [
+  { metric: "mastery", title: "Mastery Statistics" },
+  { metric: "difficulty", title: "Difficulty Statistics" },
+  { metric: "stability", title: "Stability Statistics" },
+];
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
@@ -83,17 +89,25 @@ export const KanjiMasteryBody = () => {
     );
   }
 
+  const allKanji = search.data;
   return (
     <>
-      {/* The bars start open, like the first Fill in the Kanji group. */}
+      {/* Mastery starts open, like the first Fill in the Kanji group. */}
       <Accordion
         type="multiple"
-        defaultValue={[BARS_TITLE]}
+        defaultValue={[STATS_SECTIONS[0].title]}
         className="animate-fade-in"
       >
-        <MasterySubsection title={BARS_TITLE}>
-          <MasteryBars pile={rows} allKanji={search.data} getInfo={getInfo} />
-        </MasterySubsection>
+        {STATS_SECTIONS.map(({ metric, title }) => (
+          <MasterySubsection key={metric} title={title}>
+            <MasteryBars
+              metric={metric}
+              pile={rows}
+              allKanji={allKanji}
+              getInfo={getInfo}
+            />
+          </MasterySubsection>
+        ))}
         <MasteryTopLists pile={rows} getInfo={getInfo} />
       </Accordion>
       <Suspense fallback={null}>
