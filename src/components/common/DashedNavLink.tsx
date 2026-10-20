@@ -1,5 +1,6 @@
 import { ComponentType, SVGProps, forwardRef } from "react";
 import { Link } from "@/components/dependent/routing";
+import { NotificationDot } from "@/components/common/NotificationDot";
 import { cn } from "@/lib/utils";
 
 type IconComponent = ComponentType<
@@ -14,7 +15,8 @@ type DashedNavLinkProps = {
   onClick?: () => void;
   onPointerDown?: (e: React.PointerEvent) => void;
   className?: string;
-  iconClassName?: string;
+  /** Shows the due dot right after the title. */
+  showDot?: boolean;
 };
 
 // forwardRef required: HeaderDrawer wraps this in `<DrawerClose asChild>` via
@@ -30,11 +32,13 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
       onClick,
       onPointerDown,
       className,
-      iconClassName,
+      showDot,
       ...rest
     },
     ref
   ) => {
+    const lastWordStart = title.lastIndexOf(" ") + 1;
+
     return (
       <Link
         ref={ref}
@@ -48,12 +52,16 @@ export const DashedNavLink = forwardRef<HTMLAnchorElement, DashedNavLinkProps>(
         {...rest}
       >
         <div className="flex text-sm font-semibold text-left">
-          {Icon && (
-            <Icon
-              className={cn("mr-2 mt-0.5 size-4 shrink-0", iconClassName)}
-            />
-          )}
-          {title}
+          {Icon && <Icon className="mt-0.5 mr-2 size-4 shrink-0" />}
+          {/* The dot stays glued to the title's last word when it wraps,
+              centered on the text's height. */}
+          <span>
+            {title.slice(0, lastWordStart)}
+            <span className="inline-flex items-center gap-2 whitespace-nowrap">
+              {title.slice(lastWordStart)}
+              {showDot && <NotificationDot />}
+            </span>
+          </span>
         </div>
         {description && (
           <p className="mt-1 text-xs text-left text-muted-foreground">

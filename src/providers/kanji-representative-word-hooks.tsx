@@ -79,3 +79,27 @@ export const useKanjiRepresentativeWordDetails = (
     return { ...base, englishGloss, tags: emojiTag ? [emojiTag] : [] };
   }, [base, data, kanji]);
 };
+
+/**
+ * Word, reading and gloss for any kanji, looked up synchronously — for a
+ * whole review queue, where the per-kanji hook above doesn't fit. `null`
+ * until the gloss/tag dataset has loaded.
+ */
+export const useGetRepresentativeWordDetailsFn = () => {
+  const ready = useIsKanjiWorkerReady();
+  const getRepresentativeWord = useGetRepresentativeWordFn();
+
+  const { data } = useWorkerQuery<Record<string, [string, string]>>(
+    ready ? () => requestWorker({ type: "rep-word-details" }) : null,
+    [ready]
+  );
+
+  if (data == null) return null;
+
+  return (kanji: string): RepresentativeWordDetails | null => {
+    const base = getRepresentativeWord(kanji);
+    if (base == null) return null;
+    const [englishGloss, emojiTag] = data[kanji] ?? ["", ""];
+    return { ...base, englishGloss, tags: emojiTag ? [emojiTag] : [] };
+  };
+};

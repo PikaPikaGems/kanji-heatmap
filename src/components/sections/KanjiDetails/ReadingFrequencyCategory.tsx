@@ -1,5 +1,3 @@
-import { useKanjiReadingDetails } from "@/providers/kanji-reading-category-hooks";
-
 import {
   Table,
   TableBody,
@@ -11,79 +9,71 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
+import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { useKanjiReadingDetails } from "@/providers/kanji-reading-category-hooks";
 import {
   kandracPaperUrl,
   readingFrequencySourceLinks,
 } from "@/lib/freq/freq-source-info";
-import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
-import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import {
-  FrequencyCategory,
   frequencyColors,
   frequencyLabels,
   KanjiReadingEntry,
   readingTypeLabels,
 } from "@/lib/kanji-section-constants";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { TableSkeleton } from "./TableSkeleton";
 
-const FrequencyBadge = ({ frequency }: { frequency: FrequencyCategory }) => {
-  const label = frequencyLabels[frequency];
-  const colorClass = frequencyColors[frequency];
+const UsageCell = ({ entry }: { entry: KanjiReadingEntry }) => {
+  const label = frequencyLabels[entry.frequency];
+  if (!label) return <TableCell>?</TableCell>;
 
   return (
-    <span className={`text-xs font-bold ${colorClass}`}>
-      {frequency} {label}
-    </span>
+    <TableCell>
+      <span className={`text-xs font-bold ${frequencyColors[entry.frequency]}`}>
+        {entry.frequency} {label}
+      </span>
+    </TableCell>
   );
 };
 
-const ReadingTypeBadge = ({ type }: { type: "ON" | "KUN" }) => {
-  const variant = type === "ON" ? "default" : "secondary";
-  return (
-    <Badge variant={variant} className="text-xs">
-      {readingTypeLabels[type]}
-    </Badge>
-  );
-};
-
-const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => {
-  return (
-    <TableRow>
-      <TableCell className="text-base kanji-font">
-        <RomajiBadge kana={entry.reading} />
-      </TableCell>
-      <TableCell>
-        <FrequencyBadge frequency={entry.frequency} />
-      </TableCell>
-      <TableCell>
-        {entry.example_word ? (
-          <ExampleWordPopover word={entry.example_word} />
-        ) : (
-          "-"
-        )}
-      </TableCell>
-      <TableCell>
-        <ReadingTypeBadge type={entry.type} />
-      </TableCell>
-    </TableRow>
-  );
-};
+const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => (
+  <TableRow>
+    <TableCell className="text-base kanji-font">
+      <RomajiBadge kana={entry.reading} />
+    </TableCell>
+    <UsageCell entry={entry} />
+    <TableCell className="text-base kanji-font">
+      {entry.example_word == null ? (
+        "-"
+      ) : (
+        <ExampleWordPopover word={entry.example_word} />
+      )}
+    </TableCell>
+    <TableCell>
+      <Badge
+        variant={entry.type === "KUN" ? "secondary" : "default"}
+        className="whitespace-nowrap"
+      >
+        {readingTypeLabels[entry.type]}
+      </Badge>
+    </TableCell>
+  </TableRow>
+);
 
 export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
-  const { status, error, kanjiReadingData } = useKanjiReadingDetails(kanji);
+  const { status, kanjiReadingData } = useKanjiReadingDetails(kanji);
 
-  if (status === "pending" || status === "idle") {
-    return <TableSkeleton />;
-  }
+  if (status === "idle" || status === "pending") return <TableSkeleton />;
 
-  if (status === "error" || error) {
+  if (status === "error") {
     return (
       <DefaultErrorFallback message="Failed to load reading frequency data." />
     );
   }
 
-  if (!kanjiReadingData || kanjiReadingData.length === 0) {
+  if (!kanjiReadingData?.length) {
     return (
       <div className="w-full p-4 text-base text-center">{`There is no reading usefulness data for ${kanji} right now.`}</div>
     );
@@ -98,7 +88,7 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
               <TableHead className="text-left">Reading</TableHead>
               <TableHead className="text-left">Frequency</TableHead>
               <TableHead className="text-left">Sample Word</TableHead>
-              <TableHead className="text-left">Type </TableHead>
+              <TableHead className="text-left">Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -110,6 +100,8 @@ export const ReadingFrequencyCategory = ({ kanji }: { kanji: string }) => {
             ))}
           </TableBody>
         </Table>
+      </div>
+      <div className="mt-2 text-xs text-left">
         <p className="my-4">
           This data comes from Dr. Patrick {`Kandrac's`} research on reading
           frequency in common vocabulary.

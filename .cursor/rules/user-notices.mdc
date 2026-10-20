@@ -1,0 +1,26 @@
+---
+description: Notices the user must read use UserNotice / LoginNotice - emoji, normal text color, inline underlined actions
+alwaysApply: true
+---
+
+# Notices: readable text with inline actions
+
+A notice the user should read (not logged in, read-only, unsaved draft, can't save) uses `UserNotice` from `@/components/common/UserNotice`:
+
+- A leading ⚠️ (or another fitting emoji) and `text-foreground` text — never muted gray, since people need to read it.
+- Actions are underlined words inside the sentence (`NoticeAction`), not separate boxed buttons.
+- No bordered boxes with big buttons.
+
+For logged-out states always use `LoginNotice` (`@/components/dependent/account/LoginNotice`): "⚠️ You're not logged in. **Log in** to {what it unlocks}." On phones it shortens itself to "**Log in** to {what it unlocks}." (no ⚠️).
+
+```tsx
+// ❌ BAD
+<div className="border rounded-lg p-3 text-muted-foreground">
+  Log in to save your notes. <Button>Log in</Button>
+</div>
+
+// ✅ GOOD
+<LoginNotice to="save your notes" />
+```
+
+Errors and warnings that aren't notices (validation, "couldn't save") stay bold yellow; see `warnings-bold-yellow.mdc`.

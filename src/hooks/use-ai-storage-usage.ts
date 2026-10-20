@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { AiStorageUsage } from "@/lib/ai-explain/storage-budgets";
+import { useCurrentOwner } from "@/lib/engine/content-owner";
 
 /** Same as AI_GENERATED_CONTENT_EVENT; spelled out so the storage module stays lazy. */
 const AI_GENERATED_CONTENT_EVENT = "ai-generated-content-changed";
@@ -23,15 +24,26 @@ const readEstimate = async () => {
   }
 };
 
-/** Bytes used by AI content per kind, refreshed whenever it changes. */
-export const useAiStorageUsage = () => {
-  const [state, setState] = useState<AiStorageUsageState>({
-    status: "loading",
-  });
+const LOADING: AiStorageUsageState = { status: "loading" };
+
+/**
+ * Bytes used by AI content per kind, refreshed whenever it changes or the
+ * owner (logged-in account or guest) does. Loading until the owner is known.
+ */
+export const useAiStorageUsage = (): AiStorageUsageState => {
+  const owner = useCurrentOwner();
+  const ownerId = owner.status === "known" ? owner.ownerId : undefined;
+  // Tagged with its owner so one owner's sizes never show for the next.
+  const [loaded, setLoaded] = useState<{
+    ownerId: string;
+    state: AiStorageUsageState;
+  } | null>(null);
 
   // Effect needed: sizes come from IndexedDB and the Storage API (async,
-  // outside React), and the change subscription must end on unmount.
+  // outside React), and the change subscription must end on unmount. It
+  // re-runs on ownerId because the sizes counted as "mine" belong to one owner.
   useEffect(() => {
+    if (ownerId === undefined) return;
     let active = true;
     const refresh = async () => {
       try {
@@ -40,9 +52,10 @@ export const useAiStorageUsage = () => {
           getAiStorageUsage(),
           readEstimate(),
         ]);
-        if (active) setState({ status: "ready", usage, estimate });
+        if (active)
+          setLoaded({ ownerId, state: { status: "ready", usage, estimate } });
       } catch {
-        if (active) setState({ status: "error" });
+        if (active) setLoaded({ ownerId, state: { status: "error" } });
       }
     };
     void refresh();
@@ -51,7 +64,8 @@ export const useAiStorageUsage = () => {
       active = false;
       window.removeEventListener(AI_GENERATED_CONTENT_EVENT, refresh);
     };
-  }, []);
+  }, [ownerId]);
 
-  return state;
+  if (!loaded || loaded.ownerId !== ownerId) return LOADING;
+  return loaded.state;
 };
