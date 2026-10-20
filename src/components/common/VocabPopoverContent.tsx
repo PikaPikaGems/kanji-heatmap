@@ -16,7 +16,13 @@ import { cn } from "@/lib/utils";
  * "✨ AI Explain" on its own line between the gloss and the action icons,
  * when AI study tools are set up.
  */
-const WordAiExplain = ({ word }: { word: string }) => {
+const WordAiExplain = ({
+  word,
+  english,
+}: {
+  word: string;
+  english?: string;
+}) => {
   const [settings] = useAiExplainSettings();
   const owner = useCurrentOwner();
   // Nobody's saved answers show until the owner is known.
@@ -28,7 +34,7 @@ const WordAiExplain = ({ word }: { word: string }) => {
         <button
           type="button"
           className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
-          onClick={() => openWordExplain(word)}
+          onClick={() => openWordExplain(word, english)}
         >
           ✨ AI Explain
         </button>
@@ -97,7 +103,7 @@ export const VocabPopoverContent = ({
           </div>
         </>
       )}
-      <WordAiExplain word={word} />
+      <WordAiExplain word={word} english={definition} />
       <DottedSeparator />
       <WordActionIcons kana={kana ?? ""} word={word} />
 

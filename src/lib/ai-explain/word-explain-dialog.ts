@@ -6,7 +6,13 @@ import { useSyncExternalStore } from "react";
  * mounted once in App. `session` changes on every opening so the dialog
  * starts fresh.
  */
-type WordExplainDialog = { open: boolean; word: string; session: number };
+type WordExplainDialog = {
+  open: boolean;
+  word: string;
+  /** The popover's English gloss, shown under the word. */
+  english?: string;
+  session: number;
+};
 
 let state: WordExplainDialog = { open: false, word: "", session: 0 };
 const listeners = new Set<() => void>();
@@ -16,8 +22,8 @@ const set = (next: WordExplainDialog) => {
   for (const listener of listeners) listener();
 };
 
-export const openWordExplain = (word: string) =>
-  set({ open: true, word, session: state.session + 1 });
+export const openWordExplain = (word: string, english?: string) =>
+  set({ open: true, word, english, session: state.session + 1 });
 
 export const closeWordExplain = () => set({ ...state, open: false });
 

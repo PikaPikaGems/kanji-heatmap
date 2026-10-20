@@ -142,7 +142,7 @@ export const ReviewRatings = ({
 }) => {
   if (!showReading && !showWriting) return null;
   return (
-    <section className="w-full max-w-md px-4 py-3 mx-auto mt-4 border rounded-xl border-foreground/5 bg-muted/10">
+    <section className="w-full px-4 py-3 mt-4 border rounded-xl border-foreground/5 bg-muted/10">
       <h3 className="mb-1 text-xs font-bold text-center uppercase text-muted-foreground">
         Review ratings
       </h3>

@@ -11,7 +11,7 @@ const INPUTS: readonly PointerType[] = ["fine", "coarse"];
 /**
  * Which sessions the Speed Katakana grid shows: keyboard or touchscreen
  * (they are recorded apart, since typing on glass is slower). The device's
- * own kind is marked "this device".
+ * own kind is marked "like this device".
  */
 export const SpeedKatakanaInputOptions = ({
   value,
@@ -45,7 +45,10 @@ export const SpeedKatakanaInputOptions = ({
             <span className="translate-y-0.5">
               {INPUT_LABELS[option]}
               {option === devicePointer && (
-                <span className="text-muted-foreground"> (this device)</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  (like this device)
+                </span>
               )}
             </span>
           </label>

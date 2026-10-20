@@ -194,6 +194,7 @@ const NotesPopover = ({
         // Closing doesn't cancel: the answer is still saved when it arrives.
         onClose={() => setView("closed")}
         japaneseText={japaneseText}
+        english={item.en}
         word={isWord}
         speakButtons={<SpeakButtons speech={speech} />}
         state={explain.state}

@@ -5,8 +5,8 @@ import {
   speedKatakanaPageMeta,
 } from "@/lib/pages/practice-pages";
 
-export const READING_MASTERY_LABEL = "Kanji Reading Mastery";
-export const WRITING_MASTERY_LABEL = "Kanji Writing Mastery";
+export const READING_MASTERY_LABEL = "Kanji Reading Mastery ⭐️";
+export const WRITING_MASTERY_LABEL = "Kanji Writing Mastery ⭐️";
 
 /**
  * What the activity heatmap counts. `recognition` / `production` are Reading /

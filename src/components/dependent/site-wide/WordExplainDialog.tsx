@@ -7,7 +7,15 @@ import {
   useWordExplainDialog,
 } from "@/lib/ai-explain/word-explain-dialog";
 
-const WordExplainFlow = ({ word, open }: { word: string; open: boolean }) => {
+const WordExplainFlow = ({
+  word,
+  english,
+  open,
+}: {
+  word: string;
+  english?: string;
+  open: boolean;
+}) => {
   const explain = useAiExplain();
 
   // Effect needed: the explanation starts when the dialog opens from a
@@ -24,6 +32,7 @@ const WordExplainFlow = ({ word, open }: { word: string; open: boolean }) => {
       // Closing doesn't cancel: the answer is still saved when it arrives.
       onClose={closeWordExplain}
       japaneseText={word}
+      english={english}
       word
       speakButtons={<SpeakButton word={word} iconType="volume-2" />}
       state={explain.state}
@@ -37,7 +46,9 @@ const WordExplainFlow = ({ word, open }: { word: string; open: boolean }) => {
 
 /** "✨ AI Explain" for one word, opened with `openWordExplain(word)`. */
 export const WordExplainDialog = () => {
-  const { open, word, session } = useWordExplainDialog();
+  const { open, word, english, session } = useWordExplainDialog();
   if (session === 0) return null;
-  return <WordExplainFlow key={session} word={word} open={open} />;
+  return (
+    <WordExplainFlow key={session} word={word} english={english} open={open} />
+  );
 };

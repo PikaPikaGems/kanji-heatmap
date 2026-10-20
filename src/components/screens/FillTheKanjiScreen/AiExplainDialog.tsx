@@ -100,6 +100,7 @@ export const AiExplainDialog = ({
   open,
   onClose,
   japaneseText,
+  english,
   word = false,
   speakButtons,
   state,
@@ -109,6 +110,8 @@ export const AiExplainDialog = ({
   open: boolean;
   onClose: () => void;
   japaneseText: string;
+  /** The English translation or gloss shown under the text, when known. */
+  english?: string;
   /** A single word: explained without grammar. */
   word?: boolean;
   /** Next to the text, e.g. the game's speak buttons for this sentence. */
@@ -140,6 +143,9 @@ export const AiExplainDialog = ({
             text={japaneseText}
             className="text-2xl leading-10"
           />
+          {english && (
+            <p className="text-sm text-muted-foreground">{english}</p>
+          )}
           {speakButtons}
         </div>
         <div className="text-left">
