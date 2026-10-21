@@ -129,10 +129,12 @@ export const StructureInfo = ({ kanji }: { kanji: string }) => {
               (TopoKanji)
             </TableCellFixed>
             <TableCellGrow>
-              <OriginalKanjiComponentBreakdown
-                kanji={kanji}
-                showNotAvailable={true}
-              />
+              <div className="flex w-full text-left justify-left">
+                <OriginalKanjiComponentBreakdown
+                  kanji={kanji}
+                  showNotAvailable={true}
+                />
+              </div>
             </TableCellGrow>
           </TableRow>
         </TableBody>
