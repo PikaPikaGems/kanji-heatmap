@@ -59,8 +59,6 @@ export const SingleKanjiPart = ({
       {/* The reading is the family's, not necessarily this kanji's: 門
               is もん, but kanji with 門 (間 簡 閑) are read かん. */}
       {phonetics.length > 0 && (
-        // Text first, readings below: up to four readings (各) wrap inside
-        // the box instead of stretching the whole popover.
         <SoundHint kanji={kanji} phonetics={phonetics} />
       )}
 
@@ -105,7 +103,6 @@ export const SingleKanjiPart = ({
         />
       );
     }
-    console.log("not opening popover", kanji, componentEntry);
     return <div className={triggerClassName}>{kanji}</div>;
   }
 
