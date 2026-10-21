@@ -6,7 +6,7 @@ const STORAGE_KEY = "attempt-count-heatmap-scale";
 type ScaleSettings = { scale: AttemptCountScale };
 
 /**
- * Persisted attempt-count brightness scale, shared by the Fill the Kanji and
+ * Persisted attempt-count brightness scale, shared by the Fill in the Kanji and
  * Speed Katakana heatmaps.
  */
 export const useAttemptCountScale = () => {

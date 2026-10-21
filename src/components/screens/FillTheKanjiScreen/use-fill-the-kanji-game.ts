@@ -66,7 +66,7 @@ const isEditableTarget = (target: EventTarget | null) => {
 };
 
 /**
- * The Fill the Kanji game loop: card cursor, which blank is selected, what
+ * The Fill in the Kanji game loop: card cursor, which blank is selected, what
  * each blank holds, answer feedback, and keyboard shortcuts (1–8, or 1–6 and q w e r t y, pick a tile,
  * ! reads the sentence aloud, @ reads it slowly, Backspace / Delete undo the most recently placed
  * kanji, Enter submits once every blank is filled). The Game component stays

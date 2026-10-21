@@ -11,6 +11,7 @@ import {
   defaultSearchTextSettings,
   defaultSortSettings,
 } from "@/lib/settings/search-settings-adapter";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { SearchSettings } from "@/lib/settings/settings";
 import { buildPracticeDeck } from "./build-deck";
 import { DeckFilterSettings, PracticeItem } from "./types";
@@ -24,6 +25,7 @@ type RepEntry = [string, string, string, string];
 export const usePracticeDeck = (settings: DeckFilterSettings) => {
   const getInfo = useGetKanjiInfoFn();
   const ready = useIsKanjiWorkerReady();
+  const bookmarks = useBookmarkedKanji();
 
   // Word and reading come from the snapshot; the gloss and tag are fetched
   // once, here, because the deck displays them.
@@ -73,12 +75,23 @@ export const usePracticeDeck = (settings: DeckFilterSettings) => {
     return buildPracticeDeck({
       repWords,
       includedKanji: new Set(filteredKanji.data),
+      bookmarkedKanji:
+        bookmarks.status === "absent" ? undefined : bookmarks.kanji,
       getKeyword: (kanji) => getInfo(kanji)?.keyword ?? "...",
       settings,
     });
-  }, [filteredKanji.data, filteredKanji.status, getInfo, repWords, settings]);
+  }, [
+    filteredKanji.data,
+    filteredKanji.status,
+    getInfo,
+    repWords,
+    settings,
+    bookmarks.status,
+    bookmarks.kanji,
+  ]);
 
   const loading =
+    (settings.bookmarkedOnly && bookmarks.status === "loading") ||
     filteredKanji.status === "loading" ||
     filteredKanji.status === "idle" ||
     repStatus === "loading" ||

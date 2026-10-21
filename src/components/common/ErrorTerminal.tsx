@@ -1,6 +1,8 @@
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { CheckCircle, Copy } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { HintChip } from "@/components/common/HintChip";
+import { useFlashHint } from "@/hooks/use-flash-hint";
 
 export const ErrorTerminal = ({
   content,
@@ -13,11 +15,12 @@ export const ErrorTerminal = ({
 }) => {
   const { copy, status } = useCopyToClipboard(1500);
   const copied = status === "copied";
+  const hint = useFlashHint();
 
   return (
     <div
       className={cn(
-        "w-full max-w-md overflow-hidden text-left rounded-xl border border-neutral-700 bg-[#0d1117] shadow-lg",
+        "relative w-full max-w-md overflow-hidden text-left rounded-xl border border-neutral-700 bg-[#0d1117] shadow-lg",
         className
       )}
     >
@@ -36,6 +39,7 @@ export const ErrorTerminal = ({
           type="button"
           onClick={(e) => {
             void copy(content, e);
+            hint.show("Copied to clipboard");
           }}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 font-mono text-[11px] text-neutral-300 transition-colors hover:bg-neutral-700 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
           aria-label={copied ? "Copied" : "Copy error report"}
@@ -59,6 +63,15 @@ export const ErrorTerminal = ({
       >
         {content}
       </pre>
+      {hint.hint && (
+        <HintChip
+          key={hint.hint.key}
+          className="font-sans right-3 bottom-3"
+          onDone={hint.done}
+        >
+          {hint.hint.text}
+        </HintChip>
+      )}
     </div>
   );
 };

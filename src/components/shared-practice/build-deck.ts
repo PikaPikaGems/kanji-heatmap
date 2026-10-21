@@ -1,4 +1,3 @@
-import { isBookmarked } from "@/lib/bookmarks";
 import { shuffle } from "@/lib/utils";
 import { randomFontIndex } from "@/hooks/use-change-font";
 import { DeckFilterSettings, PracticeItem } from "./types";
@@ -8,11 +7,14 @@ type RepEntry = [string, string, string, string];
 export const buildPracticeDeck = ({
   repWords,
   includedKanji,
+  bookmarkedKanji,
   getKeyword,
   settings,
 }: {
   repWords: Record<string, RepEntry>;
   includedKanji: ReadonlySet<string>;
+  /** The account's bookmarks; omitted when this build has none (filter skipped). */
+  bookmarkedKanji?: ReadonlySet<string>;
   getKeyword: (kanji: string) => string;
   settings: DeckFilterSettings;
 }): PracticeItem[] => {
@@ -25,7 +27,13 @@ export const buildPracticeDeck = ({
     if (!word || !reading) continue;
 
     if (!includedKanji.has(kanji)) continue;
-    if (settings.bookmarkedOnly && !isBookmarked(kanji, word)) continue;
+    if (
+      settings.bookmarkedOnly &&
+      bookmarkedKanji &&
+      !bookmarkedKanji.has(kanji)
+    ) {
+      continue;
+    }
 
     items.push({
       kanji,

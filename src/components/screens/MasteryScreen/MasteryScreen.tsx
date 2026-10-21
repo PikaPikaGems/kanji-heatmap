@@ -1,30 +1,101 @@
+import { lazy } from "react";
+import { Loader2 } from "lucide-react";
+import { PracticeButton } from "@/components/ui/practice-button";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
-import { ScreenShell } from "@/components/common/ScreenShell";
-import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
-import { practiceNavLinks } from "@/lib/pages/nav-links";
+import { useIsKanjiWorkerReady } from "@/kanji-worker/kanji-worker-hooks";
+import { AccountGateMessage } from "@/components/mastery-review/MasteryGateScreen";
+import { isEngineAbsent } from "@/lib/engine/account-ui";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
+import { ControlBar } from "../ListScreen/ControlBar";
+import { ItemCountBadge } from "../ListScreen/ControlBar/ItemCountBadge";
+import LoadingKanjis from "../ListScreen/KanjiList/LoadingKanjis";
+import { SuspendedKanjiList } from "../ListScreen/KanjiList/LazyKanjiList";
+import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
+import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
+import { MasteryMetricBadge } from "./MasteryMetricBadge";
+import { MasteryAccountBanner } from "./MasteryAccountBanner";
+import { LoginPill } from "@/components/dependent/account/LoginPill";
+import { MasteryTileColors } from "./MasteryTileColors";
+import { cnWarningText } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
+
+const MasteryPresentationPopover = lazy(
+  () => import("./MasteryPresentationPopover")
+);
+
+/**
+ * The `/` grid, search, sort and filter, colored by mastery (design 5.9).
+ * Without a pile to read (signed out, a browser that can't save progress, or
+ * a build without the engine) every tile stays uncolored ("Not started");
+ * a bottom banner says why, except in builds without the engine.
+ */
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
+  const account = useAccountStatus();
+  const ready = useIsKanjiWorkerReady();
+  const pile = useReviewPileByKanji();
+
+  if (account.kind === "loading") {
+    return (
+      <div
+        className="flex items-center justify-center min-h-dvh"
+        role="status"
+        aria-label="Loading"
+      >
+        <Loader2 className="size-7 animate-spin" />
+      </div>
+    );
+  }
+
+  if (account.kind === "error" || account.kind === "recovery") {
+    return (
+      <MasteryCenteredMessage>
+        <AccountGateMessage status={account} />
+      </MasteryCenteredMessage>
+    );
+  }
+
+  if (account.kind === "active" && pile.status === "failed") {
+    return (
+      <MasteryCenteredMessage>
+        <p className={cn("max-w-sm text-sm", cnWarningText)}>
+          Couldn&apos;t load your progress.
+        </p>
+        {pile.retry && (
+          <PracticeButton variant="secondary" onClick={pile.retry}>
+            Try again
+          </PracticeButton>
+        )}
+      </MasteryCenteredMessage>
+    );
+  }
+
+  const unsupportedBrowser =
+    account.kind === "unavailable" && !isEngineAbsent(account.reason);
 
   return (
-    <ScreenShell>
-      <div className="flex flex-col items-center justify-center flex-1 gap-5  text-center min-h-[50vh]">
-        <div className="text-3xl">{"🙇🏽‍♀️ 🙇"}</div>
-
-        <div className="space-y-2">
-          <p className="text-xs font-extrabold tracking-wide uppercase text-muted-foreground">
-            Coming soon
-          </p>
-          <p className="max-w-md mx-auto text-sm text-muted-foreground">
-            This page isn’t ready yet — keep practicing for now.
-          </p>
-        </div>
-
-        <DashedNavLinkList
-          items={practiceNavLinks}
-          className="grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2"
-        />
-      </div>
-    </ScreenShell>
+    <>
+      <ListScreenLayout
+        controlBar={<ControlBar Popover={MasteryPresentationPopover} />}
+        badge={
+          <>
+            <ItemCountBadge />
+            <MasteryMetricBadge />
+          </>
+        }
+      >
+        {ready ? (
+          <MasteryTileColors>
+            <SuspendedKanjiList />
+          </MasteryTileColors>
+        ) : (
+          <LoadingKanjis />
+        )}
+      </ListScreenLayout>
+      {account.kind === "signed-out" && <LoginPill emoji="💪" />}
+      {unsupportedBrowser && <MasteryAccountBanner />}
+    </>
   );
 };
 

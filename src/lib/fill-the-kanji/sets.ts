@@ -1,8 +1,9 @@
 /**
- * The Fill the Kanji challenge sets, in display order.
+ * The Fill in the Kanji challenge sets, in display order.
  *
- * `id` must match the set's folder, public/json/fill-the-kanji/<id>/, and is
- * also the key used for stored stats, so renaming an id loses the stats recorded under it.
+ * `id` must match the set's folder, public/json/fill-the-kanji/<id>/, and also
+ * names the set's engine activity type (see activity.ts), so renaming an id
+ * loses the progress recorded under it.
  * `unit` names what the set holds in the download settings ("5,100+ sentences");
  * the size and count there come from the generated download-sizes.json and
  * set-sizes.json.
