@@ -60,12 +60,29 @@ const WordKanjiLinks = ({
   );
 };
 
+/** Stands in for the reading and meaning while the vocab data loads. */
+const GlossSkeleton = () => (
+  <div
+    role="status"
+    aria-label="Loading meaning"
+    className="flex flex-col items-center gap-1.5 py-1"
+  >
+    <div className="w-3/4 h-3 rounded-full bg-muted animate-pulse" />
+    <div className="w-1/2 h-3 rounded-full bg-muted animate-pulse" />
+    <p className="pt-0.5 text-[10px] text-muted-foreground">
+      読み込み中 · Loading…
+    </p>
+  </div>
+);
+
 interface VocabPopoverContentProps {
   word: string;
   kana?: string;
   wordKanjis: { kanji: string; keyword: string }[];
   definition?: string;
   optionalSection?: ReactNode;
+  /** The meaning is still on its way; show a skeleton in its place. */
+  definitionLoading?: boolean;
 }
 
 export const VocabPopoverContent = ({
@@ -74,6 +91,7 @@ export const VocabPopoverContent = ({
   wordKanjis,
   definition,
   optionalSection,
+  definitionLoading = false,
 }: VocabPopoverContentProps) => {
   const [showAllLinks, setShowAllLinks] = useState(false);
   const maxLinks = 6;
@@ -87,18 +105,19 @@ export const VocabPopoverContent = ({
     <div className="p-2 w-72">
       <WordKanjiLinks wordKanjis={wordKanjis} />
 
-      {(definition || optionalSection) && (
+      {(definition || optionalSection || definitionLoading) && (
         <>
           <DottedSeparator />
           <div className="my-2">
             {optionalSection}
+            {definitionLoading && <GlossSkeleton />}
             {definition && (
-              <>
+              <div className="animate-fade-in-fast">
                 <ExpandableGloss
                   definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
                   maxLen={120}
                 />
-              </>
+              </div>
             )}
           </div>
         </>
