@@ -15,7 +15,7 @@ import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
 import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
 import { MasteryAccountBanner } from "./MasteryAccountBanner";
-import { MasteryLoginPill } from "./MasteryLoginPill";
+import { LoginPill } from "@/components/dependent/account/LoginPill";
 import { MasteryTileColors } from "./MasteryTileColors";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
@@ -93,7 +93,7 @@ const MasteryScreen = () => {
           <LoadingKanjis />
         )}
       </ListScreenLayout>
-      {account.kind === "signed-out" && <MasteryLoginPill />}
+      {account.kind === "signed-out" && <LoginPill emoji="💪" />}
       {unsupportedBrowser && <MasteryAccountBanner />}
     </>
   );

@@ -40,16 +40,24 @@ export const ExampleWordPopover = ({
   optionalSection,
   contentClassName,
 }: ExampleWordPopoverProps) => {
-  const { vocabInfo } = useVocabDetails(word);
+  const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
-  if (vocabInfo == null) {
+  // Plain text only while loading; a word missing from the vocab data (or a
+  // failed lookup) is still a button, shown without furigana.
+  if (status === "idle" || status === "loading") {
     return (
-      <span className={cn("cursor-default kanji-font", className)}>{word}</span>
+      <span
+        className={cn("cursor-default kanji-font", className)}
+        title="読み込み中 · Loading..."
+      >
+        {word}
+      </span>
     );
   }
 
-  const partsReading = vocabInfo.parts
+  const parts: WordPartDetail[] = vocabInfo?.parts ?? [[word]];
+  const partsReading = parts
     .map(([text, furigana]) => furigana || text)
     .join("");
 
@@ -65,7 +73,7 @@ export const ExampleWordPopover = ({
             className
           )}
         >
-          {vocabInfo.parts.map((part, i) => (
+          {parts.map((part, i) => (
             <FuriganaPart key={`${i}-${part[0]}`} part={part} />
           ))}
         </Button>
@@ -73,9 +81,9 @@ export const ExampleWordPopover = ({
       content={
         <VocabPopoverContent
           word={word}
-          kana={readingOverride ?? partsReading}
+          kana={readingOverride ?? (vocabInfo ? partsReading : undefined)}
           wordKanjis={wordKanjis}
-          definition={wordTranslationOverride ?? vocabInfo.meaning}
+          definition={wordTranslationOverride ?? vocabInfo?.meaning}
           optionalSection={optionalSection}
         />
       }

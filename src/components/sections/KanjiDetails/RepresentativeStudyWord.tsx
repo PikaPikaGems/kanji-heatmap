@@ -4,19 +4,87 @@ import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { FreqTagBadges } from "@/components/common/FreqTagBadges";
-import { vocabExternalLinksCore } from "@/lib/external-links";
+import {
+  vocabExternalLinks,
+  vocabExternalLinksCore,
+} from "@/lib/external-links";
 import { InfoIcon } from "lucide-react";
 import { Table, TableBody, TableRow } from "@/components/ui/table";
 import { LabelCell, TableCellGrow } from "./General";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
 
 import { VocabActions } from "@/components/common/VocabActions";
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
 
 const AnchorWordDetails = lazy(() => import("./AiContent/AnchorWordDetails"));
+
+const vocabExternalLinksMore = vocabExternalLinks.slice(
+  vocabExternalLinksCore.length
+);
+
+const AnchorWordLink = ({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: ReactNode;
+  className?: string;
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noreferrer"
+    className={cn(
+      "inline-flex items-center px-3 py-1 text-xs transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground",
+      className
+    )}
+  >
+    {children}
+  </a>
+);
+
+/**
+ * The core dictionary links, then "· · ·" that reveals the rest (the ones
+ * the vocab popover lists under "Explore in the wild").
+ */
+const AnchorWordLinks = ({ word }: { word: string }) => {
+  const [showMore, setShowMore] = useState(false);
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 py-1">
+      {vocabExternalLinksCore.map(({ name, url }) => (
+        <AnchorWordLink key={name} href={url(word)}>
+          {name}
+        </AnchorWordLink>
+      ))}
+      {showMore ? (
+        vocabExternalLinksMore.map(({ name, url }) => (
+          <AnchorWordLink
+            key={name}
+            href={url(word)}
+            className="animate-fade-in-fast"
+          >
+            {name}
+          </AnchorWordLink>
+        ))
+      ) : (
+        <button
+          type="button"
+          aria-label={`See more links for ${word}`}
+          onClick={() => setShowMore(true)}
+          className="inline-flex items-center px-3 py-1 text-xs font-bold tracking-widest transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
+        >
+          · · ·
+        </button>
+      )}
+    </div>
+  );
+};
 
 const ViewVocabDetails = () => (
   <GenericPopover
@@ -113,17 +181,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
     {
       label: "Links",
       description: `Look up ${word} in dictionaries and see it used in the wild.`,
-      content: vocabExternalLinksCore.map(({ name, url }) => (
-        <a
-          key={name}
-          href={url(word)}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center px-3 py-1 text-xs transition-colors border border-dashed rounded-full border-foreground/30 hover:bg-accent hover:text-accent-foreground"
-        >
-          {name}
-        </a>
-      )),
+      content: <AnchorWordLinks word={word} />,
     },
   ];
 

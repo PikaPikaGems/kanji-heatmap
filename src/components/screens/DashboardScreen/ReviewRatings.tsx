@@ -128,32 +128,19 @@ const RatingsRow = ({
 };
 
 /**
- * How mastery reviews were rated: a row each for Reading and Writing (the
- * ones shown), then Combined when both are.
+ * How mastery reviews were rated: a row each for Reading, Writing and
+ * Combined, whatever the activity filters show.
  */
-export const ReviewRatings = ({
-  ratings,
-  showReading = true,
-  showWriting = true,
-}: {
-  ratings: DayRatings;
-  showReading?: boolean;
-  showWriting?: boolean;
-}) => {
-  if (!showReading && !showWriting) return null;
-  return (
-    <section className="w-full px-4 py-3 mt-4 border rounded-xl border-foreground/5 bg-muted/10">
-      <h3 className="mb-1 text-xs font-bold text-center uppercase text-muted-foreground">
-        Review ratings
-      </h3>
-      {showReading && <RatingsRow label="Reading" ratings={ratings.reading} />}
-      {showWriting && <RatingsRow label="Writing" ratings={ratings.writing} />}
-      {showReading && showWriting && (
-        <RatingsRow
-          label="Combined"
-          ratings={addRatings(ratings.reading, ratings.writing)}
-        />
-      )}
-    </section>
-  );
-};
+export const ReviewRatings = ({ ratings }: { ratings: DayRatings }) => (
+  <section className="w-full px-4 py-3 mt-4 border rounded-xl border-foreground/5 bg-muted/10">
+    <h3 className="mb-1 text-xs font-bold text-center uppercase text-muted-foreground">
+      Review ratings
+    </h3>
+    <RatingsRow label="Reading" ratings={ratings.reading} />
+    <RatingsRow label="Writing" ratings={ratings.writing} />
+    <RatingsRow
+      label="Combined"
+      ratings={addRatings(ratings.reading, ratings.writing)}
+    />
+  </section>
+);

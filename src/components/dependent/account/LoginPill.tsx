@@ -4,12 +4,12 @@ import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { cn } from "@/lib/utils";
 
 /**
- * Logged out: a primary badge (white in dark mode, like the bottom banner it
+ * Logged out on /mastery and /dashboard: a primary badge (white in dark mode, like the bottom banner it
  * replaced) floating just above the bottom-left island; tapping it opens the
  * login dialog. Hidden offline, where the app's offline banner speaks
  * instead.
  */
-export const MasteryLoginPill = () => {
+export const LoginPill = ({ emoji }: { emoji: string }) => {
   const { online } = useNetworkState();
   if (!online) return null;
 
@@ -28,7 +28,7 @@ export const MasteryLoginPill = () => {
         <span className="underline underline-offset-2 decoration-2">
           Log in
         </span>{" "}
-        to see mastery 💪
+        to view {emoji}
       </span>
     </button>
   );

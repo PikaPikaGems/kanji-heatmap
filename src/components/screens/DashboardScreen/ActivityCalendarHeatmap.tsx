@@ -82,8 +82,8 @@ const ActivityHeatmapGrid = ({
 };
 
 /**
- * The period's cards, its captions and its review ratings. Kanji added and
- * each ratings row follow their activity filter.
+ * The period's cards, its captions and its review ratings. Kanji added
+ * follows its activity filter; the ratings always show every row.
  */
 const PeriodSummary = ({
   stats,
@@ -109,11 +109,7 @@ const PeriodSummary = ({
         </>
       )}
     </div>
-    <ReviewRatings
-      ratings={ratings}
-      showReading={filters.readingMastery}
-      showWriting={filters.writingMastery}
-    />
+    <ReviewRatings ratings={ratings} />
   </>
 );
 
