@@ -13,7 +13,7 @@ export const StudyNotesAccordion = ({ kanji }: { kanji: string }) => {
   if (isAccountUiHidden(status)) return null;
 
   return (
-    <SimpleAccordion trigger="Personal Study Notes">
+    <SimpleAccordion trigger="Personal Study Notes ⭐️">
       <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
         <Suspense fallback={<SectionLoading />}>
           <KanjiStudyNotes key={kanji} kanji={kanji} />
