@@ -46,7 +46,7 @@ export const OriginalKanjiComponentBreakdown = ({
   return (
     <>
       {hasParts && (
-        <div className="flex flex-wrap gap-2 text-left">
+        <div className="flex flex-wrap justify-center gap-2">
           {parts.map((item) => (
             <SingleKanjiPart
               key={item.part}

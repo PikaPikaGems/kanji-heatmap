@@ -12,6 +12,30 @@ import {
 import { isKnownRadical } from "@/lib/radicals";
 import { useComponentSearchEntry } from "@/components/sections/KanjiDetails/use-component-search-entry";
 
+export const SoundHint = ({
+  kanji,
+  phonetics,
+}: {
+  kanji: string;
+  phonetics: string[];
+}) => {
+  return (
+    <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5 ">
+      <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
+        Sound hint for kanji with <span className="kanji-font">{kanji}</span>:
+      </p>
+      <div className="flex flex-wrap justify-center">
+        {phonetics.map((phonetic) => (
+          <RomajiBadge
+            key={phonetic}
+            kana={phonetic}
+            className="m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base"
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 export const SingleKanjiPart = ({
   kanji,
   keyword,
@@ -37,21 +61,7 @@ export const SingleKanjiPart = ({
       {phonetics.length > 0 && (
         // Text first, readings below: up to four readings (各) wrap inside
         // the box instead of stretching the whole popover.
-        <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
-          <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
-            Sound hint for kanji with{" "}
-            <span className="kanji-font">{kanji}</span>:
-          </p>
-          <div className="flex flex-wrap justify-center">
-            {phonetics.map((phonetic) => (
-              <RomajiBadge
-                key={phonetic}
-                kana={phonetic}
-                className="m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base"
-              />
-            ))}
-          </div>
-        </div>
+        <SoundHint kanji={kanji} phonetics={phonetics} />
       )}
 
       {/* A radical opens the radical popover even when it is also a
@@ -76,6 +86,26 @@ export const SingleKanjiPart = ({
   const triggerClassName = `flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 ${canOpenPopover ? "hover:border-solid hover:border-neon-accent" : "cursor-default"} ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`;
 
   if (!canOpenPopover) {
+    if (kanji === "ヨ冖又") {
+      // TODO: TEMPORARY HACK FIX ME LATER
+      // "ヨ冖又":{"s":["しん"]
+      return (
+        <GenericPopover
+          modal
+          trigger={
+            <button type="button" className={triggerClassName}>
+              {kanji}
+            </button>
+          }
+          content={
+            <div className="m-2">
+              <SoundHint kanji={kanji} phonetics={["しん"]} />
+            </div>
+          }
+        />
+      );
+    }
+    console.log("not opening popover", kanji, componentEntry);
     return <div className={triggerClassName}>{kanji}</div>;
   }
 
