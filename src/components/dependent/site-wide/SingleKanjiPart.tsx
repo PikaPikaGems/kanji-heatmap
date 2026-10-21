@@ -36,6 +36,7 @@ export const SoundHint = ({
     </div>
   );
 };
+
 export const SingleKanjiPart = ({
   kanji,
   keyword,
