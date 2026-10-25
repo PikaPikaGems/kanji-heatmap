@@ -1,7 +1,55 @@
-import { WindowVirtualizer } from "virtua";
-import React, { useState } from "react";
+import { Virtualizer, WindowVirtualizer } from "virtua";
+import React, { ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { HoverKanji } from "@/components/sections/KanjiHoverItem";
 import { useVirtualListDims } from "./useVirtualDims";
+
+/**
+ * In installed PWAs the <body> is the scroll container instead of the window
+ * (see the `display-mode: standalone` rules in index.css that work around iOS
+ * standalone fixed-position drift), so window-based virtualization would never
+ * see any scrolling there. Display mode cannot change within a session, so a
+ * one-time check is enough. Must stay in sync with the media query gating the
+ * CSS scroller switch.
+ */
+const isStandaloneDisplay =
+  typeof window !== "undefined" &&
+  window.matchMedia("(display-mode: standalone)").matches;
+
+/** Virtualizes against the <body> scroller used in standalone display mode. */
+const BodyScrollVirtualizer = ({ children }: { children: ReactNode }) => {
+  const scrollRef = useRef<HTMLElement | null>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const [startMargin, setStartMargin] = useState(0);
+
+  useLayoutEffect(() => {
+    scrollRef.current = document.body;
+    const outer = outerRef.current;
+    if (!outer) return;
+    // Distance from the top of the body's scrollable content to the
+    // virtualizer (e.g. the pt-24 clearing the fixed header + control bar).
+    setStartMargin(
+      Math.max(
+        0,
+        Math.round(outer.getBoundingClientRect().top + document.body.scrollTop)
+      )
+    );
+  }, []);
+
+  return (
+    <div ref={outerRef}>
+      <Virtualizer scrollRef={scrollRef} startMargin={startMargin}>
+        {children}
+      </Virtualizer>
+    </div>
+  );
+};
+
+const ListVirtualizer = ({ children }: { children: ReactNode }) =>
+  isStandaloneDisplay ? (
+    <BodyScrollVirtualizer>{children}</BodyScrollVirtualizer>
+  ) : (
+    <WindowVirtualizer>{children}</WindowVirtualizer>
+  );
 
 const KanjiListRaw = ({
   kanjiKeys = [],
@@ -15,7 +63,7 @@ const KanjiListRaw = ({
 
   return (
     <div className="w-full animate-fade-in">
-      <WindowVirtualizer>
+      <ListVirtualizer>
         {Array.from({ length: rows }).map((_, rowIndex) => {
           const isNotLast = rowIndex < rows - 1;
           const hasCompleteRows = isNotLast || kanjiKeys.length % cols === 0;
@@ -40,7 +88,7 @@ const KanjiListRaw = ({
             </div>
           );
         })}
-      </WindowVirtualizer>
+      </ListVirtualizer>
     </div>
   );
 };
