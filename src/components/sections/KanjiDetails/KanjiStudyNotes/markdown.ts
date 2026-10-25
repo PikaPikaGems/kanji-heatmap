@@ -157,10 +157,51 @@ const configureVocabDirective = (node: DirectiveNode) => {
 };
 
 /**
+ * Puts text that only looks like a directive back as it was typed.
+ * remark-directive reads any `:word` as one (the `:30` of "10:30", the
+ * seconds of the timestamp in a server-merged note), and an unknown
+ * directive renders as an empty block, dropping the text. Only `:vocab` is
+ * ours. `source` is the Markdown the tree was parsed from.
+ */
+const restoreUnknownTextDirectives = (tree: Root, source: string) => {
+  visit(tree, (node, index, parent) => {
+    if (node.type !== "textDirective" || parent == null || index == null) {
+      return;
+    }
+    const directive = node as DirectiveNode;
+    if (directive.name === "vocab") return;
+
+    const start = node.position?.start.offset;
+    const end = node.position?.end.offset;
+    const typed =
+      start != null && end != null && end <= source.length
+        ? source.slice(start, end)
+        : `:${directive.name}`;
+    // Joined with the text around it, so the Japanese pass below sees whole
+    // runs ("10:30です" stays one piece of text).
+    const before = parent.children[index - 1];
+    const after = parent.children[index + 1];
+    const from = before?.type === "text" ? index - 1 : index;
+    const to = after?.type === "text" ? index + 2 : index + 1;
+    const value =
+      (before?.type === "text" ? before.value : "") +
+      typed +
+      (after?.type === "text" ? after.value : "");
+    parent.children.splice(from, to - from, {
+      type: "text",
+      value,
+    } satisfies Text as RootContent as (typeof parent.children)[number]);
+    return from;
+  });
+};
+
+/**
  * Converts Japanese words in ordinary Markdown text into inline vocab nodes.
  * Explicit :vocab directives are preserved and may provide kana/definition.
  */
-export const remarkJapaneseVocab: Plugin<[], Root> = () => (tree) => {
+export const remarkJapaneseVocab: Plugin<[], Root> = () => (tree, file) => {
+  restoreUnknownTextDirectives(tree, String(file.value ?? ""));
+
   visit(tree, "text", (node, index, parent) => {
     if (
       parent == null ||

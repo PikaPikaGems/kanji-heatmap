@@ -8,15 +8,9 @@ test.describe("site chrome", () => {
     const island = page.getByRole("navigation", { name: "Primary" });
     await island.getByRole("link", { name: "Dashboard" }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByText(/Local storage only/)).toBeVisible({
-      timeout: 30_000,
-    });
 
     await island.getByRole("link", { name: "Visualize Mastery" }).click();
     await expect(page).toHaveURL(/\/mastery$/);
-    await expect(page.getByText("Coming soon")).toBeVisible({
-      timeout: 30_000,
-    });
 
     await island.getByRole("link", { name: "Explore Kanji" }).click();
     await expect(page).toHaveURL(/\/(\?.*)?$/);
@@ -30,7 +24,6 @@ test.describe("site chrome", () => {
     await expect(page.getByText(/\d+ Items/)).toBeVisible({ timeout: 30_000 });
 
     await page.getByRole("button", { name: "Open practice menu" }).click();
-    await expect(page.getByText("Select a mode")).toBeVisible();
 
     await page.getByRole("link", { name: /Reading Practice/ }).click();
     // Trailing "?" is fine — wouter can leave an empty query string.

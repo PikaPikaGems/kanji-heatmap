@@ -1,3 +1,4 @@
+import { describeAiError } from "@/lib/ai-explain/describe-error";
 import { useEffect, useRef, useState } from "react";
 import {
   AI_GENERATED_CONTENT_EVENT,
@@ -13,10 +14,19 @@ import {
   addAiExplainUsage,
   modelOf,
   readAiExplainSettings,
+  usesWebSearch,
   type AiExplainSettings,
 } from "@/lib/ai-explain/preferences";
-import { buildRegenerationPrompt } from "@/lib/ai-explain/prompts";
+import {
+  buildRegenerationPrompt,
+  withoutWebSearch,
+} from "@/lib/ai-explain/prompts";
 import { streamXaiSearchedCompletion } from "@/lib/ai-explain/xai";
+import {
+  abortInFlight,
+  getInFlight,
+  trackInFlight,
+} from "@/lib/ai-explain/in-flight";
 
 type TextState = {
   status: "loading" | "ready" | "generating" | "error";
@@ -33,12 +43,20 @@ export const useAiDrawerText = (
   const [state, setState] = useState<TextState>({ status: "loading" });
   const request = useRef<AbortController | null>(null);
   const readVersion = useRef(0);
+  const flightKey = `text:${id}`;
 
   // Effect needed: reads IndexedDB and subscribes to external storage changes;
-  // render cannot await the database, and cleanup must abort requests on unmount.
+  // render cannot await the database. A request still running from an
+  // earlier mount (the drawer was closed) shows as generating until it lands.
   useEffect(() => {
     let mounted = true;
     const load = async () => {
+      const running = getInFlight(flightKey);
+      if (running && !request.current) {
+        if (mounted) setState({ status: "generating" });
+        await running.settled;
+        if (!mounted) return;
+      }
       const version = ++readVersion.current;
       try {
         const result = await getTextResult(id);
@@ -59,7 +77,7 @@ export const useAiDrawerText = (
     };
     const changed = (event: Event) => {
       if ((event as CustomEvent<{ cleared: boolean }>).detail?.cleared) {
-        request.current?.abort();
+        abortInFlight(flightKey);
         request.current = null;
         setState({ status: "ready" });
       }
@@ -67,17 +85,18 @@ export const useAiDrawerText = (
     };
     void load();
     window.addEventListener(AI_GENERATED_CONTENT_EVENT, changed);
+    // No abort on unmount: the reply is still saved when it arrives.
     return () => {
       mounted = false;
-      request.current?.abort();
       request.current = null;
       window.removeEventListener(AI_GENERATED_CONTENT_EVENT, changed);
     };
-  }, [id]);
+  }, [id, flightKey]);
 
   /** Resolves true when a new result is showing. */
   const generate = async (instructions: string): Promise<boolean> => {
-    if (request.current || state.status === "loading") return false;
+    if (request.current || getInFlight(flightKey) || state.status === "loading")
+      return false;
     const settings = readAiExplainSettings();
     if (!isAiExplainReady(settings)) return false;
     // New text adds to saved storage; regenerating replaces it.
@@ -100,16 +119,26 @@ export const useAiDrawerText = (
     request.current = controller;
     readVersion.current++;
     const previous = state.result;
-    const basePrompt = makePrompt(settings);
+    const webSearch = usesWebSearch(settings);
+    const basePrompt = webSearch
+      ? makePrompt(settings)
+      : withoutWebSearch(makePrompt(settings));
     const prompt = previous
       ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
       : basePrompt;
     setState({ status: "generating", result: previous });
+    let finish: () => void = () => {};
+    trackInFlight(
+      flightKey,
+      controller,
+      new Promise<void>((resolve) => (finish = resolve))
+    );
     try {
       const reply = await streamXaiSearchedCompletion({
         apiKey: settings.apiKey,
         model: modelOf(settings),
         prompt,
+        webSearch,
         signal: controller.signal,
         onText: (preview) => {
           if (!controller.signal.aborted) {
@@ -151,20 +180,21 @@ export const useAiDrawerText = (
         setState({
           status: "error",
           result: previous,
-          message:
-            error instanceof Error
-              ? error.message
-              : "Couldn't generate this answer. Please try again.",
+          message: describeAiError(
+            error,
+            "Couldn't generate this answer. Please try again."
+          ),
         });
       }
       return false;
     } finally {
+      finish();
       if (request.current === controller) request.current = null;
     }
   };
 
   const cancel = () => {
-    request.current?.abort();
+    abortInFlight(flightKey);
     request.current = null;
     setState({ status: "ready", result: state.result });
   };

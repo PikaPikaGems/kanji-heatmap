@@ -1,0 +1,22 @@
+---
+description: Warning and error messages are bold yellow text, never thin red text
+alwaysApply: true
+---
+
+# Warnings are bold yellow, never thin red
+
+Thin, small red text is hard to read on the dark theme. Any text that warns the user or reports an error (validation errors, "couldn't save", "will be lost for good", over-limit notices) is bold yellow. The classes live in one place, `@/lib/generic-cn`: use `cnWarningText` (bold + color), or `cnWarningTextColor` when the text is already bold. Never write the yellow classes inline, so the color can change in one place:
+
+```tsx
+// ❌ BAD — thin red text
+<p role="alert" className="text-xs text-destructive">{message}</p>
+
+// ✅ GOOD — the shared warning style, readable in both themes
+<p role="alert" className={cn("text-xs", cnWarningText)}>
+  {message}
+</p>
+```
+
+Game feedback colors (e.g. Fill the Kanji's yellow "almost" answers) aren't warnings and keep their own classes.
+
+Red is still fine where it isn't text to read: destructive buttons (e.g. "Delete", "Log out and delete"), status dots, and "Again" rating borders.

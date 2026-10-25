@@ -2,12 +2,9 @@ import { BookOpenCheck } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { formatRawCount } from "@/lib/format-count";
-import {
-  FILL_THE_KANJI_SETS,
-  FillTheKanjiSetId,
-} from "@/lib/fill-the-kanji/sets";
+import { FILL_THE_KANJI_SETS } from "@/lib/fill-the-kanji/sets";
 import { setRowCount } from "@/lib/fill-the-kanji/batches";
-import { SetBatchStats, rowsSeen } from "@/lib/fill-the-kanji/storage";
+import { AllSetBatchStats, rowsSeen } from "@/lib/fill-the-kanji/progress";
 import { OverviewCaption } from "./ActivityStatCard";
 
 /**
@@ -17,7 +14,7 @@ import { OverviewCaption } from "./ActivityStatCard";
 export const FillTheKanjiSetProgress = ({
   statsById,
 }: {
-  statsById: Map<FillTheKanjiSetId, SetBatchStats>;
+  statsById: AllSetBatchStats;
 }) => {
   const rows = FILL_THE_KANJI_SETS.map(({ id, label }) => ({
     id,

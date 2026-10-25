@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
-import { ActivityKind, recordActivity } from "@/lib/activity";
+import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
 import { PracticeItem } from "./types";
 
 export type PracticeSessionPhase = "initial" | "loading" | "playing" | "ended";
+
+/** The engine record type of a finished round, per practice mode. */
+type RoundRecordType =
+  | "reading_practice_round_completed"
+  | "writing_practice_round_completed";
 
 /**
  * Shared practice-session state machine used by the recognition and
@@ -20,13 +25,13 @@ export type PracticeSessionPhase = "initial" | "loading" | "playing" | "ended";
 export const usePracticeSession = <
   TResult extends PracticeItem & { correct: boolean },
 >({
-  activityKind,
+  recordType,
   sessionSize,
   onPlay,
   onSessionStart,
   onGoToInitial,
 }: {
-  activityKind: ActivityKind;
+  recordType: RoundRecordType;
   sessionSize: number;
   onPlay?: (commitPlaying: () => void) => void;
   onSessionStart?: () => void;
@@ -42,6 +47,7 @@ export const usePracticeSession = <
   const [runResults, setRunResults] = useState<TResult[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const setOpenedKanji = useSetOpenedParam();
+  const recorder = useActivityRecorder();
 
   // Effect needed: syncs the external ?open= URL param — the kanji drawer is
   // only allowed on the end screen, and this also clears a stale param when
@@ -60,6 +66,7 @@ export const usePracticeSession = <
     nextCursor: number,
     builtDeck?: PracticeItem[]
   ) => {
+    recorder.startRound();
     if (builtDeck) setDeck(builtDeck);
     setSessionItems(items);
     setCursor(nextCursor);
@@ -97,7 +104,11 @@ export const usePracticeSession = <
     const forgottens = sessionResults.filter((r) => !r.correct);
     const moreLeft = forgottens.length > 0 || cursor < deck.length;
 
-    recordActivity(activityKind);
+    void recorder.recordRound({
+      type: recordType,
+      correctCount: sessionResults.length - forgottens.length,
+      attemptedCount: sessionResults.length,
+    });
     setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
     setHasMore(moreLeft);
@@ -149,6 +160,7 @@ export const usePracticeSession = <
     results,
     runResults,
     hasMore,
+    saveError: recorder.saveError,
     play,
     goToInitial,
     startGame,

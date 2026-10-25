@@ -1,4 +1,8 @@
-import { DEFAULT_HEATMAP_CELL_METRIC, HeatmapCellMetric } from "@/lib/activity";
+import {
+  DEFAULT_HEATMAP_CELL_METRIC,
+  HEATMAP_CELL_METRICS,
+  HeatmapCellMetric,
+} from "@/lib/activity";
 import { useLocalStorage } from "./use-local-storage";
 
 const STORAGE_KEY = "speed-katakana-heatmap-metric";
@@ -13,5 +17,10 @@ export const useHeatmapCellMetric = () => {
 
   const setMetric = (next: HeatmapCellMetric) => setItem("metric", next);
 
-  return [metric, setMetric] as const;
+  // A saved metric this version no longer offers ("Best speed (>70%)") falls
+  // back to the default.
+  const current = HEATMAP_CELL_METRICS.includes(metric)
+    ? metric
+    : DEFAULT_HEATMAP_CELL_METRIC;
+  return [current, setMetric] as const;
 };

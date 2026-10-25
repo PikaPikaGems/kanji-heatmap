@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useGetKanjiInfoFn,
   useIsKanjiWorkerReady,
@@ -12,13 +12,13 @@ import {
   JouyouGradeListItems,
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
-import { useBookmarkedKanji } from "@/hooks/use-bookmarked-kanji";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { DashboardPanel } from "./DashboardPanel";
+import { TwoWaySwitch } from "./TwoWaySwitch";
 
 const ALL_KANJI_SEARCH = toSearchSettings(new URLSearchParams());
 
@@ -77,13 +77,13 @@ const BreakdownRows = ({ bands }: { bands: BreakdownBand[] }) => (
   </Table>
 );
 
-export const BookmarksBreakdown = () => {
+const BookmarksBreakdownBody = () => {
+  const loggedIn = useAccountStatus().kind === "active";
   const ready = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);
-  const bookmarked = useBookmarkedKanji();
+  const bookmarks = useBookmarkedKanji();
   const [showGrade, setShowGrade] = useState(false);
-  const switchId = useId();
 
   const jlptBands = useMemo((): BreakdownBand[] => {
     const next = emptyJlptCounts();
@@ -94,7 +94,7 @@ export const BookmarksBreakdown = () => {
       next[jlpt].total += 1;
     }
 
-    for (const kanji of bookmarked) {
+    for (const kanji of bookmarks.kanji) {
       const jlpt = getInfo(kanji)?.jlpt ?? "none";
       next[jlpt].bookmarked += 1;
     }
@@ -109,7 +109,7 @@ export const BookmarksBreakdown = () => {
         total: next[jlpt].total,
       };
     });
-  }, [ready, getInfo, search.data, bookmarked]);
+  }, [ready, getInfo, search.data, bookmarks.kanji]);
 
   const gradeBands = useMemo((): BreakdownBand[] => {
     const next = emptyGradeCounts();
@@ -120,7 +120,7 @@ export const BookmarksBreakdown = () => {
       next[grade].total += 1;
     }
 
-    for (const kanji of bookmarked) {
+    for (const kanji of bookmarks.kanji) {
       const grade = toJouyouGrade(getInfo(kanji)?.jouyouGrade);
       next[grade].bookmarked += 1;
     }
@@ -135,43 +135,47 @@ export const BookmarksBreakdown = () => {
         total: next[grade].total,
       };
     });
-  }, [ready, getInfo, search.data, bookmarked]);
+  }, [ready, getInfo, search.data, bookmarks.kanji]);
 
   // Grade now comes from the same synchronous lookup as JLPT, so there is no
   // separate grade-map request to wait on.
+  // Without an account there are no bookmarks to wait for: every band is 0.
   const loading =
-    !ready || search.status === "loading" || search.status === "idle";
+    !ready ||
+    search.status === "loading" ||
+    search.status === "idle" ||
+    (loggedIn && bookmarks.status === "loading");
 
   const bands = showGrade ? gradeBands : jlptBands;
   return (
-    <DashboardPanel title="Bookmarks">
-      <div className="flex items-center justify-center gap-2 mb-4 text-xs text-muted-foreground">
-        <Label
-          htmlFor={switchId}
-          className={!showGrade ? "text-foreground font-semibold" : undefined}
-        >
-          JLPT
-        </Label>
-        <Switch
-          id={switchId}
-          checked={showGrade}
-          onCheckedChange={setShowGrade}
-          aria-label="Toggle between JLPT and grade breakdown"
-        />
-        <Label
-          htmlFor={switchId}
-          className={showGrade ? "text-foreground font-semibold" : undefined}
-        >
-          Grade
-        </Label>
-      </div>
+    <>
       {loading ? (
         <div className="py-8">
           <KaomojiAnimation />
         </div>
       ) : (
-        <BreakdownRows bands={bands} />
+        <div
+          key={showGrade ? "grade" : "jlpt"}
+          className="animate-fade-in-fast"
+        >
+          <BreakdownRows bands={bands} />
+        </div>
       )}
-    </DashboardPanel>
+      {/* Under the rows, like the switch under Kanji Mastery's bars. */}
+      <TwoWaySwitch
+        className="mt-4"
+        left="JLPT"
+        right="Grade"
+        checked={showGrade}
+        onCheckedChange={setShowGrade}
+        ariaLabel="Toggle between JLPT and grade breakdown"
+      />
+    </>
   );
 };
+
+export const BookmarksBreakdown = () => (
+  <DashboardPanel title="Bookmarks">
+    <BookmarksBreakdownBody />
+  </DashboardPanel>
+);

@@ -8,10 +8,20 @@ export default defineConfig({
   plugins: [react()],
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify("test"),
+    __STUDY_ENGINE_INCLUDED__: JSON.stringify(false),
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Tests never load the optional study engine (see vite.config.ts).
+      "kh-study-engine/mock": path.resolve(
+        __dirname,
+        "./src/lib/engine/not-included.ts"
+      ),
+      "kh-study-engine": path.resolve(
+        __dirname,
+        "./src/lib/engine/not-included.ts"
+      ),
     },
   },
   test: {

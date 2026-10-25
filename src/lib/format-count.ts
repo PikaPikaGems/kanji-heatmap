@@ -35,3 +35,13 @@ export const formatApproxBytes = (bytes: number) => {
       : [rounded / 1_000, "KB"];
   return `~${Number(value.toPrecision(2))} ${unit}`;
 };
+
+/**
+ * `count` as a share of `total`: whole percents, one decimal under 10%
+ * (0.4%, 3.8%, 17%), and "0%" when there is nothing to share.
+ */
+export const formatShare = (count: number, total: number) => {
+  if (total === 0 || count === 0) return "0%";
+  const value = (count / total) * 100;
+  return `${value < 10 ? value.toFixed(1) : Math.round(value)}%`;
+};
