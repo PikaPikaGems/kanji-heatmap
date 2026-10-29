@@ -3,11 +3,7 @@ import type { ReactNode } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
-import {
-  bandEmoji,
-  itemBand,
-  MASTERY_LEVEL_LABELS,
-} from "@/lib/engine/mastery-metrics";
+import { itemBand, MASTERY_LEVEL_LABELS } from "@/lib/engine/mastery-metrics";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
@@ -76,9 +72,6 @@ const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   const label = band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band];
   return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 my-1 ml-2 text-xs font-semibold border rounded-full whitespace-nowrap">
-      <span aria-hidden className="mr-0.5">
-        {bandEmoji(band)}
-      </span>
       <span
         aria-hidden
         className={cn(
