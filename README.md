@@ -103,10 +103,10 @@ The visualizer settings are in `vite.config.ts`.
 
 ### Study engine (optional)
 
-Accounts, sync, notes, bookmarks and review piles come from the private
-[experimental-engine](https://github.com/PikaPikaGems/experimental-engine).
-Without it the app builds and runs with those features hidden. To include it
-locally, build the engine and point at its `dist`:
+Optional features can from from your own engine.
+
+experimental-engine. Without it the app builds and runs without those features.
+To include it locally, build the engine and point at its `dist`:
 
 ```bash
 KH_STUDY_ENGINE_ENTRY=/path/to/experimental-engine/dist pnpm run dev
