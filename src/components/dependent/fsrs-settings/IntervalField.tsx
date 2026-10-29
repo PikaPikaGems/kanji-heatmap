@@ -6,6 +6,12 @@ import { DAYS_PER_MONTH } from "./interval-limits";
 
 const WARN_ABOVE_MONTHS = 14;
 const WARN_BELOW_MONTHS = 6;
+/**
+ * Mastered needs an interval of MASTERED_MIN_DAYS (330). 11 months (330
+ * days) only reaches it when a card hits the cap exactly, so warn below a
+ * year, which clears it with room to spare.
+ */
+const MASTERED_SAFE_MONTHS = 12;
 
 const describeMonths = (months: number, days: number) =>
   months < 24
@@ -62,9 +68,9 @@ export const IntervalField = ({
           {`A maximum interval under ${WARN_BELOW_MONTHS} months keeps bringing back cards you already know well. That's extra reviews for little gain, and it works against what FSRS is for: spacing reviews out as your memory gets stronger.`}
         </Warning>
       )}
-      {months * DAYS_PER_MONTH < MASTERED_MIN_DAYS && (
+      {months < MASTERED_SAFE_MONTHS && (
         <Warning>
-          {`Under ${Math.ceil(MASTERED_MIN_DAYS / DAYS_PER_MONTH)} months, no card can ever be marked Mastered: that needs its next review ${MASTERED_MIN_DAYS}+ days out.`}
+          {`Under ${MASTERED_SAFE_MONTHS} months, cards may never be marked Mastered: that needs a next review ${MASTERED_MIN_DAYS}+ days out.`}
         </Warning>
       )}
       <FieldError message={error} />

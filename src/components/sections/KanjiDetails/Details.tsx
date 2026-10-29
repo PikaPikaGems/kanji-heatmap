@@ -66,32 +66,43 @@ const DetailsNotice = ({
   children: ReactNode;
 }) => (
   <div className="flex items-start px-3 py-2">
-    <Icon className="mr-2 text-yellow-600 size-4 dark:text-yellow-500" />
+    <Icon className="mr-2 mt-0.5 text-yellow-600 size-4 shrink-0 dark:text-yellow-500" />
     <p className="text-xs leading-relaxed text-left text-foreground">
       {children}
     </p>
   </div>
 );
 
-/** Logged out, it starts with "**Log in** for more natural-sounding speech". */
+/**
+ * Logged out: log in for natural-sounding audio. Logged in: that audio,
+ * with the device's own voice when a file isn't available.
+ */
 const SpeechNote = () => {
   const status = useAccountStatus();
-  const browserTts = (
-    <>
-      use your {"browser's"} built-in text-to-speech, which may not work on some
-      devices.
-    </>
-  );
 
   if (status.kind === "signed-out") {
     return (
       <>
-        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for more
-        natural-sounding speech 🔊 🎧. Until then, speak buttons {browserTts}
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for
+        natural-sounding speech 🔊 🎧. Until then, speak buttons use your
+        {" device's"} built-in voice, which may not work on every device.
       </>
     );
   }
-  return <>Speak buttons 🔊 🎧 {browserTts}</>;
+  if (status.kind === "active") {
+    return (
+      <>
+        Speak buttons 🔊 🎧 play natural-sounding audio, and use your
+        {" device's"} built-in voice when audio isn&apos;t available.
+      </>
+    );
+  }
+  return (
+    <>
+      Speak buttons 🔊 🎧 use your {"device's"} built-in voice, which may not
+      work on every device.
+    </>
+  );
 };
 
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {

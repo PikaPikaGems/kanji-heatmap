@@ -36,8 +36,8 @@ export const ProgressNotSavedNotice = ({
   if (account.kind === "signed-out") {
     return (
       <UserNotice className={cn("text-center", className)}>
-        You&apos;re not logged in, so this round wasn&apos;t saved.{" "}
-        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction>.
+        Not saved. <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction>{" "}
+        to save your rounds.
       </UserNotice>
     );
   }

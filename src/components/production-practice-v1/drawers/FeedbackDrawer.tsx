@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { RatingButtons } from "@/components/shared-practice";
+import { RatingButtons, RatingLabel } from "@/components/shared-practice";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
@@ -37,7 +37,7 @@ const ForgotFooter = ({
       className="px-1 text-xs sm:text-sm whitespace-nowrap"
       onClick={onNext}
     >
-      Forgot · {intervals.again}
+      <RatingLabel label="Forgot" interval={intervals.again} />
     </PracticeButton>
     <RatingButtons intervals={intervals} disabled onRate={ignoreRate} />
   </div>

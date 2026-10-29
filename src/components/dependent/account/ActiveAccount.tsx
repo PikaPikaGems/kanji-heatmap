@@ -13,7 +13,7 @@ import { SyncStatusLine } from "./SyncStatusLine";
 /**
  * Sidebar card for a logged-in account: who, sync state and logout. Sync
  * problems and account notices live in the sync details modal; the status
- * line only flags them with a ‼️.
+ * line turns red and yellow to flag them.
  */
 export const ActiveAccount = ({
   status,

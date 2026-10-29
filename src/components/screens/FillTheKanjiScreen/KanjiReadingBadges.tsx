@@ -9,7 +9,8 @@ import type {
 import { translateValue } from "@/lib/wanakana-adapter";
 import { cn } from "@/lib/utils";
 
-const MAX_READINGS = 4;
+/** Readings shown before "· · ·"; three or fewer are all shown. */
+const COLLAPSED_READINGS = 2;
 
 /**
  * シャ for ジャ, ひ for -び: the reading without (han)dakuten or the
@@ -29,8 +30,9 @@ const withoutRendaku = (readings: string[]) =>
   );
 
 /**
- * Up to four readings: onyomi first, then kunyomi to fill the rest, without
- * rendaku repeats; a "· · ·" badge shows the rest. An onyomi that the phonetic component
+ * Two readings and a "· · ·" badge that shows the rest (all of them when
+ * there are three or fewer): onyomi first, then kunyomi, without rendaku
+ * repeats. An onyomi that the phonetic component
  * gives (間 → カン from 門) gets a solid lime border, the lime of the sound
  * hint in the kanji drawer.
  */
@@ -46,11 +48,13 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
 
   const allOnyomi = withoutRendaku(general.allOn);
   const allKunyomi = withoutRendaku(general.allKun);
-  const hasMore = allOnyomi.length + allKunyomi.length > MAX_READINGS;
-  const onyomi = showAll ? allOnyomi : allOnyomi.slice(0, MAX_READINGS);
-  const kunyomi = showAll
-    ? allKunyomi
-    : allKunyomi.slice(0, MAX_READINGS - onyomi.length);
+  // "· · ·" only saves a badge when it hides at least two readings.
+  const hasMore = allOnyomi.length + allKunyomi.length > COLLAPSED_READINGS + 1;
+  const collapsed = hasMore && !showAll;
+  const onyomi = collapsed ? allOnyomi.slice(0, COLLAPSED_READINGS) : allOnyomi;
+  const kunyomi = collapsed
+    ? allKunyomi.slice(0, COLLAPSED_READINGS - onyomi.length)
+    : allKunyomi;
   const phoneticSounds = hover?.phonetic?.sound ?? [];
   const isPhonetic = (on: string) =>
     phoneticSounds.includes(translateValue(on, "hiragana"));
@@ -83,7 +87,7 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
           className="m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base"
         />
       ))}
-      {hasMore && !showAll && (
+      {collapsed && (
         <button
           type="button"
           className={cn(

@@ -37,6 +37,49 @@ export const SoundHint = ({
   );
 };
 
+/**
+ * A sound part shows only its sound hint. Otherwise a radical opens the
+ * radical popover even when it is also a kanji (夕; the popover links to the
+ * kanji), then a component opens the component popover.
+ */
+const PartPopoverContent = ({
+  kanji,
+  keyword,
+  phonetics,
+  isRadical,
+  isComponent,
+  isKanji,
+}: {
+  kanji: string;
+  keyword?: string;
+  phonetics: string[];
+  isRadical: boolean;
+  isComponent: boolean;
+  isKanji: boolean;
+}) => {
+  // The reading is the family's, not necessarily this kanji's: 門 is もん,
+  // but kanji with 門 (間 簡 閑) are read かん.
+  if (phonetics.length > 0) {
+    return <SoundHint kanji={kanji} phonetics={phonetics} />;
+  }
+  if (isRadical) return <RadicalPopoverContent radical={kanji} />;
+  if (isComponent) {
+    return (
+      <ComponentPopoverContent
+        component={kanji}
+        keyword={keyword}
+        isKanji={isKanji}
+      />
+    );
+  }
+  return (
+    <>
+      <FakeComponentLink radical={kanji} keyword={keyword} />
+      <span className="italic font-normal">{"(Component)"}</span>
+    </>
+  );
+};
+
 export const SingleKanjiPart = ({
   kanji,
   keyword,
@@ -60,28 +103,14 @@ export const SingleKanjiPart = ({
 
   const content = (
     <div className="p-2 text-xs font-bold">
-      {/* The reading is the family's, not necessarily this kanji's: 門
-              is もん, but kanji with 門 (間 簡 閑) are read かん. */}
-      {phonetics.length > 0 && (
-        <SoundHint kanji={kanji} phonetics={phonetics} />
-      )}
-
-      {/* A radical opens the radical popover even when it is also a
-              kanji (夕); the popover links to the kanji. */}
-      {isKnownRadical(kanji, radicals) ? (
-        <RadicalPopoverContent radical={kanji} />
-      ) : componentEntry ? (
-        <ComponentPopoverContent
-          component={kanji}
-          keyword={componentKeyword}
-          isKanji={isKanji}
-        />
-      ) : (
-        <>
-          <FakeComponentLink radical={kanji} keyword={componentKeyword} />
-          <span className="italic font-normal">{"(Component)"}</span>
-        </>
-      )}
+      <PartPopoverContent
+        kanji={kanji}
+        keyword={componentKeyword}
+        phonetics={phonetics}
+        isRadical={isKnownRadical(kanji, radicals)}
+        isComponent={componentEntry != null}
+        isKanji={isKanji}
+      />
     </div>
   );
 

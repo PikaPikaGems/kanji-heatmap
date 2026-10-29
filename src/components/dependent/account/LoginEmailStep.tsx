@@ -71,8 +71,8 @@ export const LoginEmailStep = ({
       />
       <div className="flex flex-col items-center gap-3 pt-4 border-t-2 border-dashed">
         <p className="text-sm font-bold text-center text-foreground text-pretty">
-          Most features of Kanji Heatmap will forever be free 💝, no login
-          required.
+          Most features of Kanji Heatmap will always be free, no login required
+          💝
         </p>
         <p className="text-sm text-center text-foreground text-pretty">
           For premium features, message us on{" "}

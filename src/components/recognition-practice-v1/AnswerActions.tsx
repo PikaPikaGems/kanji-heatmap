@@ -1,7 +1,11 @@
 import type { FsrsRating } from "engine-contract";
 import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { FORGOT_HINT, RatingButtons } from "@/components/shared-practice";
+import {
+  FORGOT_HINT,
+  RatingButtons,
+  RatingLabel,
+} from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
 
 /**
@@ -30,7 +34,7 @@ export const AnswerActions = ({
           className="px-1 text-xs sm:text-sm"
           disabled
         >
-          Forgot
+          <RatingLabel label="Forgot" interval={grading.intervals.again} />
         </PracticeButton>
         <RatingButtons intervals={grading.intervals} onRate={onRate} />
       </div>
