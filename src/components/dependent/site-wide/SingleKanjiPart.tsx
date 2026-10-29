@@ -52,8 +52,11 @@ export const SingleKanjiPart = ({
   const getKanjiInfo = useGetKanjiInfoFn();
   const componentEntry = useComponentSearchEntry(kanji);
   const componentKeyword = keyword ?? getKanjiInfo?.(kanji)?.keyword;
+  // A phonetic component always opens, for its sound hint.
   const canOpenPopover =
-    isKnownRadical(kanji, radicals) || componentEntry != null;
+    isKnownRadical(kanji, radicals) ||
+    componentEntry != null ||
+    phonetics.length > 0;
 
   const content = (
     <div className="p-2 text-xs font-bold">
@@ -85,25 +88,6 @@ export const SingleKanjiPart = ({
   const triggerClassName = `flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 ${canOpenPopover ? "hover:border-solid hover:border-neon-accent" : "cursor-default"} ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`;
 
   if (!canOpenPopover) {
-    if (kanji === "ヨ冖又") {
-      // TODO: TEMPORARY HACK FIX ME LATER
-      // "ヨ冖又":{"s":["しん"]
-      return (
-        <GenericPopover
-          modal
-          trigger={
-            <button type="button" className={triggerClassName}>
-              {kanji}
-            </button>
-          }
-          content={
-            <div className="m-2">
-              <SoundHint kanji={kanji} phonetics={["しん"]} />
-            </div>
-          }
-        />
-      );
-    }
     return <div className={triggerClassName}>{kanji}</div>;
   }
 

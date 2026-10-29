@@ -18,6 +18,8 @@ export type SentenceSpeech = { normal: Speech; slow: Speech };
 
 export type GameCard = {
   item: FillTheKanjiItem;
+  /** Where the sentence is from, copied with it (see `AnswerState`). */
+  source: string;
   puzzle: Puzzle;
   tiles: string[];
 };
@@ -188,6 +190,7 @@ export const useFillTheKanjiGame = ({
     setAnswer({
       open: true,
       item: card.item,
+      source: card.source,
       kind: feedbackKind(rightCount, filled.length),
       puzzle: card.puzzle,
       tiles: card.tiles,
@@ -211,6 +214,7 @@ export const useFillTheKanjiGame = ({
     setAnswer({
       open: true,
       item: card.item,
+      source: card.source,
       kind: "forgot",
       puzzle: card.puzzle,
       tiles: card.tiles,

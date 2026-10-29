@@ -27,6 +27,9 @@ import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { NoticeAction } from "@/components/common/UserNotice";
+import { openLoginDialog } from "@/lib/engine/login-dialog";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 
 export const RirikkuCTABadge = () => {
   return (
@@ -70,6 +73,27 @@ const DetailsNotice = ({
   </div>
 );
 
+/** Logged out, it starts with "**Log in** for more natural-sounding speech". */
+const SpeechNote = () => {
+  const status = useAccountStatus();
+  const browserTts = (
+    <>
+      use your {"browser's"} built-in text-to-speech, which may not work on some
+      devices.
+    </>
+  );
+
+  if (status.kind === "signed-out") {
+    return (
+      <>
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for more
+        natural-sounding speech 🔊 🎧. Until then, speak buttons {browserTts}
+      </>
+    );
+  }
+  return <>Speak buttons 🔊 🎧 {browserTts}</>;
+};
+
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return (
     <div className="my-4">
@@ -78,8 +102,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
           Note
         </h3>
         <DetailsNotice icon={Volume2}>
-          Speak buttons 🔊 🎧 use your {"browser's"} built-in text-to-speech,
-          which may not work on some devices.
+          <SpeechNote />
         </DetailsNotice>
         <div className="mx-3 border-t border-dotted border-foreground/15" />
         <DetailsNotice icon={Bug}>

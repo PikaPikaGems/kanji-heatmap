@@ -33,7 +33,7 @@ const BandRow = ({
 );
 
 /** "Not started", then the measure's four bands, dullest first. */
-const BandRows = ({ measure }: { measure: MasteryMetric }) => (
+export const BandRows = ({ measure }: { measure: MasteryMetric }) => (
   <ul className="flex flex-col gap-1.5">
     <BandRow
       label={NOT_STARTED_LABEL}

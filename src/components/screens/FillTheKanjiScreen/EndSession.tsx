@@ -4,7 +4,6 @@ import { useKanjiUrlState } from "@/hooks/routing-hooks";
 import { pickEndCheer } from "@/lib/practice-cheers";
 import { cn, percent } from "@/lib/utils";
 import { EndScreenLayout, Stat } from "@/components/shared-practice";
-import { TextActionButton } from "@/components/common/AiActionButtons";
 import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { ItemResult, MissedKanji } from "./types";
 
@@ -51,13 +50,12 @@ const MissedKanjiList = ({
 );
 
 /**
- * End of a batch: the shared end screen, with Retry mistakes and the missed
- * kanji in the scrolling area.
+ * End of a batch: the shared end screen with the missed kanji, and Retry
+ * Mistakes (when there are any) next to "I'm done".
  */
 export const EndSession = ({
   results,
   batchLabel,
-  onNext,
   saveError,
   onRetryMistakes,
   onEnd,
@@ -66,7 +64,6 @@ export const EndSession = ({
   batchLabel: string;
   /** Copy for why saving the batch to the account failed, if it did. */
   saveError: string | null;
-  onNext: () => void;
   /** Replays just the missed sentences; not recorded as a batch attempt. */
   onRetryMistakes: () => void;
   onEnd: () => void;
@@ -77,8 +74,13 @@ export const EndSession = ({
   const [openedKanji, setOpenedKanji] = useKanjiUrlState();
   // While the kanji drawer is open, Enter, Space and Escape belong to it.
   const drawerClosed = openedKanji == null;
+  const hasMistakes = correct < results.length;
 
-  useEnterAction(onNext, drawerClosed, CONTINUE_KEYS);
+  useEnterAction(
+    hasMistakes ? onRetryMistakes : onEnd,
+    drawerClosed,
+    CONTINUE_KEYS
+  );
   useEnterAction(onEnd, drawerClosed, ["Escape"]);
 
   return (
@@ -95,21 +97,14 @@ export const EndSession = ({
           />
         </>
       }
-      onContinue={onNext}
+      onContinue={hasMistakes ? onRetryMistakes : undefined}
+      continueLabel="Retry Mistakes"
       onEnd={onEnd}
       notice={<ProgressNotSavedNotice saveError={saveError} />}
     >
-      {/* The missed kanji sit right under Retry mistakes. */}
-      <div className="flex flex-col items-center gap-2 empty:hidden">
-        {correct < results.length && (
-          <TextActionButton onClick={onRetryMistakes}>
-            Retry mistakes
-          </TextActionButton>
-        )}
-        {missed.length > 0 && (
-          <MissedKanjiList missed={missed} onOpen={setOpenedKanji} />
-        )}
-      </div>
+      {missed.length > 0 && (
+        <MissedKanjiList missed={missed} onOpen={setOpenedKanji} />
+      )}
     </EndScreenLayout>
   );
 };

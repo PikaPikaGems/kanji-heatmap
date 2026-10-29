@@ -2,6 +2,7 @@ import type { AuthStatus, EngineAPI, QuerySnapshot } from "engine-contract";
 import {
   AUTH_STATUS_KEY,
   getCachedStore,
+  createSyncStatusStore,
   SYNC_STATUS_KEY,
 } from "./store-cache";
 
@@ -35,9 +36,7 @@ export const startEngineLifecycle = (api: EngineAPI) => {
   const auth = getCachedStore(api, AUTH_STATUS_KEY, (a) =>
     a.auth.watchStatus()
   );
-  const sync = getCachedStore(api, SYNC_STATUS_KEY, (a) =>
-    a.sync.watchStatus()
-  );
+  const sync = getCachedStore(api, SYNC_STATUS_KEY, createSyncStatusStore);
 
   const active = () => isActive(auth.getSnapshot());
 

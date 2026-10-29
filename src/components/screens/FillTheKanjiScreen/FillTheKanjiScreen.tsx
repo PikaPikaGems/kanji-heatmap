@@ -6,7 +6,6 @@ import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawe
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
 import {
-  batchCount,
   batchLabel,
   setLabel,
   totalBatchCount,
@@ -30,7 +29,7 @@ const FillTheKanjiScreen = () => {
   const [phase, setPhase] = useState<Phase>("initial");
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<ItemResult[] | null>(null);
-  // Bumped per start so "Retry mistakes" remounts the game with new blanks.
+  // Bumped per start so "Retry Mistakes" remounts the game with new blanks.
   const [playKey, setPlayKey] = useState(0);
   // Sentences being retried; null while playing a full batch. A retry isn't
   // a batch attempt, so it isn't recorded in the stats.
@@ -71,11 +70,6 @@ const FillTheKanjiScreen = () => {
     play();
   };
 
-  const playNextBatch = () => {
-    selectBatch(setId, batch >= batchCount(setId) ? 1 : batch + 1);
-    play();
-  };
-
   return (
     <>
       <PracticeShell progress={headerProgress}>
@@ -105,7 +99,6 @@ const FillTheKanjiScreen = () => {
               results={results}
               batchLabel={`${setLabel(setId)} · Batch ${batchLabel(batch)}`}
               saveError={recorder.saveError}
-              onNext={playNextBatch}
               onRetryMistakes={() =>
                 play(results.filter((r) => !r.correct).map((r) => r.item.jp))
               }

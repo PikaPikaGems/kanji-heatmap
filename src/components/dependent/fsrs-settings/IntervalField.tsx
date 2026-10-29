@@ -1,4 +1,5 @@
 import { Slider } from "@/components/ui/slider";
+import { MASTERED_MIN_DAYS } from "@/lib/engine/mastery-metrics";
 import { clamp } from "@/lib/utils";
 import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 import { DAYS_PER_MONTH } from "./interval-limits";
@@ -59,6 +60,11 @@ export const IntervalField = ({
       {months < WARN_BELOW_MONTHS && (
         <Warning>
           {`A maximum interval under ${WARN_BELOW_MONTHS} months keeps bringing back cards you already know well. That's extra reviews for little gain, and it works against what FSRS is for: spacing reviews out as your memory gets stronger.`}
+        </Warning>
+      )}
+      {months * DAYS_PER_MONTH < MASTERED_MIN_DAYS && (
+        <Warning>
+          {`Under ${Math.ceil(MASTERED_MIN_DAYS / DAYS_PER_MONTH)} months, no card can ever be marked Mastered: that needs its next review ${MASTERED_MIN_DAYS}+ days out.`}
         </Warning>
       )}
       <FieldError message={error} />

@@ -27,6 +27,8 @@ export type FeedbackKind = "correct" | "almost" | "wrong" | "forgot";
 export type AnswerState = {
   open: boolean;
   item: FillTheKanjiItem;
+  /** Where the sentence is from, e.g. "N5 · Challenge 3 · Batch 7 · Sentence 4". */
+  source: string;
   kind: FeedbackKind;
   puzzle: Puzzle;
   /** The multiple choice tiles offered for this sentence. */
@@ -102,8 +104,8 @@ const TileChoices = ({
 );
 
 /** Plain sentence, sentence with furigana, then the translation. */
-const clipboardText = (item: FillTheKanjiItem) =>
-  [plainSentence(item.jp), item.jp, item.en].join("\n");
+const clipboardText = (item: FillTheKanjiItem, source: string) =>
+  [source, plainSentence(item.jp), item.jp, item.en].join("\n");
 
 const CONFIRM_KEYS = ["Enter", " "] as const;
 
@@ -238,7 +240,7 @@ export const AnswerDrawer = ({
   });
 
   if (!answer) return null;
-  const { item, kind, puzzle, tiles, filled, blankResults } = answer;
+  const { item, source, kind, puzzle, tiles, filled, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
   // Nobody's saved answers show until the owner is known.
   const showAiExplain =
@@ -281,7 +283,10 @@ export const AnswerDrawer = ({
         <span className="text-muted-foreground" aria-hidden>
           ·
         </span>
-        <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
+        <CopyButton
+          textToCopy={clipboardText(item, source)}
+          iconType="clipboard"
+        />
         {(hasNotes || showAiExplain) && (
           <NotesPopover
             // Remounts on login/logout: the open answer belongs to one owner.

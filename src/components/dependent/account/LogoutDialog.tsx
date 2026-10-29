@@ -110,13 +110,18 @@ const LogoutForm = ({ userId }: { userId: string }) => {
             Also remove from this device
           </legend>
           <LogoutRemovalOption
-            label="My study data"
-            details="Notes, bookmarks, review pile and progress. They're saved to your account and come back when you log in again."
+            label="My cached study data on this device"
+            details="The copy of your notes, bookmarks, review pile and progress kept on this device. Nothing is deleted from your account."
             checked={choices.studyData}
             onCheckedChange={choose("studyData")}
           />
-          {(losesUnsynced || losesRejectedNotes) && (
+          {choices.studyData && (
             <RemovalWarning>
+              <p>
+                ⚠️ The next time you log in on this device, all your study data
+                has to download again, which can take a while. If this is your
+                own device, we recommend keeping it.
+              </p>
               {losesUnsynced && (
                 <p>
                   ⚠️ Your {pending} unsynced {changeWord} will be lost forever

@@ -18,6 +18,7 @@ export const EndScreenLayout = ({
   stats,
   children,
   onContinue,
+  continueLabel = "Continue",
   onEnd,
   notice,
 }: {
@@ -31,6 +32,8 @@ export const EndScreenLayout = ({
   children?: ReactNode;
   /** The next round; omit when there is nothing left to do. */
   onContinue?: () => void;
+  /** E.g. Fill the Kanji's "Retry Mistakes". */
+  continueLabel?: string;
   /** Leaves the game: "I'm done" next to Continue, otherwise "Done". */
   onEnd: () => void;
   /** Under the buttons, e.g. "progress not saved". */
@@ -72,7 +75,7 @@ export const EndScreenLayout = ({
         {onContinue ? (
           <>
             <PracticeButton size="lg" onClick={guarded(onContinue)}>
-              Continue
+              {continueLabel}
             </PracticeButton>
             <PracticeButton size="md" variant="ghost" onClick={guarded(onEnd)}>
               I&apos;m done

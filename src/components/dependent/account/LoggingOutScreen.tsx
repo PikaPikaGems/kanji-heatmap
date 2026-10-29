@@ -32,8 +32,9 @@ const stepCopy = (step: LogoutStep, request: LogoutRequest) => {
   }
   if (request.clearLocalData) {
     return {
-      doing: "Removing your study data and ending your session…",
-      done: "Removed your study data and ended your session",
+      doing:
+        "Removing cached study data from this device and ending your session…",
+      done: "Removed cached study data from this device and ended your session",
     };
   }
   return { doing: "Ending your session…", done: "Ended your session" };

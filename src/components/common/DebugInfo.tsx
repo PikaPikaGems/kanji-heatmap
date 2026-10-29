@@ -19,6 +19,7 @@ import { initAiVoice, type AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { StorageUsageBar } from "./StorageUsageBar";
 import { Progress } from "@/components/ui/progress";
+import { UserNotice } from "@/components/common/UserNotice";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import {
@@ -150,6 +151,10 @@ const AiUsage = ({ usage }: { usage: AiExplainUsage }) => {
 
   return (
     <div className="space-y-3 text-xs">
+      <UserNotice icon="💡" className="text-xs font-bold">
+        This is only for AI Study Tools, which use your own xAI API key. If you
+        haven&apos;t added one, you can ignore this section.
+      </UserNotice>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
         <DebugRow label="Text tokens">
           <span className="tabular-nums">

@@ -11,7 +11,7 @@ import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHin
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
-import { TTS_DISCLAIMER } from "@/lib/tts";
+import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import {
   AllChallengeSetStats,
   summarizeChallengeSetStats,
@@ -177,9 +177,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                 </div>
               )}
               {soundEnabled && soundType === "speak" && (
-                <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                  {TTS_DISCLAIMER}
-                </p>
+                <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
               )}
             </div>
 

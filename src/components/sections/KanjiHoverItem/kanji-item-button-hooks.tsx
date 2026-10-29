@@ -112,7 +112,7 @@ export const useItemBtnCn = (kanji: string) => {
         ? "bg-background"
         : freqCategoryCn[freqRankCategory]);
 
-  const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}`;
+  const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}${tileColor?.dimmed ? " opacity-50" : ""}`;
   const btnCn =
     itemType === "compact"
       ? `${btnCnRaw} kanji-font`

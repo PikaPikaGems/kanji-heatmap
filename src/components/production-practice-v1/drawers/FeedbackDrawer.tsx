@@ -1,5 +1,7 @@
 import { useState } from "react";
+import type { FsrsRating } from "engine-contract";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { RatingButtons } from "@/components/shared-practice";
 import { useArmedConfirmKey } from "@/hooks/use-armed-confirm-key";
 import { feedbackTitle } from "@/lib/dakanji-grade";
 import { StrokeOrderPlayer } from "../StrokeOrderPlayer";
@@ -14,6 +16,33 @@ const PREVIEW_SIZE = 130;
 
 const ENTER_OR_SPACE = ["Enter", " "] as const;
 
+const ignoreRate = () => {};
+
+/**
+ * Writing Mastery after Forgot or a wrong kanji (already graded Again): the
+ * same row as Reading Mastery's, with Forgot moving on and Hard / Good / Easy
+ * disabled but still showing their intervals.
+ */
+const ForgotFooter = ({
+  intervals,
+  onNext,
+}: {
+  intervals: Record<FsrsRating, string>;
+  onNext: () => void;
+}) => (
+  <div className="grid grid-cols-4 gap-2 px-3 sm:px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-lg mx-auto w-full">
+    <PracticeButton
+      variant="danger"
+      size="md"
+      className="px-1 text-xs sm:text-sm whitespace-nowrap"
+      onClick={onNext}
+    >
+      Forgot · {intervals.again}
+    </PracticeButton>
+    <RatingButtons intervals={intervals} disabled onRate={ignoreRate} />
+  </div>
+);
+
 export const FeedbackDrawer = ({
   open,
   kind,
@@ -22,6 +51,7 @@ export const FeedbackDrawer = ({
   drawing,
   gradingEnabled = true,
   nextLabel,
+  intervals,
   onNext,
 }: {
   open: boolean;
@@ -32,6 +62,8 @@ export const FeedbackDrawer = ({
   gradingEnabled?: boolean;
   /** Mastery game: "Continue" (the card was rated on the draw step). */
   nextLabel?: string;
+  /** Mastery game: a missed card gets the Forgot / rating row instead. */
+  intervals?: Record<FsrsRating, string>;
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
@@ -65,7 +97,13 @@ export const FeedbackDrawer = ({
         title={title}
         titleClassName={bounce ? "animate-practice-bounce-soft" : undefined}
         description={<ItemReveal item={item} />}
-        footer={<NextKanjiFooter label={nextLabel} onNext={onNext} />}
+        footer={
+          intervals && kind !== "correct" ? (
+            <ForgotFooter intervals={intervals} onNext={onNext} />
+          ) : (
+            <NextKanjiFooter label={nextLabel} onNext={onNext} />
+          )
+        }
       >
         {kind === "noKanji" ? (
           <div className="flex flex-col items-center gap-2 px-3 pb-2 mt-4 overflow-y-auto sm:px-4">

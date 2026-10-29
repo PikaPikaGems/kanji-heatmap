@@ -71,12 +71,16 @@ export const LoginEmailStep = ({
       />
       <div className="flex flex-col items-center gap-3 pt-4 border-t-2 border-dashed">
         <p className="text-sm font-bold text-center text-foreground text-pretty">
-          New? Message us on{" "}
-          <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />
-          , <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,
+          Most features of Kanji Heatmap will forever be free 💝, no login
+          required.
+        </p>
+        <p className="text-sm text-center text-foreground text-pretty">
+          For premium features, message us on{" "}
+          <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,{" "}
+          <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />{" "}
           or{" "}
           <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />{" "}
-          to join the waitlist.
+          and we&apos;ll give you an early bird discount code on launch. 🚀
         </p>
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {CONTACT_ITEMS.map((item) => (

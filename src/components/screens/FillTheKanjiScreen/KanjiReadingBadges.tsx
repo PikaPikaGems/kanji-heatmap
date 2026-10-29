@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { badgeVariants } from "@/components/ui/badge-utils";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { useKanjiInfo } from "@/kanji-worker/kanji-worker-hooks";
 import type {
@@ -28,7 +30,7 @@ const withoutRendaku = (readings: string[]) =>
 
 /**
  * Up to four readings: onyomi first, then kunyomi to fill the rest, without
- * rendaku repeats. An onyomi that the phonetic component
+ * rendaku repeats; a "· · ·" badge shows the rest. An onyomi that the phonetic component
  * gives (間 → カン from 門) gets a solid lime border, the lime of the sound
  * hint in the kanji drawer.
  */
@@ -38,13 +40,17 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
   const hover = useKanjiInfo(kanji, "hover-card")
     .data as HoverItemReturnData | null;
 
+  const [showAll, setShowAll] = useState(false);
+
   if (general == null) return null;
 
-  const onyomi = withoutRendaku(general.allOn).slice(0, MAX_READINGS);
-  const kunyomi = withoutRendaku(general.allKun).slice(
-    0,
-    MAX_READINGS - onyomi.length
-  );
+  const allOnyomi = withoutRendaku(general.allOn);
+  const allKunyomi = withoutRendaku(general.allKun);
+  const hasMore = allOnyomi.length + allKunyomi.length > MAX_READINGS;
+  const onyomi = showAll ? allOnyomi : allOnyomi.slice(0, MAX_READINGS);
+  const kunyomi = showAll
+    ? allKunyomi
+    : allKunyomi.slice(0, MAX_READINGS - onyomi.length);
   const phoneticSounds = hover?.phonetic?.sound ?? [];
   const isPhonetic = (on: string) =>
     phoneticSounds.includes(translateValue(on, "hiragana"));
@@ -52,7 +58,14 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
   if (onyomi.length === 0 && kunyomi.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap justify-center">
+    // Keyed so the full list fades in when "· · ·" opens it.
+    <div
+      key={String(showAll)}
+      className={cn(
+        "flex flex-wrap justify-center",
+        showAll && "animate-fade-in-fast"
+      )}
+    >
       {onyomi.map((on) => (
         <RomajiBadge
           key={on}
@@ -70,6 +83,19 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
           className="m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base"
         />
       ))}
+      {hasMore && !showAll && (
+        <button
+          type="button"
+          className={cn(
+            badgeVariants({ variant: "outline" }),
+            "m-0.5 px-2 py-0.5 text-base cursor-pointer whitespace-nowrap hover:bg-neon-accent hover:text-black"
+          )}
+          aria-label="Show all readings"
+          onClick={() => setShowAll(true)}
+        >
+          · · ·
+        </button>
+      )}
     </div>
   );
 };
