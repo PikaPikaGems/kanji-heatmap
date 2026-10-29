@@ -219,8 +219,8 @@ const COLUMNS: {
   Icon: LucideIcon;
   kind: "writing" | "reading";
 }[] = [
-  { title: "Reading", Icon: Eye, kind: "reading" },
   { title: "Writing", Icon: PenLine, kind: "writing" },
+  { title: "Reading", Icon: Eye, kind: "reading" },
 ];
 
 /**
@@ -266,21 +266,13 @@ export const ProgressTable = ({
                 <FieldLabel label={label} definition={definition} />
               </TableCell>
               {COLUMNS.map(({ kind }) => {
-                const { text, swatchCn, emoji } = cell(
-                  item?.[kind] ?? null,
-                  now
-                );
+                const { text, swatchCn } = cell(item?.[kind] ?? null, now);
                 return (
                   <TableCell
                     key={kind}
-                    className="px-2 py-1.5 text-[13px] font-bold text-left break-words tabular-nums sm:px-3 sm:text-sm"
+                    className="px-2 py-1.5 text-[13px] font-bold text-left whitespace-nowrap tabular-nums sm:px-3 sm:text-sm"
                   >
-                    <span className="flex items-center gap-1.5">
-                      {emoji ? (
-                        <span aria-hidden className="mr-0.5 shrink-0">
-                          {emoji}
-                        </span>
-                      ) : null}
+                    <span className="flex items-start gap-1.5 flex-shrink-0">
                       {swatchCn ? (
                         <span
                           className={`inline-block size-3 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
