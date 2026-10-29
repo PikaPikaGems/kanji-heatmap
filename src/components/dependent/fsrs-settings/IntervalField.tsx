@@ -1,10 +1,17 @@
 import { Slider } from "@/components/ui/slider";
+import { MASTERED_MIN_DAYS } from "@/lib/engine/mastery-metrics";
 import { clamp } from "@/lib/utils";
 import { FieldError, FieldTitle, SliderEnds, Warning } from "./FieldParts";
 import { DAYS_PER_MONTH } from "./interval-limits";
 
 const WARN_ABOVE_MONTHS = 14;
 const WARN_BELOW_MONTHS = 6;
+/**
+ * Mastered needs an interval of MASTERED_MIN_DAYS (330). 11 months (330
+ * days) only reaches it when a card hits the cap exactly, so warn below a
+ * year, which clears it with room to spare.
+ */
+const MASTERED_SAFE_MONTHS = 12;
 
 const describeMonths = (months: number, days: number) =>
   months < 24
@@ -59,6 +66,11 @@ export const IntervalField = ({
       {months < WARN_BELOW_MONTHS && (
         <Warning>
           {`A maximum interval under ${WARN_BELOW_MONTHS} months keeps bringing back cards you already know well. That's extra reviews for little gain, and it works against what FSRS is for: spacing reviews out as your memory gets stronger.`}
+        </Warning>
+      )}
+      {months < MASTERED_SAFE_MONTHS && (
+        <Warning>
+          {`Under ${MASTERED_SAFE_MONTHS} months, cards may never be marked Mastered: that needs a next review ${MASTERED_MIN_DAYS}+ days out.`}
         </Warning>
       )}
       <FieldError message={error} />

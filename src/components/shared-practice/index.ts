@@ -7,7 +7,7 @@ export { PracticeBottomBar } from "./PracticeBottomBar";
 export { PracticeInitialScreen } from "./PracticeInitialScreen";
 export { PracticeShell } from "./PracticeShell";
 export { RadioRow } from "./RadioRow";
-export { RatingButtons } from "./RatingButtons";
+export { RatingButtons, RatingLabel } from "./RatingButtons";
 export {
   FORGOT_HINT,
   FORGOT_KEYS,

@@ -102,8 +102,12 @@ const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
     primerRef.current?.focus();
     void session.start();
   };
+  // After the round's last card the end screen has no input, so the
+  // keyboard must not be kept open for it.
   const next = () => {
-    primerRef.current?.focus();
+    const { state } = session;
+    const isLast = state.status === "card" && state.position >= state.total;
+    if (!isLast) primerRef.current?.focus();
     void session.next();
   };
 

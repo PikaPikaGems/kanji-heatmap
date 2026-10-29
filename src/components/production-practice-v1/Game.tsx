@@ -399,6 +399,7 @@ export const Game = ({
         drawing={drawing}
         gradingEnabled={feedbackGradingEnabled}
         nextLabel={grading ? "Continue" : undefined}
+        intervals={grading?.intervals}
         onNext={advance}
       />
     </div>

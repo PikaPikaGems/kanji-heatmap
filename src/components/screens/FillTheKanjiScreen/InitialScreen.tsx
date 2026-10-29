@@ -12,7 +12,7 @@ import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
-import { TTS_DISCLAIMER } from "@/lib/tts";
+import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import {
   FILL_THE_KANJI_SETS,
   FillTheKanjiSetId,
@@ -176,7 +176,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           <div className="flex flex-col">
             <ToggleRow
               id="sound-on"
-              label="Sound On"
+              label="Sound after answering"
               checked={soundEnabled}
               onChange={(v) =>
                 setSetting(
@@ -217,9 +217,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             </div>
             {((soundEnabled && soundType === "speak") ||
               settings.readAloudOnShow) && (
-              <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                {TTS_DISCLAIMER}
-              </p>
+              <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
             )}
           </div>
 

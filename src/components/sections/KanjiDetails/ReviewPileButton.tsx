@@ -23,9 +23,7 @@ import {
 } from "@/lib/engine/use-review-pile-item";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
-
-const addCn =
-  "flex text-left gap-2 px-2 py-2 text-sm font-bold underline rounded-lg decoration-dotted underline-offset-4 hover:text-green-400 text-green-500 hover:decoration-solid disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline";
+import { reviewPileAddCn } from "./review-pile-add-cn";
 
 const AddLabel = ({ word }: { word: string }) => (
   <>
@@ -113,7 +111,7 @@ const ActiveReviewPileButton = ({
         <WriteBlockedPopover
           blocker={blocker}
           trigger={
-            <button type="button" className={addCn}>
+            <button type="button" className={reviewPileAddCn}>
               <AddLabel word={word} />
             </button>
           }
@@ -121,7 +119,7 @@ const ActiveReviewPileButton = ({
       ) : (
         <button
           type="button"
-          className={addCn}
+          className={reviewPileAddCn}
           disabled={
             !api || current === undefined || action.kind === "busy" || tooLong
           }
@@ -177,7 +175,11 @@ export const ReviewPileButton = ({
   }
   if (status.kind === "signed-out") {
     return (
-      <button type="button" className={addCn} onClick={openLoginDialog}>
+      <button
+        type="button"
+        className={reviewPileAddCn}
+        onClick={openLoginDialog}
+      >
         <AddLabel word={word} />
       </button>
     );
@@ -186,7 +188,7 @@ export const ReviewPileButton = ({
     return (
       <GenericPopover
         trigger={
-          <button type="button" className={addCn}>
+          <button type="button" className={reviewPileAddCn}>
             <AddLabel word={word} />
           </button>
         }
@@ -204,7 +206,7 @@ export const ReviewPileButton = ({
       <WriteBlockedPopover
         blocker={blocker}
         trigger={
-          <button type="button" className={addCn}>
+          <button type="button" className={reviewPileAddCn}>
             <AddLabel word={word} />
           </button>
         }
@@ -212,7 +214,7 @@ export const ReviewPileButton = ({
     );
   }
   return (
-    <button type="button" className={addCn} disabled>
+    <button type="button" className={reviewPileAddCn} disabled>
       <AddLabel word={word} />
     </button>
   );

@@ -29,9 +29,29 @@ const BUTTONS: readonly {
 ];
 
 /**
+ * A rating button's label with its interval on a smaller second line, so a
+ * long interval ("3.5mo") can't overflow a narrow button.
+ */
+export const RatingLabel = ({
+  label,
+  interval,
+}: {
+  label: string;
+  interval: string;
+}) => (
+  <span className="flex flex-col items-center leading-tight">
+    <span>{label}</span>
+    <span className="text-[10px] sm:text-xs font-semibold opacity-80 tabular-nums">
+      {interval}
+    </span>
+  </span>
+);
+
+/**
  * Hard / Good / Easy buttons for a correct answer in a mastery game, as
  * grid children (the caller owns the grid). Each carries the interval it
- * would schedule, e.g. "Good · 5d", and its key as a tiny hint (H / G / E).
+ * would schedule under its label ("Good", then "5d"), and its key as a tiny
+ * hint (H / G / E).
  * "Again" has no button here: Forgot and wrong answers grade it.
  */
 export const RatingButtons = ({
@@ -55,7 +75,7 @@ export const RatingButtons = ({
         disabled={disabled}
         onClick={() => onRate(rating)}
       >
-        {label} · {intervals[rating]}
+        <RatingLabel label={label} interval={intervals[rating]} />
         <KeyHint>{hint}</KeyHint>
       </PracticeButton>
     ))}

@@ -5,6 +5,7 @@ import {
   FORGOT_KEYS,
   RATING_KEYS,
   RatingButtons,
+  RatingLabel,
   ratingForKey,
 } from "@/components/shared-practice";
 import type { PassingRating } from "@/components/shared-practice";
@@ -48,7 +49,7 @@ const RatingFooter = ({
       disabled={hasSelection}
       onClick={onForgot}
     >
-      Forgot
+      <RatingLabel label="Forgot" interval={rating.intervals.again} />
       {!hasSelection && <KeyHint>{FORGOT_HINT}</KeyHint>}
     </PracticeButton>
     <RatingButtons

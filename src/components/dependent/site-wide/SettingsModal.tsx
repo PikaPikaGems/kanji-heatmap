@@ -15,7 +15,8 @@ import { useCurrentFont } from "@/hooks/use-change-font";
 import { useCurrentJpVoice } from "@/hooks/use-jp-voice";
 import { useAvailableJpVoices } from "@/hooks/use-available-jp-voices";
 import { ColorGrid } from "@/components/common/ColorGrid";
-import { DEFAULT_JP_VOICE_ID, findJpVoice, TTS_DISCLAIMER } from "@/lib/tts";
+import { DEFAULT_JP_VOICE_ID, findJpVoice } from "@/lib/tts";
+import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import { cn } from "@/lib/utils";
 import { PracticeButton } from "@/components/ui/practice-button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -106,7 +107,7 @@ const JpVoiceSelect = () => {
           ))}
         </SelectContent>
       </Select>
-      <p className="pt-2 text-xs text-muted-foreground">{TTS_DISCLAIMER}</p>
+      <TtsNotice className="pt-2" />
     </div>
   );
 };

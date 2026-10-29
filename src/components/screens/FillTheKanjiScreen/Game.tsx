@@ -12,6 +12,9 @@ import {
   chunkOfBatch,
   chunkRowStart,
   batchRowRange,
+  levelOfBatch,
+  positionInLevel,
+  setLabel,
 } from "@/lib/fill-the-kanji/batches";
 import {
   buildPuzzle,
@@ -51,17 +54,22 @@ const useBatchCards = (
     if (!data?.data || !similarMap) return [];
     const [start, end] = batchRowRange(setId, batch);
     const offset = chunkRowStart(chunk);
-    const items = data.data
+    const sourceOf = (sentence: number) =>
+      `${setLabel(setId)} · Challenge ${levelOfBatch(batch)} · Batch ${positionInLevel(batch)} · Sentence ${sentence}`;
+    // Numbered in file order (1-based), before retries filter some out.
+    const rows = data.data
       .slice(start - offset, end - offset)
-      .map(rowToItem)
-      .filter((item) => onlyJp == null || onlyJp.includes(item.jp));
+      .map((row, i) => ({ item: rowToItem(row), source: sourceOf(i + 1) }))
+      .filter(({ item }) => onlyJp == null || onlyJp.includes(item.jp));
+    const items = rows.map(({ item }) => item);
     const puzzles = items.map((item) => buildPuzzle(item.jp, tileCount));
     const batchKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
     const getSimilars = (k: string) => similarMap[k] ?? [];
 
     return shuffle(
-      items.map((item, i) => ({
+      rows.map(({ item, source }, i) => ({
         item,
+        source,
         puzzle: puzzles[i],
         tiles: buildTiles({
           answers: puzzles[i].answers,

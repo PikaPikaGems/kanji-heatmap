@@ -36,7 +36,7 @@ export type BandInfo = { label: string; rule: string };
 // lastReviewedAt`, the interval set at the last review, which does not shrink
 // as the card nears its due date. A lapse shortens the interval, so a
 // forgotten card falls back to Fresh by itself.
-const MASTERED_MIN_DAYS = 330;
+export const MASTERED_MIN_DAYS = 330;
 const MATURE_MIN_DAYS = 180;
 const FRESH_BELOW_DAYS = 45;
 

@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
@@ -15,6 +15,7 @@ import {
 import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { ProgressTable } from "./ProgressTable";
 import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
+import { reviewPileAddCn } from "./review-pile-add-cn";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
@@ -62,19 +63,26 @@ const NotInPileKanjiProgress = ({
 
   return (
     <div className="flex flex-col gap-3 pb-1">
-      <div className="flex flex-col gap-1 px-1 pt-1">
+      <div className="flex flex-col items-start gap-2 px-1 pt-1">
         <UserNotice icon="📚">
-          This kanji {`is not`} in your review pile yet. <br />
-          {word != null && (
-            <NoticeAction
-              onClick={() => void add()}
-              disabled={!canAdd || action.kind === "busy"}
-              additionalClassName="text-green-500 hover:text-green-400 hover:decoration-solid"
-            >
-              Add {kanji} to your review pile
-            </NoticeAction>
-          )}
+          This kanji {`is not`} in your review pile yet.
         </UserNotice>
+        {/* Looks like the drawer's own "Add 日 to my review pile". */}
+        {word != null && (
+          <button
+            type="button"
+            className={cn(reviewPileAddCn, "-ml-2")}
+            onClick={() => void add()}
+            disabled={!canAdd || action.kind === "busy"}
+          >
+            {action.kind === "busy" ? (
+              <Loader2 size={16} className="translate-y-0.5 animate-spin" />
+            ) : (
+              <PlusCircle size={16} className="translate-y-0.5 shrink-0" />
+            )}
+            Add {word} to my review pile
+          </button>
+        )}
         {action.kind === "error" && (
           <p role="alert" className={cn("text-sm text-left", cnWarningText)}>
             {action.message}

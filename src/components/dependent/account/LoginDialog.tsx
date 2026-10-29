@@ -5,6 +5,7 @@ import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-conte
 import { useEngineState } from "@/lib/engine/engine";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
+import { useResetApp } from "@/providers/app-reset-hooks";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
 import { LoginCodeStep } from "./LoginCodeStep";
 import { LoginDownloadingStep } from "./LoginDownloadingStep";
@@ -64,12 +65,15 @@ const LoginStepScreen = ({
 const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
   const [step, setStep] = useState<LoginStep>({ kind: "email", email: "" });
   const locked = isLocked(step);
+  const resetApp = useResetApp();
 
   const download = async () => {
     setStep({ kind: "downloading", error: null });
     const result = await api.sync.catchUp();
     if (result.ok) {
       closeLoginDialog();
+      // Every screen starts over with the account's data.
+      resetApp();
       return;
     }
     setStep({ kind: "downloading", error: copyForCode(result.error.code) });

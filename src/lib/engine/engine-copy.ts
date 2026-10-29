@@ -60,8 +60,12 @@ export const LOGOUT_FAILED_COPY =
 export const ENGINE_FAILED_COPY =
   "Your progress couldn't be loaded. Refresh the page to try again.";
 
-export const PUSH_BLOCKED_COPY =
-  "Changes from this device can't upload. Log out and remove this device's data to fix it.";
+/** `action` ("Log out") is an inline button in the sentence that opens the logout dialog. */
+export const PUSH_BLOCKED_COPY = {
+  before: "Changes from this device can't upload. ",
+  action: "Log out",
+  after: " and remove the cached study data on this device to fix it.",
+};
 
 export const OLD_PENDING_COPY =
   "Some changes have been waiting to upload for over a week. Go online and sync soon, or saving will be paused.";

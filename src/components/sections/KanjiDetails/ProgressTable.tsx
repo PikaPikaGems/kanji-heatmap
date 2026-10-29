@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Eye, PenLine, type LucideIcon } from "lucide-react";
 import type { CardProgress, ReviewPileItemView } from "engine-contract";
 import { InfoIcon } from "@/components/icons";
@@ -12,7 +13,11 @@ import {
 } from "@/components/ui/table";
 import { formatDaysHuman, formatInterval } from "@/lib/engine/format-interval";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
-import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import { BandRows } from "@/components/screens/MasteryScreen/MeasureIntro";
+import {
+  MEASURE_INTROS,
+  NOT_STARTED_LABEL,
+} from "@/lib/engine/mastery-heatmap-metrics";
 import {
   bandEmoji,
   difficultyBand,
@@ -53,7 +58,7 @@ type Cell = {
 type Field = {
   label: string;
   /** Short plain-English meaning, shown in the label's info popover. */
-  definition: string;
+  definition: ReactNode;
   /**
    * The cell for one card. `card` is null when there is no card yet (logged
    * out, or the kanji is not in the review pile).
@@ -121,12 +126,13 @@ const FIELDS: Field[] = [
   ),
   {
     label: "Mastery",
-    definition: `How well it has stuck over time: ${[
-      NOT_STARTED_LABEL,
-      ...MASTERY_LEVEL_LABELS,
-    ].join(
-      ", "
-    )}. It moves up as you keep remembering it across longer gaps, and drops back when you forget it.`,
+    // The same bands as the /mastery legend's popover.
+    definition: (
+      <>
+        <p className="mb-2">{MEASURE_INTROS.mastery}</p>
+        <BandRows measure="mastery" />
+      </>
+    ),
     cell: masteryCell,
   },
   studiedField(
@@ -208,7 +214,7 @@ const FieldLabel = ({ label, definition }: Omit<Field, "cell">) => (
     content={
       <div className="px-4 py-3 text-xs text-left w-60">
         <p className="mb-1 font-bold">{label}</p>
-        <p>{definition}</p>
+        {typeof definition === "string" ? <p>{definition}</p> : definition}
       </div>
     }
   />
@@ -272,7 +278,7 @@ export const ProgressTable = ({
                     key={kind}
                     className="px-2 py-1.5 text-[13px] font-bold text-left whitespace-nowrap tabular-nums sm:px-3 sm:text-sm"
                   >
-                    <span className="flex items-start gap-1.5 flex-shrink-0">
+                    <span className="flex items-center gap-1.5 flex-shrink-0">
                       {swatchCn ? (
                         <span
                           className={`inline-block size-3 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}

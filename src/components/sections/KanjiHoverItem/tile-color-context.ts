@@ -1,6 +1,11 @@
 import { createContext } from "react";
 
-export type TileColor = { bgCn: string; textCn: string };
+export type TileColor = {
+  bgCn: string;
+  textCn: string;
+  /** Fades the tile, e.g. a /mastery kanji with no anchor word. */
+  dimmed?: boolean;
+};
 
 /**
  * Lets a screen decide each tile's fill and text color (the /mastery heatmap)
