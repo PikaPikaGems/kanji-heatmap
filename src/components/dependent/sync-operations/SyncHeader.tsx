@@ -17,6 +17,7 @@ import {
 import { closeSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
+import { openLogoutDialog } from "@/lib/engine/logout-flow";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
@@ -67,6 +68,7 @@ const AccountNotices = () => {
 export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
   const api = useEngineApi();
   const { online } = useNetworkState();
+  const account = useAccountStatus();
   const needsRefresh = needsDataRefresh(sync);
   const failure = sync?.state === "failed" ? sync.error : null;
   const label =
@@ -100,7 +102,23 @@ export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
       <AccountNotices />
       {/* Saving is stuck until they act, so it reads as a warning. */}
       {sync?.pushBlocked && (
-        <UserNotice className={cnWarningText}>{PUSH_BLOCKED_COPY}</UserNotice>
+        <UserNotice className={cnWarningText}>
+          {PUSH_BLOCKED_COPY.before}
+          {account.kind === "active" ? (
+            <NoticeAction
+              onClick={() => {
+                // One modal at a time.
+                closeSyncOperations();
+                openLogoutDialog(account.userId);
+              }}
+            >
+              {PUSH_BLOCKED_COPY.action}
+            </NoticeAction>
+          ) : (
+            PUSH_BLOCKED_COPY.action
+          )}
+          {PUSH_BLOCKED_COPY.after}
+        </UserNotice>
       )}
       {(sync?.oldestPendingOperationAgeMs ?? 0) > OLD_PENDING_MS && (
         <UserNotice>{OLD_PENDING_COPY}</UserNotice>
