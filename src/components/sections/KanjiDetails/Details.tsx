@@ -63,7 +63,7 @@ const DetailsNotice = ({
   children: ReactNode;
 }) => (
   <div className="flex items-start px-3 py-2">
-    <Icon className="mr-2 text-yellow-600  size-4 dark:text-yellow-500" />
+    <Icon className="mr-2 text-yellow-600 size-4 dark:text-yellow-500" />
     <p className="text-xs leading-relaxed text-left text-foreground">
       {children}
     </p>
@@ -161,7 +161,6 @@ export const KanjiDetails = ({
           </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
-      <RepresentativeStudyWordAccordion kanji={kanji} />
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
@@ -206,6 +205,7 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
+      <RepresentativeStudyWordAccordion kanji={kanji} />
       <StudyNotesAccordion kanji={kanji} />
       <YourProgressAccordion kanji={kanji} />
       <ReadingUsefulnessAccordion kanji={kanji} />

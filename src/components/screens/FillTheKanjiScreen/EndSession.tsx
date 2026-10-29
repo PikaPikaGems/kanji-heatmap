@@ -29,7 +29,7 @@ const MissedKanjiList = ({
   onOpen: (kanji: string) => void;
 }) => (
   <p
-    className="flex flex-wrap justify-center gap-x-2 text-base kanji-font"
+    className="flex flex-wrap justify-center text-lg gap-x-2 kanji-font"
     lang="ja"
   >
     {missed.map(({ kanji, kind }) => (
@@ -38,7 +38,7 @@ const MissedKanjiList = ({
         type="button"
         onClick={() => onOpen(kanji)}
         className={cn(
-          "px-0.5 cursor-pointer rounded-lg transition-colors hover:bg-foreground/10 active:bg-foreground/20",
+          "px-1 cursor-pointer rounded-lg transition-colors hover:bg-foreground/10 active:bg-foreground/20",
           kind === "wrong"
             ? "text-red-500"
             : "text-yellow-600 dark:text-yellow-400"

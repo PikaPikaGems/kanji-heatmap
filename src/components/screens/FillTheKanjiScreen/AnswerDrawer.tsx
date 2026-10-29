@@ -76,7 +76,7 @@ const TileChoices = ({
   getInfo: GetBasicKanjiInfo | undefined;
 }) => (
   <p
-    className="flex flex-wrap justify-center gap-x-2 pb-4 text-sm kanji-font"
+    className="flex flex-wrap justify-center pb-4 text-base gap-x-2 kanji-font"
     lang="ja"
   >
     {tiles.map((kanji, i) => {
@@ -259,7 +259,7 @@ export const AnswerDrawer = ({
             getInfo={getKanjiInfo ?? undefined}
             className="text-4xl sm:text-[2.5rem] text-foreground"
           />
-          <p className="pt-1 text-xs text-foreground">{item.en}</p>
+          <p className="pt-4 text-xs text-foreground">{item.en}</p>
         </div>
       }
       footer={

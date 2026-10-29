@@ -31,16 +31,18 @@ export const NoticeAction = ({
   children,
   onClick,
   disabled,
+  additionalClassName,
 }: {
   children: ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  additionalClassName?: string;
 }) => (
   <button
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="font-bold underline rounded-sm underline-offset-4 decoration-2 hover-text-theme-color-with-opacity-100 disabled:opacity-50 disabled:no-underline"
+    className={`font-bold underline rounded-sm underline-offset-4 decoration-2 hover-text-theme-color-with-opacity-100 disabled:opacity-50 disabled:no-underline ${additionalClassName}`}
   >
     {children}
   </button>

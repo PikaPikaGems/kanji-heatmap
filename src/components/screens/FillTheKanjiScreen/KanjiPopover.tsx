@@ -70,12 +70,12 @@ export const KanjiPopover = ({
               {keyword}
             </span>
             <KanjiReadingBadges kanji={kanji} />
-            <div className="flex flex-wrap justify-center">
+            <div className="flex flex-wrap justify-center pb-3 border-b border-dotted">
               <FrequencyBadges frequency={frequency} />
             </div>
             <button
               type="button"
-              className="mt-1 mb-1.5 text-xs underline text-muted-foreground decoration-dotted underline-offset-4 hover:text-foreground"
+              className="my-3 text-xs underline text-muted-foreground decoration-dotted underline-offset-4 hover:text-foreground"
               onClick={() => setView("practice")}
             >
               Practice writing now

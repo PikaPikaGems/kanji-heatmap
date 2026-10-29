@@ -64,11 +64,12 @@ const NotInPileKanjiProgress = ({
     <div className="flex flex-col gap-3 pb-1">
       <div className="flex flex-col gap-1 px-1 pt-1">
         <UserNotice icon="📚">
-          This kanji isn&apos;t in your review pile yet.{" "}
+          This kanji {`is not`} in your review pile yet. <br />
           {word != null && (
             <NoticeAction
               onClick={() => void add()}
               disabled={!canAdd || action.kind === "busy"}
+              additionalClassName="text-green-500 hover:text-green-400 hover:decoration-solid"
             >
               Add {kanji} to your review pile
             </NoticeAction>
