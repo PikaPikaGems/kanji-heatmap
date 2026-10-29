@@ -10,7 +10,7 @@ export const YourProgressAccordion = ({ kanji }: { kanji: string }) => {
   if (isAccountUiHidden(status)) return null;
 
   return (
-    <SimpleAccordion trigger="Your Progress ⭐️">
+    <SimpleAccordion trigger="Kanji Study Progress ⭐️">
       <ErrorBoundary details="KanjiProgress in KanjiDetails">
         <KanjiProgress key={kanji} kanji={kanji} />
       </ErrorBoundary>
