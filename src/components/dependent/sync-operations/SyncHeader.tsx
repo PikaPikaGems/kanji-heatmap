@@ -18,6 +18,7 @@ import { closeSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
+import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
 export const OLD_PENDING_MS = 7 * 24 * 60 * 60 * 1000;
@@ -97,7 +98,10 @@ export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
         )}
       </div>
       <AccountNotices />
-      {sync?.pushBlocked && <UserNotice>{PUSH_BLOCKED_COPY}</UserNotice>}
+      {/* Saving is stuck until they act, so it reads as a warning. */}
+      {sync?.pushBlocked && (
+        <UserNotice className={cnWarningText}>{PUSH_BLOCKED_COPY}</UserNotice>
+      )}
       {(sync?.oldestPendingOperationAgeMs ?? 0) > OLD_PENDING_MS && (
         <UserNotice>{OLD_PENDING_COPY}</UserNotice>
       )}

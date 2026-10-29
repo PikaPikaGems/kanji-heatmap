@@ -20,7 +20,7 @@ export const SoundHint = ({
   phonetics: string[];
 }) => {
   return (
-    <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5 ">
+    <div className="px-2 py-1.5 mx-auto text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
       <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
         Sound hint for kanji with <span className="kanji-font">{kanji}</span>:
       </p>
