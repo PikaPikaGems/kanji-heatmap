@@ -77,7 +77,7 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
   fillTheKanji: fillTheKanjiPageMeta.shortLabel,
   readingMastery: READING_MASTERY_LABEL,
   writingMastery: WRITING_MASTERY_LABEL,
-  newKanji: "New Kanji Added",
+  newKanji: "New Items Added",
 };
 
 /** The order the heatmap's checkboxes and day popovers list them in. */
