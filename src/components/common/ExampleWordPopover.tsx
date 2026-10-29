@@ -59,8 +59,8 @@ export const ExampleWordPopover = ({
         <Button
           variant="outline"
           className={cn(
-            "h-auto items-end rounded-2xl border-dotted px-4 py-3 kanji-font",
-            "hover:bg-muted active:bg-muted",
+            "h-auto items-end rounded-2xl px-4 py-3 kanji-font",
+            "hover:bg-muted active:bg-muted border border-dashed",
             className
           )}
         >
