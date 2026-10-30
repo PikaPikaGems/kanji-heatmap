@@ -7,6 +7,7 @@ import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
 import {
   batchLabel,
+  isValidBatch,
   setLabel,
   totalBatchCount,
 } from "@/lib/fill-the-kanji/batches";
@@ -70,6 +71,14 @@ const FillTheKanjiScreen = () => {
     play();
   };
 
+  const nextBatch = batch + 1;
+  const startNextBatch = isValidBatch(setId, nextBatch)
+    ? () => {
+        selectBatch(setId, nextBatch);
+        play();
+      }
+    : null;
+
   return (
     <>
       <PracticeShell progress={headerProgress}>
@@ -102,6 +111,7 @@ const FillTheKanjiScreen = () => {
               onRetryMistakes={() =>
                 play(results.filter((r) => !r.correct).map((r) => r.item.jp))
               }
+              onNextBatch={startNextBatch}
               onEnd={goToInitial}
             />
           </div>

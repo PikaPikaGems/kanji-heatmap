@@ -51,13 +51,15 @@ const MissedKanjiList = ({
 
 /**
  * End of a batch: the shared end screen with the missed kanji, and Retry
- * Mistakes (when there are any) next to "I'm done".
+ * Mistakes (when there are any) or Continue to the next batch (when perfect)
+ * next to "I'm done".
  */
 export const EndSession = ({
   results,
   batchLabel,
   saveError,
   onRetryMistakes,
+  onNextBatch,
   onEnd,
 }: {
   results: ItemResult[];
@@ -66,6 +68,8 @@ export const EndSession = ({
   saveError: string | null;
   /** Replays just the missed sentences; not recorded as a batch attempt. */
   onRetryMistakes: () => void;
+  /** Starts the next batch of the set; null after the set's last batch. */
+  onNextBatch: (() => void) | null;
   onEnd: () => void;
 }) => {
   const cheer = useMemo(() => pickEndCheer(), []);
@@ -75,12 +79,9 @@ export const EndSession = ({
   // While the kanji drawer is open, Enter, Space and Escape belong to it.
   const drawerClosed = openedKanji == null;
   const hasMistakes = correct < results.length;
+  const onContinue = hasMistakes ? onRetryMistakes : onNextBatch;
 
-  useEnterAction(
-    hasMistakes ? onRetryMistakes : onEnd,
-    drawerClosed,
-    CONTINUE_KEYS
-  );
+  useEnterAction(onContinue ?? onEnd, drawerClosed, CONTINUE_KEYS);
   useEnterAction(onEnd, drawerClosed, ["Escape"]);
 
   return (
@@ -97,8 +98,8 @@ export const EndSession = ({
           />
         </>
       }
-      onContinue={hasMistakes ? onRetryMistakes : undefined}
-      continueLabel="Retry Mistakes"
+      onContinue={onContinue ?? undefined}
+      continueLabel={hasMistakes ? "Retry Mistakes" : "Continue"}
       onEnd={onEnd}
       notice={<ProgressNotSavedNotice saveError={saveError} />}
     >
