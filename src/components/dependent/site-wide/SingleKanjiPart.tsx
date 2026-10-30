@@ -54,8 +54,7 @@ export const SingleKanjiPart = ({
   const componentKeyword = keyword ?? getKanjiInfo?.(kanji)?.keyword;
   // A phonetic component always opens, for its sound hint.
   const canOpenPopover =
-    isKnownRadical(kanji, radicals) ||
-    componentEntry != null;
+    isKnownRadical(kanji, radicals) || componentEntry != null;
 
   const content = (
     <div className="p-2 text-xs font-bold">
