@@ -32,6 +32,18 @@ kanji drawer stay empty unless you fill these folders (paths are in
 - `public/kanji-words/v6/<KANJI>.json`
 - `public/kanji-textbook-words-min/<KANJI>.json`
 
+Both are built in [jp-misc-data](https://github.com/PikaPikaGems/jp-misc-data)
+(private) and uploaded to cloud storage by hand:
+
+| Local folder                       | Cloud storage folder       | Built from                                                          |
+| ---------------------------------- | -------------------------- | ------------------------------------------------------------------- |
+| `public/kanji-words/v6/`           | `kanji-common-words/v6/`   | `jp-word-ranks-data/V6/BY_CHAR_MIN_KANJI_JSON/`                     |
+| `public/kanji-textbook-words-min/` | `kanji-textbook-words/v7/` | `textbook-japanese-words/output-min/` (run `node script.mjs` first) |
+
+To fill them locally, copy those folders from a jp-misc-data checkout. The
+rest of the app's data (`public/json/`) comes from jp-misc-data's
+`kanji-heatmap-build/`.
+
 The AI voice files (`public/yomiage/`, ~65 MB) aren't committed either.
 `pnpm dev` and `pnpm build` copy them in with
 `scripts/copy-yomiage-files.mjs`, downloading them once per yomiage version
