@@ -1,4 +1,3 @@
-import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
 import {
   FORGOT_HINT,
@@ -49,8 +48,11 @@ const RatingFooter = ({
       disabled={hasSelection}
       onClick={onForgot}
     >
-      <RatingLabel label="Forgot" interval={rating.intervals.again} />
-      {!hasSelection && <KeyHint>{FORGOT_HINT}</KeyHint>}
+      <RatingLabel
+        label="Forgot"
+        interval={rating.intervals.again}
+        hint={!hasSelection ? FORGOT_HINT : undefined}
+      />
     </PracticeButton>
     <RatingButtons
       intervals={rating.intervals}
