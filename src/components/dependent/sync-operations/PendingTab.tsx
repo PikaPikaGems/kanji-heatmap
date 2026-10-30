@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { SyncOperation } from "engine-contract";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { relativeTime } from "@/lib/engine/relative-time";
-import { snapshotValue } from "@/lib/engine/store-cache";
+import { keepLastReady, snapshotValue } from "@/lib/engine/store-cache";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
 import {
   describeOperation,
@@ -44,7 +44,7 @@ const PendingRow = ({ op }: { op: SyncOperation }) => {
 const PendingPage = ({ offset }: { offset: number }) => {
   const snapshot = useEngineQuery(
     `sync.watchOutbox:${PAGE_SIZE}:${offset}`,
-    (api) => api.sync.watchOutbox({ limit: PAGE_SIZE, offset })
+    (api) => keepLastReady(api.sync.watchOutbox({ limit: PAGE_SIZE, offset }))
   );
 
   if (snapshot.status === "loading") {
