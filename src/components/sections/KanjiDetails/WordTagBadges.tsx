@@ -17,6 +17,7 @@ import {
 const BOOK_LEVEL_RANGES = [
   ["🥚 Core 1", "🐥 Core 3"],
   ["Shin N4", "Shin N1"],
+  ["Bun N5", "Bun N1"],
   ["🌕 K Lvl 1", "🌑 K Lvl 5"],
 ];
 
