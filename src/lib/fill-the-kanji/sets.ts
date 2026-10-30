@@ -9,46 +9,31 @@
  * set-sizes.json.
  */
 export const FILL_THE_KANJI_SETS = [
+  { id: "everyday", label: "💬 Everyday", unit: "sentences" },
   {
-    id: "everyday-phrases-onomatopoeia",
-    label: "💬 Everyday Phrases",
+    id: "travel-emotions",
+    label: "💬 Travel and Emotions",
     unit: "sentences",
   },
-  {
-    id: "short-phrases",
-    label: "⚡ Short Phrases",
-    unit: "phrases",
-  },
+  { id: "onomatopoeia", label: "🔔 Onomatopoeia", unit: "sentences" },
+  { id: "short-phrases", label: "⚡ Short Phrases", unit: "phrases" },
   { id: "n5", label: "🥚 N5 Grammar", unit: "sentences" },
   { id: "n4", label: "🐣 N4 Grammar", unit: "sentences" },
   { id: "n3", label: "🐥 N3 Grammar", unit: "sentences" },
   { id: "n2", label: "🦢 N2 Grammar", unit: "sentences" },
   { id: "n1", label: "🐦‍🔥 N1 Grammar", unit: "sentences" },
+  { id: "intermediate", label: "🦆 Misc Grammar", unit: "sentences" },
+  { id: "beginner-1", label: "🌱 Basic", unit: "sentences" },
+  { id: "beginner-2", label: "☘️ Common", unit: "sentences" },
+  { id: "beginner-3", label: "🌷 Fluent", unit: "sentences" },
   {
-    id: "intermediate",
-    label: "🦆 Misc Grammar",
+    id: "essential-verbs-counters",
+    label: "🏃 Essential Verbs and Counters",
     unit: "sentences",
   },
-  {
-    id: "beginner-1",
-    label: "🌱 Basic",
-    unit: "sentences",
-  },
-  {
-    id: "beginner-2",
-    label: "☘️ Common",
-    unit: "sentences",
-  },
-  {
-    id: "beginner-3",
-    label: "🌷 Fluent",
-    unit: "sentences",
-  },
-  {
-    id: "verb-focused",
-    label: "🏃 Verbs",
-    unit: "sentences",
-  },
+  { id: "verbs-1", label: "🏃 Verbs 1", unit: "sentences" },
+  { id: "verbs-2", label: "🏃 Verbs 2", unit: "sentences" },
+  { id: "verbs-3", label: "🏃 Verbs 3", unit: "sentences" },
   { id: "emoji", label: "😀 Emoji", unit: "emoji" },
 ] as const;
 
@@ -61,7 +46,7 @@ export const FILL_THE_KANJI_SET_GROUPS: {
 }[] = [
   {
     title: "Everyday Japanese",
-    setIds: ["everyday-phrases-onomatopoeia", "short-phrases"],
+    setIds: ["everyday", "travel-emotions", "onomatopoeia", "short-phrases"],
   },
   {
     title: "Grammar Sentences",
@@ -71,5 +56,14 @@ export const FILL_THE_KANJI_SET_GROUPS: {
     title: "Basic to Fluent",
     setIds: ["beginner-1", "beginner-2", "beginner-3"],
   },
-  { title: "Verbs and Emoji", setIds: ["verb-focused", "emoji"] },
+  {
+    title: "Verbs, Counters and Emojis",
+    setIds: [
+      "essential-verbs-counters",
+      "verbs-1",
+      "verbs-2",
+      "verbs-3",
+      "emoji",
+    ],
+  },
 ];
