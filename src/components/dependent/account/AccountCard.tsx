@@ -88,7 +88,7 @@ export const AccountCard = ({
   children?: ReactNode;
 }) => (
   <div className="flex flex-col gap-3 p-3 text-left border rounded-xl">
-    <div className="flex items-center gap-3">
+    <div className="flex items-start gap-3">
       <Avatar initial={initial} />
       <div className="flex flex-col flex-1 min-w-0">
         <span className="text-sm font-bold truncate" title={name}>

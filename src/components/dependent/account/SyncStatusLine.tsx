@@ -3,7 +3,6 @@ import { Drawer as DrawerPrimitive } from "vaul";
 import { useNetworkState } from "@/hooks/use-network-state";
 import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useFailedOpsCount } from "@/lib/engine/sync-queries";
-import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 import { syncDotClassName, syncLabel } from "./sync-display";
 
@@ -35,9 +34,9 @@ export const SyncStatusLine = ({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center self-start gap-1.5 text-xs text-left rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "inline-flex items-start self-start gap-1.5 text-xs text-left rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           needsAttention
-            ? cnWarningText
+            ? `font-bold text-red-500`
             : "text-muted-foreground hover:text-foreground"
         )}
         aria-label={`${label}${pending > 0 ? `, ${pending} pending` : ""}${needsAttention ? ", needs attention" : ""}. View sync details`}
