@@ -45,7 +45,7 @@ export const SyncStatusLine = ({
         <span
           aria-hidden
           className={cn(
-            "size-2 shrink-0 rounded-full",
+            "size-2 shrink-0 rounded-full mt-1.5",
             needsAttention ? "bg-red-500" : syncDotClassName(sync, online)
           )}
         />
