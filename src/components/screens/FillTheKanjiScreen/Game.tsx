@@ -4,6 +4,7 @@ import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import { useJsonFetch } from "@/hooks/use-json";
+import { useTapGuard } from "@/hooks/use-tap-guard";
 import { useSimilarKanjiMap } from "@/kanji-worker/kanji-worker-hooks";
 import { fillTheKanjiChunkUrl } from "@/lib/offline-preload";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
@@ -11,6 +12,9 @@ import {
   chunkOfBatch,
   chunkRowStart,
   batchRowRange,
+  levelOfBatch,
+  positionInLevel,
+  setLabel,
 } from "@/lib/fill-the-kanji/batches";
 import {
   buildPuzzle,
@@ -50,17 +54,22 @@ const useBatchCards = (
     if (!data?.data || !similarMap) return [];
     const [start, end] = batchRowRange(setId, batch);
     const offset = chunkRowStart(chunk);
-    const items = data.data
+    const sourceOf = (sentence: number) =>
+      `${setLabel(setId)} · Challenge ${levelOfBatch(batch)} · Batch ${positionInLevel(batch)} · Sentence ${sentence}`;
+    // Numbered in file order (1-based), before retries filter some out.
+    const rows = data.data
       .slice(start - offset, end - offset)
-      .map(rowToItem)
-      .filter((item) => onlyJp == null || onlyJp.includes(item.jp));
+      .map((row, i) => ({ item: rowToItem(row), source: sourceOf(i + 1) }))
+      .filter(({ item }) => onlyJp == null || onlyJp.includes(item.jp));
+    const items = rows.map(({ item }) => item);
     const puzzles = items.map((item) => buildPuzzle(item.jp, tileCount));
     const batchKanji = [...new Set(puzzles.flatMap((p) => p.sentenceKanji))];
     const getSimilars = (k: string) => similarMap[k] ?? [];
 
     return shuffle(
-      items.map((item, i) => ({
+      rows.map(({ item, source }, i) => ({
         item,
+        source,
         puzzle: puzzles[i],
         tiles: buildTiles({
           answers: puzzles[i].answers,
@@ -77,6 +86,45 @@ const useBatchCards = (
 };
 
 const ignoreEscape = () => {};
+
+/**
+ * Forgot and Next. Remounted for each card, so for its first 0.5 s taps do
+ * nothing: a double tap on the answer drawer's Continue would otherwise mark
+ * the next card as forgotten.
+ */
+const AnswerButtons = ({
+  canForget,
+  canSubmit,
+  onForgot,
+  onSubmit,
+}: {
+  canForget: boolean;
+  canSubmit: boolean;
+  onForgot: () => void;
+  onSubmit: () => void;
+}) => {
+  const guarded = useTapGuard();
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <PracticeButton
+        variant="danger"
+        size="md"
+        disabled={!canForget}
+        onClick={guarded(onForgot)}
+      >
+        Forgot
+      </PracticeButton>
+      <PracticeButton
+        variant="primary"
+        size="md"
+        disabled={!canSubmit}
+        onClick={guarded(onSubmit)}
+      >
+        Next
+      </PracticeButton>
+    </div>
+  );
+};
 
 export const Game = ({
   setId,
@@ -173,24 +221,14 @@ export const Game = ({
           }`}
         >
           <TileGrid tiles={tiles} onPick={game.pickTile} />
-          <div className="grid grid-cols-2 gap-2">
-            <PracticeButton
-              variant="danger"
-              size="md"
-              disabled={game.allFilled || revealed}
-              onClick={game.forgot}
-            >
-              Forgot
-            </PracticeButton>
-            <PracticeButton
-              variant="primary"
-              size="md"
-              disabled={!game.allFilled || revealed}
-              onClick={game.submit}
-            >
-              Next
-            </PracticeButton>
-          </div>
+          <AnswerButtons
+            // A new card restarts the tap guard.
+            key={game.index}
+            canForget={!game.allFilled && !revealed}
+            canSubmit={game.allFilled && !revealed}
+            onForgot={game.forgot}
+            onSubmit={game.submit}
+          />
         </div>
       </div>
 

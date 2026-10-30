@@ -1,12 +1,18 @@
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
-import { RadioRow, ToggleRow } from "@/components/shared-practice";
+import {
+  PracticeBottomBar,
+  RadioRow,
+  ToggleRow,
+} from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { LevelGridSelector } from "@/components/shared-practice/LevelGridSelector";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
+import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
+import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
-import { TTS_DISCLAIMER } from "@/lib/tts";
+import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import {
   FILL_THE_KANJI_SETS,
   FillTheKanjiSetId,
@@ -26,30 +32,34 @@ import {
   totalBatchCount,
 } from "@/lib/fill-the-kanji/batches";
 import {
-  countAllAttemptedBatches,
-  readSetBatchStats,
-  BatchStats,
-} from "@/lib/fill-the-kanji/storage";
+  AllSetBatchStats,
+  SetBatchStats,
+  countAllPlayedBatches,
+  countPlayedBatches,
+} from "@/lib/fill-the-kanji/progress";
 import {
   DEFAULT_TILE_COUNT,
   isTileCount,
   TILE_COUNT_OPTIONS,
   TileCount,
 } from "@/lib/fill-the-kanji/puzzle";
-import { formatLastAttempted } from "@/lib/fill-the-kanji/format";
+import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
 import { SoundMode } from "./types";
 import { useFillTheKanjiSettings } from "./use-fill-the-kanji-settings";
 
 /** Same select as the Sorting and Filtering modal: options with descriptions. */
 const SetSelect = ({
   selected,
+  allStats,
   onSelect,
 }: {
   selected: FillTheKanjiSetId;
+  /** Null when progress isn't available (logged out, loading). */
+  allStats: AllSetBatchStats | null;
   onSelect: (setId: FillTheKanjiSetId) => void;
 }) => (
   <ResponsiveSelect
-    label="Select a Challenge"
+    label="Select a Challenge Set"
     value={selected}
     onChange={(v) => {
       if (isFillTheKanjiSetId(v)) onSelect(v);
@@ -57,9 +67,11 @@ const SetSelect = ({
     options={FILL_THE_KANJI_SETS.map(({ id, label }) => ({
       value: id,
       label,
-      description: `${setRowCount(id).toLocaleString()} sentences · ${
-        Object.keys(readSetBatchStats(id)).length
-      }/${batchCount(id)} batches played`,
+      description: `${setRowCount(id).toLocaleString()} sentences${
+        allStats
+          ? ` · ${countPlayedBatches(allStats.get(id) ?? {})}/${batchCount(id)} batches played`
+          : ""
+      }`,
     }))}
   />
 );
@@ -67,13 +79,15 @@ const SetSelect = ({
 const BatchSummary = ({
   setId,
   batch,
-  stats,
+  setStats,
 }: {
   setId: FillTheKanjiSetId;
   batch: number;
-  stats: BatchStats | null;
+  /** This set's stats; null when progress isn't available (logged out, loading). */
+  setStats: SetBatchStats | null;
 }) => {
   const [start, end] = batchRowRange(setId, batch);
+  const stats = setStats?.[batch];
   return (
     <div className="flex flex-col gap-1 text-xs font-bold text-left min-h-10">
       <div>
@@ -86,10 +100,12 @@ const BatchSummary = ({
             🔁 {stats.attemptCount}{" "}
             {stats.attemptCount === 1 ? "attempt" : "attempts"}
           </div>
-          <div>🕒 Last played {formatLastAttempted(stats.lastAttempted)}</div>
+          <div>
+            🕒 Last played {formatLastAttemptedDay(stats.lastAttemptedAt)}
+          </div>
         </div>
       ) : (
-        <div className="text-muted-foreground">Not played yet</div>
+        setStats && <div className="text-muted-foreground">Not played yet</div>
       )}
     </div>
   );
@@ -129,7 +145,8 @@ const Key = ({ children }: { children: string }) => (
 export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const { settings, setId, batch, setSetting, selectSet, selectBatch } =
     useFillTheKanjiSettings();
-  const stats = readSetBatchStats(setId);
+  const allStats = useAllSetBatchStats();
+  const setStats = allStats?.get(setId) ?? null;
 
   const soundEnabled = settings.sound.enabled;
   const soundType: SoundMode = settings.sound.enabled
@@ -148,15 +165,18 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             <h1 className="pt-4 text-lg font-bold text-center">
               {fillTheKanjiPageMeta.heading}
             </h1>
-            <p className="text-xs font-bold text-muted-foreground tabular-nums">
-              {countAllAttemptedBatches()} of {totalBatchCount()} batches played
-            </p>
+            {allStats && (
+              <p className="text-xs font-bold text-muted-foreground tabular-nums">
+                {countAllPlayedBatches(allStats)} of {totalBatchCount()} batches
+                played
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col">
             <ToggleRow
               id="sound-on"
-              label="Sound On"
+              label="Sound after answering"
               checked={soundEnabled}
               onChange={(v) =>
                 setSetting(
@@ -197,9 +217,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             </div>
             {((soundEnabled && soundType === "speak") ||
               settings.readAloudOnShow) && (
-              <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                {TTS_DISCLAIMER}
-              </p>
+              <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
             )}
           </div>
 
@@ -213,44 +231,43 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           />
 
           <div className="text-left">
-            <SetSelect selected={setId} onSelect={selectSet} />
+            <SetSelect
+              selected={setId}
+              allStats={allStats}
+              onSelect={selectSet}
+            />
           </div>
           <LevelGridSelector
             levelCount={levelCount(setId)}
             itemsPerLevel={BATCHES_PER_LEVEL}
             levelSize={(level) => batchesInLevel(setId, level)}
             isDone={(level, pos) =>
-              stats[String(batchFromLevelAndPos(level, pos))] != null
+              setStats?.[batchFromLevelAndPos(level, pos)] != null
             }
             level={levelOfBatch(batch)}
             position={positionInLevel(batch)}
             onSelect={(level, pos) =>
               selectBatch(setId, batchFromLevelAndPos(level, pos))
             }
-            levelHeading="Select a Level"
+            levelHeading="Select a Challenge"
             itemHeading="Select a Batch"
           />
-          <BatchSummary
-            setId={setId}
-            batch={batch}
-            stats={stats[String(batch)] ?? null}
-          />
+          <BatchSummary setId={setId} batch={batch} setStats={setStats} />
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-        <div className="w-full max-w-lg mx-auto">
-          <PracticeButton size="lg" onClick={onStart}>
-            Start
-          </PracticeButton>
-          {!isCoarsePointer && (
-            <p className="pt-2 text-xs text-center text-muted-foreground">
-              Tip: during a batch, press <Key>!</Key> to hear the sentence, or{" "}
-              <Key>@</Key> to hear it slowly.
-            </p>
-          )}
-        </div>
-      </div>
+      <PracticeBottomBar>
+        <PracticeButton size="lg" onClick={onStart}>
+          Start
+        </PracticeButton>
+        <SaveProgressHint />
+        {!isCoarsePointer && (
+          <p className="text-xs text-center text-muted-foreground">
+            Tip: during a batch, press <Key>!</Key> to hear the sentence, or{" "}
+            <Key>@</Key> to hear it slowly.
+          </p>
+        )}
+      </PracticeBottomBar>
     </div>
   );
 };

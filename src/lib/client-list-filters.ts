@@ -9,20 +9,22 @@ type Membership = { has: (kanji: string) => boolean };
 
 /**
  * Apply bookmark / anchor-word filters that the worker search cannot express
- * (localStorage bookmarks, and the anchor-word toggle).
+ * (the account's bookmarks, and the anchor-word toggle).
  */
 export const applyClientListFilters = (
   kanjis: string[],
   filters: FilterSettings,
   ctx: {
-    bookmarkedKanji: Membership;
+    /** Null when bookmarks don't exist in this build: the filter is skipped. */
+    bookmarkedKanji: Membership | null;
     kanjiWithAnchorWords: Membership | null;
   }
 ): string[] => {
   let result = kanjis;
 
-  if (filters.bookmarkedOnly) {
-    result = result.filter((kanji) => ctx.bookmarkedKanji.has(kanji));
+  const bookmarked = ctx.bookmarkedKanji;
+  if (filters.bookmarkedOnly && bookmarked != null) {
+    result = result.filter((kanji) => bookmarked.has(kanji));
   }
 
   if (filters.withAnchorWordsOnly) {

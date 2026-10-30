@@ -3,6 +3,7 @@ import { Download, Loader2, RotateCcw } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { downloadBlob } from "@/lib/ai-explain/download";
 import { cn } from "@/lib/utils";
+import { cnWarningText } from "@/lib/generic-cn";
 
 /**
  * The one style for secondary AI actions: bold text, dotted underline, icon.
@@ -90,7 +91,7 @@ export const DownloadMarkdownButton = ({
         {label}
       </DownloadButton>
       {error && (
-        <span role="alert" className="text-xs font-bold text-destructive">
+        <span role="alert" className={cn("text-xs", cnWarningText)}>
           {error}
         </span>
       )}
@@ -162,12 +163,12 @@ export const AiRequestFeedback = ({
       </div>
     )}
     {error && (
-      <p role="alert" className="text-sm font-bold text-destructive">
-        {error}
+      <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
+        ⚠️ {error}
       </p>
     )}
     {warning && (
-      <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+      <p role="status" className={cn("text-sm", cnWarningText)}>
         {warning}
       </p>
     )}

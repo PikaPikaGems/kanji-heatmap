@@ -83,7 +83,7 @@ export const FuriganaSentence = ({
       {bunsetsu.map((parts, i) => (
         // min-w-0 + max-w-full: a long bunsetsu wraps inside its own box
         // instead of widening the row (on iOS it widened the whole drawer).
-        <span key={i} className="min-w-0 max-w-full">
+        <span key={i} className="max-w-full min-w-0">
           {parts.map(({ reading, chars }, j) => {
             const text = chars.map(({ char, blank }, k) => {
               const result = blank == null ? undefined : blankResults?.[blank];
@@ -95,7 +95,7 @@ export const FuriganaSentence = ({
                     key={k}
                     kanji={char}
                     info={info}
-                    className={color}
+                    className={`${color} underline underline-offset-8 decoration-dashed decoration-foreground/10 hover:decoration-foreground hover:decoration-solid`}
                     style={hopDelayStyle(result, blank)}
                   />
                 );

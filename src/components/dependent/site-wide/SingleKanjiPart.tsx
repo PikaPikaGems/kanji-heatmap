@@ -20,7 +20,7 @@ export const SoundHint = ({
   phonetics: string[];
 }) => {
   return (
-    <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5 ">
+    <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
       <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
         Sound hint for kanji with <span className="kanji-font">{kanji}</span>:
       </p>
@@ -52,6 +52,7 @@ export const SingleKanjiPart = ({
   const getKanjiInfo = useGetKanjiInfoFn();
   const componentEntry = useComponentSearchEntry(kanji);
   const componentKeyword = keyword ?? getKanjiInfo?.(kanji)?.keyword;
+  // A phonetic component always opens, for its sound hint.
   const canOpenPopover =
     isKnownRadical(kanji, radicals) || componentEntry != null;
 
@@ -85,9 +86,7 @@ export const SingleKanjiPart = ({
   const triggerClassName = `flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 ${canOpenPopover ? "hover:border-solid hover:border-neon-accent" : "cursor-default"} ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`;
 
   if (!canOpenPopover) {
-    if (kanji === "ヨ冖又") {
-      // TODO: TEMPORARY HACK FIX ME LATER
-      // "ヨ冖又":{"s":["しん"]
+    if (phonetics.length > 0) {
       return (
         <GenericPopover
           modal
@@ -98,7 +97,7 @@ export const SingleKanjiPart = ({
           }
           content={
             <div className="m-2">
-              <SoundHint kanji={kanji} phonetics={["しん"]} />
+              <SoundHint kanji={kanji} phonetics={phonetics} />
             </div>
           }
         />

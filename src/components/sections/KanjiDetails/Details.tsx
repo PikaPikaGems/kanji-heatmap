@@ -1,5 +1,6 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { lazy, ReactNode, Suspense } from "react";
-import { Bug, Loader2, Volume2 } from "lucide-react";
+import { Bug, Volume2 } from "lucide-react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -7,7 +8,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
-import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
+import { ReadingFrequencyCategory as ReadingUsefulnessTable } from "./ReadingFrequencyCategory";
 import { SampleVocabulary } from "./SampleVocabulary";
 import { TextbookVocabulary } from "./TextbookVocabulary";
 import { Badge } from "@/components/ui/badge";
@@ -19,21 +20,16 @@ import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
+import { StudyNotesAccordion } from "./StudyNotesAccordion";
+import { YourProgressAccordion } from "./YourProgressAccordion";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
-
-const StudyNotesLoadingFallback = () => (
-  <div
-    className="flex items-center justify-center w-full h-48"
-    role="status"
-    aria-label="Loading"
-  >
-    <Loader2 className="size-7 animate-spin" />
-  </div>
-);
+import { NoticeAction } from "@/components/common/UserNotice";
+import { openLoginDialog } from "@/lib/engine/login-dialog";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 
 export const RirikkuCTABadge = () => {
   return (
@@ -70,12 +66,44 @@ const DetailsNotice = ({
   children: ReactNode;
 }) => (
   <div className="flex items-start px-3 py-2">
-    <Icon className="mr-2 text-yellow-600  size-4 dark:text-yellow-500" />
+    <Icon className="mr-2 mt-0.5 text-yellow-600 size-4 shrink-0 dark:text-yellow-500" />
     <p className="text-xs leading-relaxed text-left text-foreground">
       {children}
     </p>
   </div>
 );
+
+/**
+ * Logged out: log in for natural-sounding audio. Logged in: that audio,
+ * with the device's own voice when a file isn't available.
+ */
+const SpeechNote = () => {
+  const status = useAccountStatus();
+
+  if (status.kind === "signed-out") {
+    return (
+      <>
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for
+        natural-sounding speech 🔊 🎧. Until then, speak buttons use your
+        {" device's"} built-in voice, which may not work on every device.
+      </>
+    );
+  }
+  if (status.kind === "active") {
+    return (
+      <>
+        Speak buttons 🔊 🎧 play natural-sounding audio, and use your
+        {" device's"} built-in voice when audio isn&apos;t available.
+      </>
+    );
+  }
+  return (
+    <>
+      Speak buttons 🔊 🎧 use your {"device's"} built-in voice, which may not
+      work on every device.
+    </>
+  );
+};
 
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return (
@@ -85,8 +113,7 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
           Note
         </h3>
         <DetailsNotice icon={Volume2}>
-          Speak buttons 🔊 🎧 use your {"browser's"} built-in text-to-speech,
-          which may not work on some devices.
+          <SpeechNote />
         </DetailsNotice>
         <div className="mx-3 border-t border-dotted border-foreground/15" />
         <DetailsNotice icon={Bug}>
@@ -108,7 +135,6 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
-const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 const KanjiEssay = lazy(() => import("./KanjiEssay"));
 const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
@@ -126,6 +152,14 @@ const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
     </>
   );
 };
+
+const ReadingUsefulnessAccordion = ({ kanji }: { kanji: string }) => (
+  <SimpleAccordion trigger="Reading Usefulness">
+    <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
+      <ReadingUsefulnessTable kanji={kanji} />
+    </ErrorBoundary>
+  </SimpleAccordion>
+);
 
 export const KanjiDetails = ({
   kanji,
@@ -161,7 +195,6 @@ export const KanjiDetails = ({
           </Suspense>
         </ErrorBoundary>
       </SimpleAccordion>
-      <RepresentativeStudyWordAccordion kanji={kanji} />
       <SimpleAccordion trigger={`Textbook Vocabulary Containing ${kanji}`}>
         <ErrorBoundary details="TextbookVocabulary in KanjiDetails">
           <TextbookVocabulary kanji={kanji} />
@@ -183,7 +216,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Kanji Essay">
           <ErrorBoundary details="KanjiEssay in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <KanjiEssay
                 key={kanji}
                 kanji={kanji}
@@ -196,7 +229,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Visual Mnemonics">
           <ErrorBoundary details="VisualMnemonics in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <VisualMnemonics
                 key={kanji}
                 kanji={kanji}
@@ -206,18 +239,10 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
-      <SimpleAccordion trigger="Personal Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
-      <SimpleAccordion trigger={"Reading Usefulness"}>
-        <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
-          <ReadingFrequencyCategory kanji={kanji} />
-        </ErrorBoundary>
-      </SimpleAccordion>
+      <RepresentativeStudyWordAccordion kanji={kanji} />
+      <StudyNotesAccordion kanji={kanji} />
+      <YourProgressAccordion kanji={kanji} />
+      <ReadingUsefulnessAccordion kanji={kanji} />
       <SimpleAccordion
         trigger={`External Links for ${kanji}`}
         defaultOpen={true}

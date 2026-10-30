@@ -1,18 +1,24 @@
 import { ReactNode } from "react";
 
+export const CHART_TITLE =
+  "Cumulative Use vs Standard Competition Ranking (Frequency)";
+
 export const CumUseChartWrapper = ({
   legends,
+  showTitle,
   children,
 }: {
   legends: ReactNode;
+  /** False in the modal, whose header already carries the title. */
+  showTitle: boolean;
   children: ReactNode;
 }) => {
   return (
     <article className="flex justify-center flex-col items-center">
       <div className="w-full max-w-5xl">
-        <h1 className="font-bold text-lg md:text-xl my-3">
-          Cumulative Use vs Standard Competition Ranking (Frequency)
-        </h1>
+        {showTitle && (
+          <h1 className="font-bold text-lg md:text-xl my-3">{CHART_TITLE}</h1>
+        )}
 
         <div>{children}</div>
         <div className="flex flex-wrap justify-center">{legends}</div>

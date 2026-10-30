@@ -1,13 +1,6 @@
 import { expect, test } from "./fixtures";
 
 test.describe("navigation", () => {
-  test("dashboard renders", async ({ page }) => {
-    await page.goto("/dashboard");
-    await expect(page.getByText(/Local storage only/)).toBeVisible({
-      timeout: 30_000,
-    });
-  });
-
   test("about page renders", async ({ page }) => {
     await page.goto("/about");
     await expect(

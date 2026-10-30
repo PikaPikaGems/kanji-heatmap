@@ -2,6 +2,7 @@ import { SORT_ORDER_SELECT } from "@/lib/options/options-arr";
 import { SearchSettings } from "@/lib/settings/settings";
 
 import { PracticeButton } from "@/components/ui/practice-button";
+import { DialogActions } from "@/components/common/DialogActions";
 
 import { FreqRankTypeInfo } from "@/components/common/freq/FreqRankTypeInfo";
 import { StrokeCountField } from "@/components/common/StrokeCountField";
@@ -11,6 +12,7 @@ import { FrequencyRankDataSource } from "@/components/common/freq/FrequencyRankD
 import { FrequencyRankingRangeField } from "@/components/common/freq/FrequencyRankingRangeField";
 
 import { FilterSectionLayout } from "./FilterContentLayout";
+import { BookmarkedOnlyFilterToggle } from "./BookmarkedOnlyFilterToggle";
 import { FilterToggleRow } from "./FilterToggleRow";
 import { ItemCount } from "./ItemCount";
 import {
@@ -149,9 +151,7 @@ export const SortAndFilterSettingsForm = ({
           }
           toggleFiltersField={
             <>
-              <FilterToggleRow
-                id="filter-bookmarked-only"
-                label="Bookmarked only"
+              <BookmarkedOnlyFilterToggle
                 checked={filterValues.bookmarkedOnly}
                 onChange={form.setBookmarkedOnly}
               />
@@ -182,7 +182,7 @@ export const SortAndFilterSettingsForm = ({
             </div>
           )}
         </div>
-        <div className="flex justify-end px-0 pt-2 space-x-1">
+        <DialogActions className="pt-2">
           <PracticeButton
             variant="secondary"
             disabled={isClearDisabled}
@@ -197,7 +197,7 @@ export const SortAndFilterSettingsForm = ({
           <PracticeButton disabled={isDisabled} type="submit">
             Apply
           </PracticeButton>
-        </div>
+        </DialogActions>
       </div>
     </form>
   );

@@ -17,6 +17,7 @@ import { SpeakButtons } from "./SpeakButtons";
 import { AiExplainDialog } from "./AiExplainDialog";
 import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { useCurrentOwner } from "@/lib/engine/content-owner";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
 /** "almost": wrong, but at least half the blanks were right. */
@@ -26,6 +27,8 @@ export type FeedbackKind = "correct" | "almost" | "wrong" | "forgot";
 export type AnswerState = {
   open: boolean;
   item: FillTheKanjiItem;
+  /** Where the sentence is from, e.g. "N5 · Challenge 3 · Batch 7 · Sentence 4". */
+  source: string;
   kind: FeedbackKind;
   puzzle: Puzzle;
   /** The multiple choice tiles offered for this sentence. */
@@ -75,7 +78,7 @@ const TileChoices = ({
   getInfo: GetBasicKanjiInfo | undefined;
 }) => (
   <p
-    className="flex flex-wrap justify-center gap-x-2 pb-4 text-sm kanji-font"
+    className="flex flex-wrap justify-center pb-4 text-base gap-x-2 kanji-font"
     lang="ja"
   >
     {tiles.map((kanji, i) => {
@@ -101,8 +104,8 @@ const TileChoices = ({
 );
 
 /** Plain sentence, sentence with furigana, then the translation. */
-const clipboardText = (item: FillTheKanjiItem) =>
-  [plainSentence(item.jp), item.jp, item.en].join("\n");
+const clipboardText = (item: FillTheKanjiItem, source: string) =>
+  [source, plainSentence(item.jp), item.jp, item.en].join("\n");
 
 const CONFIRM_KEYS = ["Enter", " "] as const;
 
@@ -125,6 +128,8 @@ const NotesPopover = ({
   const [view, setView] = useState<NotesView>("closed");
   const explain = useAiExplain();
   const japaneseText = plainSentence(item.jp);
+  // The emoji set's items are single words: no grammar to explain.
+  const isWord = item.emoji != null;
   const triggerClassName = cn(
     cnDottedUnderlineTrigger,
     "text-xs text-foreground"
@@ -175,7 +180,7 @@ const NotesPopover = ({
                   className={triggerClassName}
                   onClick={() => {
                     setView("explain");
-                    void explain.run(japaneseText);
+                    void explain.run(japaneseText, { word: isWord });
                   }}
                 >
                   ✨ AI Explain
@@ -188,15 +193,19 @@ const NotesPopover = ({
       <AiExplainDialog
         key={japaneseText}
         open={view === "explain"}
-        onClose={() => {
-          explain.cancel();
-          setView("closed");
-        }}
+        // Closing doesn't cancel: the answer is still saved when it arrives.
+        onClose={() => setView("closed")}
         japaneseText={japaneseText}
-        speech={speech}
+        english={item.en}
+        word={isWord}
+        speakButtons={<SpeakButtons speech={speech} />}
         state={explain.state}
         onRegenerate={(instructions) =>
-          void explain.run(japaneseText, { fresh: true, instructions })
+          void explain.run(japaneseText, {
+            fresh: true,
+            instructions,
+            word: isWord,
+          })
         }
         onDelete={() => explain.remove(japaneseText)}
       />
@@ -221,6 +230,7 @@ export const AnswerDrawer = ({
   const open = answer?.open ?? false;
   const getKanjiInfo = useGetKanjiInfoFn();
   const [aiExplainSettings] = useAiExplainSettings();
+  const owner = useCurrentOwner();
 
   // Don't treat the Enter that submitted the answer as "Continue".
   useArmedConfirmKey({
@@ -230,9 +240,11 @@ export const AnswerDrawer = ({
   });
 
   if (!answer) return null;
-  const { item, kind, puzzle, tiles, filled, blankResults } = answer;
+  const { item, source, kind, puzzle, tiles, filled, blankResults } = answer;
   const hasNotes = item.notes !== "" || item.tags.length > 0;
-  const showAiExplain = isAiExplainReady(aiExplainSettings);
+  // Nobody's saved answers show until the owner is known.
+  const showAiExplain =
+    owner.status === "known" && isAiExplainReady(aiExplainSettings);
 
   return (
     <PracticeDrawerShell
@@ -249,7 +261,7 @@ export const AnswerDrawer = ({
             getInfo={getKanjiInfo ?? undefined}
             className="text-4xl sm:text-[2.5rem] text-foreground"
           />
-          <p className="pt-1 text-xs text-foreground">{item.en}</p>
+          <p className="pt-4 text-xs text-foreground">{item.en}</p>
         </div>
       }
       footer={
@@ -271,9 +283,14 @@ export const AnswerDrawer = ({
         <span className="text-muted-foreground" aria-hidden>
           ·
         </span>
-        <CopyButton textToCopy={clipboardText(item)} iconType="clipboard" />
+        <CopyButton
+          textToCopy={clipboardText(item, source)}
+          iconType="clipboard"
+        />
         {(hasNotes || showAiExplain) && (
           <NotesPopover
+            // Remounts on login/logout: the open answer belongs to one owner.
+            key={owner.status === "known" ? owner.ownerId : undefined}
             item={item}
             showAiExplain={showAiExplain}
             speech={speech}

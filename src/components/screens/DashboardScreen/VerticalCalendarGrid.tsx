@@ -2,6 +2,7 @@ import {
   ActivityByDay,
   ActivityKindFilters,
   monthLabelsForWeeks,
+  type RatingsByDay,
   toLocalDateKey,
   VERTICAL_MONTH_HALF_ROWS,
 } from "@/lib/activity";
@@ -16,11 +17,13 @@ import { CalendarDayCell } from "./CalendarGrid";
 export const VerticalCalendarGrid = ({
   columns,
   byDay,
+  ratingsByDay,
   filters,
   maxN,
 }: {
   columns: (string | null)[][];
-  byDay: ActivityByDay;
+  byDay: ActivityByDay | null;
+  ratingsByDay: RatingsByDay | null;
   filters: ActivityKindFilters;
   maxN: number;
 }) => {
@@ -40,6 +43,7 @@ export const VerticalCalendarGrid = ({
             key={`${colIndex}-${dayIndex}`}
             dateKey={dateKey}
             byDay={byDay}
+            ratingsByDay={ratingsByDay}
             filters={filters}
             maxN={maxN}
             todayKey={todayKey}

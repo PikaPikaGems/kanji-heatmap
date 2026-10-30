@@ -7,7 +7,7 @@ import {
   usePracticeDeck,
 } from "@/components/shared-practice";
 import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
-import { TTS_DISCLAIMER } from "@/lib/tts";
+import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { PracticeItem, RecognitionPracticeSettings, SoundMode } from "./types";
 
@@ -74,9 +74,7 @@ export const InitialScreen = ({
             </div>
           )}
           {soundEnabled && soundType === "speak" && (
-            <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-              {TTS_DISCLAIMER}
-            </p>
+            <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
           )}
         </div>
       }

@@ -12,8 +12,14 @@ import {
 import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
 import { ProductionPracticeV1Screen } from "@/components/production-practice-v1";
 import {
+  ReadingMasteryScreen,
+  WritingMasteryScreen,
+} from "@/components/mastery-review";
+import {
   recognitionPracticePageMeta,
   productionPracticePageMeta,
+  readingMasteryPageMeta,
+  writingMasteryPageMeta,
   speedKatakanaPageMeta,
   fillTheKanjiPageMeta,
 } from "@/lib/pages/practice-pages";
@@ -82,6 +88,16 @@ const productionPracticeV1Page = {
   Component: ProductionPracticeV1Screen,
 };
 
+const readingMasteryPage = {
+  ...readingMasteryPageMeta,
+  Component: ReadingMasteryScreen,
+};
+
+const writingMasteryPage = {
+  ...writingMasteryPageMeta,
+  Component: WritingMasteryScreen,
+};
+
 const pageItems = {
   kanjiPage,
   cumUseGraphPage,
@@ -94,6 +110,8 @@ const pageItems = {
   fillTheKanjiPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  writingMasteryPage,
 };
 
 export default pageItems;

@@ -113,6 +113,21 @@ ANALYZE=true ANALYZE_TEMPLATE=flamegraph pnpm run build
 
 The visualizer settings are in `vite.config.ts`.
 
+### Study engine (optional)
+
+Optional features can from from your own engine.
+
+experimental-engine. Without it the app builds and runs without those features.
+To include it locally, build the engine and point at its `dist`:
+
+```bash
+KH_STUDY_ENGINE_ENTRY=/path/to/experimental-engine/dist pnpm run dev
+```
+
+Deploys get it from `scripts/fetch-study-engine.mjs`, which runs during
+`pnpm build` only when the `KH_STUDY_ENGINE_TOKEN` secret (a read-only GitHub
+token for that repo) is set, and builds the pinned commit into `.study-engine/`.
+
 ## Talk to us
 
 - [Discord](https://discord.gg/Ash8ZrGb4s)

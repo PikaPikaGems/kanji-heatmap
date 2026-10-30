@@ -1,5 +1,6 @@
+import { cn } from "@/lib/utils";
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { CopyButton } from "@/components/common/CopyButton";
 import {
   AiPrimaryButton,
@@ -46,13 +47,7 @@ export const GeneratedText = ({
   const result = state.result;
   const markdown = result ? normalizeAiMarkdown(result.markdown) : "";
 
-  if (state.status === "loading") {
-    return (
-      <p className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading saved AI content…
-      </p>
-    );
-  }
+  if (state.status === "loading") return <SectionLoading />;
 
   return (
     <div ref={topRef} className="space-y-4 text-left">
@@ -122,7 +117,8 @@ export const GeneratedText = ({
         </>
       )}
       <SavedStorageNotice kind="text" />
-      <div className="flex flex-wrap gap-2">
+      {/* Regenerate sits centered under the answer; Generate stays left. */}
+      <div className={cn("flex flex-wrap gap-2", result && "justify-center")}>
         {result ? (
           <RegenerateButton busy={busy} onClick={() => void runGenerate()} />
         ) : (
