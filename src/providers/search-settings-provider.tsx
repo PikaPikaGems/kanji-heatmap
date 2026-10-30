@@ -57,29 +57,30 @@ export function SearchSettingsProvider({ children }: { children: ReactNode }) {
     if (!SEARCH_SHARING_PAGES.includes(location)) {
       return;
     }
-    setSearchParams(
-      (prev) => {
-        const searchSettings = toSearchSettings(prev);
-        const partial1 = toSearchParams(
-          prev,
-          "textSearch",
-          searchSettings.textSearch
-        );
-        const partial2 = toSearchParams(
-          partial1,
-          "filterSettings",
-          searchSettings.filterSettings
-        );
-        const final = toSearchParams(
-          partial2,
-          "sortSettings",
-          searchSettings.sortSettings
-        );
-
-        return final;
-      },
-      { replace: true }
+    const current = window.location.search.replace(/^\?/, "");
+    const prev = new URLSearchParams(current);
+    const searchSettings = toSearchSettings(prev);
+    const partial1 = toSearchParams(
+      prev,
+      "textSearch",
+      searchSettings.textSearch
     );
+    const partial2 = toSearchParams(
+      partial1,
+      "filterSettings",
+      searchSettings.filterSettings
+    );
+    const final = toSearchParams(
+      partial2,
+      "sortSettings",
+      searchSettings.sortSettings
+    );
+
+    // Nothing to normalize: writing anyway would leave a bare `?` in the URL.
+    if (final.toString() === current) {
+      return;
+    }
+    setSearchParams(final, { replace: true });
   }, [setSearchParams, location]);
 
   // Effect needed: persists the page's search string to an external memory
