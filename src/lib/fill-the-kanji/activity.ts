@@ -5,8 +5,8 @@ const FILL_THE_KANJI_ACTIVITY_PREFIX = "fill_the_kanji_";
 
 /**
  * The engine generic-challenge activity type for a set: the set id with `-`
- * as `_`, e.g. n5 → fill_the_kanji_n5, everyday-phrases-onomatopoeia →
- * fill_the_kanji_everyday_phrases_onomatopoeia. A batch's challengeId is its
+ * as `_`, e.g. n5 → fill_the_kanji_n5, travel-emotions →
+ * fill_the_kanji_travel_emotions. A batch's challengeId is its
  * 1-based batch number.
  */
 export const fillTheKanjiActivityType = (setId: FillTheKanjiSetId): string =>
