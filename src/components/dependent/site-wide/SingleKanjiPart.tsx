@@ -20,7 +20,7 @@ export const SoundHint = ({
   phonetics: string[];
 }) => {
   return (
-    <div className="px-2 py-1.5 mx-auto text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
+    <div className="px-2 py-1.5 mx-auto mb-2 text-left border max-w-64 rounded-xl border-lime-400/40 bg-lime-400/5">
       <p className="font-normal leading-snug text-center whitespace-normal text-muted-foreground">
         Sound hint for kanji with <span className="kanji-font">{kanji}</span>:
       </p>
@@ -34,49 +34,6 @@ export const SoundHint = ({
         ))}
       </div>
     </div>
-  );
-};
-
-/**
- * A sound part shows only its sound hint. Otherwise a radical opens the
- * radical popover even when it is also a kanji (夕; the popover links to the
- * kanji), then a component opens the component popover.
- */
-const PartPopoverContent = ({
-  kanji,
-  keyword,
-  phonetics,
-  isRadical,
-  isComponent,
-  isKanji,
-}: {
-  kanji: string;
-  keyword?: string;
-  phonetics: string[];
-  isRadical: boolean;
-  isComponent: boolean;
-  isKanji: boolean;
-}) => {
-  // The reading is the family's, not necessarily this kanji's: 門 is もん,
-  // but kanji with 門 (間 簡 閑) are read かん.
-  if (phonetics.length > 0) {
-    return <SoundHint kanji={kanji} phonetics={phonetics} />;
-  }
-  if (isRadical) return <RadicalPopoverContent radical={kanji} />;
-  if (isComponent) {
-    return (
-      <ComponentPopoverContent
-        component={kanji}
-        keyword={keyword}
-        isKanji={isKanji}
-      />
-    );
-  }
-  return (
-    <>
-      <FakeComponentLink radical={kanji} keyword={keyword} />
-      <span className="italic font-normal">{"(Component)"}</span>
-    </>
   );
 };
 
@@ -98,25 +55,55 @@ export const SingleKanjiPart = ({
   // A phonetic component always opens, for its sound hint.
   const canOpenPopover =
     isKnownRadical(kanji, radicals) ||
-    componentEntry != null ||
-    phonetics.length > 0;
+    componentEntry != null;
 
   const content = (
     <div className="p-2 text-xs font-bold">
-      <PartPopoverContent
-        kanji={kanji}
-        keyword={componentKeyword}
-        phonetics={phonetics}
-        isRadical={isKnownRadical(kanji, radicals)}
-        isComponent={componentEntry != null}
-        isKanji={isKanji}
-      />
+      {/* The reading is the family's, not necessarily this kanji's: 門
+              is もん, but kanji with 門 (間 簡 閑) are read かん. */}
+      {phonetics.length > 0 && (
+        <SoundHint kanji={kanji} phonetics={phonetics} />
+      )}
+
+      {/* A radical opens the radical popover even when it is also a
+              kanji (夕); the popover links to the kanji. */}
+      {isKnownRadical(kanji, radicals) ? (
+        <RadicalPopoverContent radical={kanji} />
+      ) : componentEntry ? (
+        <ComponentPopoverContent
+          component={kanji}
+          keyword={componentKeyword}
+          isKanji={isKanji}
+        />
+      ) : (
+        <>
+          <FakeComponentLink radical={kanji} keyword={componentKeyword} />
+          <span className="italic font-normal">{"(Component)"}</span>
+        </>
+      )}
     </div>
   );
 
   const triggerClassName = `flex flex-col my-1 kanji-font text-3xl border-2 rounded-2xl p-2 ${canOpenPopover ? "hover:border-solid hover:border-neon-accent" : "cursor-default"} ${phonetics.length > 0 ? " border-lime-400" : "border-dotted"}`;
 
   if (!canOpenPopover) {
+    if (phonetics.length > 0) {
+      return (
+        <GenericPopover
+          modal
+          trigger={
+            <button type="button" className={triggerClassName}>
+              {kanji}
+            </button>
+          }
+          content={
+            <div className="m-2">
+              <SoundHint kanji={kanji} phonetics={phonetics} />
+            </div>
+          }
+        />
+      );
+    }
     return <div className={triggerClassName}>{kanji}</div>;
   }
 
