@@ -19,6 +19,7 @@ export const Pagination = ({
       className="rounded-lg h-7 w-7"
       disabled={page === 1}
       onClick={onPrev}
+      aria-label="Previous page"
     >
       <ArrowLeft />
     </Button>
@@ -31,6 +32,7 @@ export const Pagination = ({
       className="rounded-lg h-7 w-7"
       disabled={page === totalPages}
       onClick={onNext}
+      aria-label="Next page"
     >
       <ArrowRight />
     </Button>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { SyncOperation } from "engine-contract";
-import { TextActionButton } from "@/components/common/AiActionButtons";
+import { Pagination } from "@/components/sections/KanjiDetails/Pagination";
 import { relativeTime } from "@/lib/engine/relative-time";
 import { keepLastReady, snapshotValue } from "@/lib/engine/store-cache";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
@@ -18,7 +18,8 @@ import {
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
-const PAGE_SIZE = 50;
+/** Rows per page, so the list fits the dialog without a long scroll. */
+const PAGE_SIZE = 10;
 
 const PendingRow = ({ op }: { op: SyncOperation }) => {
   const kanji = operationKanji(op);
@@ -69,29 +70,35 @@ const PendingPage = ({ offset }: { offset: number }) => {
   );
 };
 
-/** Changes still waiting to upload, 50 at a time. */
+/**
+ * Changes still waiting to upload, 10 per page with the drawer's
+ * "← 1 of 4 →" pagination. Only the page shown is read from the engine.
+ */
 export const PendingTab = ({ total }: { total: number }) => {
-  const [pages, setPages] = useState(1);
+  const [page, setPage] = useState(1);
 
   if (total === 0) {
     return (
       <EmptyOperations icon="✅">Nothing is waiting to upload.</EmptyOperations>
     );
   }
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  // Uploads shrink the list while it is open: stay on its last page.
+  const shown = Math.min(page, totalPages);
   return (
-    <div className="flex flex-col gap-3">
-      <OperationList>
-        {Array.from({ length: pages }, (_, page) => (
-          <PendingPage key={page} offset={page * PAGE_SIZE} />
-        ))}
-      </OperationList>
-      {total > pages * PAGE_SIZE && (
-        <TextActionButton
-          className="self-center"
-          onClick={() => setPages(pages + 1)}
-        >
-          Load more
-        </TextActionButton>
+    <div className="flex flex-col">
+      <div key={shown} className="animate-fade-in-fast">
+        <OperationList>
+          <PendingPage offset={(shown - 1) * PAGE_SIZE} />
+        </OperationList>
+      </div>
+      {totalPages > 1 && (
+        <Pagination
+          page={shown}
+          totalPages={totalPages}
+          onPrev={() => setPage(shown - 1)}
+          onNext={() => setPage(shown + 1)}
+        />
       )}
     </div>
   );
