@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>AI Provider Spike</title>
+    <style>
+      :root {
+        --bg: #fafafa;
+        --fg: #111;
+        --mut: #666;
+        --bd: #ddd;
+        --card: #fff;
+        --ok: #15803d;
+        --bad: #b91c1c;
+        --warn: #a16207;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0a0a;
+          --fg: #f5f5f5;
+          --mut: #a3a3a3;
+          --bd: #2a2a2a;
+          --card: #141414;
+          --ok: #4ade80;
+          --bad: #f87171;
+          --warn: #fbbf24;
+          color-scheme: dark;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 16px 16px 120px;
+        max-width: 720px;
+        margin-inline: auto;
+      }
+      h1 {
+        font-size: 1.3rem;
+        margin: 0 0 4px;
+      }
+      p.note {
+        color: var(--mut);
+        font-size: 0.85rem;
+        margin: 4px 0 12px;
+      }
+      details {
+        background: var(--card);
+        border: 1px solid var(--bd);
+        border-radius: 10px;
+        margin: 10px 0;
+      }
+      summary {
+        cursor: pointer;
+        padding: 12px 14px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      summary span {
+        font-weight: 400;
+        font-size: 0.8rem;
+        color: var(--mut);
+      }
+      .inner {
+        padding: 0 14px 14px;
+      }
+      label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 10px 0 3px;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        font: inherit;
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      button {
+        font: inherit;
+        font-size: 0.85rem;
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--bd);
+        background: var(--fg);
+        color: var(--bg);
+        cursor: pointer;
+      }
+      button.sec {
+        background: transparent;
+        color: var(--fg);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: progress;
+      }
+      .out {
+        margin-top: 10px;
+        font-size: 0.8rem;
+      }
+      .res {
+        border-top: 1px dashed var(--bd);
+        padding: 8px 0;
+        overflow-wrap: anywhere;
+      }
+      .res b {
+        font-size: 0.85rem;
+      }
+      .ok {
+        color: var(--ok);
+      }
+      .bad {
+        color: var(--bad);
+      }
+      .warn {
+        color: var(--warn);
+      }
+      pre {
+        white-space: pre-wrap;
+        font-size: 0.75rem;
+        background: var(--bg);
+        border: 1px solid var(--bd);
+        border-radius: 6px;
+        padding: 6px 8px;
+        margin: 4px 0 0;
+        max-height: 220px;
+        overflow: auto;
+      }
+      img {
+        max-width: 220px;
+        border-radius: 8px;
+        display: block;
+        margin-top: 6px;
+      }
+      audio {
+        width: 100%;
+        margin-top: 6px;
+      }
+      .rate {
+        display: flex;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .rate button {
+        background: transparent;
+        color: var(--fg);
+        padding: 4px 8px;
+      }
+      .rate button.on {
+        background: var(--fg);
+        color: var(--bg);
+      }
+      .bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--card);
+        border-top: 1px solid var(--bd);
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+      }
+      #copyBox {
+        display: none;
+        height: 140px;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>AI provider spike</h1>
+    <p class="note">
+      Throwaway test page for AI Study Tools. Paste a key, tap Check key, then
+      the tests. Keys stay in this tab's memory only: nothing is saved, and
+      closing the tab forgets them. Each test makes one small real request (a
+      few cents in total).
+    </p>
+    <label for="line">Japanese test line (speech tests)</label>
+    <select id="line">
+      <option value="0">
+        1 · 雨が降りそうだから、傘を持っていったほうがいいよ。
+      </option>
+      <option value="1">2 · 生きる、生ビール、先生、一生</option>
+      <option value="2">
+        3 · The kanji 水 appears in 水曜日, which means Wednesday.
+      </option>
+    </select>
+    <div id="providers"></div>
+    <div class="bar">
+      <button id="copy">Copy results</button>
+      <span class="note" id="count" style="margin: 0">0 results</span>
+    </div>
+    <textarea id="copyBox" readonly></textarea>
+
+    <script>
+      const LINES = [
+        "雨が降りそうだから、傘を持っていったほうがいいよ。",
+        "生きる、生ビール、先生、一生",
+        "The kanji 水 appears in 水曜日, which means Wednesday.",
+      ];
+      const TEXT_PROMPT =
+        "In two short sentences, what does the Japanese word 一生 mean? Cite one source.";
+      const IMAGE_PROMPT =
+        "A small friendly cartoon of a water droplet wearing a raincoat, simple flat colors, no text.";
+      const results = [];
+      const ratings = {};
+      const keys = {};
+      const $ = (s, el = document) => el.querySelector(s);
+      const lineText = () => LINES[Number($("#line").value)];
+      const lineNo = () => Number($("#line").value) + 1;
+
+      const mask = (provider, value) => {
+        let s = typeof value === "string" ? value : JSON.stringify(value);
+        const k = keys[provider];
+        if (k && s) s = s.split(k).join("[key]");
+        return s;
+      };
+
+      /** Fetch and classify: blocked for browsers (CORS), network error, or a response. */
+      async function call(provider, url, opts) {
+        const t0 = performance.now();
+        try {
+          const res = await fetch(url, opts);
+          const readable = [];
+          res.headers.forEach((_, name) => readable.push(name));
+          return { res, readable, ms: Math.round(performance.now() - t0) };
+        } catch (error) {
+          let reachable = false;
+          try {
+            await fetch(url, { mode: "no-cors" });
+            reachable = true;
+          } catch {
+            // Not reachable at all.
+          }
+          return {
+            error: reachable
+              ? "BLOCKED for browsers (CORS): the server answered, but the browser refused to hand over the response."
+              : `Network error: ${error}`,
+            blocked: reachable,
+          };
+        }
+      }
+
+      function record(provider, test, out, extra = {}) {
+        const entry = {
+          provider,
+          test,
+          browserAccess: out.error
+            ? out.blocked
+              ? "blocked"
+              : "network-error"
+            : "ok",
+          status: out.res ? out.res.status : null,
+          ms: out.ms ?? null,
+          readableHeaders: out.readable ?? [],
+          ...extra,
+        };
+        if (out.error) entry.error = out.error;
+        results.push(entry);
+        $("#count").textContent = `${results.length} results`;
+        const box = $(`#out-${provider}`);
+        const div = document.createElement("div");
+        div.className = "res";
+        const okClass =
+          entry.browserAccess !== "ok"
+            ? "bad"
+            : entry.status >= 200 && entry.status < 300
+              ? "ok"
+              : "warn";
+        div.innerHTML = `<b>${test}</b> <span class="${okClass}">${
+          entry.browserAccess === "ok"
+            ? `HTTP ${entry.status} · ${entry.ms} ms`
+            : entry.browserAccess
+        }</span>`;
+        const show = { ...entry };
+        delete show.provider;
+        delete show.test;
+        const pre = document.createElement("pre");
+        pre.textContent = mask(provider, JSON.stringify(show, null, 2));
+        div.appendChild(pre);
+        box.prepend(div);
+        return div;
+      }
+
+      async function errorBody(provider, res) {
+        try {
+          return mask(provider, (await res.text()).slice(0, 600));
+        } catch {
+          return "";
+        }
+      }
+
+      function attachAudio(div, provider, blob, label) {
+        const url = URL.createObjectURL(blob);
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = url;
+        div.appendChild(audio);
+        const id = `${provider} · line ${lineNo()} · ${label}`;
+        const rate = document.createElement("div");
+        rate.className = "rate";
+        for (const choice of ["Natural", "OK", "Unnatural"]) {
+          const b = document.createElement("button");
+          b.textContent = choice;
+          b.onclick = () => {
+            ratings[id] = choice;
+            rate
+              .querySelectorAll("button")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+          };
+          rate.appendChild(b);
+        }
+        div.appendChild(rate);
+      }
+
+      function attachImage(div, src) {
+        const img = document.createElement("img");
+        img.src = src;
+        div.appendChild(img);
+      }
+
+      /** Reads a server-sent-events body and returns every parsed data object. */
+      async function sseEvents(res) {
+        const text = await res.text();
+        const events = [];
+        for (const line of text.split("\n")) {
+          if (!line.startsWith("data:")) continue;
+          const data = line.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
+          try {
+            events.push(JSON.parse(data));
+          } catch {
+            // Partial or non-JSON line.
+          }
+        }
+        return events;
+      }
+
+      /** Gemini returns raw 16-bit PCM; wrap it in a WAV header to play it. */
+      function pcmToWav(b64, rate = 24000) {
+        const pcm = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+        const buf = new ArrayBuffer(44 + pcm.length);
+        const v = new DataView(buf);
+        const w = (o, s) =>
+          [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+        w(0, "RIFF");
+        v.setUint32(4, 36 + pcm.length, true);
+        w(8, "WAVE");
+        w(12, "fmt ");
+        v.setUint32(16, 16, true);
+        v.setUint16(20, 1, true);
+        v.setUint16(22, 1, true);
+        v.setUint32(24, rate, true);
+        v.setUint32(28, rate * 2, true);
+        v.setUint16(32, 2, true);
+        v.setUint16(34, 16, true);
+        w(36, "data");
+        v.setUint32(40, pcm.length, true);
+        new Uint8Array(buf, 44).set(pcm);
+        return {
+          blob: new Blob([buf], { type: "audio/wav" }),
+          pcmBytes: pcm.length,
+        };
+      }
+
+      const pickModel = (ids, patterns) => {
+        for (const p of patterns) {
+          const hit = ids
+            .filter((id) => p.test(id))
+            .sort()
+            .reverse()[0];
+          if (hit) return hit;
+        }
+        return "";
+      };
+
+      /* ---------- Providers ---------- */
+
+      const PROVIDERS = [
+        {
+          id: "openai",
+          name: "OpenAI",
+          note: "text · web search · images · speech",
+          fields: [
+            ["textModel", "Text model", ""],
+            ["imageModel", "Image model", "gpt-image-1-mini"],
+            ["ttsModel", "Speech model", "gpt-4o-mini-tts"],
+            ["voice", "Voice", "coral"],
+            [
+              "style",
+              "Speaking style",
+              "Speak natural, standard Tokyo Japanese at a calm, slightly slow pace, like a language teacher.",
+            ],
+          ],
+          auth: (k) => ({ Authorization: `Bearer ${k}` }),
+          async check(p, k, f) {
+            const out = await call(p.id, "https://api.openai.com/v1/models", {
+              headers: p.auth(k),
+            });
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            const ids = ((await out.res.json()).data ?? []).map((m) => m.id);
+            if (!f.textModel.value)
+              f.textModel.value = pickModel(ids, [
+                /^gpt-5(\.\d+)?-mini$/,
+                /^gpt-4\.1-mini$/,
+                /^gpt-4o-mini$/,
+                /^gpt-/,
+              ]);
+            record(p.id, "Check key", out, {
+              models: ids.length,
+              imageModels: ids.filter((i) => /image/.test(i)),
+              ttsModels: ids.filter((i) => /tts/.test(i)),
+            });
+          },
+          tests: {
+            async "Text (streamed)"(p, k, f) {
+              const out = await call(
+                p.id,
+                "https://api.openai.com/v1/chat/completions",
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model: f.textModel.value,
+                    stream: true,
+                    stream_options: { include_usage: true },
+                    messages: [{ role: "user", content: TEXT_PROMPT }],
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, "Text (streamed)", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const events = await sseEvents(out.res);
+              const usage =
+                events
+                  .map((e) => e.usage)
+                  .filter(Boolean)
+                  .pop() ?? null;
+              const text = events
+                .map((e) => e.choices?.[0]?.delta?.content ?? "")
+                .join("");
+              record(p.id, "Text (streamed)", out, {
+                usage,
+                text: text.slice(0, 300),
+              });
+            },
+            async "Text + web search"(p, k, f) {
+              const out = await call(
+                p.id,
+                "https://api.openai.com/v1/responses",
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model: f.textModel.value,
+                    input: TEXT_PROMPT,
+                    tools: [{ type: "web_search" }],
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, "Text + web search", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const searches = (body.output ?? []).filter(
+                (o) => o.type === "web_search_call"
+              ).length;
+              record(p.id, "Text + web search", out, {
+                usage: body.usage ?? null,
+                webSearchCalls: searches,
+                text: (body.output_text ?? "").slice(0, 300),
+              });
+            },
+            async Image(p, k, f) {
+              const out = await call(
+                p.id,
+                "https://api.openai.com/v1/images/generations",
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model: f.imageModel.value,
+                    prompt: IMAGE_PROMPT,
+                    size: "1024x1024",
+                    quality: "low",
+                    output_format: "webp",
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, "Image", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const b64 = body.data?.[0]?.b64_json;
+              const div = record(p.id, "Image", out, {
+                usage: body.usage ?? null,
+                imageKB: b64 ? Math.round((b64.length * 3) / 4 / 1024) : null,
+              });
+              if (b64) attachImage(div, `data:image/webp;base64,${b64}`);
+            },
+            async Speech(p, k, f) {
+              const test = `Speech line ${lineNo()}`;
+              const out = await call(
+                p.id,
+                "https://api.openai.com/v1/audio/speech",
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model: f.ttsModel.value,
+                    voice: f.voice.value,
+                    input: lineText(),
+                    instructions: f.style.value,
+                    response_format: "mp3",
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, test, out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const blob = await out.res.blob();
+              const div = record(p.id, test, out, {
+                audioKB: Math.round(blob.size / 1024),
+                characters: lineText().length,
+              });
+              attachAudio(div, p.id, blob, f.voice.value);
+            },
+          },
+        },
+        {
+          id: "elevenlabs",
+          name: "ElevenLabs",
+          note: "speech · account credits",
+          fields: [
+            ["voiceId", "Voice ID (filled from your voices)", ""],
+            ["model", "Model", "eleven_multilingual_v2"],
+            ["format", "Output format", "mp3_44100_64"],
+          ],
+          auth: (k) => ({ "xi-api-key": k }),
+          async check(p, k, f) {
+            const out = await call(
+              p.id,
+              "https://api.elevenlabs.io/v1/user/subscription",
+              {
+                headers: p.auth(k),
+              }
+            );
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key + credits", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            const s = await out.res.json();
+            record(p.id, "Check key + credits", out, {
+              character_count: s.character_count,
+              character_limit: s.character_limit,
+              next_reset: s.next_character_count_reset_unix
+                ? new Date(
+                    s.next_character_count_reset_unix * 1000
+                  ).toISOString()
+                : null,
+              tier: s.tier,
+            });
+            const v = await call(p.id, "https://api.elevenlabs.io/v1/voices", {
+              headers: p.auth(k),
+            });
+            if (v.error || !v.res.ok) return record(p.id, "List voices", v);
+            const voices = (await v.res.json()).voices ?? [];
+            const sel = document.createElement("select");
+            for (const voice of voices) {
+              const o = document.createElement("option");
+              o.value = voice.voice_id;
+              o.textContent = `${voice.name}${voice.labels?.language ? ` · ${voice.labels.language}` : ""}${voice.labels?.accent ? ` · ${voice.labels.accent}` : ""}`;
+              sel.appendChild(o);
+            }
+            sel.onchange = () => (f.voiceId.value = sel.value);
+            f.voiceId.after(sel);
+            if (!f.voiceId.value && voices[0])
+              f.voiceId.value = voices[0].voice_id;
+            record(p.id, "List voices", v, { voices: voices.length });
+          },
+          tests: {
+            async Speech(p, k, f) {
+              const test = `Speech line ${lineNo()}`;
+              const out = await call(
+                p.id,
+                `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(f.voiceId.value)}?output_format=${encodeURIComponent(f.format.value)}`,
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    text: lineText(),
+                    model_id: f.model.value,
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, test, out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const costHeaders = {};
+              for (const h of [
+                "character-cost",
+                "x-character-count",
+                "request-id",
+                "history-item-id",
+              ])
+                costHeaders[h] = out.res.headers.get(h);
+              const blob = await out.res.blob();
+              const div = record(p.id, test, out, {
+                costHeaders,
+                audioKB: Math.round(blob.size / 1024),
+                characters: lineText().length,
+              });
+              attachAudio(div, p.id, blob, f.model.value);
+            },
+          },
+        },
+        {
+          id: "fish",
+          name: "Fish Audio",
+          note: "speech · balance",
+          fields: [
+            ["model", "Model (sent as the model header)", "s1"],
+            [
+              "referenceId",
+              "Voice model ID (optional; pick a Japanese voice on fish.audio)",
+              "",
+            ],
+          ],
+          auth: (k) => ({ Authorization: `Bearer ${k}` }),
+          async check(p, k) {
+            const out = await call(
+              p.id,
+              "https://api.fish.audio/wallet/self/api-credit",
+              {
+                headers: p.auth(k),
+              }
+            );
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key + balance", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            record(p.id, "Check key + balance", out, {
+              balance: await out.res.json(),
+            });
+          },
+          tests: {
+            async Speech(p, k, f) {
+              const test = `Speech line ${lineNo()}`;
+              const body = { text: lineText(), format: "mp3", mp3_bitrate: 64 };
+              if (f.referenceId.value) body.reference_id = f.referenceId.value;
+              const out = await call(p.id, "https://api.fish.audio/v1/tts", {
+                method: "POST",
+                headers: {
+                  ...p.auth(k),
+                  "Content-Type": "application/json",
+                  model: f.model.value,
+                },
+                body: JSON.stringify(body),
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, test, out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const blob = await out.res.blob();
+              const div = record(p.id, test, out, {
+                audioKB: Math.round(blob.size / 1024),
+                utf8Bytes: new TextEncoder().encode(lineText()).length,
+              });
+              attachAudio(div, p.id, blob, f.model.value);
+            },
+          },
+        },
+        {
+          id: "gemini",
+          name: "Google Gemini",
+          note: "text · Google Search · images · speech",
+          fields: [
+            ["textModel", "Text model", ""],
+            ["imageModel", "Image model", ""],
+            ["ttsModel", "Speech model", ""],
+            ["voice", "Voice", "Kore"],
+            [
+              "style",
+              "Speaking style",
+              "Read this in natural standard Japanese, calmly and a little slowly, like a teacher:",
+            ],
+          ],
+          auth: (k) => ({ "x-goog-api-key": k }),
+          base: "https://generativelanguage.googleapis.com/v1beta",
+          async check(p, k, f) {
+            const out = await call(p.id, `${p.base}/models?pageSize=200`, {
+              headers: p.auth(k),
+            });
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            const ids = ((await out.res.json()).models ?? []).map((m) =>
+              m.name.replace("models/", "")
+            );
+            if (!f.textModel.value)
+              f.textModel.value = pickModel(ids, [
+                /^gemini-[\d.]+-flash$/,
+                /^gemini-.*flash(?!.*(image|tts|live|lite))/,
+                /^gemini-/,
+              ]);
+            if (!f.imageModel.value)
+              f.imageModel.value = pickModel(ids, [
+                /^gemini-.*flash.*image/,
+                /image/,
+              ]);
+            if (!f.ttsModel.value)
+              f.ttsModel.value = pickModel(ids, [
+                /^gemini-.*flash.*tts/,
+                /tts/,
+              ]);
+            record(p.id, "Check key", out, {
+              models: ids.length,
+              imageModels: ids.filter((i) => /image/.test(i)),
+              ttsModels: ids.filter((i) => /tts/.test(i)),
+            });
+          },
+          async generate(p, k, model, body) {
+            return call(
+              p.id,
+              `${p.base}/models/${encodeURIComponent(model)}:generateContent`,
+              {
+                method: "POST",
+                headers: { ...p.auth(k), "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+              }
+            );
+          },
+          tests: {
+            async "Text + Google Search"(p, k, f) {
+              const out = await p.generate(p, k, f.textModel.value, {
+                contents: [{ parts: [{ text: TEXT_PROMPT }] }],
+                tools: [{ google_search: {} }],
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, "Text + Google Search", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const cand = body.candidates?.[0];
+              record(p.id, "Text + Google Search", out, {
+                usageMetadata: body.usageMetadata ?? null,
+                searchQueries: cand?.groundingMetadata?.webSearchQueries ?? [],
+                sources: (cand?.groundingMetadata?.groundingChunks ?? [])
+                  .length,
+                text: (cand?.content?.parts ?? [])
+                  .map((x) => x.text ?? "")
+                  .join("")
+                  .slice(0, 300),
+              });
+            },
+            async Image(p, k, f) {
+              const out = await p.generate(p, k, f.imageModel.value, {
+                contents: [{ parts: [{ text: IMAGE_PROMPT }] }],
+                generationConfig: { responseModalities: ["IMAGE"] },
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, "Image", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const part = (body.candidates?.[0]?.content?.parts ?? []).find(
+                (x) => x.inlineData
+              );
+              const div = record(p.id, "Image", out, {
+                usageMetadata: body.usageMetadata ?? null,
+                mimeType: part?.inlineData?.mimeType ?? null,
+                imageKB: part
+                  ? Math.round((part.inlineData.data.length * 3) / 4 / 1024)
+                  : null,
+              });
+              if (part)
+                attachImage(
+                  div,
+                  `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`
+                );
+            },
+            async Speech(p, k, f) {
+              const test = `Speech line ${lineNo()}`;
+              const out = await p.generate(p, k, f.ttsModel.value, {
+                contents: [
+                  { parts: [{ text: `${f.style.value} ${lineText()}` }] },
+                ],
+                generationConfig: {
+                  responseModalities: ["AUDIO"],
+                  speechConfig: {
+                    voiceConfig: {
+                      prebuiltVoiceConfig: { voiceName: f.voice.value },
+                    },
+                  },
+                },
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, test, out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const part = (body.candidates?.[0]?.content?.parts ?? []).find(
+                (x) => x.inlineData
+              );
+              if (!part)
+                return record(p.id, test, out, {
+                  body: "No audio part returned",
+                });
+              const rate = Number(
+                (part.inlineData.mimeType.match(/rate=(\d+)/) ?? [])[1] ?? 24000
+              );
+              const { blob, pcmBytes } = pcmToWav(part.inlineData.data, rate);
+              const seconds = pcmBytes / (rate * 2);
+              const div = record(p.id, test, out, {
+                usageMetadata: body.usageMetadata ?? null,
+                mimeType: part.inlineData.mimeType,
+                seconds: Math.round(seconds * 10) / 10,
+                wavMBPerMinute:
+                  Math.round((((pcmBytes / seconds) * 60) / 1048576) * 10) / 10,
+              });
+              attachAudio(div, p.id, blob, f.voice.value);
+            },
+          },
+        },
+        {
+          id: "xai",
+          name: "xAI (Grok)",
+          note: "already works in the app · usage check",
+          fields: [
+            ["textModel", "Text model", "grok-4.3"],
+            ["voice", "Voice", "ara"],
+          ],
+          auth: (k) => ({ Authorization: `Bearer ${k}` }),
+          async check(p, k) {
+            const out = await call(
+              p.id,
+              "https://api.x.ai/v1/language-models",
+              { headers: p.auth(k) }
+            );
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            record(p.id, "Check key", out, {
+              models: ((await out.res.json()).models ?? []).map((m) => m.id),
+            });
+          },
+          tests: {
+            async "Text + web search"(p, k, f) {
+              const out = await call(p.id, "https://api.x.ai/v1/responses", {
+                method: "POST",
+                headers: { ...p.auth(k), "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  model: f.textModel.value,
+                  input: [{ role: "user", content: TEXT_PROMPT }],
+                  tools: [{ type: "web_search" }],
+                  store: false,
+                }),
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, "Text + web search", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              record(p.id, "Text + web search", out, {
+                usage: body.usage ?? null,
+              });
+            },
+            async Speech(p, k, f) {
+              const test = `Speech line ${lineNo()}`;
+              const out = await call(p.id, "https://api.x.ai/v1/tts", {
+                method: "POST",
+                headers: { ...p.auth(k), "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  text: lineText(),
+                  voice_id: f.voice.value,
+                  language: "ja",
+                  output_format: {
+                    codec: "mp3",
+                    sample_rate: 24000,
+                    bit_rate: 64000,
+                  },
+                }),
+              });
+              if (out.error || !out.res.ok)
+                return record(p.id, test, out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const blob = await out.res.blob();
+              const div = record(p.id, test, out, {
+                audioKB: Math.round(blob.size / 1024),
+                characters: lineText().length,
+              });
+              attachAudio(div, p.id, blob, f.voice.value);
+            },
+          },
+        },
+        {
+          id: "anthropic",
+          name: "Anthropic (Claude)",
+          note: "text · web search · usage check",
+          fields: [["model", "Model", "claude-opus-5-5"]],
+          auth: (k) => ({
+            "x-api-key": k,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true",
+          }),
+          async check(p, k) {
+            const out = await call(
+              p.id,
+              "https://api.anthropic.com/v1/models",
+              { headers: p.auth(k) }
+            );
+            if (out.error || !out.res.ok)
+              return record(p.id, "Check key", out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            record(p.id, "Check key", out, {
+              models: ((await out.res.json()).data ?? []).map((m) => m.id),
+            });
+          },
+          tests: {
+            async "Text + web search"(p, k, f) {
+              const model = f.model.value;
+              // The newer search tool runs on Opus/Sonnet 4.6+; Haiku keeps the basic one.
+              const toolType = /haiku/.test(model)
+                ? "web_search_20250305"
+                : "web_search_20260209";
+              const out = await call(
+                p.id,
+                "https://api.anthropic.com/v1/messages",
+                {
+                  method: "POST",
+                  headers: { ...p.auth(k), "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model,
+                    max_tokens: 4000,
+                    output_config: { effort: "low" },
+                    tools: [
+                      { type: toolType, name: "web_search", max_uses: 2 },
+                    ],
+                    messages: [{ role: "user", content: TEXT_PROMPT }],
+                  }),
+                }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, "Text + web search", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              record(p.id, "Text + web search", out, {
+                toolType,
+                stop_reason: body.stop_reason,
+                usage: body.usage ?? null,
+                text: (body.content ?? [])
+                  .filter((b) => b.type === "text")
+                  .map((b) => b.text)
+                  .join("")
+                  .slice(0, 300),
+              });
+            },
+          },
+        },
+      ];
+
+      /* ---------- UI ---------- */
+
+      for (const p of PROVIDERS) {
+        const d = document.createElement("details");
+        d.innerHTML = `<summary>${p.name}<span>${p.note}</span></summary><div class="inner"></div>`;
+        const inner = $(".inner", d);
+        const f = {};
+        const keyLabel = document.createElement("label");
+        keyLabel.textContent = "API key";
+        const keyInput = document.createElement("input");
+        keyInput.type = "password";
+        keyInput.autocomplete = "off";
+        keyInput.spellcheck = false;
+        keyInput.oninput = () => (keys[p.id] = keyInput.value.trim());
+        inner.append(keyLabel, keyInput);
+        for (const [name, label, value] of p.fields) {
+          const l = document.createElement("label");
+          l.textContent = label;
+          const input = document.createElement("input");
+          input.value = value;
+          input.spellcheck = false;
+          f[name] = input;
+          inner.append(l, input);
+        }
+        const row = document.createElement("div");
+        row.className = "row";
+        const run = (fn) => async (e) => {
+          const k = keys[p.id];
+          if (!k) return alert("Paste the key first.");
+          e.target.disabled = true;
+          try {
+            await fn(p, k, f);
+          } catch (error) {
+            record(p.id, "Script error", { error: String(error) });
+          } finally {
+            e.target.disabled = false;
+          }
+        };
+        const check = document.createElement("button");
+        check.textContent = "Check key";
+        check.onclick = run(p.check);
+        row.appendChild(check);
+        for (const [name, fn] of Object.entries(p.tests)) {
+          const b = document.createElement("button");
+          b.className = "sec";
+          b.textContent = name;
+          b.onclick = run(fn);
+          row.appendChild(b);
+        }
+        const out = document.createElement("div");
+        out.className = "out";
+        out.id = `out-${p.id}`;
+        inner.append(row, out);
+        $("#providers").appendChild(d);
+      }
+
+      $("#copy").onclick = async () => {
+        const report = {
+          when: new Date().toISOString(),
+          origin: location.origin,
+          userAgent: navigator.userAgent,
+          results: results.map((r) =>
+            JSON.parse(mask(r.provider, JSON.stringify(r)))
+          ),
+          listening: ratings,
+        };
+        const text = JSON.stringify(report, null, 2);
+        const box = $("#copyBox");
+        box.value = text;
+        try {
+          await navigator.clipboard.writeText(text);
+          $("#copy").textContent = "Copied";
+        } catch {
+          box.style.display = "block";
+          box.select();
+          $("#copy").textContent = "Select and copy below";
+        }
+        setTimeout(() => ($("#copy").textContent = "Copy results"), 2000);
+      };
+    </script>
+  </body>
+</html>
