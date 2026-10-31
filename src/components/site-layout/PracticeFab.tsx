@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Gamepad2 } from "lucide-react";
+import { RocketIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -66,7 +66,7 @@ export const PracticeFab = () => {
           onMouseEnter={prefetchPracticeRoutes}
           onFocus={prefetchPracticeRoutes}
         >
-          <Gamepad2 />
+          <RocketIcon />
           {totalDue(due) > 0 && (
             <NotificationDot className="absolute top-1/2 left-[calc(50%+1.2rem)] -translate-y-1/2" />
           )}

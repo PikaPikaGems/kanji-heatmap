@@ -1,5 +1,5 @@
 import {
-  Brain,
+  GraduationCap,
   ChartSpline,
   Eye,
   Keyboard,
@@ -71,7 +71,7 @@ export const masteryPageMeta = {
 export const floatingIslandNavLinks: NavLinkItem[] = [
   { ...dashboardPageMeta, Icon: LayoutDashboard },
   { ...exploreKanjiPageMeta, Icon: SearchIcon },
-  { ...masteryPageMeta, Icon: Brain },
+  { ...masteryPageMeta, Icon: GraduationCap },
 ];
 
 // Menu entries (sidebar + practice FAB). The mastery links carry no star of
@@ -163,7 +163,7 @@ export const headerNavSections: NavLinkSection[] = [
     heading: "Kanji Mastery",
     starred: true,
     links: [
-      { ...masteryPageMeta, Icon: Brain },
+      { ...masteryPageMeta, Icon: GraduationCap },
       writingMasteryNavLink,
       readingMasteryNavLink,
       readingMastery2NavLink,

@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Info } from "lucide-react";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -74,8 +74,8 @@ const splitMeanings = (gloss: string) =>
     .filter(Boolean);
 
 /**
- * The 👁 at the bottom of a word card: opens the word's speak button and its
- * English meanings (not the word, which the card already shows).
+ * The ⓘ in a word card's top-right corner: opens the word's speak button and
+ * its English meanings (not the word, which the card already shows).
  */
 const WordHintPopover = ({ word, gloss }: { word: string; gloss: string }) => {
   const meanings = splitMeanings(gloss);
@@ -85,9 +85,9 @@ const WordHintPopover = ({ word, gloss }: { word: string; gloss: string }) => {
         <button
           type="button"
           aria-label="Show the meaning"
-          className="flex items-center justify-center transition-colors rounded-full size-7 text-muted-foreground hover:text-foreground hover:bg-foreground/10 data-[state=open]:bg-foreground/10 data-[state=open]:text-foreground"
+          className="absolute flex items-center justify-center transition-colors rounded-full top-1.5 right-1.5 size-6 text-muted-foreground hover:text-foreground hover:bg-foreground/10 data-[state=open]:bg-foreground/10 data-[state=open]:text-foreground"
         >
-          <Eye aria-hidden className="size-4" />
+          <Info aria-hidden className="size-3.5" />
         </button>
       }
       contentClassName="w-72 max-w-[calc(100vw-1.5rem)] p-3 text-sm text-left"
@@ -113,8 +113,8 @@ const WordHintPopover = ({ word, gloss }: { word: string; gloss: string }) => {
 
 /**
  * The card's words with the target kanji blanked, each in its own dashed
- * card with its reading badges under it and a 👁 that opens its meaning and
- * speak button. Kanji without a secondary word show the main word alone.
+ * card with its reading badges under it and an ⓘ in the corner that opens
+ * its meaning and speak button. Kanji without a secondary word show the main word alone.
  */
 export const ClozeWords = ({
   item,
@@ -141,7 +141,7 @@ export const ClozeWords = ({
       {words.map((word) => (
         <div
           key={word.word}
-          className="flex flex-col items-center justify-between min-w-0 gap-2 px-4 pt-4 pb-2 border border-dashed rounded-2xl border-foreground/15"
+          className="relative flex flex-col items-center justify-between min-w-0 gap-2 px-4 pb-5 border border-dashed pt-7 rounded-2xl border-foreground/15"
         >
           <p
             className={cn(
