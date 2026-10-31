@@ -26,7 +26,7 @@ export const AnswerFeedback = ({
 
   return (
     <div
-      className="flex flex-col items-center gap-3"
+      className="flex flex-col items-center gap-8"
       role="status"
       aria-live="polite"
       aria-label={correct ? "Correct" : "Forgot"}

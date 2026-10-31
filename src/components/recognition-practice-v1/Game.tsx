@@ -193,7 +193,7 @@ export const Game = ({
           }
         >
           <p
-            className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} ${current.word.length > 4 ? "lg:text-8xl" : "lg:text-9xl xl:text-[10rem]"} leading-tight break-all md:text-8xl whitespace-nowrap`}
+            className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} ${current.word.length > 4 ? "lg:text-8xl" : "lg:text-9xl xl:text-[10rem]"} leading-tight break-all md:text-8xl whitespace-nowrap pb-[0.15em]`}
           >
             {/* Once answered, each kanji opens its popover (before, its
                 readings would give the answer away). */}
@@ -209,7 +209,7 @@ export const Game = ({
           text={current.englishGloss}
           resetKey={index}
           forceReveal={feedback != null}
-          className="mt-1 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+          className="mt-2 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
         />
       </div>
 
