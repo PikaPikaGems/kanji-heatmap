@@ -3,6 +3,7 @@ import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
 import { formatInterval } from "@/lib/engine/format-interval";
+import { CARD_TYPE_LABELS } from "@/lib/engine/card-types";
 import { MasterySubsection } from "./MasterySubsection";
 import { TwoWaySwitch } from "../TwoWaySwitch";
 import {
@@ -12,11 +13,6 @@ import {
   topDifficultCards,
   type TopCard,
 } from "./mastery-tally";
-
-const CARD_TYPE_LABELS: Record<CardType, string> = {
-  reading: "Reading",
-  writing: "Writing",
-};
 
 /** What an empty list shows: an emoji, a short title, and what shows up here. */
 type EmptyList = { emoji: string; title: string; hint: string };

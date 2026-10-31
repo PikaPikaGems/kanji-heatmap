@@ -12,6 +12,7 @@ import {
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
 import { getBandLabels } from "@/lib/engine/mastery-heatmap-metrics";
+import { ALL_CARD_TYPES, cardProgress } from "@/lib/engine/card-types";
 import {
   isCardStarted,
   itemBand,
@@ -174,20 +175,24 @@ export type TopCard = {
 };
 
 const TOP_COUNT = 10;
-const CARD_TYPES: readonly CardType[] = ["reading", "writing"];
-
 const cardsWhere = (
   pile: readonly ReviewPileItemView[],
   keep: (card: CardProgress) => boolean
 ): TopCard[] =>
   pile.flatMap((item) =>
-    CARD_TYPES.filter((cardType) => keep(item[cardType])).map((cardType) => ({
-      kanji: item.kanji,
-      cardType,
-      difficulty: item[cardType].difficulty,
-      stability: item[cardType].stability,
-      lastReviewedAt: item[cardType].lastReviewedAt,
-    }))
+    ALL_CARD_TYPES.flatMap((cardType) => {
+      const card = cardProgress(item, cardType);
+      if (!card || !keep(card)) return [];
+      return [
+        {
+          kanji: item.kanji,
+          cardType,
+          difficulty: card.difficulty,
+          stability: card.stability,
+          lastReviewedAt: card.lastReviewedAt,
+        },
+      ];
+    })
   );
 
 /** FSRS difficulty (1–10) a card must exceed to count as "most difficult". */

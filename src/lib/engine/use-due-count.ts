@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CardType } from "engine-contract";
+import { ALL_CARD_TYPES } from "./card-types";
 import { useAccountStatus } from "./use-account-status";
 import { useEngineApi, useEngineQuery } from "./use-engine-query";
 
@@ -42,19 +43,18 @@ export const useDueCount = (): DueCounts | null => {
 
     let cancelled = false;
     const refresh = () => {
-      void Promise.all([
-        api.reviews.getDueCount("reading"),
-        api.reviews.getDueCount("writing"),
-      ]).then(([reading, writing]) => {
+      void Promise.all(
+        ALL_CARD_TYPES.map((cardType) => api.reviews.getDueCount(cardType))
+      ).then((results) => {
         if (cancelled) return;
-        const next = {
-          reading: reading.ok ? reading.value : 0,
-          writing: writing.ok ? writing.value : 0,
-        };
+        const next = Object.fromEntries(
+          ALL_CARD_TYPES.map((cardType, i) => {
+            const result = results[i];
+            return [cardType, result.ok ? result.value : 0];
+          })
+        ) as DueCounts;
         setCounts((prev) =>
-          prev?.reading === next.reading && prev.writing === next.writing
-            ? prev
-            : next
+          prev && ALL_CARD_TYPES.every((t) => prev[t] === next[t]) ? prev : next
         );
       });
     };
@@ -79,6 +79,6 @@ export const useDueCount = (): DueCounts | null => {
   return active ? counts : null;
 };
 
-/** Reading plus writing cards due; 0 while unknown. */
+/** Cards due across every card type; 0 while unknown. */
 export const totalDue = (counts: DueCounts | null): number =>
-  counts ? counts.reading + counts.writing : 0;
+  counts ? counts.reading + counts.secondaryReading + counts.writing : 0;
