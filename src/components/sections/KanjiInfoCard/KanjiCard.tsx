@@ -14,7 +14,7 @@ import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
 import { HintChip } from "@/components/common/HintChip";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useFlashHint } from "@/hooks/use-flash-hint";
@@ -91,14 +91,14 @@ export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
 };
 
 const RepWordKanji = ({ kanji }: { kanji: string }) => {
-  const repWord = useKanjiRepresentativeWordDetails(kanji);
+  const repWord = useKanjiAnchorWords(kanji)?.main;
 
   return (
     <>
       {repWord && (
         <div className="flex justify-center gap-2 m-auto">
           <span className="text-sm kanji-font">
-            {repWord.tags?.[0]} {repWord.word} ({repWord.reading})
+            {repWord.tier} {repWord.word} ({repWord.readings.join("・")})
           </span>
         </div>
       )}

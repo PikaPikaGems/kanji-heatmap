@@ -65,7 +65,7 @@ export const useMasterySession = ({
 }: {
   cardType: CardType;
   /** Practice item for a kanji (null: no usable word, the card is skipped). */
-  getItem: ((kanji: string) => PracticeItem | null) | null;
+  getItem: ((kanji: string, word: string) => PracticeItem | null) | null;
 }) => {
   const api = useEngineApi();
   const [state, setState] = useState<MasteryState>({ status: "start" });
@@ -107,8 +107,7 @@ export const useMasterySession = ({
       const card = queue.cards[queue.next];
       queue.next += 1;
 
-      const item = getItem?.(card.kanji);
-      if (!item) continue;
+      if (!getItem) continue;
 
       const opened = await engine.reviews.beginReview({
         kanji: card.kanji,
@@ -121,6 +120,13 @@ export const useMasterySession = ({
       if (run !== runRef.current) {
         void engine.reviews.cancel(opened.value.handleId);
         return;
+      }
+      // The card asks about the word it was added with; skip it when that
+      // word is no longer one of the kanji's anchor words.
+      const item = getItem(card.kanji, opened.value.word);
+      if (!item) {
+        void engine.reviews.cancel(opened.value.handleId);
+        continue;
       }
       openCardRef.current = { handleId: opened.value.handleId, item };
       setState({

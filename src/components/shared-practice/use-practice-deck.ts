@@ -1,11 +1,10 @@
 import { useMemo } from "react";
-import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import {
   useGetKanjiInfoFn,
-  useIsKanjiWorkerReady,
   useKanjiSearch,
-  useWorkerQuery,
 } from "@/kanji-worker/kanji-worker-hooks";
+import type { AnchorWordBasics } from "@/lib/kanji/anchor-words";
+import { useGetAnchorWordsFn } from "@/providers/kanji-representative-word-hooks";
 import {
   defaultFilterSettings,
   defaultSearchTextSettings,
@@ -16,45 +15,15 @@ import { SearchSettings } from "@/lib/settings/settings";
 import { buildPracticeDeck } from "./build-deck";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
-type RepEntry = [string, string, string, string];
-
 /**
- * Loads the representative-word data and builds the filtered practice deck —
- * the identical data flow both practice InitialScreens used to duplicate.
+ * Loads the anchor words and builds the filtered practice deck of each
+ * kanji's main word — the identical data flow both practice InitialScreens
+ * used to duplicate.
  */
 export const usePracticeDeck = (settings: DeckFilterSettings) => {
   const getInfo = useGetKanjiInfoFn();
-  const ready = useIsKanjiWorkerReady();
+  const getAnchorWords = useGetAnchorWordsFn();
   const bookmarks = useBookmarkedKanji();
-
-  // Word and reading come from the snapshot; the gloss and tag are fetched
-  // once, here, because the deck displays them.
-  const { data: repDetails, status: repStatus } = useWorkerQuery<
-    Record<string, [string, string]>
-  >(
-    ready
-      ? () => KANJI_WORKER_SINGLETON.request({ type: "rep-word-details" })
-      : null,
-    [ready]
-  );
-
-  const repWords = useMemo(() => {
-    if (repDetails == null || getInfo == null) return null;
-
-    const entries: Record<string, RepEntry> = {};
-    for (const kanji of Object.keys(repDetails)) {
-      const info = getInfo(kanji);
-      if (info?.repWord == null) continue;
-      const [englishGloss, emojiTag] = repDetails[kanji];
-      entries[kanji] = [
-        info.repWord,
-        info.repReading ?? "",
-        englishGloss,
-        emojiTag,
-      ];
-    }
-    return entries;
-  }, [repDetails, getInfo]);
 
   const searchSettings = useMemo<SearchSettings>(
     () => ({
@@ -71,9 +40,16 @@ export const usePracticeDeck = (settings: DeckFilterSettings) => {
   const filteredKanji = useKanjiSearch(searchSettings);
 
   const deck: PracticeItem[] = useMemo(() => {
-    if (!getInfo || !repWords || filteredKanji.status !== "success") return [];
+    if (!getInfo || !getAnchorWords || filteredKanji.status !== "success") {
+      return [];
+    }
+    const words: Record<string, AnchorWordBasics> = {};
+    for (const kanji of filteredKanji.data ?? []) {
+      const main = getAnchorWords(kanji)?.main;
+      if (main) words[kanji] = main;
+    }
     return buildPracticeDeck({
-      repWords,
+      words,
       includedKanji: new Set(filteredKanji.data),
       bookmarkedKanji:
         bookmarks.status === "absent" ? undefined : bookmarks.kanji,
@@ -84,7 +60,7 @@ export const usePracticeDeck = (settings: DeckFilterSettings) => {
     filteredKanji.data,
     filteredKanji.status,
     getInfo,
-    repWords,
+    getAnchorWords,
     settings,
     bookmarks.status,
     bookmarks.kanji,
@@ -94,8 +70,7 @@ export const usePracticeDeck = (settings: DeckFilterSettings) => {
     (settings.bookmarkedOnly && bookmarks.status === "loading") ||
     filteredKanji.status === "loading" ||
     filteredKanji.status === "idle" ||
-    repStatus === "loading" ||
-    repStatus === "idle";
+    getAnchorWords == null;
   const canStart = !loading && deck.length > 0;
 
   return { deck, loading, canStart };

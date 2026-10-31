@@ -1,4 +1,11 @@
 import { useMemo } from "react";
+import {
+  toAnchorWordBasics,
+  withFrequencyTags,
+  type AnchorWordBasics,
+  type AnchorWordsDetailsFile,
+  type KanjiAnchorWords,
+} from "@/lib/kanji/anchor-words";
 
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import {
@@ -8,21 +15,16 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 
 /**
- * A kanji's representative study word.
+ * A kanji's main anchor word (its "representative word").
  *
  * The word and its reading are rendered by expanded grid tiles during render,
- * so they ride along in the main info snapshot. The English gloss and emoji
- * tag are only ever shown on detail surfaces and in practice decks, so they
- * stay worker-side and are fetched on first use.
+ * so they ride along in the main info snapshot. Glosses, tags, ranks and the
+ * secondary word are only shown on detail surfaces and in games, so they stay
+ * worker-side and are fetched on first use.
  */
 export interface RepresentativeWordData {
   word: string;
   reading: string;
-}
-
-export interface RepresentativeWordDetails extends RepresentativeWordData {
-  englishGloss: string;
-  tags: string[];
 }
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
@@ -56,50 +58,59 @@ export const useKanjiRepresentativeWord = (
   );
 };
 
+const toBasics = (base: RepresentativeWordData) =>
+  toAnchorWordBasics(base.word, base.reading, undefined);
+
 /**
- * Word, reading, gloss and tags. Triggers the one-time fetch of the gloss/tag
- * dataset, so only use it where those fields are actually displayed.
+ * A kanji's anchor words with their glosses, tags, ranks and tiers. The main
+ * word and its readings show at once (from the snapshot); the rest, and the
+ * secondary word, fill in when the worker answers. Asks the worker for this
+ * one kanji, so only use it where those fields are actually displayed.
  */
-export const useKanjiRepresentativeWordDetails = (
-  kanji: string
-): RepresentativeWordDetails | null => {
+export const useKanjiAnchorWords = (kanji: string): KanjiAnchorWords | null => {
   const ready = useIsKanjiWorkerReady();
   const base = useKanjiRepresentativeWord(kanji);
 
-  const { data } = useWorkerQuery<Record<string, [string, string]>>(
-    ready ? () => requestWorker({ type: "rep-word-details" }) : null,
-    [ready]
+  const { data } = useWorkerQuery<KanjiAnchorWords | null>(
+    ready && base != null
+      ? () => requestWorker({ type: "kanji-anchor-words", payload: kanji })
+      : null,
+    [ready, kanji, base != null],
+    false
   );
 
-  return useMemo(() => {
-    if (base == null) {
-      return null;
+  if (base == null) return null;
+  if (data != null && data.main.word === base.word) return data;
+  const basics = toBasics(base);
+  return (
+    basics && {
+      main: withFrequencyTags(basics.main, undefined),
+      secondary: null,
     }
-    const [englishGloss, emojiTag] = data?.[kanji] ?? ["", ""];
-    return { ...base, englishGloss, tags: emojiTag ? [emojiTag] : [] };
-  }, [base, data, kanji]);
+  );
 };
 
 /**
- * Word, reading and gloss for any kanji, looked up synchronously — for a
- * whole review queue, where the per-kanji hook above doesn't fit. `null`
- * until the gloss/tag dataset has loaded.
+ * Anchor words (word, readings, gloss) for any kanji, looked up
+ * synchronously — for a whole deck or review queue, where the per-kanji hook
+ * above doesn't fit. `null` until the details file has loaded.
  */
-export const useGetRepresentativeWordDetailsFn = () => {
+export const useGetAnchorWordsFn = () => {
   const ready = useIsKanjiWorkerReady();
   const getRepresentativeWord = useGetRepresentativeWordFn();
 
-  const { data } = useWorkerQuery<Record<string, [string, string]>>(
-    ready ? () => requestWorker({ type: "rep-word-details" }) : null,
+  const { data } = useWorkerQuery<AnchorWordsDetailsFile>(
+    ready ? () => requestWorker({ type: "anchor-words-details" }) : null,
     [ready]
   );
 
-  if (data == null) return null;
-
-  return (kanji: string): RepresentativeWordDetails | null => {
-    const base = getRepresentativeWord(kanji);
-    if (base == null) return null;
-    const [englishGloss, emojiTag] = data[kanji] ?? ["", ""];
-    return { ...base, englishGloss, tags: emojiTag ? [emojiTag] : [] };
-  };
+  // Memo needed: practice decks memoize (and shuffle) on this function, so a
+  // new one every render would rebuild and reshuffle the deck each render.
+  return useMemo(() => {
+    if (data == null) return null;
+    return (kanji: string): KanjiAnchorWords<AnchorWordBasics> | null => {
+      const base = getRepresentativeWord(kanji);
+      return base && toAnchorWordBasics(base.word, base.reading, data[kanji]);
+    };
+  }, [data, getRepresentativeWord]);
 };

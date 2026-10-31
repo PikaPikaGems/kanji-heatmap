@@ -1,3 +1,7 @@
+import type {
+  AnchorWordsDetailsFile,
+  AnchorWordsFrequencyTagsFile,
+} from "@/lib/kanji/anchor-words";
 import wanakana from "@/lib/wanakana-adapter";
 import { JLTPTtypes } from "@/lib/jlpt";
 import {
@@ -59,9 +63,14 @@ export const fetchSphmnComponents = createFetch<SphmnComponentsFile>(
   assetsPaths.SPHMN_COMPONENTS_FILE
 );
 
-export const fetchRepWordDetails = createFetch<
-  Record<string, [string, string]>
->(assetsPaths.REP_WORD_DETAILS_FILE);
+export const fetchAnchorWordsDetails = createFetch<AnchorWordsDetailsFile>(
+  assetsPaths.ANCHOR_WORDS_DETAILS_FILE
+);
+
+export const fetchAnchorWordsFrequencyTags =
+  createFetch<AnchorWordsFrequencyTagsFile>(
+    assetsPaths.ANCHOR_WORDS_FREQUENCY_TAGS_FILE
+  );
 
 export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
   assetsPaths.KANJI_DECOMPOSITION

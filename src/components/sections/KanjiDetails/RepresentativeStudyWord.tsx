@@ -1,5 +1,5 @@
 import { SectionLoading } from "@/components/common/SectionLoading";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -128,7 +128,7 @@ const WhatIsARepresentativeStudyWord = () => {
 };
 
 export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
-  const data = useKanjiRepresentativeWordDetails(kanji);
+  const data = useKanjiAnchorWords(kanji)?.main;
   const [aiSettings] = useAiExplainSettings();
   const owner = useCurrentOwner();
 
@@ -140,7 +140,8 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
     );
   }
 
-  const { word, reading, englishGloss, tags } = data;
+  const { word, readings, englishGloss, tier } = data;
+  const reading = readings.join("・");
 
   const rows: { label: string; description: string; content: ReactNode }[] = [
     {
@@ -159,14 +160,14 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
     {
       label: "Readings",
       description: "How the word is read.",
-      content: reading
-        .split("・")
-        .map((r) => <RomajiBadge key={r} kana={r} className="text-lg" />),
+      content: readings.map((r) => (
+        <RomajiBadge key={r} kana={r} className="text-lg" />
+      )),
     },
     {
       label: "Tags",
       description: "How common the word is, by the word lists it is in.",
-      content: tags.length > 0 ? <FreqTagBadges tags={tags} /> : null,
+      content: tier ? <FreqTagBadges tags={[tier]} /> : null,
     },
     {
       label: "Gloss",
