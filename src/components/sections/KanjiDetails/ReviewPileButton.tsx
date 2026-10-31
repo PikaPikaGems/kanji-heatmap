@@ -66,8 +66,8 @@ const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
 
 /**
  * Shown once the kanji is in the review pile: a pill "● Mastery · Fresh"
- * with the kanji's combined mastery (the weaker of reading and writing) in
- * its /mastery color, "Not started" until both cards are reviewed.
+ * with the kanji's combined mastery (the lowest of its cards) in
+ * its /mastery color, "Not started" until every card is reviewed.
  */
 const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   const band = itemBand(item, "combined", "mastery", Date.now());

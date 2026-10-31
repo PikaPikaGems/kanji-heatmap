@@ -11,7 +11,20 @@ export const AiKanjiEssay = ({
   keyword: string;
 }) => {
   const getInfo = useGetKanjiInfoFn();
-  const anchor = useKanjiAnchorWords(kanji)?.main;
+  const anchors = useKanjiAnchorWords(kanji);
+  const anchorWords = anchors
+    ? [anchors.main, anchors.secondary].flatMap((word) =>
+        word
+          ? [
+              {
+                word: word.word,
+                reading: word.readings.join("・"),
+                englishGloss: word.englishGloss,
+              },
+            ]
+          : []
+      )
+    : [];
   return (
     <GeneratedText
       key={kanji}
@@ -24,11 +37,7 @@ export const AiKanjiEssay = ({
           kanjiContext: JSON.stringify({
             keyword,
             readings: { on: getInfo?.(kanji)?.on, kun: getInfo?.(kanji)?.kun },
-            anchorWord: anchor && {
-              word: anchor.word,
-              reading: anchor.readings.join("・"),
-              englishGloss: anchor.englishGloss,
-            },
+            anchorWords,
           }),
         })
       }

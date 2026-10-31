@@ -90,8 +90,9 @@ export const AccountGateMessage = ({
 };
 
 /**
- * What /reading-mastery and /writing-mastery show instead of the game while
- * the account can't review (design 5.1 and 5.8). A build without the study
+ * What the mastery games (/reading-mastery, /reading-mastery-2,
+ * /writing-mastery) show instead of the game while the account can't review
+ * (design 5.1 and 5.8). A build without the study
  * engine has no such pages: Not Available, as for a missing page.
  */
 export const MasteryGateScreen = ({
