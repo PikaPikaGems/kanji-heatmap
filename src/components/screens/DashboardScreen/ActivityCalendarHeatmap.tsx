@@ -33,7 +33,7 @@ import { isQueryFailed } from "./is-query-failed";
 import { QueryFallback } from "./QueryFallback";
 import { useLiveOrEmpty } from "./use-live-or-empty";
 import {
-  KanjiAddedCaption,
+  ItemsAddedCaption,
   OverviewCaption,
   OverviewCaptionSkeleton,
 } from "./ActivityStatCard";
@@ -105,7 +105,7 @@ const PeriodSummary = ({
       {filters.newKanji && (
         <>
           <div className="hidden sm:flex">·</div>
-          <KanjiAddedCaption count={stats.kinds.newKanji.count} />
+          <ItemsAddedCaption count={stats.kinds.newKanji.count} />
         </>
       )}
     </div>
@@ -167,8 +167,8 @@ const ActivityCalendarHeatmapBody = () => {
       <div className="mt-2">
         <ActivityKindFiltersRow
           filters={filters}
-          onChange={(kind, checked) =>
-            setSetting("filters", { ...filters, [kind]: checked })
+          onChange={(changes) =>
+            setSetting("filters", { ...filters, ...changes })
           }
         />
       </div>

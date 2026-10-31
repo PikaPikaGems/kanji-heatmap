@@ -1,4 +1,9 @@
-import type { DailySummary, FsrsRating, ReviewSummary } from "engine-contract";
+import type {
+  CardType,
+  DailySummary,
+  FsrsRating,
+  ReviewSummary,
+} from "engine-contract";
 import { isDateKeyInRange } from "./dates";
 import type { DateRange } from "./types";
 
@@ -14,14 +19,18 @@ export const RATING_LABELS: Record<FsrsRating, string> = {
 };
 
 /** A day's (or a period's) review ratings, per card type. */
-export type DayRatings = { reading: ReviewSummary; writing: ReviewSummary };
+export type DayRatings = Record<CardType, ReviewSummary>;
 
 /** Local YYYY-MM-DD → that day's ratings; days without reviews are absent. */
 export type RatingsByDay = Record<string, DayRatings>;
 
-export const EMPTY_DAY_RATINGS: DayRatings = { reading: {}, writing: {} };
+export const EMPTY_DAY_RATINGS: DayRatings = {
+  reading: {},
+  secondaryReading: {},
+  writing: {},
+};
 
-/** Two rating tallies added together (e.g. reading + writing = combined). */
+/** Two rating tallies added together (e.g. every card type = combined). */
 export const addRatings = (
   a: ReviewSummary,
   b: ReviewSummary
@@ -32,6 +41,13 @@ export const addRatings = (
   easy: (a.easy ?? 0) + (b.easy ?? 0),
 });
 
+/** Every card type's ratings added together. */
+export const combinedRatings = (ratings: DayRatings): ReviewSummary =>
+  addRatings(
+    addRatings(ratings.reading, ratings.secondaryReading),
+    ratings.writing
+  );
+
 /** Reviews graded in total, whatever the rating. */
 export const totalRatings = (summary: ReviewSummary): number =>
   RATINGS.reduce((sum, rating) => sum + (summary[rating] ?? 0), 0);
@@ -41,7 +57,11 @@ export const toRatingsByDay = (summaries: DailySummary[]): RatingsByDay =>
   Object.fromEntries(
     summaries.map((summary) => [
       summary.summaryDate,
-      { reading: summary.reviews.reading, writing: summary.reviews.writing },
+      {
+        reading: summary.reviews.reading,
+        secondaryReading: summary.reviews.secondaryReading,
+        writing: summary.reviews.writing,
+      },
     ])
   );
 
@@ -55,6 +75,10 @@ export const ratingsInRange = (
     if (!isDateKeyInRange(key, range)) continue;
     total = {
       reading: addRatings(total.reading, day.reading),
+      secondaryReading: addRatings(
+        total.secondaryReading,
+        day.secondaryReading
+      ),
       writing: addRatings(total.writing, day.writing),
     };
   }

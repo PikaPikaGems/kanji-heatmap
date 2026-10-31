@@ -87,18 +87,35 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
   readingMastery: READING_MASTERY_LABEL,
   readingMastery2: READING_MASTERY_2_LABEL,
   writingMastery: WRITING_MASTERY_LABEL,
-  newKanji: "New Items Added",
+  newKanji: "Items Added",
 };
 
-/** The order the heatmap's checkboxes and day popovers list them in. */
-export const ALL_ACTIVITY_KINDS: ActivityKind[] = [
-  "writingMastery",
-  "readingMastery",
-  "readingMastery2",
-  "production",
-  "recognition",
-  "recognition2",
-  "fillTheKanji",
-  "speedKatakana",
-  "newKanji",
+/**
+ * The heatmap's checkbox groups, like the practice menu's sections; their
+ * order is the order day popovers list the kinds in.
+ */
+export const ACTIVITY_KIND_GROUPS: {
+  heading: string;
+  kinds: ActivityKind[];
+}[] = [
+  {
+    heading: "Kanji Mastery ⭐️",
+    kinds: ["writingMastery", "readingMastery", "readingMastery2"],
+  },
+  {
+    heading: "Practice Games",
+    kinds: [
+      "speedKatakana",
+      "fillTheKanji",
+      "recognition",
+      "recognition2",
+      "production",
+    ],
+  },
+  { heading: "Review Pile", kinds: ["newKanji"] },
 ];
+
+/** The order the heatmap's checkboxes and day popovers list them in. */
+export const ALL_ACTIVITY_KINDS: ActivityKind[] = ACTIVITY_KIND_GROUPS.flatMap(
+  ({ kinds }) => kinds
+);

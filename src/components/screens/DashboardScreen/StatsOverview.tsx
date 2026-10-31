@@ -18,7 +18,7 @@ import {
   ActivityCountsGridSkeleton,
 } from "./ActivityCountsGrid";
 import {
-  KanjiAddedCaption,
+  ItemsAddedCaption,
   OverviewCaption,
   OverviewCaptionSkeleton,
 } from "./ActivityStatCard";
@@ -92,7 +92,7 @@ const StatsOverviewBody = () => {
           value={formatRawCount(stats.daysActive)}
         />
         <div className="hidden sm:flex">·</div>
-        <KanjiAddedCaption count={stats.kinds.newKanji.count} />
+        <ItemsAddedCaption count={stats.kinds.newKanji.count} />
       </div>
       <ReviewRatings ratings={allTime.totals.reviews} />
     </>

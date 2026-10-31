@@ -93,13 +93,13 @@ export const OverviewCaption = ({
   </div>
 );
 
-/** "Kanji added" with its ⓘ: what counts as an addition. */
-export const KanjiAddedCaption = ({ count }: { count: number }) => (
+/** "Items added" with its ⓘ: what counts as an addition. */
+export const ItemsAddedCaption = ({ count }: { count: number }) => (
   <OverviewCaption
     Icon={SquarePlus}
-    label="Kanji added"
+    label="Items added"
     value={formatRawCount(count)}
-    info="Each time a kanji goes into your review pile. Removing a kanji and adding it back counts as 2."
+    info="Each time a kanji goes into your review pile with its words. Removing a kanji and adding it back counts as 2."
   />
 );
 
