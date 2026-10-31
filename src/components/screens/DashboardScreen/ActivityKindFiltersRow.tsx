@@ -32,9 +32,9 @@ const KindCheckbox = ({
 );
 
 /**
- * The heatmap's activity checkboxes in groups (Kanji Mastery, Practice
- * Games, Review Pile), each group with an "All" checkbox when it has more
- * than one. `onChange` gets every kind that changed at once.
+ * The heatmap's activity checkboxes in groups like the practice menu's
+ * (Kanji Mastery, with Items Added, and Practice Games), each with an "All"
+ * checkbox. `onChange` gets every kind that changed at once.
  */
 export const ActivityKindFiltersRow = ({
   filters,

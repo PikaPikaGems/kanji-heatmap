@@ -1,4 +1,6 @@
+import { Fragment } from "react";
 import { SpeakButton } from "@/components/common/SpeakButton";
+import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import {
   BLANK_BOX_CN,
@@ -41,10 +43,12 @@ const Cloze = ({
   );
 };
 
-/** "(たかい) 🔊" under its word. */
+/** The word's reading badges (tap for romaji) and its speak button, under the word. */
 const ReadingLine = ({ word }: { word: PracticeWord }) => (
-  <span className="inline-flex items-center justify-center gap-1 text-sm font-normal sm:text-base text-muted-foreground">
-    <span className="kanji-font">({word.reading})</span>
+  <span className="flex flex-wrap items-center justify-center gap-1">
+    {word.reading.split("・").map((reading) => (
+      <RomajiBadge key={reading} kana={reading} />
+    ))}
     <SpeakButton word={word.word} iconType="volume-2" />
   </span>
 );
@@ -55,7 +59,7 @@ const sizeCn = (length: number) =>
 
 /**
  * The card's words with the target kanji blanked, "[?]い · 最[?]", each with
- * its reading and a speak button under it. Kanji without a secondary word
+ * its reading badges and a speak button under it. Kanji without a secondary word
  * show the main word alone.
  */
 export const ClozeWords = ({
@@ -128,7 +132,10 @@ export const ClozeWords = ({
   );
 };
 
-/** "View English glosses": each word's meaning, in a popover so the pad stays high. */
+/**
+ * "View English glosses": each word's meaning next to its cloze, in a popover
+ * so the pad stays high.
+ */
 export const GlossesPopover = ({ item }: { item: PracticeItem }) => {
   const words = item.secondary ? [item, item.secondary] : [item];
   return (
@@ -143,14 +150,16 @@ export const GlossesPopover = ({ item }: { item: PracticeItem }) => {
       }
       contentClassName="w-72 p-3 text-xs text-left"
       content={
-        <div className="flex flex-col gap-2">
+        // Each word as its cloze, never the whole word: that would give the
+        // answer away.
+        <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-2">
           {words.map(({ word, englishGloss }) => (
-            <p key={word}>
-              <span className="mr-1.5 text-sm font-bold kanji-font">
-                {word}
+            <Fragment key={word}>
+              <span className="text-lg kanji-font" lang="ja">
+                <Cloze word={word} kanji={item.kanji} revealed={false} />
               </span>
-              {englishGloss || item.keyword}
-            </p>
+              <p>{englishGloss || item.keyword}</p>
+            </Fragment>
           ))}
         </div>
       }

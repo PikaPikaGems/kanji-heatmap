@@ -100,7 +100,7 @@ export const ACTIVITY_KIND_GROUPS: {
 }[] = [
   {
     heading: "Kanji Mastery ⭐️",
-    kinds: ["writingMastery", "readingMastery", "readingMastery2"],
+    kinds: ["writingMastery", "readingMastery", "readingMastery2", "newKanji"],
   },
   {
     heading: "Practice Games",
@@ -112,7 +112,6 @@ export const ACTIVITY_KIND_GROUPS: {
       "production",
     ],
   },
-  { heading: "Review Pile", kinds: ["newKanji"] },
 ];
 
 /** The order the heatmap's checkboxes and day popovers list them in. */
