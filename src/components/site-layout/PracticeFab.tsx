@@ -6,18 +6,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { NotificationDot } from "@/components/common/NotificationDot";
-import {
-  floatingIslandNavLinks,
-  practiceNavSections,
-} from "@/lib/pages/nav-links";
-import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
+import { floatingIslandNavLinks } from "@/lib/pages/nav-links";
+import { dueNavHrefs } from "@/lib/pages/mode-nav-links";
 import { totalDue, useDueCount } from "@/lib/engine/use-due-count";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
+import { PracticeFabMenu } from "./PracticeFabMenu";
 
 const fabHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
@@ -41,7 +38,6 @@ export const PracticeFab = () => {
 
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
   const due = useDueCount();
-  const modeSections = useVisibleNavSections(practiceNavSections);
 
   if (!fabHrefs.has(location)) {
     return null;
@@ -83,11 +79,8 @@ export const PracticeFab = () => {
         className="z-50 w-[min(100vw-1.5rem,28rem)] p-3 pt-0"
         aria-label="Practice menu"
       >
-        <DashedNavLinkSections
-          sections={modeSections}
+        <PracticeFabMenu
           dotHrefs={dueNavHrefs(due)}
-          listClassName="grid grid-cols-2 gap-2"
-          hideDescriptions
           onItemClick={() => setOpen(false)}
         />
       </PopoverContent>

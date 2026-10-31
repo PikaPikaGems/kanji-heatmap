@@ -17,6 +17,8 @@ type DashedNavLinkProps = {
   className?: string;
   /** Shows the due dot right after the title. */
   showDot?: boolean;
+  /** The full name when the title is short, e.g. "Practice" in a grid. */
+  "aria-label"?: string;
 };
 
 // forwardRef required: HeaderDrawer wraps this in `<DrawerClose asChild>` via

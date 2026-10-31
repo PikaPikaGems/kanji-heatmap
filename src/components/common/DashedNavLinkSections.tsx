@@ -49,6 +49,7 @@ export const NavSectionLinks = ({
         <DashedNavLink
           href={item.href}
           title={item.title}
+          aria-label={item.ariaLabel}
           description={hideDescriptions ? undefined : item.description}
           Icon={item.Icon}
           onClick={onItemClick}
@@ -57,14 +58,9 @@ export const NavSectionLinks = ({
         />
       );
 
-      const wrapped = wrapItem ? wrapItem(link, item) : link;
       return (
         <Fragment key={item.href}>
-          {item.wide ? (
-            <div className="grid col-span-full">{wrapped}</div>
-          ) : (
-            wrapped
-          )}
+          {wrapItem ? wrapItem(link, item) : link}
         </Fragment>
       );
     })}
