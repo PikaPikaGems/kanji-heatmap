@@ -29,6 +29,7 @@ import { LoginDialog } from "@/components/dependent/account/LoginDialog";
 import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
 import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
 import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
+import { SyncNowDialog } from "@/components/dependent/account/SyncNowDialog";
 import { WordExplainDialog } from "@/components/dependent/site-wide/WordExplainDialog";
 import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
 import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
@@ -183,6 +184,7 @@ const App = () => {
             <LoggingOutScreen />
             <FsrsSettingsDialog />
             <SyncOperationsDialog />
+            <SyncNowDialog />
             <WriteBlockedDialog />
             <WordExplainDialog />
           </KanjiFunctionalityProvider>

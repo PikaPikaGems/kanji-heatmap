@@ -169,13 +169,17 @@ export const ActivityStatCard = ({
       counts[0]?.value === 0 && "opacity-40"
     )}
   >
-    <div className="flex items-center min-w-0 gap-2">
+    {/* Phones (three cards in a row): the icon above the name. */}
+    <div className="flex flex-col items-start min-w-0 gap-1.5 md:flex-row md:items-center md:gap-2">
       <div className="flex items-center justify-center border rounded-lg size-7 shrink-0 border-foreground/10 bg-background text-foreground/65">
         <Icon className="size-3.5" aria-hidden />
       </div>
-      <div className="text-xs leading-tight line-clamp-2">{title}</div>
+      <div className="text-[11px] leading-tight line-clamp-3 sm:text-xs md:line-clamp-2">
+        {title}
+      </div>
     </div>
-    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
+    {/* Phones: one count per line, so each fits a third of the screen. */}
+    <div className="flex flex-col pl-0.5 gap-y-1 mt-auto md:flex-row md:flex-wrap md:items-baseline md:gap-x-4 md:mt-0">
       {counts.map((count, i) => (
         <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}

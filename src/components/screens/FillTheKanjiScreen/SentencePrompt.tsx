@@ -2,7 +2,7 @@ import { useState } from "react";
 import { cn, isKanji } from "@/lib/utils";
 import { parseBunsetsu, Puzzle } from "@/lib/fill-the-kanji/puzzle";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
-import { KanjiPopover } from "./KanjiPopover";
+import { KanjiPopover } from "@/components/shared-practice/KanjiPopover";
 import { BLANK_BOX_CN, blankCn, type BlankState } from "./blank-cn";
 
 /** Bunsetsu laid out with a visible gap between them, wrapping as needed. */

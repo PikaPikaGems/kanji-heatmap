@@ -199,7 +199,7 @@ export const General = ({ kanji }: { kanji: string }) => {
               <LabelCell label={label} description={description} />
               <TableCellGrow>
                 {items.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">{items}</div>
+                  <div className="flex flex-wrap gap-1.5">{items}</div>
                 ) : (
                   <div> - </div>
                 )}

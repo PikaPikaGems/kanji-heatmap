@@ -29,7 +29,7 @@ export const VocabActions = ({
   kana: string;
 }) => {
   return (
-    <div className="relative flex flex-wrap items-center justify-center p-2 space-x-1">
+    <div className="relative flex flex-wrap items-center justify-center gap-1.5 p-2">
       <BugIconErrorBoundary>
         <JotobaBtn word={word} />
       </BugIconErrorBoundary>

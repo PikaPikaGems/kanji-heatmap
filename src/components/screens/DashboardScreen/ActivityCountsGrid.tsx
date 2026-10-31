@@ -15,7 +15,10 @@ import {
 
 const REVIEWS = { unit: "Reviews", unitSingular: "Review" };
 
-/** The mastery cards, one per row at every width. */
+/**
+ * The mastery cards: side by side in one row on phones, stacked in the column
+ * beside the practice games from `md`.
+ */
 const CARDS: {
   kind: ActivityKind;
   title: string;
@@ -39,7 +42,7 @@ const CARDS: {
 ];
 
 const GRID_CN = "grid gap-2 sm:gap-3 md:grid-cols-2";
-const CARDS_CN = "grid gap-2 sm:gap-3";
+const CARDS_CN = "grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-1";
 
 /**
  * The mastery cards (days, then reviews), then the practice games' table:

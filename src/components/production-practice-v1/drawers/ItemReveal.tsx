@@ -4,6 +4,7 @@ import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { KanjiKeywordCard } from "@/components/dependent/routing/global-links";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import type { PracticeWord } from "@/components/shared-practice";
+import { KanjiPopover } from "@/components/shared-practice/KanjiPopover";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import type { PracticeItem } from "../types";
 
@@ -76,14 +77,38 @@ const AnswerWordPopover = ({
   />
 );
 
+/** The answer kanji, a size up from the words; opens the kanji popover. */
+const AnswerKanji = ({ kanji }: { kanji: string }) => {
+  const info = useGetKanjiInfoFn()?.(kanji);
+  if (!info) {
+    return (
+      <span lang="ja" className="px-3 py-1 text-3xl kanji-font">
+        {kanji}
+      </span>
+    );
+  }
+  return (
+    <KanjiPopover
+      kanji={kanji}
+      info={info}
+      className="px-3 py-1 text-3xl border border-dashed rounded-2xl kanji-font border-foreground/30 hover:border-foreground/60"
+    />
+  );
+};
+
 /**
- * The card's words, "高い 最高" (or the main word alone); each opens its own
- * popover. Shared across feedback drawers.
+ * The answer: the kanji, "·", then the card's words, "高 · 高い 最高" (or
+ * the main word alone). The kanji opens the kanji popover, each word its
+ * own popover. Shared across feedback drawers.
  */
 export const ItemReveal = ({ item }: { item: PracticeItem }) => {
   const words = item.secondary ? [item, item.secondary] : [item];
   return (
     <div className="flex flex-wrap items-center justify-center gap-3 text-xl text-foreground">
+      <AnswerKanji kanji={item.kanji} />
+      <span aria-hidden className="text-muted-foreground">
+        ·
+      </span>
       {words.map((word) => (
         <AnswerWordPopover
           key={word.word}
