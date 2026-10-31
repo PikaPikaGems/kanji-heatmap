@@ -74,3 +74,33 @@ const [openedModal, setOpenedModal] = useState<
 Do **not** split those flags onto each button just to avoid rerenders — the parent still owns the discriminant because switching one overlay must close the others.
 
 Passing that discriminant down is also one callback (`onAction`), not `onClose` + `onOpenSettings` + `onOpenInstallGuide`. See `no-duplicate-action-props.mdc`.
+
+## 3. Few states per component; values that change together are one state
+
+Keep each component to a small number of states (single responsibility). Many `useState`s in one component usually means it does more than one job: split it (section 1).
+
+If several values always change together, they are **one** state holding an object, set in one call, not parallel `useState`s that can drift apart.
+
+```tsx
+// ❌ BAD — four setters that must always be called together
+const [deck, setDeck] = useState<Item[]>([]);
+const [cursor, setCursor] = useState(0);
+const [results, setResults] = useState<Result[] | null>(null);
+const [progress, setProgress] = useState(0);
+
+// ✅ GOOD — one round, replaced as a whole
+const [round, setRound] = useState<Round>({
+  deck: [],
+  cursor: 0,
+  results: null,
+  progress: 0,
+});
+```
+
+When the next state depends on the current one in several ways (phase transitions, retries, "next" that reads the old results), use `useReducer` with named actions instead of spreading the logic over several setters and handlers.
+
+```tsx
+// ✅ GOOD — transitions live in one pure function
+const [session, dispatch] = useReducer(sessionReducer, initialSession);
+dispatch({ type: "finished", results });
+```

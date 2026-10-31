@@ -10,6 +10,8 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Single responsibility: one screen → one component (no `variant` enums stuffed into a "god" screen); route phases with a linear early-return chain in that component’s body (wrap with the layout shell at the call site; do not use `renderPhase()`). Prefer early exits in conditionals generally. See `react-single-responsibility-screens.mdc`.
 - Control flow: use `if` / `else` with early exits (`return`, `continue`) as much as possible, and avoid `switch` / `case` statements. See `prefer-if-early-return.mdc`.
 - React state: do not pile unrelated `useState` into one component — extract subtrees that do not depend on some of that state. Mutually exclusive flags (`isLoading` / `isError` / `isSuccess`, or overlays that cannot be open together) should be one status union. See `react-state-colocation.mdc`. Callbacks that only pick a value on that union are one `onAction`, not parallel `onOpenX` / `onClose` props. See `no-duplicate-action-props.mdc`.
+- Few states per component: keep each component to a small number of states. Values that always change together are one state holding an object; state whose next value depends on the current one in several ways uses `useReducer`. See `react-state-colocation.mdc`.
+- Reuse before copy: use or extend an existing component (a prop for the real difference, or a shared smaller piece) instead of copying it and changing a few lines. See `reuse-before-copy.mdc`.
 - Formatting: run Prettier on the exact files you edit (`pnpm exec prettier --write <paths>`); do not run a full-repo format unless asked. Before finishing any change, run `pnpm exec prettier --check .` and fix the files it reports — CI fails on formatting, and `pnpm run build` doesn't run Prettier. Match `.prettierrc.json`. See `prettier-format.mdc`.
 - Data fixes: never hardcode per-character mappings, exception lists, keyword overrides and the like in code; they belong in the data build, not in this repo, unless the user explicitly says to hardcode that case. See `no-hardcoded-data-fixes.mdc`.
 - PRs: run Prettier, commit remaining changes, then push and create the PR. See `pr-before-create.mdc`.
@@ -18,6 +20,7 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Buttons: text buttons never use the default shadcn `Button`; use `PracticeButton`, the dotted `TextActionButton`, an inline `NoticeAction`, or a pill. See `text-buttons-not-shadcn.mdc`.
 - Dialogs: buttons go in `DialogActions` (right-aligned, main action rightmost; stacked full width on phones, main action on top; Cancel is a `ghost` PracticeButton). See `dialog-buttons.mdc`.
 - Notices: messages users must read use `UserNotice` (⚠️ + normal text color, inline underlined actions); logged-out states use `LoginNotice`. See `user-notices.mdc`.
+- Plans: write implementation plans, design notes and handoffs as Markdown, not HTML. HTML is only for visual mockups. See `plans-in-markdown.mdc`.
 - Tailwind: colocate `className` strings; do not extract `_CN` (or similar) constants unless the same string is reused in multiple places. See `inline-tailwind-classes.mdc`.
 
 ## Cursor Cloud specific instructions

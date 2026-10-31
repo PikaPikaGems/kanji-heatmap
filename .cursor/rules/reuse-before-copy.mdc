@@ -1,0 +1,14 @@
+---
+description: Reuse or extend existing components instead of copying them
+alwaysApply: true
+---
+
+# Reuse before copy
+
+Before writing a new component, look for an existing one that already does most of the job.
+
+- If it fits, use it as is.
+- If it almost fits, extend it with a prop for the real difference (data, a slot, a label), or extract the shared part into a smaller component both callers use.
+- Do not copy a component and change a few lines. Two near-identical copies drift apart and every fix has to be made twice.
+
+This does not override `react-single-responsibility-screens.mdc`: two different screens are still two components, but they share the pieces they have in common instead of duplicating them.
