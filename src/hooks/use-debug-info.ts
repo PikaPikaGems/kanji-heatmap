@@ -6,6 +6,7 @@ import type { AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { formatMegabytes } from "@/lib/format-bytes";
 import type { AiExplainUsage } from "@/lib/ai-explain/preferences";
+import { useEngineState } from "@/lib/engine/engine";
 
 declare const __BUILD_TIMESTAMP__: string;
 
@@ -14,6 +15,8 @@ export type DebugInfoSnapshot = {
   effectiveType?: NetworkState["effectiveType"];
   saveData?: boolean;
   version: string;
+  /** The study engine's release, when this build includes it and it loaded. */
+  engineVersion?: string;
   viewportWidth: number;
   viewportHeight: number;
   device: UserAgentData | null;
@@ -53,6 +56,7 @@ export const formatDebugInfoForClipboard = (
     "",
     `Network: ${network}`,
     `Version: ${info.version}`,
+    ...(info.engineVersion ? [`Engine: ${info.engineVersion}`] : []),
     `Viewport: ${info.viewportWidth}×${info.viewportHeight}`,
   ];
 
@@ -113,6 +117,7 @@ export const formatStorageForClipboard = (
 export function useDebugInfo(): DebugInfoSnapshot {
   const { online, effectiveType, saveData } = useNetworkState();
   const [viewportWidth, viewportHeight] = useWindowSize(0);
+  const engine = useEngineState();
   const device =
     typeof navigator !== "undefined" && navigator.userAgent
       ? getUserAgentData(navigator.userAgent)
@@ -123,6 +128,8 @@ export function useDebugInfo(): DebugInfoSnapshot {
     effectiveType,
     saveData,
     version: __BUILD_TIMESTAMP__,
+    engineVersion:
+      engine.status === "ready" ? engine.api.releaseVersion : undefined,
     viewportWidth,
     viewportHeight,
     device,

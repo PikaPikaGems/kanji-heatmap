@@ -13,8 +13,6 @@ export type ChallengeSetStats = {
   latestCpm: number;
   bestCpm: number;
   timesTaken: number;
-  /** Best CPM among attempts with accuracy > 70%; absent until one qualifies. */
-  bestCpmWithAccuracyOver70?: number;
   /** Day of the most recent attempt. */
   lastAttemptedAt: LocalDate;
 };
@@ -38,7 +36,6 @@ export const toChallengeSetStats = (
     latestCpm: ptr.latest.cpmVal,
     bestCpm: ptr.best.cpm.value,
     timesTaken: ptr.attemptCount,
-    bestCpmWithAccuracyOver70: ptr.best.cpmOverAcc70?.value,
     lastAttemptedAt: ptr.latest.attemptedAt,
   };
 };

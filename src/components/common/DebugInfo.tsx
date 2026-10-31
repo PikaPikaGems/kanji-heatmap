@@ -221,6 +221,11 @@ const DebugInfoBody = () => {
           <DebugRow label="Version">
             <span className="font-mono">v{info.version}</span>
           </DebugRow>
+          {info.engineVersion && (
+            <DebugRow label="Engine">
+              <span className="font-mono">{info.engineVersion}</span>
+            </DebugRow>
+          )}
           <DebugRow label="Viewport">
             {info.viewportWidth}×{info.viewportHeight}
           </DebugRow>

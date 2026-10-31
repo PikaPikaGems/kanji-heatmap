@@ -96,7 +96,7 @@ export const WriteBlockedDialog = () => {
 export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
   <>
     {copyForWriteBlocker(blocker)}
-    {blocker === "premium_lapsed" && (
+    {blocker === "entitlement_expired" && (
       <>
         {" "}
         <WriteBlockedLearnMore />
