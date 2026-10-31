@@ -46,7 +46,11 @@ export const ScrollableDialogContent = ({
     )}
     {...props}
   >
-    <DialogHeader className={cn("shrink-0 px-6 pt-4 pb-2", headerClassName)}>
+    {/* Tall enough (and padded right) that the body starts below the
+        corner close button and a long title never runs under it. */}
+    <DialogHeader
+      className={cn("shrink-0 pl-6 pr-16 pt-5 pb-4", headerClassName)}
+    >
       <DialogTitle className={cn("m-0", titleClassName)}>{title}</DialogTitle>
       {description != null && (
         <DialogDescription className="sr-only">{description}</DialogDescription>

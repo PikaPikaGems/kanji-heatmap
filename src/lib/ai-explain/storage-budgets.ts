@@ -22,9 +22,6 @@ export const AI_STORAGE_LIMITS: Record<AiStorageKind, number> = {
 /** The near-limit notice shows from this share of a limit. */
 export const STORAGE_WARNING_RATIO = 0.7;
 
-/** Until accounts exist, everything on this device belongs to the guest. */
-export const CURRENT_OWNER_ID = "guest";
-
 /** Bytes of one kind: the current user's, and everyone else's on this device. */
 export type KindUsage = { mine: number; others: number };
 export type AiStorageUsage = Record<AiStorageKind, KindUsage>;

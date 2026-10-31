@@ -32,8 +32,10 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     overlayClassName?: string;
+    /** For a dialog that can't be dismissed (no corner close button). */
+    hideClose?: boolean;
   }
->(({ className, overlayClassName, children, ...props }, ref) => (
+>(({ className, overlayClassName, hideClose, children, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay className={overlayClassName} />
     <DialogPrimitive.Content
@@ -45,16 +47,18 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close asChild className="absolute top-3 right-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="p-4 border-2 border-dashed rounded-xl bg-background z-1000!"
-        >
-          <CircleX className="size-8" />
-          <span className="sr-only">Close</span>
-        </Button>
-      </DialogPrimitive.Close>
+      {!hideClose && (
+        <DialogPrimitive.Close asChild className="absolute top-3 right-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-4 border-2 border-dashed rounded-xl bg-background z-1000!"
+          >
+            <CircleX className="size-8" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));

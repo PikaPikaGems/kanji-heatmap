@@ -1,4 +1,4 @@
 {
-  "batchSize": 20,
+  "batchSize": 25,
   "batchesPerChunk": 10
 }

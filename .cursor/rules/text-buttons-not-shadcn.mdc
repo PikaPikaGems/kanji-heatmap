@@ -1,0 +1,23 @@
+---
+description: Buttons with text never use the default shadcn Button; pick one of the site's button styles
+alwaysApply: true
+---
+
+# Text buttons never use the default shadcn `Button`
+
+The plain shadcn `Button` (`@/components/ui/button`) doesn't match the site. Any button that shows text uses one of these instead:
+
+- `PracticeButton` (`@/components/ui/practice-button`): main actions — Start, Log in, Save, Cancel, dialog buttons, Try again. Variants: `primary`, `secondary`, `danger` (destructive), `ghost`, and the rating colors `orange` / `blue` / `green`.
+- `TextActionButton` (`@/components/common/AiActionButtons`): low-key actions in a section — the dotted-underline text style ("Download Markdown", "Regenerate MP3", "View Primary Data Sources").
+- `NoticeAction` (`@/components/common/UserNotice`): an action inside a sentence of a notice ("Log in", "discard this draft").
+- A pill (like `BookmarkButton`): on/off toggles that live next to a kanji.
+
+```tsx
+// ❌ BAD
+<Button variant="outline" onClick={retry}>Try again</Button>
+
+// ✅ GOOD
+<PracticeButton variant="secondary" onClick={retry}>Try again</PracticeButton>
+```
+
+The shadcn `Button` is still fine for icon-only buttons (with an `aria-label`).

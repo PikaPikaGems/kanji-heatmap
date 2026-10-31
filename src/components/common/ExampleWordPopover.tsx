@@ -1,39 +1,23 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { VocabPopoverContent } from "@/components/common/VocabPopoverContent";
-
 import {
   useVocabDetails,
   useWordKanjis,
   WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
+import { cn } from "@/lib/utils";
 
-const SmallFuriganaPart = ({
-  part,
-  className = "",
-}: {
-  part: WordPartDetail;
-  className?: string;
-}) => {
-  const [text, reading] = part;
-
-  if (!reading) {
-    return (
-      <ruby className={className}>
-        {text}
-        <rt />
-      </ruby>
-    );
-  }
+/** One piece of the word; kanji pieces carry their reading as furigana. */
+const FuriganaPart = ({ part }: { part: WordPartDetail }) => {
+  const [text, furigana] = part;
+  if (!furigana) return <span>{text}</span>;
 
   return (
-    <ruby className={className}>
+    <ruby>
       {text}
-      <rp>(</rp>
-      <rt className="text-[0.5em]">{reading}</rt>
-      <rp>)</rp>
+      <rt className="text-[0.5em]">{furigana}</rt>
     </ruby>
   );
 };
@@ -59,23 +43,14 @@ export const ExampleWordPopover = ({
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
-  if (status !== "success") {
-    return (
-      <span
-        className={`text-3xl cursor-default kanji-font ${className}`}
-        title="読み込み中 · Loading..."
-      >
-        {word}
-      </span>
-    );
-  }
-
-  const kana =
-    readingOverride ??
-    (vocabInfo ?? { parts: [] }).parts
-      .map((part) => part[1] || part[0])
-      .join("");
-  const meaning = wordTranslationOverride ?? vocabInfo?.meaning;
+  // Always a button. Until the vocab data answers (or for a word it doesn't
+  // have) the word shows without furigana, and the popover opens with what
+  // is already known: kanji links, actions and outside links.
+  const loading = status === "idle" || status === "loading";
+  const parts: WordPartDetail[] = vocabInfo?.parts ?? [[word]];
+  const partsReading = parts
+    .map(([text, furigana]) => furigana || text)
+    .join("");
 
   return (
     <GenericPopover
@@ -83,24 +58,27 @@ export const ExampleWordPopover = ({
       trigger={
         <Button
           variant="outline"
-          className={`items-end h-auto px-4 py-3  border-dashed rounded-2xl kanji-font hover:bg-foreground/5 ${className}`}
-        >
-          {vocabInfo?.parts == null ? (
-            <span>{word}</span>
-          ) : (
-            vocabInfo.parts.map((part, index) => (
-              <SmallFuriganaPart key={`${part[0]}-${index}`} part={part} />
-            ))
+          className={cn(
+            "h-auto items-end rounded-2xl px-4 py-3 kanji-font",
+            "hover:bg-muted active:bg-muted border border-dashed",
+            className
           )}
+        >
+          <span key={status} className="animate-fade-in-fast">
+            {parts.map((part, i) => (
+              <FuriganaPart key={`${i}-${part[0]}`} part={part} />
+            ))}
+          </span>
         </Button>
       }
       content={
         <VocabPopoverContent
           word={word}
-          kana={kana}
+          kana={readingOverride ?? (vocabInfo ? partsReading : undefined)}
           wordKanjis={wordKanjis}
-          definition={meaning}
+          definition={wordTranslationOverride ?? vocabInfo?.meaning}
           optionalSection={optionalSection}
+          definitionLoading={loading && wordTranslationOverride == null}
         />
       }
     />

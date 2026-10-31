@@ -5,6 +5,9 @@ import type { AiStorageUsageState } from "@/hooks/use-ai-storage-usage";
 import type { AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { formatMegabytes } from "@/lib/format-bytes";
+import type { AiExplainUsage } from "@/lib/ai-explain/preferences";
+import { ENGINE_API_VERSION } from "engine-contract";
+import { useEngineState } from "@/lib/engine/engine";
 
 declare const __BUILD_TIMESTAMP__: string;
 
@@ -13,6 +16,11 @@ export type DebugInfoSnapshot = {
   effectiveType?: NetworkState["effectiveType"];
   saveData?: boolean;
   version: string;
+  /**
+   * The study engine's release and the engine API this build was compiled
+   * against ("1.0.0 · API 15"), when this build includes it and it loaded.
+   */
+  engineVersion?: string;
   viewportWidth: number;
   viewportHeight: number;
   device: UserAgentData | null;
@@ -51,23 +59,24 @@ export const formatDebugInfoForClipboard = (
     `Captured: ${formatCaptureTimestamp(capturedAt)}`,
     "",
     `Network: ${network}`,
-    `Version: ${info.version}`,
     `Viewport: ${info.viewportWidth}×${info.viewportHeight}`,
   ];
 
   if (info.device) {
     const { os, browser, platform } = info.device;
     lines.push(
-      "",
       `OS: ${os.name} · ${os.version} · ${platform.platform}`,
       `Browser: ${browser.name} · ${browser.version}`
     );
   }
 
+  lines.push("", `App Version: ${info.version}`);
+  if (info.engineVersion) lines.push(`KH Engine: ${info.engineVersion}`);
+
   return lines.join("\n");
 };
 
-/** The offline Japanese Voice model, as Debug Info shows it. */
+/** The offline Japanese Voice model, as App & Device Info shows it. */
 export const voiceModelStatus = (voice: AiVoiceState) => {
   if (voice.cached == null) return "Checking…";
   if (!voice.cached) return "Not downloaded";
@@ -112,6 +121,7 @@ export const formatStorageForClipboard = (
 export function useDebugInfo(): DebugInfoSnapshot {
   const { online, effectiveType, saveData } = useNetworkState();
   const [viewportWidth, viewportHeight] = useWindowSize(0);
+  const engine = useEngineState();
   const device =
     typeof navigator !== "undefined" && navigator.userAgent
       ? getUserAgentData(navigator.userAgent)
@@ -122,8 +132,19 @@ export function useDebugInfo(): DebugInfoSnapshot {
     effectiveType,
     saveData,
     version: __BUILD_TIMESTAMP__,
+    engineVersion:
+      engine.status === "ready"
+        ? `${engine.api.releaseVersion} · API ${ENGINE_API_VERSION}`
+        : undefined,
     viewportWidth,
     viewportHeight,
     device,
   };
 }
+
+/** This month's AI usage, one line, for the copied report. */
+export const formatAiUsageForClipboard = (usage: AiExplainUsage) => [
+  "",
+  "AI usage this month",
+  `Text tokens: ${usage.tokens} · Requests: ${usage.requests} · Search calls: ${usage.searchCalls} · Images: ${usage.imageRequests} · Audio generations: ${usage.audioRequests} · Speech characters: ${usage.audioCharacters}`,
+];

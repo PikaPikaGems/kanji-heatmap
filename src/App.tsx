@@ -25,6 +25,15 @@ import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
+import { LoginDialog } from "@/components/dependent/account/LoginDialog";
+import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
+import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
+import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
+import { SyncNowDialog } from "@/components/dependent/account/SyncNowDialog";
+import { WordExplainDialog } from "@/components/dependent/site-wide/WordExplainDialog";
+import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
+import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
+import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
 
 const {
   kanjiPage,
@@ -37,7 +46,11 @@ const {
   speedKatakanaPage,
   fillTheKanjiPage,
   recognitionPracticeV1Page,
+  recognitionPractice2Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  readingMastery2Page,
+  writingMasteryPage,
 } = pageItems;
 
 const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
@@ -66,20 +79,44 @@ const App = () => {
                 path={speedKatakanaPage.href}
                 component={speedKatakanaPage.Component}
               />
-              {/* Fill the Kanji uses the shared practice shell + header. */}
+              {/* Fill in the Kanji uses the shared practice shell + header. */}
               <Route
                 path={fillTheKanjiPage.href}
                 component={fillTheKanjiPage.Component}
               />
+              {/* The game's old URL (bookmarks, installed shortcuts). */}
+              <Route path="/fill-the-kanji">
+                <Redirect
+                  to={`${fillTheKanjiPage.href}${window.location.search}`}
+                  replace
+                />
+              </Route>
               {/* Recognition practice has its own header. */}
               <Route
                 path={recognitionPracticeV1Page.href}
                 component={RecognitionPracticeV1}
               />
+              <Route
+                path={recognitionPractice2Page.href}
+                component={recognitionPractice2Page.Component}
+              />
               {/* Production (writing) practice has its own header + ONNX. */}
               <Route
                 path={productionPracticeV1Page.href}
                 component={ProductionPracticeV1}
+              />
+              {/* Mastery games (review pile) share the practice shell. */}
+              <Route
+                path={readingMasteryPage.href}
+                component={readingMasteryPage.Component}
+              />
+              <Route
+                path={readingMastery2Page.href}
+                component={readingMastery2Page.Component}
+              />
+              <Route
+                path={writingMasteryPage.href}
+                component={writingMasteryPage.Component}
               />
               <Route>
                 <Header />
@@ -140,6 +177,16 @@ const App = () => {
             </Switch>
             {/* Outside the Switch so it also shows on the game screens. */}
             <BottomBanner />
+            {/* Also outside the Switch: any screen can open these. */}
+            <LoginDialog />
+            <RecoveryDialog />
+            <LogoutDialog />
+            <LoggingOutScreen />
+            <FsrsSettingsDialog />
+            <SyncOperationsDialog />
+            <SyncNowDialog />
+            <WriteBlockedDialog />
+            <WordExplainDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

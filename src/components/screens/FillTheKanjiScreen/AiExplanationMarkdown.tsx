@@ -14,7 +14,7 @@ import {
 } from "@/components/sections/KanjiDetails/KanjiStudyNotes/markdown-sanitize";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { cn, isKanji } from "@/lib/utils";
-import { KanjiPopover } from "./KanjiPopover";
+import { KanjiPopover } from "@/components/shared-practice/KanjiPopover";
 
 type SpanProps = ComponentPropsWithoutRef<"span"> & ExtraProps;
 

@@ -14,7 +14,41 @@ import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
+import type { AnchorWord } from "@/lib/kanji/anchor-words";
+import { HintChip } from "@/components/common/HintChip";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useFlashHint } from "@/hooks/use-flash-hint";
+
+/** The card's big kanji; a double click (or double tap) copies it. */
+const CopyableBigKanji = ({ kanji }: { kanji: string }) => {
+  const { copy } = useCopyToClipboard();
+  const hint = useFlashHint();
+
+  return (
+    <span className="relative inline-block">
+      <span
+        className="text-[140px] leading-none kanji-font select-none cursor-copy"
+        title="Double-click to copy"
+        onDoubleClick={(e) => {
+          void copy(kanji, e);
+          hint.show(`Copied ${kanji}`);
+        }}
+      >
+        {kanji}
+      </span>
+      {hint.hint && (
+        <HintChip
+          key={hint.hint.key}
+          className="-translate-x-1/2 left-1/2 -bottom-2"
+          onDone={hint.done}
+        >
+          {hint.hint.text}
+        </HintChip>
+      )}
+    </span>
+  );
+};
 
 const transformKanjiWordDetails = (
   kanji: string,
@@ -57,19 +91,28 @@ export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
   );
 };
 
+/** "🌱 高い (たかい)": one anchor word, kept on one line. */
+const AnchorWordLine = ({ word }: { word: AnchorWord }) => (
+  <span className="whitespace-nowrap">
+    {word.tier} {word.word} ({word.readings.join("・")})
+  </span>
+);
+
+/** The kanji's anchor words, "🌱 高い (たかい) · 🌱 最高 (さいこう)". */
 const RepWordKanji = ({ kanji }: { kanji: string }) => {
-  const repWord = useKanjiRepresentativeWordDetails(kanji);
+  const anchors = useKanjiAnchorWords(kanji);
+  if (anchors == null) return null;
 
   return (
-    <>
-      {repWord && (
-        <div className="flex justify-center gap-2 m-auto">
-          <span className="text-sm kanji-font">
-            {repWord.tags?.[0]} {repWord.word} ({repWord.reading})
-          </span>
-        </div>
+    <div className="flex flex-wrap justify-center px-2 m-auto text-sm text-center gap-x-1.5 kanji-font">
+      <AnchorWordLine word={anchors.main} />
+      {anchors.secondary && (
+        <>
+          <span aria-hidden>·</span>
+          <AnchorWordLine word={anchors.secondary} />
+        </>
       )}
-    </>
+    </div>
   );
 };
 
@@ -94,7 +137,7 @@ export const KanjiCard = ({ kanji }: { kanji: string }) => {
     <KanjiCardLayout
       main={
         <div className="relative py-2 pl-2 mr-4 rounded-3xl">
-          <span className="text-[140px] leading-none kanji-font">{kanji}</span>
+          <CopyableBigKanji kanji={kanji} />
           <div className="mt-4 font-bold uppercase -translate-y-1 text-md">
             {info.keyword}
           </div>

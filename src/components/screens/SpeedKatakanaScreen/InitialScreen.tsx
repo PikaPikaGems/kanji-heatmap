@@ -1,21 +1,35 @@
 import { PracticeButton } from "@/components/ui/practice-button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { RadioRow, ToggleRow } from "@/components/shared-practice";
+import {
+  PracticeBottomBar,
+  SoundAfterAnswering,
+  ToggleRow,
+} from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
+import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { useEnterAction } from "@/hooks/use-enter-action";
+import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
-import { TTS_DISCLAIMER } from "@/lib/tts";
-import { SoundMode, WordCount } from "./types";
-import { readSetStats } from "./storage";
+import {
+  AllChallengeSetStats,
+  summarizeChallengeSetStats,
+} from "@/lib/speed-katakana/stats";
+import { WordCount } from "./types";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 import { levelOf, positionInLevel } from "./constants";
-import { useSpeedKatakanaProgress } from "./use-speed-katakana-progress";
 import { ChallengeSetSelector } from "./ChallengeSetSelector";
 import { useChallengeSearchParam } from "./use-challenge-search-param";
 
-const SetStats = ({ challengeSet }: { challengeSet: number }) => {
-  const currentStats = readSetStats(challengeSet);
+const SetStats = ({
+  challengeSet,
+  allStats,
+}: {
+  challengeSet: number;
+  /** Null when progress isn't available (logged out, loading). */
+  allStats: AllChallengeSetStats | null;
+}) => {
+  const currentStats = allStats?.get(challengeSet);
   const level = levelOf(challengeSet);
   const pos = positionInLevel(challengeSet);
   const stats = currentStats
@@ -64,12 +78,8 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const { settings, setSetting, selectChallengeSet } =
     useChallengeSearchParam();
 
-  const { summary } = useSpeedKatakanaProgress();
-
-  const soundEnabled = settings.sound.enabled;
-  const soundType: SoundMode = settings.sound.enabled
-    ? settings.sound.type
-    : "correct";
+  const allStats = useSpeedKatakanaStats();
+  const summary = summarizeChallengeSetStats(allStats);
 
   useEnterAction(onStart);
 
@@ -89,6 +99,18 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           </div>
 
           <div className="flex flex-col gap-2">
+            <SoundAfterAnswering
+              sound={settings.sound}
+              onChange={(sound) => setSetting("sound", sound)}
+              childrenSpeak={settings.readAloudOnShow ?? false}
+            >
+              <ToggleRow
+                id="read-aloud-on-show"
+                label="Read each word aloud when it appears"
+                checked={settings.readAloudOnShow ?? false}
+                onChange={(v) => setSetting("readAloudOnShow", v)}
+              />
+            </SoundAfterAnswering>
             <ToggleRow
               id="randomize-font"
               label="Randomize Font"
@@ -126,64 +148,23 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
               )}
             </div>
 
-            <div className="flex flex-col">
-              <ToggleRow
-                id="sound-on"
-                label="Sound On"
-                checked={soundEnabled}
-                onChange={(v) =>
-                  setSetting(
-                    "sound",
-                    v ? { enabled: true, type: soundType } : { enabled: false }
-                  )
-                }
-              />
-              {soundEnabled && (
-                <div className="flex flex-wrap pl-1 animate-fade-in-fast">
-                  <RadioRow
-                    name="sound-mode"
-                    value="speak"
-                    current={soundType}
-                    label="Say out loud"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                  <RadioRow
-                    name="sound-mode"
-                    value="correct"
-                    current={soundType}
-                    label="Sound when correct"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                </div>
-              )}
-              {soundEnabled && soundType === "speak" && (
-                <p className="w-full pt-1 text-xs text-left animate-fade-in-fast">
-                  {TTS_DISCLAIMER}
-                </p>
-              )}
-            </div>
-
             <ChallengeSetSelector
               challengeSet={settings.challengeSet}
+              allStats={allStats}
               onSelect={selectChallengeSet}
             />
           </div>
 
-          <SetStats challengeSet={settings.challengeSet} />
+          <SetStats challengeSet={settings.challengeSet} allStats={allStats} />
         </div>
       </div>
 
-      <div className="shrink-0 px-4 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t-4 border-dotted rounded-3xl bg-background">
-        <div className="w-full max-w-lg mx-auto">
-          <PracticeButton size="lg" onClick={onStart}>
-            Start
-          </PracticeButton>
-        </div>
-      </div>
+      <PracticeBottomBar>
+        <PracticeButton size="lg" onClick={onStart}>
+          Start
+        </PracticeButton>
+        <SaveProgressHint />
+      </PracticeBottomBar>
     </div>
   );
 };

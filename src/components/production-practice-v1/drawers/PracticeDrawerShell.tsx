@@ -57,10 +57,16 @@ export const PracticeDrawerShell = ({
   );
 };
 
-export const NextKanjiFooter = ({ onNext }: { onNext: () => void }) => (
+export const NextKanjiFooter = ({
+  label = "Next Kanji →",
+  onNext,
+}: {
+  label?: string;
+  onNext: () => void;
+}) => (
   <div className="px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-w-md mx-auto w-full">
     <PracticeButton size="lg" onClick={onNext}>
-      Next Kanji →
+      {label}
     </PracticeButton>
   </div>
 );

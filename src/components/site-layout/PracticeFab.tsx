@@ -1,25 +1,26 @@
 import { useState } from "react";
-import { NotebookPen } from "lucide-react";
+import { Gamepad2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { DashedNavLinkList } from "@/components/common/DashedNavLinkList";
-import {
-  floatingIslandNavLinks,
-  practiceNavLinks,
-} from "@/lib/pages/nav-links";
+import { NotificationDot } from "@/components/common/NotificationDot";
+import { floatingIslandNavLinks } from "@/lib/pages/nav-links";
+import { dueNavHrefs } from "@/lib/pages/mode-nav-links";
+import { totalDue, useDueCount } from "@/lib/engine/use-due-count";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
+import { PracticeFabMenu } from "./PracticeFabMenu";
 
 const fabHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
 const prefetchPracticeRoutes = () => {
   void import("@/components/recognition-practice-v1/RecognitionPracticeV1");
+  void import("@/components/recognition-practice-v1/RecognitionPractice2");
   void import("@/components/production-practice-v1/ProductionPracticeV1");
   void import("@/components/screens/SpeedKatakanaScreen/SpeedKatakanaScreen");
   void import("@/components/screens/FillTheKanjiScreen/FillTheKanjiScreen");
@@ -36,6 +37,7 @@ export const PracticeFab = () => {
   const useSecondaryVariant = location === "/" && hasBgMeaning;
 
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
+  const due = useDueCount();
 
   if (!fabHrefs.has(location)) {
     return null;
@@ -56,7 +58,7 @@ export const PracticeFab = () => {
           size="icon"
           variant={useSecondaryVariant ? "secondary" : "primary"}
           className={cn(
-            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom)+var(--bottom-banner-height,0px))]",
+            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-0 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-11 [&_svg]:shrink-0 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom)+var(--bottom-banner-height,0px))]",
             useSecondaryVariant && "border-foreground/40"
           )}
           aria-label="Open practice menu"
@@ -64,21 +66,21 @@ export const PracticeFab = () => {
           onMouseEnter={prefetchPracticeRoutes}
           onFocus={prefetchPracticeRoutes}
         >
-          <NotebookPen />
+          <Gamepad2 />
+          {totalDue(due) > 0 && (
+            <NotificationDot className="absolute -translate-x-1/2 bottom-2 left-1/2" />
+          )}
         </PracticeButton>
       </PopoverTrigger>
       <PopoverContent
         side="top"
         align="end"
         sideOffset={12}
-        className="z-50 w-[min(100vw-1.5rem,28rem)] p-3"
+        className="z-50 w-[min(100vw-1.5rem,28rem)] p-3 pt-0"
+        aria-label="Practice menu"
       >
-        <p className="px-1 mb-2 text-sm font-semibold text-left">
-          Select a mode
-        </p>
-        <DashedNavLinkList
-          items={practiceNavLinks}
-          className="grid grid-cols-2 gap-2"
+        <PracticeFabMenu
+          dotHrefs={dueNavHrefs(due)}
           onItemClick={() => setOpen(false)}
         />
       </PopoverContent>

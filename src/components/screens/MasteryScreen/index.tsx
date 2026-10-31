@@ -1,12 +1,12 @@
-import { lazy } from "react";
-import { PageWrapper } from "@/components/dependent/site-wide/PageWrapper";
+import { lazy, Suspense } from "react";
+import { ListScreenFallback } from "../ListScreen/ListScreenFallback";
 
 const LazyMasteryScreen = lazy(() => import("./MasteryScreen"));
 
 const MasteryScreen = () => (
-  <PageWrapper>
+  <Suspense fallback={<ListScreenFallback />}>
     <LazyMasteryScreen />
-  </PageWrapper>
+  </Suspense>
 );
 
 export { MasteryScreen };

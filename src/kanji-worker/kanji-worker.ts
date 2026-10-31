@@ -11,6 +11,13 @@ import {
   WorkerApi,
 } from "@/lib/kanji/kanji-worker-types";
 import {
+  toAnchorWordBasics,
+  withFrequencyTags,
+  type KanjiAnchorWords,
+} from "@/lib/kanji/anchor-words";
+import {
+  fetchAnchorWordsDetails,
+  fetchAnchorWordsFrequencyTags,
   fetchComponents,
   fetchGeneralKanjiInfo,
   fetchHoverKanjiInfo,
@@ -20,7 +27,6 @@ import {
   fetchMultiKanjiStructures,
   fetchRadicalPopoverText,
   fetchRadicals,
-  fetchRepWordDetails,
   fetchSegmentedVocab,
   fetchSimilarKanjis,
   fetchSphmnComponents,
@@ -138,9 +144,11 @@ const loadSimilar = lazyDataset(
   (): Promise<Record<string, string[]>> => fetchSimilarKanjis()
 );
 
-const loadRepWordDetails = lazyDataset(
-  (): Promise<Record<string, [string, string]>> => fetchRepWordDetails()
-);
+/** Glosses and secondary words: the drawer, practice decks and mastery games. */
+const loadAnchorWordsDetails = lazyDataset(fetchAnchorWordsDetails);
+
+/** Tags, ranks and tier per anchor word: only the drawer's detail surfaces. */
+const loadAnchorWordsFrequencyTags = lazyDataset(fetchAnchorWordsFrequencyTags);
 
 /** Component search and the sph-mn rows of the kanji details. */
 const loadSphmnComponents = lazyDataset(() =>
@@ -364,6 +372,36 @@ const handleKanjiStructure = requirePayload(async (kanji: string) => {
   return structures[kanji] ?? null;
 });
 
+/**
+ * One kanji's anchor words with their tags, ranks and tier. Per kanji, so the
+ * drawer never copies the two whole files to the main thread.
+ */
+const handleKanjiAnchorWords = requirePayload(
+  async (kanji: string): Promise<KanjiAnchorWords | null> => {
+    const [main, details, frequencyTags] = await Promise.all([
+      CORE,
+      loadAnchorWordsDetails(),
+      loadAnchorWordsFrequencyTags(),
+    ]);
+    const info = main[kanji];
+    const basics = toAnchorWordBasics(
+      info?.repWord,
+      info?.repReading,
+      details[kanji]
+    );
+    if (basics == null) return null;
+    return {
+      main: withFrequencyTags(basics.main, frequencyTags[basics.main.word]),
+      secondary: basics.secondary
+        ? withFrequencyTags(
+            basics.secondary,
+            frequencyTags[basics.secondary.word]
+          )
+        : null,
+    };
+  }
+);
+
 const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
   const readingDetails = await loadReadingDetails();
   const entries = readingDetails[kanji];
@@ -432,7 +470,8 @@ const HANDLERS: {
       loadGeneralInfo(),
       loadSimilar(),
       loadDecomposition(),
-      loadRepWordDetails(),
+      loadAnchorWordsDetails(),
+      loadAnchorWordsFrequencyTags(),
       loadStructures(),
       loadReadingDetails(),
       loadSphmnComponents(),
@@ -440,7 +479,8 @@ const HANDLERS: {
     return null;
   },
   "component-map": () => loadComponents(),
-  "rep-word-details": () => loadRepWordDetails(),
+  "anchor-words-details": () => loadAnchorWordsDetails(),
+  "kanji-anchor-words": handleKanjiAnchorWords,
   "similar-map": () => loadSimilar(),
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,

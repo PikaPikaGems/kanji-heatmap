@@ -1,32 +1,12 @@
-import { BOOKMARK_KEY_PREFIX } from "@/lib/bookmarks";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { useKanjiSearchResult } from "@/kanji-worker/kanji-worker-hooks";
 import { isKanji } from "@/lib/utils";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
-import { useStorageValue } from "@/hooks/use-storage-value";
 import { KANJI_COUNT } from "@/lib/options/constants";
 import { getFinalResults } from "@/lib/results-utils";
 
-const countBookmarked = () => {
-  let n = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (
-      key?.startsWith(BOOKMARK_KEY_PREFIX) &&
-      localStorage.getItem(key) === "true"
-    )
-      n++;
-  }
-  return n;
-};
-
-const useKnownCount = () =>
-  useStorageValue(
-    countBookmarked,
-    (key) => key?.startsWith(BOOKMARK_KEY_PREFIX) ?? false
-  );
-
 const KnownBadge = () => {
-  const knownCount = useKnownCount();
+  const knownCount = useBookmarkedKanji().kanji.size;
 
   return (
     <>

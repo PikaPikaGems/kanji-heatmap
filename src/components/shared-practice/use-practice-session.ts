@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
-import { ActivityKind, recordActivity } from "@/lib/activity";
+import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
+import {
+  practiceRoundRecord,
+  type PracticeActivityType,
+} from "@/lib/practice/activity";
 import { PracticeItem } from "./types";
 
 export type PracticeSessionPhase = "initial" | "loading" | "playing" | "ended";
@@ -20,13 +24,13 @@ export type PracticeSessionPhase = "initial" | "loading" | "playing" | "ended";
 export const usePracticeSession = <
   TResult extends PracticeItem & { correct: boolean },
 >({
-  activityKind,
+  activityType,
   sessionSize,
   onPlay,
   onSessionStart,
   onGoToInitial,
 }: {
-  activityKind: ActivityKind;
+  activityType: PracticeActivityType;
   sessionSize: number;
   onPlay?: (commitPlaying: () => void) => void;
   onSessionStart?: () => void;
@@ -42,6 +46,7 @@ export const usePracticeSession = <
   const [runResults, setRunResults] = useState<TResult[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const setOpenedKanji = useSetOpenedParam();
+  const recorder = useActivityRecorder();
 
   // Effect needed: syncs the external ?open= URL param — the kanji drawer is
   // only allowed on the end screen, and this also clears a stale param when
@@ -60,6 +65,7 @@ export const usePracticeSession = <
     nextCursor: number,
     builtDeck?: PracticeItem[]
   ) => {
+    recorder.startRound();
     if (builtDeck) setDeck(builtDeck);
     setSessionItems(items);
     setCursor(nextCursor);
@@ -97,7 +103,7 @@ export const usePracticeSession = <
     const forgottens = sessionResults.filter((r) => !r.correct);
     const moreLeft = forgottens.length > 0 || cursor < deck.length;
 
-    recordActivity(activityKind);
+    void recorder.recordRound(practiceRoundRecord(activityType));
     setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
     setHasMore(moreLeft);
@@ -112,7 +118,15 @@ export const usePracticeSession = <
     const forgottens = (results ?? [])
       .filter((r) => !r.correct)
       .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
+        ({
+          kanji,
+          word,
+          reading,
+          englishGloss,
+          keyword,
+          fontIndex,
+          secondary,
+        }) =>
           ({
             kanji,
             word,
@@ -120,6 +134,7 @@ export const usePracticeSession = <
             englishGloss,
             keyword,
             fontIndex,
+            ...(secondary ? { secondary } : {}),
           }) satisfies PracticeItem
       );
 
@@ -149,6 +164,7 @@ export const usePracticeSession = <
     results,
     runResults,
     hasMore,
+    saveError: recorder.saveError,
     play,
     goToInitial,
     startGame,

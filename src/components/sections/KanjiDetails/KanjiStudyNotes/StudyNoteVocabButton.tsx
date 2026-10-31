@@ -6,7 +6,7 @@ import {
   useVocabDetails,
   useWordKanjis,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
 import { useHighlightVocabKanji } from "@/hooks/use-highlight-vocab-kanji";
 import { isJapanese } from "wanakana";
 
@@ -34,9 +34,9 @@ export const StudyNoteVocabButton = ({
   const [highlight] = useHighlightVocabKanji();
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
-  const representativeWord = useKanjiRepresentativeWordDetails(
+  const representativeWord = useKanjiAnchorWords(
     isSingleKanji(word) ? word : ""
-  );
+  )?.main;
 
   if (!wordHasKanji(word)) {
     if (isJapanese(word)) {
@@ -67,7 +67,7 @@ export const StudyNoteVocabButton = ({
     kanaOverride ||
     kanaFromParts ||
     (representativeWord?.word === word
-      ? representativeWord.reading
+      ? representativeWord.readings.join("・")
       : undefined) ||
     undefined;
   const meaning =

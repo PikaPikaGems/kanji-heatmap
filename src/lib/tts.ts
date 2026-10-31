@@ -1,6 +1,6 @@
 /** Reusable disclaimer for any text-to-speech feature — not every device/browser ships Japanese TTS voices. */
 export const TTS_DISCLAIMER =
-  "⚠️ text-to-speech might not work on all devices.";
+  "⚠️ Speech uses your device's built-in voice, which may not work on every device.";
 
 export const DEFAULT_JP_VOICE_ID = "default";
 

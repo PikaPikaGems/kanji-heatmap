@@ -13,7 +13,8 @@ const assetsPaths = {
   RADICAL_POPOVER_TEXT_FILE: "/json/v2/radical_popover_text.json",
   SPHMN_COMPONENTS_FILE: "/json/v2/sphmn_components.json",
   VOCAB_FILE: "/json/v2/vocab.json",
-  REP_WORD_DETAILS_FILE: "/json/v2/rep_word_details.json",
+  ANCHOR_WORDS_DETAILS_FILE: "/json/v2/anchor_words_details.json",
+  ANCHOR_WORDS_FREQUENCY_TAGS_FILE: "/json/v2/anchor_words_frequency_tags.json",
   CUM_USE: "/json/v2/cum_use.json",
   KANJI_SVGS: `${ASSETS_BASE_URL}/kanji/`,
   KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v6`, // Note: No slash at the end is intentional
@@ -29,7 +30,7 @@ const assetsPaths = {
   // One merged file in place of the four per-source structure files: 50 KB
   // gzipped against 66 KB over four requests.
   KANJI_STRUCTURES: "/json/v2/kanji_structures.json",
-  ICON_SVG: "/img/v2/app-icon.svg",
+  ICON_SVG: "/img/v3/app-logo.svg",
   SPEED_KATAKANA_CHALLENGE_SET: "/json/katakana/challenge-set-", // append `<setNumber>.json`
   FILL_THE_KANJI_SET: "/json/fill-the-kanji/", // append `<setId>/<chunk>.json`
   SPEED_KATAKANA_CORRECT_SOUND: "/sounds/correct.mp3",

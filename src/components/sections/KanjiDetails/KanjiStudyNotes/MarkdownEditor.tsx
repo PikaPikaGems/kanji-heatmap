@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef } from "react";
+import { type ReactNode, useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { EDITOR_HIGHLIGHT_CLASSES } from "./editorHighlightClasses";
 import { getMarkdownHighlightSegments } from "./markdown";
-import { LOCAL_STORAGE_WARNING } from "@/components/common/LocalStorageWarning";
+import { utf8ByteLength } from "./utf8-bytes";
+import { cnWarningTextColor } from "@/lib/generic-cn";
 
 /*
  * HOW THIS EDITOR WORKS — and why the iOS-specific code below exists.
@@ -60,10 +61,19 @@ const isIOSLikeWebKit =
   typeof CSS.supports === "function" &&
   CSS.supports("-webkit-touch-callout", "none");
 
-interface MarkdownEditorProps {
+export interface MarkdownEditorProps {
   value: string;
-  maxLength: number;
+  /**
+   * Byte budget (UTF-8) for the counter. Typing past it is allowed so a paste
+   * isn't cut off mid-way; the owner decides what to do with an over-long note.
+   * 0 means the limit isn't known (logged out): only the size is shown.
+   */
+  maxBytes: number;
   onChange: (value: string) => void;
+  /** Read-only: the owner is saying why somewhere else (e.g. another tab). */
+  disabled?: boolean;
+  /** Left of the byte counter: save status. */
+  status?: ReactNode;
   /** Grow to fill the parent instead of a fixed h-64. */
   fill?: boolean;
   autoFocus?: boolean;
@@ -71,8 +81,10 @@ interface MarkdownEditorProps {
 
 export const MarkdownEditor = ({
   value,
-  maxLength,
+  maxBytes,
   onChange,
+  disabled = false,
+  status,
   fill = false,
   autoFocus = false,
 }: MarkdownEditorProps) => {
@@ -80,6 +92,9 @@ export const MarkdownEditor = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollSyncRafRef = useRef<number | null>(null);
   const segments = useMemo(() => getMarkdownHighlightSegments(value), [value]);
+  const bytes = utf8ByteLength(value);
+  const hasLimit = maxBytes > 0;
+  const isOverLimit = hasLimit && bytes > maxBytes;
 
   const syncScrollNow = () => {
     const backdrop = backdropRef.current;
@@ -149,7 +164,8 @@ export const MarkdownEditor = ({
       <div
         className={cn(
           "relative overflow-hidden bg-background rounded-xl border-[3px] border-dotted border-border focus-within:border-ring focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring",
-          fill && "min-h-0 flex-1"
+          fill && "min-h-0 flex-1",
+          disabled && "opacity-60"
         )}
       >
         <pre
@@ -174,14 +190,14 @@ export const MarkdownEditor = ({
           ref={textareaRef}
           aria-label="Kanji study notes Markdown"
           value={value}
-          maxLength={maxLength}
+          disabled={disabled}
           rows={8}
           spellCheck={false}
           autoFocus={autoFocus}
           placeholder="Markdown works here plus useful extras! Japanese texts (e.g. 日本語, にほんご) are clickable on View Mode."
           className={cn(
             sharedEditorTextClass,
-            "relative block w-full resize-none bg-transparent outline-none",
+            "relative block w-full resize-none bg-transparent outline-none disabled:cursor-not-allowed",
             fill ? "h-full min-h-0" : "h-64",
             // Glyphs stay invisible so only the backdrop colors show; caret stays visible.
             "text-transparent caret-foreground [-webkit-text-fill-color:transparent]",
@@ -210,13 +226,15 @@ export const MarkdownEditor = ({
           onBlur={stopScrollSyncLoop}
         />
       </div>
-      <div className="flex justify-between mt-1.5 pr-2">
-        <p className="text-xs">{LOCAL_STORAGE_WARNING}</p>
+      <div className="flex items-center justify-between gap-2 mt-1.5 pr-2">
+        <div className="flex flex-wrap items-center min-w-0 gap-x-2 text-xs text-left">
+          {status}
+        </div>
         <p
-          className={`shrink-0 text-xs text-right font-bold ${value.length >= maxLength ? "text-red-500" : "text-muted-foreground"}`}
+          className={`shrink-0 text-xs text-right font-bold ${isOverLimit ? cnWarningTextColor : "text-muted-foreground"}`}
           aria-live="polite"
         >
-          {value.length} / {maxLength}
+          {hasLimit ? `${bytes} / ${maxBytes} bytes` : `${bytes} bytes`}
         </p>
       </div>
     </div>

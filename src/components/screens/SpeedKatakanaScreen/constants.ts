@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS: SpeedKatakanaSettings = {
   displayEnglish: true,
   wordCount: 48,
   sound: { enabled: true, type: "correct" },
+  readAloudOnShow: false,
 };
 
 export const SPEED_KATAKANA_TOTAL_CHALLENGES = 200;

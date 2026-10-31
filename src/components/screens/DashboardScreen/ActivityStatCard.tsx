@@ -1,4 +1,7 @@
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { SquarePlus, type LucideIcon } from "lucide-react";
+import { GenericPopover } from "@/components/common/GenericPopover";
+import { InfoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import {
   HoverCard,
@@ -7,7 +10,8 @@ import {
 } from "@/components/ui/hover-card";
 import { formatCompactCount, formatRawCount } from "@/lib/format-count";
 
-const StatValue = ({
+/** A count; at 1,000 and over it shows abbreviated, with the exact count on hover. */
+export const StatValue = ({
   display,
   raw,
   abbreviated,
@@ -58,16 +62,52 @@ export const OverviewCaption = ({
   Icon,
   label,
   value,
+  info,
 }: {
   Icon: LucideIcon;
   label: string;
   value: string;
+  /** What the number means, behind an ⓘ after the value. */
+  info?: ReactNode;
 }) => (
   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
     <Icon className="size-4 shrink-0" aria-hidden />
     <span>
       {label}: <span className="font-bold text-foreground">{value}</span>
     </span>
+    {info && (
+      <GenericPopover
+        trigger={
+          <button
+            type="button"
+            aria-label={`About ${label}`}
+            className="rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <InfoIcon className="size-3.5" aria-hidden />
+          </button>
+        }
+        content={
+          <p className="px-4 py-3 text-xs text-left w-60 text-pretty">{info}</p>
+        }
+      />
+    )}
+  </div>
+);
+
+/** "Items added" with its ⓘ: what counts as an addition. */
+export const ItemsAddedCaption = ({ count }: { count: number }) => (
+  <OverviewCaption
+    Icon={SquarePlus}
+    label="Items added"
+    value={formatRawCount(count)}
+    info="Each time a kanji goes into your review pile with its words. Removing a kanji and adding it back counts as 2."
+  />
+);
+
+/** Stands in for an OverviewCaption while its value loads. */
+export const OverviewCaptionSkeleton = () => (
+  <div className="flex justify-center">
+    <div className="w-40 h-5 rounded-full bg-muted animate-pulse" />
   </div>
 );
 
@@ -133,12 +173,26 @@ export const ActivityStatCard = ({
       <div className="flex items-center justify-center border rounded-lg size-7 shrink-0 border-foreground/10 bg-background text-foreground/65">
         <Icon className="size-3.5" aria-hidden />
       </div>
-      <div className="text-xs truncate">{title}</div>
+      <div className="text-xs leading-tight line-clamp-2">{title}</div>
     </div>
-    <div className="flex flex-col items-start pl-0.5 gap-x-4 gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline">
+    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
       {counts.map((count, i) => (
         <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}
+    </div>
+  </div>
+);
+
+/** Stands in for an ActivityStatCard while its counts load. */
+export const ActivityStatCardSkeleton = () => (
+  <div className="flex flex-col w-full min-w-0 gap-2 px-2.5 py-2 border rounded-xl border-foreground/5 bg-muted/10 animate-pulse sm:px-3 sm:py-2.5">
+    <div className="flex items-center min-w-0 gap-2">
+      <div className="rounded-lg size-7 shrink-0 bg-muted" />
+      <div className="w-24 h-3 rounded-full bg-muted" />
+    </div>
+    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
+      <div className="w-14 h-7 rounded-lg bg-muted" />
+      <div className="h-[18px] w-16 rounded-lg bg-muted" />
     </div>
   </div>
 );

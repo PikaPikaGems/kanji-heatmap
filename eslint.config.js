@@ -12,7 +12,7 @@ const {
 } = reactPlugin.configs.recommended.rules;
 
 export default tseslint.config(
-  { ignores: ["dist", "functions/types.d.ts"] },
+  { ignores: ["dist", "functions/types.d.ts", ".study-engine"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

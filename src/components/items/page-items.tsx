@@ -9,11 +9,23 @@ import {
   DashboardScreen,
   MasteryScreen,
 } from "@/components/screens";
-import { RecognitionPracticeV1Screen } from "@/components/recognition-practice-v1";
+import {
+  RecognitionPracticeV1Screen,
+  RecognitionPractice2Screen,
+} from "@/components/recognition-practice-v1";
 import { ProductionPracticeV1Screen } from "@/components/production-practice-v1";
 import {
+  ReadingMasteryScreen,
+  ReadingMastery2Screen,
+  WritingMasteryScreen,
+} from "@/components/mastery-review";
+import {
   recognitionPracticePageMeta,
+  recognitionPractice2PageMeta,
   productionPracticePageMeta,
+  readingMasteryPageMeta,
+  readingMastery2PageMeta,
+  writingMasteryPageMeta,
   speedKatakanaPageMeta,
   fillTheKanjiPageMeta,
 } from "@/lib/pages/practice-pages";
@@ -77,9 +89,29 @@ const recognitionPracticeV1Page = {
   Component: RecognitionPracticeV1Screen,
 };
 
+const recognitionPractice2Page = {
+  ...recognitionPractice2PageMeta,
+  Component: RecognitionPractice2Screen,
+};
+
 const productionPracticeV1Page = {
   ...productionPracticePageMeta,
   Component: ProductionPracticeV1Screen,
+};
+
+const readingMasteryPage = {
+  ...readingMasteryPageMeta,
+  Component: ReadingMasteryScreen,
+};
+
+const readingMastery2Page = {
+  ...readingMastery2PageMeta,
+  Component: ReadingMastery2Screen,
+};
+
+const writingMasteryPage = {
+  ...writingMasteryPageMeta,
+  Component: WritingMasteryScreen,
 };
 
 const pageItems = {
@@ -93,7 +125,11 @@ const pageItems = {
   speedKatakanaPage,
   fillTheKanjiPage,
   recognitionPracticeV1Page,
+  recognitionPractice2Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  readingMastery2Page,
+  writingMasteryPage,
 };
 
 export default pageItems;
