@@ -19,7 +19,12 @@ import { useGetAnchorWordsFn } from "@/providers/kanji-representative-word-hooks
 import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
-import { useHeatmapMetric } from "./use-heatmap-metric";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
+import {
+  BOOKMARKED_FILL_CN,
+  useHeatmapMetric,
+  useHighlightBookmarked,
+} from "./use-heatmap-metric";
 
 type TileColorLookup = (kanji: Kanji) => TileColor;
 
@@ -30,12 +35,14 @@ type GetAnchorWords = (
 type CachedLookup = {
   getInfo: GetBasicKanjiInfo | null;
   getAnchorWords: GetAnchorWords | null;
+  /** The bookmarks to paint solid, or null when the highlight is off. */
+  bookmarked: ReadonlySet<Kanji> | null;
   lookup: TileColorLookup;
 };
 
 // The pile map is stable between store updates, so a lookup built for it and
 // a metric keeps its identity: tiles only re-render when the pile, the
-// metric or the kanji info changes (no useMemo).
+// metric, the kanji info or the highlighted bookmarks change (no useMemo).
 const lookupsByPile = new WeakMap<
   ReadonlyMap<Kanji, ReviewPileItemView>,
   Map<HeatmapMetric, CachedLookup>
@@ -62,7 +69,8 @@ const getLookup = (
   pile: ReadonlyMap<Kanji, ReviewPileItemView>,
   metric: HeatmapMetric,
   getInfo: GetBasicKanjiInfo | null,
-  getAnchorWords: GetAnchorWords | null
+  getAnchorWords: GetAnchorWords | null,
+  bookmarked: ReadonlySet<Kanji> | null
 ): TileColorLookup => {
   const byMetric = lookupsByPile.get(pile) ?? new Map();
   lookupsByPile.set(pile, byMetric);
@@ -70,13 +78,22 @@ const getLookup = (
   if (
     cached &&
     cached.getInfo === getInfo &&
-    cached.getAnchorWords === getAnchorWords
+    cached.getAnchorWords === getAnchorWords &&
+    cached.bookmarked === bookmarked
   ) {
     return cached.lookup;
   }
 
   const measure = getHeatmapMeasure(metric);
   const lookup: TileColorLookup = (kanji) => {
+    if (bookmarked?.has(kanji)) {
+      return {
+        bgCn: pile.has(kanji)
+          ? BOOKMARKED_FILL_CN.reviewing
+          : BOOKMARKED_FILL_CN.bookmarked,
+        textCn: "text-black",
+      };
+    }
     // Read per tile, not when the lookup is built: mastery levels depend on
     // the clock, and the lookup lives as long as the pile snapshot.
     const band = getHeatmapBand(metric, pile.get(kanji), Date.now());
@@ -86,13 +103,15 @@ const getLookup = (
       dimmed: hasNoCardFor(kanji, metric, getInfo, getAnchorWords),
     };
   };
-  byMetric.set(metric, { getInfo, getAnchorWords, lookup });
+  byMetric.set(metric, { getInfo, getAnchorWords, bookmarked, lookup });
   return lookup;
 };
 
 /** Colors the tiles below by the picked metric instead of by frequency. */
 export const MasteryTileColors = ({ children }: { children: ReactNode }) => {
   const [metric] = useHeatmapMetric();
+  const [highlightBookmarked] = useHighlightBookmarked();
+  const bookmarks = useBookmarkedKanji();
   const { byKanji } = useReviewPileByKanji();
   const getInfo = useGetKanjiInfoFn();
   // The secondary words are only needed to dim kanji without one.
@@ -102,7 +121,13 @@ export const MasteryTileColors = ({ children }: { children: ReactNode }) => {
 
   return (
     <TileColorContext.Provider
-      value={getLookup(byKanji, metric, getInfo, getAnchorWords)}
+      value={getLookup(
+        byKanji,
+        metric,
+        getInfo,
+        getAnchorWords,
+        highlightBookmarked ? bookmarks.kanji : null
+      )}
     >
       {children}
     </TileColorContext.Provider>

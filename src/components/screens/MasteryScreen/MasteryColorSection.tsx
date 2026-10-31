@@ -10,6 +10,7 @@ import {
 } from "@/lib/engine/mastery-heatmap-metrics";
 import { MasteryScaleLegend } from "./MasteryLegend";
 import { MeasureIntro } from "./MeasureIntro";
+import { BookmarkedHighlightSwitch } from "./BookmarkedHighlightSwitch";
 import { useHeatmapMetric } from "./use-heatmap-metric";
 
 /** Mastery's stand-in for the frequency "Background Color Meaning" section. */
@@ -41,6 +42,7 @@ export const MasteryColorSection = () => {
           combined={isCombinedHeatmapMetric(metric)}
         />
       </div>
+      <BookmarkedHighlightSwitch />
     </>
   );
 };

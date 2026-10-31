@@ -2,6 +2,10 @@ import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections
 import { moreGamesNavLinks, practiceFabColumns } from "@/lib/pages/nav-links";
 import { useVisibleNavSections } from "@/lib/pages/mode-nav-links";
 
+/** Soft filled tiles instead of the dashed boxes; a ring on keyboard focus. */
+const TILE_CN =
+  "border-0 bg-foreground/[0.04] hover:bg-foreground/10 active:bg-foreground/15 outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:bg-foreground/10";
+
 const MORE_GAMES = [{ heading: "More Games", links: moreGamesNavLinks }];
 
 /**
@@ -26,6 +30,7 @@ export const PracticeFabMenu = ({
           sections={columns}
           dotHrefs={dotHrefs}
           listClassName="grid gap-2"
+          itemClassName={TILE_CN}
           hideDescriptions
           onItemClick={onItemClick}
         />
@@ -33,6 +38,7 @@ export const PracticeFabMenu = ({
       <DashedNavLinkSections
         sections={MORE_GAMES}
         listClassName="grid grid-cols-2 gap-2"
+        itemClassName={TILE_CN}
         hideDescriptions
         onItemClick={onItemClick}
       />

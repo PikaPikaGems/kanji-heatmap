@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 export type NavLinkListProps = {
   /** Layout of the links inside each section. */
   listClassName?: string;
+  /** Overrides on each link's box, e.g. filled tiles instead of dashed borders. */
+  itemClassName?: string;
   onItemClick?: () => void;
   onItemPointerDown?: (e: React.PointerEvent) => void;
   /** Hrefs that show the due dot. */
@@ -37,6 +39,7 @@ export const NavSectionHeadingText = ({
 export const NavSectionLinks = ({
   links,
   listClassName,
+  itemClassName,
   onItemClick,
   onItemPointerDown,
   dotHrefs,
@@ -55,6 +58,7 @@ export const NavSectionLinks = ({
           onClick={onItemClick}
           onPointerDown={onItemPointerDown}
           showDot={dotHrefs?.has(item.href)}
+          className={itemClassName}
         />
       );
 
