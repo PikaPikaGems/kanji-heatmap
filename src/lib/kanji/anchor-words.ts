@@ -105,3 +105,73 @@ export const findAnchorWord = <T extends AnchorWordBasics>(
   if (words.secondary?.word === word) return words.secondary;
   return null;
 };
+
+/** The tier emoji's name, as on the kanji-common-words pages. */
+export const ANCHOR_TIER_LABELS: Record<string, string> = {
+  "🌱": "Basic",
+  "☘️": "Common",
+  "🌷": "Fluent",
+  "📚": "Advanced",
+  "🌶️": "Niche",
+  "🦉": "Unranked",
+};
+
+/** The 15 frequency lists behind `AnchorWord.ranks`, in order. */
+export const ANCHOR_RANK_SOURCES: { label: string; description: string }[] = [
+  {
+    label: "Conversations",
+    description:
+      "Everyday spoken Japanese: the Corpus of Everyday Japanese Conversation (CEJC), all conversations.",
+  },
+  {
+    label: "Small talk",
+    description: "Casual small talk (雑談) in the CEJC conversation corpus.",
+  },
+  {
+    label: "Written (compounds)",
+    description:
+      "Written Japanese (BCCWJ corpus), counting compounds as one word.",
+  },
+  {
+    label: "Written (short words)",
+    description: "Written Japanese (BCCWJ corpus), split into short words.",
+  },
+  {
+    label: "Web (CC100)",
+    description: "Web text from the CommonCrawl CC100 corpus.",
+  },
+  {
+    label: "Web (NWJC)",
+    description: "The NINJAL Web Japanese Corpus.",
+  },
+  { label: "Wikipedia", description: "Japanese Wikipedia." },
+  {
+    label: "Slice-of-life anime",
+    description: "Subtitles of slice-of-life anime.",
+  },
+  {
+    label: "Media (jiten)",
+    description: "Anime, drama, novels, games and more, from jiten.moe.",
+  },
+  { label: "TV drama (jiten)", description: "TV drama, from jiten.moe." },
+  { label: "Anime + drama", description: "Anime and drama subtitles." },
+  { label: "YouTube", description: "Transcribed YouTube videos." },
+  { label: "Netflix", description: "Netflix subtitles." },
+  {
+    label: "Netflix (no names)",
+    description: "Netflix subtitles, with names removed.",
+  },
+  {
+    label: "jpdb",
+    description: "jpdb.io: the word's place in the JPDB frequency deck.",
+  },
+];
+
+/** Ranks beyond this fill none of the bar. */
+export const ANCHOR_RANK_BAR_MAX = 15_000;
+
+/** How full a rank's bar is, 0–100; an unranked word (-1) has an empty bar. */
+export const anchorRankProgress = (rank: number) =>
+  rank === -1
+    ? 0
+    : (Math.max(ANCHOR_RANK_BAR_MAX - rank, 0) * 100) / ANCHOR_RANK_BAR_MAX;

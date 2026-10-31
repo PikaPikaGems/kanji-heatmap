@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { Eye, PenLine, type LucideIcon } from "lucide-react";
-import type { CardProgress, ReviewPileItemView } from "engine-contract";
+import type {
+  CardProgress,
+  CardType,
+  ReviewPileItemView,
+} from "engine-contract";
 import { InfoIcon } from "@/components/icons";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import {
@@ -28,6 +32,12 @@ import {
   stabilityBand,
 } from "@/lib/engine/mastery-metrics";
 import { relativeTime } from "@/lib/engine/relative-time";
+import {
+  ALL_CARD_TYPES,
+  CARD_TYPE_LABELS,
+  cardProgress,
+} from "@/lib/engine/card-types";
+import { cn } from "@/lib/utils";
 
 const NONE = "—";
 const NOT_APPLICABLE = "N/A";
@@ -220,50 +230,80 @@ const FieldLabel = ({ label, definition }: Omit<Field, "cell">) => (
   />
 );
 
-const COLUMNS: {
-  title: string;
-  Icon: LucideIcon;
-  kind: "writing" | "reading";
-}[] = [
-  { title: "Writing", Icon: PenLine, kind: "writing" },
-  { title: "Reading", Icon: Eye, kind: "reading" },
-];
+const COLUMN_ICONS: Record<CardType, LucideIcon> = {
+  writing: PenLine,
+  reading: Eye,
+  secondaryReading: Eye,
+};
+
+/** The word each card asks about; `secondaryReading` is absent without a secondary word. */
+export type ProgressTableWords = Partial<Record<CardType, string>>;
+
+/** "No 2nd word": one cell down the whole Reading II column. */
+const NO_SECONDARY_WORD = "No 2nd word";
+
+const ColumnHeader = ({
+  cardType,
+  word,
+}: {
+  cardType: CardType;
+  word: string | undefined;
+}) => {
+  const Icon = COLUMN_ICONS[cardType];
+  return (
+    <TableHead
+      className={cn(
+        "h-auto px-1.5 py-2 align-top sm:px-3",
+        word == null && "opacity-50"
+      )}
+    >
+      <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase whitespace-nowrap text-foreground">
+        <Icon className="size-3.5 shrink-0" aria-hidden />
+        {CARD_TYPE_LABELS[cardType]}
+      </span>
+      <span className="block text-sm font-normal truncate kanji-font text-foreground">
+        {word ?? NONE}
+      </span>
+    </TableHead>
+  );
+};
 
 /**
- * A kanji's reading and writing progress side by side, one field per row.
- * `item` is null when there is nothing to show yet (logged out, or not in
- * the review pile), which fills every cell with its default.
+ * A kanji's cards side by side (Writing, Reading I, Reading II), one field
+ * per row, each column headed by the word it asks about. `item` is null when
+ * there is nothing to show yet (logged out, or not in the review pile), which
+ * fills every cell with its default. Without a secondary word the Reading II
+ * column is one faded "No 2nd word" cell.
  */
 export const ProgressTable = ({
   item,
+  words,
 }: {
   item: ReviewPileItemView | null;
+  words: ProgressTableWords;
 }) => {
   const now = Date.now();
+  const hasSecondary = words.secondaryReading != null;
 
   return (
     <div className="mt-4 overflow-hidden border rounded-xl border-foreground/10 bg-muted/10">
       <Table className="table-fixed">
         <TableHeader>
           <TableRow className="border-foreground/10 bg-muted/30 hover:bg-muted/30">
-            <TableHead className="w-[36%] h-auto px-2 py-2 text-[10px] font-bold tracking-wider uppercase sm:w-48 sm:px-3">
+            <TableHead className="w-[28%] h-auto px-2 py-2 text-[10px] font-bold tracking-wider uppercase align-top sm:w-40 sm:px-3">
               Field
             </TableHead>
-            {COLUMNS.map(({ title, Icon }) => (
-              <TableHead
-                key={title}
-                className="h-auto px-2 py-2 text-[10px] font-bold tracking-wider uppercase text-foreground sm:px-3"
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  <Icon className="size-3.5 shrink-0" aria-hidden />
-                  {title}
-                </span>
-              </TableHead>
+            {ALL_CARD_TYPES.map((cardType) => (
+              <ColumnHeader
+                key={cardType}
+                cardType={cardType}
+                word={words[cardType]}
+              />
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {FIELDS.map(({ label, definition, cell }) => (
+          {FIELDS.map(({ label, definition, cell }, row) => (
             <TableRow
               key={label}
               className="border-dotted border-foreground/15 hover:bg-transparent"
@@ -271,17 +311,30 @@ export const ProgressTable = ({
               <TableCell className="px-2 py-1.5 text-left sm:px-3">
                 <FieldLabel label={label} definition={definition} />
               </TableCell>
-              {COLUMNS.map(({ kind }) => {
-                const { text, swatchCn } = cell(item?.[kind] ?? null, now);
+              {ALL_CARD_TYPES.map((cardType) => {
+                if (cardType === "secondaryReading" && !hasSecondary) {
+                  if (row > 0) return null;
+                  return (
+                    <TableCell
+                      key={cardType}
+                      rowSpan={FIELDS.length}
+                      className="px-1.5 text-xs font-bold text-center align-middle opacity-50 sm:px-3"
+                    >
+                      {NO_SECONDARY_WORD}
+                    </TableCell>
+                  );
+                }
+                const card = item ? cardProgress(item, cardType) : null;
+                const { text, swatchCn } = cell(card, now);
                 return (
                   <TableCell
-                    key={kind}
-                    className="px-2 py-1.5 text-[13px] font-bold text-left whitespace-nowrap tabular-nums sm:px-3 sm:text-sm"
+                    key={cardType}
+                    className="px-1.5 py-1.5 text-xs font-bold text-left tabular-nums sm:px-3 sm:text-sm"
                   >
-                    <span className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="flex items-start gap-1.5">
                       {swatchCn ? (
                         <span
-                          className={`inline-block size-3 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
+                          className={`inline-block size-3 mt-0.5 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
                           aria-hidden
                         />
                       ) : null}

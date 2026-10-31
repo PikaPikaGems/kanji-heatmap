@@ -139,12 +139,15 @@ const KanjiEssay = lazy(() => import("./KanjiEssay"));
 const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
-  const info = useKanjiAnchorWords(kanji)?.main;
+  const anchors = useKanjiAnchorWords(kanji);
+  const words = anchors
+    ? [anchors.main.word, anchors.secondary?.word].filter(Boolean).join(" · ")
+    : "";
 
   return (
     <>
       <SimpleAccordion
-        trigger={`Anchor Word${info?.word ? `: ${info?.word}` : ""}`}
+        trigger={`${anchors?.secondary ? "Anchor Words" : "Anchor Word"}${words ? `: ${words}` : ""}`}
         defaultOpen={false}
       >
         <RepresentativeStudyWord kanji={kanji} />

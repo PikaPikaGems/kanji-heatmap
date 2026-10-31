@@ -17,7 +17,15 @@ import {
   refreshReviewPileItem,
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
-import { ProgressTable } from "./ProgressTable";
+import type { ReviewPileItemView } from "engine-contract";
+import { getBandFillCn } from "@/lib/engine/mastery-colors";
+import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import {
+  itemBand,
+  itemCards,
+  MASTERY_LEVEL_LABELS,
+} from "@/lib/engine/mastery-metrics";
+import { ProgressTable, type ProgressTableWords } from "./ProgressTable";
 import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
 import { reviewPileAddCn } from "./review-pile-add-cn";
 import { cnWarningText } from "@/lib/generic-cn";
@@ -40,13 +48,61 @@ const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
   </UserNotice>
 );
 
+/** The words the kanji's cards would ask about if it were added now. */
+const wordsFromData = (
+  kanji: string,
+  pile: { words: PileWords } | null
+): ProgressTableWords => ({
+  writing: kanji,
+  reading: pile?.words.word,
+  secondaryReading: pile?.words.secondaryWord,
+});
+
+/** The words the pile item's cards ask about (fixed when it was added). */
+const wordsFromItem = (item: ReviewPileItemView): ProgressTableWords => ({
+  writing: item.kanji,
+  reading: item.word,
+  secondaryReading: item.secondary?.word,
+});
+
+/** "Combined mastery: ● Fresh (lowest of 3 cards)", above the table. */
+const CombinedMastery = ({ item }: { item: ReviewPileItemView }) => {
+  const band = itemBand(item, "combined", "mastery", Date.now());
+  const count = itemCards(item).length;
+  return (
+    <p className="flex flex-wrap items-center px-1 pt-1 text-sm text-left gap-x-1.5">
+      <span>Combined mastery:</span>
+      <span className="inline-flex items-center gap-1.5 font-bold">
+        <span
+          aria-hidden
+          className={cn(
+            "size-3 rounded-sm border border-black/20 dark:border-white/25",
+            getBandFillCn("mastery", band)
+          )}
+        />
+        {band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band]}
+      </span>
+      <span className="text-muted-foreground">
+        ({band == null ? "until all" : "lowest of"} {count} cards
+        {band == null ? " are reviewed" : ""})
+      </span>
+    </p>
+  );
+};
+
 /** Logged out: the table with its defaults, under the log-in notice. */
-const SignedOutKanjiProgress = () => (
-  <div className="flex flex-col gap-3 pb-1">
-    <LoginNotice to="track your progress on this kanji" className="px-1 pt-1" />
-    <ProgressTable item={null} />
-  </div>
-);
+const SignedOutKanjiProgress = ({ kanji }: { kanji: string }) => {
+  const pile = usePileWords(kanji);
+  return (
+    <div className="flex flex-col gap-3 pb-1">
+      <LoginNotice
+        to="track your progress on this kanji"
+        className="px-1 pt-1"
+      />
+      <ProgressTable item={null} words={wordsFromData(kanji, pile)} />
+    </div>
+  );
+};
 
 /** Logged in, not in the review pile: the defaults, plus a way to add it. */
 const NotInPileKanjiProgress = ({
@@ -93,12 +149,12 @@ const NotInPileKanjiProgress = ({
           </p>
         )}
       </div>
-      <ProgressTable item={null} />
+      <ProgressTable item={null} words={wordsFromData(kanji, pile)} />
     </div>
   );
 };
 
-/** Logged in: the kanji's reading and writing cards from `pile.watch`. */
+/** Logged in: the kanji's cards from `pile.watch`. */
 const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
@@ -131,9 +187,20 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
       />
     );
   }
+  const missingSecondary =
+    item.secondary == null ? pile?.words.secondaryWord : undefined;
   return (
     <div className="flex flex-col gap-1 pb-1">
-      <ProgressTable item={item} />
+      <CombinedMastery item={item} />
+      <ProgressTable item={item} words={wordsFromItem(item)} />
+      {missingSecondary && (
+        <UserNotice className="px-1 pt-2 text-xs text-left">
+          Reading II isn&apos;t in your review pile for this kanji. To add{" "}
+          <span className="kanji-font">{missingSecondary}</span>, remove{" "}
+          <span className="kanji-font">{kanji}</span> from your review pile and
+          add it again. Its progress starts over.
+        </UserNotice>
+      )}
       <div className="px-1 text-left">
         <RemoveFromReviewPile kanji={kanji} disabled={blocker != null} />
       </div>
@@ -162,7 +229,9 @@ const KanjiProgress = ({ kanji }: { kanji: string }) => {
     );
   }
   if (status.kind === "loading") return <Spinner />;
-  if (status.kind === "signed-out") return <SignedOutKanjiProgress />;
+  if (status.kind === "signed-out") {
+    return <SignedOutKanjiProgress kanji={kanji} />;
+  }
   return <ActiveKanjiProgress kanji={kanji} />;
 };
 
