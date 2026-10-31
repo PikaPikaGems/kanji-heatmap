@@ -12,7 +12,11 @@ import {
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
 import { getBandLabels } from "@/lib/engine/mastery-heatmap-metrics";
-import { ALL_CARD_TYPES, cardProgress } from "@/lib/engine/card-types";
+import {
+  ALL_CARD_TYPES,
+  CARD_TYPE_LABELS,
+  cardProgress,
+} from "@/lib/engine/card-types";
 import {
   isCardStarted,
   itemBand,
@@ -22,14 +26,12 @@ import {
 } from "@/lib/engine/mastery-metrics";
 
 export const MASTERY_CARD_KINDS: readonly MasteryCardKind[] = [
-  "reading",
-  "writing",
+  ...ALL_CARD_TYPES,
   "combined",
 ];
 
 export const KIND_TITLES: Record<MasteryCardKind, string> = {
-  reading: "Reading",
-  writing: "Writing",
+  ...CARD_TYPE_LABELS,
   combined: "Combined",
 };
 
@@ -74,8 +76,11 @@ export const JOUYOU_GROUPING: MasteryGrouping = {
 export type BandCounts = number[];
 
 export type MasteryTally = {
-  /** Kanji that have an anchor word: the 100% every bar is measured against. */
-  total: number;
+  /**
+   * The 100% each card kind's bars are measured against: kanji with a main
+   * anchor word, or for Reading II, kanji with a secondary word.
+   */
+  totals: Record<MasteryCardKind, number>;
 } & Record<MasteryMetric, Record<MasteryCardKind, BandCounts>>;
 
 const emptyBands = (metric: MasteryMetric): BandCounts =>
@@ -83,12 +88,13 @@ const emptyBands = (metric: MasteryMetric): BandCounts =>
 
 const emptyByKind = (metric: MasteryMetric) => ({
   reading: emptyBands(metric),
+  secondaryReading: emptyBands(metric),
   writing: emptyBands(metric),
   combined: emptyBands(metric),
 });
 
 const emptyTally = (): MasteryTally => ({
-  total: 0,
+  totals: { reading: 0, secondaryReading: 0, writing: 0, combined: 0 },
   mastery: emptyByKind("mastery"),
   stability: emptyByKind("stability"),
   difficulty: emptyByKind("difficulty"),
@@ -112,7 +118,7 @@ const fillNotStarted = (tally: MasteryTally) => {
     for (const kind of MASTERY_CARD_KINDS) {
       const counts = tally[metric][kind];
       const started = counts.reduce((sum, n) => sum + n, 0);
-      counts[0] = Math.max(0, tally.total - started);
+      counts[0] = Math.max(0, tally.totals[kind] - started);
     }
   }
 };
@@ -122,16 +128,25 @@ export type MasteryTallies = {
   all: MasteryTally;
 };
 
+/** Adds one kanji to a tally's totals (Reading II only with a secondary word). */
+const addToTotals = (tally: MasteryTally, secondary: boolean) => {
+  tally.totals.reading += 1;
+  tally.totals.writing += 1;
+  tally.totals.combined += 1;
+  if (secondary) tally.totals.secondaryReading += 1;
+};
+
 /**
  * Buckets every pile card by group, card kind and metric band. `allKanji`
  * is every kanji in the app; only those with an anchor word can be studied,
- * so only they count toward a group's total. `now` (ms) dates the mastery
- * levels.
+ * so only they count toward a group's totals (and only those with a
+ * secondary word toward Reading II's). `now` (ms) dates the mastery levels.
  */
 export const tallyMastery = (
   allKanji: readonly string[],
   pile: readonly ReviewPileItemView[],
   getInfo: GetBasicKanjiInfo,
+  hasSecondaryWord: (kanji: string) => boolean,
   grouping: MasteryGrouping,
   now: number
 ): MasteryTallies => {
@@ -143,18 +158,23 @@ export const tallyMastery = (
   for (const kanji of allKanji) {
     const info = getInfo(kanji);
     if (!info?.repWord) continue;
-    byGroup[grouping.keyOf(info)].total += 1;
-    all.total += 1;
+    const secondary = hasSecondaryWord(kanji);
+    addToTotals(byGroup[grouping.keyOf(info)], secondary);
+    addToTotals(all, secondary);
   }
 
   for (const item of pile) {
     const info = getInfo(item.kanji);
     const tally = byGroup[grouping.keyOf(info)];
-    // A piled kanji whose anchor word is gone from the data still has
-    // progress to show, so it joins the total rather than overflowing it.
+    // A piled kanji whose anchor word (or secondary word) is gone from the
+    // data still has progress to show, so it joins the totals rather than
+    // overflowing them.
     if (!info?.repWord) {
-      tally.total += 1;
-      all.total += 1;
+      addToTotals(tally, item.secondary != null);
+      addToTotals(all, item.secondary != null);
+    } else if (item.secondary && !hasSecondaryWord(item.kanji)) {
+      tally.totals.secondaryReading += 1;
+      all.totals.secondaryReading += 1;
     }
     for (const kind of MASTERY_CARD_KINDS) {
       countStarted(tally, item, kind, now);

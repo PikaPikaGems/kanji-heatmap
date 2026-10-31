@@ -3,9 +3,10 @@ import type { CardType, ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
 import { formatInterval } from "@/lib/engine/format-interval";
-import { CARD_TYPE_LABELS } from "@/lib/engine/card-types";
+import { ALL_CARD_TYPES, CARD_TYPE_LABELS } from "@/lib/engine/card-types";
 import { MasterySubsection } from "./MasterySubsection";
-import { TwoWaySwitch } from "../TwoWaySwitch";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { Tabs } from "@/components/ui/tabs";
 import {
   leastStableCards,
   MOST_DIFFICULT_ABOVE,
@@ -96,20 +97,24 @@ const TopListItem = ({
   empty: (cardType: CardType) => EmptyList;
   captionFor?: (card: TopCard) => string;
 }) => {
-  const [cardType, setCardType] = useState<CardType>("reading");
+  const [cardType, setCardType] = useState<CardType>("writing");
   return (
     <MasterySubsection title={title}>
       <p className="mb-3 text-xs text-left text-muted-foreground">{about}</p>
-      <TwoWaySwitch
-        className="justify-start"
-        left="Reading"
-        right="Writing"
-        checked={cardType === "writing"}
-        onCheckedChange={(writing) =>
-          setCardType(writing ? "writing" : "reading")
-        }
-        ariaLabel="Toggle between reading and writing cards"
-      />
+      <Tabs
+        value={cardType}
+        onValueChange={(value) => setCardType(value as CardType)}
+      >
+        <SegmentedTabsList
+          value={cardType}
+          label="Card type"
+          className="h-9 text-xs"
+          options={ALL_CARD_TYPES.map((value) => ({
+            value,
+            label: CARD_TYPE_LABELS[value],
+          }))}
+        />
+      </Tabs>
       <div key={cardType} className="animate-fade-in-fast">
         <TopTiles
           cards={cardsFor(pile, cardType)}

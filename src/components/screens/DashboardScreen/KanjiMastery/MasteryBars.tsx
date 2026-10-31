@@ -20,8 +20,14 @@ import {
   tallyMastery,
 } from "./mastery-tally";
 
-/** Cards side by side on wider screens: one column per card shown. */
-const GRID_COLUMNS_CN = ["", "", "md:grid-cols-2", "md:grid-cols-3"];
+/** Cards side by side on wider screens: one column per card shown (four as 2 × 2). */
+const GRID_COLUMNS_CN = [
+  "",
+  "",
+  "md:grid-cols-2",
+  "md:grid-cols-3",
+  "md:grid-cols-2",
+];
 
 /**
  * One measure's statistics: what it means (its ⓘ opens the bands), the
@@ -36,6 +42,7 @@ export const MasteryBars = ({
   pile,
   allKanji,
   getInfo,
+  hasSecondaryWord,
 }: {
   metric: MasteryMetric;
   shownKinds: MasteryKindFilter;
@@ -43,12 +50,20 @@ export const MasteryBars = ({
   pile: readonly ReviewPileItemView[];
   allKanji: readonly string[];
   getInfo: GetBasicKanjiInfo;
+  hasSecondaryWord: (kanji: string) => boolean;
 }) => {
   const [showJouyou, setShowJouyou] = useState(false);
 
   const grouping = showJouyou ? JOUYOU_GROUPING : JLPT_GROUPING;
   // Read at render: levels shift over weeks, so no ticking timer is needed.
-  const tallies = tallyMastery(allKanji, pile, getInfo, grouping, Date.now());
+  const tallies = tallyMastery(
+    allKanji,
+    pile,
+    getInfo,
+    hasSecondaryWord,
+    grouping,
+    Date.now()
+  );
   const kinds = MASTERY_CARD_KINDS.filter((kind) => shownKinds[kind]);
 
   return (

@@ -101,10 +101,11 @@ export const useKanjiAnchorWords = (
 /**
  * Anchor words (word, readings, gloss) for any kanji, looked up
  * synchronously — for a whole deck or review queue, where the per-kanji hook
- * above doesn't fit. `null` until the details file has loaded.
+ * above doesn't fit. `null` until the details file has loaded, and while
+ * `enabled` is false (nothing is fetched).
  */
-export const useGetAnchorWordsFn = () => {
-  const ready = useIsKanjiWorkerReady();
+export const useGetAnchorWordsFn = (enabled = true) => {
+  const ready = useIsKanjiWorkerReady() && enabled;
   const getRepresentativeWord = useGetRepresentativeWordFn();
 
   const { data } = useWorkerQuery<AnchorWordsDetailsFile>(

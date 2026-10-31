@@ -1,4 +1,8 @@
-import type { CardProgress, ReviewPileItemView } from "engine-contract";
+import type {
+  CardProgress,
+  CardType,
+  ReviewPileItemView,
+} from "engine-contract";
 import { ALL_CARD_TYPES, cardProgress } from "./card-types";
 
 /**
@@ -6,8 +10,8 @@ import { ALL_CARD_TYPES, cardProgress } from "./card-types";
  * Pure functions over `reviews.pile.watchAll()` rows.
  */
 
-/** A kanji's reading card, its writing card, or the weaker of the two. */
-export type MasteryCardKind = "reading" | "writing" | "combined";
+/** One of a kanji's cards, or all of them together (the weakest). */
+export type MasteryCardKind = CardType | "combined";
 export type MasteryMetric = "mastery" | "stability" | "difficulty";
 
 /** In the order the dashboard toggle lists them. */
@@ -185,9 +189,9 @@ export const itemBand = (
   measure: MasteryMetric,
   now: number
 ): number | null => {
-  if (kind === "reading" || kind === "writing") {
-    const card = item[kind];
-    return isCardStarted(card) ? cardBand(card, measure, now) : null;
+  if (kind !== "combined") {
+    const card = cardProgress(item, kind);
+    return card && isCardStarted(card) ? cardBand(card, measure, now) : null;
   }
   const cards = itemCards(item);
   if (!cards.every(isCardStarted)) return null;

@@ -52,13 +52,13 @@ export const BandRows = ({ measure }: { measure: MasteryMetric }) => (
 );
 
 const getCombinedNote = (measure: MasteryMetric): string => {
-  const pick = measure === "difficulty" ? "harder" : "weaker";
-  return `Combined counts once both reading and writing are reviewed, and shows the ${pick} of the two.`;
+  const pick = measure === "difficulty" ? "hardest" : "weakest";
+  return `Combined counts once every card of a kanji is reviewed (Writing, Reading I and, when it has a second word, Reading II), and shows the ${pick} of them.`;
 };
 
 /**
  * The measure's one-line meaning; its ⓘ opens what each square means (and,
- * for a combined metric, how reading and writing combine).
+ * for a combined metric, how its cards combine).
  */
 export const MeasureIntro = ({
   measure,

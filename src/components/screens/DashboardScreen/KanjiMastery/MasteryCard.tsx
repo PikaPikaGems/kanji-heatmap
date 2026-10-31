@@ -36,7 +36,7 @@ export const MasteryCard = ({
               title={`${label} · ${cardTitle}`}
               dotCn={cn}
               counts={tallies.byGroup[key][metric][kind]}
-              total={tallies.byGroup[key].total}
+              total={tallies.byGroup[key].totals[kind]}
               measure={metric}
             />
           ))}
@@ -44,7 +44,7 @@ export const MasteryCard = ({
             label="All"
             title={`All · ${cardTitle}`}
             counts={tallies.all[metric][kind]}
-            total={tallies.all.total}
+            total={tallies.all.totals[kind]}
             measure={metric}
           />
         </TableBody>
