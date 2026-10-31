@@ -1,3 +1,4 @@
+import { describeChime, getChimeLog } from "@/lib/chime-log";
 import { MonitorSmartphone, Wifi, WifiOff } from "lucide-react";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { OfflineDownloads } from "@/components/common/OfflineDownloads";
@@ -193,6 +194,33 @@ const AiUsage = ({ usage }: { usage: AiExplainUsage }) => {
   );
 };
 
+/**
+ * The last correct-answer chimes, newest first, as of opening the modal:
+ * whether each played, and what was speaking when it started.
+ */
+const ChimeLog = () => {
+  const { entries, total } = getChimeLog();
+  if (entries.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        No chimes since the page loaded. Play a game, then open this again.
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-2 text-xs">
+      <p className="text-muted-foreground">
+        {total} since the page loaded. Newest first.
+      </p>
+      <ul className="space-y-1 font-mono text-[11px]">
+        {entries.map((entry, i) => (
+          <li key={i}>{describeChime(entry)}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 /** Mounted only while the modal is open, so the checks below run on open. */
 const DebugInfoBody = () => {
   const { info, storage, voice, aiUsage, text } = useDebugReport();
@@ -251,6 +279,11 @@ const DebugInfoBody = () => {
           <AiUsage usage={aiUsage} />
         </div>
       </SimpleAccordion>
+      <SimpleAccordion trigger="Correct chime">
+        <div className="px-2 pb-2">
+          <ChimeLog />
+        </div>
+      </SimpleAccordion>
       <SimpleAccordion trigger="Offline downloads">
         <div className="px-2 pb-2">
           <OfflineDownloads />
@@ -285,7 +318,7 @@ const DebugInfoContent = () => (
   <ScrollableDialogContent
     size="md"
     title="App & Device Info"
-    description="App version, device, network, storage, AI usage and offline downloads"
+    description="App version, device, network, storage, AI usage, the correct chime and offline downloads"
     titleClassName="text-left"
   >
     <DebugInfoBody />
