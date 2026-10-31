@@ -6,6 +6,8 @@ import { NEW_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import { itemBand, MASTERY_LEVEL_LABELS } from "@/lib/engine/mastery-metrics";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
+import { InfoIcon } from "@/components/icons";
+import { MeasureLegendContent } from "@/components/screens/MasteryScreen/MeasureIntro";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
@@ -65,25 +67,37 @@ const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
 );
 
 /**
- * Shown once the kanji is in the review pile: a pill "● Mastery · Fresh"
- * with the kanji's combined mastery (the lowest of its cards) in
- * its /mastery color, "New" until every card is reviewed.
+ * Shown once the kanji is in the review pile: a pill "● Fresh ⓘ" with the
+ * kanji's combined mastery (the lowest of its cards) in its /mastery color,
+ * "New" until every card is reviewed. Tapping it opens the same legend as
+ * /mastery's, so the color and name can be read.
  */
 const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   const band = itemBand(item, "combined", "mastery", Date.now());
   const label = band == null ? NEW_LABEL : MASTERY_LEVEL_LABELS[band];
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 my-1 ml-2 text-xs font-semibold border rounded-full whitespace-nowrap">
-      <span
-        aria-hidden
-        className={cn(
-          "size-3 rounded-full border border-foreground/40",
-          getBandFillCn("mastery", band)
-        )}
-      />
-      <span className="sr-only">Mastery:</span>
-      {label}
-    </span>
+    <GenericPopover
+      trigger={
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 my-1 ml-2 text-xs font-semibold transition-colors border rounded-full whitespace-nowrap hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "size-3 rounded-full border border-foreground/40",
+              getBandFillCn("mastery", band)
+            )}
+          />
+          <span className="sr-only">Mastery:</span>
+          {label}
+          <InfoIcon aria-hidden size={12} className="text-muted-foreground" />
+        </button>
+      }
+      content={
+        <MeasureLegendContent measure="mastery" combined title="Mastery" />
+      }
+    />
   );
 };
 

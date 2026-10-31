@@ -57,6 +57,39 @@ const getCombinedNote = (measure: MasteryMetric): string => {
 };
 
 /**
+ * What a measure's squares mean: optionally its title and one-line meaning,
+ * then each band, then (for a combined metric) how the cards combine. The
+ * body of every mastery legend popover.
+ */
+export const MeasureLegendContent = ({
+  measure,
+  combined,
+  title,
+}: {
+  measure: MasteryMetric;
+  combined: boolean;
+  /** With a title, the one-line meaning goes under it. */
+  title?: string;
+}) => (
+  <div className="px-4 py-3 text-left w-72">
+    {title && (
+      <>
+        <p className="text-xs font-bold">{title}</p>
+        <p className="mb-2 text-xs text-muted-foreground">
+          {MEASURE_INTROS[measure]}
+        </p>
+      </>
+    )}
+    <BandRows measure={measure} />
+    {combined && (
+      <p className="pt-2 mt-3 text-xs border-t border-dotted text-muted-foreground">
+        {getCombinedNote(measure)}
+      </p>
+    )}
+  </div>
+);
+
+/**
  * The measure's one-line meaning; its ⓘ opens what each square means (and,
  * for a combined metric, how its cards combine).
  */
@@ -84,15 +117,6 @@ export const MeasureIntro = ({
         <InfoIcon className="inline-block -translate-y-px" size={12} />
       </button>
     }
-    content={
-      <div className="px-4 py-3 text-left w-72">
-        <BandRows measure={measure} />
-        {combined && (
-          <p className="pt-2 mt-3 text-xs border-t border-dotted text-muted-foreground">
-            {getCombinedNote(measure)}
-          </p>
-        )}
-      </div>
-    }
+    content={<MeasureLegendContent measure={measure} combined={combined} />}
   />
 );

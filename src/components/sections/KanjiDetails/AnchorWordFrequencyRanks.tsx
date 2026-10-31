@@ -2,11 +2,60 @@ import { InfoIcon } from "@/components/icons";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import {
   ANCHOR_RANK_BAR_MAX,
+  ANCHOR_RANK_LIST_CAP,
   ANCHOR_RANK_SOURCES,
   anchorRankProgress,
+  type AnchorRankSource,
 } from "@/lib/kanji/anchor-words";
+
+/** One "Size: …" line of a list's popover. */
+const SourceFact = ({ term, children }: { term: string; children: string }) => (
+  <div className="flex gap-2">
+    <dt className="w-16 font-bold shrink-0 text-muted-foreground">{term}</dt>
+    <dd className="min-w-0 text-pretty">{children}</dd>
+  </div>
+);
+
+/**
+ * What a list is: its name, what it counts, how big it is and where its text
+ * comes from, the word's rank in it, then how the rank and bar read.
+ */
+const SourceDetails = ({
+  source,
+  word,
+  rank,
+}: {
+  source: AnchorRankSource;
+  word: string;
+  rank: number;
+}) => (
+  <div className="flex flex-col gap-2 px-4 py-3 text-xs text-left w-72">
+    <p className="text-sm font-bold">{source.label}</p>
+    <p className="text-pretty">{source.description}</p>
+    <dl className="flex flex-col gap-1 py-2 border-dotted border-y">
+      <SourceFact term="Size">{source.size}</SourceFact>
+      {source.coverage && (
+        <SourceFact term="Text">{source.coverage}</SourceFact>
+      )}
+      <SourceFact term={word}>
+        {rank === -1
+          ? `Not in its top ${ANCHOR_RANK_LIST_CAP.toLocaleString()}`
+          : `#${rank.toLocaleString()}`}
+      </SourceFact>
+    </dl>
+    <p className="text-muted-foreground text-pretty">
+      1 is the most frequent. Only each list&apos;s top{" "}
+      {ANCHOR_RANK_LIST_CAP.toLocaleString()} words are used, and the bar is
+      empty from #{ANCHOR_RANK_BAR_MAX.toLocaleString()}.
+    </p>
+    <div>
+      <ExternalTextLink href={source.url} text="Visit the source" />
+    </div>
+  </div>
+);
 
 /**
  * An anchor word's rank in each of the 15 frequency lists, laid out like the
@@ -30,7 +79,8 @@ export const AnchorWordFrequencyRanks = ({
       </p>
       <Table className="my-2">
         <TableBody>
-          {ANCHOR_RANK_SOURCES.map(({ label, description }, i) => {
+          {ANCHOR_RANK_SOURCES.map((source, i) => {
+            const { label } = source;
             const rank = ranks[i] ?? -1;
             return (
               <TableRow key={label} className="p-0 my-1 text-left">
@@ -48,14 +98,7 @@ export const AnchorWordFrequencyRanks = ({
                       </button>
                     }
                     content={
-                      <div className="p-3 text-xs w-72">
-                        <p>{description}</p>
-                        <p className="pt-2 text-muted-foreground">
-                          1 is the most frequent. The bar is empty from #
-                          {ANCHOR_RANK_BAR_MAX.toLocaleString()} and for words
-                          that aren&apos;t in the list&apos;s top 25,000.
-                        </p>
-                      </div>
+                      <SourceDetails source={source} word={word} rank={rank} />
                     }
                   />
                 </TableCell>

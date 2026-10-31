@@ -12,7 +12,7 @@ import { FillTheKanjiItem } from "@/lib/fill-the-kanji/types";
 import { plainSentence, type Puzzle } from "@/lib/fill-the-kanji/puzzle";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { type BlankResult, FuriganaSentence } from "./SentencePrompt";
-import { KanjiPopover } from "./KanjiPopover";
+import { KanjiPopover } from "@/components/shared-practice/KanjiPopover";
 import { SpeakButtons } from "./SpeakButtons";
 import { AiExplainDialog } from "./AiExplainDialog";
 import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";

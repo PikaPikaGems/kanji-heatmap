@@ -314,7 +314,7 @@ export const Game = ({
     <div className="relative flex flex-col w-full h-full overflow-hidden">
       <EndSession onClick={onEnd} />
 
-      <div className="flex flex-col items-center flex-1 min-h-0 px-3 pt-8 pb-2 overflow-y-auto sm:px-4">
+      <div className="flex flex-col items-center flex-1 min-h-0 px-4 pt-12 pb-4 overflow-y-auto sm:px-6 [justify-content:safe_center]">
         {!gradingEnabled && (
           <p
             className={cn(
@@ -329,12 +329,12 @@ export const Game = ({
 
         <ClozeWords item={current} revealed={feedback != null} />
 
-        <div className="mt-1">
+        <div className="mt-4">
           <HintsPopover key={index} item={current} />
         </div>
 
         <div
-          className="relative w-full mx-auto mt-2"
+          className="relative w-full mx-auto mt-4"
           style={{ maxWidth: padSize + 32 }}
         >
           <DrawingPad

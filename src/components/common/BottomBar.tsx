@@ -16,7 +16,7 @@ export const BottomBar = ({
   return (
     <>
       <div
-        className={`flex flex-wrap items-center gap-x-1 gap-y-1.5 justify-${justify} w-full mt-4`}
+        className={`flex flex-wrap items-center gap-x-1 gap-y-2 justify-${justify} w-full mt-4`}
       >
         <LinksOutItems />
         <DotIcon className="w-2 m-0" />

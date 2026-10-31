@@ -342,10 +342,10 @@ export const ProgressTable = ({
                     key={cardType}
                     className="px-1.5 py-1.5 text-xs font-bold text-left tabular-nums sm:px-3 sm:text-sm"
                   >
-                    <span className="flex items-start gap-1.5">
+                    <span className="flex items-center gap-1.5">
                       {swatchCn ? (
                         <span
-                          className={`inline-block size-3 mt-0.5 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
+                          className={`inline-block size-3 shrink-0 rounded-sm border border-black/20 dark:border-white/25 ${swatchCn}`}
                           aria-hidden
                         />
                       ) : null}
