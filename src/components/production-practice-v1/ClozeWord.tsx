@@ -1,4 +1,4 @@
-import { Lightbulb } from "lucide-react";
+import { Eye } from "lucide-react";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -66,10 +66,55 @@ const sizeCn = (length: number) =>
 const promptWords = (item: PracticeItem): PracticeWord[] =>
   item.secondary ? [item, item.secondary] : [item];
 
+/** "1. to teach; to instruct 2. to tell" → ["to teach; to instruct", "to tell"]. */
+const splitMeanings = (gloss: string) =>
+  gloss
+    .split(/\s*\d+\.\s+/)
+    .map((meaning) => meaning.trim())
+    .filter(Boolean);
+
+/**
+ * The 👁 at the bottom of a word card: opens the word's speak button and its
+ * English meanings (not the word, which the card already shows).
+ */
+const WordHintPopover = ({ word, gloss }: { word: string; gloss: string }) => {
+  const meanings = splitMeanings(gloss);
+  return (
+    <GenericPopover
+      trigger={
+        <button
+          type="button"
+          aria-label="Show the meaning"
+          className="flex items-center justify-center transition-colors rounded-full size-7 text-muted-foreground hover:text-foreground hover:bg-foreground/10 data-[state=open]:bg-foreground/10 data-[state=open]:text-foreground"
+        >
+          <Eye aria-hidden className="size-4" />
+        </button>
+      }
+      contentClassName="w-72 max-w-[calc(100vw-1.5rem)] p-3 text-sm text-left"
+      content={
+        <div className="flex items-start gap-3" lang="en">
+          <SpeakButton word={word} iconType="volume-2" />
+          {meanings.length > 1 ? (
+            <ol className="flex flex-col gap-0.5 pt-1 pl-4 list-decimal marker:text-muted-foreground">
+              {meanings.map((meaning) => (
+                <li key={meaning} className="pl-0.5 text-pretty">
+                  {meaning}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="pt-1.5 text-pretty">{meanings[0] ?? gloss}</p>
+          )}
+        </div>
+      }
+    />
+  );
+};
+
 /**
  * The card's words with the target kanji blanked, each in its own dashed
- * card with its reading badges under it. Kanji without a secondary word
- * show the main word alone. The speak buttons are in "View hints".
+ * card with its reading badges under it and a 👁 that opens its meaning and
+ * speak button. Kanji without a secondary word show the main word alone.
  */
 export const ClozeWords = ({
   item,
@@ -96,7 +141,7 @@ export const ClozeWords = ({
       {words.map((word) => (
         <div
           key={word.word}
-          className="flex flex-col items-center justify-between min-w-0 gap-2 px-4 py-4 border border-dashed rounded-2xl border-foreground/15"
+          className="flex flex-col items-center justify-between min-w-0 gap-2 px-4 pt-4 pb-2 border border-dashed rounded-2xl border-foreground/15"
         >
           <p
             className={cn(
@@ -109,92 +154,12 @@ export const ClozeWords = ({
             <Cloze word={word.word} kanji={item.kanji} revealed={revealed} />
           </p>
           <ReadingBadges word={word} />
+          <WordHintPopover
+            word={word.word}
+            gloss={word.englishGloss || item.keyword}
+          />
         </div>
       ))}
     </div>
   );
 };
-
-/** "1. to teach; to instruct 2. to tell" → ["to teach; to instruct", "to tell"]. */
-const splitMeanings = (gloss: string) =>
-  gloss
-    .split(/\s*\d+\.\s+/)
-    .map((meaning) => meaning.trim())
-    .filter(Boolean);
-
-/** One word's hint: its cloze and speak button, then its meanings. */
-const WordHint = ({
-  word,
-  kanji,
-  gloss,
-}: {
-  word: string;
-  kanji: string;
-  gloss: string;
-}) => {
-  const meanings = splitMeanings(gloss);
-  return (
-    <li className="flex flex-col gap-1.5 p-3 border border-dashed rounded-xl border-foreground/15">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-2xl kanji-font whitespace-nowrap" lang="ja">
-          <Cloze
-            word={word}
-            kanji={kanji}
-            revealed={false}
-            blankClassName="rounded-md border-2"
-          />
-        </span>
-        <SpeakButton word={word} iconType="volume-2" />
-      </div>
-      {meanings.length > 1 ? (
-        <ol className="flex flex-col gap-0.5 pl-4 list-decimal marker:text-muted-foreground">
-          {meanings.map((meaning) => (
-            <li key={meaning} className="pl-0.5 text-pretty">
-              {meaning}
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <p className="text-pretty">{meanings[0] ?? gloss}</p>
-      )}
-    </li>
-  );
-};
-
-/**
- * "View hints": a card per word with its cloze, its speak button and its
- * English meanings, in a popover so the pad stays high.
- */
-export const HintsPopover = ({ item }: { item: PracticeItem }) => (
-  <GenericPopover
-    trigger={
-      <button
-        type="button"
-        className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold transition-colors border border-dashed rounded-full border-foreground/30 text-muted-foreground hover:text-foreground hover:bg-foreground/10 data-[state=open]:bg-foreground/10 data-[state=open]:text-foreground"
-      >
-        <Lightbulb aria-hidden className="size-3.5" />
-        View hints
-      </button>
-    }
-    contentClassName="w-80 max-w-[calc(100vw-1.5rem)] p-3 text-sm text-left"
-    content={
-      <div className="flex flex-col gap-2">
-        <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-          Hints
-        </p>
-        {/* Each word as its cloze, never the whole word: that would give the
-            answer away. */}
-        <ul className="flex flex-col gap-2">
-          {promptWords(item).map(({ word, englishGloss }) => (
-            <WordHint
-              key={word}
-              word={word}
-              kanji={item.kanji}
-              gloss={englishGloss || item.keyword}
-            />
-          ))}
-        </ul>
-      </div>
-    }
-  />
-);
