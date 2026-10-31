@@ -94,7 +94,7 @@ const AnswerKanji = ({ kanji }: { kanji: string }) => {
     <KanjiPopover
       kanji={kanji}
       info={info}
-      className="px-1 text-3xl underline kanji-font underline-offset-8 decoration-dashed decoration-foreground/30 hover:decoration-foreground hover:decoration-solid"
+      className="px-1 text-3xl underline kanji-font underline-offset-8 decoration-dashed decoration-foreground/10 hover:decoration-foreground hover:decoration-solid"
     />
   );
 };

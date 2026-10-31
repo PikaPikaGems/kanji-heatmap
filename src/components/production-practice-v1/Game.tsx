@@ -21,7 +21,7 @@ import {
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
-import { ClozeWords } from "./ClozeWord";
+import { ClozeWords, HintsPopover } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
 import { DRAW_SVG_SIZE, GRADE_TOP_K, soundOf } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
@@ -327,10 +327,14 @@ export const Game = ({
           </p>
         )}
 
-        <ClozeWords key={index} item={current} revealed={feedback != null} />
+        <ClozeWords item={current} revealed={feedback != null} />
+
+        <div className="mt-4">
+          <HintsPopover key={index} item={current} />
+        </div>
 
         <div
-          className="relative w-full mx-auto mt-5"
+          className="relative w-full mx-auto mt-4"
           style={{ maxWidth: padSize + 32 }}
         >
           <DrawingPad

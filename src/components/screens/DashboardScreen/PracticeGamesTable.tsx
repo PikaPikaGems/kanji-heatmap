@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Eye, Keyboard, PenLine, Puzzle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ActivityKind, ActivityStats } from "@/lib/activity";
 import {
@@ -10,6 +9,7 @@ import {
   speedKatakanaPageMeta,
 } from "@/lib/pages/practice-pages";
 import { formatCompactCount, formatRawCount } from "@/lib/format-count";
+import { GAME_ICONS } from "@/lib/pages/nav-links";
 import { cn } from "@/lib/utils";
 import { StatValue } from "./ActivityStatCard";
 
@@ -26,33 +26,33 @@ const ROWS: {
   {
     kind: "fillTheKanji",
     title: fillTheKanjiPageMeta.shortLabel,
-    Icon: Puzzle,
+    Icon: GAME_ICONS.fillTheKanji,
     unit: "batches",
     unitSingular: "batch",
   },
   {
     kind: "speedKatakana",
     title: speedKatakanaPageMeta.shortLabel,
-    Icon: Keyboard,
+    Icon: GAME_ICONS.speedKatakana,
     unit: "sessions",
     unitSingular: "session",
   },
   {
     kind: "production",
     title: productionPracticePageMeta.shortLabel,
-    Icon: PenLine,
+    Icon: GAME_ICONS.writingPractice,
     ...ROUNDS,
   },
   {
     kind: "recognition",
     title: recognitionPracticePageMeta.shortLabel,
-    Icon: Eye,
+    Icon: GAME_ICONS.readingPractice,
     ...ROUNDS,
   },
   {
     kind: "recognition2",
     title: recognitionPractice2PageMeta.shortLabel,
-    Icon: Eye,
+    Icon: GAME_ICONS.readingPractice,
     ...ROUNDS,
   },
 ];

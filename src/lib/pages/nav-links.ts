@@ -1,7 +1,7 @@
 import {
-  GraduationCap,
   ChartSpline,
   Eye,
+  Flame,
   Keyboard,
   LayoutDashboard,
   PencilLine,
@@ -21,6 +21,19 @@ import {
   speedKatakanaPageMeta,
   writingMasteryPageMeta,
 } from "@/lib/pages/practice-pages";
+
+/**
+ * Each game's icon. The menus (sidebar, practice FAB) and the dashboard all
+ * read them from here, so a game looks the same everywhere.
+ */
+export const GAME_ICONS = {
+  fillTheKanji: Puzzle,
+  speedKatakana: Keyboard,
+  writingPractice: PenLine,
+  readingPractice: Eye,
+  writingMastery: PencilLine,
+  readingMastery: ScanEye,
+} as const;
 
 export type NavLinkIcon = ComponentType<
   SVGProps<SVGSVGElement> & { className?: string }
@@ -71,40 +84,40 @@ export const masteryPageMeta = {
 export const floatingIslandNavLinks: NavLinkItem[] = [
   { ...dashboardPageMeta, Icon: LayoutDashboard },
   { ...exploreKanjiPageMeta, Icon: SearchIcon },
-  { ...masteryPageMeta, Icon: GraduationCap },
+  { ...masteryPageMeta, Icon: Flame },
 ];
 
 // Menu entries (sidebar + practice FAB). The mastery links carry no star of
 // their own; their "Kanji Mastery" heading (or "Mastery" column) does.
 const writingPracticeNavLink: NavLinkItem = {
   ...productionPracticePageMeta,
-  Icon: PenLine,
+  Icon: GAME_ICONS.writingPractice,
 };
 const readingPracticeNavLink: NavLinkItem = {
   ...recognitionPracticePageMeta,
-  Icon: Eye,
+  Icon: GAME_ICONS.readingPractice,
 };
 const readingPractice2NavLink: NavLinkItem = {
   ...recognitionPractice2PageMeta,
-  Icon: Eye,
+  Icon: GAME_ICONS.readingPractice,
 };
 const writingMasteryNavLink: NavLinkItem = {
   ...writingMasteryPageMeta,
-  Icon: PencilLine,
+  Icon: GAME_ICONS.writingMastery,
 };
 const readingMasteryNavLink: NavLinkItem = {
   ...readingMasteryPageMeta,
-  Icon: ScanEye,
+  Icon: GAME_ICONS.readingMastery,
 };
 const readingMastery2NavLink: NavLinkItem = {
   ...readingMastery2PageMeta,
-  Icon: ScanEye,
+  Icon: GAME_ICONS.readingMastery,
 };
 
 /** The games that aren't a skill's practice: Fill in the Kanji, Speed Katakana. */
 export const moreGamesNavLinks: NavLinkItem[] = [
-  { ...fillTheKanjiPageMeta, Icon: Puzzle },
-  { ...speedKatakanaPageMeta, Icon: Keyboard },
+  { ...fillTheKanjiPageMeta, Icon: GAME_ICONS.fillTheKanji },
+  { ...speedKatakanaPageMeta, Icon: GAME_ICONS.speedKatakana },
 ];
 
 const practiceGamesSection: NavLinkSection = {
@@ -163,7 +176,7 @@ export const headerNavSections: NavLinkSection[] = [
     heading: "Kanji Mastery",
     starred: true,
     links: [
-      { ...masteryPageMeta, Icon: GraduationCap },
+      { ...masteryPageMeta, Icon: Flame },
       writingMasteryNavLink,
       readingMasteryNavLink,
       readingMastery2NavLink,
