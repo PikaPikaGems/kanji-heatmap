@@ -17,7 +17,7 @@ export const KeyHint = ({
   <kbd
     aria-hidden="true"
     className={cn(
-      "-ml-1 hidden font-sans text-[9px] font-semibold leading-none opacity-60 pointer-events-none [@media(pointer:fine)]:inline",
+      "-ml-1 hidden whitespace-nowrap font-sans text-[9px] font-semibold leading-none opacity-60 pointer-events-none [@media(pointer:fine)]:inline",
       className
     )}
   >

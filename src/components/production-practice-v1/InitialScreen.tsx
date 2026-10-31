@@ -47,7 +47,7 @@ export const InitialScreen = ({
         >
           <ToggleRow
             id="hear-on-load"
-            label="Hear pronunciation on load"
+            label="Read each word aloud when it appears"
             checked={settings.hearPronunciationOnLoad}
             onChange={(v) => setSetting("hearPronunciationOnLoad", v)}
           />

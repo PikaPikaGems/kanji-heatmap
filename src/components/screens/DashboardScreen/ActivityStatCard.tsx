@@ -175,7 +175,7 @@ export const ActivityStatCard = ({
       </div>
       <div className="text-xs leading-tight line-clamp-2">{title}</div>
     </div>
-    <div className="flex flex-col items-start pl-0.5 gap-x-4 gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline">
+    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
       {counts.map((count, i) => (
         <StatCountItem key={count.unit} {...count} primary={i === 0} />
       ))}
@@ -190,7 +190,7 @@ export const ActivityStatCardSkeleton = () => (
       <div className="rounded-lg size-7 shrink-0 bg-muted" />
       <div className="w-24 h-3 rounded-full bg-muted" />
     </div>
-    <div className="flex flex-col items-start pl-0.5 gap-x-4 gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline">
+    <div className="flex flex-wrap items-baseline pl-0.5 gap-x-4 gap-y-1">
       <div className="w-14 h-7 rounded-lg bg-muted" />
       <div className="h-[18px] w-16 rounded-lg bg-muted" />
     </div>

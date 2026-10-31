@@ -7,7 +7,6 @@ import {
   READING_MASTERY_LABEL,
   WRITING_MASTERY_LABEL,
 } from "@/lib/activity";
-import { cn } from "@/lib/utils";
 import { ActivityStatCard, ActivityStatCardSkeleton } from "./ActivityStatCard";
 import {
   PracticeGamesTable,
@@ -16,38 +15,31 @@ import {
 
 const REVIEWS = { unit: "Reviews", unitSingular: "Review" };
 
-/**
- * The mastery cards. On phones Writing Mastery takes a whole row over
- * Reading Mastery I and II; from `md` the three stack in one column.
- */
+/** The mastery cards, one per row at every width. */
 const CARDS: {
   kind: ActivityKind;
   title: string;
   Icon: LucideIcon;
-  cellCn: string;
 }[] = [
   {
     kind: "writingMastery",
     title: WRITING_MASTERY_LABEL,
     Icon: Brush,
-    cellCn: "col-span-2 md:col-span-1",
   },
   {
     kind: "readingMastery",
     title: READING_MASTERY_LABEL,
     Icon: Brain,
-    cellCn: "",
   },
   {
     kind: "readingMastery2",
     title: READING_MASTERY_2_LABEL,
     Icon: Brain,
-    cellCn: "",
   },
 ];
 
 const GRID_CN = "grid gap-2 sm:gap-3 md:grid-cols-2";
-const CARDS_CN = "grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-1";
+const CARDS_CN = "grid gap-2 sm:gap-3";
 
 /**
  * The mastery cards (days, then reviews), then the practice games' table:
@@ -56,8 +48,8 @@ const CARDS_CN = "grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-1";
 export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => (
   <div className={GRID_CN}>
     <div className={CARDS_CN}>
-      {CARDS.map(({ kind, title, Icon, cellCn }) => (
-        <div key={kind} className={cn("grid", cellCn)}>
+      {CARDS.map(({ kind, title, Icon }) => (
+        <div key={kind} className="grid">
           <ActivityStatCard
             title={title}
             Icon={Icon}
@@ -81,8 +73,8 @@ export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => (
 export const ActivityCountsGridSkeleton = () => (
   <div className={GRID_CN}>
     <div className={CARDS_CN}>
-      {CARDS.map(({ kind, cellCn }) => (
-        <div key={kind} className={cn("grid", cellCn)}>
+      {CARDS.map(({ kind }) => (
+        <div key={kind} className="grid">
           <ActivityStatCardSkeleton />
         </div>
       ))}

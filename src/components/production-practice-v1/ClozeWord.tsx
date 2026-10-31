@@ -16,10 +16,13 @@ const Cloze = ({
   word,
   kanji,
   revealed,
+  blankClassName,
 }: {
   word: string;
   kanji: string;
   revealed: boolean;
+  /** Overrides on the blank's box, e.g. a thinner square one at small sizes. */
+  blankClassName?: string;
 }) => {
   const idx = word.indexOf(kanji);
   const before = idx === -1 ? "" : word.slice(0, idx);
@@ -32,7 +35,7 @@ const Cloze = ({
         <span className="mx-[0.2em]">{kanji}</span>
       ) : (
         <span
-          className={cn(BLANK_BOX_CN, blankCn.empty)}
+          className={cn(BLANK_BOX_CN, blankCn.empty, blankClassName)}
           aria-label="missing kanji"
         >
           <span className="text-[0.55em] font-extrabold">?</span>
@@ -94,7 +97,7 @@ export const ClozeWords = ({
       {words.map((word) => (
         <div
           key={word.word}
-          className="flex flex-col items-center justify-between min-w-0 gap-1 px-3 pt-2 pb-1 border border-dashed rounded-2xl border-foreground/30"
+          className="flex flex-col items-center justify-between min-w-0 gap-1 px-4 py-6 border border-dashed rounded-2xl border-foreground/15"
         >
           <p
             className={cn(
@@ -135,7 +138,12 @@ export const HintsPopover = ({ item }: { item: PracticeItem }) => (
         {promptWords(item).map(({ word, englishGloss }) => (
           <Fragment key={word}>
             <span className="text-lg kanji-font whitespace-nowrap" lang="ja">
-              <Cloze word={word} kanji={item.kanji} revealed={false} />
+              <Cloze
+                word={word}
+                kanji={item.kanji}
+                revealed={false}
+                blankClassName="rounded-none border-2"
+              />
             </span>
             <SpeakButton word={word} iconType="volume-2" />
             <p className="text-pretty">{englishGloss || item.keyword}</p>
