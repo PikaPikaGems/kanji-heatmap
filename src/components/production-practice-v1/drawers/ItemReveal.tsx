@@ -2,36 +2,26 @@ import { Fragment } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { KanjiKeywordCard } from "@/components/dependent/routing/global-links";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
 import type { PracticeWord } from "@/components/shared-practice";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import type { PracticeItem } from "../types";
 
-/** Each kanji of the word with its keyword: "高 · HIGH". */
-const WordKanjiList = ({ word }: { word: string }) => {
+/** Each kanji of the word as the vocab popover's kanji cards, not clickable. */
+const WordKanjiCards = ({ word }: { word: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
-  const kanjiRows = [...new Set(word)].flatMap((char) => {
+  const cards = [...new Set(word)].flatMap((char) => {
     const keyword = getKanjiInfo?.(char)?.keyword;
     return keyword ? [{ char, keyword }] : [];
   });
-  if (kanjiRows.length === 0) return null;
+  if (cards.length === 0) return null;
 
   return (
-    <div className="w-full pt-3 border-t border-dotted">
-      <ul className="grid grid-cols-[auto_auto_auto] items-center mx-auto gap-x-2 gap-y-1 w-fit">
-        {kanjiRows.map(({ char, keyword }) => (
-          <li key={char} className="contents">
-            <span className="text-2xl leading-none kanji-font" lang="ja">
-              {char}
-            </span>
-            <span aria-hidden className="text-muted-foreground">
-              ·
-            </span>
-            <span className="text-xs font-bold text-left uppercase">
-              {keyword}
-            </span>
-          </li>
-        ))}
-      </ul>
+    <div className="flex flex-wrap justify-center p-1">
+      {cards.map(({ char, keyword }) => (
+        <KanjiKeywordCard key={char} kanji={char} keyword={keyword} />
+      ))}
     </div>
   );
 };
@@ -56,18 +46,18 @@ const AnswerWordPopover = ({
       <button
         type="button"
         lang="ja"
-        className="px-1 rounded-lg cursor-pointer kanji-font underline underline-offset-8 decoration-dashed decoration-foreground/10 transition-colors hover:decoration-foreground hover:decoration-solid hover:bg-foreground/10 active:bg-foreground/20"
+        className="px-2 py-1 transition-colors border-2 border-dashed rounded-lg cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
       >
         {word.word}
       </button>
     }
-    contentClassName="w-64 max-w-[calc(100vw-1.5rem)] p-0"
+    contentClassName="w-72 max-w-[calc(100vw-1.5rem)] p-0"
     content={
-      <div className="flex flex-col items-center gap-2 px-4 py-3 text-center">
-        <span className="text-lg font-bold kanji-font" lang="ja">
+      <div className="flex flex-col items-center p-2 text-center">
+        <span className="pt-1 text-lg font-bold kanji-font" lang="ja">
           {word.word}
         </span>
-        <div className="flex flex-wrap items-center justify-center gap-1">
+        <div className="flex flex-wrap items-center justify-center gap-1 py-1">
           {word.reading.split("・").map((reading) => (
             <RomajiBadge key={reading} kana={reading} />
           ))}
@@ -76,10 +66,11 @@ const AnswerWordPopover = ({
           </span>
           <SpeakButton word={word.word} iconType="volume-2" />
         </div>
-        <p className="text-xs font-bold text-muted-foreground text-pretty">
+        <p className="px-2 pb-2 text-xs font-bold text-muted-foreground text-pretty">
           {word.englishGloss || fallbackGloss}
         </p>
-        <WordKanjiList word={word.word} />
+        <DottedSeparator />
+        <WordKanjiCards word={word.word} />
       </div>
     }
   />

@@ -407,6 +407,26 @@ export const GlobalKanjiLink = ({
   );
 };
 
+/** GlobalKanjiLink's card (keyword badge over the kanji), not a link. */
+export const KanjiKeywordCard = ({
+  kanji,
+  keyword,
+  fontSize,
+}: {
+  kanji: string;
+  keyword: string;
+  fontSize?: FontSize;
+}) => (
+  <div className={cnJPCard}>
+    <JPCardInner
+      label={keyword}
+      character={kanji}
+      fontSize={fontSize}
+      badgeClassName="border border-solid border-foreground/10"
+    />
+  </div>
+);
+
 export const GlobalHomeHeaderLink = () => {
   return <Link to={"/"}>Kanji Heatmap</Link>;
 };

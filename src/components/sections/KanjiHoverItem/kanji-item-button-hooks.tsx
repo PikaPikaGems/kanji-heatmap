@@ -112,10 +112,10 @@ export const useItemBtnCn = (kanji: string) => {
         ? "bg-background"
         : freqCategoryCn[freqRankCategory]);
 
-  // Hatched: diagonal stripes over the fill, with muted text, so a kanji
-  // with nothing to color still reads as a tile, not as a gap.
+  // Hatched: diagonal stripes over the fill, with muted text and 75%
+  // opacity, so a kanji with nothing to color still reads as a tile.
   const hatchedCn =
-    " bg-[repeating-linear-gradient(135deg,hsl(var(--foreground)/0.14)_0_2px,transparent_2px_8px)] !text-muted-foreground";
+    " bg-[repeating-linear-gradient(135deg,hsl(var(--foreground)/0.14)_0_2px,transparent_2px_8px)] !text-muted-foreground opacity-75";
   const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}${tileColor?.dimmed ? hatchedCn : ""}`;
   const btnCn =
     itemType === "compact"
