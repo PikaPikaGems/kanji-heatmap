@@ -2,14 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Rocket } from "lucide-react";
 import { DrawingPad } from "@/components/dependent/DrawingPad";
 import type { DrawingSubmitPayload, Stroke } from "@/lib/stroke-types";
-import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
-import { SpeakButton } from "@/components/common/SpeakButton";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useFitPadSize } from "@/hooks/use-fit-pad-size";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { BlurredGloss, FORGOT_KEYS } from "@/components/shared-practice";
+import { FORGOT_KEYS } from "@/components/shared-practice";
 import type {
   MasteryGrading,
   PassingRating,
@@ -23,7 +21,7 @@ import {
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
-import { ClozeWord } from "./ClozeWord";
+import { ClozeWords, GlossesPopover } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
 import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
@@ -325,26 +323,11 @@ export const Game = ({
           </p>
         )}
 
-        <ClozeWord
-          word={current.word}
-          kanji={current.kanji}
-          fontIndex={current.fontIndex}
-          revealed={feedback != null}
-        />
+        <ClozeWords item={current} revealed={feedback != null} />
 
-        <div className="flex flex-wrap items-center justify-center gap-1 mt-3">
-          {current.reading.split("・").map((r) => (
-            <RomajiBadge key={r} kana={r} />
-          ))}
-          <SpeakButton word={current.word} iconType="volume-2" />
+        <div className="mt-1">
+          <GlossesPopover key={index} item={current} />
         </div>
-
-        <BlurredGloss
-          text={current.englishGloss}
-          resetKey={index}
-          blurrable={false}
-          className="mt-2"
-        />
 
         <div
           className="relative w-full mx-auto mt-2"

@@ -28,4 +28,5 @@ export type {
   MasteryGrading,
   PracticeItem,
   PracticeSessionResult,
+  PracticeWord,
 } from "./types";

@@ -19,10 +19,11 @@ export const InitialScreen = ({
     DEFAULT_SETTINGS
   );
   // Writing practice never randomizes fonts (unlike reading / speed katakana).
-  const { deck, loading, canStart } = usePracticeDeck({
-    ...settings,
-    randomizeFont: false,
-  });
+  // Each card shows the main word with the secondary one next to it.
+  const { deck, loading, canStart } = usePracticeDeck(
+    { ...settings, randomizeFont: false },
+    "main-and-secondary"
+  );
 
   useEnterAction(canStart ? () => onStart(deck) : null, canStart);
 

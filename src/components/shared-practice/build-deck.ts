@@ -1,10 +1,22 @@
 import { shuffle } from "@/lib/utils";
 import { randomFontIndex } from "@/hooks/use-change-font";
 import type { AnchorWordBasics } from "@/lib/kanji/anchor-words";
-import { DeckFilterSettings, PracticeItem } from "./types";
+import { DeckFilterSettings, PracticeItem, PracticeWord } from "./types";
+
+/** An anchor word as a practice card shows it. */
+export const toPracticeWord = ({
+  word,
+  readings,
+  englishGloss,
+}: AnchorWordBasics): PracticeWord => ({
+  word,
+  reading: readings.join("・"),
+  englishGloss,
+});
 
 export const buildPracticeDeck = ({
   words,
+  secondaryWords,
   includedKanji,
   bookmarkedKanji,
   getKeyword,
@@ -12,6 +24,8 @@ export const buildPracticeDeck = ({
 }: {
   /** The anchor word to practice, per kanji. */
   words: Record<string, AnchorWordBasics>;
+  /** Shown next to `words` (the writing games); omitted by reading games. */
+  secondaryWords?: Record<string, AnchorWordBasics>;
   includedKanji: ReadonlySet<string>;
   /** The account's bookmarks; omitted when this build has none (filter skipped). */
   bookmarkedKanji?: ReadonlySet<string>;
@@ -20,10 +34,8 @@ export const buildPracticeDeck = ({
 }): PracticeItem[] => {
   const items: PracticeItem[] = [];
 
-  for (const [kanji, { word, readings, englishGloss }] of Object.entries(
-    words
-  )) {
-    if (!word || readings.length === 0) continue;
+  for (const [kanji, anchor] of Object.entries(words)) {
+    if (!anchor.word || anchor.readings.length === 0) continue;
 
     if (!includedKanji.has(kanji)) continue;
     if (
@@ -34,13 +46,13 @@ export const buildPracticeDeck = ({
       continue;
     }
 
+    const secondary = secondaryWords?.[kanji];
     items.push({
       kanji,
-      word,
-      reading: readings.join("・"),
-      englishGloss,
+      ...toPracticeWord(anchor),
       keyword: getKeyword(kanji) || "...",
       fontIndex: settings.randomizeFont ? randomFontIndex() : null,
+      ...(secondary ? { secondary: toPracticeWord(secondary) } : {}),
     });
   }
 

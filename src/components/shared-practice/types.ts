@@ -2,14 +2,23 @@ import type { FsrsRating } from "engine-contract";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { JouyouGradeType } from "@/lib/jouyou-grade";
 
-/** Shared deck item used by recognition + production practice. */
-export type PracticeItem = {
-  kanji: string;
+/** A word a card shows; `reading` is its readings joined with "・". */
+export type PracticeWord = {
   word: string;
   reading: string;
   englishGloss: string;
+};
+
+/** Shared deck item used by recognition + production practice. */
+export type PracticeItem = PracticeWord & {
+  kanji: string;
   keyword: string;
   fontIndex: number | null;
+  /**
+   * The kanji's secondary anchor word, shown next to the main word by the
+   * writing games. Reading games drill one word and leave it out.
+   */
+  secondary?: PracticeWord;
 };
 
 /** Minimal result shape for the shared end-session screen. */

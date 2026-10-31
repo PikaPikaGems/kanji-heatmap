@@ -118,7 +118,15 @@ export const usePracticeSession = <
     const forgottens = (results ?? [])
       .filter((r) => !r.correct)
       .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
+        ({
+          kanji,
+          word,
+          reading,
+          englishGloss,
+          keyword,
+          fontIndex,
+          secondary,
+        }) =>
           ({
             kanji,
             word,
@@ -126,6 +134,7 @@ export const usePracticeSession = <
             englishGloss,
             keyword,
             fontIndex,
+            ...(secondary ? { secondary } : {}),
           }) satisfies PracticeItem
       );
 

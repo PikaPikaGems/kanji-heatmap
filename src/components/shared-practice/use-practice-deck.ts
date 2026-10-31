@@ -15,8 +15,11 @@ import { SearchSettings } from "@/lib/settings/settings";
 import { buildPracticeDeck } from "./build-deck";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
-/** Which of each kanji's anchor words a deck drills. */
-export type DeckAnchor = "main" | "secondary";
+/**
+ * Which of each kanji's anchor words a deck drills: the main word, the main
+ * word with the secondary one next to it (writing), or the secondary word.
+ */
+export type DeckAnchor = "main" | "main-and-secondary" | "secondary";
 
 /**
  * Loads the anchor words and builds the filtered practice deck of each
@@ -50,13 +53,18 @@ export const usePracticeDeck = (
       return [];
     }
     const words: Record<string, AnchorWordBasics> = {};
+    const secondaryWords: Record<string, AnchorWordBasics> = {};
     for (const kanji of filteredKanji.data ?? []) {
       const anchors = getAnchorWords(kanji);
-      const word = anchor === "main" ? anchors?.main : anchors?.secondary;
+      const word = anchor === "secondary" ? anchors?.secondary : anchors?.main;
       if (word) words[kanji] = word;
+      if (anchor === "main-and-secondary" && anchors?.secondary) {
+        secondaryWords[kanji] = anchors.secondary;
+      }
     }
     return buildPracticeDeck({
       words,
+      secondaryWords,
       includedKanji: new Set(filteredKanji.data),
       bookmarkedKanji:
         bookmarks.status === "absent" ? undefined : bookmarks.kanji,
