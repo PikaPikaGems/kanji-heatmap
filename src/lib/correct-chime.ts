@@ -10,32 +10,42 @@ import {
  * The chime after a correct answer, shared by every game, with a log of the
  * last few chimes for App & Device Info (`chime-log.ts`).
  *
- * - A few <audio> elements are made when a game's code loads and kept for the
- *   page's life; each chime takes one that isn't playing, so a playing one is
- *   never rewound (Safari often stays silent after that).
- * - On iPhone (Safari and the home-screen app) a chime still goes missing
- *   now and then mid-round, and iPhone fails silently. So every chime is
- *   logged: whether it played, was blocked, was cut off, or never started,
- *   and whether any speech was playing. A missing chime logged as "played"
- *   means iPhone played it silently.
+ * Every chime is a brand-new <audio> element. On iPhone (Safari and the
+ * home-screen app) replaying the same element again and again works a few
+ * times, then now and then plays nothing mid-round, with no error. A new
+ * element each time has no leftover state to trip over. It plays from a copy
+ * of the file kept in memory (fetched once, when a game's code loads), so it
+ * starts at once, needs no network and works offline. Like before, it plays
+ * with the ring/silent switch on silent.
+ *
+ * iPhone fails silently, so every chime is logged: whether it played, was
+ * blocked, was cut off, or never started, and whether any speech was
+ * playing. A missing chime logged as "played" means iPhone played it
+ * silently.
  */
-const POOL_SIZE = 3;
+
 /** Longer than the file (1.8 s), so a played chime has ended by then. */
 const SETTLE_MS = 2500;
 
-const makeChime = () => {
-  const audio = new Audio(assetsPaths.SPEED_KATAKANA_CORRECT_SOUND);
-  audio.preload = "auto";
-  return audio;
-};
+const FILE_URL = assetsPaths.SPEED_KATAKANA_CORRECT_SOUND;
 
-// Module-level: made once, when a game's code loads, so the file is ready
-// before the first answer. Not in a browser (tests), there is nothing to play.
-const pool: HTMLAudioElement[] =
-  typeof Audio === "undefined"
-    ? []
-    : Array.from({ length: POOL_SIZE }, makeChime);
-let nextSlot = 0;
+// Module-level: the file is fetched once, when a game's code loads, and kept
+// as an in-memory URL. Until then (or if the fetch fails) chimes use the
+// file's own URL. Not in a browser (tests), there is nothing to fetch.
+let chimeUrl = FILE_URL;
+if (typeof window !== "undefined" && typeof fetch === "function") {
+  fetch(FILE_URL)
+    .then((response) => (response.ok ? response.blob() : null))
+    .then((blob) => {
+      if (blob) chimeUrl = URL.createObjectURL(blob);
+    })
+    .catch(() => {
+      // Offline before the first chime: the file's URL still works online.
+    });
+}
+
+// Elements still playing, so none is garbage-collected mid-chime.
+const playing = new Set<HTMLAudioElement>();
 
 const audioSessionType = () =>
   (navigator as Navigator & { audioSession?: { type: string } }).audioSession
@@ -51,20 +61,19 @@ const currentSpeech = (): ChimeLogEntry["speech"] => {
 };
 
 /**
- * Plays `audio` from the start and records how it went on `entry`: ended
- * (played), paused before the end (cut off), still at 0 after the file's
- * length (never started), or a rejected play() (blocked).
+ * Plays a new element and records how it went on `entry`: ended (played),
+ * paused before the end (cut off), still at 0 after the file's length (never
+ * started), or a rejected play() (blocked).
  */
-const playAndWatch = (
-  audio: HTMLAudioElement,
-  entry: ChimeLogEntry,
-  onBlocked: () => void
-) => {
+const playOnce = (entry: ChimeLogEntry, onBlocked: () => void) => {
+  const audio = new Audio(chimeUrl);
+  playing.add(audio);
   const done = new AbortController();
   const settle = (outcome: ChimeOutcome) => {
     if (entry.outcome.kind !== "pending") return;
     entry.outcome = outcome;
     done.abort();
+    playing.delete(audio);
   };
   audio.addEventListener("ended", () => settle({ kind: "played" }), {
     signal: done.signal,
@@ -83,11 +92,6 @@ const playAndWatch = (
     );
   }, SETTLE_MS);
 
-  try {
-    audio.currentTime = 0;
-  } catch {
-    // Not seekable yet (still loading): it plays from the start anyway.
-  }
   audio.play().catch((err: unknown) => {
     settle({
       kind: "blocked",
@@ -98,30 +102,24 @@ const playAndWatch = (
 };
 
 export const playCorrectChime = () => {
-  if (pool.length === 0) return;
-  const speech = currentSpeech();
-  // Prefer an idle element, so a playing one is never rewound.
-  const idle = pool.findIndex((audio) => audio.paused || audio.ended);
-  const slot = idle === -1 ? nextSlot : idle;
-  nextSlot = (slot + 1) % pool.length;
-
+  if (typeof Audio === "undefined") return;
   const entry: ChimeLogEntry = {
     at: new Date(),
-    speech,
-    slot,
+    speech: currentSpeech(),
+    attempt: "first",
     outcome: { kind: "pending" },
     audioSession: audioSessionType(),
   };
   addChimeLogEntry(entry);
-  playAndWatch(pool[slot], entry, () => {
-    // The element may be stuck (e.g. its load was interrupted): replace it so
-    // the next chime gets a fresh one, and try once more with it.
-    const fresh = makeChime();
-    pool[slot] = fresh;
-    const retry: ChimeLogEntry = { ...entry, slot: "retry" };
-    retry.outcome = { kind: "pending" };
+  playOnce(entry, () => {
+    // Refused (e.g. the element couldn't load): try once more.
+    const retry: ChimeLogEntry = {
+      ...entry,
+      attempt: "retry",
+      outcome: { kind: "pending" },
+    };
     addChimeLogEntry(retry);
-    playAndWatch(fresh, retry, () => {
+    playOnce(retry, () => {
       // Still blocked (autoplay rules, no audio device): stay silent.
     });
   });

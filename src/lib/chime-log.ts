@@ -16,8 +16,8 @@ export type ChimeLogEntry = {
   at: Date;
   /** What was speaking when the chime started. */
   speech: "none" | "browser voice" | "AI voice";
-  /** Which pool element played it; "retry" for the fresh one after a failure. */
-  slot: number | "retry";
+  /** "retry" for the second try after `play()` was refused. */
+  attempt: "first" | "retry";
   outcome: ChimeOutcome;
   /** `navigator.audioSession.type`, where the browser has it. */
   audioSession?: string;
@@ -43,12 +43,12 @@ const describeOutcome = (outcome: ChimeOutcome) => {
   return "never started";
 };
 
-/** One log line: "18:02:41 · played · slot 1 · speech: none · session auto". */
+/** One log line: "18:02:41 · played · speech: none · session auto". */
 export const describeChime = (entry: ChimeLogEntry) =>
   [
     `${pad(entry.at.getHours())}:${pad(entry.at.getMinutes())}:${pad(entry.at.getSeconds())}`,
     describeOutcome(entry.outcome),
-    entry.slot === "retry" ? "retry" : `slot ${entry.slot + 1}`,
+    ...(entry.attempt === "retry" ? ["retry"] : []),
     `speech: ${entry.speech}`,
     ...(entry.audioSession ? [`session ${entry.audioSession}`] : []),
   ].join(" · ");
