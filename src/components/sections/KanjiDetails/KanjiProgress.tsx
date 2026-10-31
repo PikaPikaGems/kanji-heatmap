@@ -19,7 +19,7 @@ import {
 } from "@/lib/engine/use-review-pile-item";
 import type { ReviewPileItemView } from "engine-contract";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
-import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import { NEW_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import {
   itemBand,
   itemCards,
@@ -80,7 +80,7 @@ const CombinedMastery = ({ item }: { item: ReviewPileItemView }) => {
             getBandFillCn("mastery", band)
           )}
         />
-        {band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band]}
+        {band == null ? NEW_LABEL : MASTERY_LEVEL_LABELS[band]}
       </span>
       <span className="text-muted-foreground">
         ({band == null ? "until all" : "lowest of"} {count} cards

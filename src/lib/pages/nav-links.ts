@@ -92,18 +92,25 @@ const writingMasteryNavLink: NavLinkItem = {
   wide: true,
 };
 
-// In the FAB's two-column grid: Speed Katakana, Fill in the Kanji / Reading
-// Practice I, II / Writing Practice (whole row).
+// In the FAB's two-column grid: Fill in the Kanji, Speed Katakana / Writing
+// Practice (whole row) / Reading Practice I, II.
 const practiceGamesSection: NavLinkSection = {
   heading: "Practice Games",
   links: [
-    { ...speedKatakanaPageMeta, Icon: Keyboard },
     { ...fillTheKanjiPageMeta, Icon: Puzzle },
+    { ...speedKatakanaPageMeta, Icon: Keyboard },
+    { ...productionPracticePageMeta, Icon: PenLine, wide: true },
     { ...recognitionPracticePageMeta, Icon: Eye },
     { ...recognitionPractice2PageMeta, Icon: Eye },
-    { ...productionPracticePageMeta, Icon: PenLine, wide: true },
   ],
 };
+
+// Writing first (a whole row in the FAB), then Reading Mastery I, II.
+const masteryNavLinks: NavLinkItem[] = [
+  writingMasteryNavLink,
+  readingMasteryNavLink,
+  readingMastery2NavLink,
+];
 
 /**
  * Practice destinations in the FAB menu, games first; the sidebar repeats
@@ -114,11 +121,7 @@ export const practiceNavSections: NavLinkSection[] = [
   {
     heading: "Kanji Mastery",
     starred: true,
-    links: [
-      readingMasteryNavLink,
-      readingMastery2NavLink,
-      writingMasteryNavLink,
-    ],
+    links: masteryNavLinks,
   },
 ];
 
@@ -135,12 +138,7 @@ export const headerNavSections: NavLinkSection[] = [
   {
     heading: "Kanji Mastery",
     starred: true,
-    links: [
-      { ...masteryPageMeta, Icon: GraduationCap },
-      readingMasteryNavLink,
-      readingMastery2NavLink,
-      writingMasteryNavLink,
-    ],
+    links: [{ ...masteryPageMeta, Icon: GraduationCap }, ...masteryNavLinks],
   },
   practiceGamesSection,
 ];

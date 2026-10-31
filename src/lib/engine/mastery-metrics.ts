@@ -178,7 +178,7 @@ export const itemCards = (item: ReviewPileItemView): CardProgress[] =>
 
 /**
  * The 0-based band a pile item falls in for one card kind and measure, or
- * `null` for "Not started". Band 0 is always the weakest (Fresh, the lowest
+ * `null` for "New". Band 0 is always the weakest (Fresh, the lowest
  * stability, the hardest difficulty), so Combined, which needs every card the
  * item has started, takes the lowest band of them. `now` (ms) only matters
  * for mastery.
@@ -200,12 +200,12 @@ export const itemBand = (
 
 /**
  * One emoji per band, weakest first, shared by every measure since band 0 is
- * always the weakest: a waxing moon that ends in a flame. Not started is the
+ * always the weakest: a waxing moon that ends in a flame. New is the
  * new moon.
  */
 const NOT_STARTED_EMOJI = "🌑";
 const BAND_EMOJIS = ["🌒", "🌓", "🌖", "🔥"] as const;
 
-/** The emoji of a band from `itemBand` and friends; `null` is Not started. */
+/** The emoji of a band from `itemBand` and friends; `null` is New. */
 export const bandEmoji = (band: number | null): string =>
   band == null ? NOT_STARTED_EMOJI : BAND_EMOJIS[band];

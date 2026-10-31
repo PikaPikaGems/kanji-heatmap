@@ -407,7 +407,10 @@ export const GlobalKanjiLink = ({
   );
 };
 
-/** GlobalKanjiLink's card (keyword badge over the kanji), not a link. */
+/**
+ * GlobalKanjiLink's card (keyword badge over the kanji), not a link: its badge
+ * is outlined, so it doesn't read as a button.
+ */
 export const KanjiKeywordCard = ({
   kanji,
   keyword,
@@ -422,7 +425,7 @@ export const KanjiKeywordCard = ({
       label={keyword}
       character={kanji}
       fontSize={fontSize}
-      badgeClassName="border border-solid border-foreground/10"
+      badgeVariant="outline"
     />
   </div>
 );

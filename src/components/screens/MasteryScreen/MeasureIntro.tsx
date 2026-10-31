@@ -5,8 +5,8 @@ import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
   getBands,
   MEASURE_INTROS,
-  NOT_STARTED_LABEL,
-  NOT_STARTED_RULES,
+  NEW_LABEL,
+  NEW_RULES,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 import { cn } from "@/lib/utils";
@@ -32,12 +32,12 @@ const BandRow = ({
   </li>
 );
 
-/** "Not started", then the measure's four bands, dullest first. */
+/** "New", then the measure's four bands, dullest first. */
 export const BandRows = ({ measure }: { measure: MasteryMetric }) => (
   <ul className="flex flex-col gap-1.5">
     <BandRow
-      label={NOT_STARTED_LABEL}
-      rule={NOT_STARTED_RULES[measure]}
+      label={NEW_LABEL}
+      rule={NEW_RULES[measure]}
       fillCn={getBandFillCn(measure, null)}
     />
     {getBands(measure).map(({ label, rule }, band) => (

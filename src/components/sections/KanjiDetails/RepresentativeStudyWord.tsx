@@ -147,7 +147,10 @@ const toWordEntry = ({ word, tags }: AnchorWord): CommonWordEntry => {
   };
 };
 
-/** One anchor word's table, then its frequency ranks. */
+/**
+ * One anchor word's table, then its frequency ranks, then View Vocabulary
+ * Details (or the AI controls).
+ */
 const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
   const [aiSettings] = useAiExplainSettings();
   const owner = useCurrentOwner();
@@ -176,13 +179,9 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
       )),
     },
     {
-      label: "Tier",
-      description: "How common the word is, across the frequency lists below.",
-      content: tier ? (
-        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
-          {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
-        </Badge>
-      ) : null,
+      label: "Gloss",
+      description: "A short English meaning of the word.",
+      content: <span className="text-sm font-bold">{englishGloss}</span>,
     },
     {
       label: "Tags",
@@ -192,15 +191,19 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
           <WordTagBadges
             entry={toWordEntry(anchor)}
             isName={tags.includes("name")}
-            maxVisible={4}
+            maxVisible={Infinity}
             className="-m-1"
           />
         ) : null,
     },
     {
-      label: "Gloss",
-      description: "A short English meaning of the word.",
-      content: <span className="text-sm font-bold">{englishGloss}</span>,
+      label: "Tier",
+      description: "How common the word is, across the frequency lists below.",
+      content: tier ? (
+        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
+          {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
+        </Badge>
+      ) : null,
     },
     {
       label: "Actions",
@@ -235,6 +238,7 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
         </TableBody>
       </Table>
 
+      <AnchorWordFrequencyRanks word={word} ranks={ranks} />
       {owner.status === "known" && !isAiExplainReady(aiSettings) && (
         <div className="flex flex-wrap items-center gap-1 pt-2">
           <ViewVocabDetails />
@@ -249,7 +253,6 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
           />
         </Suspense>
       )}
-      <AnchorWordFrequencyRanks word={word} ranks={ranks} />
     </div>
   );
 };
@@ -283,7 +286,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           value={shown}
           onValueChange={(value) => setTab(value as AnchorTab)}
         >
-          <div className="flex justify-center px-2">
+          <div className="flex justify-start px-2">
             <SegmentedTabsList
               value={shown}
               label="Anchor words"

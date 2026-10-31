@@ -147,7 +147,7 @@ export const ANCHOR_RANK_SOURCES: { label: string; description: string }[] = [
   { label: "Wikipedia", description: "Japanese Wikipedia." },
   {
     label: "Slice-of-life anime",
-    description: "Subtitles of slice-of-life anime.",
+    description: "Subtitles of slice-of-life anime, from Dave Doebrick.",
   },
   {
     label: "Media (jiten)",
@@ -156,10 +156,14 @@ export const ANCHOR_RANK_SOURCES: { label: string; description: string }[] = [
   { label: "TV drama (jiten)", description: "TV drama, from jiten.moe." },
   { label: "Anime + drama", description: "Anime and drama subtitles." },
   { label: "YouTube", description: "Transcribed YouTube videos." },
-  { label: "Netflix", description: "Netflix subtitles." },
   {
-    label: "Netflix (no names)",
-    description: "Netflix subtitles, with names removed.",
+    label: "Netflix (Shoui)",
+    description: "Netflix subtitles, from Shoui's frequency dictionaries.",
+  },
+  {
+    label: "Netflix (Dave Doebrick)",
+    description:
+      "Netflix Japan subtitles (around 2019), with names removed, from Dave Doebrick's word frequency report.",
   },
   {
     label: "jpdb",

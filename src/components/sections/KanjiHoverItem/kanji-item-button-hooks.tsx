@@ -13,6 +13,7 @@ import {
 import { BorderColorMeaning } from "@/lib/settings/settings";
 import { JLTPTtypes } from "@/lib/jlpt";
 import { TileColorContext } from "./tile-color-context";
+import { cnHatched } from "@/lib/generic-cn";
 
 export const cn = `animate-fade-in-fast h-95 w-full p-1.5 rounded-lg text-2xl ml-1 border-4 bg-opacity-100 z-0 hover:border-neon-accent transition-all transition-discrete duration-500`;
 export const loadingCn = `${cn} animate-pulse duration-1000 h-full !bg-lime-400 !border-3 border-white dark:border-black`;
@@ -114,8 +115,7 @@ export const useItemBtnCn = (kanji: string) => {
 
   // Hatched: diagonal stripes over the fill, with muted text and 75%
   // opacity, so a kanji with nothing to color still reads as a tile.
-  const hatchedCn =
-    " bg-[repeating-linear-gradient(135deg,hsl(var(--foreground)/0.14)_0_2px,transparent_2px_8px)] !text-muted-foreground opacity-75";
+  const hatchedCn = ` ${cnHatched} !text-muted-foreground opacity-75`;
   const btnCnRaw = `${cn} ${border} ${bgColor} ${textColor}${tileColor?.dimmed ? hatchedCn : ""}`;
   const btnCn =
     itemType === "compact"

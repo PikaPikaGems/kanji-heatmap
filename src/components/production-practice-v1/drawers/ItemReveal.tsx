@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
@@ -27,7 +26,7 @@ const WordKanjiCards = ({ word }: { word: string }) => {
 };
 
 /**
- * One answer word, dashed-underlined like Fill in the Kanji's answer kanji.
+ * One answer word, in a dashed pill.
  * Tapping it opens the word: its readings and speak button, its gloss, and
  * each of its kanji with the kanji's keyword.
  */
@@ -46,7 +45,7 @@ const AnswerWordPopover = ({
       <button
         type="button"
         lang="ja"
-        className="px-2 py-1 transition-colors border-2 border-dashed rounded-lg cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
+        className="px-5 py-2 transition-colors border-2 border-dashed rounded-full cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
       >
         {word.word}
       </button>
@@ -77,22 +76,19 @@ const AnswerWordPopover = ({
 );
 
 /**
- * The card's words, "高い · 最高" (or the main word alone); each opens its
- * own popover. Shared across feedback drawers.
+ * The card's words, "高い 最高" (or the main word alone); each opens its own
+ * popover. Shared across feedback drawers.
  */
 export const ItemReveal = ({ item }: { item: PracticeItem }) => {
   const words = item.secondary ? [item, item.secondary] : [item];
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-2 text-4xl text-foreground">
-      {words.map((word, i) => (
-        <Fragment key={word.word}>
-          {i > 0 && (
-            <span aria-hidden className="text-2xl text-muted-foreground">
-              ·
-            </span>
-          )}
-          <AnswerWordPopover word={word} fallbackGloss={item.keyword} />
-        </Fragment>
+    <div className="flex flex-wrap items-center justify-center gap-3 text-4xl text-foreground">
+      {words.map((word) => (
+        <AnswerWordPopover
+          key={word.word}
+          word={word}
+          fallbackGloss={item.keyword}
+        />
       ))}
     </div>
   );

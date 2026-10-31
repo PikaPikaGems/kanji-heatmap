@@ -6,6 +6,7 @@ import type { AiVoiceState } from "@/lib/ai-voice/engine";
 import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { formatMegabytes } from "@/lib/format-bytes";
 import type { AiExplainUsage } from "@/lib/ai-explain/preferences";
+import { ENGINE_API_VERSION } from "engine-contract";
 import { useEngineState } from "@/lib/engine/engine";
 
 declare const __BUILD_TIMESTAMP__: string;
@@ -15,7 +16,10 @@ export type DebugInfoSnapshot = {
   effectiveType?: NetworkState["effectiveType"];
   saveData?: boolean;
   version: string;
-  /** The study engine's release, when this build includes it and it loaded. */
+  /**
+   * The study engine's release and the engine API this build was compiled
+   * against ("1.0.0 · API 15"), when this build includes it and it loaded.
+   */
   engineVersion?: string;
   viewportWidth: number;
   viewportHeight: number;
@@ -55,19 +59,19 @@ export const formatDebugInfoForClipboard = (
     `Captured: ${formatCaptureTimestamp(capturedAt)}`,
     "",
     `Network: ${network}`,
-    `Version: ${info.version}`,
-    ...(info.engineVersion ? [`Engine: ${info.engineVersion}`] : []),
     `Viewport: ${info.viewportWidth}×${info.viewportHeight}`,
   ];
 
   if (info.device) {
     const { os, browser, platform } = info.device;
     lines.push(
-      "",
       `OS: ${os.name} · ${os.version} · ${platform.platform}`,
       `Browser: ${browser.name} · ${browser.version}`
     );
   }
+
+  lines.push("", `App Version: ${info.version}`);
+  if (info.engineVersion) lines.push(`KH Engine: ${info.engineVersion}`);
 
   return lines.join("\n");
 };
@@ -129,7 +133,9 @@ export function useDebugInfo(): DebugInfoSnapshot {
     saveData,
     version: __BUILD_TIMESTAMP__,
     engineVersion:
-      engine.status === "ready" ? engine.api.releaseVersion : undefined,
+      engine.status === "ready"
+        ? `${engine.api.releaseVersion} · API ${ENGINE_API_VERSION}`
+        : undefined,
     viewportWidth,
     viewportHeight,
     device,

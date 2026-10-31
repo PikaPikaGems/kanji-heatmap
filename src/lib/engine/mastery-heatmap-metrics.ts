@@ -132,7 +132,7 @@ const METRIC_INFO: Record<HeatmapMetric, MetricInfo> = {
   },
 };
 
-export const NOT_STARTED_LABEL = "Not started";
+export const NEW_LABEL = "New";
 
 export const getHeatmapMetricLabel = (metric: HeatmapMetric): string =>
   METRIC_INFO[metric].label;
@@ -151,8 +151,8 @@ export const getHeatmapCardKind = (metric: HeatmapMetric): MasteryCardKind =>
   METRIC_INFO[metric].card;
 
 /**
- * The word at the bright end of a measure's scale: "Not started [] [] [] []
- * [] Mastered" (the blank Not started square comes first).
+ * The word at the bright end of a measure's scale: "New [] [] [] []
+ * [] Mastered" (the blank New square comes first).
  */
 export const SCALE_END_LABELS: Record<MasteryMetric, string> = {
   mastery: "Mastered",
@@ -168,17 +168,17 @@ export const MEASURE_INTROS: Record<MasteryMetric, string> = {
 };
 
 /**
- * Why a card is "Not started" for a measure. FSRS has no stability or
+ * Why a card is "New" for a measure. FSRS has no stability or
  * difficulty before the first review, so it is never a low or high band.
  */
-export const NOT_STARTED_RULES: Record<MasteryMetric, string> = {
+export const NEW_RULES: Record<MasteryMetric, string> = {
   mastery: "Not in your review pile, or never reviewed",
   stability: "Never reviewed, so no stability yet",
   difficulty: "Never reviewed, so no difficulty yet",
 };
 
 /**
- * A measure's bands, dullest color first (not including "Not started"):
+ * A measure's bands, dullest color first (not including "New"):
  * brighter is always better, so difficulty runs from hardest to easiest.
  */
 export const getBands = (measure: MasteryMetric): readonly BandInfo[] => {
@@ -186,13 +186,13 @@ export const getBands = (measure: MasteryMetric): readonly BandInfo[] => {
   return measure === "stability" ? STABILITY_BANDS : DIFFICULTY_BANDS;
 };
 
-/** Band labels in `getBands` order (not including "Not started"). */
+/** Band labels in `getBands` order (not including "New"). */
 export const getBandLabels = (measure: MasteryMetric): string[] =>
   getBands(measure).map(({ label }) => label);
 
 /**
  * 0-based band (in `getBands` order) a pile row falls in for this metric, or
- * null for "Not started": not in the pile, or a needed card is still new.
+ * null for "New": not in the pile, or a needed card is still new.
  * `now` (ms) is only used by the mastery levels.
  */
 export const getHeatmapBand = (

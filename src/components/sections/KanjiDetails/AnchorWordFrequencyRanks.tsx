@@ -11,7 +11,8 @@ import {
 /**
  * An anchor word's rank in each of the 15 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
- * full at #1 and empty from #15,000 (or when the word isn't ranked).
+ * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
+ * when the word is in none of the lists.
  */
 export const AnchorWordFrequencyRanks = ({
   word,
@@ -20,13 +21,7 @@ export const AnchorWordFrequencyRanks = ({
   word: string;
   ranks: number[];
 }) => {
-  if (ranks.length === 0) {
-    return (
-      <div className="w-full p-4 text-sm text-center">
-        There is no frequency rank data for {word} right now.
-      </div>
-    );
-  }
+  if (ranks.every((rank) => rank === -1)) return null;
 
   return (
     <div className="text-left">

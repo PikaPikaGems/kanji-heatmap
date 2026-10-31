@@ -28,7 +28,7 @@ const MasteryPresentationPopover = lazy(
  * The `/` grid, colored by mastery (design 5.9). Search, sort, filter and
  * item settings are shared with `/`; the background color meaning is its own.
  * Without a pile to read (signed out, a browser that can't save progress, or
- * a build without the engine) every tile stays uncolored ("Not started");
+ * a build without the engine) every tile stays uncolored ("New");
  * a bottom banner says why, except in builds without the engine.
  */
 const MasteryScreen = () => {

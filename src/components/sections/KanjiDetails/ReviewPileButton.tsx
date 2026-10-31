@@ -2,7 +2,7 @@ import { WriteBlockedPopover } from "@/components/dependent/account/WriteBlocked
 import type { ReactNode } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
-import { NOT_STARTED_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
+import { NEW_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import { itemBand, MASTERY_LEVEL_LABELS } from "@/lib/engine/mastery-metrics";
 import { Loader2, PlusCircle } from "lucide-react";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -67,11 +67,11 @@ const LoadFailedNote = ({ onRetry }: { onRetry?: () => void }) => (
 /**
  * Shown once the kanji is in the review pile: a pill "● Mastery · Fresh"
  * with the kanji's combined mastery (the lowest of its cards) in
- * its /mastery color, "Not started" until every card is reviewed.
+ * its /mastery color, "New" until every card is reviewed.
  */
 const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   const band = itemBand(item, "combined", "mastery", Date.now());
-  const label = band == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[band];
+  const label = band == null ? NEW_LABEL : MASTERY_LEVEL_LABELS[band];
   return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 my-1 ml-2 text-xs font-semibold border rounded-full whitespace-nowrap">
       <span

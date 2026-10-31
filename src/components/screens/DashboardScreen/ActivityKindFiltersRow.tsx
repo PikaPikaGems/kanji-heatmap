@@ -33,53 +33,36 @@ const KindCheckbox = ({
 
 /**
  * The heatmap's activity checkboxes in groups like the practice menu's
- * (Kanji Mastery, with Items Added, and Practice Games), each with an "All"
- * checkbox. `onChange` gets every kind that changed at once.
+ * (Kanji Mastery, with Items Added, and Practice Games).
  */
 export const ActivityKindFiltersRow = ({
   filters,
   onChange,
 }: {
   filters: ActivityKindFilters;
-  onChange: (changes: Partial<Record<ActivityKind, boolean>>) => void;
+  onChange: (kind: ActivityKind, checked: boolean) => void;
 }) => {
   const idBase = useId();
   return (
     <div className="flex flex-col items-center gap-3">
-      {ACTIVITY_KIND_GROUPS.map(({ heading, kinds }) => {
-        // Checked when the whole group is; checking it turns the group on.
-        const allChecked = kinds.every((kind) => filters[kind]);
-        return (
-          <fieldset key={heading} className="flex flex-col items-center">
-            <legend className="mb-1.5 text-[10px] font-bold tracking-wider text-center uppercase text-muted-foreground">
-              {heading}
-            </legend>
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-              {kinds.length > 1 && (
-                <KindCheckbox
-                  id={`${idBase}-${heading}-all`}
-                  label="All"
-                  checked={allChecked}
-                  onChange={(checked) =>
-                    onChange(
-                      Object.fromEntries(kinds.map((kind) => [kind, checked]))
-                    )
-                  }
-                />
-              )}
-              {kinds.map((kind) => (
-                <KindCheckbox
-                  key={kind}
-                  id={`${idBase}-${kind}`}
-                  label={ACTIVITY_KIND_LABELS[kind]}
-                  checked={filters[kind]}
-                  onChange={(checked) => onChange({ [kind]: checked })}
-                />
-              ))}
-            </div>
-          </fieldset>
-        );
-      })}
+      {ACTIVITY_KIND_GROUPS.map(({ heading, kinds }) => (
+        <fieldset key={heading} className="flex flex-col items-center">
+          <legend className="mb-1.5 text-[10px] font-bold tracking-wider text-center uppercase text-muted-foreground">
+            {heading}
+          </legend>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            {kinds.map((kind) => (
+              <KindCheckbox
+                key={kind}
+                id={`${idBase}-${kind}`}
+                label={ACTIVITY_KIND_LABELS[kind]}
+                checked={filters[kind]}
+                onChange={(checked) => onChange(kind, checked)}
+              />
+            ))}
+          </div>
+        </fieldset>
+      ))}
     </div>
   );
 };

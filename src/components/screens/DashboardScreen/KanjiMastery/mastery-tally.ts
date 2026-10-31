@@ -25,8 +25,11 @@ import {
   MASTERY_METRICS,
 } from "@/lib/engine/mastery-metrics";
 
+/** The dashboard's card order: the reading cards first, Combined last. */
 export const MASTERY_CARD_KINDS: readonly MasteryCardKind[] = [
-  ...ALL_CARD_TYPES,
+  "reading",
+  "secondaryReading",
+  "writing",
   "combined",
 ];
 
@@ -70,7 +73,7 @@ export const JOUYOU_GROUPING: MasteryGrouping = {
 };
 
 /**
- * Segment counts for one bar, indexed by band: 0 is "Not started", then the
+ * Segment counts for one bar, indexed by band: 0 is "New", then the
  * metric's bands in order.
  */
 export type BandCounts = number[];
@@ -112,8 +115,8 @@ const countStarted = (
   }
 };
 
-/** Everything not counted into a band is "Not started". */
-const fillNotStarted = (tally: MasteryTally) => {
+/** Everything not counted into a band is "New". */
+const fillNew = (tally: MasteryTally) => {
   for (const metric of MASTERY_METRICS) {
     for (const kind of MASTERY_CARD_KINDS) {
       const counts = tally[metric][kind];
@@ -182,7 +185,7 @@ export const tallyMastery = (
     }
   }
 
-  for (const tally of [all, ...Object.values(byGroup)]) fillNotStarted(tally);
+  for (const tally of [all, ...Object.values(byGroup)]) fillNew(tally);
   return { byGroup, all };
 };
 

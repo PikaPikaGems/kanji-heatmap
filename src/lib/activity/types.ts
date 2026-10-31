@@ -105,11 +105,11 @@ export const ACTIVITY_KIND_GROUPS: {
   {
     heading: "Practice Games",
     kinds: [
-      "speedKatakana",
       "fillTheKanji",
+      "speedKatakana",
+      "production",
       "recognition",
       "recognition2",
-      "production",
     ],
   },
 ];

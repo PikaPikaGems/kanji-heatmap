@@ -20,7 +20,7 @@ import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import { BandRows } from "@/components/screens/MasteryScreen/MeasureIntro";
 import {
   MEASURE_INTROS,
-  NOT_STARTED_LABEL,
+  NEW_LABEL,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import {
   bandEmoji,
@@ -37,6 +37,7 @@ import {
   CARD_TYPE_LABELS,
   cardProgress,
 } from "@/lib/engine/card-types";
+import { cnHatched } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
 const NONE = "—";
@@ -117,7 +118,7 @@ const studiedField = (
 const masteryCell = (card: CardProgress | null, now: number): Cell => {
   const level = card && isCardStarted(card) ? masteryLevel(card, now) : null;
   return {
-    text: level == null ? NOT_STARTED_LABEL : MASTERY_LEVEL_LABELS[level],
+    text: level == null ? NEW_LABEL : MASTERY_LEVEL_LABELS[level],
     swatchCn: getBandFillCn("mastery", level),
     emoji: bandEmoji(level),
   };
@@ -239,41 +240,35 @@ const COLUMN_ICONS: Record<CardType, LucideIcon> = {
 /** The word each card asks about; `secondaryReading` is absent without a secondary word. */
 export type ProgressTableWords = Partial<Record<CardType, string>>;
 
-/** "No 2nd word": one cell down the whole Reading II column. */
+/** "No 2nd word": one hatched cell down the whole Reading II column. */
 const NO_SECONDARY_WORD = "No 2nd word";
 
-const ColumnHeader = ({
-  cardType,
-  word,
-}: {
-  cardType: CardType;
-  word: string | undefined;
-}) => {
+const ColumnHeader = ({ cardType }: { cardType: CardType }) => {
   const Icon = COLUMN_ICONS[cardType];
   return (
-    <TableHead
-      className={cn(
-        "h-auto px-1.5 py-2 align-top sm:px-3",
-        word == null && "opacity-50"
-      )}
-    >
+    <TableHead className="h-auto px-1.5 py-2 align-middle sm:px-3">
       <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase whitespace-nowrap text-foreground">
         <Icon className="size-3.5 shrink-0" aria-hidden />
         {CARD_TYPE_LABELS[cardType]}
-      </span>
-      <span className="block text-sm font-normal truncate kanji-font text-foreground">
-        {word ?? NONE}
       </span>
     </TableHead>
   );
 };
 
+/** The first row: what each card tests, above "Next review". */
+const TARGET_FIELD = {
+  label: "Target",
+  definition:
+    "What the card tests: the kanji you write (Writing), the main anchor word you read (Reading I) or the secondary one (Reading II).",
+};
+
 /**
  * A kanji's cards side by side (Writing, Reading I, Reading II), one field
- * per row, each column headed by the word it asks about. `item` is null when
+ * per row, the first row being what each card tests. `item` is null when
  * there is nothing to show yet (logged out, or not in the review pile), which
  * fills every cell with its default. Without a secondary word the Reading II
- * column is one faded "No 2nd word" cell.
+ * column is one hatched "No 2nd word" cell. On phones the table scrolls
+ * sideways instead of squeezing its columns.
  */
 export const ProgressTable = ({
   item,
@@ -287,23 +282,48 @@ export const ProgressTable = ({
 
   return (
     <div className="mt-4 overflow-hidden border rounded-xl border-foreground/10 bg-muted/10">
-      <Table className="table-fixed">
+      <Table className="table-fixed min-w-[26rem]">
         <TableHeader>
           <TableRow className="border-foreground/10 bg-muted/30 hover:bg-muted/30">
-            <TableHead className="w-[28%] h-auto px-2 py-2 text-[10px] font-bold tracking-wider uppercase align-top sm:w-40 sm:px-3">
+            <TableHead className="w-[28%] h-auto px-2 py-2 text-[10px] font-bold tracking-wider uppercase align-middle sm:w-40 sm:px-3">
               Field
             </TableHead>
             {ALL_CARD_TYPES.map((cardType) => (
-              <ColumnHeader
-                key={cardType}
-                cardType={cardType}
-                word={words[cardType]}
-              />
+              <ColumnHeader key={cardType} cardType={cardType} />
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {FIELDS.map(({ label, definition, cell }, row) => (
+          <TableRow className="border-dotted border-foreground/15 hover:bg-transparent">
+            <TableCell className="px-2 py-1.5 text-left sm:px-3">
+              <FieldLabel {...TARGET_FIELD} />
+            </TableCell>
+            {ALL_CARD_TYPES.map((cardType) => {
+              if (cardType === "secondaryReading" && !hasSecondary) {
+                return (
+                  <TableCell
+                    key={cardType}
+                    rowSpan={FIELDS.length + 1}
+                    className={cn(
+                      cnHatched,
+                      "px-1.5 text-xs font-bold text-center align-middle text-muted-foreground sm:px-3"
+                    )}
+                  >
+                    {NO_SECONDARY_WORD}
+                  </TableCell>
+                );
+              }
+              return (
+                <TableCell
+                  key={cardType}
+                  className="px-1.5 py-1.5 text-lg text-left truncate kanji-font sm:px-3"
+                >
+                  {words[cardType] ?? NONE}
+                </TableCell>
+              );
+            })}
+          </TableRow>
+          {FIELDS.map(({ label, definition, cell }) => (
             <TableRow
               key={label}
               className="border-dotted border-foreground/15 hover:bg-transparent"
@@ -313,16 +333,7 @@ export const ProgressTable = ({
               </TableCell>
               {ALL_CARD_TYPES.map((cardType) => {
                 if (cardType === "secondaryReading" && !hasSecondary) {
-                  if (row > 0) return null;
-                  return (
-                    <TableCell
-                      key={cardType}
-                      rowSpan={FIELDS.length}
-                      className="px-1.5 text-xs font-bold text-center align-middle opacity-50 sm:px-3"
-                    >
-                      {NO_SECONDARY_WORD}
-                    </TableCell>
-                  );
+                  return null;
                 }
                 const card = item ? cardProgress(item, cardType) : null;
                 const { text, swatchCn } = cell(card, now);

@@ -167,8 +167,8 @@ const ActivityCalendarHeatmapBody = () => {
       <div className="mt-2">
         <ActivityKindFiltersRow
           filters={filters}
-          onChange={(changes) =>
-            setSetting("filters", { ...filters, ...changes })
+          onChange={(kind, checked) =>
+            setSetting("filters", { ...filters, [kind]: checked })
           }
         />
       </div>

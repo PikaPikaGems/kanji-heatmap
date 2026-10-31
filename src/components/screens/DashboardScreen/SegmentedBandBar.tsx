@@ -2,7 +2,7 @@ import { StackedBar } from "@/components/common/StackedBar";
 
 /**
  * A StackedBar of mastery bands: one block per band, in order. Band 0 is skipped so the track shows through
- * (empty = not started). `bandCn` / `bandLabels` are indexed by band.
+ * (empty = New). `bandCn` / `bandLabels` are indexed by band.
  */
 export const SegmentedBandBar = ({
   counts,
@@ -31,7 +31,7 @@ export const SegmentedBandBar = ({
       total={totalUnits}
       segments={counts.map((count, band) => ({
         key: String(band),
-        // Band 0 ("Not started") stays empty track.
+        // Band 0 ("New") stays empty track.
         value: band === 0 ? 0 : count,
         cn: bandCn[band],
       }))}
