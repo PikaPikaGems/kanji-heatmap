@@ -14,7 +14,7 @@ export type ChimeOutcome =
 
 export type ChimeLogEntry = {
   at: Date;
-  /** What was speaking when the chime started (and was then stopped). */
+  /** What was speaking when the chime started. */
   speech: "none" | "browser voice" | "AI voice";
   /** Which pool element played it; "retry" for the fresh one after a failure. */
   slot: number | "retry";

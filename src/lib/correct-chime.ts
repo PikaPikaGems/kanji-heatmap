@@ -1,5 +1,5 @@
 import assetsPaths from "@/lib/assets-paths";
-import { isAiSpeaking, stopAiSpeech } from "@/lib/ai-voice/engine";
+import { isAiSpeaking } from "@/lib/ai-voice/engine";
 import {
   addChimeLogEntry,
   type ChimeLogEntry,
@@ -8,18 +8,16 @@ import {
 
 /**
  * The chime after a correct answer, shared by every game, with a log of the
- * last few chimes for App & Device Info.
+ * last few chimes for App & Device Info (`chime-log.ts`).
  *
  * - A few <audio> elements are made when a game's code loads and kept for the
  *   page's life; each chime takes one that isn't playing, so a playing one is
  *   never rewound (Safari often stays silent after that).
- * - Speech still going when the answer is right (the sentence read aloud when
- *   the card appeared, or after a miss) is stopped first. On iPhone the
- *   browser voice holds the audio and the chime that starts under it is often
- *   swallowed; the answer is in, so that speech is done anyway.
- * - Every chime is logged: what was speaking, and whether it played, was
- *   blocked, was cut off, or never started. iPhone fails silently, so this is
- *   how a missing chime can be told apart from the rest.
+ * - On iPhone (Safari and the home-screen app) a chime still goes missing
+ *   now and then mid-round, and iPhone fails silently. So every chime is
+ *   logged: whether it played, was blocked, was cut off, or never started,
+ *   and whether any speech was playing. A missing chime logged as "played"
+ *   means iPhone played it silently.
  */
 const POOL_SIZE = 3;
 /** Longer than the file (1.8 s), so a played chime has ended by then. */
@@ -43,16 +41,12 @@ const audioSessionType = () =>
   (navigator as Navigator & { audioSession?: { type: string } }).audioSession
     ?.type;
 
-/** Stops speech still going, and says which one it was. */
-const stopSpeech = (): ChimeLogEntry["speech"] => {
+/** Which speech, if any, is playing (only recorded, never stopped). */
+const currentSpeech = (): ChimeLogEntry["speech"] => {
   if (typeof window !== "undefined" && window.speechSynthesis?.speaking) {
-    window.speechSynthesis.cancel();
     return "browser voice";
   }
-  if (isAiSpeaking()) {
-    stopAiSpeech();
-    return "AI voice";
-  }
+  if (isAiSpeaking()) return "AI voice";
   return "none";
 };
 
@@ -105,7 +99,7 @@ const playAndWatch = (
 
 export const playCorrectChime = () => {
   if (pool.length === 0) return;
-  const speech = stopSpeech();
+  const speech = currentSpeech();
   // Prefer an idle element, so a playing one is never rewound.
   const idle = pool.findIndex((audio) => audio.paused || audio.ended);
   const slot = idle === -1 ? nextSlot : idle;
