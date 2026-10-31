@@ -27,8 +27,8 @@ const WordKanjiCards = ({ word }: { word: string }) => {
 
 /**
  * One answer word, in a dashed pill.
- * Tapping it opens the word: its readings and speak button, its gloss, and
- * each of its kanji with the kanji's keyword.
+ * Tapping it opens the word: its readings and speak button, its gloss then
+ * the word itself, and each of its kanji with the kanji's keyword.
  */
 const AnswerWordPopover = ({
   word,
@@ -53,9 +53,6 @@ const AnswerWordPopover = ({
     contentClassName="w-72 max-w-[calc(100vw-1.5rem)] p-0"
     content={
       <div className="flex flex-col items-center p-2 text-center">
-        <span className="pt-1 text-lg font-bold kanji-font" lang="ja">
-          {word.word}
-        </span>
         <div className="flex flex-wrap items-center justify-center gap-1 py-1">
           {word.reading.split("・").map((reading) => (
             <RomajiBadge key={reading} kana={reading} />
@@ -67,6 +64,10 @@ const AnswerWordPopover = ({
         </div>
         <p className="px-2 pb-2 text-xs font-bold text-muted-foreground text-pretty">
           {word.englishGloss || fallbackGloss}
+          <span aria-hidden> · </span>
+          <span lang="ja" className="kanji-font whitespace-nowrap">
+            {word.word}
+          </span>
         </p>
         <DottedSeparator />
         <WordKanjiCards word={word.word} />
