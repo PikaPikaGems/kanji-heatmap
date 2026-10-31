@@ -89,10 +89,13 @@ export const NeedsAttentionTab = ({
   );
 };
 
-/** Rows per page, like the Pending tab. */
-const PAGE_SIZE = 10;
+/**
+ * Rows per page: half the Pending tab's 10, since each row here is about
+ * twice as tall (its error and Dismiss).
+ */
+const PAGE_SIZE = 5;
 
-/** The failed operations, 10 per page with the drawer's pagination. */
+/** The failed operations, 5 per page with the drawer's pagination. */
 const FailedOperationPages = ({
   operations,
   onDismissed,
