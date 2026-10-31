@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RocketIcon } from "lucide-react";
+import { Gamepad2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -58,7 +58,7 @@ export const PracticeFab = () => {
           size="icon"
           variant={useSecondaryVariant ? "secondary" : "primary"}
           className={cn(
-            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-6 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-10 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom)+var(--bottom-banner-height,0px))]",
+            "fixed-viewport-layer fixed z-40 rounded-full h-[5rem] w-[5rem] p-0 border-b-[8px] active:translate-y-[5px] active:border-b-[3px] [&_svg]:size-11 [&_svg]:shrink-0 right-[calc(0.35rem+5px)] bottom-[calc(1rem+env(safe-area-inset-bottom)+var(--bottom-banner-height,0px))]",
             useSecondaryVariant && "border-foreground/40"
           )}
           aria-label="Open practice menu"
@@ -66,9 +66,9 @@ export const PracticeFab = () => {
           onMouseEnter={prefetchPracticeRoutes}
           onFocus={prefetchPracticeRoutes}
         >
-          <RocketIcon />
+          <Gamepad2 />
           {totalDue(due) > 0 && (
-            <NotificationDot className="absolute top-1/2 left-[calc(50%+1.2rem)] -translate-y-1/2" />
+            <NotificationDot className="absolute -translate-x-1/2 bottom-2 left-1/2" />
           )}
         </PracticeButton>
       </PopoverTrigger>
