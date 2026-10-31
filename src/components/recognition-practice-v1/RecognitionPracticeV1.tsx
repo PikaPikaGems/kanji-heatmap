@@ -26,7 +26,7 @@ const RecognitionPracticeV1 = () => {
   const primerRef = useRef<HTMLInputElement | null>(null);
 
   const session = usePracticeSession<SessionResult>({
-    recordType: "reading_practice_round_completed",
+    activityType: "reading_practice",
     sessionSize: SESSION_SIZE,
     // Focus the sr-only primer so the soft keyboard opens with the session.
     onSessionStart: () => primerRef.current?.focus(),

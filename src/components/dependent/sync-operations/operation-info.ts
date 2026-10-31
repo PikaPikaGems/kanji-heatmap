@@ -1,12 +1,12 @@
 import type { RecentFailedOperation, SyncOperation } from "engine-contract";
+import { CARD_TYPE_LABELS } from "@/lib/engine/card-types";
+import { practiceActivityLabel } from "@/lib/practice/activity";
 import {
   Bookmark,
-  BookOpen,
   Gamepad2,
   Keyboard,
   ListMinus,
   ListPlus,
-  PenLine,
   SlidersHorizontal,
   SquarePen,
   Trophy,
@@ -34,14 +34,6 @@ const OPERATION_INFO: Record<
     Icon: Keyboard,
   },
   generic_challenge_completed: { label: "Practice activity", Icon: Gamepad2 },
-  reading_practice_round_completed: {
-    label: "Reading practice",
-    Icon: BookOpen,
-  },
-  writing_practice_round_completed: {
-    label: "Writing practice",
-    Icon: PenLine,
-  },
 };
 
 export const operationIcon = (type: OperationType) => OPERATION_INFO[type].Icon;
@@ -55,7 +47,10 @@ export const describeOperation = (op: SyncOperation): string => {
     return op.isActive ? "Bookmark added" : "Bookmark removed";
   }
   if (op.type === "review-grade") {
-    return `${op.cardType === "reading" ? "Reading" : "Writing"} review: ${op.grade}`;
+    return `${CARD_TYPE_LABELS[op.cardType]} review: ${op.grade}`;
+  }
+  if (op.type === "generic_challenge_completed") {
+    return practiceActivityLabel(op.activityType) ?? operationLabel(op.type);
   }
   return operationLabel(op.type);
 };

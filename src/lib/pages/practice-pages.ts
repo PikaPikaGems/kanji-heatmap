@@ -2,10 +2,18 @@
 
 export const recognitionPracticePageMeta = {
   href: "/reading-practice",
-  title: "Reading Practice",
-  shortLabel: "Reading Practice",
-  heading: "👁️ Reading Practice",
+  title: "Reading Practice I",
+  shortLabel: "Reading Practice I",
+  heading: "👁️ Reading Practice I",
   description: "Type the correct reading for each word",
+} as const;
+
+export const recognitionPractice2PageMeta = {
+  href: "/reading-practice-2",
+  title: "Reading Practice II",
+  shortLabel: "Reading Practice II",
+  heading: "👁️ Reading Practice II",
+  description: "Type the correct reading for each kanji's second word",
 } as const;
 
 export const productionPracticePageMeta = {
@@ -18,10 +26,18 @@ export const productionPracticePageMeta = {
 
 export const readingMasteryPageMeta = {
   href: "/reading-mastery",
-  title: "Reading Mastery",
-  shortLabel: "Reading Mastery",
-  heading: "👁️ Kanji Reading Mastery",
+  title: "Reading Mastery I",
+  shortLabel: "Reading Mastery I",
+  heading: "👁️ Kanji Reading Mastery I",
   description: "Review due readings from your review pile",
+} as const;
+
+export const readingMastery2PageMeta = {
+  href: "/reading-mastery-2",
+  title: "Reading Mastery II",
+  shortLabel: "Reading Mastery II",
+  heading: "👁️ Kanji Reading Mastery II",
+  description: "Review due second-word readings from your review pile",
 } as const;
 
 export const writingMasteryPageMeta = {
