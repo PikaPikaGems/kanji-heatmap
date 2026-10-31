@@ -6,13 +6,17 @@ import {
   getWriteBlocker,
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
-import { useAddToReviewPile } from "@/lib/engine/use-review-pile-add";
+import {
+  pileWordsLabel,
+  useAddToReviewPile,
+  usePileWords,
+  type PileWords,
+} from "@/lib/engine/use-review-pile-add";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
   refreshReviewPileItem,
   useReviewPileItem,
 } from "@/lib/engine/use-review-pile-item";
-import { useKanjiRepresentativeWord } from "@/providers/kanji-representative-word-hooks";
 import { ProgressTable } from "./ProgressTable";
 import { RemoveFromReviewPile } from "./RemoveFromReviewPile";
 import { reviewPileAddCn } from "./review-pile-add-cn";
@@ -47,19 +51,19 @@ const SignedOutKanjiProgress = () => (
 /** Logged in, not in the review pile: the defaults, plus a way to add it. */
 const NotInPileKanjiProgress = ({
   kanji,
-  word,
+  pile,
   blocked,
 }: {
   kanji: string;
-  /** The kanji's representative word, which the pile stores with it. */
-  word: string | null;
+  /** The kanji's anchor words, which the pile stores with it. */
+  pile: { words: PileWords; loaded: boolean } | null;
   blocked: boolean;
 }) => {
   const { add, action, tooLong, hasApi } = useAddToReviewPile(
     kanji,
-    word ?? ""
+    pile?.words ?? { word: "" }
   );
-  const canAdd = word != null && hasApi && !blocked && !tooLong;
+  const canAdd = pile != null && pile.loaded && hasApi && !blocked && !tooLong;
 
   return (
     <div className="flex flex-col gap-3 pb-1">
@@ -67,8 +71,8 @@ const NotInPileKanjiProgress = ({
         <UserNotice icon="📚">
           This kanji {`is not`} in your review pile yet.
         </UserNotice>
-        {/* Looks like the drawer's own "Add 日 to my review pile". */}
-        {word != null && (
+        {/* Looks like the drawer's own "Add 高い · 最高 to my review pile". */}
+        {pile != null && (
           <button
             type="button"
             className={cn(reviewPileAddCn, "-ml-2")}
@@ -80,7 +84,7 @@ const NotInPileKanjiProgress = ({
             ) : (
               <PlusCircle size={16} className="translate-y-0.5 shrink-0" />
             )}
-            Add {word} to my review pile
+            Add {pileWordsLabel(pile.words)} to my review pile
           </button>
         )}
         {action.kind === "error" && (
@@ -99,7 +103,7 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
   const blocker = getWriteBlocker(useAccountStatus());
-  const word = useKanjiRepresentativeWord(kanji)?.word ?? null;
+  const pile = usePileWords(kanji);
 
   if (snapshot.status === "loading" || snapshot.status === "unavailable") {
     return <Spinner />;
@@ -122,7 +126,7 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
     return (
       <NotInPileKanjiProgress
         kanji={kanji}
-        word={word}
+        pile={pile}
         blocked={blocker != null}
       />
     );

@@ -16,7 +16,11 @@ import {
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
-import { useAddToReviewPile } from "@/lib/engine/use-review-pile-add";
+import {
+  pileWordsLabel,
+  useAddToReviewPile,
+  type PileWords,
+} from "@/lib/engine/use-review-pile-add";
 import {
   refreshReviewPileItem,
   useReviewPileItem,
@@ -25,10 +29,10 @@ import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 import { reviewPileAddCn } from "./review-pile-add-cn";
 
-const AddLabel = ({ word }: { word: string }) => (
+const AddLabel = ({ words }: { words: PileWords }) => (
   <>
-    <PlusCircle size={16} className="translate-y-0.5 shrink-0" /> Add {word} to
-    my review pile
+    <PlusCircle size={16} className="translate-y-0.5 shrink-0" /> Add{" "}
+    {pileWordsLabel(words)} to my review pile
   </>
 );
 
@@ -83,19 +87,21 @@ const PileMastery = ({ item }: { item: ReviewPileItemView }) => {
   );
 };
 
-/** Logged in: reads `reviews.pile.watch(kanji)`, adds with the anchor word. */
+/** Logged in: reads `reviews.pile.watch(kanji)`, adds with the anchor words. */
 const ActiveReviewPileButton = ({
   kanji,
-  word,
+  words,
+  wordsLoaded,
   status,
 }: {
   kanji: string;
-  word: string;
+  words: PileWords;
+  wordsLoaded: boolean;
   status: Extract<AccountStatus, { kind: "active" }>;
 }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
-  const { add, action, tooLong } = useAddToReviewPile(kanji, word);
+  const { add, action, tooLong } = useAddToReviewPile(kanji, words);
 
   const current = snapshotValue(snapshot);
   const blocker = getWriteBlocker(status);
@@ -112,7 +118,7 @@ const ActiveReviewPileButton = ({
           blocker={blocker}
           trigger={
             <button type="button" className={reviewPileAddCn}>
-              <AddLabel word={word} />
+              <AddLabel words={words} />
             </button>
           }
         />
@@ -121,7 +127,11 @@ const ActiveReviewPileButton = ({
           type="button"
           className={reviewPileAddCn}
           disabled={
-            !api || current === undefined || action.kind === "busy" || tooLong
+            !api ||
+            !wordsLoaded ||
+            current === undefined ||
+            action.kind === "busy" ||
+            tooLong
           }
           onClick={() => void add()}
         >
@@ -130,7 +140,7 @@ const ActiveReviewPileButton = ({
           ) : (
             <PlusCircle size={16} className="translate-y-0.5 shrink-0" />
           )}
-          Add {word} to my review pile
+          Add {pileWordsLabel(words)} to my review pile
         </button>
       )}
       {snapshot.status === "failed" && (
@@ -150,16 +160,19 @@ const ActiveReviewPileButton = ({
 };
 
 /**
- * Review-pile control in the kanji drawer: add the anchor word, or see that
- * it is in the pile (removing it lives in Your Progress). The caller hides it
- * in builds without the engine.
+ * Review-pile control in the kanji drawer: add the anchor words, or see that
+ * the kanji is in the pile (removing it lives in Your Progress). The caller
+ * hides it in builds without the engine.
  */
 export const ReviewPileButton = ({
   kanji,
-  word,
+  words,
+  wordsLoaded,
 }: {
   kanji: string;
-  word: string;
+  words: PileWords;
+  /** False until the secondary word is known; adding waits for it. */
+  wordsLoaded: boolean;
 }) => {
   const status = useAccountStatus();
 
@@ -168,7 +181,8 @@ export const ReviewPileButton = ({
       <ActiveReviewPileButton
         key={kanji}
         kanji={kanji}
-        word={word}
+        words={words}
+        wordsLoaded={wordsLoaded}
         status={status}
       />
     );
@@ -180,7 +194,7 @@ export const ReviewPileButton = ({
         className={reviewPileAddCn}
         onClick={openLoginDialog}
       >
-        <AddLabel word={word} />
+        <AddLabel words={words} />
       </button>
     );
   }
@@ -189,7 +203,7 @@ export const ReviewPileButton = ({
       <GenericPopover
         trigger={
           <button type="button" className={reviewPileAddCn}>
-            <AddLabel word={word} />
+            <AddLabel words={words} />
           </button>
         }
         content={
@@ -207,7 +221,7 @@ export const ReviewPileButton = ({
         blocker={blocker}
         trigger={
           <button type="button" className={reviewPileAddCn}>
-            <AddLabel word={word} />
+            <AddLabel words={words} />
           </button>
         }
       />
@@ -215,7 +229,7 @@ export const ReviewPileButton = ({
   }
   return (
     <button type="button" className={reviewPileAddCn} disabled>
-      <AddLabel word={word} />
+      <AddLabel words={words} />
     </button>
   );
 };

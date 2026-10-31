@@ -58,6 +58,9 @@ export const useKanjiRepresentativeWord = (
   );
 };
 
+/** Until `loaded`, only the main word and its readings are known (no secondary word yet). */
+export type LoadingAnchorWords = KanjiAnchorWords & { loaded: boolean };
+
 const toBasics = (base: RepresentativeWordData) =>
   toAnchorWordBasics(base.word, base.reading, undefined);
 
@@ -67,7 +70,9 @@ const toBasics = (base: RepresentativeWordData) =>
  * secondary word, fill in when the worker answers. Asks the worker for this
  * one kanji, so only use it where those fields are actually displayed.
  */
-export const useKanjiAnchorWords = (kanji: string): KanjiAnchorWords | null => {
+export const useKanjiAnchorWords = (
+  kanji: string
+): LoadingAnchorWords | null => {
   const ready = useIsKanjiWorkerReady();
   const base = useKanjiRepresentativeWord(kanji);
 
@@ -80,12 +85,15 @@ export const useKanjiAnchorWords = (kanji: string): KanjiAnchorWords | null => {
   );
 
   if (base == null) return null;
-  if (data != null && data.main.word === base.word) return data;
+  if (data != null && data.main.word === base.word) {
+    return { ...data, loaded: true };
+  }
   const basics = toBasics(base);
   return (
     basics && {
       main: withFrequencyTags(basics.main, undefined),
       secondary: null,
+      loaded: false,
     }
   );
 };

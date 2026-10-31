@@ -39,8 +39,9 @@ const ConfirmRemove = ({
     <div className="flex flex-col gap-5 px-2 pt-2 text-left">
       <div className="flex flex-col gap-2 text-sm">
         <p>
-          This deletes {kanji}&apos;s reading and writing review history. Adding
-          it again later starts both from scratch.
+          This deletes the review history of every card of {kanji}. Adding it
+          again later starts them all from scratch, with its current anchor
+          words.
         </p>
         <p className="font-bold">You can&apos;t undo this.</p>
       </div>
@@ -69,8 +70,8 @@ const ConfirmRemove = ({
 /**
  * The low-key red "Remove {kanji} from review pile" action at the bottom of
  * Your progress, and the dialog that asks first. Removing deletes the pile
- * item's reading and writing cards' history (a later add starts both from
- * scratch).
+ * item's history for every card (a later add starts them all from scratch,
+ * with the kanji's current anchor words).
  */
 export const RemoveFromReviewPile = ({
   kanji,
