@@ -27,7 +27,7 @@ export const KanjiPopoverWord = ({
             kanji={char}
             info={info}
             className={cn(
-              "underline decoration-dashed decoration-2 underline-offset-[0.12em] decoration-foreground/30 hover:decoration-foreground hover:decoration-solid",
+              "underline decoration-dashed decoration-[3px] underline-offset-[0.2em] decoration-foreground/30 hover:decoration-foreground hover:decoration-solid",
               kanjiClassName
             )}
           />
