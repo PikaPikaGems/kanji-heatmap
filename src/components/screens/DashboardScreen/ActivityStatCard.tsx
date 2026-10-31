@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/hover-card";
 import { formatCompactCount, formatRawCount } from "@/lib/format-count";
 
-const StatValue = ({
+/** A count; at 1,000 and over it shows abbreviated, with the exact count on hover. */
+export const StatValue = ({
   display,
   raw,
   abbreviated,

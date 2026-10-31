@@ -45,7 +45,7 @@ const AnswerWordPopover = ({
       <button
         type="button"
         lang="ja"
-        className="px-5 py-2 transition-colors border-2 border-dashed rounded-full cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
+        className="p-4 transition-colors border border-dashed rounded-3xl cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
       >
         {word.word}
       </button>

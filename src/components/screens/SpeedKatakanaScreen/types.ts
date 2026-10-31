@@ -17,6 +17,8 @@ export type SpeedKatakanaSettings = {
   displayEnglish: boolean;
   wordCount: WordCount;
   sound: { enabled: true; type: SoundMode } | { enabled: false };
+  /** Speak each word when it appears. Optional: older saved settings lack it. */
+  readAloudOnShow?: boolean;
 };
 
 export type SessionStats = {

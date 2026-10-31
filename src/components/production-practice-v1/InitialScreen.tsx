@@ -2,11 +2,12 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import {
   PracticeInitialScreen,
+  SoundAfterAnswering,
   ToggleRow,
   usePracticeDeck,
 } from "@/components/shared-practice";
 import { productionPracticePageMeta } from "@/lib/pages/practice-pages";
-import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
+import { DEFAULT_SETTINGS, SETTINGS_KEY, soundOf } from "./constants";
 import { PracticeItem, ProductionPracticeSettings } from "./types";
 
 export const InitialScreen = ({
@@ -39,25 +40,18 @@ export const InitialScreen = ({
       canStart={canStart}
       onStart={() => onStart(deck)}
       sessionOptions={
-        <>
+        <SoundAfterAnswering
+          sound={soundOf(settings)}
+          onChange={(sound) => setSetting("sound", sound)}
+          childrenSpeak={settings.hearPronunciationOnLoad}
+        >
           <ToggleRow
             id="hear-on-load"
             label="Hear pronunciation on load"
             checked={settings.hearPronunciationOnLoad}
             onChange={(v) => setSetting("hearPronunciationOnLoad", v)}
           />
-          {settings.hearPronunciationOnLoad && (
-            <p className="w-full text-xs text-left animate-fade-in-fast">
-              ⚠️ Text-to-speech might not work on all devices.
-            </p>
-          )}
-          <ToggleRow
-            id="celebratory-sound"
-            label="Celebratory sound on correct"
-            checked={settings.celebratorySoundOnCorrect}
-            onChange={(v) => setSetting("celebratorySoundOnCorrect", v)}
-          />
-        </>
+        </SoundAfterAnswering>
       }
     />
   );

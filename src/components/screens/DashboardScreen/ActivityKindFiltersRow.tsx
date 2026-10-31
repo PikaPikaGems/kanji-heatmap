@@ -1,7 +1,7 @@
 import { useId } from "react";
 import {
   ACTIVITY_KIND_GROUPS,
-  ACTIVITY_KIND_LABELS,
+  ACTIVITY_KIND_FILTER_LABELS,
   ActivityKind,
   ActivityKindFilters,
 } from "@/lib/activity";
@@ -55,7 +55,7 @@ export const ActivityKindFiltersRow = ({
               <KindCheckbox
                 key={kind}
                 id={`${idBase}-${kind}`}
-                label={ACTIVITY_KIND_LABELS[kind]}
+                label={ACTIVITY_KIND_FILTER_LABELS[kind]}
                 checked={filters[kind]}
                 onChange={(checked) => onChange(kind, checked)}
               />

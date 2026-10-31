@@ -22,6 +22,9 @@ export { RecapTile } from "./RecapTile";
 export { RoundRecap } from "./RoundRecap";
 export type { RoundRecapTile } from "./RoundRecap";
 export { ToggleRow } from "./ToggleRow";
+export { SoundAfterAnswering } from "./SoundAfterAnswering";
+export { CHIME_SOUND } from "./sound-setting";
+export type { SoundMode, SoundSetting } from "./sound-setting";
 export { usePracticeDeck } from "./use-practice-deck";
 export type {
   DeckFilterSettings,

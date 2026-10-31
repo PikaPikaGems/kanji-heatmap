@@ -2,6 +2,10 @@ import {
   DEFAULT_DECK_FILTER_SETTINGS,
   PRACTICE_SESSION_SIZE,
 } from "@/components/shared-practice/constants";
+import {
+  CHIME_SOUND,
+  type SoundSetting,
+} from "@/components/shared-practice/sound-setting";
 import { ProductionPracticeSettings } from "./types";
 
 export const SESSION_SIZE = PRACTICE_SESSION_SIZE;
@@ -23,7 +27,17 @@ export const SETTINGS_KEY = "production-practice-v1-settings";
 export const DEFAULT_SETTINGS: ProductionPracticeSettings = {
   ...DEFAULT_DECK_FILTER_SETTINGS,
   hearPronunciationOnLoad: false,
-  celebratorySoundOnCorrect: true,
+  sound: CHIME_SOUND,
+};
+
+/** The sound setting, from the older on/off chime when it was saved before. */
+export const soundOf = ({
+  sound,
+  celebratorySoundOnCorrect,
+}: ProductionPracticeSettings): SoundSetting => {
+  if (sound) return sound;
+  if (celebratorySoundOnCorrect === false) return { enabled: false };
+  return CHIME_SOUND;
 };
 
 /** Same as Stroke Order · Writing Practice; shrink via useFitPadSize on narrow screens. */

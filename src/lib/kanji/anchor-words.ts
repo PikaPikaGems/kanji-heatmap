@@ -166,7 +166,7 @@ export const ANCHOR_RANK_SOURCES: { label: string; description: string }[] = [
       "Netflix Japan subtitles (around 2019), with names removed, from Dave Doebrick's word frequency report.",
   },
   {
-    label: "jpdb",
+    label: "JPDB.io",
     description: "jpdb.io: the word's place in the JPDB frequency deck.",
   },
 ];

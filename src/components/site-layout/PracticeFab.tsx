@@ -87,6 +87,7 @@ export const PracticeFab = () => {
           sections={modeSections}
           dotHrefs={dueNavHrefs(due)}
           listClassName="grid grid-cols-2 gap-2"
+          hideDescriptions
           onItemClick={() => setOpen(false)}
         />
       </PopoverContent>

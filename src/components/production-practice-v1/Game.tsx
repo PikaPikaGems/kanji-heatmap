@@ -21,9 +21,9 @@ import {
 import { RecognizingStatus } from "@/components/common/RecognizingStatus";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
-import { ClozeWords, GlossesPopover } from "./ClozeWord";
+import { ClozeWords, HintsPopover } from "./ClozeWord";
 import { buildCandidateGrid } from "./build-candidates";
-import { DRAW_SVG_SIZE, GRADE_TOP_K } from "./constants";
+import { DRAW_SVG_SIZE, GRADE_TOP_K, soundOf } from "./constants";
 import { SelectSimilarKanjiDrawer } from "./drawers/SelectSimilarKanjiDrawer";
 import { FeedbackDrawer } from "./drawers/FeedbackDrawer";
 import {
@@ -202,7 +202,11 @@ export const Game = ({
     recognitionSkipped?: boolean;
   }) => {
     if (correct) {
-      playCorrect({ enabled: settings.celebratorySoundOnCorrect });
+      const sound = soundOf(settings);
+      playCorrect({
+        enabled: sound.enabled,
+        speak: sound.enabled && sound.type === "speak" ? speak : undefined,
+      });
     }
     // Mastery: a wrong kanji is "again", whatever rating was pressed. Every
     // mastery submit carries a rating; "good" (Enter's) is only a fallback.
@@ -326,7 +330,7 @@ export const Game = ({
         <ClozeWords item={current} revealed={feedback != null} />
 
         <div className="mt-1">
-          <GlossesPopover key={index} item={current} />
+          <HintsPopover key={index} item={current} />
         </div>
 
         <div

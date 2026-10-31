@@ -11,6 +11,8 @@ export type NavLinkListProps = {
   /** Hrefs that show the due dot. */
   dotHrefs?: ReadonlySet<string>;
   wrapItem?: (link: ReactNode, item: NavLinkItem) => ReactNode;
+  /** Titles only, no subtitles (the sidebar menu still has them). */
+  hideDescriptions?: boolean;
 };
 
 /** A section heading's text, with its ⭐️ when starred. */
@@ -39,6 +41,7 @@ export const NavSectionLinks = ({
   onItemPointerDown,
   dotHrefs,
   wrapItem,
+  hideDescriptions,
 }: NavLinkListProps & { links: NavLinkItem[] }) => (
   <div className={cn(listClassName)}>
     {links.map((item) => {
@@ -46,7 +49,7 @@ export const NavSectionLinks = ({
         <DashedNavLink
           href={item.href}
           title={item.title}
-          description={item.description}
+          description={hideDescriptions ? undefined : item.description}
           Icon={item.Icon}
           onClick={onItemClick}
           onPointerDown={onItemPointerDown}

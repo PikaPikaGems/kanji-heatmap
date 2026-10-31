@@ -43,13 +43,16 @@ const Cloze = ({
   );
 };
 
-/** The word's reading badges (tap for romaji) and its speak button, under the word. */
-const ReadingLine = ({ word }: { word: PracticeWord }) => (
-  <span className="flex flex-wrap items-center justify-center gap-1">
+/** The word's reading badges (tap for romaji), a size smaller than elsewhere. */
+const ReadingBadges = ({ word }: { word: PracticeWord }) => (
+  <span className="flex flex-wrap items-center justify-center">
     {word.reading.split("・").map((reading) => (
-      <RomajiBadge key={reading} kana={reading} />
+      <RomajiBadge
+        key={reading}
+        kana={reading}
+        className="m-0.5 px-2.5 py-0.5 sm:py-1 text-base sm:text-lg"
+      />
     ))}
-    <SpeakButton word={word.word} iconType="volume-2" />
   </span>
 );
 
@@ -57,10 +60,14 @@ const ReadingLine = ({ word }: { word: PracticeWord }) => (
 const sizeCn = (length: number) =>
   length > 6 ? "text-2xl sm:text-4xl" : "text-3xl sm:text-5xl";
 
+/** The card's words: the main one, then the secondary one when it has one. */
+const promptWords = (item: PracticeItem): PracticeWord[] =>
+  item.secondary ? [item, item.secondary] : [item];
+
 /**
- * The card's words with the target kanji blanked, "[?]い · 最[?]", each with
- * its reading badges and a speak button under it. Kanji without a secondary word
- * show the main word alone.
+ * The card's words with the target kanji blanked, each in its own dashed
+ * card with its reading badges under it. Kanji without a secondary word
+ * show the main word alone. The speak buttons are in "View hints".
  */
 export const ClozeWords = ({
   item,
@@ -70,8 +77,8 @@ export const ClozeWords = ({
   /** When true, show the real kanji instead of the "?" blanks. */
   revealed?: boolean;
 }) => {
-  const { secondary } = item;
-  const length = item.word.length + (secondary?.word.length ?? 0);
+  const words = promptWords(item);
+  const length = words.reduce((sum, { word }) => sum + word.length, 0);
   const fontStyle =
     item.fontIndex === null
       ? undefined
@@ -82,29 +89,13 @@ export const ClozeWords = ({
   return (
     <div
       lang="ja"
-      className={cn(
-        "grid items-center max-w-full gap-y-1 justify-items-center",
-        secondary ? "grid-cols-[auto_auto_auto] gap-x-2" : "grid-cols-1"
-      )}
+      className="flex flex-wrap items-stretch justify-center max-w-full gap-3"
     >
-      <p
-        className={cn(
-          "leading-tight",
-          sizeCn(length),
-          item.fontIndex === null && "kanji-font"
-        )}
-        style={fontStyle}
-      >
-        <Cloze word={item.word} kanji={item.kanji} revealed={revealed} />
-      </p>
-      {secondary && (
-        <>
-          <span
-            aria-hidden
-            className={cn("text-muted-foreground", sizeCn(length))}
-          >
-            ·
-          </span>
+      {words.map((word) => (
+        <div
+          key={word.word}
+          className="flex flex-col items-center justify-between min-w-0 gap-1 px-3 pt-2 pb-1 border border-dashed rounded-2xl border-foreground/30"
+        >
           <p
             className={cn(
               "leading-tight",
@@ -113,56 +104,44 @@ export const ClozeWords = ({
             )}
             style={fontStyle}
           >
-            <Cloze
-              word={secondary.word}
-              kanji={item.kanji}
-              revealed={revealed}
-            />
+            <Cloze word={word.word} kanji={item.kanji} revealed={revealed} />
           </p>
-        </>
-      )}
-      <ReadingLine word={item} />
-      {secondary && (
-        <>
-          <span aria-hidden />
-          <ReadingLine word={secondary} />
-        </>
-      )}
+          <ReadingBadges word={word} />
+        </div>
+      ))}
     </div>
   );
 };
 
 /**
- * "View English glosses": each word's meaning next to its cloze, in a popover
- * so the pad stays high.
+ * "View hints": each word's cloze, its speak button and its English
+ * meaning, in a popover so the pad stays high.
  */
-export const GlossesPopover = ({ item }: { item: PracticeItem }) => {
-  const words = item.secondary ? [item, item.secondary] : [item];
-  return (
-    <GenericPopover
-      trigger={
-        <button
-          type="button"
-          className={cn(cnDottedUnderlineTrigger, "text-xs font-bold")}
-        >
-          View English {words.length > 1 ? "glosses" : "gloss"}
-        </button>
-      }
-      contentClassName="w-72 p-3 text-xs text-left"
-      content={
-        // Each word as its cloze, never the whole word: that would give the
-        // answer away.
-        <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-2">
-          {words.map(({ word, englishGloss }) => (
-            <Fragment key={word}>
-              <span className="text-lg kanji-font" lang="ja">
-                <Cloze word={word} kanji={item.kanji} revealed={false} />
-              </span>
-              <p>{englishGloss || item.keyword}</p>
-            </Fragment>
-          ))}
-        </div>
-      }
-    />
-  );
-};
+export const HintsPopover = ({ item }: { item: PracticeItem }) => (
+  <GenericPopover
+    trigger={
+      <button
+        type="button"
+        className={cn(cnDottedUnderlineTrigger, "text-xs font-bold")}
+      >
+        View hints
+      </button>
+    }
+    contentClassName="w-80 max-w-[calc(100vw-1.5rem)] p-3 text-xs text-left"
+    content={
+      // Each word as its cloze, never the whole word: that would give the
+      // answer away.
+      <div className="grid grid-cols-[auto_auto_1fr] items-center gap-x-3 gap-y-2">
+        {promptWords(item).map(({ word, englishGloss }) => (
+          <Fragment key={word}>
+            <span className="text-lg kanji-font whitespace-nowrap" lang="ja">
+              <Cloze word={word} kanji={item.kanji} revealed={false} />
+            </span>
+            <SpeakButton word={word} iconType="volume-2" />
+            <p className="text-pretty">{englishGloss || item.keyword}</p>
+          </Fragment>
+        ))}
+      </div>
+    }
+  />
+);

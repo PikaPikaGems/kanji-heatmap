@@ -91,6 +91,22 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
 };
 
 /**
+ * The heatmap checkboxes' labels: short, since each group's heading
+ * already says "Kanji Mastery ⭐️" or "Practice Games".
+ */
+export const ACTIVITY_KIND_FILTER_LABELS: Record<ActivityKind, string> = {
+  writingMastery: "Writing",
+  readingMastery: "Reading I",
+  readingMastery2: "Reading II",
+  newKanji: "Items Added",
+  fillTheKanji: fillTheKanjiPageMeta.shortLabel,
+  speedKatakana: speedKatakanaPageMeta.shortLabel,
+  production: "Writing",
+  recognition: "Reading I",
+  recognition2: "Reading II",
+};
+
+/**
  * The heatmap's checkbox groups, like the practice menu's sections; their
  * order is the order day popovers list the kinds in.
  */

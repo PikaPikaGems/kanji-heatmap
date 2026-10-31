@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
   PracticeBottomBar,
-  RadioRow,
+  SoundAfterAnswering,
   ToggleRow,
 } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
@@ -11,12 +11,11 @@ import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHin
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useSpeedKatakanaStats } from "@/hooks/use-speed-katakana-stats";
 import { speedKatakanaPageMeta } from "@/lib/pages/practice-pages";
-import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import {
   AllChallengeSetStats,
   summarizeChallengeSetStats,
 } from "@/lib/speed-katakana/stats";
-import { SoundMode, WordCount } from "./types";
+import { WordCount } from "./types";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 import { levelOf, positionInLevel } from "./constants";
 import { ChallengeSetSelector } from "./ChallengeSetSelector";
@@ -82,11 +81,6 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const allStats = useSpeedKatakanaStats();
   const summary = summarizeChallengeSetStats(allStats);
 
-  const soundEnabled = settings.sound.enabled;
-  const soundType: SoundMode = settings.sound.enabled
-    ? settings.sound.type
-    : "correct";
-
   useEnterAction(onStart);
 
   return (
@@ -105,6 +99,18 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
           </div>
 
           <div className="flex flex-col gap-2">
+            <SoundAfterAnswering
+              sound={settings.sound}
+              onChange={(sound) => setSetting("sound", sound)}
+              childrenSpeak={settings.readAloudOnShow ?? false}
+            >
+              <ToggleRow
+                id="read-aloud-on-show"
+                label="Read each word aloud when it appears"
+                checked={settings.readAloudOnShow ?? false}
+                onChange={(v) => setSetting("readAloudOnShow", v)}
+              />
+            </SoundAfterAnswering>
             <ToggleRow
               id="randomize-font"
               label="Randomize Font"
@@ -139,45 +145,6 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
                 <p className="w-full text-xs text-left animate-fade-in-fast">
                   ⚠️ Practice sessions (24 words) will not be recorded.
                 </p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <ToggleRow
-                id="sound-on"
-                label="Sound On"
-                checked={soundEnabled}
-                onChange={(v) =>
-                  setSetting(
-                    "sound",
-                    v ? { enabled: true, type: soundType } : { enabled: false }
-                  )
-                }
-              />
-              {soundEnabled && (
-                <div className="flex flex-wrap pl-1 animate-fade-in-fast">
-                  <RadioRow
-                    name="sound-mode"
-                    value="speak"
-                    current={soundType}
-                    label="Say out loud"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                  <RadioRow
-                    name="sound-mode"
-                    value="correct"
-                    current={soundType}
-                    label="Sound when correct"
-                    onChange={(v) =>
-                      setSetting("sound", { enabled: true, type: v })
-                    }
-                  />
-                </div>
-              )}
-              {soundEnabled && soundType === "speak" && (
-                <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
               )}
             </div>
 
