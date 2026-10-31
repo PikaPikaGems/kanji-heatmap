@@ -77,12 +77,15 @@ const AnswerWordPopover = ({
   />
 );
 
-/** The answer kanji, a size up from the words; opens the kanji popover. */
+/**
+ * The answer kanji, a size up from the words, with Fill in the Kanji's muted
+ * dashed underline; opens the kanji popover.
+ */
 const AnswerKanji = ({ kanji }: { kanji: string }) => {
   const info = useGetKanjiInfoFn()?.(kanji);
   if (!info) {
     return (
-      <span lang="ja" className="px-3 py-1 text-3xl kanji-font">
+      <span lang="ja" className="px-1 text-3xl kanji-font">
         {kanji}
       </span>
     );
@@ -91,7 +94,7 @@ const AnswerKanji = ({ kanji }: { kanji: string }) => {
     <KanjiPopover
       kanji={kanji}
       info={info}
-      className="px-3 py-1 text-3xl border border-dashed rounded-2xl kanji-font border-foreground/30 hover:border-foreground/60"
+      className="px-1 text-3xl underline kanji-font underline-offset-8 decoration-dashed decoration-foreground/30 hover:decoration-foreground hover:decoration-solid"
     />
   );
 };
