@@ -2,7 +2,7 @@ import { FreqSquare } from "@/components/common/freq/FreqSquare";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
   getBandLabels,
-  NOT_STARTED_LABEL,
+  NEW_LABEL,
   SCALE_END_LABELS,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
@@ -17,8 +17,8 @@ const ScaleSquare = ({ label, cn }: { label: string; cn: string }) => (
 
 /**
  * The site's heatmap legend (like "Less [] [] [] [] [] More") for a mastery
- * measure: the see-through "Not started" square, then the four bands, in one
- * run: "Not started [][][][][] Mastered".
+ * measure: the see-through "New" square, then the four bands, in one
+ * run: "New [][][][][] Mastered".
  */
 export const MasteryScaleLegend = ({
   measure,
@@ -30,8 +30,8 @@ export const MasteryScaleLegend = ({
   <div
     className={cn("flex flex-wrap items-center gap-1 my-3 text-xs", className)}
   >
-    {NOT_STARTED_LABEL}
-    <ScaleSquare label={NOT_STARTED_LABEL} cn={getBandFillCn(measure, null)} />
+    {NEW_LABEL}
+    <ScaleSquare label={NEW_LABEL} cn={getBandFillCn(measure, null)} />
     {getBandLabels(measure).map((label, band) => (
       <ScaleSquare
         key={label}

@@ -26,7 +26,8 @@ type WordTag =
   | { kind: "jlpt"; jlpt: JLTPTtypes }
   | { kind: "tier"; tier: string; label: string }
   | { kind: "book"; id: string; label: string; jlpt?: JLTPTtypes }
-  | { kind: "variant" };
+  | { kind: "variant" }
+  | { kind: "name" };
 
 /** Tags in display priority: variant, JLPT, Kaishi, frequency tier, word lists. */
 const getWordTags = (entry: CommonWordEntry): WordTag[] => {
@@ -57,6 +58,14 @@ const getWordTags = (entry: CommonWordEntry): WordTag[] => {
 };
 
 const WordTagBadge = ({ tag }: { tag: WordTag }) => {
+  if (tag.kind === "name") {
+    return (
+      <BadgeWithPopover
+        name="👤 Name"
+        desc="A proper noun (a name of a person, place or thing), not a dictionary word"
+      />
+    );
+  }
   if (tag.kind === "kaishi") {
     return (
       <BadgeWithPopover
@@ -126,17 +135,23 @@ const tagKey = (tag: WordTag) => (tag.kind === "book" ? tag.id : tag.kind);
 /** Shows the top tags of a word; the rest are revealed by a "..." badge. */
 export const WordTagBadges = ({
   entry,
+  isName = false,
   showEmptyState = false,
   maxVisible = 3,
   className,
 }: {
   entry: CommonWordEntry;
+  /** A proper noun: a "Name" badge goes first. */
+  isName?: boolean;
   showEmptyState?: boolean;
   maxVisible?: number;
   className?: string;
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const tags = getWordTags(entry);
+  const tags: WordTag[] = [
+    ...(isName ? [{ kind: "name" } as const] : []),
+    ...getWordTags(entry),
+  ];
 
   if (tags.length === 0) {
     return showEmptyState ? <>-</> : null;

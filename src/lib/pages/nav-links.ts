@@ -14,7 +14,9 @@ import type { ComponentType, SVGProps } from "react";
 import {
   fillTheKanjiPageMeta,
   productionPracticePageMeta,
+  readingMastery2PageMeta,
   readingMasteryPageMeta,
+  recognitionPractice2PageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
   writingMasteryPageMeta,
@@ -29,6 +31,8 @@ export type NavLinkItem = {
   title: string;
   description: string;
   Icon: NavLinkIcon;
+  /** The full name when `title` is short, e.g. "Writing" under "Practice". */
+  ariaLabel?: string;
 };
 
 /** A group of menu links under an optional small heading. */
@@ -71,37 +75,77 @@ export const floatingIslandNavLinks: NavLinkItem[] = [
 ];
 
 // Menu entries (sidebar + practice FAB). The mastery links carry no star of
-// their own; their "Kanji Mastery" section heading does.
-const readingMasteryNavLink: NavLinkItem = {
-  ...readingMasteryPageMeta,
-  Icon: ScanEye,
+// their own; their "Kanji Mastery" heading (or "Mastery" column) does.
+const writingPracticeNavLink: NavLinkItem = {
+  ...productionPracticePageMeta,
+  Icon: PenLine,
 };
-
+const readingPracticeNavLink: NavLinkItem = {
+  ...recognitionPracticePageMeta,
+  Icon: Eye,
+};
+const readingPractice2NavLink: NavLinkItem = {
+  ...recognitionPractice2PageMeta,
+  Icon: Eye,
+};
 const writingMasteryNavLink: NavLinkItem = {
   ...writingMasteryPageMeta,
   Icon: PencilLine,
 };
+const readingMasteryNavLink: NavLinkItem = {
+  ...readingMasteryPageMeta,
+  Icon: ScanEye,
+};
+const readingMastery2NavLink: NavLinkItem = {
+  ...readingMastery2PageMeta,
+  Icon: ScanEye,
+};
+
+/** The games that aren't a skill's practice: Fill in the Kanji, Speed Katakana. */
+export const moreGamesNavLinks: NavLinkItem[] = [
+  { ...fillTheKanjiPageMeta, Icon: Puzzle },
+  { ...speedKatakanaPageMeta, Icon: Keyboard },
+];
 
 const practiceGamesSection: NavLinkSection = {
   heading: "Practice Games",
   links: [
-    { ...recognitionPracticePageMeta, Icon: Eye },
-    { ...productionPracticePageMeta, Icon: PenLine },
-    { ...fillTheKanjiPageMeta, Icon: Puzzle },
-    { ...speedKatakanaPageMeta, Icon: Keyboard },
+    ...moreGamesNavLinks,
+    writingPracticeNavLink,
+    readingPracticeNavLink,
+    readingPractice2NavLink,
   ],
 };
 
+/** A link titled by its skill alone; its column heading names the mode. */
+const skillLink = (item: NavLinkItem, skill: string): NavLinkItem => ({
+  ...item,
+  title: skill,
+  ariaLabel: item.title,
+});
+
 /**
- * Practice destinations in the FAB menu, games first; the sidebar repeats
- * them with Kanji Mastery first.
+ * The practice FAB's two columns, Practice and Mastery ⭐️, each with a
+ * button per skill. The skill names match the dashboard heatmap's
+ * checkboxes.
  */
-export const practiceNavSections: NavLinkSection[] = [
-  practiceGamesSection,
+export const practiceFabColumns: NavLinkSection[] = [
   {
-    heading: "Kanji Mastery",
+    heading: "Practice",
+    links: [
+      skillLink(writingPracticeNavLink, "Writing"),
+      skillLink(readingPracticeNavLink, "Reading I"),
+      skillLink(readingPractice2NavLink, "Reading II"),
+    ],
+  },
+  {
+    heading: "Mastery",
     starred: true,
-    links: [readingMasteryNavLink, writingMasteryNavLink],
+    links: [
+      skillLink(writingMasteryNavLink, "Writing"),
+      skillLink(readingMasteryNavLink, "Reading I"),
+      skillLink(readingMastery2NavLink, "Reading II"),
+    ],
   },
 ];
 
@@ -120,8 +164,9 @@ export const headerNavSections: NavLinkSection[] = [
     starred: true,
     links: [
       { ...masteryPageMeta, Icon: GraduationCap },
-      readingMasteryNavLink,
       writingMasteryNavLink,
+      readingMasteryNavLink,
+      readingMastery2NavLink,
     ],
   },
   practiceGamesSection,

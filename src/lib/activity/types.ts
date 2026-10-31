@@ -1,25 +1,29 @@
 import {
   fillTheKanjiPageMeta,
   productionPracticePageMeta,
+  recognitionPractice2PageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
 } from "@/lib/pages/practice-pages";
 
-export const READING_MASTERY_LABEL = "Kanji Reading Mastery ⭐️";
+export const READING_MASTERY_LABEL = "Kanji Reading Mastery I ⭐️";
+export const READING_MASTERY_2_LABEL = "Kanji Reading Mastery II ⭐️";
 export const WRITING_MASTERY_LABEL = "Kanji Writing Mastery ⭐️";
 
 /**
- * What the activity heatmap counts. `recognition` / `production` are Reading /
- * Writing Practice rounds (names kept for saved filter settings); the mastery
- * kinds count reviews graded in the two mastery games, and `newKanji` the
- * kanji added to the review pile.
+ * What the activity heatmap counts. `recognition` / `recognition2` /
+ * `production` are Reading Practice I / II and Writing Practice rounds (names
+ * kept for saved filter settings); the mastery kinds count reviews graded in
+ * the three mastery games, and `newKanji` the items added to the review pile.
  */
 export type ActivityKind =
   | "speedKatakana"
   | "production"
   | "recognition"
+  | "recognition2"
   | "fillTheKanji"
   | "readingMastery"
+  | "readingMastery2"
   | "writingMastery"
   | "newKanji";
 
@@ -43,8 +47,10 @@ export const EMPTY_DAY_COUNTS: DayCounts = {
   speedKatakana: 0,
   production: 0,
   recognition: 0,
+  recognition2: 0,
   fillTheKanji: 0,
   readingMastery: 0,
+  readingMastery2: 0,
   writingMastery: 0,
   newKanji: 0,
 };
@@ -64,8 +70,10 @@ export const DEFAULT_KIND_FILTERS: ActivityKindFilters = {
   speedKatakana: true,
   production: true,
   recognition: true,
+  recognition2: true,
   fillTheKanji: true,
   readingMastery: true,
+  readingMastery2: true,
   writingMastery: true,
   newKanji: true,
 };
@@ -74,19 +82,55 @@ export const ACTIVITY_KIND_LABELS: Record<ActivityKind, string> = {
   speedKatakana: speedKatakanaPageMeta.shortLabel,
   production: productionPracticePageMeta.shortLabel,
   recognition: recognitionPracticePageMeta.shortLabel,
+  recognition2: recognitionPractice2PageMeta.shortLabel,
   fillTheKanji: fillTheKanjiPageMeta.shortLabel,
   readingMastery: READING_MASTERY_LABEL,
+  readingMastery2: READING_MASTERY_2_LABEL,
   writingMastery: WRITING_MASTERY_LABEL,
-  newKanji: "New Items Added",
+  newKanji: "Items Added",
 };
 
-/** The order the heatmap's checkboxes and day popovers list them in. */
-export const ALL_ACTIVITY_KINDS: ActivityKind[] = [
-  "readingMastery",
-  "writingMastery",
-  "recognition",
-  "production",
-  "fillTheKanji",
-  "speedKatakana",
-  "newKanji",
+/**
+ * The heatmap checkboxes' labels: short, since each group's heading
+ * already says "Kanji Mastery ⭐️" or "Practice Games".
+ */
+export const ACTIVITY_KIND_FILTER_LABELS: Record<ActivityKind, string> = {
+  writingMastery: "Writing",
+  readingMastery: "Reading I",
+  readingMastery2: "Reading II",
+  newKanji: "Items Added",
+  fillTheKanji: fillTheKanjiPageMeta.shortLabel,
+  speedKatakana: speedKatakanaPageMeta.shortLabel,
+  production: "Writing",
+  recognition: "Reading I",
+  recognition2: "Reading II",
+};
+
+/**
+ * The heatmap's checkbox groups, like the practice menu's sections; their
+ * order is the order day popovers list the kinds in.
+ */
+export const ACTIVITY_KIND_GROUPS: {
+  heading: string;
+  kinds: ActivityKind[];
+}[] = [
+  {
+    heading: "Kanji Mastery ⭐️",
+    kinds: ["writingMastery", "readingMastery", "readingMastery2", "newKanji"],
+  },
+  {
+    heading: "Practice Games",
+    kinds: [
+      "fillTheKanji",
+      "speedKatakana",
+      "production",
+      "recognition",
+      "recognition2",
+    ],
+  },
 ];
+
+/** The order the heatmap's checkboxes and day popovers list them in. */
+export const ALL_ACTIVITY_KINDS: ActivityKind[] = ACTIVITY_KIND_GROUPS.flatMap(
+  ({ kinds }) => kinds
+);

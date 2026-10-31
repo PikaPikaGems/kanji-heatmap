@@ -1,9 +1,15 @@
 import { SectionLoading } from "@/components/common/SectionLoading";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
+import { ANCHOR_TIER_LABELS, type AnchorWord } from "@/lib/kanji/anchor-words";
+import type { CommonWordEntry } from "@/lib/sample-vocabulary";
+import { Badge } from "@/components/ui/badge";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { Tabs } from "@/components/ui/tabs";
+import { AnchorWordFrequencyRanks } from "./AnchorWordFrequencyRanks";
+import { WordTagBadges } from "./WordTagBadges";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
-import { FreqTagBadges } from "@/components/common/FreqTagBadges";
 import {
   vocabExternalLinks,
   vocabExternalLinksCore,
@@ -112,8 +118,9 @@ const WhatIsARepresentativeStudyWord = () => {
             <p className="py-2">
               An <strong>Anchor Word</strong> is a Japanese word chosen to
               create a strong, memorable connection between a kanji and one of
-              its vocabulary words. Each of the ~2,000 kanji in Kanji Heatmap
-              has one unique Anchor Word.
+              its vocabulary words. Each kanji in Kanji Heatmap has a main
+              Anchor Word, and many also have a secondary one, usually with
+              another reading of the kanji. No word is used by two kanji.
             </p>
             <p className="py-2">
               Anchor Words are selected by {`Kanji Heatmap's`} algorithm, which
@@ -127,26 +134,34 @@ const WhatIsARepresentativeStudyWord = () => {
   );
 };
 
-export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
-  const data = useKanjiRepresentativeWordDetails(kanji);
+const JLPT_TAGS = ["n5", "n4", "n3", "n2", "n1"];
+
+/** The word's tags as a word-list entry, so they show like other words' badges. */
+const toWordEntry = ({ word, tags }: AnchorWord): CommonWordEntry => {
+  const jlpt = tags.find((tag) => JLPT_TAGS.includes(tag));
+  return {
+    w: word,
+    j: jlpt ? Number(jlpt.slice(1)) : undefined,
+    k: tags.includes("kaishi"),
+    o: tags.join(","),
+  };
+};
+
+/**
+ * One anchor word's table, then its frequency ranks, then View Vocabulary
+ * Details (or the AI controls).
+ */
+const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
   const [aiSettings] = useAiExplainSettings();
   const owner = useCurrentOwner();
-
-  if (!data) {
-    return (
-      <div className="w-full p-4 text-base text-center">
-        No Anchor Word available for {kanji}.
-      </div>
-    );
-  }
-
-  const { word, reading, englishGloss, tags } = data;
+  const { word, readings, englishGloss, tier, tags, ranks } = anchor;
+  const reading = readings.join("・");
 
   const rows: { label: string; description: string; content: ReactNode }[] = [
     {
       label: "Word",
       description:
-        "This kanji's Anchor Word. Tap it for its kanji, meaning and more links.",
+        "This Anchor Word. Tap it for its kanji, meaning and more links.",
       content: (
         <ExampleWordPopover
           word={word}
@@ -159,19 +174,36 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
     {
       label: "Readings",
       description: "How the word is read.",
-      content: reading
-        .split("・")
-        .map((r) => <RomajiBadge key={r} kana={r} className="text-lg" />),
-    },
-    {
-      label: "Tags",
-      description: "How common the word is, by the word lists it is in.",
-      content: tags.length > 0 ? <FreqTagBadges tags={tags} /> : null,
+      content: readings.map((r) => (
+        <RomajiBadge key={r} kana={r} className="text-lg" />
+      )),
     },
     {
       label: "Gloss",
       description: "A short English meaning of the word.",
       content: <span className="text-sm font-bold">{englishGloss}</span>,
+    },
+    {
+      label: "Tags",
+      description: "Its JLPT level and the word lists it is in.",
+      content:
+        tags.length > 0 ? (
+          <WordTagBadges
+            entry={toWordEntry(anchor)}
+            isName={tags.includes("name")}
+            maxVisible={Infinity}
+            className="-m-1"
+          />
+        ) : null,
+    },
+    {
+      label: "Tier",
+      description: "How common the word is, across the frequency lists below.",
+      content: tier ? (
+        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
+          {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
+        </Badge>
+      ) : null,
     },
     {
       label: "Actions",
@@ -186,7 +218,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
   ];
 
   return (
-    <div className="py-3 space-y-3 text-left">
+    <div className="space-y-3">
       <Table className="table-fixed">
         <TableBody>
           {rows.map(({ label, description, content }) => (
@@ -206,6 +238,7 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
         </TableBody>
       </Table>
 
+      <AnchorWordFrequencyRanks word={word} ranks={ranks} />
       {owner.status === "known" && !isAiExplainReady(aiSettings) && (
         <div className="flex flex-wrap items-center gap-1 pt-2">
           <ViewVocabDetails />
@@ -220,9 +253,71 @@ export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
           />
         </Suspense>
       )}
+    </div>
+  );
+};
+
+type AnchorTab = "main" | "secondary";
+
+/**
+ * The kanji's anchor words: one panel, or Main / Secondary tabs when it has
+ * a secondary word.
+ */
+export const RepresentativeStudyWord = ({ kanji }: { kanji: string }) => {
+  const anchors = useKanjiAnchorWords(kanji);
+  const [tab, setTab] = useState<AnchorTab>("main");
+
+  if (!anchors) {
+    return (
+      <div className="w-full p-4 text-base text-center">
+        No Anchor Word available for {kanji}.
+      </div>
+    );
+  }
+
+  const { main, secondary } = anchors;
+  // Arrowing to a kanji without a secondary word falls back to the main one.
+  const shown: AnchorTab = secondary ? tab : "main";
+
+  return (
+    <div className="py-3 space-y-3 text-left">
+      {secondary ? (
+        <Tabs
+          value={shown}
+          onValueChange={(value) => setTab(value as AnchorTab)}
+        >
+          <div className="flex justify-start px-2">
+            <SegmentedTabsList
+              value={shown}
+              label="Anchor words"
+              options={[
+                {
+                  value: "main",
+                  label: <TabLabel name="Main" word={main.word} />,
+                },
+                {
+                  value: "secondary",
+                  label: <TabLabel name="Secondary" word={secondary.word} />,
+                },
+              ]}
+            />
+          </div>
+          <div key={shown} className="pt-2 animate-fade-in-fast">
+            <AnchorWordPanel anchor={shown === "main" ? main : secondary} />
+          </div>
+        </Tabs>
+      ) : (
+        <AnchorWordPanel anchor={main} />
+      )}
       <div className="pt-16 pl-2 text-left">
         <WhatIsARepresentativeStudyWord />
       </div>
     </div>
   );
 };
+
+const TabLabel = ({ name, word }: { name: string; word: string }) => (
+  <span className="whitespace-nowrap">
+    {name} · <span className="kanji-font">{word}</span>
+  </span>
+);

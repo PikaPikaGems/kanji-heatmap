@@ -50,7 +50,10 @@ const DayDetail = ({
   // The day's review ratings, for the mastery kinds the filters show.
   const dayRatings = ratingsByDay[dateKey] ?? EMPTY_DAY_RATINGS;
   const ratings = addRatings(
-    filters.readingMastery ? dayRatings.reading : {},
+    addRatings(
+      filters.readingMastery ? dayRatings.reading : {},
+      filters.readingMastery2 ? dayRatings.secondaryReading : {}
+    ),
     filters.writingMastery ? dayRatings.writing : {}
   );
 

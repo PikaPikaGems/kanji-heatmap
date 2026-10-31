@@ -1,3 +1,4 @@
+import type { AnchorWordsDetailsFile, KanjiAnchorWords } from "./anchor-words";
 import { JLTPTtypes } from "../jlpt";
 import type { RadicalPopoverDetails, RadicalsRuntime } from "../radicals";
 import type { WordPartDetail } from "../furigana";
@@ -236,10 +237,18 @@ export interface WorkerApi {
   "kanji-hover": { payload: string; response: HoverItemReturnData };
   "kanji-general": { payload: string; response: GeneralKanjiItem };
   "component-map": { payload: undefined; response: ComponentsMap };
-  /** Gloss and emoji tag, needed only by detail surfaces and practice decks. */
-  "rep-word-details": {
+  /**
+   * The whole anchor-words details file (glosses, secondary words), for
+   * practice decks and mastery games, which look up many kanji at once.
+   */
+  "anchor-words-details": {
     payload: undefined;
-    response: Record<string, [englishGloss: string, emojiTag: string]>;
+    response: AnchorWordsDetailsFile;
+  };
+  /** One kanji's anchor words with tags, ranks and tier, for the drawer. */
+  "kanji-anchor-words": {
+    payload: string;
+    response: KanjiAnchorWords | null;
   };
   "kanji-similar": { payload: string; response: string[] };
   /** The whole similar map, for callers that look up many kanji at once. */

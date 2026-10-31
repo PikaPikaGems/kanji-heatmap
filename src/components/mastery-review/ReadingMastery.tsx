@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import type { CardType } from "engine-contract";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
@@ -11,7 +12,10 @@ import {
 import type { RecognitionPracticeSettings } from "@/components/recognition-practice-v1/types";
 import { useLockVisualViewportScroll } from "@/components/recognition-practice-v1/use-lock-visual-viewport-scroll";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { readingMasteryPageMeta } from "@/lib/pages/practice-pages";
+import {
+  readingMasteryPageMeta,
+  type PracticePageMeta,
+} from "@/lib/pages/practice-pages";
 import { getMasteryBlocker } from "./get-mastery-blocker";
 import { MasteryEndScreen } from "./MasteryEndScreen";
 import { MasteryGateScreen } from "./MasteryGateScreen";
@@ -24,13 +28,20 @@ const ignoreProgress = () => {};
 
 type ReadingMasterySession = ReturnType<typeof useMasterySession>;
 
+/** The reading card types: Reading I (main word) and Reading II (secondary word). */
+export type ReadingCardType = Exclude<CardType, "writing">;
+
 const ReadingMasteryPhase = ({
+  page,
+  cardType,
   session,
   ready,
   blocker,
   onStart,
   onNext,
 }: {
+  page: PracticePageMeta;
+  cardType: ReadingCardType;
   session: ReadingMasterySession;
   ready: boolean;
   blocker: string | null;
@@ -47,9 +58,9 @@ const ReadingMasteryPhase = ({
     return (
       <div className="h-full animate-fade-in">
         <MasteryStartScreen
-          heading={readingMasteryPageMeta.heading}
-          description={readingMasteryPageMeta.description}
-          cardType="reading"
+          heading={page.heading}
+          description={page.description}
+          cardType={cardType}
           ready={ready}
           blocker={blocker}
           error={state.error}
@@ -65,7 +76,7 @@ const ReadingMasteryPhase = ({
         results={session.results}
         saveError={session.saveError}
         saveFailures={session.saveFailures}
-        cardType="reading"
+        cardType={cardType}
         moreDue={state.moreDue}
         onMore={onStart}
         onDone={session.leave}
@@ -89,9 +100,17 @@ const ReadingMasteryPhase = ({
   );
 };
 
-const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
+const ReadingMasteryRun = ({
+  page,
+  cardType,
+  blocker,
+}: {
+  page: PracticePageMeta;
+  cardType: ReadingCardType;
+  blocker: string | null;
+}) => {
   const { getItem } = useMasteryItemLookup();
-  const session = useMasterySession({ cardType: "reading", getItem });
+  const session = useMasterySession({ cardType, getItem });
   const primerRef = useRef<HTMLInputElement | null>(null);
 
   useLockVisualViewportScroll();
@@ -122,6 +141,8 @@ const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
       />
       <PracticeShell progress={session.progress}>
         <ReadingMasteryPhase
+          page={page}
+          cardType={cardType}
           session={session}
           ready={getItem != null}
           blocker={blocker}
@@ -138,23 +159,41 @@ const ReadingMasteryRun = ({ blocker }: { blocker: string | null }) => {
   );
 };
 
-/** /reading-mastery: review due reading cards from the review pile. */
-const ReadingMastery = () => {
-  useHtmlDocumentTitle(readingMasteryPageMeta.heading);
+/**
+ * A reading mastery game: review due cards of `cardType` from the review
+ * pile, each asking for the reading of the word it was added with
+ * (/reading-mastery and /reading-mastery-2).
+ */
+export const ReadingMasteryGame = ({
+  page,
+  cardType,
+}: {
+  page: PracticePageMeta;
+  cardType: ReadingCardType;
+}) => {
+  useHtmlDocumentTitle(page.heading);
   const status = useAccountStatus();
 
   if (status.kind !== "active") {
     return (
       <PracticeShell progress={0}>
-        <MasteryGateScreen
-          status={status}
-          feature={readingMasteryPageMeta.title}
-        />
+        <MasteryGateScreen status={status} feature={page.title} />
       </PracticeShell>
     );
   }
 
-  return <ReadingMasteryRun blocker={getMasteryBlocker(status)} />;
+  return (
+    <ReadingMasteryRun
+      page={page}
+      cardType={cardType}
+      blocker={getMasteryBlocker(status)}
+    />
+  );
 };
+
+/** /reading-mastery: Reading I, the main words' readings. */
+const ReadingMastery = () => (
+  <ReadingMasteryGame page={readingMasteryPageMeta} cardType="reading" />
+);
 
 export default ReadingMastery;

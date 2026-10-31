@@ -3,6 +3,7 @@ import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import {
   PracticeBottomBar,
   RadioRow,
+  SoundAfterAnswering,
   ToggleRow,
 } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
@@ -12,7 +13,6 @@ import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
-import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import {
   FILL_THE_KANJI_SETS,
   FillTheKanjiSetId,
@@ -44,7 +44,6 @@ import {
   TileCount,
 } from "@/lib/fill-the-kanji/puzzle";
 import { formatLastAttemptedDay } from "@/lib/fill-the-kanji/format";
-import { SoundMode } from "./types";
 import { useFillTheKanjiSettings } from "./use-fill-the-kanji-settings";
 
 /** Same select as the Sorting and Filtering modal: options with descriptions. */
@@ -148,11 +147,6 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
   const allStats = useAllSetBatchStats();
   const setStats = allStats?.get(setId) ?? null;
 
-  const soundEnabled = settings.sound.enabled;
-  const soundType: SoundMode = settings.sound.enabled
-    ? settings.sound.type
-    : "correct";
-
   useEnterAction(onStart);
   const isCoarsePointer = useCoarsePointer();
 
@@ -173,53 +167,18 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             )}
           </div>
 
-          <div className="flex flex-col">
+          <SoundAfterAnswering
+            sound={settings.sound}
+            onChange={(sound) => setSetting("sound", sound)}
+            childrenSpeak={settings.readAloudOnShow ?? false}
+          >
             <ToggleRow
-              id="sound-on"
-              label="Sound after answering"
-              checked={soundEnabled}
-              onChange={(v) =>
-                setSetting(
-                  "sound",
-                  v ? { enabled: true, type: soundType } : { enabled: false }
-                )
-              }
+              id="read-aloud-on-show"
+              label="Read each sentence aloud when it appears"
+              checked={settings.readAloudOnShow ?? false}
+              onChange={(v) => setSetting("readAloudOnShow", v)}
             />
-            {soundEnabled && (
-              <div className="flex flex-wrap pl-1 animate-fade-in-fast">
-                <RadioRow
-                  name="sound-mode"
-                  value="speak"
-                  current={soundType}
-                  label="Say out loud"
-                  onChange={(v) =>
-                    setSetting("sound", { enabled: true, type: v })
-                  }
-                />
-                <RadioRow
-                  name="sound-mode"
-                  value="correct"
-                  current={soundType}
-                  label="Sound when correct"
-                  onChange={(v) =>
-                    setSetting("sound", { enabled: true, type: v })
-                  }
-                />
-              </div>
-            )}
-            <div className="pt-3">
-              <ToggleRow
-                id="read-aloud-on-show"
-                label="Read each sentence aloud when it appears"
-                checked={settings.readAloudOnShow ?? false}
-                onChange={(v) => setSetting("readAloudOnShow", v)}
-              />
-            </div>
-            {((soundEnabled && soundType === "speak") ||
-              settings.readAloudOnShow) && (
-              <TtsNotice className="w-full pt-1 animate-fade-in-fast" />
-            )}
-          </div>
+          </SoundAfterAnswering>
 
           <TileCountPicker
             current={

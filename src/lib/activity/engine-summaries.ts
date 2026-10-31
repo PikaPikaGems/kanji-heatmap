@@ -6,9 +6,15 @@ import type {
   LocalDate,
 } from "engine-contract";
 import { isFillTheKanjiActivityType } from "@/lib/fill-the-kanji/activity";
+import type { PracticeActivityType } from "@/lib/practice/activity";
 import { emptyActivityStats } from "./queries";
 import { totalRatings } from "./ratings";
 import { ActivityByDay, ActivityStats, DayCounts } from "./types";
+
+const READING_PRACTICE: PracticeActivityType = "reading_practice";
+const SECONDARY_READING_PRACTICE: PracticeActivityType =
+  "secondary_reading_practice";
+const WRITING_PRACTICE: PracticeActivityType = "writing_practice";
 
 /** Fill in the Kanji batches across every set (one generic activity type per set). */
 const sumFillTheKanji = (
@@ -20,11 +26,13 @@ const sumFillTheKanji = (
 
 /** The heatmap's per-kind counts for a day's (or a period's) engine summary. */
 export const toDayCounts = (summary: ActivityRecordSummary): DayCounts => ({
-  recognition: summary.practice.reading,
-  production: summary.practice.writing,
+  recognition: summary.genericChallenges[READING_PRACTICE] ?? 0,
+  recognition2: summary.genericChallenges[SECONDARY_READING_PRACTICE] ?? 0,
+  production: summary.genericChallenges[WRITING_PRACTICE] ?? 0,
   fillTheKanji: sumFillTheKanji(summary.genericChallenges),
   speedKatakana: summary.practice.speedKatakana,
   readingMastery: totalRatings(summary.reviews.reading),
+  readingMastery2: totalRatings(summary.reviews.secondaryReading),
   writingMastery: totalRatings(summary.reviews.writing),
   newKanji: summary.reviews.newItems,
 });
@@ -58,14 +66,14 @@ export const firstFillTheKanjiDay = (
 export const EMPTY_ALL_TIME_SUMMARY: AllTimeSummary = {
   totals: {
     genericChallenges: {},
-    practice: { speedKatakana: 0, reading: 0, writing: 0 },
-    reviews: { reading: {}, writing: {}, newItems: 0 },
+    practice: { speedKatakana: 0 },
+    reviews: { reading: {}, secondaryReading: {}, writing: {}, newItems: 0 },
   },
   daysActive: {
     genericChallenges: {},
     totalDaysActive: 0,
-    practice: { speedKatakana: 0, reading: 0, writing: 0 },
-    reviews: { reading: 0, writing: 0, newItems: 0 },
+    practice: { speedKatakana: 0 },
+    reviews: { reading: 0, secondaryReading: 0, writing: 0, newItems: 0 },
   },
   firstAttempts: { genericChallenges: {}, practice: {}, review: {} },
 };
@@ -80,11 +88,15 @@ export const toAllTimeStats = (
   const stats = emptyActivityStats();
   stats.daysActive = daysActive.totalDaysActive;
   stats.kinds.recognition = {
-    days: daysActive.practice.reading,
+    days: daysActive.genericChallenges[READING_PRACTICE] ?? 0,
     count: counts.recognition,
   };
+  stats.kinds.recognition2 = {
+    days: daysActive.genericChallenges[SECONDARY_READING_PRACTICE] ?? 0,
+    count: counts.recognition2,
+  };
   stats.kinds.production = {
-    days: daysActive.practice.writing,
+    days: daysActive.genericChallenges[WRITING_PRACTICE] ?? 0,
     count: counts.production,
   };
   stats.kinds.fillTheKanji = {
@@ -98,6 +110,10 @@ export const toAllTimeStats = (
   stats.kinds.readingMastery = {
     days: daysActive.reviews.reading,
     count: counts.readingMastery,
+  };
+  stats.kinds.readingMastery2 = {
+    days: daysActive.reviews.secondaryReading,
+    count: counts.readingMastery2,
   };
   stats.kinds.writingMastery = {
     days: daysActive.reviews.writing,

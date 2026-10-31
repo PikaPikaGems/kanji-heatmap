@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
 import { useActivityRecorder } from "@/lib/engine/use-activity-recorder";
+import {
+  practiceRoundRecord,
+  type PracticeActivityType,
+} from "@/lib/practice/activity";
 import { PracticeItem } from "./types";
 
 export type PracticeSessionPhase = "initial" | "loading" | "playing" | "ended";
-
-/** The engine record type of a finished round, per practice mode. */
-type RoundRecordType =
-  | "reading_practice_round_completed"
-  | "writing_practice_round_completed";
 
 /**
  * Shared practice-session state machine used by the recognition and
@@ -25,13 +24,13 @@ type RoundRecordType =
 export const usePracticeSession = <
   TResult extends PracticeItem & { correct: boolean },
 >({
-  recordType,
+  activityType,
   sessionSize,
   onPlay,
   onSessionStart,
   onGoToInitial,
 }: {
-  recordType: RoundRecordType;
+  activityType: PracticeActivityType;
   sessionSize: number;
   onPlay?: (commitPlaying: () => void) => void;
   onSessionStart?: () => void;
@@ -104,11 +103,7 @@ export const usePracticeSession = <
     const forgottens = sessionResults.filter((r) => !r.correct);
     const moreLeft = forgottens.length > 0 || cursor < deck.length;
 
-    void recorder.recordRound({
-      type: recordType,
-      correctCount: sessionResults.length - forgottens.length,
-      attemptedCount: sessionResults.length,
-    });
+    void recorder.recordRound(practiceRoundRecord(activityType));
     setRunResults((prev) => [...prev, ...sessionResults]);
     setResults(sessionResults);
     setHasMore(moreLeft);
@@ -123,7 +118,15 @@ export const usePracticeSession = <
     const forgottens = (results ?? [])
       .filter((r) => !r.correct)
       .map(
-        ({ kanji, word, reading, englishGloss, keyword, fontIndex }) =>
+        ({
+          kanji,
+          word,
+          reading,
+          englishGloss,
+          keyword,
+          fontIndex,
+          secondary,
+        }) =>
           ({
             kanji,
             word,
@@ -131,6 +134,7 @@ export const usePracticeSession = <
             englishGloss,
             keyword,
             fontIndex,
+            ...(secondary ? { secondary } : {}),
           }) satisfies PracticeItem
       );
 

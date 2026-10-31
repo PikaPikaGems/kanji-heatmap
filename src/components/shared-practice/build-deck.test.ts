@@ -1,13 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { buildPracticeDeck, withFreshFonts } from "./build-deck";
+import type { AnchorWordBasics } from "@/lib/kanji/anchor-words";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
-type RepEntry = [string, string, string, string];
+const word = (
+  w: string,
+  readings: string[],
+  englishGloss: string
+): AnchorWordBasics => ({ word: w, readings, englishGloss });
 
-const repWords: Record<string, RepEntry> = {
-  水: ["水道", "すいどう", "water supply", ""],
-  火: ["火事", "かじ", "fire", ""],
-  日: ["日本", "にほん", "Japan", ""],
+const repWords: Record<string, AnchorWordBasics> = {
+  水: word("水道", ["すいどう"], "water supply"),
+  火: word("火事", ["かじ"], "fire"),
+  日: word("日本", ["にほん", "にっぽん"], "Japan"),
 };
 
 const defaultSettings: DeckFilterSettings = {
@@ -20,11 +25,11 @@ const defaultSettings: DeckFilterSettings = {
 
 const build = (
   overrides: Partial<DeckFilterSettings> = {},
-  words: Record<string, RepEntry> = repWords,
+  words: Record<string, AnchorWordBasics> = repWords,
   includedKanji: ReadonlySet<string> = new Set(["水", "火", "日"])
 ) =>
   buildPracticeDeck({
-    repWords: words,
+    words,
     includedKanji,
     getKeyword: (kanji) => (kanji === "日" ? "" : `${kanji}-keyword`),
     settings: { ...defaultSettings, ...overrides },
@@ -47,9 +52,9 @@ describe("buildPracticeDeck", () => {
   it("skips invalid entries and kanji excluded by the worker filters", () => {
     const withBadEntries = {
       ...repWords,
-      無: null as unknown as RepEntry, // no anchor word selected
-      空: ["", "そら", "sky", ""] as RepEntry, // missing word
-      鳥: ["小鳥", "ことり", "bird", ""] as RepEntry,
+      空: word("", ["そら"], "sky"), // missing word
+      雨: word("雨", [], "rain"), // no reading
+      鳥: word("小鳥", ["ことり"], "bird"),
     };
 
     const deck = build({}, withBadEntries);

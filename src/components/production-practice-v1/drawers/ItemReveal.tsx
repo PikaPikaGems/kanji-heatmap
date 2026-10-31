@@ -1,39 +1,95 @@
-import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { GenericPopover } from "@/components/common/GenericPopover";
 import { SpeakButton } from "@/components/common/SpeakButton";
-import { KanjiPopover } from "@/components/screens/FillTheKanjiScreen/KanjiPopover";
+import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { KanjiKeywordCard } from "@/components/dependent/routing/global-links";
+import { DottedSeparator } from "@/components/ui/dotted-separator";
+import type { PracticeWord } from "@/components/shared-practice";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import type { PracticeItem } from "../types";
 
-/**
- * The answer word; each kanji in it opens the same kanji popover as Fill in
- * the Kanji's sentences (kana stay plain text).
- */
-const AnswerWord = ({ word }: { word: string }) => {
+/** Each kanji of the word as the vocab popover's kanji cards, not clickable. */
+const WordKanjiCards = ({ word }: { word: string }) => {
   const getKanjiInfo = useGetKanjiInfoFn();
+  const cards = [...new Set(word)].flatMap((char) => {
+    const keyword = getKanjiInfo?.(char)?.keyword;
+    return keyword ? [{ char, keyword }] : [];
+  });
+  if (cards.length === 0) return null;
+
   return (
-    <span className="text-4xl kanji-font" lang="ja">
-      {[...word].map((char, i) => {
-        const info = getKanjiInfo?.(char);
-        if (!info) return <span key={i}>{char}</span>;
-        return <KanjiPopover key={i} kanji={char} info={info} />;
-      })}
-    </span>
+    <div className="flex flex-wrap justify-center p-1">
+      {cards.map(({ char, keyword }) => (
+        <KanjiKeywordCard key={char} kanji={char} keyword={keyword} />
+      ))}
+    </div>
   );
 };
 
-/** Word · reading badges · speak · gloss — shared across feedback drawers. */
-export const ItemReveal = ({ item }: { item: PracticeItem }) => (
-  <div className="flex flex-col items-center gap-1 text-foreground">
-    <div className="flex flex-wrap items-center justify-center gap-1">
-      <AnswerWord word={item.word} />
-      <span className="mx-1 text-base font-normal">·</span>
-      {item.reading.split("・").map((r) => (
-        <RomajiBadge key={r} kana={r} />
-      ))}
-      <SpeakButton word={item.word} iconType="volume-2" />
-    </div>
-    <p className="text-xs font-bold text-muted-foreground">
-      {item.englishGloss || item.keyword}
-    </p>
-  </div>
+/**
+ * One answer word, in a dashed pill.
+ * Tapping it opens the word: its readings and speak button, its gloss, and
+ * each of its kanji with the kanji's keyword.
+ */
+const AnswerWordPopover = ({
+  word,
+  fallbackGloss,
+}: {
+  word: PracticeWord;
+  fallbackGloss: string;
+}) => (
+  <GenericPopover
+    // Inside a drawer: modal, or the popover can't be clicked.
+    modal
+    focusOnOpen={false}
+    trigger={
+      <button
+        type="button"
+        lang="ja"
+        className="p-3 transition-colors border border-dashed rounded-3xl cursor-pointer kanji-font border-foreground/30 hover:bg-foreground/10 hover:border-foreground/60 active:bg-foreground/20"
+      >
+        {word.word}
+      </button>
+    }
+    contentClassName="w-72 max-w-[calc(100vw-1.5rem)] p-0"
+    content={
+      <div className="flex flex-col items-center p-2 text-center">
+        <span className="pt-1 text-lg font-bold kanji-font" lang="ja">
+          {word.word}
+        </span>
+        <div className="flex flex-wrap items-center justify-center gap-1 py-1">
+          {word.reading.split("・").map((reading) => (
+            <RomajiBadge key={reading} kana={reading} />
+          ))}
+          <span aria-hidden className="text-muted-foreground">
+            ·
+          </span>
+          <SpeakButton word={word.word} iconType="volume-2" />
+        </div>
+        <p className="px-2 pb-2 text-xs font-bold text-muted-foreground text-pretty">
+          {word.englishGloss || fallbackGloss}
+        </p>
+        <DottedSeparator />
+        <WordKanjiCards word={word.word} />
+      </div>
+    }
+  />
 );
+
+/**
+ * The card's words, "高い 最高" (or the main word alone); each opens its own
+ * popover. Shared across feedback drawers.
+ */
+export const ItemReveal = ({ item }: { item: PracticeItem }) => {
+  const words = item.secondary ? [item, item.secondary] : [item];
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3 text-xl text-foreground">
+      {words.map((word) => (
+        <AnswerWordPopover
+          key={word.word}
+          word={word}
+          fallbackGloss={item.keyword}
+        />
+      ))}
+    </div>
+  );
+};

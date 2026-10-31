@@ -66,7 +66,7 @@ const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
       </UserNotice>
     );
   }
-  if (blocker.reason === "premium_lapsed") {
+  if (blocker.reason === "entitlement_expired") {
     return (
       <UserNotice>
         Your account can&apos;t save changes right now, so these settings are

@@ -60,7 +60,7 @@
     "cmdk": "1.0.0",
     "dexie": "4.4.4",
     "dmak": "^0.3.1",
-    "engine-contract": "github:PikaPikaGems/experimental-engine-contract#2d008fe1a70c3e7accdaec170fcfcb8cd820dce5",
+    "engine-contract": "github:PikaPikaGems/experimental-engine-contract#cc93ef549367089967dce6ec58c2e9fdff6c4634",
     "fuzzysearch": "^1.0.3",
     "lucide-react": "^1.55.0",
     "marked": "^18.0.6",

@@ -3,6 +3,7 @@ import { cn, isKanji } from "@/lib/utils";
 import { parseBunsetsu, Puzzle } from "@/lib/fill-the-kanji/puzzle";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { KanjiPopover } from "./KanjiPopover";
+import { BLANK_BOX_CN, blankCn, type BlankState } from "./blank-cn";
 
 /** Bunsetsu laid out with a visible gap between them, wrapping as needed. */
 const bunsetsuRowCn =
@@ -144,20 +145,6 @@ const promptSizeCn = (length: number) => {
   return "text-3xl sm:text-5xl";
 };
 
-export type BlankState = "empty" | "filled" | "current" | "right" | "wrong";
-
-/** Same ring as focused input fields (ui/input.tsx). */
-const inputLikeRingCn = "ring-2 ring-ring ring-offset-2 ring-offset-background";
-
-const blankCn: Record<BlankState, string> = {
-  empty: "border-dotted border-foreground/60 text-muted-foreground",
-  filled: "border-dotted border-foreground/40",
-  current: cn("border-dotted border-foreground", inputLikeRingCn),
-  right:
-    "border-dotted border-green-500 bg-green-500/15 animate-practice-correct-pop",
-  wrong: "border-dotted border-red-500 bg-red-500/15 animate-practice-shake",
-};
-
 const BlankButton = ({
   blank,
   value,
@@ -192,7 +179,8 @@ const BlankButton = ({
           : undefined
       }
       className={cn(
-        "inline-flex items-center justify-center mx-[0.2em] min-w-[1.45em] h-[1.55em] px-[0.12em] rounded-xl border-[3px] leading-none align-middle transition-colors",
+        BLANK_BOX_CN,
+        "transition-colors",
         "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-default enabled:hover:bg-accent",
         blankCn[state]

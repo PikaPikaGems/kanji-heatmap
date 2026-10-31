@@ -1,12 +1,17 @@
-import type { CardProgress, ReviewPileItemView } from "engine-contract";
+import type {
+  CardProgress,
+  CardType,
+  ReviewPileItemView,
+} from "engine-contract";
+import { ALL_CARD_TYPES, cardProgress } from "./card-types";
 
 /**
  * How review-pile cards are bucketed for mastery views (design 5.9 / 5.10).
  * Pure functions over `reviews.pile.watchAll()` rows.
  */
 
-/** A kanji's reading card, its writing card, or the weaker of the two. */
-export type MasteryCardKind = "reading" | "writing" | "combined";
+/** One of a kanji's cards, or all of them together (the weakest). */
+export type MasteryCardKind = CardType | "combined";
 export type MasteryMetric = "mastery" | "stability" | "difficulty";
 
 /** In the order the dashboard toggle lists them. */
@@ -167,12 +172,16 @@ const cardBand = (
   return difficultyBand(card.difficulty);
 };
 
+/** A pile item's cards: writing, Reading I and, when it has one, Reading II. */
+export const itemCards = (item: ReviewPileItemView): CardProgress[] =>
+  ALL_CARD_TYPES.flatMap((cardType) => cardProgress(item, cardType) ?? []);
+
 /**
  * The 0-based band a pile item falls in for one card kind and measure, or
- * `null` for "Not started". Band 0 is always the weakest (Fresh, the lowest
- * stability, the hardest difficulty), so Combined, which needs both cards
- * started, takes the lower band of the two. `now` (ms) only matters for
- * mastery.
+ * `null` for "New". Band 0 is always the weakest (Fresh, the lowest
+ * stability, the hardest difficulty), so Combined, which needs every card the
+ * item has started, takes the lowest band of them. `now` (ms) only matters
+ * for mastery.
  */
 export const itemBand = (
   item: ReviewPileItemView,
@@ -180,26 +189,23 @@ export const itemBand = (
   measure: MasteryMetric,
   now: number
 ): number | null => {
-  if (kind === "reading" || kind === "writing") {
-    const card = item[kind];
-    return isCardStarted(card) ? cardBand(card, measure, now) : null;
+  if (kind !== "combined") {
+    const card = cardProgress(item, kind);
+    return card && isCardStarted(card) ? cardBand(card, measure, now) : null;
   }
-  if (!isCardStarted(item.reading) || !isCardStarted(item.writing)) {
-    return null;
-  }
-  const reading = cardBand(item.reading, measure, now);
-  const writing = cardBand(item.writing, measure, now);
-  return Math.min(reading, writing);
+  const cards = itemCards(item);
+  if (!cards.every(isCardStarted)) return null;
+  return Math.min(...cards.map((card) => cardBand(card, measure, now)));
 };
 
 /**
  * One emoji per band, weakest first, shared by every measure since band 0 is
- * always the weakest: a waxing moon that ends in a flame. Not started is the
+ * always the weakest: a waxing moon that ends in a flame. New is the
  * new moon.
  */
 const NOT_STARTED_EMOJI = "🌑";
 const BAND_EMOJIS = ["🌒", "🌓", "🌖", "🔥"] as const;
 
-/** The emoji of a band from `itemBand` and friends; `null` is Not started. */
+/** The emoji of a band from `itemBand` and friends; `null` is New. */
 export const bandEmoji = (band: number | null): string =>
   band == null ? NOT_STARTED_EMOJI : BAND_EMOJIS[band];

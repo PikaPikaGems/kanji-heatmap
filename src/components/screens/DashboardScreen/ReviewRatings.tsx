@@ -4,8 +4,9 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { LegendDot, StackedBar } from "@/components/common/StackedBar";
 import { RATING_FILL } from "@/components/shared-practice/rating-border";
+import { ALL_CARD_TYPES, CARD_TYPE_LABELS } from "@/lib/engine/card-types";
 import {
-  addRatings,
+  combinedRatings,
   type DayRatings,
   RATING_LABELS,
   RATINGS,
@@ -128,19 +129,21 @@ const RatingsRow = ({
 };
 
 /**
- * How mastery reviews were rated: a row each for Reading, Writing and
- * Combined, whatever the activity filters show.
+ * How mastery reviews were rated: a row each for Writing, Reading I,
+ * Reading II and Combined (all three), whatever the activity filters show.
  */
 export const ReviewRatings = ({ ratings }: { ratings: DayRatings }) => (
   <section className="w-full px-4 py-3 mt-4 border rounded-xl border-foreground/5 bg-muted/10">
     <h3 className="mb-1 text-xs font-bold text-center uppercase text-muted-foreground">
       Review ratings
     </h3>
-    <RatingsRow label="Reading" ratings={ratings.reading} />
-    <RatingsRow label="Writing" ratings={ratings.writing} />
-    <RatingsRow
-      label="Combined"
-      ratings={addRatings(ratings.reading, ratings.writing)}
-    />
+    {ALL_CARD_TYPES.map((cardType) => (
+      <RatingsRow
+        key={cardType}
+        label={CARD_TYPE_LABELS[cardType]}
+        ratings={ratings[cardType]}
+      />
+    ))}
+    <RatingsRow label="Combined" ratings={combinedRatings(ratings)} />
   </section>
 );

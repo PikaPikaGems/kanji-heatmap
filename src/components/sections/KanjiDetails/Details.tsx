@@ -18,7 +18,7 @@ import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { StructureInfo } from "./StructureInfo";
 import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { BottomBar } from "@/components/common/BottomBar";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
 import { StudyNotesAccordion } from "./StudyNotesAccordion";
 import { YourProgressAccordion } from "./YourProgressAccordion";
@@ -139,12 +139,15 @@ const KanjiEssay = lazy(() => import("./KanjiEssay"));
 const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
 const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
-  const info = useKanjiRepresentativeWordDetails(kanji);
+  const anchors = useKanjiAnchorWords(kanji);
+  const words = anchors
+    ? [anchors.main.word, anchors.secondary?.word].filter(Boolean).join(" · ")
+    : "";
 
   return (
     <>
       <SimpleAccordion
-        trigger={`Anchor Word${info?.word ? `: ${info?.word}` : ""}`}
+        trigger={`${anchors?.secondary ? "Anchor Words" : "Anchor Word"}${words ? `: ${words}` : ""}`}
         defaultOpen={false}
       >
         <RepresentativeStudyWord kanji={kanji} />

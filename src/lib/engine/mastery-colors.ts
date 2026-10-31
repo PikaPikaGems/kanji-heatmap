@@ -15,7 +15,7 @@ const BAND_FILL_CN = [
 ] as const;
 
 /**
- * `band` is 0-based; null (Not started) is an uncolored, see-through tile.
+ * `band` is 0-based; null (New) is an uncolored, see-through tile.
  * Every measure shares the one ramp, so the measure doesn't change the fill.
  */
 export const getBandFillCn = (

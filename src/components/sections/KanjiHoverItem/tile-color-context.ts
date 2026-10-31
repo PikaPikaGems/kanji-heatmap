@@ -3,7 +3,7 @@ import { createContext } from "react";
 export type TileColor = {
   bgCn: string;
   textCn: string;
-  /** Fades the tile, e.g. a /mastery kanji with no anchor word. */
+  /** Hatches the tile, e.g. a /mastery kanji with no card for the metric. */
   dimmed?: boolean;
 };
 

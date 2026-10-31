@@ -1,137 +1,84 @@
-import { Brain, Brush, Eye, Keyboard, PenLine, Puzzle } from "lucide-react";
+import { Brain, Brush } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
+  ActivityKind,
   ActivityStats,
+  READING_MASTERY_2_LABEL,
   READING_MASTERY_LABEL,
   WRITING_MASTERY_LABEL,
 } from "@/lib/activity";
-import {
-  fillTheKanjiPageMeta,
-  productionPracticePageMeta,
-  recognitionPracticePageMeta,
-  speedKatakanaPageMeta,
-} from "@/lib/pages/practice-pages";
 import { ActivityStatCard, ActivityStatCardSkeleton } from "./ActivityStatCard";
+import {
+  PracticeGamesTable,
+  PracticeGamesTableSkeleton,
+} from "./PracticeGamesTable";
+
+const REVIEWS = { unit: "Reviews", unitSingular: "Review" };
+
+/** The mastery cards, one per row at every width. */
+const CARDS: {
+  kind: ActivityKind;
+  title: string;
+  Icon: LucideIcon;
+}[] = [
+  {
+    kind: "writingMastery",
+    title: WRITING_MASTERY_LABEL,
+    Icon: Brush,
+  },
+  {
+    kind: "readingMastery",
+    title: READING_MASTERY_LABEL,
+    Icon: Brain,
+  },
+  {
+    kind: "readingMastery2",
+    title: READING_MASTERY_2_LABEL,
+    Icon: Brain,
+  },
+];
+
+const GRID_CN = "grid gap-2 sm:gap-3 md:grid-cols-2";
+const CARDS_CN = "grid gap-2 sm:gap-3";
 
 /**
- * One card per activity: its days, then its reviews / rounds / batches /
- * sessions. The two mastery games come first, then the four practice games.
+ * The mastery cards (days, then reviews), then the practice games' table:
+ * under the cards on phones, beside them from `md`.
  */
-export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => {
-  const { kinds } = stats;
-  return (
-    <div className="flex flex-col gap-2 sm:gap-3">
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <ActivityStatCard
-          title={READING_MASTERY_LABEL}
-          Icon={Brain}
-          counts={[
-            {
-              value: kinds.readingMastery.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.readingMastery.count,
-              unit: "Reviews",
-              unitSingular: "Review",
-            },
-          ]}
-        />
-        <ActivityStatCard
-          title={WRITING_MASTERY_LABEL}
-          Icon={Brush}
-          counts={[
-            {
-              value: kinds.writingMastery.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.writingMastery.count,
-              unit: "Reviews",
-              unitSingular: "Review",
-            },
-          ]}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
-        <ActivityStatCard
-          title={recognitionPracticePageMeta.shortLabel}
-          Icon={Eye}
-          counts={[
-            {
-              value: kinds.recognition.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.recognition.count,
-              unit: "Rounds",
-              unitSingular: "Round",
-            },
-          ]}
-        />
-        <ActivityStatCard
-          title={productionPracticePageMeta.shortLabel}
-          Icon={PenLine}
-          counts={[
-            { value: kinds.production.days, unit: "Days", unitSingular: "Day" },
-            {
-              value: kinds.production.count,
-              unit: "Rounds",
-              unitSingular: "Round",
-            },
-          ]}
-        />
-        <ActivityStatCard
-          title={fillTheKanjiPageMeta.shortLabel}
-          Icon={Puzzle}
-          counts={[
-            {
-              value: kinds.fillTheKanji.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.fillTheKanji.count,
-              unit: "Batches",
-              unitSingular: "Batch",
-            },
-          ]}
-        />
-        <ActivityStatCard
-          title={speedKatakanaPageMeta.shortLabel}
-          Icon={Keyboard}
-          counts={[
-            {
-              value: kinds.speedKatakana.days,
-              unit: "Days",
-              unitSingular: "Day",
-            },
-            {
-              value: kinds.speedKatakana.count,
-              unit: "Sessions",
-              unitSingular: "Session",
-            },
-          ]}
-        />
-      </div>
+export const ActivityCountsGrid = ({ stats }: { stats: ActivityStats }) => (
+  <div className={GRID_CN}>
+    <div className={CARDS_CN}>
+      {CARDS.map(({ kind, title, Icon }) => (
+        <div key={kind} className="grid">
+          <ActivityStatCard
+            title={title}
+            Icon={Icon}
+            counts={[
+              {
+                value: stats.kinds[kind].days,
+                unit: "Days",
+                unitSingular: "Day",
+              },
+              { value: stats.kinds[kind].count, ...REVIEWS },
+            ]}
+          />
+        </div>
+      ))}
     </div>
-  );
-};
+    <PracticeGamesTable stats={stats} />
+  </div>
+);
 
-/** The same grid of cards as pulsing placeholders, while the counts load. */
+/** The same cards and table as pulsing placeholders, while the counts load. */
 export const ActivityCountsGridSkeleton = () => (
-  <div className="flex flex-col gap-2 sm:gap-3">
-    <div className="grid grid-cols-2 gap-2 sm:gap-3">
-      {Array.from({ length: 2 }, (_, i) => (
-        <ActivityStatCardSkeleton key={i} />
+  <div className={GRID_CN}>
+    <div className={CARDS_CN}>
+      {CARDS.map(({ kind }) => (
+        <div key={kind} className="grid">
+          <ActivityStatCardSkeleton />
+        </div>
       ))}
     </div>
-    <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 sm:gap-3">
-      {Array.from({ length: 4 }, (_, i) => (
-        <ActivityStatCardSkeleton key={i} />
-      ))}
-    </div>
+    <PracticeGamesTableSkeleton />
   </div>
 );

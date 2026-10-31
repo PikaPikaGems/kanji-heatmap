@@ -218,9 +218,6 @@ const DebugInfoBody = () => {
               />
             </span>
           </DebugRow>
-          <DebugRow label="Version">
-            <span className="font-mono">v{info.version}</span>
-          </DebugRow>
           <DebugRow label="Viewport">
             {info.viewportWidth}×{info.viewportHeight}
           </DebugRow>
@@ -233,6 +230,14 @@ const DebugInfoBody = () => {
                 {device.browser.name} {device.browser.version}
               </DebugRow>
             </>
+          )}
+          <DebugRow label="App Version">
+            <span className="font-mono">v{info.version}</span>
+          </DebugRow>
+          {info.engineVersion && (
+            <DebugRow label="KH Engine">
+              <span className="font-mono">{info.engineVersion}</span>
+            </DebugRow>
           )}
         </dl>
       </SimpleAccordion>

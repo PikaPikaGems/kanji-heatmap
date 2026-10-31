@@ -6,7 +6,7 @@ import type { WriteBlocker } from "./use-account-status";
  */
 const CODE_COPY: Record<string, string> = {
   stale_session: "Go online to continue.",
-  premium_lapsed: "Your account can't save changes right now.",
+  entitlement_expired: "Your account can't save changes right now.",
   outbox_full:
     "Saving is paused until this device syncs. Go online to continue.",
   outbox_stale:
@@ -39,7 +39,7 @@ const BLOCKER_COPY: Record<WriteBlocker, string> = {
   recovery: "This device's saved data needs attention.",
   outbox_full: CODE_COPY.outbox_full,
   outbox_stale: CODE_COPY.outbox_stale,
-  premium_lapsed: CODE_COPY.premium_lapsed,
+  entitlement_expired: CODE_COPY.entitlement_expired,
   storage_quota: CODE_COPY.storage_quota,
   cache_rebuilding: CODE_COPY.cache_rebuilding,
 };
@@ -77,8 +77,8 @@ export const REVIEW_SETTINGS_UPDATE_COPY =
 export const copyForCode = (code: string): string =>
   CODE_COPY[code] ?? "Something went wrong. Try again.";
 
-/** "Your account can't save changes right now.", the premium-lapsed copy. */
-export const PREMIUM_LAPSED_COPY = CODE_COPY.premium_lapsed;
+/** "Your account can't save changes right now.", the entitlement-expired copy. */
+export const ENTITLEMENT_EXPIRED_COPY = CODE_COPY.entitlement_expired;
 
 export const copyForWriteBlocker = (blocker: WriteBlocker): string =>
   BLOCKER_COPY[blocker];

@@ -45,8 +45,10 @@ const {
   speedKatakanaPage,
   fillTheKanjiPage,
   recognitionPracticeV1Page,
+  recognitionPractice2Page,
   productionPracticeV1Page,
   readingMasteryPage,
+  readingMastery2Page,
   writingMasteryPage,
 } = pageItems;
 
@@ -93,6 +95,10 @@ const App = () => {
                 path={recognitionPracticeV1Page.href}
                 component={RecognitionPracticeV1}
               />
+              <Route
+                path={recognitionPractice2Page.href}
+                component={recognitionPractice2Page.Component}
+              />
               {/* Production (writing) practice has its own header + ONNX. */}
               <Route
                 path={productionPracticeV1Page.href}
@@ -102,6 +108,10 @@ const App = () => {
               <Route
                 path={readingMasteryPage.href}
                 component={readingMasteryPage.Component}
+              />
+              <Route
+                path={readingMastery2Page.href}
+                component={readingMastery2Page.Component}
               />
               <Route
                 path={writingMasteryPage.href}

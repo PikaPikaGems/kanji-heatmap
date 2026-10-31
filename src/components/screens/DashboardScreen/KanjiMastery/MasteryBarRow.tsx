@@ -4,20 +4,17 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { getBandFillCn } from "@/lib/engine/mastery-colors";
-import {
-  getBandLabels,
-  NOT_STARTED_LABEL,
-} from "@/lib/engine/mastery-heatmap-metrics";
+import { getBandLabels, NEW_LABEL } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 import { formatShare } from "@/lib/format-count";
 import { SegmentedBandBar } from "../SegmentedBandBar";
 import type { BandCounts } from "./mastery-tally";
 
-/** Labels and fills per segment; index 0 is "Not started" (the empty track). */
+/** Labels and fills per segment; index 0 is "New" (the empty track). */
 const segmentsOf = (measure: MasteryMetric) => {
   const labels = getBandLabels(measure);
   return {
-    labels: [NOT_STARTED_LABEL, ...labels],
+    labels: [NEW_LABEL, ...labels],
     fills: ["", ...labels.map((_, band) => getBandFillCn(measure, band))],
   };
 };

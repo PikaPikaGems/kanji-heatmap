@@ -5,8 +5,8 @@ import { getBandFillCn } from "@/lib/engine/mastery-colors";
 import {
   getBands,
   MEASURE_INTROS,
-  NOT_STARTED_LABEL,
-  NOT_STARTED_RULES,
+  NEW_LABEL,
+  NEW_RULES,
 } from "@/lib/engine/mastery-heatmap-metrics";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 import { cn } from "@/lib/utils";
@@ -32,12 +32,12 @@ const BandRow = ({
   </li>
 );
 
-/** "Not started", then the measure's four bands, dullest first. */
+/** "New", then the measure's four bands, dullest first. */
 export const BandRows = ({ measure }: { measure: MasteryMetric }) => (
   <ul className="flex flex-col gap-1.5">
     <BandRow
-      label={NOT_STARTED_LABEL}
-      rule={NOT_STARTED_RULES[measure]}
+      label={NEW_LABEL}
+      rule={NEW_RULES[measure]}
       fillCn={getBandFillCn(measure, null)}
     />
     {getBands(measure).map(({ label, rule }, band) => (
@@ -52,13 +52,13 @@ export const BandRows = ({ measure }: { measure: MasteryMetric }) => (
 );
 
 const getCombinedNote = (measure: MasteryMetric): string => {
-  const pick = measure === "difficulty" ? "harder" : "weaker";
-  return `Combined counts once both reading and writing are reviewed, and shows the ${pick} of the two.`;
+  const pick = measure === "difficulty" ? "hardest" : "weakest";
+  return `Combined counts once every card of a kanji is reviewed (Writing, Reading I and, when it has a second word, Reading II), and shows the ${pick} of them.`;
 };
 
 /**
  * The measure's one-line meaning; its ⓘ opens what each square means (and,
- * for a combined metric, how reading and writing combine).
+ * for a combined metric, how its cards combine).
  */
 export const MeasureIntro = ({
   measure,

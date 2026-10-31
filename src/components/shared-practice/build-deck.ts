@@ -1,17 +1,31 @@
 import { shuffle } from "@/lib/utils";
 import { randomFontIndex } from "@/hooks/use-change-font";
-import { DeckFilterSettings, PracticeItem } from "./types";
+import type { AnchorWordBasics } from "@/lib/kanji/anchor-words";
+import { DeckFilterSettings, PracticeItem, PracticeWord } from "./types";
 
-type RepEntry = [string, string, string, string];
+/** An anchor word as a practice card shows it. */
+export const toPracticeWord = ({
+  word,
+  readings,
+  englishGloss,
+}: AnchorWordBasics): PracticeWord => ({
+  word,
+  reading: readings.join("・"),
+  englishGloss,
+});
 
 export const buildPracticeDeck = ({
-  repWords,
+  words,
+  secondaryWords,
   includedKanji,
   bookmarkedKanji,
   getKeyword,
   settings,
 }: {
-  repWords: Record<string, RepEntry>;
+  /** The anchor word to practice, per kanji. */
+  words: Record<string, AnchorWordBasics>;
+  /** Shown next to `words` (the writing games); omitted by reading games. */
+  secondaryWords?: Record<string, AnchorWordBasics>;
   includedKanji: ReadonlySet<string>;
   /** The account's bookmarks; omitted when this build has none (filter skipped). */
   bookmarkedKanji?: ReadonlySet<string>;
@@ -20,11 +34,8 @@ export const buildPracticeDeck = ({
 }): PracticeItem[] => {
   const items: PracticeItem[] = [];
 
-  for (const [kanji, entry] of Object.entries(repWords)) {
-    // Some kanji keys exist with a null entry (no anchor word selected).
-    if (!Array.isArray(entry)) continue;
-    const [word, reading, englishGloss] = entry;
-    if (!word || !reading) continue;
+  for (const [kanji, anchor] of Object.entries(words)) {
+    if (!anchor.word || anchor.readings.length === 0) continue;
 
     if (!includedKanji.has(kanji)) continue;
     if (
@@ -35,13 +46,13 @@ export const buildPracticeDeck = ({
       continue;
     }
 
+    const secondary = secondaryWords?.[kanji];
     items.push({
       kanji,
-      word,
-      reading,
-      englishGloss: englishGloss ?? "",
+      ...toPracticeWord(anchor),
       keyword: getKeyword(kanji) || "...",
       fontIndex: settings.randomizeFont ? randomFontIndex() : null,
+      ...(secondary ? { secondary: toPracticeWord(secondary) } : {}),
     });
   }
 

@@ -137,7 +137,7 @@ const ProductionPracticeV1 = () => {
   const { loadPhase } = handwriting;
 
   const session = usePracticeSession<SessionResult>({
-    recordType: "writing_practice_round_completed",
+    activityType: "writing_practice",
     sessionSize: SESSION_SIZE,
     onGoToInitial: handwriting.reset,
     // Warm recognition before "playing"; park on loading / confirm-fallback

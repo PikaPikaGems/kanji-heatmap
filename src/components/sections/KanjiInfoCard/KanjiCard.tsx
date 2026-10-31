@@ -14,7 +14,8 @@ import { KanjiCardLayout } from "./CardLayout";
 import { WordCard } from "./WordCard";
 import { CardLoadingScreen } from "@/components/common/CardLoadingScreen";
 import { OriginalKanjiComponentBreakdown } from "../KanjiDetails/OriginalComponentBreakdown";
-import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
+import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
+import type { AnchorWord } from "@/lib/kanji/anchor-words";
 import { HintChip } from "@/components/common/HintChip";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useFlashHint } from "@/hooks/use-flash-hint";
@@ -90,19 +91,28 @@ export const KanjiCardBare = ({ kanji }: { kanji: string }) => {
   );
 };
 
+/** "🌱 高い (たかい)": one anchor word, kept on one line. */
+const AnchorWordLine = ({ word }: { word: AnchorWord }) => (
+  <span className="whitespace-nowrap">
+    {word.tier} {word.word} ({word.readings.join("・")})
+  </span>
+);
+
+/** The kanji's anchor words, "🌱 高い (たかい) · 🌱 最高 (さいこう)". */
 const RepWordKanji = ({ kanji }: { kanji: string }) => {
-  const repWord = useKanjiRepresentativeWordDetails(kanji);
+  const anchors = useKanjiAnchorWords(kanji);
+  if (anchors == null) return null;
 
   return (
-    <>
-      {repWord && (
-        <div className="flex justify-center gap-2 m-auto">
-          <span className="text-sm kanji-font">
-            {repWord.tags?.[0]} {repWord.word} ({repWord.reading})
-          </span>
-        </div>
+    <div className="flex flex-wrap justify-center px-2 m-auto text-sm text-center gap-x-1.5 kanji-font">
+      <AnchorWordLine word={anchors.main} />
+      {anchors.secondary && (
+        <>
+          <span aria-hidden>·</span>
+          <AnchorWordLine word={anchors.secondary} />
+        </>
       )}
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import type { FsrsRating } from "engine-contract";
-import { KeyHint } from "@/components/common/KeyHint";
 import { PracticeButton } from "@/components/ui/practice-button";
 import {
   FORGOT_HINT,
@@ -9,8 +8,9 @@ import {
 import type { MasteryGrading } from "@/components/shared-practice";
 
 /**
- * Forgot / Next row under the answer input. In a mastery game, once the typed
- * reading matches, Forgot is disabled and Next gives way to Hard / Good / Easy.
+ * The buttons under the answer input. Mastery games: Forgot / Hard / Good /
+ * Easy, with the ratings greyed out until the typed reading matches, then
+ * Forgot greyed out. Practice games: Forgot / Next.
  */
 export const AnswerActions = ({
   matched,
@@ -25,18 +25,27 @@ export const AnswerActions = ({
   onNext: () => void;
   onRate: (rating: FsrsRating) => void;
 }) => {
-  if (grading && matched) {
+  if (grading) {
     return (
       <div className="grid grid-cols-4 gap-2">
         <PracticeButton
           variant="danger"
           size="md"
           className="px-1 text-xs sm:text-sm"
-          disabled
+          disabled={matched}
+          onClick={onForgot}
         >
-          <RatingLabel label="Forgot" interval={grading.intervals.again} />
+          <RatingLabel
+            label="Forgot"
+            interval={grading.intervals.again}
+            hint={matched ? undefined : FORGOT_HINT}
+          />
         </PracticeButton>
-        <RatingButtons intervals={grading.intervals} onRate={onRate} />
+        <RatingButtons
+          intervals={grading.intervals}
+          disabled={!matched}
+          onRate={onRate}
+        />
       </div>
     );
   }
@@ -50,7 +59,6 @@ export const AnswerActions = ({
         onClick={onForgot}
       >
         Forgot
-        {grading && !matched && <KeyHint>{FORGOT_HINT}</KeyHint>}
       </PracticeButton>
       <PracticeButton
         variant="primary"

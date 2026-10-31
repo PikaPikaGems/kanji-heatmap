@@ -6,23 +6,21 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { DashedNavLinkSections } from "@/components/common/DashedNavLinkSections";
 import { NotificationDot } from "@/components/common/NotificationDot";
-import {
-  floatingIslandNavLinks,
-  practiceNavSections,
-} from "@/lib/pages/nav-links";
-import { dueNavHrefs, useVisibleNavSections } from "@/lib/pages/mode-nav-links";
+import { floatingIslandNavLinks } from "@/lib/pages/nav-links";
+import { dueNavHrefs } from "@/lib/pages/mode-nav-links";
 import { totalDue, useDueCount } from "@/lib/engine/use-due-count";
 import { useBgSrc } from "@/hooks/routing-hooks";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useScrollLockSettleRef } from "@/hooks/use-scroll-lock-fade-tick";
 import { cn } from "@/lib/utils";
+import { PracticeFabMenu } from "./PracticeFabMenu";
 
 const fabHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
 const prefetchPracticeRoutes = () => {
   void import("@/components/recognition-practice-v1/RecognitionPracticeV1");
+  void import("@/components/recognition-practice-v1/RecognitionPractice2");
   void import("@/components/production-practice-v1/ProductionPracticeV1");
   void import("@/components/screens/SpeedKatakanaScreen/SpeedKatakanaScreen");
   void import("@/components/screens/FillTheKanjiScreen/FillTheKanjiScreen");
@@ -40,7 +38,6 @@ export const PracticeFab = () => {
 
   const buttonRef = useScrollLockSettleRef<HTMLButtonElement>();
   const due = useDueCount();
-  const modeSections = useVisibleNavSections(practiceNavSections);
 
   if (!fabHrefs.has(location)) {
     return null;
@@ -82,10 +79,8 @@ export const PracticeFab = () => {
         className="z-50 w-[min(100vw-1.5rem,28rem)] p-3 pt-0"
         aria-label="Practice menu"
       >
-        <DashedNavLinkSections
-          sections={modeSections}
+        <PracticeFabMenu
           dotHrefs={dueNavHrefs(due)}
-          listClassName="grid grid-cols-2 gap-2"
           onItemClick={() => setOpen(false)}
         />
       </PopoverContent>

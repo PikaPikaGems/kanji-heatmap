@@ -5,7 +5,12 @@ import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
-import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
+import {
+  recognitionPracticePageMeta,
+  type PracticePageMeta,
+} from "@/lib/pages/practice-pages";
+import type { PracticeActivityType } from "@/lib/practice/activity";
+import type { DeckAnchor } from "@/components/shared-practice/use-practice-deck";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { useLockVisualViewportScroll } from "./use-lock-visual-viewport-scroll";
@@ -15,8 +20,20 @@ import { RecognitionPracticeSettings, SessionResult } from "./types";
 /** Toggle off to size the shell with `bottom-0` instead of visualViewport height. */
 const visualPortOn = false;
 
-const RecognitionPracticeV1 = () => {
-  useHtmlDocumentTitle(recognitionPracticePageMeta.heading);
+/**
+ * A reading practice game: type the reading of each kanji's main word
+ * (/reading-practice) or secondary word (/reading-practice-2).
+ */
+export const ReadingPracticeGame = ({
+  page,
+  anchor,
+  activityType,
+}: {
+  page: PracticePageMeta;
+  anchor: DeckAnchor;
+  activityType: PracticeActivityType;
+}) => {
+  useHtmlDocumentTitle(page.heading);
 
   const [settings] = useLocalStorage<RecognitionPracticeSettings>(
     SETTINGS_KEY,
@@ -26,7 +43,7 @@ const RecognitionPracticeV1 = () => {
   const primerRef = useRef<HTMLInputElement | null>(null);
 
   const session = usePracticeSession<SessionResult>({
-    recordType: "reading_practice_round_completed",
+    activityType,
     sessionSize: SESSION_SIZE,
     // Focus the sr-only primer so the soft keyboard opens with the session.
     onSessionStart: () => primerRef.current?.focus(),
@@ -50,7 +67,11 @@ const RecognitionPracticeV1 = () => {
       >
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
-            <InitialScreen onStart={session.startGame} />
+            <InitialScreen
+              page={page}
+              anchor={anchor}
+              onStart={session.startGame}
+            />
           </div>
         )}
 
@@ -90,5 +111,14 @@ const RecognitionPracticeV1 = () => {
     </>
   );
 };
+
+/** /reading-practice: Reading Practice I, the main words. */
+const RecognitionPracticeV1 = () => (
+  <ReadingPracticeGame
+    page={recognitionPracticePageMeta}
+    anchor="main"
+    activityType="reading_practice"
+  />
+);
 
 export default RecognitionPracticeV1;

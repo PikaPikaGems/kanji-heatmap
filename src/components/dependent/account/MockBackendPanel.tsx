@@ -13,7 +13,7 @@ import { useEngineQuery } from "@/lib/engine/use-engine-query";
 
 const FAILURE_CODES = [
   "validation_failed",
-  "premium_lapsed",
+  "entitlement_expired",
   "stale_session",
   "schema_version_mismatch",
   "unknown_operation_error",

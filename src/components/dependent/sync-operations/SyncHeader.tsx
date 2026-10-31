@@ -38,7 +38,7 @@ const AccountNotices = () => {
       {!writeAccess.allowed && (
         <UserNotice>
           {copyForWriteBlocker(writeAccess.reason)}
-          {writeAccess.reason === "premium_lapsed" && (
+          {writeAccess.reason === "entitlement_expired" && (
             <>
               {" "}
               <NoticeAction
