@@ -14,7 +14,9 @@ import type { ComponentType, SVGProps } from "react";
 import {
   fillTheKanjiPageMeta,
   productionPracticePageMeta,
+  readingMastery2PageMeta,
   readingMasteryPageMeta,
+  recognitionPractice2PageMeta,
   recognitionPracticePageMeta,
   speedKatakanaPageMeta,
   writingMasteryPageMeta,
@@ -29,6 +31,8 @@ export type NavLinkItem = {
   title: string;
   description: string;
   Icon: NavLinkIcon;
+  /** Spans the whole row of a grid menu (the practice FAB). */
+  wide?: boolean;
 };
 
 /** A group of menu links under an optional small heading. */
@@ -77,18 +81,27 @@ const readingMasteryNavLink: NavLinkItem = {
   Icon: ScanEye,
 };
 
+const readingMastery2NavLink: NavLinkItem = {
+  ...readingMastery2PageMeta,
+  Icon: ScanEye,
+};
+
 const writingMasteryNavLink: NavLinkItem = {
   ...writingMasteryPageMeta,
   Icon: PencilLine,
+  wide: true,
 };
 
+// In the FAB's two-column grid: Speed Katakana, Fill in the Kanji / Reading
+// Practice I, II / Writing Practice (whole row).
 const practiceGamesSection: NavLinkSection = {
   heading: "Practice Games",
   links: [
-    { ...recognitionPracticePageMeta, Icon: Eye },
-    { ...productionPracticePageMeta, Icon: PenLine },
-    { ...fillTheKanjiPageMeta, Icon: Puzzle },
     { ...speedKatakanaPageMeta, Icon: Keyboard },
+    { ...fillTheKanjiPageMeta, Icon: Puzzle },
+    { ...recognitionPracticePageMeta, Icon: Eye },
+    { ...recognitionPractice2PageMeta, Icon: Eye },
+    { ...productionPracticePageMeta, Icon: PenLine, wide: true },
   ],
 };
 
@@ -101,7 +114,11 @@ export const practiceNavSections: NavLinkSection[] = [
   {
     heading: "Kanji Mastery",
     starred: true,
-    links: [readingMasteryNavLink, writingMasteryNavLink],
+    links: [
+      readingMasteryNavLink,
+      readingMastery2NavLink,
+      writingMasteryNavLink,
+    ],
   },
 ];
 
@@ -121,6 +138,7 @@ export const headerNavSections: NavLinkSection[] = [
     links: [
       { ...masteryPageMeta, Icon: GraduationCap },
       readingMasteryNavLink,
+      readingMastery2NavLink,
       writingMasteryNavLink,
     ],
   },

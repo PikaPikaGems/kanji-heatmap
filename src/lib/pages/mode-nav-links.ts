@@ -2,6 +2,7 @@ import { useEngineState } from "@/lib/engine/engine";
 import type { DueCounts } from "@/lib/engine/use-due-count";
 import { masteryPageMeta, type NavLinkSection } from "@/lib/pages/nav-links";
 import {
+  readingMastery2PageMeta,
   readingMasteryPageMeta,
   writingMasteryPageMeta,
 } from "@/lib/pages/practice-pages";
@@ -9,11 +10,12 @@ import {
 const MASTERY_HREFS: ReadonlySet<string> = new Set([
   masteryPageMeta.href,
   readingMasteryPageMeta.href,
+  readingMastery2PageMeta.href,
   writingMasteryPageMeta.href,
 ]);
 
 /**
- * Drops the mastery links (Visualize, Reading, Writing) when this build has no
+ * Drops the mastery links (Visualize, Reading I / II, Writing) when this build has no
  * study engine, and any section that leaves empty (so "Kanji Mastery"
  * disappears with them); nav-links.ts itself stays static.
  */
@@ -36,6 +38,9 @@ export const useVisibleNavSections = (
 export const dueNavHrefs = (counts: DueCounts | null): ReadonlySet<string> => {
   const hrefs = new Set<string>();
   if (counts && counts.reading > 0) hrefs.add(readingMasteryPageMeta.href);
+  if (counts && counts.secondaryReading > 0) {
+    hrefs.add(readingMastery2PageMeta.href);
+  }
   if (counts && counts.writing > 0) hrefs.add(writingMasteryPageMeta.href);
   return hrefs;
 };

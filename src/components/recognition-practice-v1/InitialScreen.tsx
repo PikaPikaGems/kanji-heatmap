@@ -6,21 +6,26 @@ import {
   ToggleRow,
   usePracticeDeck,
 } from "@/components/shared-practice";
-import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
+import type { PracticePageMeta } from "@/lib/pages/practice-pages";
+import type { DeckAnchor } from "@/components/shared-practice/use-practice-deck";
 import { TtsNotice } from "@/components/dependent/account/TtsNotice";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { PracticeItem, RecognitionPracticeSettings, SoundMode } from "./types";
 
 export const InitialScreen = ({
+  page,
+  anchor,
   onStart,
 }: {
+  page: PracticePageMeta;
+  anchor: DeckAnchor;
   onStart: (deck: PracticeItem[]) => void;
 }) => {
   const [settings, setSetting] = useLocalStorage<RecognitionPracticeSettings>(
     SETTINGS_KEY,
     DEFAULT_SETTINGS
   );
-  const { deck, loading, canStart } = usePracticeDeck(settings);
+  const { deck, loading, canStart } = usePracticeDeck(settings, anchor);
 
   const soundEnabled = settings.sound?.enabled ?? true;
   const soundType: SoundMode =
@@ -30,8 +35,8 @@ export const InitialScreen = ({
 
   return (
     <PracticeInitialScreen
-      heading={recognitionPracticePageMeta.heading}
-      description={recognitionPracticePageMeta.description}
+      heading={page.heading}
+      description={page.description}
       filters={settings}
       onFilterChange={setSetting}
       deckSize={deck.length}

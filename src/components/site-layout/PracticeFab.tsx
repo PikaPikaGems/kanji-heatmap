@@ -23,6 +23,7 @@ const fabHrefs = new Set(floatingIslandNavLinks.map((link) => link.href));
 
 const prefetchPracticeRoutes = () => {
   void import("@/components/recognition-practice-v1/RecognitionPracticeV1");
+  void import("@/components/recognition-practice-v1/RecognitionPractice2");
   void import("@/components/production-practice-v1/ProductionPracticeV1");
   void import("@/components/screens/SpeedKatakanaScreen/SpeedKatakanaScreen");
   void import("@/components/screens/FillTheKanjiScreen/FillTheKanjiScreen");

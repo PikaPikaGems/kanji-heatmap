@@ -54,9 +54,14 @@ export const NavSectionLinks = ({
         />
       );
 
+      const wrapped = wrapItem ? wrapItem(link, item) : link;
       return (
         <Fragment key={item.href}>
-          {wrapItem ? wrapItem(link, item) : link}
+          {item.wide ? (
+            <div className="grid col-span-full">{wrapped}</div>
+          ) : (
+            wrapped
+          )}
         </Fragment>
       );
     })}
