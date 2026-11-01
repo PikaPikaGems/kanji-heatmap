@@ -64,6 +64,10 @@ The data published in kanjiheatmap.com by PikaPikaGems are licensed under [CC BY
   - [kanjidatabase.com](https://www.kanjidatabase.com/)
   - Alex Yatskov's Wikipedia Kanji Frequency Report
 
+### Fill the Kanji Sentences
+
+- Some sentences in the Fill the Kanji games are variations of sentences provided by [Hanabira.org](https://hanabira.org/), licensed under the Creative Commons Attribution 4.0 International ([CC BY 4.0][cc-by-4]) license
+
 ### AI Voice (experimental)
 
 - [yomiage](https://github.com/PikaPikaGems/yomiage) under [MIT][mit-license], which runs [piper-plus](https://github.com/ayutaz/piper-plus) and [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) (both MIT)
