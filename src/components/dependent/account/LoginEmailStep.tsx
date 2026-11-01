@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type RefObject } from "react";
 import type { EngineAPI } from "engine-contract";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import LinkOutIcon from "@/components/common/LinkOutIcon";
@@ -24,6 +24,33 @@ const WaitlistLink = ({
   </span>
 );
 
+/**
+ * The `website` field sent with the login code request. Off-screen, and kept
+ * out of screen readers, the tab order and autofill.
+ */
+const WebsiteField = ({
+  inputRef,
+}: {
+  inputRef: RefObject<HTMLInputElement>;
+}) => (
+  <div
+    aria-hidden
+    className="absolute -left-[10000px] top-auto size-px overflow-hidden"
+  >
+    <label>
+      Website (leave this empty)
+      <input
+        ref={inputRef}
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        defaultValue=""
+      />
+    </label>
+  </div>
+);
+
 export const LoginEmailStep = ({
   api,
   initialEmail,
@@ -35,11 +62,16 @@ export const LoginEmailStep = ({
 }) => {
   const [email, setEmail] = useState(initialEmail);
   const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
+  const websiteRef = useRef<HTMLInputElement>(null);
 
   const requestPin = async () => {
     const trimmed = email.trim();
     setStatus({ kind: "busy" });
-    const result = await api.auth.requestPin({ email: trimmed });
+    // Always sent; an empty string when the field is empty.
+    const result = await api.auth.requestPin({
+      email: trimmed,
+      website: websiteRef.current?.value ?? "",
+    });
     if (result.ok) {
       onSent(trimmed);
       return;
@@ -68,7 +100,9 @@ export const LoginEmailStep = ({
         onValueChange={setEmail}
         status={status}
         onSubmit={() => void requestPin()}
-      />
+      >
+        <WebsiteField inputRef={websiteRef} />
+      </SubmitInput>
       <div className="flex flex-col items-center gap-3 pt-4 border-t-2 border-dashed">
         <p className="text-sm font-bold text-center text-foreground text-pretty">
           Most features of Kanji Heatmap will always be free, no login required
