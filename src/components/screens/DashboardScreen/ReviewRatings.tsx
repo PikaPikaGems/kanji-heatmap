@@ -135,7 +135,7 @@ const RatingsRow = ({
 export const ReviewRatings = ({ ratings }: { ratings: DayRatings }) => (
   <section className="w-full px-4 py-3 mt-4 border rounded-xl border-foreground/5 bg-muted/10">
     <h3 className="mb-1 text-xs font-bold text-center uppercase text-muted-foreground">
-      Kanji mastery review ratings ⭐️
+      Kanji mastery ⭐️ review ratings
     </h3>
     {ALL_CARD_TYPES.map((cardType) => (
       <RatingsRow
