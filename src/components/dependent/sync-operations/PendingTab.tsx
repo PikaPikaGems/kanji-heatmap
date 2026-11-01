@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { SyncOperation } from "engine-contract";
-import { Pagination } from "@/components/sections/KanjiDetails/Pagination";
 import { relativeTime } from "@/lib/engine/relative-time";
 import { keepLastReady, snapshotValue } from "@/lib/engine/store-cache";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
@@ -15,6 +14,7 @@ import {
   OperationKanji,
   OperationList,
 } from "./OperationList";
+import { PagedOperations } from "./PagedOperations";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 
@@ -72,7 +72,7 @@ const PendingPage = ({ offset }: { offset: number }) => {
 
 /**
  * Changes still waiting to upload, 10 per page with the drawer's
- * "← 1 of 4 →" pagination. Only the page shown is read from the engine.
+ * "← 1 of 4 →" pagination above and below. Only the page shown is read from the engine.
  */
 export const PendingTab = ({ total }: { total: number }) => {
   const [page, setPage] = useState(1);
@@ -86,20 +86,14 @@ export const PendingTab = ({ total }: { total: number }) => {
   // Uploads shrink the list while it is open: stay on its last page.
   const shown = Math.min(page, totalPages);
   return (
-    <div className="flex flex-col">
-      <div key={shown} className="animate-fade-in-fast">
-        <OperationList>
-          <PendingPage offset={(shown - 1) * PAGE_SIZE} />
-        </OperationList>
-      </div>
-      {totalPages > 1 && (
-        <Pagination
-          page={shown}
-          totalPages={totalPages}
-          onPrev={() => setPage(shown - 1)}
-          onNext={() => setPage(shown + 1)}
-        />
-      )}
-    </div>
+    <PagedOperations
+      page={shown}
+      totalPages={totalPages}
+      onPageChange={setPage}
+    >
+      <OperationList>
+        <PendingPage offset={(shown - 1) * PAGE_SIZE} />
+      </OperationList>
+    </PagedOperations>
   );
 };

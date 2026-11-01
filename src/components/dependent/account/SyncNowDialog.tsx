@@ -1,11 +1,18 @@
 import type { ReactNode } from "react";
 import { CheckCircle2, CloudUpload, Loader2 } from "lucide-react";
 import { DialogActions } from "@/components/common/DialogActions";
-import { UserNotice } from "@/components/common/UserNotice";
+import { ErrorTerminal } from "@/components/common/ErrorTerminal";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
+import { formatCaptureTimestamp } from "@/hooks/use-debug-info";
+import { useDebugReport } from "@/hooks/use-debug-report";
 import { useNetworkState } from "@/hooks/use-network-state";
+import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
+import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
+import { accountLines, syncLines } from "@/lib/engine/sync-report-lines";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
   closeSyncNowDialog,
@@ -128,8 +135,52 @@ const Syncing = () => (
   </>
 );
 
-/** The sync failed: why, then try again or leave it for later. */
-const Failed = ({ message }: { message: string }) => {
+/**
+ * What went wrong, with account and sync state and the app & device info,
+ * to copy and send us. Mounted only while the sync has failed.
+ */
+const SyncFailureReport = ({
+  code,
+  message,
+}: {
+  code: string;
+  message: string;
+}) => {
+  const { text: debugReport } = useDebugReport();
+  const account = useAccountStatus();
+  const sync = useSyncStatus();
+  const failedOps = useFailedOpsCount()?.count;
+
+  const report = [
+    "Kanji Heatmap: couldn't sync",
+    `Captured: ${formatCaptureTimestamp()}`,
+    `Screen: ${window.location.pathname}`,
+    `Error: ${code}`,
+    `Message: ${message}`,
+    "",
+    ...accountLines(account),
+    "",
+    ...syncLines(sync, failedOps),
+    "",
+    debugReport,
+  ].join("\n");
+
+  return (
+    <div className="flex flex-col gap-2 text-left animate-fade-in-fast">
+      <p className="text-sm text-pretty">
+        If this keeps happening, copy this report and send it to us.
+      </p>
+      <ErrorTerminal
+        filename="sync-failed.log"
+        content={report}
+        className="max-w-none"
+      />
+    </div>
+  );
+};
+
+/** The sync failed: why, a report to send us, then try again or later. */
+const Failed = ({ code, message }: { code: string; message: string }) => {
   const api = useEngineApi();
   return (
     <>
@@ -139,9 +190,19 @@ const Failed = ({ message }: { message: string }) => {
         </p>
         <p>
           Your changes are still saved on this device. Sync soon, or saving will
-          pause.
+          pause.{" "}
+          <NoticeAction
+            onClick={() => {
+              // One modal at a time.
+              closeSyncNowDialog();
+              openSyncOperations(null);
+            }}
+          >
+            See Unsynced changes
+          </NoticeAction>
         </p>
       </StatusBody>
+      <SyncFailureReport code={code} message={message} />
       <DialogActions>
         <PracticeButton variant="ghost" onClick={closeSyncNowDialog}>
           I&apos;ll sync later
@@ -201,7 +262,9 @@ export const SyncNowDialog = () => {
         <div key={status.kind} className="flex flex-col gap-4 pb-2">
           {status.kind === "info" && <Info attention={attention} />}
           {status.kind === "syncing" && <Syncing />}
-          {status.kind === "failed" && <Failed message={status.message} />}
+          {status.kind === "failed" && (
+            <Failed code={status.code} message={status.message} />
+          )}
           {status.kind === "synced" && <Synced />}
         </div>
       </ScrollableDialogContent>

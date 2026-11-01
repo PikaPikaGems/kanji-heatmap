@@ -5,6 +5,15 @@ import { relativeTime } from "@/lib/engine/relative-time";
 export const needsDataRefresh = (sync: SyncStatus | undefined) =>
   sync?.state === "failed" && sync.error.code === "catch_up_required";
 
+/**
+ * Changes are waiting but no sync round is running. Rounds take a moment and
+ * the app starts the next one a little after (or a minute after, when
+ * uploads keep failing), so this is what shows most of the time while
+ * changes wait; `lastSyncedAt` only says the last round finished.
+ */
+const waitingToUpload = (sync: SyncStatus) =>
+  sync.state === "idle" && sync.pendingOperationsCount > 0;
+
 /** Sync state as the chip and the operations modal word it. */
 export const syncLabel = (sync: SyncStatus | undefined, online: boolean) => {
   if (!online) return "Offline";
@@ -13,6 +22,7 @@ export const syncLabel = (sync: SyncStatus | undefined, online: boolean) => {
     // The app refreshes its data on its own for this one.
     return sync.error.code === "catch_up_required" ? "Syncing…" : "Sync failed";
   }
+  if (waitingToUpload(sync)) return "Waiting to sync";
   if (sync.lastSyncedAt === undefined) return "Not synced yet";
   return `Synced ${relativeTime(sync.lastSyncedAt)}`;
 };
@@ -24,6 +34,7 @@ export const syncDotClassName = (
   if (!online) return "bg-muted-foreground";
   if (!sync || sync.state === "syncing") return "bg-amber-500 animate-pulse";
   if (sync.state === "failed") return "bg-destructive";
+  if (waitingToUpload(sync)) return "bg-amber-500";
   if (sync.lastSyncedAt === undefined) return "bg-muted-foreground";
   return "bg-green-500";
 };

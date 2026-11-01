@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { syncDotClassName, syncLabel } from "./sync-display";
 
 /**
- * The status line under the account name: "● Synced just now (2)", with the
+ * The status line under the account name: "● Synced just now", or "● Waiting to sync (2)" with the
  * pending count in brackets. When something needs a look (failed changes,
  * or a notice such as premium lapsed) the dot turns red and the text bold
  * yellow. It opens the sync details modal (design 5.7), on Needs attention

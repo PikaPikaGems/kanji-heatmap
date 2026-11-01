@@ -65,42 +65,45 @@ const SyncOperationsBody = ({
       : [];
 
   return (
-    <div className="flex flex-col gap-4 px-2 pt-1 text-left">
-      <SyncHeader sync={sync} />
-      <Tabs
-        value={tab}
-        onValueChange={(next) =>
-          setTab(next === "attention" ? "attention" : "pending")
-        }
-      >
-        <SegmentedTabsList
+    <div className="flex flex-col flex-1 min-h-0 text-left">
+      {/* Only the list scrolls; the buttons below stay in view. */}
+      <div className="flex flex-col flex-1 min-h-0 gap-4 px-6 pt-1 pb-4 overflow-y-auto">
+        <SyncHeader sync={sync} />
+        <Tabs
           value={tab}
-          label="Unsynced changes"
-          className="w-full"
-          options={[
-            {
-              value: "pending",
-              label: <TabLabel text="Pending" count={pendingCount} />,
-            },
-            {
-              value: "attention",
-              label: (
-                <TabLabel text="Needs attention" count={failedCount} warn />
-              ),
-            },
-          ]}
-        />
-        {/* Radix mounts only the open tab, so each switch fades in. */}
-        <TabsContent value="pending" className="mt-4 animate-fade-in-fast">
-          <PendingTab total={pendingCount} />
-        </TabsContent>
-        <TabsContent value="attention" className="mt-4 animate-fade-in-fast">
-          <NeedsAttentionTab
-            result={failed.result}
-            onDismissed={failed.reload}
+          onValueChange={(next) =>
+            setTab(next === "attention" ? "attention" : "pending")
+          }
+        >
+          <SegmentedTabsList
+            value={tab}
+            label="Unsynced changes"
+            className="w-full"
+            options={[
+              {
+                value: "pending",
+                label: <TabLabel text="Pending" count={pendingCount} />,
+              },
+              {
+                value: "attention",
+                label: (
+                  <TabLabel text="Needs attention" count={failedCount} warn />
+                ),
+              },
+            ]}
           />
-        </TabsContent>
-      </Tabs>
+          {/* Radix mounts only the open tab, so each switch fades in. */}
+          <TabsContent value="pending" className="mt-4 animate-fade-in-fast">
+            <PendingTab total={pendingCount} />
+          </TabsContent>
+          <TabsContent value="attention" className="mt-4 animate-fade-in-fast">
+            <NeedsAttentionTab
+              result={failed.result}
+              onDismissed={failed.reload}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
       <SyncActions
         sync={sync}
         dismissable={dismissable}
@@ -132,6 +135,7 @@ export const SyncOperationsDialog = () => {
         title="Unsynced changes"
         description="Changes waiting to upload and operations that need attention"
         titleClassName="text-left"
+        scrollBody={false}
       >
         <SyncOperationsBody requestedTab={dialog.open ? dialog.tab : null} />
       </ScrollableDialogContent>

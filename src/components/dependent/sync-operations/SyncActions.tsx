@@ -9,7 +9,8 @@ import { syncNow, useSyncNowState } from "@/lib/engine/sync-now-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 
 /**
- * The dialog's buttons, at the bottom of the modal: "Dismiss all (keeps
+ * The dialog's buttons, pinned to the bottom of the modal (like Sort and
+ * Filter's Apply) so they show without scrolling the list: "Dismiss all (keeps
  * notes)" when the Needs attention tab has something to dismiss, and "Sync
  * now" (or "Refresh data") when it can help: online with changes waiting, or
  * a refresh needed. Sync now is the main action (primary), so it comes last.
@@ -46,7 +47,7 @@ export const SyncActions = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 pt-4 border-t border-dotted">
+    <div className="px-6 pt-3 pb-5 border-t shrink-0">
       <DialogActions>
         {dismissable.length > 0 && (
           <PracticeButton
