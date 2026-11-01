@@ -85,6 +85,10 @@ export const getWriteBlocker = (status: AccountStatus): WriteBlocker | null => {
   return status.kind;
 };
 
+/** Saving is paused until this device syncs (too many or too old changes). */
+export const isSyncBlocker = (blocker: WriteBlocker | null): boolean =>
+  blocker === "outbox_full" || blocker === "outbox_stale";
+
 /**
  * True when this build has no accounts at all (no study engine, or it failed
  * to start): the sidebar then drops the account area and shows its tools at

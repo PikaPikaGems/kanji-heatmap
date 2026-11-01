@@ -1,5 +1,9 @@
 import { WriteBlockedLearnMore } from "@/components/dependent/account/WriteBlockedDialog";
-import { ENTITLEMENT_EXPIRED_COPY } from "@/lib/engine/engine-copy";
+import { SyncNowAction } from "@/components/dependent/account/SyncNowAction";
+import {
+  ENTITLEMENT_EXPIRED_COPY,
+  isSyncBlockerCopy,
+} from "@/lib/engine/engine-copy";
 import type { CardType } from "engine-contract";
 import { UserNotice } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -72,6 +76,12 @@ export const MasteryStartScreen = ({
                 <>
                   {" "}
                   <WriteBlockedLearnMore />
+                </>
+              )}
+              {isSyncBlockerCopy(blocker) && (
+                <>
+                  {" "}
+                  <SyncNowAction />
                 </>
               )}
             </UserNotice>

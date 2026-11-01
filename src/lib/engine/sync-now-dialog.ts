@@ -4,12 +4,14 @@ import { copyForCode, SYNC_INCOMPLETE_COPY } from "./engine-copy";
 import { snapshotValue } from "./store-cache";
 
 /**
- * The app-wide "Sync now" dialog, opened from the week-old-changes banner and
- * the Unsynced changes dialog. Mounted once in App, not in the banner: the
- * banner goes away as soon as the sync succeeds, and the dialog has to stay to
- * say so.
+ * The app-wide "Sync now" dialog. The bottom banner's "Learn more" opens it on
+ * "info" (why this device needs to sync, with a Sync now button); "Sync now"
+ * elsewhere (Unsynced changes, saving-paused notices) opens it straight on
+ * "syncing". Mounted once in App, not in the banner: the banner goes away as
+ * soon as the sync succeeds, and the dialog has to stay to say so.
  */
 export type SyncNowStatus =
+  | { kind: "info" }
   | { kind: "syncing" }
   | { kind: "failed"; message: string }
   | { kind: "synced" };
@@ -87,6 +89,12 @@ export const syncNow = async (api: EngineAPI) => {
     next = { kind: "failed", message: copyForCode("") };
   }
   if (id === runId) setState({ open: true, status: next });
+};
+
+/** Opens it on "info": why to sync, and a Sync now button (`syncNow`). */
+export const openSyncNowDialog = () => {
+  runId++;
+  setState({ open: true, status: { kind: "info" } });
 };
 
 /** Closes it; a sync still running keeps going but no longer shows here. */
