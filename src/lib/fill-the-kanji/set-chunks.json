@@ -1,8 +1,8 @@
 {
   "everyday": {
-    "version": "60e6747c",
+    "version": "e4ea625b",
     "chunks": [
-      "183acf29",
+      "0496e2f1",
       "4d501825",
       "b44df9c3",
       "8cc95cb3",
@@ -22,7 +22,7 @@
     ]
   },
   "onomatopoeia": {
-    "version": "404ea67b",
+    "version": "8169f641",
     "chunks": [
       "93a38c1a",
       "a933f9fb",
@@ -32,7 +32,7 @@
       "306e8b49",
       "2b9badff",
       "bf290389",
-      "9e39c51a"
+      "35430c3b"
     ]
   },
   "short-phrases": {
@@ -49,19 +49,19 @@
     ]
   },
   "n5": {
-    "version": "52c429e1",
+    "version": "a7892050",
     "chunks": [
-      "a6919883",
+      "73ff14e9",
       "8286ccbd",
       "b4ef406e"
     ]
   },
   "n4": {
-    "version": "dc22c4c9",
+    "version": "7bf3d7aa",
     "chunks": [
       "0ad5585b",
       "1eef9737",
-      "57f609f7",
+      "7707a128",
       "cb4e727f",
       "2872985e",
       "275dd550"
@@ -81,11 +81,11 @@
     ]
   },
   "n2": {
-    "version": "10bf59ea",
+    "version": "bdfa6b05",
     "chunks": [
       "bd651ee9",
       "99586c86",
-      "c8283efe",
+      "88cb3767",
       "1e6ca129",
       "0b196b6d",
       "b6a7f73e",
@@ -117,12 +117,12 @@
     ]
   },
   "beginner-1": {
-    "version": "72eda471",
+    "version": "c4370186",
     "chunks": [
       "e56ccdf3",
       "819aa8f9",
       "7f30a3a9",
-      "2698eac7",
+      "9185c11d",
       "af670d52",
       "949b37ee",
       "d806dfc4",
@@ -184,12 +184,12 @@
     ]
   },
   "essential-verbs-counters": {
-    "version": "1f2ec481",
+    "version": "63df6a00",
     "chunks": [
-      "e3cffa3c",
-      "c8f2baef",
-      "f2b6f0d8",
-      "78800754"
+      "e4689d8a",
+      "9ec7298e",
+      "dcab6668",
+      "c3252454"
     ]
   },
   "verbs-1": {
