@@ -11,7 +11,13 @@ import { useDebugReport } from "@/hooks/use-debug-report";
 import { useNetworkState } from "@/hooks/use-network-state";
 import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
 import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
-import { accountLines, syncLines } from "@/lib/engine/sync-report-lines";
+import { useAccountEmail } from "@/lib/engine/account-email";
+import {
+  accountLines,
+  failedOperationLines,
+  syncLines,
+} from "@/lib/engine/sync-report-lines";
+import { useRecentFailedOperations } from "@/components/dependent/sync-operations/use-recent-failed-operations";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
@@ -136,8 +142,8 @@ const Syncing = () => (
 );
 
 /**
- * What went wrong, with account and sync state and the app & device info,
- * to copy and send us. Mounted only while the sync has failed.
+ * What went wrong, with the account (email, user id), sync state, failed
+ * operations and the app & device info, to copy and send us. Mounted only while the sync has failed.
  */
 const SyncFailureReport = ({
   code,
@@ -148,6 +154,8 @@ const SyncFailureReport = ({
 }) => {
   const { text: debugReport } = useDebugReport();
   const account = useAccountStatus();
+  const email = useAccountEmail();
+  const failed = useRecentFailedOperations().result;
   const sync = useSyncStatus();
   const failedOps = useFailedOpsCount()?.count;
 
@@ -158,9 +166,13 @@ const SyncFailureReport = ({
     `Error: ${code}`,
     `Message: ${message}`,
     "",
-    ...accountLines(account),
+    ...accountLines(account, email),
     "",
     ...syncLines(sync, failedOps),
+    "",
+    ...failedOperationLines(
+      failed.kind === "ready" ? failed.operations : undefined
+    ),
     "",
     debugReport,
   ].join("\n");

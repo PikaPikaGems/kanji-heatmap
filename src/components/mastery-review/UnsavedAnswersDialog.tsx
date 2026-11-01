@@ -9,6 +9,7 @@ import { useDebugReport } from "@/hooks/use-debug-report";
 import { formatMegabytes } from "@/lib/format-bytes";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
+import { useAccountEmail } from "@/lib/engine/account-email";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { accountLines, syncLines } from "@/lib/engine/sync-report-lines";
 import type { SaveFailure } from "./use-mastery-session";
@@ -97,6 +98,7 @@ const ReportBody = ({
   const { text: debugReport } = useDebugReport();
   const browserStorage = useBrowserStorageLines();
   const account = useAccountStatus();
+  const email = useAccountEmail();
   const sync = useSyncStatus();
   const failedOps = useFailedOpsCount()?.count;
 
@@ -111,7 +113,7 @@ const ReportBody = ({
         `${f.kanji} · ${f.rating} · ${f.code} · ${f.at.toISOString()} · ${copyForCode(f.code)}`
     ),
     "",
-    ...accountLines(account),
+    ...accountLines(account, email),
     "",
     ...syncLines(sync, failedOps),
     "",
