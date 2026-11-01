@@ -1,13 +1,17 @@
 import { useSyncExternalStore } from "react";
-import type { EngineAPI } from "engine-contract";
-import { copyForCode } from "./engine-copy";
+import type { EngineAPI, SyncStatus } from "engine-contract";
+import { copyForCode, SYNC_INCOMPLETE_COPY } from "./engine-copy";
+import { snapshotValue } from "./store-cache";
 
 /**
- * The app-wide "Sync now" dialog, opened from the week-old-changes banner.
- * Mounted once in App, not in the banner: the banner goes away as soon as the
- * sync succeeds, and the dialog has to stay to say so.
+ * The app-wide "Sync now" dialog. The bottom banner's "Learn more" opens it on
+ * "info" (why this device needs to sync, with a Sync now button); "Sync now"
+ * elsewhere (Unsynced changes, saving-paused notices) opens it straight on
+ * "syncing". Mounted once in App, not in the banner: the banner goes away as
+ * soon as the sync succeeds, and the dialog has to stay to say so.
  */
 export type SyncNowStatus =
+  | { kind: "info" }
   | { kind: "syncing" }
   | { kind: "failed"; message: string }
   | { kind: "synced" };
@@ -26,20 +30,71 @@ const setState = (next: SyncNowState) => {
   for (const listener of listeners) listener();
 };
 
-/** Opens the dialog (if closed) and runs `sync.catchUp()`; also "Try again". */
+/** The first loaded `sync.watchStatus()` value; undefined if it failed. */
+const readSyncStatus = (api: EngineAPI) =>
+  new Promise<SyncStatus | undefined>((resolve) => {
+    const store = api.sync.watchStatus();
+    let done = false;
+    let unsubscribe = () => {};
+    const check = () => {
+      const snapshot = store.getSnapshot();
+      if (done || snapshot.status === "loading") return;
+      done = true;
+      unsubscribe();
+      resolve(snapshotValue(snapshot));
+    };
+    // The store is lazy: it starts reading on the first subscribe.
+    unsubscribe = store.subscribe(check);
+    if (done) unsubscribe();
+    check();
+  });
+
+/** Enough rounds for a full outbox, one upload batch each. */
+const MAX_SYNC_ROUNDS = 50;
+
+/**
+ * Uploads every waiting change. `catchUp()` being ok only means the cache is
+ * current: it uploads one batch per call, and nothing while uploads are
+ * blocked. So repeat it while the outbox shrinks, and only call it synced
+ * when the outbox is empty.
+ */
+const syncAllChanges = async (api: EngineAPI): Promise<SyncNowStatus> => {
+  let lastPending = Infinity;
+  for (let round = 0; round < MAX_SYNC_ROUNDS; round++) {
+    const result = await api.sync.catchUp();
+    if (!result.ok) {
+      return { kind: "failed", message: copyForCode(result.error.code) };
+    }
+    const status = await readSyncStatus(api);
+    // Never claim "synced" without seeing an empty outbox.
+    if (!status) return { kind: "failed", message: copyForCode("") };
+    const pending = status.pendingOperationsCount;
+    if (pending === 0) return { kind: "synced" };
+    if (status.pushBlocked || pending >= lastPending) {
+      return { kind: "failed", message: SYNC_INCOMPLETE_COPY };
+    }
+    lastPending = pending;
+  }
+  return { kind: "failed", message: SYNC_INCOMPLETE_COPY };
+};
+
+/** Opens the dialog (if closed) and uploads every change; also "Try again". */
 export const syncNow = async (api: EngineAPI) => {
   const id = ++runId;
   setState({ open: true, status: { kind: "syncing" } });
   let next: SyncNowStatus;
   try {
-    const result = await api.sync.catchUp();
-    next = result.ok
-      ? { kind: "synced" }
-      : { kind: "failed", message: copyForCode(result.error.code) };
+    next = await syncAllChanges(api);
   } catch {
     next = { kind: "failed", message: copyForCode("") };
   }
   if (id === runId) setState({ open: true, status: next });
+};
+
+/** Opens it on "info": why to sync, and a Sync now button (`syncNow`). */
+export const openSyncNowDialog = () => {
+  runId++;
+  setState({ open: true, status: { kind: "info" } });
 };
 
 /** Closes it; a sync still running keeps going but no longer shows here. */

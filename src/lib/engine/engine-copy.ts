@@ -8,9 +8,9 @@ const CODE_COPY: Record<string, string> = {
   stale_session: "Go online to continue.",
   entitlement_expired: "Your account can't save changes right now.",
   outbox_full:
-    "Saving is paused until this device syncs. Go online to continue.",
+    "Saving is paused: too many changes are waiting to upload. Go online and sync to continue.",
   outbox_stale:
-    "Saving is paused until this device syncs. Go online to continue.",
+    "Saving is paused: some changes haven't uploaded for too long. Go online and sync to continue.",
   cache_rebuilding: "Downloading your data…",
   storage_quota: "Your device is out of storage.",
   authentication_failed: "That code is wrong or expired.",
@@ -67,6 +67,10 @@ export const PUSH_BLOCKED_COPY = {
   after: " and remove the cached study data on this device to fix it.",
 };
 
+/** "Sync now" reached the server, but changes are still waiting to upload. */
+export const SYNC_INCOMPLETE_COPY =
+  "Some changes couldn't upload. See Unsynced changes for details.";
+
 export const OLD_PENDING_COPY =
   "Some changes have been waiting to upload for over a week. Go online and sync soon, or saving will be paused.";
 
@@ -83,16 +87,14 @@ export const ENTITLEMENT_EXPIRED_COPY = CODE_COPY.entitlement_expired;
 export const copyForWriteBlocker = (blocker: WriteBlocker): string =>
   BLOCKER_COPY[blocker];
 
-/** The week-old-changes warning; `action` is an inline button in the sentence. */
-export const OLD_PENDING_WARNING_COPY = {
-  before: "Some changes haven't synced in a week. Go online and ",
-  action: "sync now",
-  after: ", or saving will pause.",
-} as const;
+/** The bottom banner, short enough for one line on phones ("Learn more" follows). */
+export const SYNC_SOON_BANNER_COPY = "Please sync soon.";
+export const SAVING_PAUSED_BANNER_COPY = "Saving is paused.";
 
-/** The same warning, short enough for one line on phones. */
-export const OLD_PENDING_WARNING_SHORT_COPY = {
-  before: "Week-old changes haven't synced. ",
-  action: "Sync now",
-  after: "",
-} as const;
+/** A game's start screen while saving is paused ("Sync now" follows). */
+export const GAME_NOT_SAVED_UNTIL_SYNC_COPY =
+  "Saving is paused, so your progress won't be saved until this device syncs.";
+
+/** Whether `copy` is one of the saving-paused (outbox) messages. */
+export const isSyncBlockerCopy = (copy: string | null): boolean =>
+  copy === CODE_COPY.outbox_full || copy === CODE_COPY.outbox_stale;

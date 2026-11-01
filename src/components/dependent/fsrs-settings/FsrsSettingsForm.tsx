@@ -5,10 +5,13 @@ import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { LoginNotice } from "@/components/dependent/account/LoginNotice";
-import { WriteBlockedLearnMore } from "@/components/dependent/account/WriteBlockedDialog";
+import {
+  WriteBlockedLearnMore,
+  WriteBlockerCopy,
+} from "@/components/dependent/account/WriteBlockedDialog";
 import { Accordion } from "@/components/ui/accordion";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { copyForCode, copyForWriteBlocker } from "@/lib/engine/engine-copy";
+import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeFsrsSettings } from "@/lib/engine/fsrs-settings-dialog";
 import {
   LEARNING_PRESETS,
@@ -74,7 +77,11 @@ const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
       </UserNotice>
     );
   }
-  return <UserNotice>{copyForWriteBlocker(blocker.reason)}</UserNotice>;
+  return (
+    <UserNotice>
+      <WriteBlockerCopy blocker={blocker.reason} />
+    </UserNotice>
+  );
 };
 
 /** Steps to bring back when "Enable short term" is switched on again. */

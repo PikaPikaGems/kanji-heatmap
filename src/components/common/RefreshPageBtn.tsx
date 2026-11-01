@@ -15,7 +15,14 @@ export const RefreshPageBtn = ({ cnOverride }: { cnOverride?: string }) => {
   const offlineHint = useFlashHint();
 
   return (
-    <span className="relative inline-flex">
+    // Keep the tap away from a drawer's drag handling: vaul captures the
+    // pointer on pointerdown, and on iOS that can swallow the click. This
+    // button sits in the sidebar and the kanji drawer.
+    <span
+      className="relative inline-flex"
+      data-vaul-no-drag
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <Button
         variant="outline"
         size="iconXl"

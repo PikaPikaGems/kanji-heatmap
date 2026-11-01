@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { CheckCircle2, CloudUpload, Loader2 } from "lucide-react";
 import { DialogActions } from "@/components/common/DialogActions";
+import { UserNotice } from "@/components/common/UserNotice";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
+import { useNetworkState } from "@/hooks/use-network-state";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
   closeSyncNowDialog,
@@ -12,8 +14,9 @@ import {
   type SyncNowStatus,
 } from "@/lib/engine/sync-now-dialog";
 import { cnWarningText } from "@/lib/generic-cn";
+import { type SyncAttention, useSyncAttention } from "./old-pending";
 
-const TITLES: Record<SyncNowStatus["kind"], string> = {
+const TITLES: Record<Exclude<SyncNowStatus["kind"], "info">, string> = {
   syncing: "Syncing your changes…",
   failed: "Couldn't sync",
   synced: "All synced",
@@ -32,6 +35,74 @@ const StatusBody = ({
     {children}
   </div>
 );
+
+/** The "info" step's title and why, by how urgently this device needs to sync. */
+const INFO: Record<SyncAttention, { title: string; why: string }> = {
+  soon: {
+    title: "Please sync soon",
+    why: "Some changes on this device haven't uploaded to your account in over a week. If they wait too long, saving pauses until this device syncs.",
+  },
+  "paused-stale": {
+    title: "Saving is paused",
+    why: "Some changes on this device haven't uploaded to your account for too long, so saving is paused until this device syncs.",
+  },
+  "paused-full": {
+    title: "Saving is paused",
+    why: "Too many changes on this device are waiting to upload, so saving is paused until this device syncs.",
+  },
+  // Synced in the background while the dialog was open.
+  none: {
+    title: "Sync your changes",
+    why: "Nothing is waiting to upload right now.",
+  },
+};
+
+/**
+ * Opened from the bottom banner's "Learn more": why this device needs to
+ * sync, what's paused, and Sync now (which moves on to "syncing").
+ */
+const Info = ({ attention }: { attention: SyncAttention }) => {
+  const api = useEngineApi();
+  const { online } = useNetworkState();
+  const paused = attention === "paused-stale" || attention === "paused-full";
+
+  return (
+    <>
+      <div className="flex flex-col gap-3 text-sm text-left text-pretty animate-fade-in-fast">
+        <p>{INFO[attention].why}</p>
+        {paused && (
+          <ul className="flex flex-col gap-2 pl-5 list-disc">
+            <li>
+              Until then, you can&apos;t bookmark, edit notes, add to your
+              review pile or review cards.
+            </li>
+            <li>
+              You can keep practicing, but those rounds aren&apos;t recorded.
+            </li>
+          </ul>
+        )}
+        <p>Everything you saved is still on this device.</p>
+        {!online && (
+          <UserNotice>You&apos;re offline. Go online, then sync.</UserNotice>
+        )}
+      </div>
+      <DialogActions>
+        <PracticeButton variant="ghost" onClick={closeSyncNowDialog}>
+          Later
+        </PracticeButton>
+        <PracticeButton
+          variant="primary"
+          disabled={!api || !online}
+          onClick={() => {
+            if (api) void syncNow(api);
+          }}
+        >
+          Sync now
+        </PracticeButton>
+      </DialogActions>
+    </>
+  );
+};
 
 /** While `sync.catchUp()` runs: a spinner, and a way to stop waiting. */
 const Syncing = () => (
@@ -104,11 +175,15 @@ const Synced = () => (
 );
 
 /**
- * "Sync now" from the week-old-changes banner: syncs while open, then says
- * whether it worked. Mounted once in App (see `sync-now-dialog.ts`).
+ * The Sync now dialog: "info" from the bottom banner's "Learn more", then
+ * syncing and whether it worked ("Sync now" elsewhere starts at syncing).
+ * Mounted once in App (see `sync-now-dialog.ts`).
  */
 export const SyncNowDialog = () => {
   const { open, status } = useSyncNowState();
+  const attention = useSyncAttention();
+  const title =
+    status.kind === "info" ? INFO[attention].title : TITLES[status.kind];
 
   return (
     <Dialog
@@ -119,11 +194,12 @@ export const SyncNowDialog = () => {
     >
       <ScrollableDialogContent
         size="md"
-        title={TITLES[status.kind]}
-        description="Uploading changes that haven't synced in a week"
+        title={title}
+        description="Uploading the changes saved on this device"
         titleClassName="text-left"
       >
         <div key={status.kind} className="flex flex-col gap-4 pb-2">
+          {status.kind === "info" && <Info attention={attention} />}
           {status.kind === "syncing" && <Syncing />}
           {status.kind === "failed" && <Failed message={status.message} />}
           {status.kind === "synced" && <Synced />}

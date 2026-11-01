@@ -6,13 +6,17 @@ import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { copyForWriteBlocker } from "@/lib/engine/engine-copy";
-import type { WriteBlocker } from "@/lib/engine/use-account-status";
+import {
+  isSyncBlocker,
+  type WriteBlocker,
+} from "@/lib/engine/use-account-status";
 import {
   closeWriteBlockedDialog,
   openWriteBlockedDialog,
   useWriteBlockedDialogOpen,
 } from "@/lib/engine/write-blocked-dialog";
 import { CONTACT_ITEMS } from "./contact-items";
+import { SyncNowAction } from "./SyncNowAction";
 
 /**
  * The underlined "Learn more" after the premium-lapsed copy. A plain button
@@ -92,7 +96,10 @@ export const WriteBlockedDialog = () => {
   );
 };
 
-/** A write blocker's copy, with "Learn more" when the premium lapsed. */
+/**
+ * A write blocker's copy, with "Learn more" when the premium lapsed and
+ * "Sync now" when saving is paused until this device syncs.
+ */
 export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
   <>
     {copyForWriteBlocker(blocker)}
@@ -102,14 +109,20 @@ export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
         <WriteBlockedLearnMore />
       </>
     )}
+    {isSyncBlocker(blocker) && (
+      <>
+        {" "}
+        <SyncNowAction />
+      </>
+    )}
   </>
 );
 
 /**
  * A write action the account can't do right now (premium lapsed, saving
  * paused, out of storage): the button stays tappable and opens a popover
- * with the reason (and "Learn more" when premium lapsed) instead of a line
- * of text under it.
+ * with the reason (and "Learn more" or "Sync now") instead of a line of
+ * text under it.
  */
 export const WriteBlockedPopover = ({
   blocker,
@@ -127,7 +140,7 @@ export const WriteBlockedPopover = ({
       onOpenChange={setOpen}
       trigger={trigger}
       content={
-        // "Learn more" opens the dialog: close the popover behind it.
+        // "Learn more" / "Sync now" open a dialog: close the popover behind it.
         <div onClickCapture={() => setOpen(false)}>
           <UserNotice className="px-4 py-3 text-sm max-w-64">
             <WriteBlockerCopy blocker={blocker} />

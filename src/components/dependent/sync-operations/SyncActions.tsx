@@ -2,14 +2,11 @@ import { useState } from "react";
 import type { RecentFailedOperation, SyncStatus } from "engine-contract";
 import { Loader2 } from "lucide-react";
 import { DialogActions } from "@/components/common/DialogActions";
-import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { needsDataRefresh } from "@/components/dependent/account/sync-display";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useNetworkState } from "@/hooks/use-network-state";
-import { copyForCode } from "@/lib/engine/engine-copy";
+import { syncNow, useSyncNowState } from "@/lib/engine/sync-now-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
-import { cnWarningText } from "@/lib/generic-cn";
-import { cn } from "@/lib/utils";
 
 /**
  * The dialog's buttons, at the bottom of the modal: "Dismiss all (keeps
@@ -29,25 +26,14 @@ export const SyncActions = ({
 }) => {
   const api = useEngineApi();
   const { online } = useNetworkState();
-  const [syncStatus, setSyncStatus] = useState<ActionStatus>({ kind: "idle" });
+  const syncNowState = useSyncNowState();
   const [dismissing, setDismissing] = useState(false);
-  const syncing = syncStatus.kind === "busy";
+  const syncing = syncNowState.open && syncNowState.status.kind === "syncing";
   const needsRefresh = needsDataRefresh(sync);
   const showSync =
     needsRefresh || (online && (sync?.pendingOperationsCount ?? 0) > 0);
 
   if (!showSync && dismissable.length === 0) return null;
-
-  const syncNow = async () => {
-    if (!api || syncing) return;
-    setSyncStatus({ kind: "busy" });
-    const result = await api.sync.catchUp();
-    setSyncStatus(
-      result.ok
-        ? { kind: "idle" }
-        : { kind: "error", message: copyForCode(result.error.code) }
-    );
-  };
 
   const dismissAll = async () => {
     if (!api || dismissing) return;
@@ -81,18 +67,16 @@ export const SyncActions = ({
             // Not disabled while busy: a disabled button fades out.
             disabled={!api}
             aria-busy={syncing}
-            onClick={() => void syncNow()}
+            // The Sync now dialog opens over this one and says how it went.
+            onClick={() => {
+              if (api && !syncing) void syncNow(api);
+            }}
           >
             {syncing && <Loader2 aria-hidden className="size-4 animate-spin" />}
             {needsRefresh ? "Refresh data" : "Sync now"}
           </PracticeButton>
         )}
       </DialogActions>
-      {syncStatus.kind === "error" && (
-        <p role="alert" className={cn("text-sm sm:text-right", cnWarningText)}>
-          ⚠️ {syncStatus.message}
-        </p>
-      )}
     </div>
   );
 };

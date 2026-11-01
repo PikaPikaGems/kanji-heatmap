@@ -10,12 +10,12 @@ import {
 } from "./mastery-metrics";
 
 /**
- * The /mastery heatmap's picker (design 5.9): which card kind and which
- * measure a tile is colored by. The band math itself is in `mastery-metrics`.
+ * The /mastery heatmap's pickers (design 5.9): which measure and which card
+ * kind a tile is colored by. The band math itself is in `mastery-metrics`.
  */
 
 /**
- * In the order the picker lists them. Reading I keeps its old "reading-" ids
+ * Every card kind and measure pair. Reading I keeps its old "reading-" ids
  * so saved picks still work.
  */
 export const HEATMAP_METRICS = [
@@ -42,103 +42,93 @@ export const isHeatmapMetric = (value: unknown): value is HeatmapMetric =>
 
 type MetricInfo = {
   label: string;
-  /** What the metric means, under its label in the picker. */
-  description: string;
   card: MasteryCardKind;
   measure: MasteryMetric;
 };
 
-/** Mastery, stability and difficulty of one card kind, e.g. "the reading of each main word". */
-const cardMetrics = (
-  card: MasteryCardKind,
-  title: string,
-  what: { mastery: string; stability: string; difficulty: string }
-): MetricInfo[] => [
+type PickerOption<T> = { value: T; label: string; description: string };
+
+/** The first picker: what a tile's color measures, in the order listed. */
+export const HEATMAP_MEASURE_OPTIONS: readonly PickerOption<MasteryMetric>[] = [
   {
-    label: `${title} mastery`,
-    description: `How far along ${what.mastery} is, from Fresh to Mastered.`,
-    card,
-    measure: "mastery",
+    value: "stability",
+    label: "Stability",
+    description: "How long you're likely to remember it.",
   },
   {
-    label: `${title} stability`,
-    description: `How long you're likely to remember ${what.stability}.`,
-    card,
-    measure: "stability",
+    value: "difficulty",
+    label: "Difficulty",
+    description: "How hard it has been for you, from 1 to 10.",
   },
   {
-    label: `${title} difficulty`,
-    description: `How hard ${what.difficulty} has been for you, from 1 to 10.`,
-    card,
-    measure: "difficulty",
+    value: "mastery",
+    label: "Mastery",
+    description: "How far along it is, from Fresh to Mastered.",
   },
 ];
 
-const [writingMastery, writingStability, writingDifficulty] = cardMetrics(
-  "writing",
-  "Writing",
+/** The second picker: which of a kanji's cards the measure is read from. */
+export const HEATMAP_CARD_OPTIONS: readonly PickerOption<MasteryCardKind>[] = [
   {
-    mastery: "writing each kanji",
-    stability: "how to write each kanji",
-    difficulty: "writing each kanji",
-  }
-);
-const [readingMastery, readingStability, readingDifficulty] = cardMetrics(
-  "reading",
-  "Reading I",
+    value: "writing",
+    label: "Writing",
+    description: "Writing each kanji.",
+  },
   {
-    mastery: "the reading of each main word",
-    stability: "the reading of each main word",
-    difficulty: "the reading of each main word",
-  }
-);
-const [secondaryMastery, secondaryStability, secondaryDifficulty] = cardMetrics(
-  "secondaryReading",
-  "Reading II",
+    value: "reading",
+    label: "Reading I",
+    description: "The reading of each main word.",
+  },
   {
-    mastery: "the reading of each second word",
-    stability: "the reading of each second word",
-    difficulty: "the reading of each second word",
-  }
-);
+    value: "secondaryReading",
+    label: "Reading II",
+    description: "The reading of each second word.",
+  },
+  {
+    value: "combined",
+    label: "Combined",
+    description: "All of a kanji's cards together, at their weakest.",
+  },
+];
+
+const cardTitle = (card: MasteryCardKind): string =>
+  HEATMAP_CARD_OPTIONS.find((option) => option.value === card)?.label ?? card;
+
+const metricInfo = (
+  card: MasteryCardKind,
+  measure: MasteryMetric
+): MetricInfo => ({ label: `${cardTitle(card)} ${measure}`, card, measure });
 
 const METRIC_INFO: Record<HeatmapMetric, MetricInfo> = {
-  "writing-mastery": writingMastery,
-  "writing-stability": writingStability,
-  "writing-difficulty": writingDifficulty,
-  "reading-mastery": readingMastery,
-  "reading-stability": readingStability,
-  "reading-difficulty": readingDifficulty,
-  "secondary-reading-mastery": secondaryMastery,
-  "secondary-reading-stability": secondaryStability,
-  "secondary-reading-difficulty": secondaryDifficulty,
-  "combined-mastery": {
-    label: "Combined mastery",
-    description: "All of a kanji's cards together: the lowest level.",
-    card: "combined",
-    measure: "mastery",
-  },
-  "combined-stability": {
-    label: "Combined stability",
-    description: "All of a kanji's cards together: the shortest-lasting.",
-    card: "combined",
-    measure: "stability",
-  },
-  "combined-difficulty": {
-    label: "Combined difficulty",
-    description: "All of a kanji's cards together: the hardest.",
-    card: "combined",
-    measure: "difficulty",
-  },
+  "writing-mastery": metricInfo("writing", "mastery"),
+  "writing-stability": metricInfo("writing", "stability"),
+  "writing-difficulty": metricInfo("writing", "difficulty"),
+  "reading-mastery": metricInfo("reading", "mastery"),
+  "reading-stability": metricInfo("reading", "stability"),
+  "reading-difficulty": metricInfo("reading", "difficulty"),
+  "secondary-reading-mastery": metricInfo("secondaryReading", "mastery"),
+  "secondary-reading-stability": metricInfo("secondaryReading", "stability"),
+  "secondary-reading-difficulty": metricInfo("secondaryReading", "difficulty"),
+  "combined-mastery": metricInfo("combined", "mastery"),
+  "combined-stability": metricInfo("combined", "stability"),
+  "combined-difficulty": metricInfo("combined", "difficulty"),
 };
+
+/** The metric for a card kind and measure picked in the two pickers. */
+export const toHeatmapMetric = (
+  card: MasteryCardKind,
+  measure: MasteryMetric
+): HeatmapMetric =>
+  HEATMAP_METRICS.find(
+    (metric) =>
+      METRIC_INFO[metric].card === card &&
+      METRIC_INFO[metric].measure === measure
+  ) ?? DEFAULT_HEATMAP_METRIC;
 
 export const NEW_LABEL = "New";
 
 export const getHeatmapMetricLabel = (metric: HeatmapMetric): string =>
   METRIC_INFO[metric].label;
-
-export const getHeatmapMetricDescription = (metric: HeatmapMetric): string =>
-  METRIC_INFO[metric].description;
 
 export const getHeatmapMeasure = (metric: HeatmapMetric): MasteryMetric =>
   METRIC_INFO[metric].measure;
