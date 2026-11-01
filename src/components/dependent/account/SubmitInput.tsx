@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 /**
  * One text input with a submit arrow inside its right edge, plus the error
  * under it. The login steps each ask for a single value this way.
+ * `children` render inside the form, for extra fields such as a honeypot.
  */
 export const SubmitInput = ({
   label,
@@ -17,6 +18,7 @@ export const SubmitInput = ({
   onValueChange,
   status,
   onSubmit,
+  children,
   ...inputProps
 }: {
   label: string;
@@ -25,9 +27,10 @@ export const SubmitInput = ({
   onValueChange: (value: string) => void;
   status: ActionStatus;
   onSubmit: () => void;
+  children?: ReactNode;
 } & Omit<
   ComponentProps<typeof Input>,
-  "value" | "onChange" | "onSubmit" | "readOnly"
+  "value" | "onChange" | "onSubmit" | "readOnly" | "children"
 >) => {
   const busy = status.kind === "busy";
 
@@ -66,6 +69,7 @@ export const SubmitInput = ({
           )}
         </Button>
       </div>
+      {children}
       {status.kind === "error" && (
         <p role="alert" className={cn("px-1 text-sm", cnWarningText)}>
           {status.message}
