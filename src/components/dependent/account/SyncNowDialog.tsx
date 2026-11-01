@@ -104,8 +104,8 @@ const Synced = () => (
 );
 
 /**
- * "Sync now" from the week-old-changes banner: syncs while open, then says
- * whether it worked. Mounted once in App (see `sync-now-dialog.ts`).
+ * "Sync now" from the week-old-changes banner and the Unsynced changes
+ * dialog: syncs while open, then says whether it worked. Mounted once in App (see `sync-now-dialog.ts`).
  */
 export const SyncNowDialog = () => {
   const { open, status } = useSyncNowState();
@@ -120,7 +120,7 @@ export const SyncNowDialog = () => {
       <ScrollableDialogContent
         size="md"
         title={TITLES[status.kind]}
-        description="Uploading changes that haven't synced in a week"
+        description="Uploading the changes saved on this device"
         titleClassName="text-left"
       >
         <div key={status.kind} className="flex flex-col gap-4 pb-2">

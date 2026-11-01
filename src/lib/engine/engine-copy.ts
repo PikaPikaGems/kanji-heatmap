@@ -67,6 +67,10 @@ export const PUSH_BLOCKED_COPY = {
   after: " and remove the cached study data on this device to fix it.",
 };
 
+/** "Sync now" reached the server, but changes are still waiting to upload. */
+export const SYNC_INCOMPLETE_COPY =
+  "Some changes couldn't upload. See Unsynced changes for details.";
+
 export const OLD_PENDING_COPY =
   "Some changes have been waiting to upload for over a week. Go online and sync soon, or saving will be paused.";
 
