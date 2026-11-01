@@ -46,10 +46,10 @@ const PendingRow = ({ op }: { op: SyncOperation }) => {
  * The engine lists the outbox in upload order (oldest first), so page 1 is
  * read from the end and reversed.
  *
- * Workaround: remove the end-offset math and the reverse once
- * `sync.watchOutbox()` can list newest first itself
- * (PikaPikaGems/experimental-engine-docs#120). Until then `total` comes from
- * a separate status read, so a page can be off by a row for a moment.
+ * Workaround: remove the end-offset math and the reverse once the engine
+ * contract lets `sync.watchOutbox()` list newest first itself. Until then
+ * `total` comes from a separate status read, so a page can be off by a row
+ * for a moment.
  */
 const PendingPage = ({ page, total }: { page: number; total: number }) => {
   const end = Math.max(0, total - (page - 1) * PAGE_SIZE);
