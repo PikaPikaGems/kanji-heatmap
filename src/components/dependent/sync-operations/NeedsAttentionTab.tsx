@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { RecentFailedOperation } from "engine-contract";
 import { ClipboardCopy } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
-import { Pagination } from "@/components/sections/KanjiDetails/Pagination";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { FailedOperationRow } from "./FailedOperationRow";
 import { EmptyOperations, OperationList } from "./OperationList";
+import { PagedOperations } from "./PagedOperations";
 import type { RecentFailedOperations } from "./use-recent-failed-operations";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
@@ -109,26 +109,20 @@ const FailedOperationPages = ({
   const shown = Math.min(page, totalPages);
   const start = (shown - 1) * PAGE_SIZE;
   return (
-    <div className="flex flex-col">
-      <div key={shown} className="animate-fade-in-fast">
-        <OperationList>
-          {operations.slice(start, start + PAGE_SIZE).map((op) => (
-            <FailedOperationRow
-              key={op.operationId}
-              op={op}
-              onDismissed={onDismissed}
-            />
-          ))}
-        </OperationList>
-      </div>
-      {totalPages > 1 && (
-        <Pagination
-          page={shown}
-          totalPages={totalPages}
-          onPrev={() => setPage(shown - 1)}
-          onNext={() => setPage(shown + 1)}
-        />
-      )}
-    </div>
+    <PagedOperations
+      page={shown}
+      totalPages={totalPages}
+      onPageChange={setPage}
+    >
+      <OperationList>
+        {operations.slice(start, start + PAGE_SIZE).map((op) => (
+          <FailedOperationRow
+            key={op.operationId}
+            op={op}
+            onDismissed={onDismissed}
+          />
+        ))}
+      </OperationList>
+    </PagedOperations>
   );
 };

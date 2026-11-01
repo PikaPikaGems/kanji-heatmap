@@ -1,4 +1,4 @@
-import type { CardType, SyncStatus } from "engine-contract";
+import type { CardType } from "engine-contract";
 import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -9,46 +9,10 @@ import { useDebugReport } from "@/hooks/use-debug-report";
 import { formatMegabytes } from "@/lib/format-bytes";
 import { copyForCode } from "@/lib/engine/engine-copy";
 import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
-import {
-  type AccountStatus,
-  useAccountStatus,
-} from "@/lib/engine/use-account-status";
+import { useAccountEmail } from "@/lib/engine/account-email";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { accountLines, syncLines } from "@/lib/engine/sync-report-lines";
 import type { SaveFailure } from "./use-mastery-session";
-
-const accountLines = (account: AccountStatus): string[] => {
-  if (account.kind !== "active") return [`Account: ${account.kind}`];
-  const write = account.writeAccess.allowed
-    ? "allowed"
-    : `blocked (${account.writeAccess.reason})`;
-  return [
-    "Account: active",
-    `Write access: ${write}`,
-    `Review settings: ${account.reviewSettings.status}`,
-    `Session expires: ${new Date(account.expiresAt).toISOString()}`,
-  ];
-};
-
-const syncLines = (
-  sync: SyncStatus | undefined,
-  failedOps: number | undefined
-): string[] => {
-  if (!sync) return ["Sync: not loaded"];
-  const lines = [
-    `Sync: ${sync.state}${sync.state === "failed" ? ` (${sync.error.code})` : ""}`,
-    `Pending changes: ${sync.pendingOperationsCount}`,
-    `Failed changes: ${failedOps ?? "not loaded"}`,
-    `Upload blocked: ${sync.pushBlocked ? "yes" : "no"}`,
-    `Server revision: ${sync.serverRevision}`,
-    `Last synced: ${
-      sync.lastSyncedAt ? new Date(sync.lastSyncedAt).toISOString() : "never"
-    }`,
-  ];
-  if (sync.oldestPendingOperationAgeMs != null) {
-    const hours = sync.oldestPendingOperationAgeMs / 3_600_000;
-    lines.push(`Oldest pending change: ${hours.toFixed(1)} h old`);
-  }
-  return lines;
-};
 
 type NavigatorExtras = Navigator & { deviceMemory?: number };
 type EstimateWithDetails = StorageEstimate & {
@@ -134,6 +98,7 @@ const ReportBody = ({
   const { text: debugReport } = useDebugReport();
   const browserStorage = useBrowserStorageLines();
   const account = useAccountStatus();
+  const email = useAccountEmail();
   const sync = useSyncStatus();
   const failedOps = useFailedOpsCount()?.count;
 
@@ -148,7 +113,7 @@ const ReportBody = ({
         `${f.kanji} · ${f.rating} · ${f.code} · ${f.at.toISOString()} · ${copyForCode(f.code)}`
     ),
     "",
-    ...accountLines(account),
+    ...accountLines(account, email),
     "",
     ...syncLines(sync, failedOps),
     "",

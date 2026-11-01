@@ -1,18 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
+import { cn } from "@/lib/utils";
 
 export const Pagination = ({
   page,
   totalPages,
   onPrev,
   onNext,
+  className,
 }: {
   page: number;
   totalPages: number;
   onPrev: () => void;
   onNext: () => void;
+  className?: string;
 }) => (
-  <div className="flex items-center justify-center gap-3 mt-3 text-sm text-muted-foreground">
+  <div
+    className={cn(
+      "flex items-center justify-center gap-3 mt-3 text-sm text-muted-foreground",
+      className
+    )}
+  >
     <Button
       size="icon"
       variant="outline"

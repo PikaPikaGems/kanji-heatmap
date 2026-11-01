@@ -13,7 +13,8 @@ import { snapshotValue } from "./store-cache";
 export type SyncNowStatus =
   | { kind: "info" }
   | { kind: "syncing" }
-  | { kind: "failed"; message: string }
+  /** `code` goes in the copyable report; `message` is what the dialog says. */
+  | { kind: "failed"; code: string; message: string }
   | { kind: "synced" };
 
 /** `status` stays when it closes, so the dialog can animate out with it. */
@@ -49,6 +50,12 @@ const readSyncStatus = (api: EngineAPI) =>
     check();
   });
 
+const failed = (code: string, message = copyForCode(code)): SyncNowStatus => ({
+  kind: "failed",
+  code,
+  message,
+});
+
 /** Enough rounds for a full outbox, one upload batch each. */
 const MAX_SYNC_ROUNDS = 50;
 
@@ -63,19 +70,20 @@ const syncAllChanges = async (api: EngineAPI): Promise<SyncNowStatus> => {
   for (let round = 0; round < MAX_SYNC_ROUNDS; round++) {
     const result = await api.sync.catchUp();
     if (!result.ok) {
-      return { kind: "failed", message: copyForCode(result.error.code) };
+      return failed(result.error.code);
     }
     const status = await readSyncStatus(api);
     // Never claim "synced" without seeing an empty outbox.
-    if (!status) return { kind: "failed", message: copyForCode("") };
+    if (!status) return failed("sync_status_unreadable", copyForCode(""));
     const pending = status.pendingOperationsCount;
     if (pending === 0) return { kind: "synced" };
-    if (status.pushBlocked || pending >= lastPending) {
-      return { kind: "failed", message: SYNC_INCOMPLETE_COPY };
+    if (status.pushBlocked) return failed("push_blocked", SYNC_INCOMPLETE_COPY);
+    if (pending >= lastPending) {
+      return failed("outbox_not_shrinking", SYNC_INCOMPLETE_COPY);
     }
     lastPending = pending;
   }
-  return { kind: "failed", message: SYNC_INCOMPLETE_COPY };
+  return failed("max_rounds_reached", SYNC_INCOMPLETE_COPY);
 };
 
 /** Opens the dialog (if closed) and uploads every change; also "Try again". */
@@ -85,8 +93,11 @@ export const syncNow = async (api: EngineAPI) => {
   let next: SyncNowStatus;
   try {
     next = await syncAllChanges(api);
-  } catch {
-    next = { kind: "failed", message: copyForCode("") };
+  } catch (error) {
+    next = failed(
+      `exception: ${error instanceof Error ? error.message : String(error)}`,
+      copyForCode("")
+    );
   }
   if (id === runId) setState({ open: true, status: next });
 };
