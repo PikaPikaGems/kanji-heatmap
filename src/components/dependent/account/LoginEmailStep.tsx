@@ -79,8 +79,8 @@ export const LoginEmailStep = ({
           <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,{" "}
           <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />{" "}
           or{" "}
-          <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />{" "}
-          and we&apos;ll give you an early bird discount code on launch. 🚀
+          <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />
+          .
         </p>
         <div className="flex flex-wrap items-center justify-center gap-1.5">
           {CONTACT_ITEMS.map((item) => (
