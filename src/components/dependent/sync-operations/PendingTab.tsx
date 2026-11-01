@@ -41,11 +41,18 @@ const PendingRow = ({ op }: { op: SyncOperation }) => {
   );
 };
 
-/** One page of the outbox; each page is its own cached store. */
-const PendingPage = ({ offset }: { offset: number }) => {
+/**
+ * One page of the outbox, newest first; each page is its own cached store.
+ * The engine lists the outbox in upload order (oldest first), so page 1 is
+ * read from the end and reversed.
+ */
+const PendingPage = ({ page, total }: { page: number; total: number }) => {
+  const end = Math.max(0, total - (page - 1) * PAGE_SIZE);
+  const offset = Math.max(0, end - PAGE_SIZE);
+  const limit = end - offset;
   const snapshot = useEngineQuery(
-    `sync.watchOutbox:${PAGE_SIZE}:${offset}`,
-    (api) => keepLastReady(api.sync.watchOutbox({ limit: PAGE_SIZE, offset }))
+    `sync.watchOutbox:${limit}:${offset}`,
+    (api) => keepLastReady(api.sync.watchOutbox({ limit, offset }))
   );
 
   if (snapshot.status === "loading") {
@@ -63,7 +70,7 @@ const PendingPage = ({ offset }: { offset: number }) => {
   }
   return (
     <>
-      {outbox.pendingSyncOperations.map((op) => (
+      {[...outbox.pendingSyncOperations].reverse().map((op) => (
         <PendingRow key={op.operationId} op={op} />
       ))}
     </>
@@ -71,8 +78,10 @@ const PendingPage = ({ offset }: { offset: number }) => {
 };
 
 /**
- * Changes still waiting to upload, 10 per page with the drawer's
- * "← 1 of 4 →" pagination above and below. Only the page shown is read from the engine.
+ * Changes still waiting to upload, newest first, 10 per page with the
+ * drawer's "← 1 of 4 →" pagination above and below. Only the page shown is
+ * read from the engine. Uploads take the oldest first, so they shrink the
+ * last page and the first page stays put.
  */
 export const PendingTab = ({ total }: { total: number }) => {
   const [page, setPage] = useState(1);
@@ -92,7 +101,7 @@ export const PendingTab = ({ total }: { total: number }) => {
       onPageChange={setPage}
     >
       <OperationList>
-        <PendingPage offset={(shown - 1) * PAGE_SIZE} />
+        <PendingPage page={shown} total={total} />
       </OperationList>
     </PagedOperations>
   );
