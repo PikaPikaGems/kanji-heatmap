@@ -1,3 +1,5 @@
+// Catch-all route: matches every path under /api/kanjiheatmap/ (e.g.
+// /api/kanjiheatmap/v1/sync) and forwards it unchanged to KH_API_URL.
 export const onRequest: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 

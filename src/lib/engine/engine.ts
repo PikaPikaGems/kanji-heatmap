@@ -55,7 +55,10 @@ const loadEngine = async (): Promise<EngineState> => {
 
   if (API_BASE_URL) {
     const { createEngine } = await import("kh-study-engine");
-    const engine = createEngine({ apiBaseUrl: API_BASE_URL });
+    // The engine builds request URLs with `new URL()` and no base, so a
+    // same-origin path like "/api/kanjiheatmap/v1" must be made absolute.
+    const apiBaseUrl = new URL(API_BASE_URL, window.location.origin).toString();
+    const engine = createEngine({ apiBaseUrl });
     if (engine.type !== "available") {
       return { status: "unavailable", reason: "no-indexeddb" };
     }
