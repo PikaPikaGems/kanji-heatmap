@@ -11,10 +11,10 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const REPO = "PikaPikaGems/experimental-engine";
-// Engine API 15 (secondary reading cards, experimental-engine#97), on the
+// Engine API 15 with the unbound-fetch fix (experimental-engine#98), on the
 // engine's main. Bump together with the dexie, ts-fsrs and engine-contract
 // pins in package.json.
-const COMMIT = "668bf8954ae0e1cebdf69163ead787c3dfbe544a";
+const COMMIT = "a6519158413616735e140c2081d0980aee1ee37f";
 const DIR = ".study-engine";
 
 const token = process.env.KH_STUDY_ENGINE_TOKEN;
