@@ -1,8 +1,7 @@
 import { useRef, useState, type RefObject } from "react";
 import type { EngineAPI } from "engine-contract";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import LinkOutIcon from "@/components/common/LinkOutIcon";
-import { CONTACT_ITEMS } from "./contact-items";
+import { ContactIcons } from "./ContactIcons";
 import { outLinks } from "@/lib/external-links";
 import type { ActionStatus } from "./action-status";
 import { loginFailureMessage } from "./login-failure";
@@ -116,17 +115,7 @@ export const LoginEmailStep = ({
           <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />
           .
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {CONTACT_ITEMS.map((item) => (
-            <LinkOutIcon
-              key={item.href}
-              href={item.href}
-              hoverText={item.text}
-              srOnlyText={item.text}
-              icon={item.icon}
-            />
-          ))}
-        </div>
+        <ContactIcons />
       </div>
     </>
   );

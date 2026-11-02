@@ -1,7 +1,12 @@
 import { useRef, useState } from "react";
 import type { PracticeActivityEventRecord } from "engine-contract";
-import { copyForCode, copyForWriteBlocker } from "./engine-copy";
-import { getWriteBlocker, useAccountStatus } from "./use-account-status";
+import { useWriteBlocker } from "./data-download";
+import {
+  copyForCode,
+  copyForWriteBlocker,
+  NOT_SAVED_NOT_DOWNLOADED_COPY,
+} from "./engine-copy";
+import { type WriteBlocker, useAccountStatus } from "./use-account-status";
 import { useEngineApi } from "./use-engine-query";
 
 type WithoutTimes<T> = T extends unknown
@@ -12,6 +17,12 @@ type WithoutTimes<T> = T extends unknown
 export type ActivityRecordInput = WithoutTimes<PracticeActivityEventRecord>;
 
 type SaveFailure = { round: number; message: string };
+
+/** The end screen's copy for a round that couldn't be saved. */
+const notSavedCopy = (blocker: WriteBlocker) =>
+  blocker === "not-downloaded" || blocker === "cache_rebuilding"
+    ? NOT_SAVED_NOT_DOWNLOADED_COPY
+    : copyForWriteBlocker(blocker);
 
 /**
  * Saves a game's finished rounds to the account's activity. Call `startRound`
@@ -24,6 +35,7 @@ type SaveFailure = { round: number; message: string };
  */
 export const useActivityRecorder = () => {
   const account = useAccountStatus();
+  const blocker = useWriteBlocker();
   const api = useEngineApi();
   const startedAtRef = useRef(Date.now());
   // Counts rounds so a late answer never shows on a later round.
@@ -39,9 +51,8 @@ export const useActivityRecorder = () => {
     if (account.kind !== "active" || !api) return;
 
     const forRound = round;
-    const blocker = getWriteBlocker(account);
     if (blocker) {
-      setFailure({ round: forRound, message: copyForWriteBlocker(blocker) });
+      setFailure({ round: forRound, message: notSavedCopy(blocker) });
       return;
     }
 

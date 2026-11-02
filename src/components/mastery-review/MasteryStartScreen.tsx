@@ -1,4 +1,3 @@
-import { WriteBlockedLearnMore } from "@/components/dependent/account/WriteBlockedDialog";
 import { SyncNowAction } from "@/components/dependent/account/SyncNowAction";
 import {
   ENTITLEMENT_EXPIRED_COPY,
@@ -11,12 +10,18 @@ import { PracticeBottomBar, Stat } from "@/components/shared-practice";
 import { LeavePractice } from "@/components/shared-practice/EndSessionButton";
 import { useOpenedParam } from "@/hooks/routing-hooks";
 import { useEnterAction } from "@/hooks/use-enter-action";
+import { useDataDownload } from "@/lib/engine/data-download";
 import { useDueCount } from "@/lib/engine/use-due-count";
 import { NothingDue } from "./NothingDue";
 import { useNextDueAt } from "./use-next-due-at";
 import { cnWarningText } from "@/lib/generic-cn";
 
-/** Start screen of a mastery game: how many cards are due, then Start. */
+/**
+ * Start screen of a mastery game: how many cards are due, then Start. While
+ * the account's data hasn't downloaded, it says so instead (Start stays
+ * disabled; the bottom banner has Try again). Without premium Start is
+ * disabled too, and the bottom banner says why.
+ */
 export const MasteryStartScreen = ({
   heading,
   description,
@@ -37,9 +42,16 @@ export const MasteryStartScreen = ({
   error?: string;
   onStart: () => void;
 }) => {
+  const downloaded = useDataDownload() === "ready";
   const due = useDueCount()?.[cardType] ?? null;
   const nextDueAt = useNextDueAt(cardType);
-  const canStart = ready && blocker == null && due != null && due > 0;
+  const canStart =
+    downloaded && ready && blocker == null && due != null && due > 0;
+  // The bottom banner already covers these two.
+  const notice =
+    !downloaded || blocker === ENTITLEMENT_EXPIRED_COPY
+      ? (error ?? null)
+      : (blocker ?? error ?? null);
   // A suggested kanji's drawer can be open; its buttons own Enter then.
   const drawerOpen = useOpenedParam() != null;
 
@@ -55,30 +67,32 @@ export const MasteryStartScreen = ({
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
 
-          {due == null && (
+          {!downloaded && (
+            <UserNotice
+              icon="📥"
+              className="text-base font-bold text-center animate-fade-in-fast"
+            >
+              Your reviews haven&apos;t downloaded yet.
+            </UserNotice>
+          )}
+          {downloaded && due == null && (
             <p className="text-sm text-muted-foreground">Loading…</p>
           )}
-          {due != null && due > 0 && (
+          {downloaded && due != null && due > 0 && (
             <Stat value={due} unit="" label="Due now" />
           )}
-          {due === 0 && (
+          {downloaded && due === 0 && (
             <NothingDue nextDueAt={nextDueAt} canAdd={blocker == null} />
           )}
         </div>
       </div>
 
       <PracticeBottomBar>
-        {(blocker ?? error) && (
+        {notice && (
           <div role="status">
             <UserNotice className={cnWarningText}>
-              {blocker ?? error}
-              {blocker === ENTITLEMENT_EXPIRED_COPY && (
-                <>
-                  {" "}
-                  <WriteBlockedLearnMore />
-                </>
-              )}
-              {isSyncBlockerCopy(blocker) && (
+              {notice}
+              {isSyncBlockerCopy(notice) && (
                 <>
                   {" "}
                   <SyncNowAction />

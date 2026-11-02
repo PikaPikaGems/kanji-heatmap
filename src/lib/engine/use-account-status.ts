@@ -3,6 +3,7 @@ import type {
   UTCTimestamp,
   WriteAccess,
 } from "engine-contract";
+import type { DataDownload } from "./data-download";
 import { type EngineUnavailableReason, useEngineState } from "./engine";
 import { AUTH_STATUS_KEY } from "./store-cache";
 import { useEngineQuery } from "./use-engine-query";
@@ -75,10 +76,21 @@ export type WriteBlocker =
   | "unavailable"
   | "signed-out"
   | "recovery"
+  | "not-downloaded"
   | Extract<WriteAccess, { allowed: false }>["reason"];
 
-export const getWriteBlocker = (status: AccountStatus): WriteBlocker | null => {
+/**
+ * `download` (data-download.ts) goes first: the engine reports a missing
+ * download (`cache_rebuilding`) only when nothing else blocks writes, so an
+ * account without premium would hide it. Use `useWriteBlocker()` in
+ * components.
+ */
+export const getWriteBlocker = (
+  status: AccountStatus,
+  download: DataDownload = "ready"
+): WriteBlocker | null => {
   if (status.kind === "active") {
+    if (download !== "ready") return "not-downloaded";
     return status.writeAccess.allowed ? null : status.writeAccess.reason;
   }
   if (status.kind === "error") return "unavailable";

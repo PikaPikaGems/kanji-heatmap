@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { UserNotice } from "@/components/common/UserNotice";
-import LinkOutIcon from "@/components/common/LinkOutIcon";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
@@ -15,7 +14,8 @@ import {
   openWriteBlockedDialog,
   useWriteBlockedDialogOpen,
 } from "@/lib/engine/write-blocked-dialog";
-import { CONTACT_ITEMS } from "./contact-items";
+import { ContactIcons } from "./ContactIcons";
+import { DownloadAgainAction } from "./DownloadAgain";
 import { SyncNowAction } from "./SyncNowAction";
 
 /**
@@ -75,17 +75,7 @@ export const WriteBlockedDialog = () => {
             <p className="font-bold text-center">
               Message us to renew, or if you think this is a mistake.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              {CONTACT_ITEMS.map((item) => (
-                <LinkOutIcon
-                  key={item.href}
-                  href={item.href}
-                  hoverText={item.text}
-                  srOnlyText={item.text}
-                  icon={item.icon}
-                />
-              ))}
-            </div>
+            <ContactIcons />
           </div>
           <PracticeButton size="md" onClick={closeWriteBlockedDialog}>
             Got it
@@ -97,8 +87,9 @@ export const WriteBlockedDialog = () => {
 };
 
 /**
- * A write blocker's copy, with "Learn more" when the premium lapsed and
- * "Sync now" when saving is paused until this device syncs.
+ * A write blocker's copy, with "Learn more" when the premium lapsed, "Sync
+ * now" when saving is paused until this device syncs, and "Try again" when
+ * the data hasn't downloaded.
  */
 export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
   <>
@@ -113,6 +104,12 @@ export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
       <>
         {" "}
         <SyncNowAction />
+      </>
+    )}
+    {blocker === "not-downloaded" && (
+      <>
+        {" "}
+        <DownloadAgainAction />
       </>
     )}
   </>

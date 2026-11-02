@@ -1,5 +1,8 @@
 import { Loader2 } from "lucide-react";
+import { ApologyCard } from "@/components/error/ApologyCard";
+import { PracticeButton } from "@/components/ui/practice-button";
 import { useTextFetch } from "@/hooks/use-json";
+import { useNetworkState } from "@/hooks/use-network-state";
 import { renderMarkdown } from "@/lib/render-markdown";
 import { cn } from "@/lib/utils";
 
@@ -15,13 +18,45 @@ const markdownArticleClass = cn(
   "[&_strong]:font-bold"
 );
 
+/**
+ * The page text couldn't load: offline (and never read here before, so the
+ * app hasn't kept a copy), or the request failed.
+ */
+const DocLoadFailed = ({ onRetry }: { onRetry: () => void }) => {
+  const { online } = useNetworkState();
+
+  if (!online) {
+    return (
+      <div role="alert" className="py-8">
+        <ApologyCard title="You're offline" showCta={false}>
+          <p className="max-w-sm -mt-2 text-sm leading-relaxed text-muted-foreground">
+            Go online to read this page.
+          </p>
+        </ApologyCard>
+      </div>
+    );
+  }
+  return (
+    <div role="alert" className="py-8">
+      <ApologyCard title="This page couldn't load">
+        <p className="max-w-sm -mt-2 text-sm leading-relaxed text-muted-foreground">
+          Check your connection and try again.
+        </p>
+        <PracticeButton variant="secondary" onClick={onRetry}>
+          Try again
+        </PracticeButton>
+      </ApologyCard>
+    </div>
+  );
+};
+
 type MarkdownDocProps = {
   /** Public path, e.g. `/md/about.md` */
   path: string;
 };
 
 export const MarkdownDoc = ({ path }: MarkdownDocProps) => {
-  const { status, data, error } = useTextFetch(path);
+  const { status, data, execute } = useTextFetch(path);
 
   if (status === "idle" || status === "pending") {
     return (
@@ -36,11 +71,7 @@ export const MarkdownDoc = ({ path }: MarkdownDocProps) => {
   }
 
   if (status === "error" || data == null) {
-    return (
-      <p className="py-16 text-center text-muted-foreground" role="alert">
-        {error?.message ?? "Failed to load document."}
-      </p>
-    );
+    return <DocLoadFailed onRetry={() => void execute()} />;
   }
 
   return (

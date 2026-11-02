@@ -42,10 +42,15 @@ const BLOCKER_COPY: Record<WriteBlocker, string> = {
   entitlement_expired: CODE_COPY.entitlement_expired,
   storage_quota: CODE_COPY.storage_quota,
   cache_rebuilding: CODE_COPY.cache_rebuilding,
+  "not-downloaded": "Your data hasn't downloaded yet.",
 };
 
-export const UPDATE_BROWSER_COPY =
-  "This browser can't save your progress. Update iOS, iPadOS, macOS or your browser to log in.";
+/** UPDATE_BROWSER_COPY in two parts, for a notice card's title and line. */
+export const UPDATE_BROWSER_TITLE_COPY =
+  "This browser can't save your progress.";
+export const UPDATE_BROWSER_DETAIL_COPY =
+  "Update iOS, iPadOS, macOS or your browser to log in.";
+export const UPDATE_BROWSER_COPY = `${UPDATE_BROWSER_TITLE_COPY} ${UPDATE_BROWSER_DETAIL_COPY}`;
 
 export const NOT_IN_BUILD_COPY = "Not available in this build.";
 
@@ -57,8 +62,10 @@ export const NOT_IN_BUILD_COPY = "Not available in this build.";
 export const LOGOUT_FAILED_COPY =
   "This device couldn't finish logging you out. Try again. If it keeps happening, reload the page.";
 
-export const ENGINE_FAILED_COPY =
-  "Your progress couldn't be loaded. Refresh the page to try again.";
+/** ENGINE_FAILED_COPY in two parts, for a notice card's title and line. */
+export const ENGINE_FAILED_TITLE_COPY = "Your progress couldn't be loaded.";
+export const ENGINE_FAILED_DETAIL_COPY = "Refresh the page to try again.";
+export const ENGINE_FAILED_COPY = `${ENGINE_FAILED_TITLE_COPY} ${ENGINE_FAILED_DETAIL_COPY}`;
 
 /** `action` ("Log out") is an inline button in the sentence that opens the logout dialog. */
 export const PUSH_BLOCKED_COPY = {
@@ -86,13 +93,19 @@ export const ENTITLEMENT_EXPIRED_COPY = CODE_COPY.entitlement_expired;
 export const copyForWriteBlocker = (blocker: WriteBlocker): string =>
   BLOCKER_COPY[blocker];
 
-/** The bottom banner, short enough for one line on phones ("Learn more" follows). */
+/**
+ * The bottom banner, short enough for one line on phones ("Learn more",
+ * "Try again" or GO_ONLINE_BANNER_COPY follows).
+ */
 export const SYNC_SOON_BANNER_COPY = "Please sync soon.";
 export const SAVING_PAUSED_BANNER_COPY = "Saving is paused.";
+export const DATA_NOT_DOWNLOADED_BANNER_COPY = "Data not downloaded.";
+export const ACCOUNT_CANT_SAVE_BANNER_COPY = "Account can't save.";
+export const GO_ONLINE_BANNER_COPY = "Please go online.";
 
-/** A game's start screen while saving is paused ("Sync now" follows). */
-export const GAME_NOT_SAVED_UNTIL_SYNC_COPY =
-  "Saving is paused, so your progress won't be saved until this device syncs.";
+/** A finished round with an account whose data hasn't downloaded yet. */
+export const NOT_SAVED_NOT_DOWNLOADED_COPY =
+  "Not saved: your data hasn't downloaded yet.";
 
 /** Whether `copy` is one of the saving-paused (outbox) messages. */
 export const isSyncBlockerCopy = (copy: string | null): boolean =>

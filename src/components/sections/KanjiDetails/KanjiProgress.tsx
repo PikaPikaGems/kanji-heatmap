@@ -1,11 +1,10 @@
 import { Loader2, PlusCircle } from "lucide-react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { NotDownloadedCard } from "@/components/dependent/account/DownloadAgain";
 import { LoginNotice } from "@/components/dependent/account/LoginNotice";
+import { useDataDownload, useWriteBlocker } from "@/lib/engine/data-download";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
-import {
-  getWriteBlocker,
-  useAccountStatus,
-} from "@/lib/engine/use-account-status";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import {
   pileWordsLabel,
   useAddToReviewPile,
@@ -158,7 +157,7 @@ const NotInPileKanjiProgress = ({
 const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
-  const blocker = getWriteBlocker(useAccountStatus());
+  const blocker = useWriteBlocker();
   const pile = usePileWords(kanji);
 
   if (snapshot.status === "loading" || snapshot.status === "unavailable") {
@@ -212,11 +211,13 @@ const ActiveKanjiProgress = ({ kanji }: { kanji: string }) => {
  * Review progress for one kanji, from its review-pile item. What shows depends
  * on the account: the table when logged in (with defaults while the kanji is
  * not in the pile), the same table with defaults and a log-in notice when
- * logged out, and an explanation otherwise. The caller hides the section in
+ * logged out, and an explanation otherwise (including an account whose data
+ * hasn't downloaded to this device yet). The caller hides the section in
  * builds without the engine.
  */
 const KanjiProgress = ({ kanji }: { kanji: string }) => {
   const status = useAccountStatus();
+  const download = useDataDownload();
 
   if (status.kind === "unavailable") {
     return <UserNotice className="p-3">{UPDATE_BROWSER_COPY}</UserNotice>;
@@ -231,6 +232,10 @@ const KanjiProgress = ({ kanji }: { kanji: string }) => {
   if (status.kind === "loading") return <Spinner />;
   if (status.kind === "signed-out") {
     return <SignedOutKanjiProgress kanji={kanji} />;
+  }
+  // The pile can't load until the account's data is on this device.
+  if (download !== "ready") {
+    return <NotDownloadedCard title="Your progress hasn't downloaded yet." />;
   }
   return <ActiveKanjiProgress kanji={kanji} />;
 };

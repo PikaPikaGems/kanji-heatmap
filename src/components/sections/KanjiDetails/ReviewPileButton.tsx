@@ -12,8 +12,8 @@ import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { snapshotValue } from "@/lib/engine/store-cache";
+import { useWriteBlocker } from "@/lib/engine/data-download";
 import {
-  type AccountStatus,
   getWriteBlocker,
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
@@ -106,19 +106,17 @@ const ActiveReviewPileButton = ({
   kanji,
   words,
   wordsLoaded,
-  status,
 }: {
   kanji: string;
   words: PileWords;
   wordsLoaded: boolean;
-  status: Extract<AccountStatus, { kind: "active" }>;
 }) => {
   const api = useEngineApi();
   const snapshot = useReviewPileItem(kanji);
   const { add, action, tooLong } = useAddToReviewPile(kanji, words);
 
   const current = snapshotValue(snapshot);
-  const blocker = getWriteBlocker(status);
+  const blocker = useWriteBlocker();
 
   if (current) {
     return <PileMastery item={current} />;
@@ -197,7 +195,6 @@ export const ReviewPileButton = ({
         kanji={kanji}
         words={words}
         wordsLoaded={wordsLoaded}
-        status={status}
       />
     );
   }

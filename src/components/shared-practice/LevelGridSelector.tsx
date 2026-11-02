@@ -49,6 +49,7 @@ export const LevelGridSelector = ({
   levelHeading,
   itemHeading,
   footnote,
+  progressKnown = true,
 }: {
   levelCount: number;
   /** Columns in the item grid (and the size of a full level). */
@@ -62,6 +63,11 @@ export const LevelGridSelector = ({
   levelHeading: string;
   itemHeading: string;
   footnote?: string;
+  /**
+   * False while a logged-in account's progress hasn't loaded (or downloaded):
+   * hides "% done" rather than claiming 0%.
+   */
+  progressKnown?: boolean;
 }) => {
   const doneInLevel = (level: number) => {
     let done = 0;
@@ -84,10 +90,12 @@ export const LevelGridSelector = ({
     <div className="flex flex-col gap-3 pt-4">
       <div className="flex items-center justify-between">
         <Label className="text-sm">{levelHeading}</Label>
-        <span className="text-sm font-semibold tabular-nums">
-          {Math.round((doneInLevel(currentLevel) / currentLevelSize) * 100)}%
-          done
-        </span>
+        {progressKnown && (
+          <span className="text-sm font-semibold tabular-nums animate-fade-in-fast">
+            {Math.round((doneInLevel(currentLevel) / currentLevelSize) * 100)}%
+            done
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-10 gap-1">

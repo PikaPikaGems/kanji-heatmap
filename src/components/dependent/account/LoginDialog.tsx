@@ -3,7 +3,8 @@ import type { EngineAPI } from "engine-contract";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEngineState } from "@/lib/engine/engine";
-import { copyForCode } from "@/lib/engine/engine-copy";
+import { finishLoginDownload } from "@/lib/engine/data-download";
+import { openDownloadFailedDialog } from "@/lib/engine/download-failed-dialog";
 import { closeLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
 import { useResetApp } from "@/providers/app-reset-hooks";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
@@ -14,15 +15,14 @@ import { LoginEmailStep } from "./LoginEmailStep";
 type LoginStep =
   | { kind: "email"; email: string }
   | { kind: "code"; email: string }
-  | { kind: "downloading"; error: string | null };
+  | { kind: "downloading" };
 
 /**
  * A click outside never closes the dialog (a stray click would lose a typed
  * email or code). It is "locked" while the data downloads after logging in
  * (no X and no Escape either).
  */
-const isLocked = (step: LoginStep) =>
-  step.kind === "downloading" && step.error === null;
+const isLocked = (step: LoginStep) => step.kind === "downloading";
 
 const LoginStepScreen = ({
   api,
@@ -35,9 +35,7 @@ const LoginStepScreen = ({
   onStep: (step: LoginStep) => void;
   onDownload: () => void;
 }) => {
-  if (step.kind === "downloading") {
-    return <LoginDownloadingStep error={step.error} onRetry={onDownload} />;
-  }
+  if (step.kind === "downloading") return <LoginDownloadingStep />;
   if (step.kind === "code") {
     return (
       <LoginCodeStep
@@ -68,15 +66,16 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
   const resetApp = useResetApp();
 
   const download = async () => {
-    setStep({ kind: "downloading", error: null });
+    setStep({ kind: "downloading" });
     const result = await api.sync.catchUp();
+    closeLoginDialog();
     if (result.ok) {
-      closeLoginDialog();
       // Every screen starts over with the account's data.
-      resetApp();
+      void finishLoginDownload(resetApp);
       return;
     }
-    setStep({ kind: "downloading", error: copyForCode(result.error.code) });
+    // Logged in regardless: say so, with Later and Try again.
+    openDownloadFailedDialog();
   };
 
   return (
@@ -88,7 +87,7 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
     >
       <ScrollableDialogContent
         size="md"
-        title="Log in to Continue"
+        title={locked ? "You're logged in" : "Log in to Continue"}
         description="Log in to your Kanji Heatmap Premium account with an email code"
         titleClassName="text-left"
         hideClose={locked}

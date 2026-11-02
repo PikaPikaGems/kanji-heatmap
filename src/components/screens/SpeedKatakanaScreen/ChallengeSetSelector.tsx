@@ -1,4 +1,5 @@
 import { LevelGridSelector } from "@/components/shared-practice/LevelGridSelector";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import type { AllChallengeSetStats } from "@/lib/speed-katakana/stats";
 import {
   CHALLENGES_PER_LEVEL,
@@ -22,18 +23,22 @@ export const ChallengeSetSelector = ({
   /** Null when progress isn't available (logged out, loading). */
   allStats: AllChallengeSetStats | null;
   onSelect: (setNumber: number) => void;
-}) => (
-  <LevelGridSelector
-    levelCount={LEVELS}
-    itemsPerLevel={CHALLENGES_PER_LEVEL}
-    isDone={(level, pos) =>
-      allStats?.has(setFromLevelAndPos(level, pos)) ?? false
-    }
-    level={levelOf(challengeSet)}
-    position={positionInLevel(challengeSet)}
-    onSelect={(level, pos) => onSelect(setFromLevelAndPos(level, pos))}
-    levelHeading="Select a Challenge Set"
-    itemHeading="Select a Challenge"
-    footnote="Lower challenges contain more common words."
-  />
-);
+}) => {
+  const loggedIn = useAccountStatus().kind === "active";
+  return (
+    <LevelGridSelector
+      levelCount={LEVELS}
+      itemsPerLevel={CHALLENGES_PER_LEVEL}
+      isDone={(level, pos) =>
+        allStats?.has(setFromLevelAndPos(level, pos)) ?? false
+      }
+      level={levelOf(challengeSet)}
+      position={positionInLevel(challengeSet)}
+      onSelect={(level, pos) => onSelect(setFromLevelAndPos(level, pos))}
+      levelHeading="Select a Challenge Set"
+      itemHeading="Select a Challenge"
+      footnote="Lower challenges contain more common words."
+      progressKnown={allStats != null || !loggedIn}
+    />
+  );
+};
