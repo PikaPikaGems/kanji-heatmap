@@ -91,13 +91,13 @@
     ]
   },
   "everyday-phrases-onomatopoeia": {
-    "version": "a592547f",
+    "version": "5f9406d8",
     "chunks": [
       "6ef972f6",
       "2f78c276",
       "bdaac6fc",
       "4c1b88df",
-      "e7cd8928",
+      "1e55c9a7",
       "6566ee35",
       "b7436581",
       "95e87ddf",
@@ -121,38 +121,38 @@
     ]
   },
   "intermediate": {
-    "version": "db35ba2d",
+    "version": "13cdd72b",
     "chunks": [
       "a3341981",
-      "c139871b",
-      "0f084605",
+      "eee6af32",
+      "7744f7ec",
       "877b1fff",
       "ed78ada0"
     ]
   },
   "n1": {
-    "version": "a94c4f44",
+    "version": "62e6ceff",
     "chunks": [
       "1fc4b0f4",
-      "698fedcb",
+      "b889ea68",
       "5c47d223",
-      "ec0bae45",
+      "ceb42924",
       "9560b1a8",
-      "76de6a0b",
+      "10f118aa",
       "f7dc5f23",
       "6df268c7",
       "8c32c40b",
-      "f1998579",
-      "572708df"
+      "c9baac76",
+      "394a200f"
     ]
   },
   "n2": {
-    "version": "6c0b3303",
+    "version": "62169c4b",
     "chunks": [
       "e91e39a2",
       "73fc19cc",
       "86402ca3",
-      "df934943",
+      "32823ffe",
       "1e6d925f",
       "f756be43",
       "a2587516",
@@ -162,9 +162,9 @@
     ]
   },
   "n3": {
-    "version": "6751ef94",
+    "version": "d409a9ff",
     "chunks": [
-      "a3f5e7d9",
+      "d25549ea",
       "170059e2",
       "2589ed35",
       "eee58aa8",
@@ -176,12 +176,12 @@
     ]
   },
   "n4": {
-    "version": "c3d81136",
+    "version": "6433f9c8",
     "chunks": [
       "d43df7b7",
       "c1f8add9",
       "e5b33a50",
-      "6445d61b",
+      "51b9fd82",
       "88d10a6e",
       "0067b95e",
       "f0bcf05d"
@@ -197,7 +197,7 @@
     ]
   },
   "short-phrases": {
-    "version": "c981d996",
+    "version": "9583d063",
     "chunks": [
       "45720645",
       "f3731497",
@@ -210,11 +210,11 @@
       "767ef90e",
       "8c2c9117",
       "0302b04a",
-      "c7334507"
+      "db24d86b"
     ]
   },
   "verb-focused": {
-    "version": "884a115f",
+    "version": "a2516a1b",
     "chunks": [
       "e22a433c",
       "2419c295",
@@ -229,7 +229,7 @@
       "64d869ae",
       "4af446fe",
       "5f740686",
-      "1e18c29d",
+      "ecb49328",
       "61ccfb57",
       "6e8c00d9",
       "19fb1c63",
