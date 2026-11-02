@@ -30,10 +30,10 @@ export const LetUsKnowAction = ({ modal = false }: { modal?: boolean }) => (
   />
 );
 
-/** "💬 If this keeps failing, let us know and we'll sort it out." */
+/** "💬 If this keeps failing, let us know." */
 export const LetUsKnowLine = ({
   before = "If this keeps failing, ",
-  after = " and we'll sort it out.",
+  after = ".",
   modal,
   className,
 }: {

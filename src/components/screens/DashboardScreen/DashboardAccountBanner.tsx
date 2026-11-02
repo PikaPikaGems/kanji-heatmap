@@ -1,5 +1,5 @@
 import { NoticeCard, NoticeCardButton } from "@/components/common/NoticeCard";
-import { DownloadAgainButton } from "@/components/dependent/account/DownloadAgain";
+import { DownloadNowButton } from "@/components/dependent/account/DownloadNow";
 import { LetUsKnowLine } from "@/components/dependent/account/LetUsKnow";
 import { useDataDownload } from "@/lib/engine/data-download";
 import {
@@ -43,7 +43,7 @@ export const DashboardAccountBanner = () => {
       <NoticeCard
         icon="📥"
         title="Your progress hasn't downloaded yet."
-        action={<DownloadAgainButton />}
+        action={<DownloadNowButton />}
         footer={<LetUsKnowLine />}
       >
         It&apos;s safe in your account. The stats below fill in once it

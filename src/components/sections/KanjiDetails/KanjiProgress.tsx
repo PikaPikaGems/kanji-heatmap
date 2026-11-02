@@ -1,6 +1,6 @@
 import { Loader2, PlusCircle } from "lucide-react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import { NotDownloadedCard } from "@/components/dependent/account/DownloadAgain";
+import { NotDownloadedCard } from "@/components/dependent/account/DownloadNow";
 import { LoginNotice } from "@/components/dependent/account/LoginNotice";
 import { useDataDownload, useWriteBlocker } from "@/lib/engine/data-download";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";

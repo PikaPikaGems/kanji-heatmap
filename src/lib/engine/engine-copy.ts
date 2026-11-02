@@ -103,9 +103,34 @@ export const DATA_NOT_DOWNLOADED_BANNER_COPY = "Data not downloaded.";
 export const ACCOUNT_CANT_SAVE_BANNER_COPY = "Account can't save.";
 export const GO_ONLINE_BANNER_COPY = "Please go online.";
 
-/** A finished round with an account whose data hasn't downloaded yet. */
-export const NOT_SAVED_NOT_DOWNLOADED_COPY =
-  "Not saved: your data hasn't downloaded yet.";
+/**
+ * Why a practice round isn't saved, finishing "You can play, but your rounds
+ * won't be saved: …" (start screen) and "Not saved: …" (end screen).
+ */
+const NOT_SAVED_REASON_COPY: Partial<Record<WriteBlocker, string>> = {
+  "not-downloaded": "your data hasn't downloaded yet.",
+  cache_rebuilding: "your data hasn't downloaded yet.",
+  entitlement_expired: "your account can't save changes right now.",
+  outbox_full: "saving is paused until this device syncs.",
+  outbox_stale: "saving is paused until this device syncs.",
+  recovery: "this device's saved data needs attention.",
+  storage_quota: "your device is out of storage.",
+};
+
+export const notSavedReasonCopy = (blocker: WriteBlocker): string =>
+  NOT_SAVED_REASON_COPY[blocker] ?? "saving isn't available right now.";
+
+/** Why the account's data didn't download, by engine error code. */
+const DOWNLOAD_ERROR_COPY: Record<string, string> = {
+  network_error: "Can't reach the server. Check your connection.",
+  rate_limited: "Too many attempts. Wait a minute.",
+  temporarily_unavailable: "The server is busy right now.",
+  storage_quota: CODE_COPY.storage_quota,
+  local_cache_unreadable: CODE_COPY.local_cache_unreadable,
+};
+
+export const copyForDownloadError = (code: string): string =>
+  DOWNLOAD_ERROR_COPY[code] ?? "The download didn't finish.";
 
 /** Whether `copy` is one of the saving-paused (outbox) messages. */
 export const isSyncBlockerCopy = (copy: string | null): boolean =>

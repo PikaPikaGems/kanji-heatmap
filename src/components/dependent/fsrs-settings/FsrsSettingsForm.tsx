@@ -1,19 +1,14 @@
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 import type { EngineAPI, ReviewSettings } from "engine-contract";
 import { Loader2, RotateCcw } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
 import { NoticeCard, NoticeCardButton } from "@/components/common/NoticeCard";
 import { UserNotice } from "@/components/common/UserNotice";
-import { DownloadAgainButton } from "@/components/dependent/account/DownloadAgain";
+import { WriteBlockerCard } from "@/components/dependent/account/WriteBlockerCard";
 import { Accordion } from "@/components/ui/accordion";
 import { PracticeButton } from "@/components/ui/practice-button";
-import {
-  copyForCode,
-  copyForWriteBlocker,
-  ENTITLEMENT_EXPIRED_COPY,
-  SAVING_PAUSED_BANNER_COPY,
-} from "@/lib/engine/engine-copy";
+import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeFsrsSettings } from "@/lib/engine/fsrs-settings-dialog";
 import {
   LEARNING_PRESETS,
@@ -22,13 +17,7 @@ import {
   writeSavedSteps,
 } from "@/lib/engine/fsrs-steps";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
-import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
-import { syncNow } from "@/lib/engine/sync-now-dialog";
-import {
-  isSyncBlocker,
-  type WriteBlocker,
-} from "@/lib/engine/use-account-status";
-import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
+import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { SettingsSection, SwitchField } from "./FieldParts";
 import { IntervalField } from "./IntervalField";
@@ -63,34 +52,21 @@ const SECTION_OF_FIELD: Record<keyof ReviewSettings, SectionId> = {
   modelWeights: "advanced",
 };
 
-/** A blocker notice's card: the reason as its title, and what it means here. */
-const BlockerCard = ({
-  icon = "⚠️",
-  title,
-  children,
-  action,
-}: {
-  icon?: string;
-  title: string;
-  children: ReactNode;
-  action?: ReactNode;
-}) => (
-  <NoticeCard icon={icon} title={title} action={action}>
-    {children}
-  </NoticeCard>
-);
+/** What each write blocker means for these settings. */
+const BLOCKER_DETAIL: Partial<Record<WriteBlocker, string>> = {
+  "not-downloaded": "These settings can't be changed until it downloads.",
+  cache_rebuilding: "These settings can't be changed until it downloads.",
+  entitlement_expired: "These settings are read-only.",
+  outbox_full: "Sync to change these settings.",
+  outbox_stale: "Sync to change these settings.",
+  recovery: "Fix it to change these settings.",
+};
 
 /** Why the settings can't be saved, as a notice card above the form. */
-const BlockerNotice = ({
-  api,
-  blocker,
-}: {
-  api: EngineAPI;
-  blocker: SaveBlocker;
-}) => {
+const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
   if (blocker.kind === "signed-out") {
     return (
-      <BlockerCard
+      <NoticeCard
         icon="👀"
         title="You're not logged in."
         action={
@@ -100,12 +76,13 @@ const BlockerNotice = ({
         }
       >
         Log in to save your review settings.
-      </BlockerCard>
+      </NoticeCard>
     );
   }
   if (blocker.kind === "update-required") {
     return (
-      <BlockerCard
+      <NoticeCard
+        icon="⚠️"
         title="This page is out of date."
         action={
           <NoticeCardButton
@@ -117,77 +94,14 @@ const BlockerNotice = ({
         }
       >
         Refresh to change your review settings.
-      </BlockerCard>
+      </NoticeCard>
     );
   }
-  const { reason } = blocker;
-  if (reason === "not-downloaded") {
-    return (
-      <BlockerCard
-        icon="📥"
-        title="Your data hasn't downloaded yet."
-        action={<DownloadAgainButton />}
-      >
-        These settings can&apos;t be changed until it downloads.
-      </BlockerCard>
-    );
-  }
-  if (reason === "entitlement_expired") {
-    return (
-      <BlockerCard
-        title={ENTITLEMENT_EXPIRED_COPY}
-        action={
-          <NoticeCardButton
-            variant="secondary"
-            onClick={openWriteBlockedDialog}
-          >
-            Learn more
-          </NoticeCardButton>
-        }
-      >
-        These settings are read-only.
-      </BlockerCard>
-    );
-  }
-  if (isSyncBlocker(reason)) {
-    return (
-      <BlockerCard
-        title={SAVING_PAUSED_BANNER_COPY}
-        action={
-          <NoticeCardButton
-            variant="secondary"
-            onClick={() => void syncNow(api)}
-          >
-            Sync now
-          </NoticeCardButton>
-        }
-      >
-        {reason === "outbox_full"
-          ? "Too many changes are waiting to upload."
-          : "Some changes haven't uploaded for too long."}{" "}
-        Sync to change these settings.
-      </BlockerCard>
-    );
-  }
-  if (reason === "recovery") {
-    return (
-      <BlockerCard
-        title={copyForWriteBlocker(reason)}
-        action={
-          <NoticeCardButton variant="secondary" onClick={openRecoveryDialog}>
-            Fix it
-          </NoticeCardButton>
-        }
-      >
-        Fix it to change these settings.
-      </BlockerCard>
-    );
-  }
-  // Out of storage, damaged data, unavailable, still loading.
   return (
-    <BlockerCard title={copyForWriteBlocker(reason)}>
-      These settings can&apos;t be saved right now.
-    </BlockerCard>
+    <WriteBlockerCard modal blocker={blocker.reason}>
+      {BLOCKER_DETAIL[blocker.reason] ??
+        "These settings can't be saved right now."}
+    </WriteBlockerCard>
   );
 };
 
@@ -287,7 +201,7 @@ export const FsrsSettingsForm = ({
       <div className="flex-1 min-h-0 px-4 pb-6 overflow-y-auto text-left">
         {(blocker !== null || notice !== null) && (
           <div className="flex flex-col gap-2 px-2 pt-2 pb-3">
-            {blocker !== null && <BlockerNotice api={api} blocker={blocker} />}
+            {blocker !== null && <BlockerNotice blocker={blocker} />}
             {notice !== null && <UserNotice>{notice}</UserNotice>}
           </div>
         )}

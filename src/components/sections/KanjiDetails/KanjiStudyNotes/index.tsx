@@ -1,6 +1,6 @@
 import { SectionLoading } from "@/components/common/SectionLoading";
 import { UserNotice } from "@/components/common/UserNotice";
-import { NotDownloadedCard } from "@/components/dependent/account/DownloadAgain";
+import { NotDownloadedCard } from "@/components/dependent/account/DownloadNow";
 import { useDataDownload, useWriteBlocker } from "@/lib/engine/data-download";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { useAccountStatus } from "@/lib/engine/use-account-status";

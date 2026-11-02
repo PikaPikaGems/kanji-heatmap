@@ -1,3 +1,4 @@
+import type { SaveError } from "@/lib/engine/use-activity-recorder";
 import { useMemo } from "react";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
@@ -18,7 +19,7 @@ export const EndSession = ({
   onEnd: () => void;
   completedSets: number;
   /** Why the finished session couldn't be saved, if it couldn't. */
-  saveError: string | null;
+  saveError: SaveError | null;
 }) => {
   const cheer = useMemo(() => pickEndCheer(), []);
   useEnterAction(onNext);

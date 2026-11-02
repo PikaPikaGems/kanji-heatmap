@@ -1,11 +1,7 @@
 import { useRef, useState } from "react";
 import type { PracticeActivityEventRecord } from "engine-contract";
 import { useWriteBlocker } from "./data-download";
-import {
-  copyForCode,
-  copyForWriteBlocker,
-  NOT_SAVED_NOT_DOWNLOADED_COPY,
-} from "./engine-copy";
+import { copyForCode } from "./engine-copy";
 import { type WriteBlocker, useAccountStatus } from "./use-account-status";
 import { useEngineApi } from "./use-engine-query";
 
@@ -16,21 +12,40 @@ type WithoutTimes<T> = T extends unknown
 /** A practice record minus its times, which the recorder adds. */
 export type ActivityRecordInput = WithoutTimes<PracticeActivityEventRecord>;
 
-type SaveFailure = { round: number; message: string };
+/**
+ * Why a finished round wasn't saved: the account can't save right now
+ * (`blocker`, worded with its fix by ProgressNotSavedNotice), or the write
+ * itself failed (`message`).
+ */
+export type SaveError =
+  | { kind: "blocked"; blocker: WriteBlocker }
+  | { kind: "failed"; message: string };
 
-/** The end screen's copy for a round that couldn't be saved. */
-const notSavedCopy = (blocker: WriteBlocker) =>
-  blocker === "not-downloaded" || blocker === "cache_rebuilding"
-    ? NOT_SAVED_NOT_DOWNLOADED_COPY
-    : copyForWriteBlocker(blocker);
+type SaveFailure = { round: number; error: SaveError };
+
+/** Engine error codes that mean the account can't save right now. */
+const BLOCKER_CODES: Record<string, WriteBlocker> = {
+  entitlement_expired: "entitlement_expired",
+  outbox_full: "outbox_full",
+  outbox_stale: "outbox_stale",
+  storage_quota: "storage_quota",
+  cache_rebuilding: "not-downloaded",
+};
+
+const errorForCode = (code: string): SaveError => {
+  const blocker = BLOCKER_CODES[code];
+  return blocker
+    ? { kind: "blocked", blocker }
+    : { kind: "failed", message: copyForCode(code) };
+};
 
 /**
  * Saves a game's finished rounds to the account's activity. Call `startRound`
  * when a round begins (its `startedAt`) and `recordRound` when it ends; the
  * end time and time zone are added there. Nothing is recorded unless the
  * account is active, and a write the account can't take right now is not
- * attempted. Either way `saveError` holds the copy to show on that round's
- * end screen (null when it saved, or when logged out, which
+ * attempted. Either way `saveError` says why that round's end screen shows
+ * "Not saved" (null when it saved, or when logged out, which
  * ProgressNotSavedNotice words itself).
  */
 export const useActivityRecorder = () => {
@@ -52,7 +67,7 @@ export const useActivityRecorder = () => {
 
     const forRound = round;
     if (blocker) {
-      setFailure({ round: forRound, message: notSavedCopy(blocker) });
+      setFailure({ round: forRound, error: { kind: "blocked", blocker } });
       return;
     }
 
@@ -63,10 +78,10 @@ export const useActivityRecorder = () => {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (!result.ok) {
-      setFailure({ round: forRound, message: copyForCode(result.error.code) });
+      setFailure({ round: forRound, error: errorForCode(result.error.code) });
     }
   };
 
-  const saveError = failure?.round === round ? failure.message : null;
+  const saveError = failure?.round === round ? failure.error : null;
   return { startRound, recordRound, saveError };
 };

@@ -1,3 +1,4 @@
+import type { SaveError } from "@/lib/engine/use-activity-recorder";
 import { useMemo } from "react";
 import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { useEnterAction } from "@/hooks/use-enter-action";
@@ -35,7 +36,7 @@ export const EndSession = ({
   /** Total words in the filtered deck (used on the final complete screen). */
   wordsCleared: number;
   /** Why the finished round couldn't be saved, if it couldn't. */
-  saveError: string | null;
+  saveError: SaveError | null;
   onNext: () => void;
   onEnd: () => void;
 }) => {

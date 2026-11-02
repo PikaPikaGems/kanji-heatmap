@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import { DownloadAgainAction } from "@/components/dependent/account/DownloadAgain";
+import { DownloadNowAction } from "@/components/dependent/account/DownloadNow";
 import { useSyncAttention } from "@/components/dependent/account/old-pending";
 import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { docPages } from "@/components/items/nav-items";
@@ -88,11 +88,13 @@ const OfflineBanner = () => (
 );
 
 /**
- * Fixed bottom banner, one message at a time, the first that applies:
- * 1. the account's data hasn't downloaded (Try again, or go online),
- * 2. saving is paused until this device syncs (Learn more, or go online),
- * 3. offline,
- * 4. the account can't save (no premium; Learn more),
+ * Fixed bottom banner, one message at a time, the first that applies (the
+ * same order as `getWriteBlocker`, so every screen names the same problem):
+ * 1. the account's data hasn't downloaded (Download now, or go online),
+ * 2. the account can't save (no premium; Learn more). Before saving paused:
+ *    syncing can't unpause it while the server refuses the uploads,
+ * 3. saving is paused until this device syncs (Learn more, or go online),
+ * 4. offline,
  * 5. changes have waited over a week to upload (Learn more),
  * 6. logged out, on the home page, dashboard and mastery page only.
  * Never on the about, terms and privacy pages.
@@ -110,7 +112,15 @@ const BottomBanner = () => {
     return (
       <NoticeBanner>
         {DATA_NOT_DOWNLOADED_BANNER_COPY}{" "}
-        {online ? <DownloadAgainAction /> : GO_ONLINE_BANNER_COPY}
+        {online ? <DownloadNowAction /> : GO_ONLINE_BANNER_COPY}
+      </NoticeBanner>
+    );
+  }
+  if (getWriteBlocker(account) === "entitlement_expired") {
+    return (
+      <NoticeBanner>
+        {ACCOUNT_CANT_SAVE_BANNER_COPY}{" "}
+        <NoticeAction onClick={openWriteBlockedDialog}>Learn more</NoticeAction>
       </NoticeBanner>
     );
   }
@@ -127,14 +137,6 @@ const BottomBanner = () => {
     );
   }
   if (!online) return <OfflineBanner />;
-  if (getWriteBlocker(account) === "entitlement_expired") {
-    return (
-      <NoticeBanner>
-        {ACCOUNT_CANT_SAVE_BANNER_COPY}{" "}
-        <NoticeAction onClick={openWriteBlockedDialog}>Learn more</NoticeAction>
-      </NoticeBanner>
-    );
-  }
   if (attention === "soon") {
     return (
       <NoticeBanner>

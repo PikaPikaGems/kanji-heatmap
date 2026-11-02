@@ -22,7 +22,7 @@ import { openWriteBlockedDialog } from "./write-blocked-dialog";
  *
  * - `downloading`: the first download (or a full re-download) is running.
  * - `not-downloaded`: it failed, or hasn't run yet. Retries happen on app
- *   start, back online, tab visible again, and the Try again buttons.
+ *   start, back online, tab visible again, and "Download now".
  * - `ready`: downloaded, or no active account (nothing to download).
  *
  * Workaround: the engine doesn't expose its cache state yet
@@ -102,15 +102,18 @@ const hasNoPremium = async (api: EngineAPI) => {
   );
 };
 
+/** Whether the logged-in account can't save because premium isn't active. */
+export const accountHasNoPremium = async () => {
+  const engine = getEngineState();
+  return engine.status === "ready" && hasNoPremium(engine.api);
+};
+
 /**
- * After the data downloads from the login dialog (or its "Couldn't download"
- * follow-up): every screen starts over with the account's data, and an
- * account without premium is told right away why it can't save.
+ * After the data downloads from the login dialog (or the download dialog it
+ * opens when that fails): every screen starts over with the account's data,
+ * and an account without premium is told right away why it can't save.
  */
 export const finishLoginDownload = async (resetApp: () => void) => {
   resetApp();
-  const engine = getEngineState();
-  if (engine.status === "ready" && (await hasNoPremium(engine.api))) {
-    openWriteBlockedDialog();
-  }
+  if (await accountHasNoPremium()) openWriteBlockedDialog();
 };

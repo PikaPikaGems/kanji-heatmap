@@ -3,9 +3,14 @@ import { LogOut } from "lucide-react";
 import { Drawer as DrawerPrimitive } from "vaul";
 import { Button } from "@/components/ui/button";
 import { useAccountEmail } from "@/lib/engine/account-email";
+import { useDataDownload } from "@/lib/engine/data-download";
 import { openLogoutDialog } from "@/lib/engine/logout-flow";
 import { useSyncStatus } from "@/lib/engine/sync-queries";
-import type { AccountStatus } from "@/lib/engine/use-account-status";
+import {
+  type AccountStatus,
+  getWriteBlocker,
+  isSyncBlocker,
+} from "@/lib/engine/use-account-status";
 import { AccountCard } from "./AccountCard";
 import { hasOldPendingChanges } from "./old-pending";
 import { SyncStatusLine } from "./SyncStatusLine";
@@ -24,8 +29,18 @@ export const ActiveAccount = ({
 }) => {
   const email = useAccountEmail();
   const sync = useSyncStatus();
+  const download = useDataDownload();
   const name = email ?? status.userId;
+  const blocker = getWriteBlocker(status, download);
+  // The data not downloaded already shows as the sync state.
+  const problem =
+    blocker === "entitlement_expired"
+      ? "Account can't save"
+      : isSyncBlocker(blocker)
+        ? "Saving paused"
+        : null;
   const hasNotice =
+    download === "not-downloaded" ||
     !status.writeAccess.allowed ||
     sync?.pushBlocked === true ||
     status.reviewSettings.status === "update_required" ||
@@ -35,7 +50,14 @@ export const ActiveAccount = ({
     <AccountCard
       name={name}
       initial={name.charAt(0).toUpperCase() || null}
-      status={<SyncStatusLine sync={sync} hasNotice={hasNotice} />}
+      status={
+        <SyncStatusLine
+          sync={sync}
+          download={download}
+          problem={problem}
+          hasNotice={hasNotice}
+        />
+      }
       tools={tools}
       actions={
         // The modal lives outside the drawer, so close the drawer first.
