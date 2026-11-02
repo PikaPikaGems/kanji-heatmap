@@ -14,6 +14,7 @@ import {
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
 import { useResetApp } from "@/providers/app-reset-hooks";
+import { FailureReport } from "./FailureReport";
 import { LetUsKnowLine } from "./LetUsKnow";
 
 const TITLES: Record<DataDownloadStatus["kind"], string> = {
@@ -60,12 +61,14 @@ const Downloading = () => (
   </>
 );
 
-/** It failed: why, who to tell, then try again or later. */
+/** It failed: why, a report to send us, then try again or later. */
 const Failed = ({
+  code,
   message,
   afterLogin,
 }: {
-  message: string | null;
+  code: string;
+  message: string;
   afterLogin: boolean;
 }) => {
   const { online } = useNetworkState();
@@ -80,12 +83,21 @@ const Failed = ({
         {afterLogin ? "You're logged in, but your" : "Your"} study data
         couldn&apos;t download to this device. It&apos;s safe in your account.
       </p>
-      {reason && (
-        <p role="alert" className={cn("text-sm", cnWarningText)}>
-          ⚠️ {reason}
-        </p>
-      )}
-      <LetUsKnowLine modal />
+      <p role="alert" className={cn("text-sm", cnWarningText)}>
+        ⚠️ {reason}
+      </p>
+      <FailureReport
+        title="Kanji Heatmap: couldn't download data"
+        filename="download-failed.log"
+        intro={
+          <LetUsKnowLine
+            modal
+            before="If this keeps failing, copy this report and "
+          />
+        }
+        code={code}
+        message={message}
+      />
       <DialogActions>
         <PracticeButton variant="secondary" onClick={closeDataDownloadDialog}>
           Later
@@ -146,7 +158,11 @@ export const DataDownloadDialog = () => {
         >
           {status.kind === "downloading" && <Downloading />}
           {status.kind === "failed" && (
-            <Failed message={status.message} afterLogin={afterLogin} />
+            <Failed
+              code={status.code}
+              message={status.message}
+              afterLogin={afterLogin}
+            />
           )}
           {status.kind === "downloaded" && <Downloaded />}
         </div>

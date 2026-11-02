@@ -41,7 +41,9 @@ export const ActiveAccount = ({
         : null;
   const hasNotice =
     download === "not-downloaded" ||
-    !status.writeAccess.allowed ||
+    // Downloading isn't a problem: the chip already says "Downloading…".
+    (!status.writeAccess.allowed &&
+      status.writeAccess.reason !== "cache_rebuilding") ||
     sync?.pushBlocked === true ||
     status.reviewSettings.status === "update_required" ||
     hasOldPendingChanges(sync);

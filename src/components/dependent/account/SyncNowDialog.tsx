@@ -1,24 +1,12 @@
 import type { ReactNode } from "react";
 import { CheckCircle2, CloudUpload, Loader2 } from "lucide-react";
 import { DialogActions } from "@/components/common/DialogActions";
-import { ErrorTerminal } from "@/components/common/ErrorTerminal";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { Dialog } from "@/components/ui/dialog";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
-import { formatCaptureTimestamp } from "@/hooks/use-debug-info";
-import { useDebugReport } from "@/hooks/use-debug-report";
 import { useNetworkState } from "@/hooks/use-network-state";
-import { useFailedOpsCount, useSyncStatus } from "@/lib/engine/sync-queries";
 import { openSyncOperations } from "@/lib/engine/sync-operations-dialog";
-import { useAccountEmail } from "@/lib/engine/account-email";
-import {
-  accountLines,
-  failedOperationLines,
-  syncLines,
-} from "@/lib/engine/sync-report-lines";
-import { useRecentFailedOperations } from "@/components/dependent/sync-operations/use-recent-failed-operations";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import {
   closeSyncNowDialog,
@@ -27,6 +15,7 @@ import {
   type SyncNowStatus,
 } from "@/lib/engine/sync-now-dialog";
 import { cnWarningText } from "@/lib/generic-cn";
+import { FailureReport } from "./FailureReport";
 import { type SyncAttention, useSyncAttention } from "./old-pending";
 
 const TITLES: Record<Exclude<SyncNowStatus["kind"], "info">, string> = {
@@ -141,56 +130,6 @@ const Syncing = () => (
   </>
 );
 
-/**
- * What went wrong, with the account (email, user id), sync state, failed
- * operations and the app & device info, to copy and send us. Mounted only while the sync has failed.
- */
-const SyncFailureReport = ({
-  code,
-  message,
-}: {
-  code: string;
-  message: string;
-}) => {
-  const { text: debugReport } = useDebugReport();
-  const account = useAccountStatus();
-  const email = useAccountEmail();
-  const failed = useRecentFailedOperations().result;
-  const sync = useSyncStatus();
-  const failedOps = useFailedOpsCount()?.count;
-
-  const report = [
-    "Kanji Heatmap: couldn't sync",
-    `Captured: ${formatCaptureTimestamp()}`,
-    `Screen: ${window.location.pathname}`,
-    `Error: ${code}`,
-    `Message: ${message}`,
-    "",
-    ...accountLines(account, email),
-    "",
-    ...syncLines(sync, failedOps),
-    "",
-    ...failedOperationLines(
-      failed.kind === "ready" ? failed.operations : undefined
-    ),
-    "",
-    debugReport,
-  ].join("\n");
-
-  return (
-    <div className="flex flex-col gap-2 text-left animate-fade-in-fast">
-      <p className="text-sm text-pretty">
-        If this keeps happening, copy this report and send it to us.
-      </p>
-      <ErrorTerminal
-        filename="sync-failed.log"
-        content={report}
-        className="max-w-none"
-      />
-    </div>
-  );
-};
-
 /** The sync failed: why, a report to send us, then try again or later. */
 const Failed = ({ code, message }: { code: string; message: string }) => {
   const api = useEngineApi();
@@ -214,7 +153,17 @@ const Failed = ({ code, message }: { code: string; message: string }) => {
           </NoticeAction>
         </p>
       </StatusBody>
-      <SyncFailureReport code={code} message={message} />
+      <FailureReport
+        title="Kanji Heatmap: couldn't sync"
+        filename="sync-failed.log"
+        intro={
+          <p className="text-sm text-pretty">
+            If this keeps happening, copy this report and send it to us.
+          </p>
+        }
+        code={code}
+        message={message}
+      />
       <DialogActions>
         <PracticeButton variant="ghost" onClick={closeSyncNowDialog}>
           I&apos;ll sync later

@@ -15,8 +15,8 @@ import { openWriteBlockedDialog } from "./write-blocked-dialog";
  */
 export type DataDownloadStatus =
   | { kind: "downloading" }
-  /** `message` says why; null when there's nothing more to say. */
-  | { kind: "failed"; message: string | null }
+  /** `message` says why; `code` goes in the copyable report. */
+  | { kind: "failed"; code: string; message: string }
   | { kind: "downloaded" };
 
 type DataDownloadDialogState = {
@@ -71,7 +71,7 @@ export const downloadNow = async (resetApp?: () => void) => {
   if (code !== null) {
     setState({
       ...state,
-      status: { kind: "failed", message: copyForDownloadError(code) },
+      status: { kind: "failed", code, message: copyForDownloadError(code) },
     });
     return;
   }
@@ -96,7 +96,7 @@ export const openLoginDownloadFailed = (code: string) => {
   setState({
     open: true,
     session: state.session + 1,
-    status: { kind: "failed", message: copyForDownloadError(code) },
+    status: { kind: "failed", code, message: copyForDownloadError(code) },
     afterLogin: true,
   });
 };
