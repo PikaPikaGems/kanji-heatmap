@@ -12,7 +12,7 @@ import {
   JouyouGradeListItems,
   toJouyouGrade,
 } from "@/lib/jouyou-grade";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useHasLiveAccount } from "./use-live-or-empty";
 import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -78,7 +78,7 @@ const BreakdownRows = ({ bands }: { bands: BreakdownBand[] }) => (
 );
 
 const BookmarksBreakdownBody = () => {
-  const loggedIn = useAccountStatus().kind === "active";
+  const loggedIn = useHasLiveAccount();
   const ready = useIsKanjiWorkerReady();
   const getInfo = useGetKanjiInfoFn();
   const search = useKanjiSearch(ALL_KANJI_SEARCH);

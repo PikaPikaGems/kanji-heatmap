@@ -12,6 +12,7 @@ import { useEnterAction } from "@/hooks/use-enter-action";
 import { useCoarsePointer } from "@/hooks/use-coarse-pointer";
 import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { SaveProgressHint } from "@/components/dependent/account/SaveProgressHint";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { fillTheKanjiPageMeta } from "@/lib/pages/practice-pages";
 import {
   FILL_THE_KANJI_SETS,
@@ -146,6 +147,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
     useFillTheKanjiSettings();
   const allStats = useAllSetBatchStats();
   const setStats = allStats?.get(setId) ?? null;
+  const loggedIn = useAccountStatus().kind === "active";
 
   useEnterAction(onStart);
   const isCoarsePointer = useCoarsePointer();
@@ -208,6 +210,7 @@ export const InitialScreen = ({ onStart }: { onStart: () => void }) => {
             onSelect={(level, pos) =>
               selectBatch(setId, batchFromLevelAndPos(level, pos))
             }
+            progressKnown={allStats != null || !loggedIn}
             levelHeading="Select a Challenge"
             itemHeading="Select a Batch"
           />

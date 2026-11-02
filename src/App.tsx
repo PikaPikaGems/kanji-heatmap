@@ -26,6 +26,7 @@ import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
 import { LoginDialog } from "@/components/dependent/account/LoginDialog";
+import { DownloadFailedDialog } from "@/components/dependent/account/DownloadFailedDialog";
 import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
 import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
 import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
@@ -179,6 +180,7 @@ const App = () => {
             <BottomBanner />
             {/* Also outside the Switch: any screen can open these. */}
             <LoginDialog />
+            <DownloadFailedDialog />
             <RecoveryDialog />
             <LogoutDialog />
             <LoggingOutScreen />

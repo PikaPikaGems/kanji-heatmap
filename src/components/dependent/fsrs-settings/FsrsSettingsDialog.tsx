@@ -2,6 +2,7 @@ import type { EngineAPI } from "engine-contract";
 import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
+import { useDataDownload } from "@/lib/engine/data-download";
 import { useEngineState } from "@/lib/engine/engine";
 import {
   closeFsrsSettings,
@@ -27,11 +28,12 @@ const Loading = ({ children }: { children: string }) => (
 
 /**
  * What the dialog shows for the current account: the form with defaults when
- * logged out (Save disabled), or with the account's current settings once they
- * load.
+ * logged out or the account's data hasn't downloaded (Save disabled), or with
+ * the account's current settings once they load.
  */
 const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
   const status = useAccountStatus();
+  const download = useDataDownload();
   const current = useEngineQuery("reviews.settings.watchCurrent", (engine) =>
     engine.reviews.settings.watchCurrent()
   );
@@ -62,7 +64,7 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
     );
   }
 
-  const writeBlocker = getWriteBlocker(status);
+  const writeBlocker = getWriteBlocker(status, download);
   const blocker: SaveBlocker | null =
     status.reviewSettings.status === "update_required"
       ? { kind: "update-required" }
@@ -81,7 +83,8 @@ const FsrsSettingsScreen = ({ api }: { api: EngineAPI }) => {
       />
     );
   }
-  if (blocker?.kind === "update-required") {
+  // The settings can't load until the account's data is on this device.
+  if (blocker?.kind === "update-required" || download !== "ready") {
     return (
       <FsrsSettingsForm
         api={api}

@@ -15,7 +15,6 @@ import { ListScreenLayout } from "../ListScreen/ListScreenLayout";
 import { MasteryCenteredMessage } from "./MasteryCenteredMessage";
 import { MasteryMetricBadge } from "./MasteryMetricBadge";
 import { MasteryAccountBanner } from "./MasteryAccountBanner";
-import { LoginPill } from "@/components/dependent/account/LoginPill";
 import { MasteryTileColors } from "./MasteryTileColors";
 import { cnWarningText } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
@@ -27,9 +26,10 @@ const MasteryPresentationPopover = lazy(
 /**
  * The `/` grid, colored by mastery (design 5.9). Search, sort, filter and
  * item settings are shared with `/`; the background color meaning is its own.
- * Without a pile to read (signed out, a browser that can't save progress, or
- * a build without the engine) every tile stays uncolored ("New");
- * a bottom banner says why, except in builds without the engine.
+ * Without a pile to read (signed out, data not downloaded yet, a browser that
+ * can't save progress, or a build without the engine) every tile stays
+ * uncolored ("New"); a bottom banner says why, except in builds without the
+ * engine.
  */
 const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
@@ -94,7 +94,6 @@ const MasteryScreen = () => {
           <LoadingKanjis />
         )}
       </ListScreenLayout>
-      {account.kind === "signed-out" && <LoginPill emoji="💪" />}
       {unsupportedBrowser && <MasteryAccountBanner />}
     </>
   );

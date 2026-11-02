@@ -5,8 +5,8 @@ import type { ActionStatus } from "@/components/dependent/account/action-status"
 import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { snapshotValue } from "@/lib/engine/store-cache";
+import { useWriteBlocker } from "@/lib/engine/data-download";
 import {
-  type AccountStatus,
   getWriteBlocker,
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
@@ -22,13 +22,7 @@ const pillCn = (bookmarked: boolean) =>
   }`;
 
 /** Logged in: reads `bookmarks.watch(kanji)` and toggles with add / remove. */
-const ActiveBookmarkButton = ({
-  kanji,
-  status,
-}: {
-  kanji: string;
-  status: Extract<AccountStatus, { kind: "active" }>;
-}) => {
+const ActiveBookmarkButton = ({ kanji }: { kanji: string }) => {
   const api = useEngineApi();
   const snapshot = useEngineQuery(`bookmarks.watch:${kanji}`, (engine) =>
     engine.bookmarks.watch(kanji)
@@ -37,7 +31,7 @@ const ActiveBookmarkButton = ({
 
   const current = snapshotValue(snapshot);
   const bookmarked = current === true;
-  const blocker = getWriteBlocker(status);
+  const blocker = useWriteBlocker();
 
   const toggle = async () => {
     if (!api || action.kind === "busy") return;
@@ -96,7 +90,7 @@ export const BookmarkButton = ({ kanji }: { kanji: string }) => {
   const status = useAccountStatus();
 
   if (status.kind === "active") {
-    return <ActiveBookmarkButton key={kanji} kanji={kanji} status={status} />;
+    return <ActiveBookmarkButton key={kanji} kanji={kanji} />;
   }
   if (status.kind === "signed-out") {
     return (

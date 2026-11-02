@@ -9,7 +9,7 @@ import {
   REVIEW_PILE_ALL_KEY,
   snapshotValue,
 } from "@/lib/engine/store-cache";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
+import { useHasLiveAccount } from "../use-live-or-empty";
 import { useEngineApi, useEngineQuery } from "@/lib/engine/use-engine-query";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -63,7 +63,7 @@ const LoadFailed = ({ onRetry }: { onRetry?: () => void }) => (
  * account to read the pile from, the view draws an empty pile.
  */
 export const KanjiMasteryBody = () => {
-  const loggedIn = useAccountStatus().kind === "active";
+  const loggedIn = useHasLiveAccount();
   const api = useEngineApi();
   const pile = useEngineQuery(REVIEW_PILE_ALL_KEY, (a) =>
     a.reviews.pile.watchAll()
