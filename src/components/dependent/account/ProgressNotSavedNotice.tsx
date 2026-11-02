@@ -27,6 +27,9 @@ export const BrowserCantSaveNotice = ({
 
 /** The fix for a write blocker, when there is one the user can do. */
 const BlockerFix = ({ blocker }: { blocker: WriteBlocker }) => {
+  if (blocker === "signed-out") {
+    return <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction>;
+  }
   if (blocker === "not-downloaded" || blocker === "cache_rebuilding") {
     return <DownloadNowAction />;
   }
@@ -60,9 +63,9 @@ export const NotSavedLine = ({
 );
 
 /**
- * End-of-round notice, shown below the round's main buttons. Says why nothing
- * was saved (logged out, or a browser that can't save), or shows `saveError`
- * in bold yellow when the account is active but the round wasn't saved.
+ * End-of-round notice, shown below the round's main buttons, in bold yellow:
+ * why nothing was saved (logged out, or `saveError` when the account is
+ * active but the round wasn't saved), or that this browser can't save.
  * Renders nothing when all is well or when this build has no accounts.
  */
 export const ProgressNotSavedNotice = ({
@@ -76,10 +79,11 @@ export const ProgressNotSavedNotice = ({
 
   if (account.kind === "signed-out") {
     return (
-      <UserNotice className={cn("text-center", className)}>
-        Not saved. <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction>{" "}
-        to save your rounds.
-      </UserNotice>
+      <NotSavedLine
+        before="Not saved:"
+        blocker="signed-out"
+        className={className}
+      />
     );
   }
   if (account.kind === "unavailable" && account.reason !== "not-included") {

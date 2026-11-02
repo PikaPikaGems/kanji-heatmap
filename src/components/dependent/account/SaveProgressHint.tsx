@@ -1,4 +1,3 @@
-import { LoginNotice } from "./LoginNotice";
 import { BrowserCantSaveNotice, NotSavedLine } from "./ProgressNotSavedNotice";
 import { cn } from "@/lib/utils";
 import { useDataDownload } from "@/lib/engine/data-download";
@@ -7,13 +6,15 @@ import {
   useAccountStatus,
 } from "@/lib/engine/use-account-status";
 
+const PLAY_UNSAVED_COPY = "You can play, but your rounds won't be saved:";
+
 /**
- * Start-screen notice under a game's Start button: the logged-out notice
- * while signed out, "can't be saved in this browser" when the browser can't
- * run the engine, and "You can play, but your rounds won't be saved: …" when
- * the account can't save right now (the bottom banner says what's wrong,
- * not that rounds won't save). Nothing while the data is still downloading:
- * a round that ends after it lands is saved.
+ * Start-screen notice under a game's Start button: "You can play, but your
+ * rounds won't be saved: …" while logged out or when the account can't save
+ * right now (the bottom banner says what's wrong, not that rounds won't
+ * save), and "can't be saved in this browser" when the browser can't run the
+ * engine. Nothing while the data is still downloading: a round that ends
+ * after it lands is saved.
  */
 export const SaveProgressHint = ({ className }: { className?: string }) => {
   const account = useAccountStatus();
@@ -21,9 +22,10 @@ export const SaveProgressHint = ({ className }: { className?: string }) => {
 
   if (account.kind === "signed-out") {
     return (
-      <LoginNotice
-        to="save your progress"
-        className={cn("text-center", className)}
+      <NotSavedLine
+        before={PLAY_UNSAVED_COPY}
+        blocker="signed-out"
+        className={className}
       />
     );
   }
@@ -42,7 +44,7 @@ export const SaveProgressHint = ({ className }: { className?: string }) => {
   }
   return (
     <NotSavedLine
-      before="You can play, but your rounds won't be saved:"
+      before={PLAY_UNSAVED_COPY}
       blocker={blocker}
       className={className}
     />

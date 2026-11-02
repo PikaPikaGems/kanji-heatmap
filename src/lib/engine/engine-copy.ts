@@ -108,6 +108,7 @@ export const GO_ONLINE_BANNER_COPY = "Please go online.";
  * won't be saved: …" (start screen) and "Not saved: …" (end screen).
  */
 const NOT_SAVED_REASON_COPY: Partial<Record<WriteBlocker, string>> = {
+  "signed-out": "you're not logged in.",
   "not-downloaded": "your data hasn't downloaded yet.",
   cache_rebuilding: "your data hasn't downloaded yet.",
   entitlement_expired: "your account can't save changes right now.",
