@@ -3,7 +3,7 @@ import type { AccountStatus } from "./use-account-status";
 
 /**
  * Account and sync state as plain-text lines for the reports people copy and
- * send us (unsaved answers, Couldn't sync).
+ * send us (unsaved answers, Couldn't sync, Couldn't download).
  */
 /** `email` is the one last used to log in on this device, if remembered. */
 export const accountLines = (
@@ -33,6 +33,7 @@ export const syncLines = (
   const lines = [
     online,
     `Sync: ${sync.state}${sync.state === "failed" ? ` (${sync.error.code})` : ""}`,
+    ...("mode" in sync ? [`Sync mode: ${sync.mode}`] : []),
     ...(sync.state === "failed" && "diagnosticId" in sync.error
       ? [`Sync diagnostic id: ${sync.error.diagnosticId}`]
       : []),

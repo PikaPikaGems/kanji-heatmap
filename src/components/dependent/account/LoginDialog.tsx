@@ -4,7 +4,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { useEngineState } from "@/lib/engine/engine";
 import { finishLoginDownload } from "@/lib/engine/data-download";
-import { openDownloadFailedDialog } from "@/lib/engine/download-failed-dialog";
+import { openLoginDownloadFailed } from "@/lib/engine/data-download-dialog";
 import { closeLoginDialog, useLoginDialog } from "@/lib/engine/login-dialog";
 import { useResetApp } from "@/providers/app-reset-hooks";
 import { PikaPikaLinks } from "@/components/common/PikaPikaLinks";
@@ -75,7 +75,7 @@ const LoginDialogFlow = ({ api, open }: { api: EngineAPI; open: boolean }) => {
       return;
     }
     // Logged in regardless: say so, with Later and Try again.
-    openDownloadFailedDialog();
+    openLoginDownloadFailed(result.error.code);
   };
 
   return (

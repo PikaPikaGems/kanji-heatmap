@@ -8,15 +8,18 @@ import {
   syncLabel,
 } from "@/components/dependent/account/sync-display";
 import { useNetworkState } from "@/hooks/use-network-state";
+import { WriteBlockerCard } from "@/components/dependent/account/WriteBlockerCard";
+import { useDataDownload, useWriteBlocker } from "@/lib/engine/data-download";
 import {
-  copyForWriteBlocker,
   OLD_PENDING_COPY,
   PUSH_BLOCKED_COPY,
   REVIEW_SETTINGS_UPDATE_COPY,
 } from "@/lib/engine/engine-copy";
 import { closeSyncOperations } from "@/lib/engine/sync-operations-dialog";
-import { useAccountStatus } from "@/lib/engine/use-account-status";
-import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
+import {
+  useAccountStatus,
+  type WriteBlocker,
+} from "@/lib/engine/use-account-status";
 import { openLogoutDialog } from "@/lib/engine/logout-flow";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import { cnWarningText } from "@/lib/generic-cn";
@@ -24,37 +27,35 @@ import { cn } from "@/lib/utils";
 
 export const OLD_PENDING_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** What each write blocker means for this device's changes. */
+const BLOCKER_DETAIL: Partial<Record<WriteBlocker, string>> = {
+  "not-downloaded": "It's safe in your account.",
+  cache_rebuilding: "It's safe in your account.",
+  entitlement_expired:
+    "Changes on this device stay here until your account can save again.",
+  outbox_full: "Sync to save again.",
+  outbox_stale: "Sync to save again.",
+  recovery: "Fix it to keep syncing.",
+};
+
 /**
- * The account's warnings (the sidebar's ‼️ points here): saving blocked, or
- * review settings that need an app refresh.
+ * The account's warnings (the sidebar's ‼️ points here): why it can't save,
+ * as the same card FSRS settings shows (one reason, the first that applies),
+ * or review settings that need an app refresh.
  */
 const AccountNotices = () => {
   const status = useAccountStatus();
+  const blocker = useWriteBlocker();
   if (status.kind !== "active") return null;
-  const { writeAccess, reviewSettings } = status;
 
   return (
     <>
-      {!writeAccess.allowed && (
-        <UserNotice>
-          {copyForWriteBlocker(writeAccess.reason)}
-          {writeAccess.reason === "entitlement_expired" && (
-            <>
-              {" "}
-              <NoticeAction
-                onClick={() => {
-                  // One modal at a time.
-                  closeSyncOperations();
-                  openWriteBlockedDialog();
-                }}
-              >
-                Learn more
-              </NoticeAction>
-            </>
-          )}
-        </UserNotice>
+      {blocker !== null && (
+        <WriteBlockerCard modal blocker={blocker}>
+          {BLOCKER_DETAIL[blocker] ?? "Changes can't be saved right now."}
+        </WriteBlockerCard>
       )}
-      {reviewSettings.status === "update_required" && (
+      {status.reviewSettings.status === "update_required" && (
         <UserNotice>{REVIEW_SETTINGS_UPDATE_COPY}</UserNotice>
       )}
     </>
@@ -69,11 +70,17 @@ export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
   const api = useEngineApi();
   const { online } = useNetworkState();
   const account = useAccountStatus();
+  const download = useDataDownload();
   const needsRefresh = needsDataRefresh(sync);
   const failure = sync?.state === "failed" ? sync.error : null;
   const label =
-    needsRefresh && online ? "Data refresh needed" : syncLabel(sync, online);
-  const canRetry = failure !== null && !needsRefresh && online;
+    needsRefresh && online
+      ? "Data refresh needed"
+      : syncLabel(sync, online, download);
+  // Not while the data isn't downloaded: Retry is an ordinary sync, and the
+  // card's "Download now" is what fixes that.
+  const canRetry =
+    failure !== null && !needsRefresh && online && download === "ready";
 
   return (
     <div className="flex flex-col gap-3">
@@ -82,7 +89,7 @@ export const SyncHeader = ({ sync }: { sync: SyncStatus | undefined }) => {
           aria-hidden
           className={cn(
             "size-2.5 rounded-full shrink-0",
-            syncDotClassName(sync, online)
+            syncDotClassName(sync, online, download)
           )}
         />
         <p className="font-semibold">{label}</p>

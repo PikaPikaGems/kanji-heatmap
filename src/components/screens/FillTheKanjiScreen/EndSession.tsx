@@ -1,3 +1,4 @@
+import type { SaveError } from "@/lib/engine/use-activity-recorder";
 import { useMemo } from "react";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { useKanjiUrlState } from "@/hooks/routing-hooks";
@@ -64,8 +65,8 @@ export const EndSession = ({
 }: {
   results: ItemResult[];
   batchLabel: string;
-  /** Copy for why saving the batch to the account failed, if it did. */
-  saveError: string | null;
+  /** Why saving the batch to the account failed, if it did. */
+  saveError: SaveError | null;
   /** Replays just the missed sentences; not recorded as a batch attempt. */
   onRetryMistakes: () => void;
   /** Starts the next batch of the set; null after the set's last batch. */

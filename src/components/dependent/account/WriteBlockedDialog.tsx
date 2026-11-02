@@ -15,7 +15,7 @@ import {
   useWriteBlockedDialogOpen,
 } from "@/lib/engine/write-blocked-dialog";
 import { ContactIcons } from "./ContactIcons";
-import { DownloadAgainAction } from "./DownloadAgain";
+import { DownloadNowAction } from "./DownloadNow";
 import { SyncNowAction } from "./SyncNowAction";
 
 /**
@@ -88,7 +88,7 @@ export const WriteBlockedDialog = () => {
 
 /**
  * A write blocker's copy, with "Learn more" when the premium lapsed, "Sync
- * now" when saving is paused until this device syncs, and "Try again" when
+ * now" when saving is paused until this device syncs, and "Download now" when
  * the data hasn't downloaded.
  */
 export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
@@ -109,7 +109,7 @@ export const WriteBlockerCopy = ({ blocker }: { blocker: WriteBlocker }) => (
     {blocker === "not-downloaded" && (
       <>
         {" "}
-        <DownloadAgainAction />
+        <DownloadNowAction />
       </>
     )}
   </>
