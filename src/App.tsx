@@ -25,6 +25,14 @@ import { PageFadeIn } from "@/components/dependent/site-wide/PageFadeIn";
 import pageItems from "@/components/items/page-items";
 import { GlobalKeyboardShortcutProvider } from "./providers/global-keyboard-shortcut-provider";
 import { useAiVoiceStartup } from "@/hooks/use-ai-voice";
+import { LoginDialog } from "@/components/dependent/account/LoginDialog";
+import { FsrsSettingsDialog } from "@/components/dependent/fsrs-settings/FsrsSettingsDialog";
+import { SyncOperationsDialog } from "@/components/dependent/sync-operations/SyncOperationsDialog";
+import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
+import { WordExplainDialog } from "@/components/dependent/site-wide/WordExplainDialog";
+import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
+import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
+import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
 
 const {
   kanjiPage,
@@ -38,6 +46,8 @@ const {
   fillTheKanjiPage,
   recognitionPracticeV1Page,
   productionPracticeV1Page,
+  readingMasteryPage,
+  writingMasteryPage,
 } = pageItems;
 
 const RecognitionPracticeV1 = recognitionPracticeV1Page.Component;
@@ -66,11 +76,18 @@ const App = () => {
                 path={speedKatakanaPage.href}
                 component={speedKatakanaPage.Component}
               />
-              {/* Fill the Kanji uses the shared practice shell + header. */}
+              {/* Fill in the Kanji uses the shared practice shell + header. */}
               <Route
                 path={fillTheKanjiPage.href}
                 component={fillTheKanjiPage.Component}
               />
+              {/* The game's old URL (bookmarks, installed shortcuts). */}
+              <Route path="/fill-the-kanji">
+                <Redirect
+                  to={`${fillTheKanjiPage.href}${window.location.search}`}
+                  replace
+                />
+              </Route>
               {/* Recognition practice has its own header. */}
               <Route
                 path={recognitionPracticeV1Page.href}
@@ -80,6 +97,15 @@ const App = () => {
               <Route
                 path={productionPracticeV1Page.href}
                 component={ProductionPracticeV1}
+              />
+              {/* Mastery games (review pile) share the practice shell. */}
+              <Route
+                path={readingMasteryPage.href}
+                component={readingMasteryPage.Component}
+              />
+              <Route
+                path={writingMasteryPage.href}
+                component={writingMasteryPage.Component}
               />
               <Route>
                 <Header />
@@ -140,6 +166,15 @@ const App = () => {
             </Switch>
             {/* Outside the Switch so it also shows on the game screens. */}
             <BottomBanner />
+            {/* Also outside the Switch: any screen can open these. */}
+            <LoginDialog />
+            <RecoveryDialog />
+            <LogoutDialog />
+            <LoggingOutScreen />
+            <FsrsSettingsDialog />
+            <SyncOperationsDialog />
+            <WriteBlockedDialog />
+            <WordExplainDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo } from "react";
 import { useSearchParams } from "@/hooks/routing-hooks";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useAllSetBatchStats } from "@/hooks/use-all-set-batch-stats";
 import { URL_PARAMS } from "@/lib/settings/url-params";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
 import {
@@ -8,19 +9,26 @@ import {
   isValidBatch,
   batchCount,
 } from "@/lib/fill-the-kanji/batches";
-import { readSetBatchStats } from "@/lib/fill-the-kanji/storage";
+import { AllSetBatchStats } from "@/lib/fill-the-kanji/progress";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./constants";
 import { FillTheKanjiSettings } from "./types";
 
 const SET_PARAM = URL_PARAMS.fillTheKanjiSet;
 const BATCH_PARAM = URL_PARAMS.fillTheKanjiBatch;
 
-/** First batch of a set with no recorded attempt, or 1 when all are played. */
-const firstUnplayedBatch = (setId: FillTheKanjiSetId): number => {
-  const stats = readSetBatchStats(setId);
+/**
+ * First batch of a set with no recorded attempt, or 1 when all are played or
+ * the stats aren't available (logged out, still loading).
+ */
+const firstUnplayedBatch = (
+  setId: FillTheKanjiSetId,
+  allStats: AllSetBatchStats | null
+): number => {
+  const stats = allStats?.get(setId);
+  if (!stats) return 1;
   const total = batchCount(setId);
   for (let batch = 1; batch <= total; batch++) {
-    if (!stats[String(batch)]) return batch;
+    if (!stats[batch]) return batch;
   }
   return 1;
 };
@@ -28,12 +36,13 @@ const firstUnplayedBatch = (setId: FillTheKanjiSetId): number => {
 /** The batch to show for a set: the remembered one, else the first unplayed. */
 export const selectedBatchFor = (
   settings: FillTheKanjiSettings,
-  setId: FillTheKanjiSetId
+  setId: FillTheKanjiSetId,
+  allStats: AllSetBatchStats | null
 ): number => {
   const remembered = settings.batchBySet[setId];
   return remembered != null && isValidBatch(setId, remembered)
     ? remembered
-    : firstUnplayedBatch(setId);
+    : firstUnplayedBatch(setId, allStats);
 };
 
 /**
@@ -56,7 +65,8 @@ export const useFillTheKanjiSettings = () => {
   const storedBatchBySet = settings.batchBySet;
   const batchBySet = useMemo(() => storedBatchBySet ?? {}, [storedBatchBySet]);
   const resolved: FillTheKanjiSettings = { ...settings, setId, batchBySet };
-  const batch = selectedBatchFor(resolved, setId);
+  const allStats = useAllSetBatchStats();
+  const batch = selectedBatchFor(resolved, setId, allStats);
 
   const rawSet = searchParams.get(SET_PARAM);
   const rawBatch = searchParams.get(BATCH_PARAM);
@@ -128,13 +138,10 @@ export const useFillTheKanjiSettings = () => {
     [batchBySet, setSetting, syncToUrl]
   );
 
-  const selectSet = useCallback(
-    (nextSet: FillTheKanjiSetId) => {
-      const remembered = { ...DEFAULT_SETTINGS, batchBySet };
-      selectBatch(nextSet, selectedBatchFor(remembered, nextSet));
-    },
-    [batchBySet, selectBatch]
-  );
+  const selectSet = (nextSet: FillTheKanjiSetId) => {
+    const remembered = { ...DEFAULT_SETTINGS, batchBySet };
+    selectBatch(nextSet, selectedBatchFor(remembered, nextSet, allStats));
+  };
 
   return {
     settings: resolved,

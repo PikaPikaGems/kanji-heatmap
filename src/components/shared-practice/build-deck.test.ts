@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { bookmarkStorageKey } from "@/lib/bookmarks";
 import { buildPracticeDeck, withFreshFonts } from "./build-deck";
 import { DeckFilterSettings, PracticeItem } from "./types";
 
@@ -60,13 +59,6 @@ describe("buildPracticeDeck", () => {
   it("keeps only kanji included by the worker search", () => {
     const deck = build({}, repWords, new Set(["水", "日"]));
     expect(deck.map((item) => item.kanji)).toEqual(["水", "日"]);
-  });
-
-  it("keeps only bookmarked kanji when bookmarkedOnly is set", () => {
-    localStorage.setItem(bookmarkStorageKey("火", "火事"), "true");
-
-    const deck = build({ bookmarkedOnly: true });
-    expect(deck.map((item) => item.kanji)).toEqual(["火"]);
   });
 
   it("falls back to '...' when the keyword is empty", () => {

@@ -1,7 +1,5 @@
 import { useJsonFetch } from "@/hooks/use-json";
 import { TEXT_BOOK_VOCAB_PATH } from "@/lib/assets-paths";
-import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
-import { textbookVocabSourceLinks } from "@/lib/external-links";
 import {
   TextbookWordEntry,
   toCommonWordEntries,
@@ -40,7 +38,6 @@ export const TextbookVocabulary = ({ kanji }: { kanji: string }) => {
           next: { key: "d", label: "d" },
         }}
       />
-      <PrimaryDataSources links={textbookVocabSourceLinks} />
     </div>
   );
 };

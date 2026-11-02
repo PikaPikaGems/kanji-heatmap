@@ -173,6 +173,11 @@ type StreamOptions = {
   onText: (text: string) => void;
 };
 
+type SearchedStreamOptions = StreamOptions & {
+  /** False sends the request without the web search tool. */
+  webSearch: boolean;
+};
+
 /** Consume SSE events, including a final event without a trailing newline. */
 const readEvents = async (
   res: Response,
@@ -219,7 +224,8 @@ export const streamXaiSearchedCompletion = async ({
   prompt,
   signal,
   onText,
-}: StreamOptions): Promise<{
+  webSearch,
+}: SearchedStreamOptions): Promise<{
   text: string;
   totalTokens: number | null;
   sources: AiSource[];
@@ -232,7 +238,7 @@ export const streamXaiSearchedCompletion = async ({
     body: JSON.stringify({
       model,
       input: [{ role: "user", content: prompt }],
-      tools: [{ type: "web_search" }],
+      ...(webSearch ? { tools: [{ type: "web_search" }] } : {}),
       stream: true,
       store: false,
     }),

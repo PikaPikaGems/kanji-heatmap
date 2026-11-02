@@ -4,6 +4,7 @@ import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import { useJsonFetch } from "@/hooks/use-json";
+import { useTapGuard } from "@/hooks/use-tap-guard";
 import { useSimilarKanjiMap } from "@/kanji-worker/kanji-worker-hooks";
 import { fillTheKanjiChunkUrl } from "@/lib/offline-preload";
 import { FillTheKanjiSetId } from "@/lib/fill-the-kanji/sets";
@@ -77,6 +78,45 @@ const useBatchCards = (
 };
 
 const ignoreEscape = () => {};
+
+/**
+ * Forgot and Next. Remounted for each card, so for its first 0.5 s taps do
+ * nothing: a double tap on the answer drawer's Continue would otherwise mark
+ * the next card as forgotten.
+ */
+const AnswerButtons = ({
+  canForget,
+  canSubmit,
+  onForgot,
+  onSubmit,
+}: {
+  canForget: boolean;
+  canSubmit: boolean;
+  onForgot: () => void;
+  onSubmit: () => void;
+}) => {
+  const guarded = useTapGuard();
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <PracticeButton
+        variant="danger"
+        size="md"
+        disabled={!canForget}
+        onClick={guarded(onForgot)}
+      >
+        Forgot
+      </PracticeButton>
+      <PracticeButton
+        variant="primary"
+        size="md"
+        disabled={!canSubmit}
+        onClick={guarded(onSubmit)}
+      >
+        Next
+      </PracticeButton>
+    </div>
+  );
+};
 
 export const Game = ({
   setId,
@@ -173,24 +213,14 @@ export const Game = ({
           }`}
         >
           <TileGrid tiles={tiles} onPick={game.pickTile} />
-          <div className="grid grid-cols-2 gap-2">
-            <PracticeButton
-              variant="danger"
-              size="md"
-              disabled={game.allFilled || revealed}
-              onClick={game.forgot}
-            >
-              Forgot
-            </PracticeButton>
-            <PracticeButton
-              variant="primary"
-              size="md"
-              disabled={!game.allFilled || revealed}
-              onClick={game.submit}
-            >
-              Next
-            </PracticeButton>
-          </div>
+          <AnswerButtons
+            // A new card restarts the tap guard.
+            key={game.index}
+            canForget={!game.allFilled && !revealed}
+            canSubmit={game.allFilled && !revealed}
+            onForgot={game.forgot}
+            onSubmit={game.submit}
+          />
         </div>
       </div>
 

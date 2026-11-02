@@ -29,8 +29,8 @@ const withoutRendaku = (readings: string[]) =>
 /**
  * Up to four readings: onyomi first, then kunyomi to fill the rest, without
  * rendaku repeats. An onyomi that the phonetic component
- * gives (間 → カン from 門) gets the same lime tint as the sound hint in the
- * kanji drawer.
+ * gives (間 → カン from 門) gets a solid lime border, the lime of the sound
+ * hint in the kanji drawer.
  */
 export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
   const general = useKanjiInfo(kanji, "general")
@@ -59,7 +59,7 @@ export const KanjiReadingBadges = ({ kanji }: { kanji: string }) => {
           kana={on}
           className={cn(
             "m-0.5 px-2 py-0.5 sm:py-0.5 text-base sm:text-base",
-            isPhonetic(on) && "bg-lime-100 dark:bg-lime-400/15"
+            isPhonetic(on) && "border-2 border-lime-500 dark:border-lime-400"
           )}
         />
       ))}

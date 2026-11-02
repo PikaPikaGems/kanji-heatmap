@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
@@ -8,6 +8,7 @@ import { usePracticeSession } from "@/components/shared-practice/use-practice-se
 import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
+import { useLockVisualViewportScroll } from "./use-lock-visual-viewport-scroll";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import { RecognitionPracticeSettings, SessionResult } from "./types";
 
@@ -25,33 +26,14 @@ const RecognitionPracticeV1 = () => {
   const primerRef = useRef<HTMLInputElement | null>(null);
 
   const session = usePracticeSession<SessionResult>({
-    activityKind: "recognition",
+    recordType: "reading_practice_round_completed",
     sessionSize: SESSION_SIZE,
     // Focus the sr-only primer so the soft keyboard opens with the session.
     onSessionStart: () => primerRef.current?.focus(),
   });
   const { phase, results, hasMore } = session;
 
-  // Effect needed (external DOM): keeps the play shell pinned to the layout
-  // top. Chasing visualViewport.offsetTop while iOS animates the keyboard
-  // makes the whole UI bob; "/" doesn't do that because ListScreen isn't
-  // viewport-pinned at all.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const lockScroll = () => {
-      if (window.scrollY !== 0) window.scrollTo(0, 0);
-    };
-
-    vv.addEventListener("scroll", lockScroll);
-    vv.addEventListener("resize", lockScroll);
-    lockScroll();
-    return () => {
-      vv.removeEventListener("scroll", lockScroll);
-      vv.removeEventListener("resize", lockScroll);
-    };
-  }, []);
+  useLockVisualViewportScroll();
 
   return (
     <>
@@ -96,6 +78,7 @@ const RecognitionPracticeV1 = () => {
               results={hasMore ? results : session.runResults}
               hasMore={hasMore}
               wordsCleared={session.deck.length}
+              saveError={session.saveError}
               onNext={session.startNextSession}
               onEnd={session.goToInitial}
             />

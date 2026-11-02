@@ -13,11 +13,7 @@ import { Button } from "@/components/ui/button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import {
-  useAiExplainSettings,
-  useAiExplainUsage,
-} from "@/hooks/use-ai-explain";
-import { Progress } from "@/components/ui/progress";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   Accordion,
   AccordionContent,
@@ -27,9 +23,13 @@ import {
 import {
   DEFAULT_AI_EXPLAIN_MODEL,
   hasValidAiExplainKey,
-  readAiExplainSettings,
+  readAiOwnerKey,
+  usesWebSearch,
+  writeAiOwnerKey,
 } from "@/lib/ai-explain/preferences";
-import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
+import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
+import { GUEST_OWNER_ID, useCurrentOwner } from "@/lib/engine/content-owner";
+import { cnDottedUnderlineTrigger, cnWarningText } from "@/lib/generic-cn";
 import { checkXaiKey, listXaiModels } from "@/lib/ai-explain/xai";
 import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
 import { cn } from "@/lib/utils";
@@ -108,8 +108,9 @@ const KeyCheckStatus = ({
 /** Wait after the last keystroke before checking, so typing isn't checked per letter. */
 const KEY_CHECK_DELAY_MS = 600;
 
-const ApiKeyField = () => {
-  const [settings, update] = useAiExplainSettings();
+/** Edits the key of one owner; remounts for the next owner, never shows theirs. */
+const ApiKeyField = ({ ownerId }: { ownerId: string }) => {
+  const [settings] = useAiExplainSettings();
   const [visible, setVisible] = useState(false);
   const [check, setCheck] = useState<KeyCheck>({ status: "idle" });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -117,12 +118,13 @@ const ApiKeyField = () => {
 
   const runCheck = (apiKey: string) => {
     setCheck({ status: "checking" });
-    // A result for a key that has since changed is dropped.
-    const stillCurrent = () => readAiExplainSettings().apiKey === apiKey;
+    // A result for a key that has since changed is dropped. It is saved for
+    // the owner who typed the key, even if someone else is logged in by then.
+    const stillCurrent = () => readAiOwnerKey(ownerId).apiKey === apiKey;
     checkXaiKey(apiKey).then(
       (result) => {
         if (!stillCurrent()) return;
-        update({ keyValid: result === "valid" });
+        writeAiOwnerKey(ownerId, { apiKey, keyValid: result === "valid" });
         setCheck(result === "valid" ? { status: "idle" } : { status: result });
       },
       () => {
@@ -133,7 +135,7 @@ const ApiKeyField = () => {
   };
 
   const onKeyChange = (apiKey: string) => {
-    update({ apiKey, keyValid: false });
+    writeAiOwnerKey(ownerId, { apiKey, keyValid: false });
     clearTimeout(timerRef.current);
     if (apiKey === "") {
       setCheck({ status: "idle" });
@@ -189,8 +191,9 @@ const ApiKeyField = () => {
         />
       )}
       <p className="pt-1 text-xs text-muted-foreground">
-        Saved only in this browser and sent only to xAI. Requests are billed to
-        your xAI account. Get a key at{" "}
+        Saved only in this browser
+        {ownerId === GUEST_OWNER_ID ? "" : ", for your account only,"} and sent
+        only to xAI. Requests are billed to your xAI account. Get a key at{" "}
         <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
         Your key and custom prompts aren&apos;t private: anyone using this
         browser can see them.
@@ -300,41 +303,13 @@ const ModelField = () => {
 
 const formatTokens = (n: number) => n.toLocaleString("en-US");
 
-const UsageField = () => {
+/** The budget only; this month's usage is in App & Device Info. */
+const BudgetField = () => {
   const [settings, update] = useAiExplainSettings();
-  const usage = useAiExplainUsage();
   const budget = settings.monthlyTokenBudget;
   const id = useId();
   return (
     <div className="mb-4">
-      {/* The token and request counts are in the subsection's subtitle. */}
-      {budget !== undefined && (
-        <div className="mb-3">
-          <p className="text-sm tabular-nums">
-            {formatTokens(usage.tokens)} / {formatTokens(budget)} tokens
-          </p>
-          <Progress
-            value={Math.min(100, (usage.tokens / budget) * 100)}
-            className="h-2 mt-2"
-            primitiveCn={usage.tokens > budget ? "bg-red-500" : undefined}
-            aria-label="Tokens used of the monthly budget"
-          />
-        </div>
-      )}
-      <p className="mb-3 text-xs text-muted-foreground">
-        Search calls: {usage.searchCalls} · Images: {usage.imageRequests} ·
-        Audio generations: {usage.audioRequests} · Speech characters:{" "}
-        {usage.audioCharacters}
-        {usage.unreportedSearchRequests > 0 &&
-          ` · ${usage.unreportedSearchRequests} searched requests without a provider-reported search count`}
-      </p>
-      {usage.reportedCostUsd > 0 && (
-        <p className="mb-3 text-xs text-muted-foreground">
-          Provider-reported charges: US${usage.reportedCostUsd.toFixed(4)}.
-          Partial total for requests that returned cost data; check xAI for your
-          full bill.
-        </p>
-      )}
       <label htmlFor={id} className="block mb-1 text-sm font-semibold">
         Monthly text-token budget (optional)
       </label>
@@ -356,14 +331,41 @@ const UsageField = () => {
         Counted in this browser only, and restarts each month. Requests
         incomplete or cancelled can still be billed. Local counters may omit
         these requests. This text-token budget is not a total spending limit for
-        search, images, or speech, and nothing is blocked. Your exact usage is
-        at <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+        search, images, or speech, and nothing is blocked. This month&apos;s
+        usage is in App & Device Info; your exact usage is at{" "}
+        <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
       </p>
     </div>
   );
 };
 
-/** A collapsible group inside the section, styled like Fill the Kanji downloads. */
+/** Kanji Essay and Anchor Word can answer from memory instead of searching. */
+const WebSearchField = () => {
+  const [settings, update] = useAiExplainSettings();
+  return (
+    <div className="mb-3">
+      <div className="flex items-center py-2">
+        <Switch
+          checked={usesWebSearch(settings)}
+          onCheckedChange={(on) =>
+            update({ noWebSearch: on ? undefined : true })
+          }
+          aria-label="Use web search for Kanji Essay and Anchor Word"
+        />
+        <span className="px-2 text-sm font-semibold">
+          Use web search for Kanji Essay and Anchor Word
+        </span>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Search finds sources and real-world examples, and is billed per search.
+        Turn it off to have Grok answer from its own memory: cheaper, but with
+        no source links and a higher chance of mistakes.
+      </p>
+    </div>
+  );
+};
+
+/** A collapsible group inside the section, styled like Fill in the Kanji downloads. */
 const SubsectionItem = ({
   value,
   title,
@@ -392,7 +394,6 @@ const SubsectionItem = ({
 
 const Subsections = () => {
   const [settings] = useAiExplainSettings();
-  const usage = useAiExplainUsage();
   const editedPrompts = useEditedPromptCount();
 
   return (
@@ -432,29 +433,79 @@ const Subsections = () => {
       <SubsectionItem
         value="storage"
         title="Generated content"
-        subtitle="Saved space and deletion"
+        subtitle="Delete what's saved on this device"
       >
         <GeneratedStorageSettings />
       </SubsectionItem>
       <SubsectionItem
         value="usage"
-        title="Usage"
-        subtitle={`This month: ${formatTokens(usage.tokens)} tokens · ${usage.requests} ${
-          usage.requests === 1 ? "request" : "requests"
-        }`}
+        title="Monthly budget"
+        subtitle={
+          settings.monthlyTokenBudget === undefined
+            ? "No text-token budget set"
+            : `${formatTokens(settings.monthlyTokenBudget)} text tokens a month`
+        }
       >
-        <UsageField />
+        <BudgetField />
       </SubsectionItem>
     </Accordion>
   );
 };
 
-export const AiExplainSection = () => {
+/** The key, switch and settings of one owner. */
+const OwnedAiExplainControls = ({ ownerId }: { ownerId: string }) => {
   const [settings, update] = useAiExplainSettings();
   const keyOk = hasValidAiExplainKey(settings);
   // The saved choice is kept while the key is missing or rejected, so a
   // working key turns it back on.
   const active = settings.enabled && keyOk;
+
+  return (
+    <>
+      <ApiKeyField ownerId={ownerId} />
+      <div className="flex items-center py-2">
+        <Switch
+          checked={active}
+          disabled={!keyOk}
+          onCheckedChange={(enabled) => update({ enabled })}
+          aria-label="Enable AI Study Tools"
+        />
+        <span
+          className={cn(
+            "px-2 text-sm font-semibold",
+            !keyOk && "text-muted-foreground"
+          )}
+        >
+          Enable AI Study Tools
+        </span>
+      </div>
+      {!keyOk && (
+        <p className="text-xs text-muted-foreground">
+          Add a Grok API key that works to turn this on.
+        </p>
+      )}
+      {active && (
+        <p
+          role="note"
+          className={cn(
+            "p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50",
+            cnWarningText
+          )}
+        >
+          Heads up: what you generate is saved only in this browser. It
+          isn&apos;t backed up and can be lost if browser data is cleared, and
+          anyone using this computer can see it. Download anything you want to
+          keep.
+        </p>
+      )}
+      {active && <WebSearchField />}
+      {active && <Subsections />}
+    </>
+  );
+};
+
+export const AiExplainSection = () => {
+  const owner = useCurrentOwner();
 
   return (
     <SimpleAccordion trigger="AI Study Tools (Experimental)">
@@ -463,40 +514,14 @@ export const AiExplainSection = () => {
           Ask Grok about sentences, anchor words, and kanji essays. Generate
           visual mnemonics and MP3 narration. Requests use your xAI account.
         </p>
-        <ApiKeyField />
-        <div className="flex items-center py-2">
-          <Switch
-            checked={active}
-            disabled={!keyOk}
-            onCheckedChange={(enabled) => update({ enabled })}
-            aria-label="Enable AI Study Tools"
-          />
-          <span
-            className={cn(
-              "px-2 text-sm font-semibold",
-              !keyOk && "text-muted-foreground"
-            )}
-          >
-            Enable AI Study Tools
-          </span>
-        </div>
-        {!keyOk && (
-          <p className="text-xs text-muted-foreground">
-            Add a Grok API key that works to turn this on.
-          </p>
+        {/* Until we know whose key this is, show none. */}
+        {owner.status === "unknown" ? (
+          <SavedAiContentLoading />
+        ) : (
+          <div key={owner.ownerId} className="animate-fade-in-fast">
+            <OwnedAiExplainControls ownerId={owner.ownerId} />
+          </div>
         )}
-        {active && (
-          <p
-            role="note"
-            className="p-2 mb-3 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50 text-amber-700 dark:text-amber-400"
-          >
-            Heads up: what you generate is saved only in this browser. It
-            isn&apos;t backed up and can be lost if browser data is cleared, and
-            anyone using this computer can see it. Download anything you want to
-            keep.
-          </p>
-        )}
-        {active && <Subsections />}
       </div>
     </SimpleAccordion>
   );

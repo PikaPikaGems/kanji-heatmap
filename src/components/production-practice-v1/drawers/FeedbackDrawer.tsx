@@ -21,6 +21,7 @@ export const FeedbackDrawer = ({
   grade,
   drawing,
   gradingEnabled = true,
+  nextLabel,
   onNext,
 }: {
   open: boolean;
@@ -29,6 +30,8 @@ export const FeedbackDrawer = ({
   grade: GradeRankInfo;
   drawing: DrawingSnapshot | null;
   gradingEnabled?: boolean;
+  /** Mastery game: "Continue" (the card was rated on the draw step). */
+  nextLabel?: string;
   onNext: () => void;
 }) => {
   const [practiceOpen, setPracticeOpen] = useState(false);
@@ -62,7 +65,7 @@ export const FeedbackDrawer = ({
         title={title}
         titleClassName={bounce ? "animate-practice-bounce-soft" : undefined}
         description={<ItemReveal item={item} />}
-        footer={<NextKanjiFooter onNext={onNext} />}
+        footer={<NextKanjiFooter label={nextLabel} onNext={onNext} />}
       >
         {kind === "noKanji" ? (
           <div className="flex flex-col items-center gap-2 px-3 pb-2 mt-4 overflow-y-auto sm:px-4">

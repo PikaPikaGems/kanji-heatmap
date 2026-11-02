@@ -1,6 +1,7 @@
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   DEFAULT_AI_EXPLAIN_PROMPT,
+  DEFAULT_AI_EXPLAIN_WORD_PROMPT,
   JAPANESE_TEXT_PLACEHOLDER,
 } from "@/lib/ai-explain/preferences";
 import {
@@ -66,6 +67,14 @@ export const usePromptEntries = (): PromptEntry[] => {
       defaultValue: DEFAULT_AI_EXPLAIN_PROMPT,
       placeholders: `${JAPANESE_TEXT_PLACEHOLDER} (if missing, the sentence is added at the end)`,
       onChange: (prompt) => update({ prompt }),
+    },
+    {
+      id: "word",
+      label: "Word Explain",
+      value: settings.wordPrompt,
+      defaultValue: DEFAULT_AI_EXPLAIN_WORD_PROMPT,
+      placeholders: `${JAPANESE_TEXT_PLACEHOLDER} (if missing, the word is added at the end)`,
+      onChange: (wordPrompt) => update({ wordPrompt }),
     },
     {
       id: "vocabulary",

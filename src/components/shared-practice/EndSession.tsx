@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { PracticeButton } from "@/components/ui/practice-button";
+import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
 import { Link } from "@/components/dependent/routing/router-adapter";
@@ -8,7 +8,7 @@ import { dedupe, percent } from "@/lib/utils";
 import { Stat } from "./CountUpStat";
 import { EndScreenLayout } from "./EndScreenLayout";
 import { PracticeSessionResult } from "./types";
-import { RecapTile } from "./RecapTile";
+import { RoundRecap } from "./RoundRecap";
 
 const CONTINUE_KEYS = ["Enter", " "] as const;
 
@@ -25,6 +25,7 @@ export const EndSession = ({
   results,
   hasMore,
   wordsCleared,
+  saveError,
   onNext,
   onEnd,
 }: {
@@ -33,6 +34,8 @@ export const EndSession = ({
   hasMore: boolean;
   /** Total words in the filtered deck (used on the final complete screen). */
   wordsCleared: number;
+  /** Why the finished round couldn't be saved, if it couldn't. */
+  saveError: string | null;
   onNext: () => void;
   onEnd: () => void;
 }) => {
@@ -51,8 +54,7 @@ export const EndSession = ({
 
     return (
       <EndScreenLayout
-        className="px-4"
-        heading={`🎉 ${cheer}`}
+        cheer={cheer}
         subtitle="All words complete"
         stats={
           <>
@@ -61,61 +63,29 @@ export const EndSession = ({
             <Stat value={results.length} unit="" label="Attempts" />
           </>
         }
-        afterStats={
-          forgottenKanji.length > 0 && (
-            <Link
-              href={multiKanjiSearchHref(forgottenKanji)}
-              className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
-            >
-              View {forgottenKanji.length} kanji you forgot
-            </Link>
-          )
-        }
-        primaryLabel="Done"
-        onPrimary={onEnd}
-      />
+        onEnd={onEnd}
+        notice={<ProgressNotSavedNotice saveError={saveError} />}
+      >
+        {forgottenKanji.length > 0 && (
+          <Link
+            href={multiKanjiSearchHref(forgottenKanji)}
+            className="text-sm font-bold underline underline-offset-4 text-muted-foreground hover:text-foreground"
+          >
+            View {forgottenKanji.length} kanji you forgot
+          </Link>
+        )}
+      </EndScreenLayout>
     );
   }
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-1 min-h-0 px-4 pt-4 overflow-y-auto">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-center kanji-font animate-practice-bounce-soft">
-            🎉 {cheer}
-          </h2>
-          <p className="mt-2 text-sm font-bold text-center text-muted-foreground">
-            {correctCount}/{results.length} correct this round
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-2 pb-4 mt-6">
-            {results.map((item, i) => (
-              <div
-                key={`${item.kanji}-${item.word}-${i}`}
-                className="animate-practice-tile-in"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <RecapTile
-                  kanji={item.kanji}
-                  keyword={item.keyword}
-                  correct={item.correct}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="shrink-0 px-4 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-background">
-        <div className="flex flex-col w-full max-w-md gap-2 mx-auto">
-          <PracticeButton size="lg" onClick={onNext}>
-            Continue
-          </PracticeButton>
-          <PracticeButton size="md" variant="ghost" onClick={onEnd}>
-            End Session
-          </PracticeButton>
-        </div>
-      </div>
-    </div>
+    <RoundRecap
+      cheer={cheer}
+      subtitle={`${correctCount}/${results.length} correct this round`}
+      tiles={results}
+      onContinue={onNext}
+      onEnd={onEnd}
+      notice={<ProgressNotSavedNotice saveError={saveError} />}
+    />
   );
 };

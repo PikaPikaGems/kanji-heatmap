@@ -4,12 +4,19 @@ import {
   ActivityByDay,
   ActivityKind,
   ActivityKindFilters,
+  ActivityStats,
   ALL_ACTIVITY_KINDS,
   DateRange,
   DayCounts,
   EMPTY_DAY_COUNTS,
-  WindowedActivityStats,
 } from "./types";
+
+export const emptyActivityStats = (): ActivityStats => ({
+  daysActive: 0,
+  kinds: Object.fromEntries(
+    ALL_ACTIVITY_KINDS.map((kind) => [kind, { days: 0, count: 0 }])
+  ) as ActivityStats["kinds"],
+});
 
 export const dayTotalForFilters = (
   day: DayCounts | undefined,
@@ -18,7 +25,7 @@ export const dayTotalForFilters = (
   if (!day) return 0;
   let total = 0;
   for (const kind of ALL_ACTIVITY_KINDS) {
-    if (filters[kind]) total += day[kind] ?? 0;
+    if (filters[kind]) total += day[kind];
   }
   return total;
 };
@@ -27,99 +34,23 @@ export const summarizeActivityInRange = (
   byDay: ActivityByDay,
   range: DateRange,
   filters: ActivityKindFilters
-): WindowedActivityStats => {
-  let daysActive = 0;
-  let speedKatakanaDays = 0;
-  let productionDays = 0;
-  let recognitionDays = 0;
-  let fillTheKanjiDays = 0;
-  let speedKatakanaSessions = 0;
-  let productionRounds = 0;
-  let recognitionRounds = 0;
-  let fillTheKanjiBatches = 0;
+): ActivityStats => {
+  const stats = emptyActivityStats();
 
   for (const [key, day] of Object.entries(byDay)) {
     if (!isDateKeyInRange(key, range)) continue;
 
-    const speedKatakana = day.speedKatakana ?? 0;
-    const production = day.production ?? 0;
-    const recognition = day.recognition ?? 0;
-    const fillTheKanji = day.fillTheKanji ?? 0;
-
-    if (filters.speedKatakana) {
-      speedKatakanaSessions += speedKatakana;
-      if (speedKatakana > 0) speedKatakanaDays += 1;
-    }
-    if (filters.production) {
-      productionRounds += production;
-      if (production > 0) productionDays += 1;
-    }
-    if (filters.recognition) {
-      recognitionRounds += recognition;
-      if (recognition > 0) recognitionDays += 1;
-    }
-    if (filters.fillTheKanji) {
-      fillTheKanjiBatches += fillTheKanji;
-      if (fillTheKanji > 0) fillTheKanjiDays += 1;
+    for (const kind of enabledKinds(filters)) {
+      const count = day[kind];
+      if (count <= 0) continue;
+      stats.kinds[kind].count += count;
+      stats.kinds[kind].days += 1;
     }
 
-    if (dayTotalForFilters(day, filters) > 0) daysActive += 1;
+    if (dayTotalForFilters(day, filters) > 0) stats.daysActive += 1;
   }
 
-  return {
-    daysActive,
-    speedKatakanaDays,
-    productionDays,
-    recognitionDays,
-    fillTheKanjiDays,
-    speedKatakanaSessions,
-    productionRounds,
-    recognitionRounds,
-    fillTheKanjiBatches,
-  };
-};
-
-/**
- * Distinct days with activity (all-time overview): total + per kind.
- */
-export const countAllDaysActive = (
-  byDay: ActivityByDay
-): Pick<
-  WindowedActivityStats,
-  | "daysActive"
-  | "speedKatakanaDays"
-  | "productionDays"
-  | "recognitionDays"
-  | "fillTheKanjiDays"
-> => {
-  let daysActive = 0;
-  let speedKatakanaDays = 0;
-  let productionDays = 0;
-  let recognitionDays = 0;
-  let fillTheKanjiDays = 0;
-
-  for (const day of Object.values(byDay)) {
-    const speedKatakana = day.speedKatakana ?? 0;
-    const production = day.production ?? 0;
-    const recognition = day.recognition ?? 0;
-    const fillTheKanji = day.fillTheKanji ?? 0;
-
-    if (speedKatakana > 0) speedKatakanaDays += 1;
-    if (production > 0) productionDays += 1;
-    if (recognition > 0) recognitionDays += 1;
-    if (fillTheKanji > 0) fillTheKanjiDays += 1;
-    if (speedKatakana + production + recognition + fillTheKanji > 0) {
-      daysActive += 1;
-    }
-  }
-
-  return {
-    daysActive,
-    speedKatakanaDays,
-    productionDays,
-    recognitionDays,
-    fillTheKanjiDays,
-  };
+  return stats;
 };
 
 export const maxDayTotalInRange = (

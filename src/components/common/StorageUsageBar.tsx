@@ -2,9 +2,7 @@ import type { ReactNode } from "react";
 import { STORAGE_WARNING_RATIO } from "@/lib/ai-explain/storage-budgets";
 import { formatMegabytes } from "@/lib/format-bytes";
 import { cn } from "@/lib/utils";
-
-const percentOf = (bytes: number, limit: number) =>
-  `${Math.min(100, (bytes / limit) * 100)}%`;
+import { LegendDot, StackedBar } from "./StackedBar";
 
 /**
  * Storage against its limit as one stacked bar: the current user's share,
@@ -40,36 +38,26 @@ export const StorageUsageBar = ({
           {formatMegabytes(total)} of {formatMegabytes(limit)}
         </span>
       </div>
-      <div
+      <StackedBar
         role="meter"
         aria-valuemin={0}
         aria-valuemax={limit}
         aria-valuenow={total}
         aria-label={`${formatMegabytes(total)} of ${formatMegabytes(limit)} used`}
-        className="flex w-full h-2 overflow-hidden rounded-full bg-secondary"
-      >
-        <div
-          className={cn("h-full", color)}
-          style={{ width: percentOf(mine, limit) }}
-        />
-        {others != null && others > 0 && (
-          <div
-            className={cn("h-full opacity-40", color)}
-            style={{ width: percentOf(others, limit) }}
-          />
-        )}
-      </div>
+        total={limit}
+        segments={[
+          { key: "mine", value: mine, cn: color },
+          { key: "others", value: others ?? 0, cn: cn("opacity-40", color) },
+        ]}
+      />
       {others != null && (
         <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <span aria-hidden className={cn("size-2 rounded-full", color)} />
+            <LegendDot className={color} />
             You {formatMegabytes(mine)}
           </span>
           <span className="inline-flex items-center gap-1">
-            <span
-              aria-hidden
-              className={cn("size-2 rounded-full opacity-40", color)}
-            />
+            <LegendDot className={cn("opacity-40", color)} />
             Others on this device {formatMegabytes(others)}
           </span>
         </div>

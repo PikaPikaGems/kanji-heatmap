@@ -114,11 +114,14 @@ importers:
         specifier: 1.0.0
         version: 1.0.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       dexie:
-        specifier: ^4.4.6
-        version: 4.4.6
+        specifier: 4.4.4
+        version: 4.4.4
       dmak:
         specifier: ^0.3.1
         version: 0.3.1
+      engine-contract:
+        specifier: github:PikaPikaGems/experimental-engine-contract#2d008fe1a70c3e7accdaec170fcfcb8cd820dce5
+        version: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/2d008fe1a70c3e7accdaec170fcfcb8cd820dce5
       fuzzysearch:
         specifier: ^1.0.3
         version: 1.0.3
@@ -161,6 +164,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.0)
+      ts-fsrs:
+        specifier: 5.4.1
+        version: 5.4.1
       unified:
         specifier: ^11.0.5
         version: 11.0.5
@@ -3017,8 +3023,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dexie@4.4.6:
-    resolution: {integrity: sha512-hJP/BO6mjB+tX6hToIO1kmxYLNmun90wYbfcoAoLpKEyDYal/k33dg0TAfoUe2TDsbbLoVIzljJ3BN2UbR5EOg==}
+  dexie@4.4.4:
+    resolution: {integrity: sha512-jIwsYI8Os2hgnqc6O49YwFDKGc5v5QjGx0wPVp543ip1F53VFAKMLthV2pQosQcVTv3eAskTWYspOx195PM0FQ==}
 
   didyoumean@1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
@@ -3063,6 +3069,10 @@ packages:
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
+
+  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/2d008fe1a70c3e7accdaec170fcfcb8cd820dce5:
+    resolution: {tarball: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/2d008fe1a70c3e7accdaec170fcfcb8cd820dce5}
+    version: 1.0.0
 
   entities@6.0.1:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
@@ -4653,6 +4663,10 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  ts-fsrs@5.4.1:
+    resolution: {integrity: sha512-mOp9+oexJexBTkwjg/jQI1aSUQRLIAvbimeKHLSmVdNJPwObugFNKmZkoggH5d6kZ0uaWLboP1Al1DnXAfIb9w==}
+    engines: {node: '>=20.0.0'}
 
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
@@ -7784,7 +7798,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie@4.4.6: {}
+  dexie@4.4.4: {}
 
   didyoumean@1.2.2: {}
 
@@ -7819,6 +7833,8 @@ snapshots:
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
+
+  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/2d008fe1a70c3e7accdaec170fcfcb8cd820dce5: {}
 
   entities@6.0.1: {}
 
@@ -9827,6 +9843,8 @@ snapshots:
   ts-api-utils@2.0.1(typescript@5.6.3):
     dependencies:
       typescript: 5.6.3
+
+  ts-fsrs@5.4.1: {}
 
   ts-interface-checker@0.1.13: {}
 

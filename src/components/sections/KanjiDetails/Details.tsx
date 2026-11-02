@@ -1,5 +1,6 @@
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { lazy, ReactNode, Suspense } from "react";
-import { Bug, Loader2, Volume2 } from "lucide-react";
+import { Bug, Volume2 } from "lucide-react";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { ErrorBoundary } from "@/components/error";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
@@ -7,7 +8,7 @@ import { BasicLoading } from "@/components/common/BasicLoading";
 import { FrequencyInfo } from "./FrequencyInfo";
 import { General } from "./General";
 import { KanjiKeyboardShortcuts } from "./KanjiKeyboardShortcuts";
-import { ReadingFrequencyCategory } from "./ReadingFrequencyCategory";
+import { ReadingFrequencyCategory as ReadingUsefulnessTable } from "./ReadingFrequencyCategory";
 import { SampleVocabulary } from "./SampleVocabulary";
 import { TextbookVocabulary } from "./TextbookVocabulary";
 import { Badge } from "@/components/ui/badge";
@@ -19,21 +20,13 @@ import { RepresentativeStudyWord } from "./RepresentativeStudyWord";
 import { BottomBar } from "@/components/common/BottomBar";
 import { useKanjiRepresentativeWordDetails } from "@/providers/kanji-representative-word-hooks";
 import { KanjiWordStatusActions } from "./KanjiWordStatusActions";
+import { StudyNotesAccordion } from "./StudyNotesAccordion";
+import { YourProgressAccordion } from "./YourProgressAccordion";
 import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { isAiExplainReady } from "@/lib/ai-explain/preferences";
-
-const StudyNotesLoadingFallback = () => (
-  <div
-    className="flex items-center justify-center w-full h-48"
-    role="status"
-    aria-label="Loading"
-  >
-    <Loader2 className="size-7 animate-spin" />
-  </div>
-);
 
 export const RirikkuCTABadge = () => {
   return (
@@ -108,7 +101,6 @@ export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   );
 };
 const StrokeAnimation = lazy(() => import("./StrokeAnimation"));
-const KanjiStudyNotes = lazy(() => import("./KanjiStudyNotes"));
 const KanjiEssay = lazy(() => import("./KanjiEssay"));
 const VisualMnemonics = lazy(() => import("./VisualMnemonics"));
 
@@ -126,6 +118,14 @@ const RepresentativeStudyWordAccordion = ({ kanji }: { kanji: string }) => {
     </>
   );
 };
+
+const ReadingUsefulnessAccordion = ({ kanji }: { kanji: string }) => (
+  <SimpleAccordion trigger="Reading Usefulness">
+    <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
+      <ReadingUsefulnessTable kanji={kanji} />
+    </ErrorBoundary>
+  </SimpleAccordion>
+);
 
 export const KanjiDetails = ({
   kanji,
@@ -183,7 +183,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Kanji Essay">
           <ErrorBoundary details="KanjiEssay in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <KanjiEssay
                 key={kanji}
                 kanji={kanji}
@@ -196,7 +196,7 @@ export const KanjiDetails = ({
       {isAiExplainReady(aiSettings) && (
         <SimpleAccordion trigger="Visual Mnemonics">
           <ErrorBoundary details="VisualMnemonics in KanjiDetails">
-            <Suspense fallback={<StudyNotesLoadingFallback />}>
+            <Suspense fallback={<SectionLoading />}>
               <VisualMnemonics
                 key={kanji}
                 kanji={kanji}
@@ -206,18 +206,9 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
-      <SimpleAccordion trigger="Personal Study Notes">
-        <ErrorBoundary details="KanjiStudyNotes in KanjiDetails">
-          <Suspense fallback={<StudyNotesLoadingFallback />}>
-            <KanjiStudyNotes key={kanji} kanji={kanji} />
-          </Suspense>
-        </ErrorBoundary>
-      </SimpleAccordion>
-      <SimpleAccordion trigger={"Reading Usefulness"}>
-        <ErrorBoundary details="ReadingFrequencyCategory in KanjiDetails">
-          <ReadingFrequencyCategory kanji={kanji} />
-        </ErrorBoundary>
-      </SimpleAccordion>
+      <StudyNotesAccordion kanji={kanji} />
+      <YourProgressAccordion kanji={kanji} />
+      <ReadingUsefulnessAccordion kanji={kanji} />
       <SimpleAccordion
         trigger={`External Links for ${kanji}`}
         defaultOpen={true}
