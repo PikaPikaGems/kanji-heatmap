@@ -149,6 +149,8 @@ export const FsrsSettingsForm = ({
   const shortTermOn =
     draft.learningStepsMinutes.length > 0 ||
     draft.relearningStepsMinutes.length > 0;
+  // Off, the steps stay in view (dimmed) as the ones switching it on brings back.
+  const shownSteps = shortTermOn ? draft : restoredSteps(defaults);
 
   const edit = (patch: Partial<ReviewSettings>) => {
     setDraft({ ...draft, ...patch });
@@ -239,28 +241,28 @@ export const FsrsSettingsForm = ({
               checked={shortTermOn}
               onCheckedChange={setShortTerm}
             />
-            {shortTermOn && (
-              <div className="flex flex-col gap-6 animate-fade-in-fast">
-                <StepsField
-                  title="Learning steps"
-                  presets={LEARNING_PRESETS}
-                  steps={draft.learningStepsMinutes}
-                  onChange={(learningStepsMinutes) =>
-                    edit({ learningStepsMinutes })
-                  }
-                  error={errorFor("learningStepsMinutes")}
-                />
-                <StepsField
-                  title="Relearning steps"
-                  presets={RELEARNING_PRESETS}
-                  steps={draft.relearningStepsMinutes}
-                  onChange={(relearningStepsMinutes) =>
-                    edit({ relearningStepsMinutes })
-                  }
-                  error={errorFor("relearningStepsMinutes")}
-                />
-              </div>
-            )}
+            <div className="flex flex-col gap-6">
+              <StepsField
+                title="Learning steps"
+                presets={LEARNING_PRESETS}
+                steps={shownSteps.learningStepsMinutes ?? []}
+                onChange={(learningStepsMinutes) =>
+                  edit({ learningStepsMinutes })
+                }
+                error={errorFor("learningStepsMinutes")}
+                disabled={!shortTermOn}
+              />
+              <StepsField
+                title="Relearning steps"
+                presets={RELEARNING_PRESETS}
+                steps={shownSteps.relearningStepsMinutes ?? []}
+                onChange={(relearningStepsMinutes) =>
+                  edit({ relearningStepsMinutes })
+                }
+                error={errorFor("relearningStepsMinutes")}
+                disabled={!shortTermOn}
+              />
+            </div>
           </SettingsSection>
           <SettingsSection value="advanced" title="Advanced">
             <ModelWeightsField

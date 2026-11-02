@@ -28,7 +28,8 @@ const StepTile = ({
     variant={selected ? "primary" : "secondary"}
     aria-pressed={selected}
     onClick={onClick}
-    className="flex-col w-full min-w-0 h-auto gap-0.5 px-2 py-2 rounded-xl"
+    // Dimmed once, by the fieldset, so selected and unselected tiles match.
+    className="flex-col w-full min-w-0 h-auto gap-0.5 px-2 py-2 rounded-xl disabled:opacity-100"
   >
     <span className="text-sm">{label}</span>
     {/* One line; a long custom value ends in "…" with the full value on hover. */}
@@ -47,7 +48,8 @@ const StepTile = ({
 /**
  * Preset tiles for one step array, plus a Custom tile that edits the draft
  * through the "Custom steps" dialog. The selected tile is derived from the
- * draft: a value matching no preset is Custom.
+ * draft: a value matching no preset is Custom. `disabled` (short term off)
+ * shows the steps dimmed and untappable, without their warnings.
  */
 export const StepsField = ({
   title,
@@ -55,12 +57,14 @@ export const StepsField = ({
   steps,
   onChange,
   error,
+  disabled = false,
 }: {
   title: string;
   presets: StepPreset[];
   steps: number[];
   onChange: (steps: number[]) => void;
   error: string | undefined;
+  disabled?: boolean;
 }) => {
   const [editing, setEditing] = useState(false);
   const selected = presets.find((preset) => sameSteps(preset.steps, steps));
@@ -68,7 +72,13 @@ export const StepsField = ({
   const isCustom = selected === undefined && steps.length > 0;
 
   return (
-    <fieldset className="flex flex-col gap-2 min-w-0">
+    <fieldset
+      disabled={disabled}
+      className={cn(
+        "flex flex-col gap-2 min-w-0 transition-opacity",
+        disabled && "opacity-50"
+      )}
+    >
       <legend className="mb-2 text-sm font-semibold">{title}</legend>
       <div className="grid grid-cols-2 gap-2">
         {presets.map((preset) => (
@@ -96,9 +106,10 @@ export const StepsField = ({
           Edit steps
         </TextActionButton>
       )}
-      {stepWarnings(steps).map((warning) => (
-        <Warning key={warning}>{warning}</Warning>
-      ))}
+      {!disabled &&
+        stepWarnings(steps).map((warning) => (
+          <Warning key={warning}>{warning}</Warning>
+        ))}
       <FieldError message={error} />
       {editing && (
         <CustomStepsDialog
