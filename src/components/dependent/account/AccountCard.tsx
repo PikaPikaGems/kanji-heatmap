@@ -88,17 +88,15 @@ export const AccountCard = ({
   children?: ReactNode;
 }) => (
   <div className="flex flex-col gap-3 p-3 text-left border rounded-xl">
-    {/* The status sits under the name and runs under the action too, so a
-        chip like "● Account can't save ›" isn't cut off. */}
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-1">
-      <div className="flex items-center row-span-2">
-        <Avatar initial={initial} />
+    <div className="flex items-start gap-3">
+      <Avatar initial={initial} />
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="text-sm font-bold truncate" title={name}>
+          {name}
+        </span>
+        {status}
       </div>
-      <span className="self-end text-sm font-bold truncate" title={name}>
-        {name}
-      </span>
-      <div className="flex items-center gap-1.5">{actions}</div>
-      <div className="flex col-span-2 min-w-0">{status}</div>
+      {actions && <div className="flex items-center gap-1.5">{actions}</div>}
     </div>
     {children}
     <DottedSeparator />

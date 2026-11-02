@@ -38,19 +38,25 @@ export const syncLabel = (
 };
 
 /**
- * The sidebar chip's wording: as `syncLabel`, but offline it says what's
- * saved ("Synced 3 h ago", "Waiting to sync"), since the Online / Offline
- * chip sits right below it.
+ * The sidebar chip's wording, short enough to fit beside the avatar: as
+ * `syncLabel`, but "No data" for data not downloaded and "Unsynced" for
+ * changes waiting (like the Unsynced changes dialog it opens). Offline it
+ * says what's saved ("Synced 3 h ago", "Unsynced"), since the Online /
+ * Offline chip sits right below it.
  */
 export const syncChipLabel = (
   sync: SyncStatus | undefined,
   online: boolean,
   download: DataDownload
 ) => {
+  if (download === "not-downloaded") return "No data";
+  if (sync && sync.state === "idle" && sync.pendingOperationsCount > 0) {
+    return "Unsynced";
+  }
   if (online || download !== "ready" || !sync) {
     return syncLabel(sync, online, download);
   }
-  if (sync.pendingOperationsCount > 0) return "Waiting to sync";
+  if (sync.pendingOperationsCount > 0) return "Unsynced";
   if (sync.lastSyncedAt === undefined) return "Not synced yet";
   return `Synced ${relativeTime(sync.lastSyncedAt)}`;
 };

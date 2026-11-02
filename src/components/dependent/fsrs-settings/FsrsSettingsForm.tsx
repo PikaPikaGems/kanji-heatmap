@@ -5,6 +5,7 @@ import { TextActionButton } from "@/components/common/AiActionButtons";
 import { DialogActions } from "@/components/common/DialogActions";
 import { NoticeCard, NoticeCardButton } from "@/components/common/NoticeCard";
 import { UserNotice } from "@/components/common/UserNotice";
+import { LoggedOutCard } from "@/components/dependent/account/LoggedOutCard";
 import { WriteBlockerCard } from "@/components/dependent/account/WriteBlockerCard";
 import { Accordion } from "@/components/ui/accordion";
 import { PracticeButton } from "@/components/ui/practice-button";
@@ -16,7 +17,6 @@ import {
   RELEARNING_PRESETS,
   writeSavedSteps,
 } from "@/lib/engine/fsrs-steps";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { forceHardRefresh } from "@/lib/force-hard-refresh";
 import { SettingsSection, SwitchField } from "./FieldParts";
@@ -65,19 +65,7 @@ const BLOCKER_DETAIL: Partial<Record<WriteBlocker, string>> = {
 /** Why the settings can't be saved, as a notice card above the form. */
 const BlockerNotice = ({ blocker }: { blocker: SaveBlocker }) => {
   if (blocker.kind === "signed-out") {
-    return (
-      <NoticeCard
-        icon="👀"
-        title="You're not logged in."
-        action={
-          <NoticeCardButton variant="secondary" onClick={openLoginDialog}>
-            Log in
-          </NoticeCardButton>
-        }
-      >
-        Log in to save your review settings.
-      </NoticeCard>
-    );
+    return <LoggedOutCard>Log in to save your review settings.</LoggedOutCard>;
   }
   if (blocker.kind === "update-required") {
     return (

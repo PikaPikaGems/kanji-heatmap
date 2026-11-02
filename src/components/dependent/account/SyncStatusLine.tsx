@@ -26,7 +26,7 @@ export const SyncStatusLine = ({
 }: {
   sync: SyncStatus | undefined;
   download: DataDownload;
-  /** Shown instead of the sync state, e.g. "Account can't save". */
+  /** Shown instead of the sync state, e.g. "Can't save". */
   problem: string | null;
   /** A warning the modal shows (not downloaded, write blocked, …). */
   hasNotice: boolean;
@@ -44,7 +44,7 @@ export const SyncStatusLine = ({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center self-start max-w-full gap-1.5 py-0.5 pl-2 pr-1.5 text-xs border rounded-full whitespace-nowrap transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "inline-flex items-center self-start max-w-full gap-1 py-px pl-1.5 pr-1 mt-1 text-[11px] border rounded-full whitespace-nowrap transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           needsAttention
             ? cnWarningText
             : "font-semibold text-muted-foreground hover:text-foreground"
@@ -55,14 +55,14 @@ export const SyncStatusLine = ({
         <span
           aria-hidden
           className={cn(
-            "size-2 shrink-0 rounded-full",
+            "size-1.5 shrink-0 rounded-full",
             needsAttention
               ? "bg-red-500"
               : syncDotClassName(sync, online, download)
           )}
         />
         <span className="truncate tabular-nums">{text}</span>
-        <ChevronRight aria-hidden className="size-3.5 shrink-0 opacity-70" />
+        <ChevronRight aria-hidden className="size-3 shrink-0 opacity-70" />
       </button>
     </DrawerPrimitive.Close>
   );

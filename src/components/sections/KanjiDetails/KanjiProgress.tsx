@@ -1,7 +1,7 @@
 import { Loader2, PlusCircle } from "lucide-react";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import { NotDownloadedCard } from "@/components/dependent/account/DownloadNow";
-import { LoginNotice } from "@/components/dependent/account/LoginNotice";
+import { LoggedOutCard } from "@/components/dependent/account/LoggedOutCard";
 import { useDataDownload, useWriteBlocker } from "@/lib/engine/data-download";
 import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
@@ -89,15 +89,14 @@ const CombinedMastery = ({ item }: { item: ReviewPileItemView }) => {
   );
 };
 
-/** Logged out: the table with its defaults, under the log-in notice. */
+/** Logged out: the table with its defaults, under the logged-out card. */
 const SignedOutKanjiProgress = ({ kanji }: { kanji: string }) => {
   const pile = usePileWords(kanji);
   return (
     <div className="flex flex-col gap-3 pb-1">
-      <LoginNotice
-        to="track your progress on this kanji"
-        className="px-1 pt-1"
-      />
+      <LoggedOutCard className="mx-1 mt-2">
+        Log in to track your progress on this kanji.
+      </LoggedOutCard>
       <ProgressTable item={null} words={wordsFromData(kanji, pile)} />
     </div>
   );

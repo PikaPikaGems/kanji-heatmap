@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LoginNotice } from "@/components/dependent/account/LoginNotice";
+import { LoggedOutCard } from "@/components/dependent/account/LoggedOutCard";
 import { readNoteDraft, writeNoteDraft } from "./draft-storage";
 import { type NotesMode, StudyNotesPanel } from "./StudyNotesPanel";
 
@@ -38,7 +38,10 @@ export const SignedOutStudyNotes = ({
         disabled: false,
       }}
       notices={() => (
-        <LoginNotice to="save this note, or it will be lost when you close this tab" />
+        <LoggedOutCard>
+          Log in to save this note. Until then, it&apos;s lost when you close
+          this tab.
+        </LoggedOutCard>
       )}
     />
   );

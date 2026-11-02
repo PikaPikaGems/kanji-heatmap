@@ -1,6 +1,7 @@
 import { NoticeCard, NoticeCardButton } from "@/components/common/NoticeCard";
 import { DownloadNowButton } from "@/components/dependent/account/DownloadNow";
 import { LetUsKnowLine } from "@/components/dependent/account/LetUsKnow";
+import { LoggedOutCard } from "@/components/dependent/account/LoggedOutCard";
 import { useDataDownload } from "@/lib/engine/data-download";
 import {
   ENGINE_FAILED_DETAIL_COPY,
@@ -8,7 +9,6 @@ import {
   UPDATE_BROWSER_DETAIL_COPY,
   UPDATE_BROWSER_TITLE_COPY,
 } from "@/lib/engine/engine-copy";
-import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { openRecoveryDialog } from "@/lib/engine/recovery-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 
@@ -24,19 +24,7 @@ export const DashboardAccountBanner = () => {
   const download = useDataDownload();
 
   if (account.kind === "signed-out") {
-    return (
-      <NoticeCard
-        icon="👀"
-        title="You're not logged in."
-        action={
-          <NoticeCardButton variant="secondary" onClick={openLoginDialog}>
-            Log in
-          </NoticeCardButton>
-        }
-      >
-        Log in to see your progress.
-      </NoticeCard>
-    );
+    return <LoggedOutCard>Log in to see your progress.</LoggedOutCard>;
   }
   if (account.kind === "active" && download !== "ready") {
     return (

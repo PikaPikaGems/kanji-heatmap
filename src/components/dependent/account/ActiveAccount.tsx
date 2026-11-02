@@ -35,7 +35,7 @@ export const ActiveAccount = ({
   // The data not downloaded already shows as the sync state.
   const problem =
     blocker === "entitlement_expired"
-      ? "Account can't save"
+      ? "Can't save"
       : isSyncBlocker(blocker)
         ? "Saving paused"
         : null;
