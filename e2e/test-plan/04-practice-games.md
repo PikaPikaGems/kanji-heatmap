@@ -1,8 +1,14 @@
 # 04 — Practice Games (P2)
 
-Guards the three practice screens against refactors of deck building
+Guards the practice screens against refactors of deck building
 (`src/components/shared-practice/`), game state machines, and the
-activity-recording pipeline (`src/lib/activity/storage.ts`).
+activity-recording pipeline (each finished round is an engine
+`generic_challenge_completed` record, `src/lib/practice/activity.ts`).
+
+Reading Practice I (`/reading-practice`) drills each kanji's main anchor
+word; Reading Practice II (`/reading-practice-2`) is the same game over each
+kanji's secondary word (kanji without one are left out of its deck). The
+writing games show both words as clozes.
 
 **Already covered** (`e2e/practice.spec.ts` — don't duplicate):
 

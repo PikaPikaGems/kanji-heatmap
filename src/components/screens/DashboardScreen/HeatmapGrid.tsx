@@ -21,7 +21,7 @@ type PopoverState = { anchor: HTMLElement; detail: ReactNode; open: boolean };
 
 /**
  * One detail popover shared by every HeatmapCell inside it. A Radix Popover
- * per cell made opening the Fill the Kanji heatmap (~1,900 cells) take about
+ * per cell made opening the Fill in the Kanji heatmap (~1,900 cells) take about
  * a second; cells are now plain buttons that point this popover at themselves.
  */
 export const HeatmapPopoverProvider = ({

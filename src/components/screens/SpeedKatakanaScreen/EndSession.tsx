@@ -1,7 +1,9 @@
+import type { SaveError } from "@/lib/engine/use-activity-recorder";
 import { useMemo } from "react";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { pickEndCheer } from "@/lib/practice-cheers";
 import { EndScreenLayout, Stat } from "@/components/shared-practice";
+import { ProgressNotSavedNotice } from "@/components/dependent/account/ProgressNotSavedNotice";
 import { SessionStats } from "./types";
 import { SpeedKatakanaStatsSummary } from "./SpeedKatakanaStatsSummary";
 
@@ -10,11 +12,14 @@ export const EndSession = ({
   onNext,
   onEnd,
   completedSets,
+  saveError,
 }: {
   stats: SessionStats;
   onNext: () => void;
   onEnd: () => void;
   completedSets: number;
+  /** Why the finished session couldn't be saved, if it couldn't. */
+  saveError: SaveError | null;
 }) => {
   const cheer = useMemo(() => pickEndCheer(), []);
   useEnterAction(onNext);
@@ -22,13 +27,8 @@ export const EndSession = ({
 
   return (
     <EndScreenLayout
-      heading={cheer}
-      subtitle=""
-      headingExtra={
-        <div className="mt-2">
-          <SpeedKatakanaStatsSummary completed={completedSets} />
-        </div>
-      }
+      cheer={cheer}
+      headingExtra={<SpeedKatakanaStatsSummary completed={completedSets} />}
       stats={
         <>
           <Stat value={stats.accuracy} unit="%" label="Accuracy" />
@@ -39,10 +39,9 @@ export const EndSession = ({
           />
         </>
       }
-      primaryLabel="Next Challenge"
-      onPrimary={onNext}
-      secondaryLabel="End Session"
-      onSecondary={onEnd}
+      onContinue={onNext}
+      onEnd={onEnd}
+      notice={<ProgressNotSavedNotice saveError={saveError} />}
     />
   );
 };

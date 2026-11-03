@@ -105,7 +105,7 @@ export const KanjiActions = ({ kanji }: { kanji: string }) => {
 export const KanjiActionsBtns = ({ kanji }: { kanji: string }) => {
   return (
     <>
-      <div className="flex flex-wrap items-center px-4 py-3 space-x-1">
+      <div className="flex flex-wrap items-center gap-1 px-4 py-3">
         <NextPrevLinks currentKanji={kanji} />
         <div className="border-2 rounded-lg">
           <ChangeFontButton />

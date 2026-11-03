@@ -1,21 +1,39 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
 import KanjiDrawerGlobal from "@/components/screens/ListScreen/Drawer/KanjiDrawerGlobal";
 import { EndSession, PracticeShell } from "@/components/shared-practice";
 import { usePracticeSession } from "@/components/shared-practice/use-practice-session";
-import { recognitionPracticePageMeta } from "@/lib/pages/practice-pages";
+import {
+  recognitionPracticePageMeta,
+  type PracticePageMeta,
+} from "@/lib/pages/practice-pages";
+import type { PracticeActivityType } from "@/lib/practice/activity";
+import type { DeckAnchor } from "@/components/shared-practice/use-practice-deck";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
+import { useLockVisualViewportScroll } from "./use-lock-visual-viewport-scroll";
 import { DEFAULT_SETTINGS, SESSION_SIZE, SETTINGS_KEY } from "./constants";
 import { RecognitionPracticeSettings, SessionResult } from "./types";
 
 /** Toggle off to size the shell with `bottom-0` instead of visualViewport height. */
 const visualPortOn = false;
 
-const RecognitionPracticeV1 = () => {
-  useHtmlDocumentTitle(recognitionPracticePageMeta.heading);
+/**
+ * A reading practice game: type the reading of each kanji's main word
+ * (/reading-practice) or secondary word (/reading-practice-2).
+ */
+export const ReadingPracticeGame = ({
+  page,
+  anchor,
+  activityType,
+}: {
+  page: PracticePageMeta;
+  anchor: DeckAnchor;
+  activityType: PracticeActivityType;
+}) => {
+  useHtmlDocumentTitle(page.heading);
 
   const [settings] = useLocalStorage<RecognitionPracticeSettings>(
     SETTINGS_KEY,
@@ -25,33 +43,14 @@ const RecognitionPracticeV1 = () => {
   const primerRef = useRef<HTMLInputElement | null>(null);
 
   const session = usePracticeSession<SessionResult>({
-    activityKind: "recognition",
+    activityType,
     sessionSize: SESSION_SIZE,
     // Focus the sr-only primer so the soft keyboard opens with the session.
     onSessionStart: () => primerRef.current?.focus(),
   });
   const { phase, results, hasMore } = session;
 
-  // Effect needed (external DOM): keeps the play shell pinned to the layout
-  // top. Chasing visualViewport.offsetTop while iOS animates the keyboard
-  // makes the whole UI bob; "/" doesn't do that because ListScreen isn't
-  // viewport-pinned at all.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const lockScroll = () => {
-      if (window.scrollY !== 0) window.scrollTo(0, 0);
-    };
-
-    vv.addEventListener("scroll", lockScroll);
-    vv.addEventListener("resize", lockScroll);
-    lockScroll();
-    return () => {
-      vv.removeEventListener("scroll", lockScroll);
-      vv.removeEventListener("resize", lockScroll);
-    };
-  }, []);
+  useLockVisualViewportScroll();
 
   return (
     <>
@@ -68,7 +67,11 @@ const RecognitionPracticeV1 = () => {
       >
         {phase === "initial" && (
           <div key="initial" className="h-full animate-fade-in">
-            <InitialScreen onStart={session.startGame} />
+            <InitialScreen
+              page={page}
+              anchor={anchor}
+              onStart={session.startGame}
+            />
           </div>
         )}
 
@@ -96,6 +99,7 @@ const RecognitionPracticeV1 = () => {
               results={hasMore ? results : session.runResults}
               hasMore={hasMore}
               wordsCleared={session.deck.length}
+              saveError={session.saveError}
               onNext={session.startNextSession}
               onEnd={session.goToInitial}
             />
@@ -107,5 +111,14 @@ const RecognitionPracticeV1 = () => {
     </>
   );
 };
+
+/** /reading-practice: Reading Practice I, the main words. */
+const RecognitionPracticeV1 = () => (
+  <ReadingPracticeGame
+    page={recognitionPracticePageMeta}
+    anchor="main"
+    activityType="reading_practice"
+  />
+);
 
 export default RecognitionPracticeV1;

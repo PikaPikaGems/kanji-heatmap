@@ -1,6 +1,7 @@
-import { useEffect, useId, useState } from "react";
+import { CheckCircle, Copy } from "@/components/icons";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useId, useState } from "react";
 import { RotateCcw, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
 import {
@@ -14,10 +15,12 @@ import {
   DEFAULT_AI_SPEECH_BIT_RATE,
   type AiSpeechBitRate,
   DEFAULT_AI_SPEECH_VOICE,
+  usesWebSearch,
 } from "@/lib/ai-explain/preferences";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
 import { DEFAULT_AI_IMAGE_MODEL } from "@/lib/ai-explain/prompts";
+import { OwnedAiContent } from "@/components/common/OwnedAiContent";
 
 type PromptEditorProps = {
   title: string;
@@ -34,33 +37,48 @@ const PromptEditor = ({
   onChange,
 }: PromptEditorProps) => {
   const id = useId();
+  const { copy, status } = useCopyToClipboard(1500);
+  const current = value ?? defaultValue;
   return (
     <div className="mb-4 space-y-1">
-      <div className="flex flex-wrap items-center justify-between gap-1">
-        <label htmlFor={id} className="text-sm font-semibold">
-          {title}
-        </label>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="rounded-lg"
-          onClick={() => onChange(undefined)}
-          disabled={value === undefined}
-        >
-          <RotateCcw /> Reset to default
-        </Button>
-      </div>
+      <label htmlFor={id} className="block text-sm font-semibold">
+        {title}
+      </label>
       <ResponsiveTextarea
         id={id}
         title={title}
         rows={10}
-        value={value ?? defaultValue}
+        value={current}
         onValueChange={(next) =>
           onChange(next === defaultValue ? undefined : next)
         }
         spellCheck={false}
       />
+      {/* Under the editor, left-aligned: reset · copy. */}
+      <div className="flex flex-wrap items-center gap-1">
+        <TextActionButton
+          icon={<RotateCcw size={14} />}
+          onClick={() => onChange(undefined)}
+          disabled={value === undefined}
+        >
+          Reset to default
+        </TextActionButton>
+        <span aria-hidden className="text-muted-foreground">
+          ·
+        </span>
+        <TextActionButton
+          icon={
+            status === "copied" ? (
+              <CheckCircle className="size-3.5 text-green-500" />
+            ) : (
+              <Copy className="size-3.5" />
+            )
+          }
+          onClick={(e) => void copy(current, e)}
+        >
+          {status === "copied" ? "Copied" : "Copy prompt"}
+        </TextActionButton>
+      </div>
       {placeholders && (
         <p className="text-xs text-muted-foreground">
           Placeholders: {placeholders}
@@ -184,6 +202,7 @@ const allPromptsMarkdown = (
 
 export const PromptSettings = () => {
   const entries = usePromptEntries();
+  const [settings] = useAiExplainSettings();
   const [selectedId, setSelectedId] = useState(entries[0].id);
   const selected =
     entries.find((entry) => entry.id === selectedId) ?? entries[0];
@@ -210,8 +229,9 @@ export const PromptSettings = () => {
       </div>
       {selected.usesSearch && (
         <p className="text-xs text-muted-foreground">
-          Uses paid web search. Search calls and model tokens are billed to your
-          xAI account.
+          {usesWebSearch(settings)
+            ? "Uses paid web search. Search calls and model tokens are billed to your xAI account."
+            : "Web search is off, so this prompt is sent without it and Grok answers from memory."}
         </p>
       )}
       <PromptEditor
@@ -306,53 +326,18 @@ export const SpeechSettings = () => {
 };
 
 type StorageStatus =
-  | { status: "loading" }
-  | { status: "ready"; bytes: number }
-  | { status: "confirm"; bytes?: number }
+  | { status: "idle" }
+  | { status: "confirm" }
   | { status: "clearing" }
+  | { status: "cleared" }
   | { status: "error"; message: string };
-export const GeneratedStorageSettings = () => {
-  const [state, setState] = useState<StorageStatus>({ status: "loading" });
-  // Effect needed: database sizes and clear events come from browser storage, not render-time data or this component's own buttons.
-  useEffect(() => {
-    let active = true;
-    const refresh = () => {
-      import("@/lib/ai-explain/storage")
-        .then(({ getAiStorageUsage }) => getAiStorageUsage())
-        .then(
-          (usage) => {
-            // Only this user's content: it's what Clear deletes.
-            const bytes = Object.values(usage).reduce(
-              (sum, kind) => sum + kind.mine,
-              0
-            );
-            if (active)
-              setState((previous) =>
-                previous.status === "confirm" || previous.status === "clearing"
-                  ? previous
-                  : { status: "ready", bytes }
-              );
-          },
-          () => {
-            if (active)
-              setState((previous) =>
-                previous.status === "confirm" || previous.status === "clearing"
-                  ? previous
-                  : {
-                      status: "error",
-                      message: "Couldn't read generated content storage.",
-                    }
-              );
-          }
-        );
-    };
-    refresh();
-    window.addEventListener("ai-generated-content-changed", refresh);
-    return () => {
-      active = false;
-      window.removeEventListener("ai-generated-content-changed", refresh);
-    };
-  }, []);
+
+/**
+ * Deletes this owner's saved AI text, images and MP3s. How much is saved is
+ * in App & Device Info (Storage on this device).
+ */
+const OwnedGeneratedStorage = () => {
+  const [state, setState] = useState<StorageStatus>({ status: "idle" });
   const clear = async () => {
     setState({ status: "clearing" });
     try {
@@ -360,7 +345,7 @@ export const GeneratedStorageSettings = () => {
         "@/lib/ai-explain/storage"
       );
       await clearGeneratedContent();
-      setState({ status: "ready", bytes: 0 });
+      setState({ status: "cleared" });
     } catch {
       setState({
         status: "error",
@@ -385,11 +370,7 @@ export const GeneratedStorageSettings = () => {
             Delete generated content
           </TextActionButton>
           <span aria-hidden>·</span>
-          <TextActionButton
-            onClick={() =>
-              setState({ status: "ready", bytes: state.bytes ?? 0 })
-            }
-          >
+          <TextActionButton onClick={() => setState({ status: "idle" })}>
             Cancel
           </TextActionButton>
         </div>
@@ -397,35 +378,35 @@ export const GeneratedStorageSettings = () => {
     );
   return (
     <div className="mb-4 space-y-2">
-      <p className="text-sm">
-        {state.status === "ready"
-          ? `Estimated generated content: ${(state.bytes / 1024 / 1024).toFixed(2)} MB`
-          : state.status === "loading"
-            ? "Checking saved content…"
-            : state.status === "clearing"
-              ? "Clearing saved content…"
-              : state.message}
-      </p>
+      {state.status === "cleared" && (
+        <p className="text-sm">Generated content deleted.</p>
+      )}
+      {state.status === "error" && <p className="text-sm">{state.message}</p>}
       <p className="text-xs text-muted-foreground">
         Saved only on this device and browser, and not private: anyone with
         access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep.
+        Download content you want to keep. See how much is saved in App & Device
+        Info.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}
         className="text-rose-500"
         busy={state.status === "clearing"}
         busyLabel="Clearing…"
-        onClick={() =>
-          setState({
-            status: "confirm",
-            bytes: state.status === "ready" ? state.bytes : undefined,
-          })
-        }
-        disabled={state.status === "loading"}
+        onClick={() => setState({ status: "confirm" })}
       >
         Clear generated content
       </TextActionButton>
     </div>
   );
 };
+
+/**
+ * Remounts for the new owner on login/logout, so a pending "Delete generated
+ * content" confirmation can't carry over and delete the other owner's content.
+ */
+export const GeneratedStorageSettings = () => (
+  <OwnedAiContent>
+    <OwnedGeneratedStorage />
+  </OwnedAiContent>
+);

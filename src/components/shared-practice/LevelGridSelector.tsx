@@ -1,5 +1,35 @@
+import type { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import { FreqCategory, freqCategoryCn } from "@/lib/freq/freq-category";
+import { cn } from "@/lib/utils";
+
+/**
+ * One numbered square in either grid. Every challenge picker (Speed Katakana,
+ * Fill in the Kanji) draws its squares here, so their shape lives in one place.
+ */
+const GridButton = ({
+  fillCn,
+  selected,
+  onClick,
+  children,
+}: {
+  fillCn: string;
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      "py-1 text-xs font-bold transition-colors border-2 rounded-md hover:opacity-80",
+      fillCn,
+      selected && "border-primary"
+    )}
+  >
+    {children}
+  </button>
+);
 
 /**
  * Level grid + item grid for picking one item inside numbered levels (speed
@@ -19,6 +49,7 @@ export const LevelGridSelector = ({
   levelHeading,
   itemHeading,
   footnote,
+  progressKnown = true,
 }: {
   levelCount: number;
   /** Columns in the item grid (and the size of a full level). */
@@ -32,6 +63,11 @@ export const LevelGridSelector = ({
   levelHeading: string;
   itemHeading: string;
   footnote?: string;
+  /**
+   * False while a logged-in account's progress hasn't loaded (or downloaded):
+   * hides "% done" rather than claiming 0%.
+   */
+  progressKnown?: boolean;
 }) => {
   const doneInLevel = (level: number) => {
     let done = 0;
@@ -54,10 +90,12 @@ export const LevelGridSelector = ({
     <div className="flex flex-col gap-3 pt-4">
       <div className="flex items-center justify-between">
         <Label className="text-sm">{levelHeading}</Label>
-        <span className="text-sm font-semibold tabular-nums">
-          {Math.round((doneInLevel(currentLevel) / currentLevelSize) * 100)}%
-          done
-        </span>
+        {progressKnown && (
+          <span className="text-sm font-semibold tabular-nums animate-fade-in-fast">
+            {Math.round((doneInLevel(currentLevel) / currentLevelSize) * 100)}%
+            done
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-10 gap-1">
@@ -68,15 +106,14 @@ export const LevelGridSelector = ({
           const bgCn = freqCategoryCn[category];
           const textCn = category > 3 ? "text-white" : "text-foreground";
           return (
-            <button
+            <GridButton
               key={level}
+              fillCn={`${bgCn} ${textCn}`}
+              selected={currentLevel === level}
               onClick={() => selectLevel(level)}
-              className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
-                currentLevel === level ? "border-primary" : ""
-              }`}
             >
               {level}
-            </button>
+            </GridButton>
           );
         })}
       </div>
@@ -89,15 +126,14 @@ export const LevelGridSelector = ({
             const bgCn = completed ? freqCategoryCn[4] : freqCategoryCn[0];
             const textCn = completed ? "text-white" : "text-foreground";
             return (
-              <button
+              <GridButton
                 key={pos}
+                fillCn={`${bgCn} ${textCn}`}
+                selected={currentPos === pos}
                 onClick={() => onSelect(currentLevel, pos)}
-                className={`py-1 ${bgCn} ${textCn} hover:opacity-80 text-xs rounded font-bold transition-colors border-2 ${
-                  currentPos === pos ? "border-primary" : ""
-                }`}
               >
                 {pos}
-              </button>
+              </GridButton>
             );
           }
         )}

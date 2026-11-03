@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { translateValue } from "@/lib/wanakana-adapter";
+import type { FsrsRating } from "engine-contract";
 import { Input } from "@/components/ui/input";
-import { PracticeButton } from "@/components/ui/practice-button";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
+import { KanjiPopoverWord } from "@/components/shared-practice/KanjiPopoverWord";
 import { useKanaInput } from "@/hooks/use-kana-input";
-import { BlurredGloss } from "@/components/shared-practice";
+import {
+  BlurredGloss,
+  hasForgotKey,
+  isForgotKeyEvent,
+  ratingForKeyEvent,
+} from "@/components/shared-practice";
+import type { MasteryGrading } from "@/components/shared-practice";
 import { EndSession } from "@/components/shared-practice/EndSessionButton";
 import {
   isForgotCommand,
@@ -14,17 +21,21 @@ import {
 } from "@/lib/practice-commands";
 import { PracticeItem, SessionResult, SoundMode } from "./types";
 import { isReadingCorrect } from "./match-reading";
+import { AnswerActions } from "./AnswerActions";
 import { AnswerFeedback } from "./AnswerFeedback";
 
 export const Game = ({
   sessionItems,
   sound,
+  grading,
   onProgress,
   onComplete,
   onEnd,
 }: {
   sessionItems: PracticeItem[];
   sound: { enabled: true; type: SoundMode } | { enabled: false };
+  /** Mastery game only: rating buttons replace Next, grades go to the engine. */
+  grading?: MasteryGrading;
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
@@ -48,6 +59,17 @@ export const Game = ({
   const playCorrect = useCorrectSound();
 
   const handleChange = (raw: string) => {
+    // Mastery: "?" is Forgot. The key handler catches it on keyboards; soft
+    // keyboards and IME commits ("？") only show up here. Never typed in.
+    if (grading && hasForgotKey(raw)) {
+      const rest = raw.replace(/[?？]/g, "");
+      if (current && !isReadingCorrect(rest, current.reading)) {
+        openFeedback(false, "again");
+        return;
+      }
+      setInputValue(rest);
+      return;
+    }
     // Keep "forgot" / "skip" as latin so the command stays typable.
     if (isForgotCommandPrefix(raw)) {
       setInputValue(raw.replace(/\s+/g, ""));
@@ -73,9 +95,10 @@ export const Game = ({
     return null;
   }
 
-  const openFeedback = (correct: boolean) => {
+  const openFeedback = (correct: boolean, rating?: FsrsRating) => {
     if (feedback != null) return;
     inputRef.current?.blur();
+    if (rating) grading?.onGrade(rating);
     const result: SessionResult = { ...current, correct };
     resultsRef.current = [...resultsRef.current, result];
     if (correct) {
@@ -109,9 +132,31 @@ export const Game = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (feedback != null || e.nativeEvent.isComposing) return;
 
-    if (e.key === "Escape") {
+    // Reading Practice: Esc is Forgot.
+    if (!grading && e.key === "Escape") {
       e.preventDefault();
-      if (!matched) openFeedback(false);
+      if (!matched) openFeedback(false, "again");
+      return;
+    }
+
+    // Mastery: "?" is Forgot, as on every rating screen. No reading contains
+    // it, so it works from the answer box and is never typed into it.
+    if (grading && isForgotKeyEvent(e)) {
+      e.preventDefault();
+      if (!matched && !e.repeat) openFeedback(false, "again");
+      return;
+    }
+
+    // Mastery shortcuts: once the reading matches, H / G / E = Hard / Good /
+    // Easy and Enter = Good. Matched means the answer is complete, so these
+    // letters never belong to it. Typing "forgot" is Forgot too.
+    const rating = grading && matched ? ratingForKeyEvent(e) : null;
+    if (rating) {
+      e.preventDefault();
+      // Not the Enter that commits an IME composition (Safari reports it
+      // after compositionend, as keyCode 229), and not a held key.
+      if (e.repeat || e.nativeEvent.keyCode === 229) return;
+      openFeedback(true, rating);
       return;
     }
 
@@ -123,7 +168,7 @@ export const Game = ({
       return;
     }
     if (forgotTyped) {
-      openFeedback(false);
+      openFeedback(false, "again");
     }
   };
 
@@ -148,9 +193,15 @@ export const Game = ({
           }
         >
           <p
-            className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} ${current.word.length > 4 ? "lg:text-8xl" : "lg:text-9xl xl:text-[10rem]"} leading-tight break-all md:text-8xl whitespace-nowrap`}
+            className={`${current.word.length > 4 ? "text-6xl" : current.word.length < 2 ? "text-8xl" : "text-7xl"} ${current.word.length > 4 ? "lg:text-8xl" : "lg:text-9xl xl:text-[10rem]"} leading-tight break-all md:text-8xl whitespace-nowrap pb-[0.15em]`}
           >
-            {current.word}
+            {/* Once answered, each kanji opens its popover (before, its
+                readings would give the answer away). */}
+            {feedback == null ? (
+              current.word
+            ) : (
+              <KanjiPopoverWord word={current.word} />
+            )}
           </p>
         </div>
 
@@ -158,7 +209,7 @@ export const Game = ({
           text={current.englishGloss}
           resetKey={index}
           forceReveal={feedback != null}
-          className="mt-1 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+          className="mt-2 focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0"
         />
       </div>
 
@@ -180,24 +231,13 @@ export const Game = ({
               {...kanaInput}
             />
 
-            <div className="grid grid-cols-2 gap-2">
-              <PracticeButton
-                variant="danger"
-                size="md"
-                disabled={matched}
-                onClick={() => openFeedback(false)}
-              >
-                Forgot
-              </PracticeButton>
-              <PracticeButton
-                variant="primary"
-                size="md"
-                disabled={!matched}
-                onClick={() => openFeedback(true)}
-              >
-                Next
-              </PracticeButton>
-            </div>
+            <AnswerActions
+              matched={matched}
+              grading={grading}
+              onForgot={() => openFeedback(false, "again")}
+              onNext={() => openFeedback(true)}
+              onRate={(rating) => openFeedback(true, rating)}
+            />
           </>
         ) : (
           <AnswerFeedback

@@ -23,35 +23,23 @@ import {
   otherOutLinks,
 } from "@/lib/external-links";
 import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
+import { TableCellFixed } from "./TableCellFixed";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
-const TableCellFixed = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
-  <TableCell
-    className={`w-28 sm:w-32 text-[10px] uppercase ${className ?? ""}`}
-  >
-    {children}
-  </TableCell>
-);
-
-const TableCellGrow = ({ children }: { children: ReactNode }) => (
+export const TableCellGrow = ({ children }: { children: ReactNode }) => (
   <TableCell className="min-w-0">{children}</TableCell>
 );
 
-const LabelCell = ({
+/** A row label with an ⓘ popover (General Information, Anchor Word). */
+export const LabelCell = ({
   label,
   description,
 }: {
   label: ReactNode;
   description: ReactNode;
 }) => (
-  <TableCellFixed>
+  <TableCellFixed className="w-28 text-[10px] uppercase">
     <GenericPopover
       trigger={
         <span className="cursor-pointer">
@@ -133,7 +121,7 @@ export const General = ({ kanji }: { kanji: string }) => {
     items: ReactNode[];
   }[] = [
     {
-      label: "Meanings",
+      label: "Core Ideas",
       description: (
         <>
           Words in english associated with this kanji. e.g., 山 →
@@ -211,7 +199,7 @@ export const General = ({ kanji }: { kanji: string }) => {
               <LabelCell label={label} description={description} />
               <TableCellGrow>
                 {items.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">{items}</div>
+                  <div className="flex flex-wrap gap-1.5">{items}</div>
                 ) : (
                   <div> - </div>
                 )}

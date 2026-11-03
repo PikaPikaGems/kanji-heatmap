@@ -12,15 +12,15 @@ export const AttemptCountScaleOptions = () => {
   const idPrefix = useId();
 
   return (
-    <div className="space-y-3">
-      <div className="text-xs font-extrabold uppercase text-muted-foreground">
+    <div>
+      <div className="mb-3 text-xs font-extrabold uppercase text-muted-foreground">
         Attempt count brightness
       </div>
-      <div className="space-y-2.5">
+      <div className="flex flex-wrap justify-center">
         {ATTEMPT_COUNT_SCALES.map((option) => {
           const inputId = `${idPrefix}-${option}`;
           return (
-            <div key={option} className="flex space-x-2">
+            <div key={option} className="flex mx-2 mt-1.5 space-x-2">
               <input
                 type="radio"
                 id={inputId}

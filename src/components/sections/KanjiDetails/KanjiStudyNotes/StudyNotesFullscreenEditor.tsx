@@ -1,14 +1,18 @@
+import type { ReactNode } from "react";
 import { FullscreenEditorDialog } from "@/components/common/FullscreenEditorDialog";
-import { MarkdownEditor } from "./MarkdownEditor";
+import { MarkdownEditor, type MarkdownEditorProps } from "./MarkdownEditor";
 import { StudyNotesTipsPopover } from "./StudyNotesTipsPopover";
 
-interface StudyNotesFullscreenEditorProps {
+interface StudyNotesFullscreenEditorProps
+  extends Pick<
+    MarkdownEditorProps,
+    "value" | "maxBytes" | "onChange" | "disabled" | "status"
+  > {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   kanji: string;
-  value: string;
-  maxLength: number;
-  onChange: (value: string) => void;
+  /** Messages shown above the editor (read-only reason, merge notice, ...). */
+  notices?: ReactNode;
 }
 
 export const StudyNotesFullscreenEditor = ({
@@ -16,8 +20,11 @@ export const StudyNotesFullscreenEditor = ({
   onOpenChange,
   kanji,
   value,
-  maxLength,
+  maxBytes,
   onChange,
+  disabled,
+  status,
+  notices,
 }: StudyNotesFullscreenEditorProps) => (
   <FullscreenEditorDialog
     open={open}
@@ -33,10 +40,13 @@ export const StudyNotesFullscreenEditor = ({
       <StudyNotesTipsPopover contentClassName="z-[70] m-0 w-[calc(100vw-2rem)] max-w-sm p-0" />
     }
   >
+    {notices ? <div className="flex flex-col gap-2">{notices}</div> : null}
     <MarkdownEditor
       value={value}
-      maxLength={maxLength}
+      maxBytes={maxBytes}
       onChange={onChange}
+      disabled={disabled}
+      status={status}
       fill
       autoFocus
     />

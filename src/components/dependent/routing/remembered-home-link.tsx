@@ -1,8 +1,9 @@
 import { forwardRef, useSyncExternalStore } from "react";
 import { Link as WouterLink, LinkProps } from "wouter";
 import {
-  getRememberedHomeHref,
-  subscribeToRememberedHomeSearch,
+  getRememberedHref,
+  SEARCH_SHARING_PAGES,
+  subscribeToRememberedSearches,
 } from "@/lib/home-search-memory";
 
 // forwardRef required: DashedNavLink passes an explicit ref, and this link is
@@ -11,22 +12,22 @@ import {
 // whose Slot injects a ref into it for focus/positioning.
 export const RememberedHomeLink = forwardRef<HTMLAnchorElement, LinkProps>(
   (props, ref) => {
-    const rememberedHomeHref = useSyncExternalStore(
-      subscribeToRememberedHomeSearch,
-      getRememberedHomeHref,
-      getRememberedHomeHref
+    const target =
+      "to" in props && props.to !== undefined ? props.to : props.href;
+    const getHref = () =>
+      target !== undefined && SEARCH_SHARING_PAGES.includes(target)
+        ? getRememberedHref(target)
+        : target;
+    const href = useSyncExternalStore(
+      subscribeToRememberedSearches,
+      getHref,
+      getHref
     );
 
     const resolvedProps =
       "to" in props && props.to !== undefined
-        ? {
-            ...props,
-            to: props.to === "/" ? rememberedHomeHref : props.to,
-          }
-        : {
-            ...props,
-            href: props.href === "/" ? rememberedHomeHref : props.href,
-          };
+        ? { ...props, to: href }
+        : { ...props, href };
 
     if (resolvedProps.asChild) {
       return <WouterLink {...resolvedProps} />;

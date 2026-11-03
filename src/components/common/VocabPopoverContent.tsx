@@ -1,10 +1,79 @@
 import { ReactNode, useState } from "react";
 import { DottedSeparator } from "@/components/ui/dotted-separator";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { SeeMore } from "@/components/common/SeeMore";
-import { VocabActions } from "@/components/common/VocabActions";
-import { GlobalKanjiLink } from "@/components/dependent/routing";
+import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
+import { VocabActions as WordActionIcons } from "@/components/common/VocabActions";
+import { SeeMore as ExpandableGloss } from "@/components/common/SeeMore";
 import { vocabExternalLinks } from "@/lib/external-links";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { openWordExplain } from "@/lib/ai-explain/word-explain-dialog";
+import { useCurrentOwner } from "@/lib/engine/content-owner";
+import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
+import { cn } from "@/lib/utils";
+
+/**
+ * "✨ AI Explain" on its own line between the gloss and the action icons,
+ * when AI study tools are set up.
+ */
+const WordAiExplain = ({
+  word,
+  english,
+}: {
+  word: string;
+  english?: string;
+}) => {
+  const [settings] = useAiExplainSettings();
+  const owner = useCurrentOwner();
+  // Nobody's saved answers show until the owner is known.
+  if (owner.status !== "known" || !isAiExplainReady(settings)) return null;
+  return (
+    <>
+      <DottedSeparator />
+      <div className="flex justify-center py-4">
+        <button
+          type="button"
+          className={cn(cnDottedUnderlineTrigger, "text-xs text-foreground")}
+          onClick={() => openWordExplain(word, english)}
+        >
+          ✨ AI Explain
+        </button>
+      </div>
+    </>
+  );
+};
+
+/** Each kanji in the word, as a link with its keyword. */
+const WordKanjiLinks = ({
+  wordKanjis,
+}: {
+  wordKanjis: VocabPopoverContentProps["wordKanjis"];
+}) => {
+  if (wordKanjis.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap justify-center p-1">
+      {wordKanjis.map(({ kanji, keyword }) => (
+        <GlobalKanjiLink kanji={kanji} keyword={keyword} key={kanji} />
+      ))}
+    </div>
+  );
+};
+
+/** Stands in for the reading and meaning while the vocab data loads. */
+const GlossSkeleton = () => (
+  <div
+    role="status"
+    aria-label="Loading meaning"
+    className="flex flex-col items-center gap-1.5 py-1"
+  >
+    <div className="w-3/4 h-3 rounded-full bg-muted animate-pulse" />
+    <div className="w-1/2 h-3 rounded-full bg-muted animate-pulse" />
+    <p className="pt-0.5 text-[10px] text-muted-foreground">
+      読み込み中 · Loading…
+    </p>
+  </div>
+);
 
 interface VocabPopoverContentProps {
   word: string;
@@ -12,6 +81,8 @@ interface VocabPopoverContentProps {
   wordKanjis: { kanji: string; keyword: string }[];
   definition?: string;
   optionalSection?: ReactNode;
+  /** The meaning is still on its way; show a skeleton in its place. */
+  definitionLoading?: boolean;
 }
 
 export const VocabPopoverContent = ({
@@ -20,6 +91,7 @@ export const VocabPopoverContent = ({
   wordKanjis,
   definition,
   optionalSection,
+  definitionLoading = false,
 }: VocabPopoverContentProps) => {
   const [showAllLinks, setShowAllLinks] = useState(false);
   const maxLinks = 6;
@@ -31,36 +103,28 @@ export const VocabPopoverContent = ({
 
   return (
     <div className="p-2 w-72">
-      {wordKanjis.length > 0 && (
-        <div className="flex flex-wrap justify-center p-1">
-          {wordKanjis.map((item, index) => (
-            <GlobalKanjiLink
-              key={`${item.kanji}-${index}`}
-              keyword={item.keyword}
-              kanji={item.kanji}
-            />
-          ))}
-        </div>
-      )}
+      <WordKanjiLinks wordKanjis={wordKanjis} />
 
-      {(definition || optionalSection) && (
+      {(definition || optionalSection || definitionLoading) && (
         <>
           <DottedSeparator />
           <div className="my-2">
             {optionalSection}
+            {definitionLoading && <GlossSkeleton />}
             {definition && (
-              <>
-                <SeeMore
+              <div className="animate-fade-in-fast">
+                <ExpandableGloss
                   definition={`${kana ?? ""} ${kana ? "・" : ""} ${definition}`}
                   maxLen={120}
                 />
-              </>
+              </div>
             )}
           </div>
         </>
       )}
+      <WordAiExplain word={word} english={definition} />
       <DottedSeparator />
-      <VocabActions kana={kana ?? ""} word={word} />
+      <WordActionIcons kana={kana ?? ""} word={word} />
 
       <div className="flex flex-wrap justify-center pt-2 text-xs font-bold">
         🧐 Explore {word} in the wild ↓

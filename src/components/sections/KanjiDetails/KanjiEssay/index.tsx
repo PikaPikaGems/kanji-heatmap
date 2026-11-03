@@ -1,6 +1,7 @@
-import { Loader2 } from "lucide-react";
+import { SectionLoading } from "@/components/common/SectionLoading";
 import { useEffect, useId, useState } from "react";
 import { getKanjiEssayUrl } from "@/lib/kanji-essays";
+import { OwnedAiContent } from "@/components/common/OwnedAiContent";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -71,15 +72,7 @@ const PublishedEssaySection = ({
   onRetry: () => void;
 }) => {
   if (state.status === "loading")
-    return (
-      <div
-        role="status"
-        aria-label="Loading essay"
-        className="flex h-48 items-center justify-center"
-      >
-        <Loader2 className="size-7 animate-spin" />
-      </div>
-    );
+    return <SectionLoading label="Loading essay" />;
   if (state.status === "error")
     return (
       <div className="space-y-3 p-4 text-center">
@@ -170,7 +163,10 @@ const KanjiEssay = ({ kanji, keyword }: { kanji: string; keyword: string }) => {
       {/* Keyed so each switch remounts and fades in instead of snapping. */}
       <div key={source} className="space-y-4 animate-fade-in-fast">
         {source === "mine" ? (
-          <AiKanjiEssay key={kanji} kanji={kanji} keyword={keyword} />
+          // Waits for the owner, then swaps (and fades in) on login/logout.
+          <OwnedAiContent>
+            <AiKanjiEssay key={kanji} kanji={kanji} keyword={keyword} />
+          </OwnedAiContent>
         ) : (
           <PublishedEssaySection
             kanji={kanji}

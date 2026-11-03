@@ -26,6 +26,17 @@ export const compareDateKeys = (a: string, b: string): number =>
 export const isDateKeyInRange = (key: string, range: DateRange): boolean =>
   key >= range.start && key <= range.end;
 
+/** Calendar days from `range.start` to `range.end`, both included. */
+export const daysInRange = (range: DateRange): number => {
+  const [startYear, startMonth, startDay] = range.start.split("-").map(Number);
+  const [endYear, endMonth, endDay] = range.end.split("-").map(Number);
+  // UTC, so daylight-saving changes can't shorten or lengthen a day.
+  const ms =
+    Date.UTC(endYear, endMonth - 1, endDay) -
+    Date.UTC(startYear, startMonth - 1, startDay);
+  return Math.round(ms / 86_400_000) + 1;
+};
+
 export const getDurationRange = (
   option: DurationOption,
   today: Date = new Date()

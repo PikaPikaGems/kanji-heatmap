@@ -24,6 +24,11 @@ export const practiceButtonVariants = cva(
           "bg-foreground text-background border-neutral-800 dark:border-neutral-400 hover:brightness-105 disabled:opacity-20",
         danger:
           "bg-rose-500 text-white border-rose-800 hover:brightness-105 disabled:opacity-20",
+        orange:
+          "bg-orange-500 text-white border-orange-700 hover:brightness-105 disabled:opacity-20",
+        blue: "bg-blue-500 text-white border-blue-700 hover:brightness-105 disabled:opacity-20",
+        green:
+          "bg-green-500 text-white border-green-700 hover:brightness-105 disabled:opacity-20",
         secondary:
           "bg-background text-foreground border-foreground/30 hover:bg-accent disabled:opacity-20",
         ghost:
