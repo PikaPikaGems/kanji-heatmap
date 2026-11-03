@@ -22,10 +22,10 @@
     ]
   },
   "onomatopoeia": {
-    "version": "0a7843ba",
+    "version": "5a12e36b",
     "chunks": [
       "907484b6",
-      "37fabb37",
+      "48f0bb09",
       "ee5c8d48",
       "b928294c",
       "ae83ec96",
@@ -184,9 +184,9 @@
     ]
   },
   "essential-verbs-counters": {
-    "version": "50065d72",
+    "version": "d2acd5f6",
     "chunks": [
-      "a0a8d31d",
+      "ece9f83a",
       "12c7002e",
       "436712c7",
       "f9dd15a9"
