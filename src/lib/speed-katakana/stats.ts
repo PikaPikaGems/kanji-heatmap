@@ -14,7 +14,7 @@ export type ChallengeSetStats = {
   bestCpm: number;
   timesTaken: number;
   /** Day of the most recent attempt. */
-  lastAttemptedAt: LocalDate;
+  lastAttemptDate: LocalDate;
 };
 
 /** Every attempted set's stats by set number; unattempted sets are absent. */
@@ -36,7 +36,7 @@ export const toChallengeSetStats = (
     latestCpm: ptr.latest.cpmVal,
     bestCpm: ptr.best.cpm.value,
     timesTaken: ptr.attemptCount,
-    lastAttemptedAt: ptr.latest.attemptedAt,
+    lastAttemptDate: ptr.latest.attemptDate,
   };
 };
 

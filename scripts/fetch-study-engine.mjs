@@ -11,10 +11,9 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const REPO = "PikaPikaGems/experimental-engine";
-// Engine API 15 with the unbound-fetch fix (experimental-engine#98), on the
-// engine's main. Bump together with the dexie, ts-fsrs and engine-contract
-// pins in package.json.
-const COMMIT = "a6519158413616735e140c2081d0980aee1ee37f";
+// Engine API 16 includes the challenge attempt date rename. Bump together
+// with the dexie, ts-fsrs and engine-contract pins in package.json.
+const COMMIT = "13b9f0c9d1156ff62e34b503b666f5b1237c4309";
 const DIR = ".study-engine";
 
 const token = process.env.KH_STUDY_ENGINE_TOKEN;

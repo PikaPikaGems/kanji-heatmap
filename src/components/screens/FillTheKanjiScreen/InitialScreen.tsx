@@ -101,7 +101,7 @@ const BatchSummary = ({
             {stats.attemptCount === 1 ? "attempt" : "attempts"}
           </div>
           <div>
-            🕒 Last played {formatLastAttemptedDay(stats.lastAttemptedAt)}
+            🕒 Last played {formatLastAttemptedDay(stats.lastAttemptDate)}
           </div>
         </div>
       ) : (

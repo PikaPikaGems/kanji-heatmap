@@ -120,8 +120,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       engine-contract:
-        specifier: github:PikaPikaGems/experimental-engine-contract#cc93ef549367089967dce6ec58c2e9fdff6c4634
-        version: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/cc93ef549367089967dce6ec58c2e9fdff6c4634
+        specifier: github:PikaPikaGems/experimental-engine-contract#dae365af93b545c3cb72d899dc695b730a317002
+        version: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/dae365af93b545c3cb72d899dc695b730a317002
       fuzzysearch:
         specifier: ^1.0.3
         version: 1.0.3
@@ -3040,8 +3040,8 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/cc93ef549367089967dce6ec58c2e9fdff6c4634:
-    resolution: {tarball: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/cc93ef549367089967dce6ec58c2e9fdff6c4634}
+  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/dae365af93b545c3cb72d899dc695b730a317002:
+    resolution: {tarball: https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/dae365af93b545c3cb72d899dc695b730a317002}
     version: 1.0.0
 
   entities@6.0.1:
@@ -7804,7 +7804,7 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/cc93ef549367089967dce6ec58c2e9fdff6c4634: {}
+  engine-contract@https://codeload.github.com/PikaPikaGems/experimental-engine-contract/tar.gz/dae365af93b545c3cb72d899dc695b730a317002: {}
 
   entities@6.0.1: {}
 

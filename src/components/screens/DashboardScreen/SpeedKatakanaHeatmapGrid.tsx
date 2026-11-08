@@ -90,7 +90,7 @@ const SetDetail = ({
       </div>
       {stats && (
         <div className="text-center text-muted-foreground">
-          Last attempted: {formatLastAttemptedDay(stats.lastAttemptedAt)}
+          Last attempted: {formatLastAttemptedDay(stats.lastAttemptDate)}
         </div>
       )}
     </div>
