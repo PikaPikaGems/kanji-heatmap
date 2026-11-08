@@ -11,9 +11,9 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const REPO = "PikaPikaGems/experimental-engine";
-// Engine API 16 includes the challenge attempt date rename. Bump together
+// Engine API 16 includes the challenge summary date renames. Bump together
 // with the dexie, ts-fsrs and engine-contract pins in package.json.
-const COMMIT = "13b9f0c9d1156ff62e34b503b666f5b1237c4309";
+const COMMIT = "088a3980daebb8944152650c309202f4c1d52a9d";
 const DIR = ".study-engine";
 
 const token = process.env.KH_STUDY_ENGINE_TOKEN;
