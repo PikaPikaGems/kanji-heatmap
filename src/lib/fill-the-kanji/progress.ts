@@ -9,7 +9,7 @@ import type { FillTheKanjiSetId } from "./sets";
 export type BatchStats = {
   attemptCount: number;
   /** Day of the most recent finished attempt. */
-  lastAttemptedAt: LocalDate;
+  lastAttemptDate: LocalDate;
 };
 
 /** Per-set map of 1-based batch number → stats; only batches with an attempt. */
@@ -22,8 +22,8 @@ export const toSetBatchStats = (
   summaries: GenericChallengeSummary[]
 ): SetBatchStats => {
   const stats: SetBatchStats = {};
-  for (const { challengeId, attemptCount, lastAttemptedAt } of summaries) {
-    stats[challengeId] = { attemptCount, lastAttemptedAt };
+  for (const { challengeId, attemptCount, lastAttemptDate } of summaries) {
+    stats[challengeId] = { attemptCount, lastAttemptDate };
   }
   return stats;
 };

@@ -18,7 +18,7 @@ export type DebugInfoSnapshot = {
   version: string;
   /**
    * The study engine's release and the engine API this build was compiled
-   * against ("1.0.0 · API 15"), when this build includes it and it loaded.
+   * against ("1.0.0 · API 16"), when this build includes it and it loaded.
    */
   engineVersion?: string;
   viewportWidth: number;
