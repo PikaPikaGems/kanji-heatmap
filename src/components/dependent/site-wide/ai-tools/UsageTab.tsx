@@ -1,9 +1,23 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Trash2 } from "lucide-react";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { OwnedAiContent } from "@/components/common/OwnedAiContent";
-import { useAiExplainUsage } from "@/hooks/use-ai-explain";
-import type { AiProviderUsage } from "@/lib/ai-explain/preferences";
+import { ExternalTextLink } from "@/components/common/ExternalTextLink";
+import { AiStorageBars } from "@/components/common/AiStorageBars";
+import { Progress } from "@/components/ui/progress";
+import {
+  useAiExplainSettings,
+  useAiExplainUsage,
+} from "@/hooks/use-ai-explain";
+import { useAiStorageUsage } from "@/hooks/use-ai-storage-usage";
+import {
+  hasValidKey,
+  type AiProviderUsage,
+} from "@/lib/ai-explain/preferences";
+import {
+  readElevenLabsBalance,
+  type ElevenLabsBalance,
+} from "@/lib/ai-explain/providers/elevenlabs";
 import {
   AI_PROVIDER_ORDER,
   AI_PROVIDERS,
@@ -60,7 +74,8 @@ const ProviderUsage = ({
       )}
       {usage.speechRequests > 0 && (
         <UsageRow label="Speech">
-          {formatCount(usage.speechRequests)} MP3s ·{" "}
+          {formatCount(usage.speechRequests)}{" "}
+          {usage.speechRequests === 1 ? "MP3" : "MP3s"} ·{" "}
           {formatCount(usage.characters)} characters
         </UsageRow>
       )}
@@ -113,8 +128,8 @@ type StorageStatus =
   | { status: "error"; message: string };
 
 /**
- * Deletes this owner's saved AI text, images and MP3s. How much is saved is
- * in App & Device Info (Storage on this device).
+ * Deletes this owner's saved AI text, images and MP3s. How much is saved
+ * shows just above (and in App & Device Info).
  */
 const OwnedGeneratedStorage = () => {
   const [state, setState] = useState<StorageStatus>({ status: "idle" });
@@ -165,8 +180,7 @@ const OwnedGeneratedStorage = () => {
       <p className="text-xs text-muted-foreground">
         Saved only on this device and browser, and not private: anyone with
         access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep. See how much is saved in App & Device
-        Info.
+        Download content you want to keep.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}
@@ -191,16 +205,139 @@ export const GeneratedStorageSettings = () => (
   </OwnedAiContent>
 );
 
-/** This month's usage, and what's saved on this device. */
-export const UsageTab = () => (
-  <div className="space-y-6">
-    <section className="space-y-2">
-      <h3 className="text-sm font-semibold">This month</h3>
-      <AiUsage />
+type BalanceState =
+  | { status: "loading" }
+  | { status: "done"; balance: ElevenLabsBalance }
+  | { status: "error"; message: string };
+
+/** ElevenLabs credits this billing period, fetched when the tab opens. */
+const ElevenLabsCredits = ({ apiKey }: { apiKey: string }) => {
+  const [state, setState] = useState<BalanceState>({ status: "loading" });
+
+  // Effect needed: reads the balance from ElevenLabs when this tab opens;
+  // render can't await a request, and a reply after unmount must be dropped.
+  useEffect(() => {
+    let active = true;
+    setState({ status: "loading" });
+    readElevenLabsBalance(apiKey).then(
+      (balance) => active && setState({ status: "done", balance }),
+      (error: unknown) =>
+        active &&
+        setState({
+          status: "error",
+          message: error instanceof Error ? error.message : "",
+        })
+    );
+    return () => {
+      active = false;
+    };
+  }, [apiKey]);
+
+  if (state.status === "loading")
+    return (
+      <p className="text-xs text-muted-foreground">
+        Checking ElevenLabs credits…
+      </p>
+    );
+  if (state.status === "error")
+    return (
+      <p className="text-xs text-muted-foreground">
+        Couldn&apos;t read ElevenLabs credits. {state.message}
+      </p>
+    );
+  const { used, limit, resetsAt } = state.balance;
+  return (
+    <section className="p-3 space-y-2 text-xs border rounded-xl animate-fade-in-fast">
+      <h4 className="text-sm font-semibold">ElevenLabs credits</h4>
+      <p className="tabular-nums">
+        {formatCount(used)} of {formatCount(limit)} used
+        {resetsAt &&
+          ` · resets ${resetsAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`}
+      </p>
+      {limit > 0 && (
+        <Progress
+          value={Math.min(100, (used / limit) * 100)}
+          className="h-2"
+          aria-label="ElevenLabs credits used"
+        />
+      )}
+      <p className="text-muted-foreground">
+        From your ElevenLabs account, for all your use, not only this app.
+      </p>
     </section>
-    <section className="space-y-2">
-      <h3 className="text-sm font-semibold">Saved content</h3>
-      <GeneratedStorageSettings />
-    </section>
-  </div>
-);
+  );
+};
+
+/** Saved text, MP3s and images on this device against their limits. */
+const StorageBars = () => {
+  const state = useAiStorageUsage();
+  if (state.status === "loading")
+    return <p className="text-xs text-muted-foreground">Checking storage…</p>;
+  if (state.status === "error")
+    return (
+      <p className="text-xs text-muted-foreground">
+        Couldn&apos;t read storage.
+      </p>
+    );
+  return (
+    <div className="space-y-4 animate-fade-in-fast">
+      <AiStorageBars usage={state.usage} />
+    </div>
+  );
+};
+
+/**
+ * Where each provider's own spending limit is set: the old in-app token
+ * budget only counted text tokens in this browser.
+ */
+const SpendingLimits = () => {
+  const [settings] = useAiExplainSettings();
+  const withKeys = AI_PROVIDER_ORDER.filter(
+    (provider) => settings.keys[provider].apiKey !== ""
+  );
+  const shown = withKeys.length > 0 ? withKeys : AI_PROVIDER_ORDER;
+  return (
+    <div className="space-y-2 text-xs">
+      <p className="text-muted-foreground">
+        To cap what AI Study Tools can cost, set a spending limit (or prepaid
+        credits) with each provider:
+      </p>
+      <ul className="space-y-1">
+        {shown.map((provider) => (
+          <li key={provider}>
+            {AI_PROVIDERS[provider].label}:{" "}
+            <ExternalTextLink
+              href={AI_PROVIDERS[provider].limitsUrl}
+              text="limits and billing"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+/** This month's usage, spending limits, and what's saved on this device. */
+export const UsageTab = () => {
+  const [settings] = useAiExplainSettings();
+  return (
+    <div className="space-y-6">
+      <section className="space-y-2">
+        <h3 className="text-sm font-semibold">This month</h3>
+        <AiUsage />
+        {hasValidKey(settings, "elevenlabs") && (
+          <ElevenLabsCredits apiKey={settings.keys.elevenlabs.apiKey} />
+        )}
+      </section>
+      <section className="space-y-2">
+        <h3 className="text-sm font-semibold">Spending limits</h3>
+        <SpendingLimits />
+      </section>
+      <section className="space-y-3">
+        <h3 className="text-sm font-semibold">Saved content</h3>
+        <StorageBars />
+        <GeneratedStorageSettings />
+      </section>
+    </div>
+  );
+};

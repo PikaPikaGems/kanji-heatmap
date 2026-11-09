@@ -15,8 +15,6 @@ export type AiProviderInfo = {
   keyPermissions?: string;
   /** Where the provider's own spending limit or usage is set. */
   limitsUrl: string;
-  /** What its key can power here, in words. */
-  powers: string;
   /** The model used until another is picked, per kind it supports. */
   defaultModels: Partial<Record<AiModelKind, string>>;
   /** The only models offered, when the picker must not take others. */
@@ -34,7 +32,6 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     keyUrlText: "console.x.ai",
     keyPlaceholder: "xai-…",
     limitsUrl: "https://console.x.ai",
-    powers: "text · web search · images · speech",
     defaultModels: {
       text: "grok-4.3",
       image: "grok-imagine-image-2.0",
@@ -50,7 +47,6 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     keyUrlText: "platform.openai.com",
     keyPlaceholder: "sk-…",
     limitsUrl: "https://platform.openai.com/settings/organization/limits",
-    powers: "text · web search · images · speech",
     defaultModels: {
       text: "gpt-5-mini",
       image: "gpt-image-1-mini",
@@ -65,7 +61,6 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     keyUrlText: "console.anthropic.com",
     keyPlaceholder: "sk-ant-…",
     limitsUrl: "https://console.anthropic.com/settings/limits",
-    powers: "text · web search",
     defaultModels: { text: "claude-sonnet-5-5" },
   },
   gemini: {
@@ -74,7 +69,6 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     keyUrlText: "aistudio.google.com",
     keyPlaceholder: "AIza…",
     limitsUrl: "https://aistudio.google.com/usage",
-    powers: "text · Google Search · images · speech",
     defaultModels: {
       text: "gemini-2.5-flash",
       image: "gemini-2.5-flash-image",
@@ -91,7 +85,6 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
     keyPlaceholder: "sk_…",
     keyPermissions: "Text to Speech, Voices: Read, User: Read",
     limitsUrl: "https://elevenlabs.io/app/subscription",
-    powers: "speech",
     defaultModels: { speech: "eleven_v3" },
     // Both read Japanese words in Japanese with language_code "ja";
     // eleven_multilingual_v2 ignores the code and reads kanji as Chinese.

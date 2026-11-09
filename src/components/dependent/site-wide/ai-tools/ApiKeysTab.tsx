@@ -168,8 +168,7 @@ const ProviderKeyCard = ({
         {info.label}
       </label>
       <p className="text-xs text-muted-foreground">
-        {info.powers} · for{" "}
-        {tools.map((tool) => AI_TOOLS[tool].label).join(", ")}
+        For {tools.map((tool) => AI_TOOLS[tool].label).join(", ")}
       </p>
       <div className="flex gap-2 pt-1">
         <Input

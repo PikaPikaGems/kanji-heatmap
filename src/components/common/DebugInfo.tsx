@@ -16,8 +16,8 @@ import {
 } from "react";
 import { type AiStorageUsageState } from "@/hooks/use-ai-storage-usage";
 import { initAiVoice, type AiVoiceState } from "@/lib/ai-voice/engine";
-import { AI_STORAGE_LIMITS } from "@/lib/ai-explain/storage-budgets";
 import { StorageUsageBar } from "./StorageUsageBar";
+import { AiStorageBars } from "./AiStorageBars";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import {
   voiceModelStatus,
@@ -96,32 +96,7 @@ const StorageUsage = ({
   const { usage, estimate } = state;
   return (
     <div className="space-y-4">
-      <StorageUsageBar
-        label="Text"
-        mine={usage.text.mine}
-        others={usage.text.others}
-        limit={AI_STORAGE_LIMITS.text}
-        note="AI Explain answers, kanji essays, anchor word essays"
-      />
-      <StorageUsageBar
-        label="MP3"
-        mine={usage.audio.mine}
-        others={usage.audio.others}
-        limit={AI_STORAGE_LIMITS.audio}
-        note="Essay and vocabulary narration"
-      />
-      <StorageUsageBar
-        label="Images"
-        mine={usage.images.mine}
-        others={usage.images.others}
-        limit={AI_STORAGE_LIMITS.images}
-        note="Visual Mnemonics"
-      />
-      <p className="text-xs text-muted-foreground">
-        MP3s and AI Explain answers: the least recently used are removed
-        automatically. Essays and images are never removed for you; new ones
-        stop saving at the limit.
-      </p>
+      <AiStorageBars usage={usage} />
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 pt-3 text-xs border-t border-dotted">
         <DebugRow label="Offline Japanese voice">
           {voiceModelStatus(voice)}
