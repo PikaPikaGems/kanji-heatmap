@@ -21,7 +21,9 @@ const CODE_COPY: Record<string, string> = {
   session_active: "You're already logged in.",
   local_cache_unreadable: "This device's saved data couldn't be opened.",
   no_active_session: "Log in to save your progress.",
-  validation_failed: "This is too long to save.",
+  // Covers every rejected write (bad activity, bad times, unknown activity
+  // type…), so it can't say why; TOO_LONG_COPY is only for a known length.
+  validation_failed: "This couldn't be saved.",
   unknown_operation_error: "Something went wrong.",
   pile_item_exists: "Already in your review pile.",
   unsupported_kanji: "This kanji can't be saved.",
@@ -86,6 +88,19 @@ export const REVIEW_SETTINGS_UPDATE_COPY =
 /** Message for an engine `{ code }` error, with a generic fallback. */
 export const copyForCode = (code: string): string =>
   CODE_COPY[code] ?? "Something went wrong. Try again.";
+
+/** For a `validation_failed` known to be `length_exceeded` (note or pile word). */
+export const TOO_LONG_COPY = "This is too long to save.";
+
+/** Like copyForCode, but says "too long" when the error's reason is length. */
+export const copyForError = (error: {
+  code: string;
+  reason?: string;
+}): string =>
+  error.reason === "length_exceeded" ? TOO_LONG_COPY : copyForCode(error.code);
+
+/** A practice round the server rejected (it may not know the activity yet). */
+export const ROUND_REJECTED_COPY = "The server couldn't save this round.";
 
 /** "Your account can't save changes right now.", the entitlement-expired copy. */
 export const ENTITLEMENT_EXPIRED_COPY = CODE_COPY.entitlement_expired;

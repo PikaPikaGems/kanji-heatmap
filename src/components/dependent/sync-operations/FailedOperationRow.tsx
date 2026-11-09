@@ -7,12 +7,12 @@ import { NoticeAction } from "@/components/common/UserNotice";
 import { PracticeButton } from "@/components/ui/practice-button";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useSetOpenedParam } from "@/hooks/routing-hooks";
-import { copyForCode } from "@/lib/engine/engine-copy";
 import { closeSyncOperations } from "@/lib/engine/sync-operations-dialog";
 import { useEngineApi } from "@/lib/engine/use-engine-query";
 import { cn } from "@/lib/utils";
 import {
   describeSubject,
+  failedOperationCopy,
   operationIcon,
   operationLabel,
   recoverableText,
@@ -92,7 +92,9 @@ export const FailedOperationRow = ({
             {operationLabel(op.operationType)}
             <StatePill rejected={rejected} />
           </p>
-          <p className={cn("text-sm", cnWarningText)}>{copyForCode(op.code)}</p>
+          <p className={cn("text-sm", cnWarningText)}>
+            {failedOperationCopy(op)}
+          </p>
           <p className="text-xs text-muted-foreground">
             <time
               className="whitespace-nowrap"

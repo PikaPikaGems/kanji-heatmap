@@ -9,7 +9,7 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { InfoIcon } from "@/components/icons";
 import { MeasureLegendContent } from "@/components/screens/MasteryScreen/MeasureIntro";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import { copyForCode, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
+import { TOO_LONG_COPY, UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import { useWriteBlocker } from "@/lib/engine/data-download";
@@ -165,7 +165,7 @@ const ActiveReviewPileButton = ({
         />
       )}
       {snapshot.status === "ready" && !snapshot.result.ok && <LoadFailedNote />}
-      {tooLong && <Note tone="error">{copyForCode("validation_failed")}</Note>}
+      {tooLong && <Note tone="error">{TOO_LONG_COPY}</Note>}
       {action.kind === "error" && <Note tone="error">{action.message}</Note>}
     </div>
   );
