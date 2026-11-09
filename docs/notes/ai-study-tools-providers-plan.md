@@ -23,7 +23,7 @@ giving AI Study Tools its own modal. Based on the brainstorm mockups and the
   characters). A money amount appears only when the API itself returns it, as
   xAI's `cost_in_usd_ticks` does (shown as US$, 10,000,000,000 ticks = US$1).
   No price lists, no estimates: prices change.
-- **PRs target `main`.**
+- **One PR against `main`**, built in phases (see Phases).
 - **Read Aloud speaks Japanese by default** (details below).
 
 ## Providers
@@ -185,9 +185,12 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
   Edited prompts keep their keys. `monthlyTokenBudget` is ignored and dropped.
 - `ai-explain-usage`: per month, per provider. Today's totals become xAI's.
 
-## PRs, in order
+## Phases (one PR)
 
-Each PR works on its own and keeps today's features working.
+One PR against `main`. Every commit message starts with its phase, e.g.
+`(Phase 1) Add AI Study Tools icon and modal with three tabs`, and each phase
+ends with a `(Phase N) COMPLETED` commit. Each phase leaves today's features
+working.
 
 1. **Modal and entry points.** New modal with three tabs; icons on the account
    card, sidebar bottom and footer; move AI usage out of App & Device Info.
@@ -199,8 +202,7 @@ Each PR works on its own and keeps today's features working.
    above and MP3 conversion for Gemini.
 5. **Visual Mnemonics.** OpenAI, Gemini.
 6. **Usage & Saved.** Per-provider usage, ElevenLabs balance.
-
-Then delete `public/spike.html`.
+7. **Clean-up.** Delete `public/spike.html`.
 
 ## Open questions
 
