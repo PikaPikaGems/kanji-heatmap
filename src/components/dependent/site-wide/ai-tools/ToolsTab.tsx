@@ -1,220 +1,156 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import { ResponsiveSelect } from "@/components/common/ResponsiveSelect";
-import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import BasicSelect from "@/components/common/BasicSelect";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
-  DEFAULT_AI_EXPLAIN_MODEL,
-  usesWebSearch,
+  hasValidKey,
+  resolveAiTool,
+  updateAiToolChoice,
+  type AiExplainSettings,
+  type ResolvedAiTool,
 } from "@/lib/ai-explain/preferences";
-import { listXaiModels } from "@/lib/ai-explain/xai";
-import { useEditedPromptCount } from "@/hooks/use-prompt-entries";
-import { ImageSettings, PromptSettings, SpeechSettings } from "./ToolSettings";
+import { setAiStudyToolsTab } from "@/lib/ai-explain/ai-tools-dialog";
+import { modelFor } from "@/lib/ai-explain/providers";
+import {
+  AI_PROVIDERS,
+  AI_TOOL_ORDER,
+  AI_TOOLS,
+  providerLabel,
+  type AiTool,
+} from "@/lib/ai-explain/providers/capabilities";
+import { ModelField } from "./ModelField";
+import { DownloadAllPrompts, ToolPrompts } from "./PromptFields";
+import { ImageOptions, SpeechOptions, WebSearchField } from "./ToolOptions";
 
-type ModelList =
-  | { status: "idle" }
-  | { status: "loading" }
-  | { status: "done"; models: string[] }
-  | { status: "error"; message: string };
-
-const DEFAULT_MODEL_OPTION = "__default__";
-const CUSTOM_MODEL_OPTION = "__custom__";
-
-const ModelField = () => {
-  const [settings, update] = useAiExplainSettings();
-  const [list, setList] = useState<ModelList>({ status: "idle" });
-  const [customOpen, setCustomOpen] = useState(false);
-  const id = useId();
-
-  // Effect needed: fetches this key's models from xAI when the section opens;
-  // render can't await a request, and the result must be ignored after unmount.
-  useEffect(() => {
-    if (settings.apiKey === "") return;
-    let active = true;
-    setList({ status: "loading" });
-    listXaiModels(settings.apiKey).then(
-      (models) => active && setList({ status: "done", models }),
-      (error: unknown) =>
-        active &&
-        setList({
-          status: "error",
-          message: error instanceof Error ? error.message : "",
-        })
-    );
-    return () => {
-      active = false;
-    };
-  }, [settings.apiKey]);
-
-  // The default model is already the first option.
-  const models =
-    list.status === "done"
-      ? list.models.filter((model) => model !== DEFAULT_AI_EXPLAIN_MODEL)
-      : [];
-  const current = settings.model;
-  const options = [
-    {
-      value: DEFAULT_MODEL_OPTION,
-      label: `Default (${DEFAULT_AI_EXPLAIN_MODEL})`,
-    },
-    ...models.map((model) => ({ value: model, label: model })),
-    // Keep a saved model that isn't (or isn't yet) in the list selectable.
-    ...(current !== undefined && !models.includes(current)
-      ? [{ value: current, label: current }]
-      : []),
-    { value: CUSTOM_MODEL_OPTION, label: "Type a model name…" },
-  ];
-
-  return (
-    <div className="mb-4 space-y-1">
-      <p aria-hidden className="text-sm font-semibold">
-        Model
-      </p>
-      <ResponsiveSelect
-        isLabelSrOnly
-        label="Model"
-        value={
-          customOpen ? CUSTOM_MODEL_OPTION : (current ?? DEFAULT_MODEL_OPTION)
-        }
-        onChange={(next) => {
-          if (next === CUSTOM_MODEL_OPTION) {
-            setCustomOpen(true);
-            return;
-          }
-          setCustomOpen(false);
-          update({ model: next === DEFAULT_MODEL_OPTION ? undefined : next });
-        }}
-        options={options}
-      />
-      {customOpen && (
-        <Input
-          className="rounded-lg"
-          id={id}
-          aria-label="Model name"
-          value={current ?? ""}
-          onChange={(e) =>
-            update({ model: e.target.value.trim() || undefined })
-          }
-          placeholder={DEFAULT_AI_EXPLAIN_MODEL}
-          autoComplete="off"
-          spellCheck={false}
-          autoFocus
-        />
-      )}
-      <p className="pt-1 text-xs text-muted-foreground">
-        {list.status === "loading" && "Loading your models… "}
-        {list.status === "error" && `Couldn't load models. ${list.message} `}
-        Models come from your xAI account.
-      </p>
-    </div>
-  );
-};
-
-/** Kanji Essay and Anchor Word can answer from memory instead of searching. */
-const WebSearchField = () => {
-  const [settings, update] = useAiExplainSettings();
-  return (
-    <div className="mb-3">
-      <div className="flex items-center py-2">
-        <Switch
-          checked={usesWebSearch(settings)}
-          onCheckedChange={(on) =>
-            update({ noWebSearch: on ? undefined : true })
-          }
-          aria-label="Use web search for Kanji Essay and Anchor Word"
-        />
-        <span className="px-2 text-sm font-semibold">
-          Use web search for Kanji Essay and Anchor Word
-        </span>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Search finds sources and real-world examples, and is billed per search.
-        Turn it off to have Grok answer from its own memory: cheaper, but with
-        no source links and a higher chance of mistakes.
-      </p>
-    </div>
-  );
-};
-
-/** A collapsible group inside the section, styled like Fill in the Kanji downloads. */
-const SubsectionItem = ({
-  value,
-  title,
-  subtitle,
-  children,
+/**
+ * The tool's provider: those with a key that works can be picked; the others
+ * are listed as needing a key.
+ */
+const ProviderField = ({
+  tool,
+  settings,
+  choice,
 }: {
-  value: string;
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-}) => (
-  <AccordionItem value={value} className="border-b-0">
-    <AccordionTrigger className="py-3 text-left hover:no-underline">
-      <span className="flex flex-col">
-        <span className="text-sm font-semibold">{title}</span>
-        <span className="text-xs font-normal text-muted-foreground">
-          {subtitle}
-        </span>
-      </span>
-    </AccordionTrigger>
-    <AccordionContent className="pt-1.5 pb-1.5 pl-3 pr-1.5 border-l-2 border-dotted">
-      {children}
-    </AccordionContent>
-  </AccordionItem>
-);
-
-const Subsections = () => {
-  const [settings] = useAiExplainSettings();
-  const editedPrompts = useEditedPromptCount();
-
+  tool: AiTool;
+  settings: AiExplainSettings;
+  choice: ResolvedAiTool;
+}) => {
+  const { providers } = AI_TOOLS[tool];
+  if (!providers.some((provider) => hasValidKey(settings, provider)))
+    return (
+      <UserNotice className="text-xs">
+        Needs a key from{" "}
+        {providers.map((provider) => providerLabel(provider)).join(", ")}.{" "}
+        <NoticeAction onClick={() => setAiStudyToolsTab("keys")}>
+          Add a key
+        </NoticeAction>
+      </UserNotice>
+    );
   return (
-    <Accordion type="multiple">
-      <SubsectionItem
-        value="customizations"
-        title="Customizations"
-        subtitle={`Model · ${settings.model ?? DEFAULT_AI_EXPLAIN_MODEL}`}
-      >
-        <ModelField />
-      </SubsectionItem>
-      <SubsectionItem
-        value="images"
-        title="Visual Mnemonics"
-        subtitle="Image model, size, and quality"
-      >
-        <ImageSettings />
-      </SubsectionItem>
-      <SubsectionItem
-        value="speech"
-        title="Read Aloud"
-        subtitle="Voice, language, and MP3 quality"
-      >
-        <SpeechSettings />
-      </SubsectionItem>
-      <SubsectionItem
-        value="prompts"
-        title="Prompts (advanced)"
-        subtitle={
-          editedPrompts === 0
-            ? "All prompts use the defaults"
-            : `${editedPrompts} edited ${editedPrompts === 1 ? "prompt" : "prompts"}`
+    <div className="space-y-1">
+      <p aria-hidden className="text-sm font-semibold">
+        Provider
+      </p>
+      <BasicSelect
+        isLabelSrOnly
+        triggerCN="rounded-lg"
+        label="Provider"
+        value={choice.provider}
+        onChange={(provider) =>
+          updateAiToolChoice(tool, {
+            provider: providers.find((option) => option === provider),
+          })
         }
-      >
-        <PromptSettings />
-      </SubsectionItem>
-    </Accordion>
+        options={providers.map((provider) => ({
+          value: provider,
+          label: AI_PROVIDERS[provider].label,
+          disabled: !hasValidKey(settings, provider),
+          description: hasValidKey(settings, provider)
+            ? undefined
+            : "Add a key in API keys",
+        }))}
+      />
+    </div>
   );
 };
 
-/** Which model, provider and prompt each tool uses. */
+/** Everything one tool uses: provider, model, options and prompt. */
+const ToolFields = ({ tool }: { tool: AiTool }) => {
+  const [settings] = useAiExplainSettings();
+  const info = AI_TOOLS[tool];
+  const choice = resolveAiTool(settings, tool);
+  const model = modelFor(choice.provider, info.kind, choice.model);
+  const hasModels = AI_PROVIDERS[choice.provider].defaultModels[info.kind];
+  return (
+    <div className="space-y-4">
+      <ProviderField tool={tool} settings={settings} choice={choice} />
+      {choice.ready && (
+        // Keyed by provider: its own fields fade in when it changes.
+        <div key={choice.provider} className="space-y-4 animate-fade-in-fast">
+          {hasModels && (
+            <ModelField
+              provider={choice.provider}
+              kind={info.kind}
+              apiKey={choice.apiKey}
+              value={choice.model}
+              onChange={(next) => updateAiToolChoice(tool, { model: next })}
+            />
+          )}
+          {info.search && <WebSearchField tool={tool} choice={choice} />}
+          {info.kind === "speech" && <SpeechOptions choice={choice} />}
+          {info.kind === "image" && (
+            <ImageOptions choice={choice} model={model} />
+          )}
+        </div>
+      )}
+      <ToolPrompts tool={tool} />
+    </div>
+  );
+};
+
+/** One tool's row: its name, and the provider and model it uses now. */
+const ToolItem = ({ tool }: { tool: AiTool }) => {
+  const [settings] = useAiExplainSettings();
+  const info = AI_TOOLS[tool];
+  const choice = resolveAiTool(settings, tool);
+  const model = modelFor(choice.provider, info.kind, choice.model);
+  return (
+    <AccordionItem value={tool} className="border-b border-dotted">
+      <AccordionTrigger className="py-3 text-left hover:no-underline">
+        <span className="flex flex-col">
+          <span className="text-sm font-semibold">{info.label}</span>
+          <span className="text-xs font-normal text-muted-foreground">
+            {choice.ready
+              ? [providerLabel(choice.provider), model]
+                  .filter(Boolean)
+                  .join(" · ")
+              : "Needs a key"}
+          </span>
+        </span>
+      </AccordionTrigger>
+      <AccordionContent className="pt-1.5 pb-4 pl-3 pr-1.5 border-l-2 border-dotted">
+        <p className="mb-3 text-xs text-muted-foreground">
+          {info.description}.
+        </p>
+        <ToolFields tool={tool} />
+      </AccordionContent>
+    </AccordionItem>
+  );
+};
+
+/** Which provider, model, options and prompt each tool uses. */
 export const ToolsTab = () => (
-  <>
-    <WebSearchField />
-    <Subsections />
-  </>
+  <div className="space-y-4">
+    <Accordion type="multiple">
+      {AI_TOOL_ORDER.map((tool) => (
+        <ToolItem key={tool} tool={tool} />
+      ))}
+    </Accordion>
+    <DownloadAllPrompts />
+  </div>
 );

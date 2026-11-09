@@ -1,6 +1,6 @@
 import type { Table } from "dexie";
 import type { ImagePalette, ImageStyle } from "./prompts";
-import type { AiSource } from "./xai";
+import type { AiProvider, AiSource } from "./providers/types";
 import { safeReadJson } from "@/lib/storage";
 import { GUEST_OWNER_ID, requireOwnerId } from "@/lib/engine/content-owner";
 import {
@@ -22,6 +22,8 @@ type Tracked = { ownerId: string; bytes: number; lastUsedAt: number };
 
 export type SentenceExplanation = {
   text: string;
+  /** Unset on answers saved before other providers: xAI. */
+  provider?: AiProvider;
   model: string;
   instructions: string;
   createdAt: number;
@@ -31,6 +33,8 @@ export type AiTextResult = {
   id: string;
   markdown: string;
   sources: AiSource[];
+  /** Unset on results saved before other providers: xAI. */
+  provider?: AiProvider;
   model: string;
   instructions: string;
   createdAt: number;
@@ -47,6 +51,8 @@ export type MnemonicImage = {
   customPalette?: string;
   resolution: "1k" | "2k";
   quality: "low" | "medium";
+  /** Unset on images saved before other providers: xAI. */
+  provider?: AiProvider;
   model: string;
   instructions: string;
   createdAt: number;
@@ -56,7 +62,12 @@ export type AiAudioRecord = {
   sourceId: string;
   fingerprint: string;
   voice: string;
+  /** Shown to the learner, e.g. "Ara" or a library voice's name. */
+  voiceName?: string;
   language: "auto" | "ja";
+  /** Unset on recordings saved before other providers: xAI. */
+  provider?: AiProvider;
+  model?: string;
   blob: Blob;
   createdAt: number;
 };

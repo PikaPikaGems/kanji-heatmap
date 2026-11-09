@@ -7,7 +7,7 @@ import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { hasValidAiExplainKey } from "@/lib/ai-explain/preferences";
+import { hasAnyValidAiKey } from "@/lib/ai-explain/preferences";
 import {
   closeAiStudyTools,
   setAiStudyToolsTab,
@@ -43,7 +43,7 @@ const TAB_OPTIONS: { value: AiToolsTab; label: string }[] = [
 /** The switch for every AI feature; it needs a key that works. */
 const EnableSwitch = () => {
   const [settings, update] = useAiExplainSettings();
-  const keyOk = hasValidAiExplainKey(settings);
+  const keyOk = hasAnyValidAiKey(settings);
   // The saved choice is kept while the key is missing or rejected, so a
   // working key turns it back on.
   const active = settings.enabled && keyOk;

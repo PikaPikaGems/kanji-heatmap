@@ -4,7 +4,9 @@ import {
   getInFlight,
   trackInFlight,
 } from "@/lib/ai-explain/in-flight";
-import { NoticeAction } from "@/components/common/UserNotice";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { openAiStudyTools } from "@/lib/ai-explain/ai-tools-dialog";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -17,12 +19,21 @@ import {
   RegenerateButton,
 } from "@/components/common/AiActionButtons";
 import {
-  addAiExplainUsage,
+  addAiUsage,
   DEFAULT_AI_SPEECH_BIT_RATE,
-  DEFAULT_AI_SPEECH_VOICE,
-  isAiExplainReady,
+  isAiToolReady,
   readAiExplainSettings,
+  rejectAiProviderKey,
+  resolveAiTool,
 } from "@/lib/ai-explain/preferences";
+import { getCurrentOwner } from "@/lib/engine/content-owner";
+import { generateProviderSpeech, modelFor } from "@/lib/ai-explain/providers";
+import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
+import {
+  AI_TOOLS,
+  providerLabel,
+} from "@/lib/ai-explain/providers/capabilities";
+import { DEFAULT_VOICES, voiceName } from "@/lib/ai-explain/providers/voices";
 import {
   AI_GENERATED_CONTENT_EVENT,
   contentFingerprint,
@@ -31,7 +42,6 @@ import {
   saveAudioRecord,
   type AiAudioRecord,
 } from "@/lib/ai-explain/storage";
-import { generateXaiSpeech } from "@/lib/ai-explain/xai";
 import { prepareNarration } from "./narration";
 
 type AudioState = {
@@ -181,8 +191,10 @@ const SavedAudio = ({
         {regenerate}
       </div>
       <p className="text-xs text-muted-foreground">
-        AI-generated voice ·{" "}
-        {record.language === "ja" ? "Japanese" : "Automatic language"}
+        AI-generated voice · {providerLabel(record.provider)} ·{" "}
+        {record.voiceName ?? voiceName(record.provider ?? "xai", record.voice)}
+        {(record.provider ?? "xai") === "xai" &&
+          (record.language === "ja" ? " · Japanese" : " · Automatic language")}
       </p>
       {message && (
         <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
@@ -204,6 +216,8 @@ export const AiAudio = ({
 }) => {
   const [state, setState] = useState<AudioState>({ status: "loading" });
   const request = useRef<AbortController | null>(null);
+  const [settings] = useAiExplainSettings();
+  const speechReady = isAiToolReady(settings, "readAloud");
   const [revision, setRevision] = useState(0);
 
   const flightKey = `audio:${sourceId}`;
@@ -263,7 +277,9 @@ export const AiAudio = ({
     if (request.current || getInFlight(flightKey) || state.status === "loading")
       return;
     const settings = readAiExplainSettings();
-    if (!isAiExplainReady(settings)) return;
+    if (!isAiToolReady(settings, "readAloud")) return;
+    const choice = resolveAiTool(settings, "readAloud");
+    const { provider } = choice;
     const controller = new AbortController();
     const epoch = getGeneratedContentEpoch();
     request.current = controller;
@@ -278,25 +294,39 @@ export const AiAudio = ({
     try {
       const text = prepareNarration(markdown);
       if (!text) throw new Error("There is no text to read aloud.");
-      const voice = settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE;
-      const language = settings.speechLanguage ?? "auto";
-      const blob = await generateXaiSpeech({
-        apiKey: settings.apiKey,
+      const voice = choice.voice ?? DEFAULT_VOICES[provider] ?? "";
+      const language = choice.language ?? "ja";
+      const model = modelFor(provider, "speech", choice.model);
+      const { blob, usage } = await generateProviderSpeech(provider, {
+        apiKey: choice.apiKey,
+        model,
         text,
         voice,
         language,
-        bitRate: settings.speechBitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
+        bitRate: choice.bitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
+        instructions: "",
         signal: controller.signal,
       });
-      addAiExplainUsage(0, { audioCharacters: text.length });
+      addAiUsage(usage);
       const fingerprint = await contentFingerprint(markdown);
       if (controller.signal.aborted) return;
       const record: AiAudioRecord = {
-        id: JSON.stringify([sourceId, fingerprint, voice, language, "mp3"]),
+        id: JSON.stringify([
+          sourceId,
+          fingerprint,
+          voice,
+          language,
+          "mp3",
+          // Recordings made before other providers keep their ids.
+          ...(provider === "xai" ? [] : [provider, model]),
+        ]),
         sourceId,
         fingerprint,
         voice,
+        voiceName: voiceName(provider, voice),
         language,
+        provider,
+        model: model || undefined,
         blob,
         createdAt: Date.now(),
       };
@@ -310,13 +340,19 @@ export const AiAudio = ({
       if (!controller.signal.aborted)
         setState({ status: "ready", record, warning });
     } catch (error) {
+      // The key stopped working (expired or revoked): hide the tool until a
+      // working key is entered.
+      const owner = getCurrentOwner();
+      if (error instanceof AiKeyRejectedError && owner.status === "known")
+        rejectAiProviderKey(owner.ownerId, provider, choice.apiKey);
       if (!controller.signal.aborted)
         setState({
           status: "error",
           record: previous,
           message: describeAiError(
             error,
-            "Couldn't generate audio. Please try again."
+            "Couldn't generate audio. Please try again.",
+            provider
           ),
         });
     } finally {
@@ -331,6 +367,15 @@ export const AiAudio = ({
     );
   return (
     <div className="space-y-3 border-t border-dotted pt-4">
+      {!speechReady && !state.record && (
+        <UserNotice className="text-xs">
+          Read Aloud needs a key from a speech provider (
+          {AI_TOOLS.readAloud.providers.map(providerLabel).join(", ")}).{" "}
+          <NoticeAction onClick={() => openAiStudyTools("keys")}>
+            Add a key
+          </NoticeAction>
+        </UserNotice>
+      )}
       {state.record ? (
         <SavedAudio
           key={`${state.record.id}-${state.record.createdAt}`}
@@ -338,6 +383,7 @@ export const AiAudio = ({
           filename={filename}
           regenerate={
             <RegenerateButton
+              disabled={!speechReady}
               busy={state.status === "generating"}
               busyLabel="Regenerating MP3…"
               onClick={() => void generate()}
@@ -347,12 +393,14 @@ export const AiAudio = ({
           }
         />
       ) : (
-        <AiPrimaryButton
-          busy={state.status === "generating"}
-          onClick={() => void generate()}
-        >
-          Generate MP3 to listen
-        </AiPrimaryButton>
+        speechReady && (
+          <AiPrimaryButton
+            busy={state.status === "generating"}
+            onClick={() => void generate()}
+          >
+            Generate MP3 to listen
+          </AiPrimaryButton>
+        )
       )}
       <AiRequestFeedback
         busy={state.status === "generating"}

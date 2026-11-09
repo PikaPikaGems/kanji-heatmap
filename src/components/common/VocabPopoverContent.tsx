@@ -6,7 +6,7 @@ import { VocabActions as WordActionIcons } from "@/components/common/VocabAction
 import { SeeMore as ExpandableGloss } from "@/components/common/SeeMore";
 import { vocabExternalLinks } from "@/lib/external-links";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { isAiToolReady } from "@/lib/ai-explain/preferences";
 import { openWordExplain } from "@/lib/ai-explain/word-explain-dialog";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
@@ -26,7 +26,8 @@ const WordAiExplain = ({
   const [settings] = useAiExplainSettings();
   const owner = useCurrentOwner();
   // Nobody's saved answers show until the owner is known.
-  if (owner.status !== "known" || !isAiExplainReady(settings)) return null;
+  if (owner.status !== "known" || !isAiToolReady(settings, "vocab"))
+    return null;
   return (
     <>
       <DottedSeparator />

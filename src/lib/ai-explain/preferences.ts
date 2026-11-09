@@ -10,23 +10,31 @@ import {
   GUEST_OWNER_ID,
   type ContentOwner,
 } from "@/lib/engine/content-owner";
+import {
+  AI_PROVIDER_ORDER,
+  AI_TOOLS,
+  type AiTool,
+} from "./providers/capabilities";
+import type { AiProvider, AiUsageRecord } from "./providers/types";
 
 export const AI_EXPLAIN_SETTINGS_KEY = "ai-explain-settings";
-/** The xAI API key per owner: `{ [ownerId]: { apiKey, keyValid } }`. */
+/**
+ * The API keys per owner and provider:
+ * `{ [ownerId]: { [provider]: { apiKey, keyValid } } }`. Before more
+ * providers, it held one xAI key per owner: `{ [ownerId]: { apiKey, keyValid } }`.
+ */
 export const AI_EXPLAIN_KEYS_KEY = "ai-explain-keys";
 export const AI_EXPLAIN_USAGE_KEY = "ai-explain-usage";
-export const AI_SPEECH_VOICES = ["ara", "eve", "rex", "sal", "leo"];
-export const DEFAULT_AI_SPEECH_VOICE = "ara";
-/** MP3 bit rates xAI accepts (192 kbps left out: no gain for speech). */
+/**
+ * MP3 bit rates offered (192 kbps left out: no gain for speech). xAI takes
+ * any; ElevenLabs gets the nearest it offers.
+ */
 export const AI_SPEECH_BIT_RATES = [32000, 64000, 96000, 128000] as const;
 export type AiSpeechBitRate = (typeof AI_SPEECH_BIT_RATES)[number];
 export const DEFAULT_AI_SPEECH_BIT_RATE: AiSpeechBitRate = 64000;
 
 /** Replaced with the sentence (furigana stripped) before sending. */
 export const JAPANESE_TEXT_PLACEHOLDER = "{JAPANESE_TEXT}";
-
-/** Used until the user picks another model in User Preferences. */
-export const DEFAULT_AI_EXPLAIN_MODEL = "grok-4.3";
 
 export const DEFAULT_AI_EXPLAIN_PROMPT = `You are a Japanese tutor helping an English-speaking learner.
 Explain the Japanese text below. No greeting, preamble or closing remarks.
@@ -80,28 +88,49 @@ Rules:
 - Examples: 2 short everyday sentences around JLPT N4 level, each under 15 words.
 - This is a single word, not a sentence: no grammar section and no literal translation.`;
 
-/** The xAI key of one owner (a logged-in account, or the guest). */
+/** One provider's key of one owner (a logged-in account, or the guest). */
 export type AiOwnerKey = {
   apiKey: string;
-  /** True once xAI accepted `apiKey`; reset whenever the key changes. */
+  /** True once the provider accepted `apiKey`; reset whenever it changes. */
   keyValid: boolean;
 };
 
+export type AiOwnerKeys = Record<AiProvider, AiOwnerKey>;
+
 /**
- * Preferences shared by everyone using this browser. Unset `model` / `prompt`
- * mean the defaults above, so improving a default reaches everyone who never
- * edited it. The API key is not here: it belongs to one owner (see below).
+ * What one tool uses. `model` and `voice` belong to `provider`: picking
+ * another provider clears them.
+ */
+export type AiToolChoice = {
+  /** Unset: the first provider in the tool's list with a key that works. */
+  provider?: AiProvider;
+  /** Unset: the provider's default model. */
+  model?: string;
+  /** Kanji Essay and Anchor Word Essay; unset means on. */
+  webSearch?: boolean;
+  /** Read Aloud. */
+  voice?: string;
+  bitRate?: AiSpeechBitRate;
+  /** Read Aloud on xAI; unset means Japanese. */
+  language?: "auto" | "ja";
+  /** Visual Mnemonics on xAI. */
+  resolution?: "1k" | "2k";
+  /** Visual Mnemonics on xAI and OpenAI. */
+  quality?: "low" | "medium";
+};
+
+/**
+ * Preferences shared by everyone using this browser. Unset prompts mean the
+ * defaults, so improving a default reaches everyone who never edited it. The
+ * API keys are not here: they belong to one owner (see below).
  */
 export type AiExplainPreferences = {
   enabled: boolean;
-  model?: string;
+  tools: Partial<Record<AiTool, AiToolChoice>>;
+  /** Grammar Explain's prompt. */
   prompt?: string;
-  /** AI Explain's prompt for a single word. */
+  /** Vocab Explain's prompt (a single word). */
   wordPrompt?: string;
-  /** Optional; when set, User Preferences shows usage as a progress bar. */
-  monthlyTokenBudget?: number;
-  /** Kanji Essay and Anchor Word answer from memory, without web search. */
-  noWebSearch?: boolean;
   vocabularyPrompt?: string;
   kanjiEssayPrompt?: string;
   imagePrompt?: string;
@@ -110,16 +139,10 @@ export type AiExplainPreferences = {
   imagePalettePrompt?: string;
   /** Edited prompts for the other palettes, including Custom. */
   imagePalettePrompts?: Partial<Record<ImagePalette, string>>;
-  imageModel?: string;
-  imageResolution?: "1k" | "2k";
-  imageQuality?: "low" | "medium";
-  speechVoice?: string;
-  speechBitRate?: AiSpeechBitRate;
-  speechLanguage?: "auto" | "ja";
 };
 
-/** What AI features read: the shared preferences plus the current owner's key. */
-export type AiExplainSettings = AiExplainPreferences & AiOwnerKey;
+/** What AI features read: the shared preferences plus the owner's keys. */
+export type AiExplainSettings = AiExplainPreferences & { keys: AiOwnerKeys };
 
 const optionalString = (v: unknown) =>
   typeof v === "string" && v.trim() !== "" ? v : undefined;
@@ -137,31 +160,54 @@ const readPromptRecord = <K extends string>(
   return result;
 };
 
+const isProvider = (value: unknown): value is AiProvider =>
+  AI_PROVIDER_ORDER.includes(value as AiProvider);
+
+/** One tool's saved choice, dropping anything malformed. */
+const readToolChoice = (value: unknown): AiToolChoice => {
+  if (!value || typeof value !== "object") return {};
+  const raw = value as Record<string, unknown>;
+  const choice: AiToolChoice = {};
+  if (isProvider(raw.provider)) choice.provider = raw.provider;
+  const model = optionalString(raw.model);
+  if (model) choice.model = model.trim();
+  if (raw.webSearch === false) choice.webSearch = false;
+  const voice = optionalString(raw.voice);
+  if (voice) choice.voice = voice;
+  const bitRate = AI_SPEECH_BIT_RATES.find((rate) => rate === raw.bitRate);
+  if (bitRate) choice.bitRate = bitRate;
+  if (raw.language === "auto") choice.language = "auto";
+  if (raw.resolution === "2k") choice.resolution = "2k";
+  if (raw.quality === "medium") choice.quality = "medium";
+  return choice;
+};
+
+const readToolChoices = (value: unknown): AiExplainPreferences["tools"] => {
+  if (!value || typeof value !== "object") return {};
+  const tools: AiExplainPreferences["tools"] = {};
+  for (const tool of Object.keys(AI_TOOLS) as AiTool[]) {
+    const choice = readToolChoice((value as Record<string, unknown>)[tool]);
+    if (Object.keys(choice).length > 0) tools[tool] = choice;
+  }
+  return tools;
+};
+
 /** Reads the shared preferences, dropping anything malformed. */
 export const readAiExplainPreferences = (): AiExplainPreferences => {
   const raw = safeReadJson<Record<string, unknown> | null>(
     AI_EXPLAIN_SETTINGS_KEY,
     null
   );
-  if (!raw || typeof raw !== "object") return { enabled: false };
+  if (!raw || typeof raw !== "object") return { enabled: false, tools: {} };
   return {
     enabled: raw.enabled === true,
-    model: optionalString(raw.model),
+    tools: readToolChoices(raw.tools),
     prompt: optionalString(raw.prompt),
     wordPrompt: optionalString(raw.wordPrompt),
     vocabularyPrompt: optionalString(raw.vocabularyPrompt),
     kanjiEssayPrompt: optionalString(raw.kanjiEssayPrompt),
     imagePrompt: optionalString(raw.imagePrompt),
     imagePalettePrompt: optionalString(raw.imagePalettePrompt),
-    imageModel: optionalString(raw.imageModel),
-    imageResolution: raw.imageResolution === "2k" ? "2k" : "1k",
-    imageQuality: raw.imageQuality === "medium" ? "medium" : "low",
-    speechVoice: optionalString(raw.speechVoice),
-    speechBitRate: AI_SPEECH_BIT_RATES.find(
-      (rate) => rate === raw.speechBitRate
-    ),
-    speechLanguage: raw.speechLanguage === "ja" ? "ja" : "auto",
-    noWebSearch: raw.noWebSearch === true || undefined,
     imageStylePrompts: readPromptRecord(
       raw.imageStylePrompts,
       Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]
@@ -170,12 +216,6 @@ export const readAiExplainPreferences = (): AiExplainPreferences => {
       raw.imagePalettePrompts,
       Object.keys(IMAGE_PALETTE_LABELS) as ImagePalette[]
     ),
-    monthlyTokenBudget:
-      typeof raw.monthlyTokenBudget === "number" &&
-      Number.isFinite(raw.monthlyTokenBudget) &&
-      raw.monthlyTokenBudget > 0
-        ? raw.monthlyTokenBudget
-        : undefined,
   };
 };
 
@@ -190,31 +230,125 @@ export const writeAiExplainPreferences = (
   notifyStorage(AI_EXPLAIN_SETTINGS_KEY);
 };
 
+/**
+ * Changes one tool's choice. Picking another provider clears the model and
+ * voice, which belonged to the previous one.
+ */
+export const updateAiToolChoice = (tool: AiTool, patch: AiToolChoice) => {
+  const preferences = readAiExplainPreferences();
+  const current = preferences.tools[tool] ?? {};
+  const switching = "provider" in patch && patch.provider !== current.provider;
+  const next: AiToolChoice = {
+    ...current,
+    ...(switching ? { model: undefined, voice: undefined } : {}),
+    ...patch,
+  };
+  writeAiExplainPreferences({
+    ...preferences,
+    tools: { ...preferences.tools, [tool]: next },
+  });
+};
+
+/** Fields the xAI-only settings had, before choices were per tool. */
+const LEGACY_FIELDS = [
+  "model",
+  "imageModel",
+  "imageResolution",
+  "imageQuality",
+  "speechVoice",
+  "speechBitRate",
+  "speechLanguage",
+  "noWebSearch",
+  "monthlyTokenBudget",
+];
+
+/**
+ * Before choices were per tool, one xAI model served every text tool and the
+ * image and speech options sat at the top level. They become the xAI choices
+ * of their tools. The monthly token budget is dropped, and so is the speech
+ * language: "auto" was saved for everyone, and Read Aloud now speaks
+ * Japanese unless switched. Module-level: runs once when this file loads.
+ */
+const moveLegacyChoicesToTools = () => {
+  const raw = safeReadJson<Record<string, unknown> | null>(
+    AI_EXPLAIN_SETTINGS_KEY,
+    null
+  );
+  if (!raw || typeof raw !== "object") return;
+  if (!LEGACY_FIELDS.some((field) => field in raw)) return;
+  const tools = readToolChoices(raw.tools);
+  const merge = (tool: AiTool, choice: AiToolChoice) => {
+    if (raw.tools !== undefined) return;
+    if (Object.keys(choice).length === 0) return;
+    tools[tool] = { ...tools[tool], ...choice };
+  };
+  const model = optionalString(raw.model);
+  for (const tool of ["anchorWord", "kanjiEssay", "grammar", "vocab"] as const)
+    if (model) merge(tool, { provider: "xai", model });
+  if (raw.noWebSearch === true) {
+    merge("anchorWord", { webSearch: false });
+    merge("kanjiEssay", { webSearch: false });
+  }
+  const imageModel = optionalString(raw.imageModel);
+  merge("mnemonics", {
+    ...(imageModel ? { provider: "xai", model: imageModel } : {}),
+    ...(raw.imageResolution === "2k" ? { resolution: "2k" } : {}),
+    ...(raw.imageQuality === "medium" ? { quality: "medium" } : {}),
+  });
+  const voice = optionalString(raw.speechVoice);
+  const bitRate = AI_SPEECH_BIT_RATES.find(
+    (rate) => rate === raw.speechBitRate && rate !== DEFAULT_AI_SPEECH_BIT_RATE
+  );
+  merge("readAloud", {
+    ...(voice ? { provider: "xai", voice } : {}),
+    ...(bitRate ? { bitRate } : {}),
+  });
+  const rest: Record<string, unknown> = { ...raw, tools };
+  for (const field of LEGACY_FIELDS) delete rest[field];
+  try {
+    localStorage.setItem(AI_EXPLAIN_SETTINGS_KEY, JSON.stringify(rest));
+  } catch {
+    // Storage can throw (e.g. private mode); this runs again next load.
+  }
+};
+
 const NO_KEY: AiOwnerKey = { apiKey: "", keyValid: false };
 
-/** Owners with a saved key; anything malformed is dropped. */
-const readOwnerKeys = (): Map<string, AiOwnerKey> => {
+const readKey = (value: unknown): AiOwnerKey | undefined => {
+  if (!value || typeof value !== "object") return undefined;
+  const { apiKey, keyValid } = value as Record<string, unknown>;
+  if (typeof apiKey !== "string" || apiKey === "") return undefined;
+  return { apiKey, keyValid: keyValid === true };
+};
+
+type StoredOwnerKeys = Partial<Record<AiProvider, AiOwnerKey>>;
+
+/**
+ * Owners with a saved key, per provider; anything malformed is dropped. An
+ * owner saved before there were providers holds one key: xAI's.
+ */
+const readAllKeys = (): Map<string, StoredOwnerKeys> => {
   const raw = safeReadJson<unknown>(AI_EXPLAIN_KEYS_KEY, null);
-  const keys = new Map<string, AiOwnerKey>();
+  const keys = new Map<string, StoredOwnerKeys>();
   if (!raw || typeof raw !== "object") return keys;
   for (const [ownerId, value] of Object.entries(raw)) {
     if (!value || typeof value !== "object") continue;
-    const { apiKey, keyValid } = value as Record<string, unknown>;
-    if (typeof apiKey === "string" && apiKey !== "")
-      keys.set(ownerId, { apiKey, keyValid: keyValid === true });
+    const legacy = readKey(value);
+    if (legacy) {
+      keys.set(ownerId, { xai: legacy });
+      continue;
+    }
+    const owned: StoredOwnerKeys = {};
+    for (const provider of AI_PROVIDER_ORDER) {
+      const key = readKey((value as Record<string, unknown>)[provider]);
+      if (key) owned[provider] = key;
+    }
+    if (Object.keys(owned).length > 0) keys.set(ownerId, owned);
   }
   return keys;
 };
 
-/** The key saved for this owner on this device (none saved reads as empty). */
-export const readAiOwnerKey = (ownerId: string): AiOwnerKey =>
-  readOwnerKeys().get(ownerId) ?? NO_KEY;
-
-/** Saves this owner's key; an empty `apiKey` deletes it. */
-export const writeAiOwnerKey = (ownerId: string, key: AiOwnerKey) => {
-  const keys = readOwnerKeys();
-  if (key.apiKey === "") keys.delete(ownerId);
-  else keys.set(ownerId, { apiKey: key.apiKey, keyValid: key.keyValid });
+const writeAllKeys = (keys: Map<string, StoredOwnerKeys>) => {
   try {
     if (keys.size === 0) localStorage.removeItem(AI_EXPLAIN_KEYS_KEY);
     else
@@ -228,16 +362,53 @@ export const writeAiOwnerKey = (ownerId: string, key: AiOwnerKey) => {
   notifyStorage(AI_EXPLAIN_KEYS_KEY);
 };
 
-export const deleteAiOwnerKey = (ownerId: string) =>
-  writeAiOwnerKey(ownerId, NO_KEY);
+const filledKeys = (owned: StoredOwnerKeys = {}): AiOwnerKeys => {
+  const keys = {} as AiOwnerKeys;
+  for (const provider of AI_PROVIDER_ORDER)
+    keys[provider] = owned[provider] ?? NO_KEY;
+  return keys;
+};
+
+/** Every provider's key saved for this owner on this device. */
+export const readAiOwnerKeys = (ownerId: string): AiOwnerKeys =>
+  filledKeys(readAllKeys().get(ownerId));
+
+/** Whether this owner has any key saved on this device. */
+export const hasSavedAiKey = (ownerId: string) => readAllKeys().has(ownerId);
+
+/** Saves one provider's key of this owner; an empty `apiKey` deletes it. */
+export const writeAiProviderKey = (
+  ownerId: string,
+  provider: AiProvider,
+  key: AiOwnerKey
+) => {
+  const keys = readAllKeys();
+  const owned = { ...keys.get(ownerId) };
+  if (key.apiKey === "") delete owned[provider];
+  else owned[provider] = { apiKey: key.apiKey, keyValid: key.keyValid };
+  if (Object.keys(owned).length === 0) keys.delete(ownerId);
+  else keys.set(ownerId, owned);
+  writeAllKeys(keys);
+};
+
+/** Deletes every key of this owner (logout). */
+export const deleteAiOwnerKeys = (ownerId: string) => {
+  const keys = readAllKeys();
+  if (!keys.delete(ownerId)) return;
+  writeAllKeys(keys);
+};
 
 /**
- * xAI refused `apiKey`: mark it unusable, unless the owner has since saved a
- * different key.
+ * The provider refused `apiKey`: mark it unusable, unless the owner has since
+ * saved a different key.
  */
-export const rejectAiOwnerKey = (ownerId: string, apiKey: string) => {
-  if (readAiOwnerKey(ownerId).apiKey !== apiKey) return;
-  writeAiOwnerKey(ownerId, { apiKey, keyValid: false });
+export const rejectAiProviderKey = (
+  ownerId: string,
+  provider: AiProvider,
+  apiKey: string
+) => {
+  if (readAiOwnerKeys(ownerId)[provider].apiKey !== apiKey) return;
+  writeAiProviderKey(ownerId, provider, { apiKey, keyValid: false });
 };
 
 /**
@@ -256,9 +427,12 @@ const moveSharedKeyToGuest = () => {
   if (
     typeof apiKey === "string" &&
     apiKey !== "" &&
-    readAiOwnerKey(GUEST_OWNER_ID).apiKey === ""
+    readAiOwnerKeys(GUEST_OWNER_ID).xai.apiKey === ""
   )
-    writeAiOwnerKey(GUEST_OWNER_ID, { apiKey, keyValid: keyValid === true });
+    writeAiProviderKey(GUEST_OWNER_ID, "xai", {
+      apiKey,
+      keyValid: keyValid === true,
+    });
   try {
     localStorage.setItem(AI_EXPLAIN_SETTINGS_KEY, JSON.stringify(preferences));
   } catch {
@@ -266,32 +440,80 @@ const moveSharedKeyToGuest = () => {
   }
 };
 moveSharedKeyToGuest();
+moveLegacyChoicesToTools();
 
 /**
- * The shared preferences plus this owner's key. While the owner is unknown
- * nobody's key is used, so AI features read as not set up.
+ * The shared preferences plus this owner's keys. While the owner is unknown
+ * nobody's keys are used, so AI features read as not set up.
  */
 export const readAiExplainSettings = (
   owner: ContentOwner = getCurrentOwner()
 ): AiExplainSettings => ({
   ...readAiExplainPreferences(),
-  ...(owner.status === "known" ? readAiOwnerKey(owner.ownerId) : NO_KEY),
+  keys:
+    owner.status === "known" ? readAiOwnerKeys(owner.ownerId) : filledKeys(),
 });
 
-/** The switch can only be turned on with a key xAI accepted. */
-export const hasValidAiExplainKey = (settings: AiExplainSettings) =>
-  settings.apiKey !== "" && settings.keyValid;
+export const hasValidKey = (
+  settings: Pick<AiExplainSettings, "keys">,
+  provider: AiProvider
+) => settings.keys[provider].apiKey !== "" && settings.keys[provider].keyValid;
 
-/** The button shows only when switched on with a key xAI accepted. */
+/** The switch can only be turned on with a key a provider accepted. */
+export const hasAnyValidAiKey = (settings: Pick<AiExplainSettings, "keys">) =>
+  AI_PROVIDER_ORDER.some((provider) => hasValidKey(settings, provider));
+
+/** AI Study Tools are switched on, with at least one key that works. */
 export const isAiExplainReady = (settings: AiExplainSettings) =>
-  settings.enabled && hasValidAiExplainKey(settings);
+  settings.enabled && hasAnyValidAiKey(settings);
 
-/** Kanji Essay and Anchor Word search the web unless switched off. */
-export const usesWebSearch = (settings: AiExplainPreferences) =>
-  settings.noWebSearch !== true;
+/** A tool's choice with its provider settled and that provider's key. */
+export type ResolvedAiTool = AiToolChoice & {
+  provider: AiProvider;
+  apiKey: string;
+  /** The provider's key works. */
+  ready: boolean;
+};
 
-export const modelOf = (settings: AiExplainSettings) =>
-  settings.model ?? DEFAULT_AI_EXPLAIN_MODEL;
+/**
+ * Which provider a tool uses now: the one picked while its key works, else
+ * the first in the tool's list whose key works. A model or voice picked for
+ * another provider is left out.
+ */
+export const resolveAiTool = (
+  settings: AiExplainSettings,
+  tool: AiTool
+): ResolvedAiTool => {
+  const choice = settings.tools[tool] ?? {};
+  const { providers } = AI_TOOLS[tool];
+  const picked =
+    choice.provider && providers.includes(choice.provider)
+      ? choice.provider
+      : undefined;
+  const provider =
+    picked && hasValidKey(settings, picked)
+      ? picked
+      : (providers.find((option) => hasValidKey(settings, option)) ??
+        picked ??
+        providers[0]);
+  const own = provider === choice.provider;
+  return {
+    ...choice,
+    model: own ? choice.model : undefined,
+    voice: own ? choice.voice : undefined,
+    provider,
+    apiKey: settings.keys[provider].apiKey,
+    ready: hasValidKey(settings, provider),
+  };
+};
+
+/** The tool's button shows: switched on, and its provider's key works. */
+export const isAiToolReady = (settings: AiExplainSettings, tool: AiTool) =>
+  settings.enabled && resolveAiTool(settings, tool).ready;
+
+/** Kanji Essay and Anchor Word Essay search the web unless switched off. */
+export const usesWebSearch = (choice: AiToolChoice | undefined) =>
+  choice?.webSearch !== false;
 
 /**
  * The prompt to send: the sentence prompt, or the word prompt when `word`.
@@ -311,25 +533,63 @@ export const buildAiExplainPrompt = (
   return template.split(JAPANESE_TEXT_PLACEHOLDER).join(japaneseText);
 };
 
+/** One provider's requests this month, in its own units. */
+export type AiProviderUsage = {
+  requests: number;
+  inputTokens: number;
+  outputTokens: number;
+  /** All tokens, including requests that reported only a total. */
+  tokens: number;
+  searches: number;
+  /** Searched requests whose reply didn't say how often it searched. */
+  unreportedSearches: number;
+  images: number;
+  speechRequests: number;
+  characters: number;
+  credits: number;
+  reportedCostUsd: number;
+};
+
 /**
- * Tokens and requests this calendar month, counted in this browser only. A
+ * Usage this calendar month, per provider, counted in this browser only. A
  * new month starts from zero.
  */
 export type AiExplainUsage = {
   month: string;
-  tokens: number;
-  requests: number;
-  imageRequests: number;
-  audioRequests: number;
-  reportedCostUsd: number;
-  audioCharacters: number;
-  searchCalls: number;
-  unreportedSearchRequests: number;
+  providers: Partial<Record<AiProvider, AiProviderUsage>>;
+};
+
+export const EMPTY_PROVIDER_USAGE: AiProviderUsage = {
+  requests: 0,
+  inputTokens: 0,
+  outputTokens: 0,
+  tokens: 0,
+  searches: 0,
+  unreportedSearches: 0,
+  images: 0,
+  speechRequests: 0,
+  characters: 0,
+  credits: 0,
+  reportedCostUsd: 0,
 };
 
 /** "2026-10" in the user's time zone. */
 const monthOf = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+const countOf = (value: unknown) =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0;
+
+const readProviderUsage = (value: unknown): AiProviderUsage => {
+  const raw = (value && typeof value === "object" ? value : {}) as Record<
+    string,
+    unknown
+  >;
+  const usage = { ...EMPTY_PROVIDER_USAGE };
+  for (const key of Object.keys(usage) as (keyof AiProviderUsage)[])
+    usage[key] = countOf(raw[key]);
+  return usage;
+};
 
 export const readAiExplainUsage = (now = new Date()): AiExplainUsage => {
   const month = monthOf(now);
@@ -337,68 +597,66 @@ export const readAiExplainUsage = (now = new Date()): AiExplainUsage => {
     AI_EXPLAIN_USAGE_KEY,
     null
   );
-  if (
-    !raw ||
-    raw.month !== month ||
-    typeof raw.tokens !== "number" ||
-    typeof raw.requests !== "number"
-  ) {
+  if (!raw || raw.month !== month) return { month, providers: {} };
+  // Before providers, the month's totals were all xAI's.
+  if (raw.providers === undefined) {
+    if (typeof raw.tokens !== "number" || typeof raw.requests !== "number")
+      return { month, providers: {} };
     return {
       month,
-      tokens: 0,
-      requests: 0,
-      imageRequests: 0,
-      audioRequests: 0,
-      reportedCostUsd: 0,
-      audioCharacters: 0,
-      searchCalls: 0,
-      unreportedSearchRequests: 0,
+      providers: {
+        xai: {
+          ...EMPTY_PROVIDER_USAGE,
+          requests: countOf(raw.requests),
+          tokens: countOf(raw.tokens),
+          searches: countOf(raw.searchCalls),
+          unreportedSearches: countOf(raw.unreportedSearchRequests),
+          images: countOf(raw.imageRequests),
+          speechRequests: countOf(raw.audioRequests),
+          characters: countOf(raw.audioCharacters),
+          reportedCostUsd: countOf(raw.reportedCostUsd),
+        },
+      },
     };
   }
-  const count = (key: string) =>
-    typeof raw[key] === "number" && Number.isFinite(raw[key]) && raw[key] >= 0
-      ? (raw[key] as number)
-      : 0;
-  return {
-    month,
-    tokens: count("tokens"),
-    requests: count("requests"),
-    imageRequests: count("imageRequests"),
-    audioRequests: count("audioRequests"),
-    reportedCostUsd: count("reportedCostUsd"),
-    audioCharacters: count("audioCharacters"),
-    searchCalls: count("searchCalls"),
-    unreportedSearchRequests: count("unreportedSearchRequests"),
-  };
+  const providers: AiExplainUsage["providers"] = {};
+  if (raw.providers && typeof raw.providers === "object")
+    for (const provider of AI_PROVIDER_ORDER) {
+      const value = (raw.providers as Record<string, unknown>)[provider];
+      if (value) providers[provider] = readProviderUsage(value);
+    }
+  return { month, providers };
 };
 
 /** Counts one finished request. */
-export const addAiExplainUsage = (
-  tokens: number,
-  extra: {
-    searchCalls?: number | null;
-    reportedCostUsd?: number | null;
-    imageRequests?: number;
-    audioCharacters?: number;
-  } = {}
-) => {
+export const addAiUsage = (record: AiUsageRecord) => {
   const usage = readAiExplainUsage();
-  const next: AiExplainUsage = {
-    ...usage,
-    month: usage.month,
-    audioRequests:
-      usage.audioRequests + (extra.audioCharacters === undefined ? 0 : 1),
-    reportedCostUsd: usage.reportedCostUsd + (extra.reportedCostUsd ?? 0),
-    imageRequests: usage.imageRequests + (extra.imageRequests ?? 0),
-    audioCharacters: usage.audioCharacters + (extra.audioCharacters ?? 0),
-    searchCalls: usage.searchCalls + (extra.searchCalls ?? 0),
-    unreportedSearchRequests:
-      usage.unreportedSearchRequests + (extra.searchCalls === null ? 1 : 0),
-    tokens: usage.tokens + tokens,
-    requests: usage.requests + 1,
+  const current = usage.providers[record.provider] ?? EMPTY_PROVIDER_USAGE;
+  const input = record.inputTokens ?? 0;
+  const output = record.outputTokens ?? 0;
+  const next: AiProviderUsage = {
+    requests: current.requests + 1,
+    inputTokens: current.inputTokens + input,
+    outputTokens: current.outputTokens + output,
+    tokens: current.tokens + (record.totalTokens ?? input + output),
+    searches: current.searches + (record.searches ?? 0),
+    unreportedSearches:
+      current.unreportedSearches + (record.searches === null ? 1 : 0),
+    images: current.images + (record.images ?? 0),
+    speechRequests:
+      current.speechRequests + (record.characters === undefined ? 0 : 1),
+    characters: current.characters + (record.characters ?? 0),
+    credits: current.credits + (record.credits ?? 0),
+    reportedCostUsd: current.reportedCostUsd + (record.reportedCostUsd ?? 0),
   };
   try {
-    localStorage.setItem(AI_EXPLAIN_USAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(
+      AI_EXPLAIN_USAGE_KEY,
+      JSON.stringify({
+        month: usage.month,
+        providers: { ...usage.providers, [record.provider]: next },
+      })
+    );
   } catch {
     // Storage can throw (e.g. private mode); the usage just isn't counted.
   }

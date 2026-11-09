@@ -17,6 +17,7 @@ export default function AnchorWordDetails({
       <GeneratedText
         key={id}
         id={id}
+        tool="anchorWord"
         filename={`anchor-word-${word}-${reading}`}
         generateLabel="✨ Generate Vocabulary Details"
         makePrompt={(settings) =>

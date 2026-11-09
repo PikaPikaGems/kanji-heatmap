@@ -327,8 +327,8 @@ const MnemonicGallery = ({
         />
       )}
       <p className="text-xs text-muted-foreground">
-        Resolution and quality are set in User Preferences. Regenerate makes a
-        fresh interpretation of your scene.
+        The provider, model and quality are set in AI Study Tools. Regenerate
+        makes a fresh interpretation of your scene.
       </p>
       <AiContentNotice />
       <p className="text-xs text-muted-foreground">

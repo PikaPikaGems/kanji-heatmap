@@ -1,5 +1,5 @@
 /**
- * Grok sometimes wraps headings in bold (`**## Heading**`), which Markdown
+ * Models sometimes wrap headings in bold (`**## Heading**`), which Markdown
  * renders as a bold paragraph showing the "##". Unwrap such lines.
  */
 export const normalizeAiMarkdown = (markdown: string) =>

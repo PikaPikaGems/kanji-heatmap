@@ -29,6 +29,7 @@ export const AiKanjiEssay = ({
     <GeneratedText
       key={kanji}
       id={`essay:${kanji}`}
+      tool="kanjiEssay"
       filename={`kanji-essay-${kanji}`}
       generateLabel="✨ Generate AI Essay"
       makePrompt={(settings) =>

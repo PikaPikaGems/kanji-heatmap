@@ -1,15 +1,14 @@
-import { useId, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Trash2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import { OwnedAiContent } from "@/components/common/OwnedAiContent";
-import { UserNotice } from "@/components/common/UserNotice";
+import { useAiExplainUsage } from "@/hooks/use-ai-explain";
+import type { AiProviderUsage } from "@/lib/ai-explain/preferences";
 import {
-  useAiExplainSettings,
-  useAiExplainUsage,
-} from "@/hooks/use-ai-explain";
+  AI_PROVIDER_ORDER,
+  AI_PROVIDERS,
+} from "@/lib/ai-explain/providers/capabilities";
+import type { AiProvider } from "@/lib/ai-explain/providers/types";
 
 /** A label and its value, one row of a two-column list. */
 const UsageRow = ({
@@ -21,92 +20,86 @@ const UsageRow = ({
 }) => (
   <>
     <dt className="text-muted-foreground">{label}</dt>
-    <dd className="min-w-0 text-right break-words">{children}</dd>
+    <dd className="min-w-0 text-right break-words tabular-nums">{children}</dd>
   </>
 );
 
 const formatCount = (n: number) => n.toLocaleString("en-US");
 
-/** This month's AI usage, counted in this browser. */
+/**
+ * One provider's month, in its own units. Rows it never reported are left
+ * out; money only when its API returned an amount.
+ */
+const ProviderUsage = ({
+  provider,
+  usage,
+}: {
+  provider: AiProvider;
+  usage: AiProviderUsage;
+}) => (
+  <section className="p-3 space-y-2 text-xs border rounded-xl">
+    <h4 className="text-sm font-semibold">{AI_PROVIDERS[provider].label}</h4>
+    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+      <UsageRow label="Requests">{formatCount(usage.requests)}</UsageRow>
+      {usage.tokens > 0 && (
+        <UsageRow label="Tokens">
+          {formatCount(usage.tokens)}
+          {usage.inputTokens + usage.outputTokens > 0 &&
+            ` (${formatCount(usage.inputTokens)} in · ${formatCount(usage.outputTokens)} out)`}
+        </UsageRow>
+      )}
+      {(usage.searches > 0 || usage.unreportedSearches > 0) && (
+        <UsageRow label="Web searches">
+          {formatCount(usage.searches)}
+          {usage.unreportedSearches > 0 &&
+            ` (+${usage.unreportedSearches} requests that didn't say)`}
+        </UsageRow>
+      )}
+      {usage.images > 0 && (
+        <UsageRow label="Images">{formatCount(usage.images)}</UsageRow>
+      )}
+      {usage.speechRequests > 0 && (
+        <UsageRow label="Speech">
+          {formatCount(usage.speechRequests)} MP3s ·{" "}
+          {formatCount(usage.characters)} characters
+        </UsageRow>
+      )}
+      {usage.credits > 0 && (
+        <UsageRow label="Credits">{formatCount(usage.credits)}</UsageRow>
+      )}
+      {usage.reportedCostUsd > 0 && (
+        <UsageRow label="Cost reported by the API">
+          US${usage.reportedCostUsd.toFixed(4)}
+        </UsageRow>
+      )}
+    </dl>
+  </section>
+);
+
+/** This month's usage per provider, counted in this browser. */
 const AiUsage = () => {
   const usage = useAiExplainUsage();
-  const [settings] = useAiExplainSettings();
-  const budget = settings.monthlyTokenBudget;
-
-  return (
-    <div className="space-y-3 text-xs">
-      <UserNotice icon="💡" className="text-xs font-bold">
-        This is only for AI Study Tools, which use your own xAI API key. If you
-        haven&apos;t added one, you can ignore this section.
-      </UserNotice>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
-        <UsageRow label="Text tokens">
-          <span className="tabular-nums">
-            {formatCount(usage.tokens)}
-            {budget !== undefined && ` / ${formatCount(budget)}`}
-          </span>
-        </UsageRow>
-        <UsageRow label="Requests">{formatCount(usage.requests)}</UsageRow>
-        <UsageRow label="Search calls">{usage.searchCalls}</UsageRow>
-        <UsageRow label="Images">{usage.imageRequests}</UsageRow>
-        <UsageRow label="Audio generations">{usage.audioRequests}</UsageRow>
-        <UsageRow label="Speech characters">
-          {formatCount(usage.audioCharacters)}
-        </UsageRow>
-        {usage.reportedCostUsd > 0 && (
-          <UsageRow label="Provider-reported charges">
-            US${usage.reportedCostUsd.toFixed(4)}
-          </UsageRow>
-        )}
-      </dl>
-      {budget !== undefined && (
-        <Progress
-          value={Math.min(100, (usage.tokens / budget) * 100)}
-          className="h-2"
-          primitiveCn={usage.tokens > budget ? "bg-red-500" : undefined}
-          aria-label="Tokens used of the monthly budget"
-        />
-      )}
-      <p className="text-muted-foreground">
-        Counted in this browser only; restarts each month.
-        {usage.unreportedSearchRequests > 0 &&
-          ` ${usage.unreportedSearchRequests} searched requests had no provider-reported search count.`}{" "}
-        Partial totals: check console.x.ai for your full bill.
-      </p>
-    </div>
+  const used = AI_PROVIDER_ORDER.filter(
+    (provider) => usage.providers[provider]
   );
-};
-
-/** An optional monthly text-token budget, shown as a bar above. */
-const BudgetField = () => {
-  const [settings, update] = useAiExplainSettings();
-  const budget = settings.monthlyTokenBudget;
-  const id = useId();
   return (
-    <div className="mb-4">
-      <label htmlFor={id} className="block mb-1 text-sm font-semibold">
-        Monthly text-token budget (optional)
-      </label>
-      <Input
-        className="rounded-lg"
-        id={id}
-        type="number"
-        inputMode="numeric"
-        min={1}
-        step={1000}
-        value={budget ?? ""}
-        onChange={(e) => {
-          const next = Math.floor(Number(e.target.value));
-          update({ monthlyTokenBudget: next > 0 ? next : undefined });
-        }}
-        placeholder="e.g. 500000"
-      />
-      <p className="pt-1 text-xs text-muted-foreground">
-        Counted in this browser only, and restarts each month. Requests
-        incomplete or cancelled can still be billed. Local counters may omit
-        these requests. This text-token budget is not a total spending limit for
-        search, images, or speech, and nothing is blocked. Your exact usage is
-        at <ExternalTextLink href="https://console.x.ai" text="console.x.ai" />.
+    <div className="space-y-3">
+      {used.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          No AI requests from this browser this month.
+        </p>
+      )}
+      {used.map((provider) => (
+        <ProviderUsage
+          key={provider}
+          provider={provider}
+          usage={usage.providers[provider]!}
+        />
+      ))}
+      <p className="text-xs text-muted-foreground">
+        Counted in this browser only, in each provider&apos;s own units;
+        restarts each month. Requests cancelled midway can still be billed. Your
+        provider&apos;s dashboard has the full bill.
       </p>
     </div>
   );
@@ -198,14 +191,13 @@ export const GeneratedStorageSettings = () => (
   </OwnedAiContent>
 );
 
-/** This month's usage, the budget, and what's saved on this device. */
+/** This month's usage, and what's saved on this device. */
 export const UsageTab = () => (
   <div className="space-y-6">
     <section className="space-y-2">
       <h3 className="text-sm font-semibold">This month</h3>
       <AiUsage />
     </section>
-    <BudgetField />
     <section className="space-y-2">
       <h3 className="text-sm font-semibold">Saved content</h3>
       <GeneratedStorageSettings />
