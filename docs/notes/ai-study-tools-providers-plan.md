@@ -57,8 +57,12 @@ Web search is expensive in input: 8–19k input tokens per searched answer
 versus ~25 without.
 
 Listening (mixed English + Japanese essay): xAI `ara` natural, OpenAI `coral`
-OK, ElevenLabs Japanese voices read kanji words as Chinese unless forced to
-Japanese. ElevenLabs was natural on all-Japanese text.
+OK. ElevenLabs with a Japanese voice read kanji words as Chinese on
+`eleven_multilingual_v2`, which ignores `language_code`. With
+`language_code: ja`, `eleven_v3` and `eleven_flash_v2_5` read the Japanese
+correctly and the English stayed clear; `eleven_v3` rated natural. Same cost
+on both models (84 credits for 381 characters), but `eleven_v3` took 8.9 s
+against 1.3 s.
 
 ## The modal
 
@@ -109,15 +113,15 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 
 ## Read Aloud
 
-| Provider   | Japanese handling                                                                                                                                                                                                 |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| xAI        | `language: ja` (as today)                                                                                                                                                                                         |
-| ElevenLabs | Voice list shows Japanese voices first. `language_code: ja` had no audible effect in the spike, so kanji words inside English can still come out as Chinese: suggest ElevenLabs for all-Japanese text, not essays |
-| OpenAI     | Instruction: the text mixes English and Japanese; read English in natural English and Japanese in standard Tokyo Japanese, never Chinese readings                                                                 |
-| Gemini     | Same instruction, prefixed to the text                                                                                                                                                                            |
+| Provider   | Japanese handling                                                                                                                                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| xAI        | `language: ja` (as today)                                                                                                                                                                                                |
+| ElevenLabs | `language_code: ja` on every request. Models limited to `eleven_v3` (default, most natural) and `eleven_flash_v2_5` (fast); not `eleven_multilingual_v2`, which ignores the code. Voice list shows Japanese voices first |
+| OpenAI     | Instruction: the text mixes English and Japanese; read English in natural English and Japanese in standard Tokyo Japanese, never Chinese readings                                                                        |
+| Gemini     | Same instruction, prefixed to the text                                                                                                                                                                                   |
 
-- Suggested defaults: xAI for essays (mixed text), ElevenLabs for
-  all-Japanese text.
+- xAI and ElevenLabs (`eleven_v3`) both read mixed English + Japanese
+  naturally; either can be the default.
 - Gemini audio is raw 24 kHz PCM: convert to MP3 before saving, or it fills
   the 35 MB audio budget about five times faster than other providers. Show
   progress while it generates.
@@ -190,10 +194,6 @@ Then delete `public/spike.html`.
   shared-voices endpoint list Japanese library voices, and can speech use one
   without adding it to the account? If adding is required, it needs Voices:
   Write on the key.
-- **ElevenLabs on mixed text.** `language_code: ja` did nothing audible in the
-  spike. Untested: whether Flash v2.5 or v3 enforce it. If neither does, the
-  remaining fix is sending Japanese words as kana (readings from the essay, or
-  a kana pass by the text model).
 - **Monthly budget.** Today it's one token budget. Options: a budget per
   provider in its own unit, or budgets for text providers only.
 - **xAI's reported cost.** Keep showing the US$ figure xAI reports, or show
