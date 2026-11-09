@@ -45,13 +45,39 @@ export const streamProviderText = (
   return stream(request);
 };
 
-export const generateProviderImage = (
+/** Images over this size are re-encoded as WebP before saving. */
+const LARGE_IMAGE_BYTES = 600 * 1024;
+
+/**
+ * Re-encodes a large image as WebP, keeping whichever is smaller. Browsers
+ * without OffscreenCanvas keep the original.
+ */
+const shrinkLargeImage = async (blob: Blob): Promise<Blob> => {
+  if (blob.size <= LARGE_IMAGE_BYTES || typeof OffscreenCanvas === "undefined")
+    return blob;
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
+    bitmap.close();
+    const smaller = await canvas.convertToBlob({
+      type: "image/webp",
+      quality: 0.85,
+    });
+    return smaller.size < blob.size ? smaller : blob;
+  } catch {
+    return blob;
+  }
+};
+
+export const generateProviderImage = async (
   provider: AiProvider,
   request: ImageRequest
 ): Promise<BlobReply> => {
   const generate = clientOf(provider).generateImage;
   if (!generate) throw unsupported(provider, "draw images");
-  return generate(request);
+  const reply = await generate(request);
+  return { ...reply, blob: await shrinkLargeImage(reply.blob) };
 };
 
 export const generateProviderSpeech = (

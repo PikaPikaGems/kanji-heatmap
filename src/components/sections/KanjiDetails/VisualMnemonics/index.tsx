@@ -1,4 +1,5 @@
 import { getInFlight } from "@/lib/ai-explain/in-flight";
+import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
 import { NoticeAction } from "@/components/common/UserNotice";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
@@ -246,8 +247,11 @@ const MnemonicGallery = ({
             description={selected.description}
           />
           <p className="text-center text-xs text-muted-foreground">
-            AI-generated mnemonic · {selected.resolution.toUpperCase()} ·{" "}
-            {selected.quality === "low" ? "Standard" : "Higher detail"}
+            AI-generated mnemonic · {providerLabel(selected.provider)}
+            {/* Size and quality are xAI's options. */}
+            {(selected.provider ?? "xai") === "xai"
+              ? ` · ${selected.resolution.toUpperCase()} · ${selected.quality === "low" ? "Standard" : "Higher detail"}`
+              : ` · ${selected.model}`}
           </p>
           {selected.unsaved && (
             <p

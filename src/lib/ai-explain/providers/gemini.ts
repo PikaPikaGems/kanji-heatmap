@@ -4,6 +4,7 @@ import {
   asRecord,
   decodeBase64,
   emptyReplyError,
+  imageBlob,
   numberOf,
   readErrorBody,
   readEvents,
@@ -257,4 +258,27 @@ export const geminiClient: AiProviderClient = {
   },
   streamText,
   generateSpeech,
+  generateImage: async ({ apiKey, model, prompt, signal }) => {
+    const body = await generateGeminiContent(
+      apiKey,
+      model,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseModalities: ["IMAGE"],
+          imageConfig: { aspectRatio: "1:1" },
+        },
+      },
+      signal
+    );
+    const image = inlineDataOf(body);
+    if (!image)
+      throw new Error(
+        "Gemini returned no image (it may have declined this scene). The previous image is unchanged."
+      );
+    return {
+      blob: imageBlob(decodeBase64(image.data)),
+      usage: { ...geminiUsage(body.usageMetadata), images: 1 },
+    };
+  },
 };

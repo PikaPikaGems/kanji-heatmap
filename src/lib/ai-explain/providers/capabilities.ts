@@ -172,7 +172,7 @@ export const AI_TOOLS: Record<AiTool, AiToolInfo> = {
     label: "Visual Mnemonics",
     kind: "image",
     search: false,
-    providers: ["xai"],
+    providers: ["xai", "openai", "gemini"],
     description: "Pictures from your mnemonic scene",
   },
 };

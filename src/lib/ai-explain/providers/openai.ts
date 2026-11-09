@@ -2,6 +2,8 @@ import { streamResponses } from "./responses-api";
 import {
   arrayOf,
   asRecord,
+  decodeBase64,
+  imageBlob,
   numberOf,
   readErrorBody,
   splitForSpeech,
@@ -94,6 +96,41 @@ export const openaiClient: AiProviderClient = {
         };
       },
     }),
+  generateImage: async ({ apiKey, model, prompt, quality, signal }) => {
+    const res = await fetch(`${BASE_URL}/images/generations`, {
+      method: "POST",
+      headers: { ...authHeaders(apiKey), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        prompt,
+        n: 1,
+        size: "1024x1024",
+        quality,
+        // PNG by default, often near 1 MB; WebP is a fraction of that.
+        output_format: "webp",
+        output_compression: 85,
+      }),
+      signal,
+    });
+    if (!res.ok) throw await responseError(res);
+    const body = asRecord(await res.json());
+    const image = asRecord(arrayOf(body.data)[0]);
+    if (typeof image.b64_json !== "string" || !image.b64_json)
+      throw new Error(
+        "No image was returned. The previous image is unchanged."
+      );
+    const usage = asRecord(body.usage);
+    return {
+      blob: imageBlob(decodeBase64(image.b64_json)),
+      usage: {
+        provider: "openai",
+        images: 1,
+        inputTokens: numberOf(usage.input_tokens),
+        outputTokens: numberOf(usage.output_tokens),
+        totalTokens: numberOf(usage.total_tokens),
+      },
+    };
+  },
   generateSpeech: async ({
     apiKey,
     model,
