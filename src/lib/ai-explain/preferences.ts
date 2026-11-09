@@ -63,6 +63,13 @@ Rules:
   Natural: It looks like rain, so you'd better take an umbrella.
 - Grammar: 3 to 5 patterns at JLPT N4 level or above only, each one short sentence under 15 words. Never explain N5 basics: particles (は, が, を, に, で, へ, と, も, の, か, よ, ね), です, だ, ます forms, plain past or negative forms, この/その/あの. If the text has fewer than 3 N4+ patterns, list only those; if it has none, write "No N4+ grammar here."`;
 
+/**
+ * How OpenAI and Gemini are asked to speak. Essays mix English and Japanese;
+ * without this, kanji words can come out with Chinese readings.
+ */
+export const DEFAULT_AI_SPEECH_PROMPT =
+  "Read this aloud calmly and a little slowly, like a language teacher. The text mixes English and Japanese: read the English parts in natural English and the Japanese parts in natural, standard Tokyo Japanese. Never use Chinese readings for kanji.";
+
 /** AI Explain for a single word (e.g. the emoji set): no grammar section. */
 export const DEFAULT_AI_EXPLAIN_WORD_PROMPT = `You are a Japanese tutor helping an English-speaking learner.
 Explain the Japanese word below. No greeting, preamble or closing remarks.
@@ -110,6 +117,8 @@ export type AiToolChoice = {
   webSearch?: boolean;
   /** Read Aloud. */
   voice?: string;
+  /** The voice's name, for voices listed online (ElevenLabs). */
+  voiceName?: string;
   bitRate?: AiSpeechBitRate;
   /** Read Aloud on xAI; unset means Japanese. */
   language?: "auto" | "ja";
@@ -139,6 +148,8 @@ export type AiExplainPreferences = {
   imagePalettePrompt?: string;
   /** Edited prompts for the other palettes, including Custom. */
   imagePalettePrompts?: Partial<Record<ImagePalette, string>>;
+  /** Read Aloud's speaking instructions (OpenAI, Gemini). */
+  speechPrompt?: string;
 };
 
 /** What AI features read: the shared preferences plus the owner's keys. */
@@ -174,6 +185,8 @@ const readToolChoice = (value: unknown): AiToolChoice => {
   if (raw.webSearch === false) choice.webSearch = false;
   const voice = optionalString(raw.voice);
   if (voice) choice.voice = voice;
+  const voiceName = optionalString(raw.voiceName);
+  if (voice && voiceName) choice.voiceName = voiceName;
   const bitRate = AI_SPEECH_BIT_RATES.find((rate) => rate === raw.bitRate);
   if (bitRate) choice.bitRate = bitRate;
   if (raw.language === "auto") choice.language = "auto";
@@ -208,6 +221,7 @@ export const readAiExplainPreferences = (): AiExplainPreferences => {
     kanjiEssayPrompt: optionalString(raw.kanjiEssayPrompt),
     imagePrompt: optionalString(raw.imagePrompt),
     imagePalettePrompt: optionalString(raw.imagePalettePrompt),
+    speechPrompt: optionalString(raw.speechPrompt),
     imageStylePrompts: readPromptRecord(
       raw.imageStylePrompts,
       Object.keys(IMAGE_STYLE_LABELS) as ImageStyle[]
@@ -240,7 +254,9 @@ export const updateAiToolChoice = (tool: AiTool, patch: AiToolChoice) => {
   const switching = "provider" in patch && patch.provider !== current.provider;
   const next: AiToolChoice = {
     ...current,
-    ...(switching ? { model: undefined, voice: undefined } : {}),
+    ...(switching
+      ? { model: undefined, voice: undefined, voiceName: undefined }
+      : {}),
     ...patch,
   };
   writeAiExplainPreferences({
@@ -501,6 +517,7 @@ export const resolveAiTool = (
     ...choice,
     model: own ? choice.model : undefined,
     voice: own ? choice.voice : undefined,
+    voiceName: own ? choice.voiceName : undefined,
     provider,
     apiKey: settings.keys[provider].apiKey,
     ready: hasValidKey(settings, provider),

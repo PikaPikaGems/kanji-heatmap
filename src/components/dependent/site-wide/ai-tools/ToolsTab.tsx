@@ -108,7 +108,11 @@ const ToolFields = ({ tool }: { tool: AiTool }) => {
           )}
         </div>
       )}
-      <ToolPrompts tool={tool} />
+      {/* Read Aloud's prompt is speaking instructions: OpenAI and Gemini only. */}
+      {(info.kind !== "speech" ||
+        AI_PROVIDERS[choice.provider].speech?.instructions) && (
+        <ToolPrompts tool={tool} />
+      )}
     </div>
   );
 };

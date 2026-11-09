@@ -80,7 +80,8 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderInfo> = {
       image: "gemini-2.5-flash-image",
       speech: "gemini-2.5-flash-preview-tts",
     },
-    speech: { bitRate: false, language: false, instructions: true },
+    // Gemini returns raw audio; we encode the MP3 at the chosen rate.
+    speech: { bitRate: true, language: false, instructions: true },
     image: { resolution: false },
   },
   elevenlabs: {
@@ -164,7 +165,7 @@ export const AI_TOOLS: Record<AiTool, AiToolInfo> = {
     label: "Read Aloud",
     kind: "speech",
     search: false,
-    providers: ["xai"],
+    providers: ["xai", "elevenlabs", "openai", "gemini"],
     description: "MP3 narration of essays",
   },
   mnemonics: {

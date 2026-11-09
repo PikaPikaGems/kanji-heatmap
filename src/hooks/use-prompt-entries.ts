@@ -2,6 +2,7 @@ import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   DEFAULT_AI_EXPLAIN_PROMPT,
   DEFAULT_AI_EXPLAIN_WORD_PROMPT,
+  DEFAULT_AI_SPEECH_PROMPT,
   JAPANESE_TEXT_PLACEHOLDER,
 } from "@/lib/ai-explain/preferences";
 import {
@@ -120,6 +121,14 @@ export const usePromptEntries = (): PromptEntry[] => {
       value: settings.imagePalettePrompt,
       defaultValue: DEFAULT_IMAGE_PALETTE_PROMPT,
       onChange: (imagePalettePrompt) => update({ imagePalettePrompt }),
+    },
+    {
+      id: "speech",
+      tool: "readAloud",
+      label: "Read Aloud: how to speak",
+      value: settings.speechPrompt,
+      defaultValue: DEFAULT_AI_SPEECH_PROMPT,
+      onChange: (speechPrompt) => update({ speechPrompt }),
     },
     ...palettes.map(paletteEntry),
     ...styles.map(styleEntry),

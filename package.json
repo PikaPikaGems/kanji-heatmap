@@ -23,6 +23,7 @@
     "copy-yomiage-files": "node scripts/copy-yomiage-files.mjs"
   },
   "dependencies": {
+    "@breezystack/lamejs": "1.2.7",
     "@fontsource/dotgothic16": "^5.2.5",
     "@fontsource/hachi-maru-pop": "^5.2.8",
     "@fontsource/kiwi-maru": "^5.2.5",

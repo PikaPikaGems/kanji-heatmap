@@ -98,4 +98,6 @@ export type AiProviderClient = {
   streamText?: (request: TextRequest) => Promise<TextReply>;
   generateImage?: (request: ImageRequest) => Promise<BlobReply>;
   generateSpeech?: (request: SpeechRequest) => Promise<BlobReply>;
+  /** The voice to use when none is picked, for voices listed online. */
+  defaultVoice?: (apiKey: string) => Promise<{ id: string; name: string }>;
 };

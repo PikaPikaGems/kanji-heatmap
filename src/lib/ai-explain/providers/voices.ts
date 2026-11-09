@@ -12,11 +12,61 @@ const named = (ids: string[]): AiVoiceOption[] =>
  */
 export const FIXED_VOICES: Partial<Record<AiProvider, AiVoiceOption[]>> = {
   xai: named(["ara", "eve", "rex", "sal", "leo"]),
+  openai: named([
+    "alloy",
+    "ash",
+    "ballad",
+    "cedar",
+    "coral",
+    "echo",
+    "fable",
+    "marin",
+    "nova",
+    "onyx",
+    "sage",
+    "shimmer",
+    "verse",
+  ]),
+  // Gemini's prebuilt voices; each speaks every supported language.
+  gemini: named([
+    "Achernar",
+    "Achird",
+    "Algenib",
+    "Algieba",
+    "Alnilam",
+    "Aoede",
+    "Autonoe",
+    "Callirrhoe",
+    "Charon",
+    "Despina",
+    "Enceladus",
+    "Erinome",
+    "Fenrir",
+    "Gacrux",
+    "Iapetus",
+    "Kore",
+    "Laomedeia",
+    "Leda",
+    "Orus",
+    "Puck",
+    "Pulcherrima",
+    "Rasalgethi",
+    "Sadachbia",
+    "Sadaltager",
+    "Schedar",
+    "Sulafat",
+    "Umbriel",
+    "Vindemiatrix",
+    "Zephyr",
+    "Zubenelgenubi",
+  ]),
 };
 
 /** The voice used until another is picked. */
 export const DEFAULT_VOICES: Partial<Record<AiProvider, string>> = {
   xai: "ara",
+  openai: "coral",
+  gemini: "Kore",
 };
 
 export const voiceName = (provider: AiProvider, id: string) =>

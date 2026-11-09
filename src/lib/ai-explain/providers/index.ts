@@ -10,8 +10,10 @@ import type {
   TextRequest,
 } from "./types";
 import { anthropicClient } from "./anthropic";
+import { elevenlabsClient } from "./elevenlabs";
 import { geminiClient } from "./gemini";
 import { openaiClient } from "./openai";
+import { AiVoiceUnavailableError } from "./shared";
 import { xaiClient } from "./xai";
 
 /** The client of each provider. */
@@ -20,6 +22,7 @@ const CLIENTS: Partial<Record<AiProvider, AiProviderClient>> = {
   openai: openaiClient,
   anthropic: anthropicClient,
   gemini: geminiClient,
+  elevenlabs: elevenlabsClient,
 };
 
 /** The provider's client; throws for one this build has no client for. */
@@ -58,6 +61,58 @@ export const generateProviderSpeech = (
   const generate = clientOf(provider).generateSpeech;
   if (!generate) throw unsupported(provider, "read aloud");
   return generate(request);
+};
+
+/**
+ * Reads `text` aloud with the tool's provider. With no voice picked, a
+ * provider whose voices are listed online picks one (ElevenLabs: the first
+ * Japanese library voice). A picked voice that has since gone is swapped for
+ * that default once, and `replacedVoice` says so.
+ */
+export const speakWithProvider = async (
+  provider: AiProvider,
+  request: Omit<SpeechRequest, "voice"> & { voice: string | undefined }
+): Promise<
+  BlobReply & {
+    voice: string;
+    /** Set when the default stood in for the picked voice or none. */
+    pickedVoice?: { id: string; name: string };
+    replacedVoice: boolean;
+  }
+> => {
+  const client = clientOf(provider);
+  const fallback = client.defaultVoice;
+  if (!request.voice && fallback) {
+    const pickedVoice = await fallback(request.apiKey);
+    const reply = await generateProviderSpeech(provider, {
+      ...request,
+      voice: pickedVoice.id,
+    });
+    return {
+      ...reply,
+      voice: pickedVoice.id,
+      pickedVoice,
+      replacedVoice: false,
+    };
+  }
+  const voice = request.voice ?? "";
+  try {
+    const reply = await generateProviderSpeech(provider, { ...request, voice });
+    return { ...reply, voice, replacedVoice: false };
+  } catch (error) {
+    if (!(error instanceof AiVoiceUnavailableError) || !fallback) throw error;
+    const pickedVoice = await fallback(request.apiKey);
+    const reply = await generateProviderSpeech(provider, {
+      ...request,
+      voice: pickedVoice.id,
+    });
+    return {
+      ...reply,
+      voice: pickedVoice.id,
+      pickedVoice,
+      replacedVoice: true,
+    };
+  }
 };
 
 /** The model a tool uses: the one picked, else the provider's default. */

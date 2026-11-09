@@ -123,3 +123,37 @@ export const checkSpeechText = (text: string, limit: number) => {
       `This text exceeds the speech limit of ${limit.toLocaleString("en-US")} characters.`
     );
 };
+
+/**
+ * Splits speech text into pieces of at most `max` characters, at paragraph
+ * breaks where it can, else after a sentence, else anywhere. Each piece is
+ * spoken separately and the MP3s joined (MP3 frames play back to back).
+ */
+export const splitForSpeech = (text: string, max: number): string[] => {
+  const pieces: string[] = [];
+  let rest = text.trim();
+  while (rest.length > max) {
+    const window = rest.slice(0, max);
+    const paragraph = window.lastIndexOf("\n\n");
+    const sentence = Math.max(
+      ...["。", "！", "？", ". ", "! ", "? ", "\n"].map((end) => {
+        const at = window.lastIndexOf(end);
+        return at < 0 ? -1 : at + end.length;
+      })
+    );
+    const cut =
+      paragraph > max / 2 ? paragraph : sentence > max / 2 ? sentence : max;
+    pieces.push(rest.slice(0, cut).trim());
+    rest = rest.slice(cut).trim();
+  }
+  if (rest) pieces.push(rest);
+  return pieces;
+};
+
+/** A voice picked earlier can no longer be used (e.g. removed by its owner). */
+export class AiVoiceUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AiVoiceUnavailableError";
+  }
+}

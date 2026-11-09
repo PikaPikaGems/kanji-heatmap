@@ -17,6 +17,7 @@ import {
   DEFAULT_VOICES,
   FIXED_VOICES,
 } from "@/lib/ai-explain/providers/voices";
+import { ElevenLabsVoiceField } from "./ElevenLabsVoiceField";
 
 /** A labelled select, the label above it. */
 const OptionSelect = ({
@@ -73,7 +74,11 @@ export const WebSearchField = ({
   </div>
 );
 
-/** Voice, MP3 quality and (xAI) language of Read Aloud. */
+/**
+ * Voice, MP3 quality and (xAI) language of Read Aloud. Every provider speaks
+ * Japanese by default: xAI in Japanese mode, ElevenLabs with language code
+ * "ja", OpenAI and Gemini through the speaking instructions.
+ */
 export const SpeechOptions = ({ choice }: { choice: ResolvedAiTool }) => {
   const { provider } = choice;
   const takes = AI_PROVIDERS[provider].speech;
@@ -81,6 +86,7 @@ export const SpeechOptions = ({ choice }: { choice: ResolvedAiTool }) => {
   const defaultVoice = DEFAULT_VOICES[provider];
   return (
     <>
+      {provider === "elevenlabs" && <ElevenLabsVoiceField choice={choice} />}
       {voices.length > 0 && (
         <OptionSelect
           label="Voice"

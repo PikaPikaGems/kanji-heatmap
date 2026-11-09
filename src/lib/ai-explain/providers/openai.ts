@@ -1,5 +1,11 @@
 import { streamResponses } from "./responses-api";
-import { arrayOf, asRecord, numberOf, readErrorBody } from "./shared";
+import {
+  arrayOf,
+  asRecord,
+  numberOf,
+  readErrorBody,
+  splitForSpeech,
+} from "./shared";
 import {
   AiKeyRejectedError,
   type AiModelKind,
@@ -50,6 +56,9 @@ const listAllModels = async (apiKey: string): Promise<string[]> => {
     .sort();
 };
 
+/** OpenAI speech takes up to 4,096 characters per request. */
+const SPEECH_PIECE = 4000;
+
 export const openaiClient: AiProviderClient = {
   listModels: async (apiKey, kind) =>
     (await listAllModels(apiKey)).filter(KIND_FILTERS[kind]),
@@ -85,4 +94,36 @@ export const openaiClient: AiProviderClient = {
         };
       },
     }),
+  generateSpeech: async ({
+    apiKey,
+    model,
+    text,
+    voice,
+    instructions,
+    signal,
+  }) => {
+    if (!text.trim()) throw new Error("There is no text to read aloud.");
+    const blobs: Blob[] = [];
+    for (const piece of splitForSpeech(text, SPEECH_PIECE)) {
+      const res = await fetch(`${BASE_URL}/audio/speech`, {
+        method: "POST",
+        headers: { ...authHeaders(apiKey), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          voice,
+          input: piece,
+          // Only the gpt-4o TTS models take speaking instructions.
+          ...(/^gpt-/.test(model) && instructions ? { instructions } : {}),
+          response_format: "mp3",
+        }),
+        signal,
+      });
+      if (!res.ok) throw await responseError(res);
+      blobs.push(await res.blob());
+    }
+    const blob = new Blob(blobs, { type: "audio/mpeg" });
+    if (!blob.size) throw new Error("No audio was returned. Try again.");
+    // OpenAI reports no usage for speech: count the characters sent.
+    return { blob, usage: { provider: "openai", characters: text.length } };
+  },
 };

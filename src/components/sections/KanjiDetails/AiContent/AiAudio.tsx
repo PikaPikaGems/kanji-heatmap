@@ -21,13 +21,15 @@ import {
 import {
   addAiUsage,
   DEFAULT_AI_SPEECH_BIT_RATE,
+  DEFAULT_AI_SPEECH_PROMPT,
   isAiToolReady,
   readAiExplainSettings,
   rejectAiProviderKey,
   resolveAiTool,
+  updateAiToolChoice,
 } from "@/lib/ai-explain/preferences";
 import { getCurrentOwner } from "@/lib/engine/content-owner";
-import { generateProviderSpeech, modelFor } from "@/lib/ai-explain/providers";
+import { modelFor, speakWithProvider } from "@/lib/ai-explain/providers";
 import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
 import {
   AI_TOOLS,
@@ -43,6 +45,7 @@ import {
   type AiAudioRecord,
 } from "@/lib/ai-explain/storage";
 import { prepareNarration } from "./narration";
+import { useDelayedElapsedMs } from "@/components/common/use-delayed-elapsed-ms";
 
 type AudioState = {
   status: "loading" | "ready" | "generating" | "error";
@@ -205,6 +208,18 @@ const SavedAudio = ({
   );
 };
 
+/** Seconds since the MP3 request started: long essays take a while. */
+const SpeechProgress = () => {
+  const elapsedMs = useDelayedElapsedMs(1000);
+  if (elapsedMs === null) return null;
+  return (
+    <p className="text-xs text-center text-muted-foreground">
+      Generating the MP3… {Math.floor(elapsedMs / 1000)} s. A long essay can
+      take a minute or more.
+    </p>
+  );
+};
+
 export const AiAudio = ({
   sourceId,
   markdown,
@@ -294,20 +309,31 @@ export const AiAudio = ({
     try {
       const text = prepareNarration(markdown);
       if (!text) throw new Error("There is no text to read aloud.");
-      const voice = choice.voice ?? DEFAULT_VOICES[provider] ?? "";
       const language = choice.language ?? "ja";
       const model = modelFor(provider, "speech", choice.model);
-      const { blob, usage } = await generateProviderSpeech(provider, {
+      const spoken = await speakWithProvider(provider, {
         apiKey: choice.apiKey,
         model,
         text,
-        voice,
+        voice: choice.voice ?? DEFAULT_VOICES[provider],
         language,
         bitRate: choice.bitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
-        instructions: "",
+        instructions: settings.speechPrompt ?? DEFAULT_AI_SPEECH_PROMPT,
         signal: controller.signal,
       });
+      const { blob, usage, voice } = spoken;
       addAiUsage(usage);
+      // A voice picked for the learner becomes their saved voice.
+      if (spoken.pickedVoice)
+        updateAiToolChoice("readAloud", {
+          provider,
+          voice: spoken.pickedVoice.id,
+          voiceName: spoken.pickedVoice.name,
+        });
+      const shownVoiceName =
+        spoken.pickedVoice?.name ??
+        choice.voiceName ??
+        voiceName(provider, voice);
       const fingerprint = await contentFingerprint(markdown);
       if (controller.signal.aborted) return;
       const record: AiAudioRecord = {
@@ -323,14 +349,16 @@ export const AiAudio = ({
         sourceId,
         fingerprint,
         voice,
-        voiceName: voiceName(provider, voice),
+        voiceName: shownVoiceName,
         language,
         provider,
         model: model || undefined,
         blob,
         createdAt: Date.now(),
       };
-      let warning: string | undefined;
+      let warning: string | undefined = spoken.replacedVoice
+        ? `Your ${providerLabel(provider)} voice is no longer available, so ${shownVoiceName} read this and is now your voice. Pick another in AI Study Tools.`
+        : undefined;
       try {
         await saveAudioRecord(record, epoch);
       } catch {
@@ -427,7 +455,10 @@ export const AiAudio = ({
           )
         }
         warning={state.warning}
-      />
+      >
+        {/* Mounted while generating, so the clock starts with the request. */}
+        <SpeechProgress />
+      </AiRequestFeedback>
     </div>
   );
 };
