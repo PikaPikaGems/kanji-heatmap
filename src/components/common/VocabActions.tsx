@@ -4,7 +4,7 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ReactNode } from "react";
 import { InfoIcon } from "../icons";
-// import { JishoBtn } from "./JishoBtn";
+import { JishoBtn } from "./JishoBtn";
 import { JotobaBtn } from "./JotobaBtn";
 import { KanjiApiBtn } from "./KanjiApiBtn";
 import { BugIconErrorBoundary } from "../error";
@@ -29,18 +29,16 @@ export const VocabActions = ({
   kana: string;
 }) => {
   return (
-    <div className="relative flex flex-wrap items-center justify-center p-2 space-x-1">
+    <div className="relative flex flex-wrap items-center justify-center gap-1.5 p-2">
       <BugIconErrorBoundary>
         <JotobaBtn word={word} />
       </BugIconErrorBoundary>
       <BugIconErrorBoundary>
         <KanjiApiBtn word={word} />
       </BugIconErrorBoundary>
-      {/*
       <BugIconErrorBoundary>
         <JishoBtn word={word} />
       </BugIconErrorBoundary>
-      */}
       <SpeakButton word={word} iconType="headphones" />
       {kana.length > 0 && <SpeakButton word={kana} iconType={"audio-lines"} />}
       <CopyButton textToCopy={word} iconType={"clipboard"} />

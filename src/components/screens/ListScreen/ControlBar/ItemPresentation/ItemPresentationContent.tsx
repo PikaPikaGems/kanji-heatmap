@@ -17,9 +17,11 @@ import { JouyouGradeBordersMeanings } from "@/components/common/JouyouGradeBorde
 import { FreqGradientInfoIcon } from "@/components/common/freq/FreqGradientInfoIcon";
 import { useBgSrc, useBgSrcDispatch } from "@/hooks/routing-hooks";
 import BasicSelect from "@/components/common/BasicSelect";
+import { isAccountUiHidden } from "@/lib/engine/account-ui";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 import { BorderColorMeaning } from "@/lib/settings/settings";
 
-const H2 = ({ children }: { children: ReactNode }) => (
+export const H2 = ({ children }: { children: ReactNode }) => (
   <h2 className="mt-4 mb-2 font-bold border-b-2 border-dotted">{children}</h2>
 );
 
@@ -49,21 +51,33 @@ const BackgroundColorSection = () => {
       {shouldAttachMeaning && (
         <div className="animate-fade-in">
           <GradientLegend />
-          <FrequencyRankDataSource
-            value={initialState}
-            setValue={(v) => {
-              dispatch(v as FrequencyType);
-            }}
-          />
+          {/* mx-1.5: room for the select's focus ring, which the popover clips. */}
+          <div className="mx-1.5">
+            <FrequencyRankDataSource
+              value={initialState}
+              setValue={(v) => {
+                dispatch(v as FrequencyType);
+              }}
+            />
+          </div>
         </div>
       )}
     </>
   );
 };
 
-const CardStateSettings = () => {
+/** Design and border color settings, shared with /mastery. */
+export const CardStateSettings = () => {
   const cardState = useItemSettings();
   const dispatch = useItemSettingsDispatch();
+  // Study status comes from the account, so builds without the engine don't
+  // offer it. A saved "study-status" choice shows as "none" there (the same
+  // borders, since nothing is bookmarked or reviewing).
+  const hasStudyStatus = !isAccountUiHidden(useAccountStatus());
+  const borderColorMeaning =
+    !hasStudyStatus && cardState.borderColorMeaning === "study-status"
+      ? "none"
+      : cardState.borderColorMeaning;
 
   return (
     <>
@@ -75,31 +89,36 @@ const CardStateSettings = () => {
         }}
       />
       <H2>Border Color Meaning</H2>
-      <BasicSelect
-        value={cardState.borderColorMeaning}
-        onChange={(v) =>
-          dispatch("borderColorMeaning", v as BorderColorMeaning)
-        }
-        label="Border Color Meaning"
-        isLabelSrOnly={true}
-        options={[
-          { value: "jlpt", label: "JLPT Level" },
-          { value: "study-status", label: "Study Status" },
-          { value: "grade", label: "Jouyou Grade" },
-          { value: "none", label: "None" },
-        ]}
-      />
-      {cardState.borderColorMeaning === "jlpt" && (
+      {/* mx-1.5: room for the select's focus ring, which the popover clips. */}
+      <div className="mx-1.5">
+        <BasicSelect
+          value={borderColorMeaning}
+          onChange={(v) =>
+            dispatch("borderColorMeaning", v as BorderColorMeaning)
+          }
+          label="Border Color Meaning"
+          isLabelSrOnly={true}
+          options={[
+            { value: "jlpt", label: "JLPT Level" },
+            ...(hasStudyStatus
+              ? [{ value: "study-status", label: "Study Status" }]
+              : []),
+            { value: "grade", label: "Jouyou Grade" },
+            { value: "none", label: "None" },
+          ]}
+        />
+      </div>
+      {borderColorMeaning === "jlpt" && (
         <div key="jlpt" className="animate-fade-in">
           <JLPTBordersMeanings />
         </div>
       )}
-      {cardState.borderColorMeaning === "study-status" && (
+      {borderColorMeaning === "study-status" && (
         <div key="study-status" className="animate-fade-in">
           <StudyStatusBorderMeanings />
         </div>
       )}
-      {cardState.borderColorMeaning === "grade" && (
+      {borderColorMeaning === "grade" && (
         <div key="grade" className="animate-fade-in">
           <JouyouGradeBordersMeanings />
         </div>
@@ -108,15 +127,28 @@ const CardStateSettings = () => {
   );
 };
 
-export const ItemPresentationSettingsContent = () => {
+/** The popover's title and body frame; /mastery fills it with its own sections. */
+export const ItemPresentationSettingsFrame = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   return (
     <article className="text-left">
       <h1 className="flex items-center pb-0 mb-0 space-x-2 text-lg font-bold">
         Item Presentation Settings
       </h1>
       <DottedSeparator className="p-0 m-0" />
+      {children}
+    </article>
+  );
+};
+
+export const ItemPresentationSettingsContent = () => {
+  return (
+    <ItemPresentationSettingsFrame>
       <CardStateSettings />
       <BackgroundColorSection />
-    </article>
+    </ItemPresentationSettingsFrame>
   );
 };

@@ -15,6 +15,17 @@ export const HeaderDrawerLoadingFallback = () => (
   </Button>
 );
 
+const OpenMenuButton = ({ onClick }: { onClick: () => void }) => (
+  <Button
+    variant="outline"
+    size="iconXl"
+    aria-label="Open menu"
+    onClick={onClick}
+  >
+    <Menu className="w-7 h-7" />
+  </Button>
+);
+
 /**
  * Keeps vaul + nav drawer out of the app entry chunk until the menu is opened.
  */
@@ -22,16 +33,7 @@ const LazyHeaderDrawer = () => {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   if (!shouldLoad) {
-    return (
-      <Button
-        variant="outline"
-        size="iconXl"
-        aria-label="Open menu"
-        onClick={() => setShouldLoad(true)}
-      >
-        <Menu className="w-7 h-7" />
-      </Button>
-    );
+    return <OpenMenuButton onClick={() => setShouldLoad(true)} />;
   }
 
   return <HeaderDrawer initiallyOpen />;

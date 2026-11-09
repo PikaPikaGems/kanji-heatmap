@@ -16,7 +16,7 @@ const requestWorker = KANJI_WORKER_SINGLETON.request;
  * kanji; it also collapses "absent" and "empty" to null, so the section's
  * "no info" state is decided in one place.
  */
-export const useKanjiReadingDetails = (kanji: string) => {
+export function useKanjiReadingDetails(kanji: string) {
   const ready = useIsKanjiWorkerReady();
 
   const { status, error, data } = useWorkerQuery<KanjiReadingEntry[] | null>(
@@ -31,4 +31,4 @@ export const useKanjiReadingDetails = (kanji: string) => {
     error,
     kanjiReadingData: data ?? null,
   };
-};
+}

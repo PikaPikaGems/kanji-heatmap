@@ -12,8 +12,9 @@ and the secondary screens.
 Route table: `src/App.tsx`; link definitions:
 `src/lib/pages/nav-links.ts`, `src/lib/pages/practice-pages.ts`.
 Layout nuance worth preserving in any refactor: `/speed-katakana`,
-`/reading-practice`, `/writing-practice` render **outside** the standard
-header layout, and speed-katakana is outside `KanjiFunctionalityProvider`
+`/reading-practice`, `/reading-practice-2`, `/writing-practice` (and the
+mastery games, including `/reading-mastery-2`) render **outside** the
+standard header layout, and speed-katakana is outside `KanjiFunctionalityProvider`
 entirely.
 
 ---

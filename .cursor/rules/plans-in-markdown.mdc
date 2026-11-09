@@ -1,0 +1,8 @@
+---
+description: Write implementation plans as Markdown
+alwaysApply: true
+---
+
+# Plans are Markdown
+
+Write implementation plans, design notes and handoffs as Markdown (`.md`), not HTML pages. Use HTML only for visual mockups.

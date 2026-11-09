@@ -22,7 +22,7 @@ export const URL_PARAMS = {
   bgSrc: "bg-src",
   /** Speed Katakana challenge set id (`/speed-katakana?challenge=200`). */
   challenge: "challenge",
-  /** Fill the Kanji set and batch (`/fill-the-kanji?set=n4&batch=12`). */
+  /** Fill in the Kanji set and batch (`/fill-in-the-kanji?set=n4&batch=12`). */
   fillTheKanjiSet: "set",
   fillTheKanjiBatch: "batch",
 } as const;

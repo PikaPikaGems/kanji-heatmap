@@ -9,8 +9,8 @@ import {
 } from "@/kanji-worker/kanji-worker-hooks";
 import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import {
+  useKanjiAnchorWords,
   useKanjiRepresentativeWord,
-  useKanjiRepresentativeWordDetails,
 } from "./kanji-representative-word-hooks";
 
 vi.mock("@/kanji-worker/kanji-worker-promise-wrapper", () => ({
@@ -44,7 +44,24 @@ const flush = async () => {
 
 beforeEach(() => {
   request.mockReset();
-  request.mockResolvedValue({ 車: ["car, vehicle", "🚗"] });
+  request.mockResolvedValue({
+    main: {
+      word: "車",
+      readings: ["くるま"],
+      englishGloss: "car, vehicle",
+      tags: ["n5"],
+      ranks: [],
+      tier: "🌱",
+    },
+    secondary: {
+      word: "電車",
+      readings: ["でんしゃ"],
+      englishGloss: "train",
+      tags: [],
+      ranks: [],
+      tier: "🌱",
+    },
+  });
 });
 
 describe("useKanjiRepresentativeWord", () => {
@@ -92,31 +109,37 @@ describe("useKanjiRepresentativeWord", () => {
   });
 });
 
-describe("useKanjiRepresentativeWordDetails", () => {
+describe("useKanjiAnchorWords", () => {
   const Probe = ({ kanji }: { kanji: string }) => {
-    const data = useKanjiRepresentativeWordDetails(kanji);
+    const data = useKanjiAnchorWords(kanji);
     if (data == null) return <span data-testid="out">none</span>;
+    const { main, secondary } = data;
     return (
-      <span data-testid="out">{`${data.word}|${data.englishGloss}|${data.tags.join(",")}`}</span>
+      <span data-testid="out">{`${main.word}|${main.englishGloss}|${main.tier}|${secondary?.word ?? "-"}`}</span>
     );
   };
 
-  it("shows the word immediately and fills in gloss and tag when they arrive", async () => {
+  it("shows the main word immediately and fills in the rest when it arrives", async () => {
     render(
       <Wrapper>
         <Probe kanji="車" />
       </Wrapper>
     );
 
-    expect(screen.getByTestId("out").textContent).toBe("車||");
+    expect(screen.getByTestId("out").textContent).toBe("車|||-");
 
     await flush();
 
-    expect(screen.getByTestId("out").textContent).toBe("車|car, vehicle|🚗");
-    expect(request).toHaveBeenCalledWith({ type: "rep-word-details" });
+    expect(screen.getByTestId("out").textContent).toBe(
+      "車|car, vehicle|🌱|電車"
+    );
+    expect(request).toHaveBeenCalledWith({
+      type: "kanji-anchor-words",
+      payload: "車",
+    });
   });
 
-  it("stays null for a kanji with no representative word", async () => {
+  it("stays null for a kanji with no main word, without asking the worker", async () => {
     render(
       <Wrapper>
         <Probe kanji="亜" />
@@ -125,5 +148,6 @@ describe("useKanjiRepresentativeWordDetails", () => {
     await flush();
 
     expect(screen.getByTestId("out").textContent).toBe("none");
+    expect(request).not.toHaveBeenCalled();
   });
 });

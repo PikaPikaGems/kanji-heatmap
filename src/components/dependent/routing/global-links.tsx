@@ -407,6 +407,29 @@ export const GlobalKanjiLink = ({
   );
 };
 
+/**
+ * GlobalKanjiLink's card (keyword badge over the kanji), not a link: its badge
+ * is outlined, so it doesn't read as a button.
+ */
+export const KanjiKeywordCard = ({
+  kanji,
+  keyword,
+  fontSize,
+}: {
+  kanji: string;
+  keyword: string;
+  fontSize?: FontSize;
+}) => (
+  <div className={cnJPCard}>
+    <JPCardInner
+      label={keyword}
+      character={kanji}
+      fontSize={fontSize}
+      badgeVariant="outline"
+    />
+  </div>
+);
+
 export const GlobalHomeHeaderLink = () => {
   return <Link to={"/"}>Kanji Heatmap</Link>;
 };

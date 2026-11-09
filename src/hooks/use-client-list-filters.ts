@@ -1,26 +1,23 @@
 import { useMemo } from "react";
-import { useBookmarkedKanji } from "@/hooks/use-bookmarked-kanji";
 import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import {
   applyClientListFilters,
   needsClientListFilters,
 } from "@/lib/client-list-filters";
+import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import { FilterSettings } from "@/lib/settings/settings";
 
 /**
- * Loads the sets needed for list client-side filters (bookmarks always;
- * representative/anchor words only when that toggle is on).
+ * Loads the sets needed for list client-side filters (the account's
+ * bookmarks; representative/anchor words only when that toggle is on).
  *
  * Anchor words used to mean fetching the 168 KB representative-word JSON on
  * the main thread; the worker snapshot already carries the word per kanji.
  */
 export const useClientListFilterContext = (filters: FilterSettings) => {
-  const bookmarked = useBookmarkedKanji();
+  const bookmarks = useBookmarkedKanji();
   const getInfo = useGetKanjiInfoFn();
   const needsAnchorData = filters.withAnchorWordsOnly;
-
-  // Set identity must stay stable: filtered lists depend on reference equality.
-  const bookmarkedKanji = useMemo(() => new Set(bookmarked), [bookmarked]);
 
   // A membership predicate rather than a prebuilt set: the snapshot answers
   // per kanji, so there is nothing to enumerate up front.
@@ -34,12 +31,17 @@ export const useClientListFilterContext = (filters: FilterSettings) => {
     };
   }, [needsAnchorData, getInfo]);
 
-  const isLoading = needsAnchorData && getInfo == null;
+  const isLoading =
+    (needsAnchorData && getInfo == null) ||
+    (filters.bookmarkedOnly && bookmarks.status === "loading");
 
   return {
     isActive: needsClientListFilters(filters),
     isLoading,
-    bookmarkedKanji,
+    // Set identity is stable (see use-kanji-sets.ts): filtered lists depend on
+    // reference equality. Null when this build has no bookmarks at all, so a
+    // leftover "bookmarked only" setting doesn't empty the list.
+    bookmarkedKanji: bookmarks.status === "absent" ? null : bookmarks.kanji,
     kanjiWithAnchorWords,
   };
 };

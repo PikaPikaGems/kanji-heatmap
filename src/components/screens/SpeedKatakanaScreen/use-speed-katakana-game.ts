@@ -82,6 +82,15 @@ export const useSpeedKatakanaGame = ({
 
   const current = words[index];
 
+  // Effect needed: speaking is a side effect of a new word appearing. Keyed
+  // on the word only, so keystrokes within a word don't repeat it.
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
+  const readAloudOnShow = settings.readAloudOnShow ?? false;
+  useEffect(() => {
+    if (readAloudOnShow && current) speakRef.current();
+  }, [current, readAloudOnShow]);
+
   const playFeedback = () => {
     playCorrect({
       enabled: settings.sound.enabled,

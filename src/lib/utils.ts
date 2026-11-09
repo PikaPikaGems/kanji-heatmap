@@ -40,12 +40,17 @@ export const checkIfInputField = (target: HTMLElement) => {
   );
 };
 
+/** CJK Unified Ideographs (U+4E00–U+9FAF) and Extension A (U+3400–U+4DBF). */
+const KANJI_RANGES: [number, number][] = [
+  [0x4e00, 0x9faf],
+  [0x3400, 0x4dbf],
+];
+
+/** Whether the first character of `char` is a kanji. */
 export const isKanji = (char: string) => {
-  const code = char.charCodeAt(0);
-  return (
-    (code >= 0x4e00 && code <= 0x9faf) || // CJK Unified Ideographs
-    (code >= 0x3400 && code <= 0x4dbf) // CJK Unified Ideographs Extension A
-  );
+  const point = char.codePointAt(0);
+  if (point == null) return false;
+  return KANJI_RANGES.some(([low, high]) => point >= low && point <= high);
 };
 
 export const dedupe = <T>(items: T[]): T[] => {

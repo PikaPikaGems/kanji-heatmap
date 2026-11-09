@@ -194,6 +194,12 @@ export const stopAiSpeech = () => {
   voice?.stop();
 };
 
+// speakAi() calls not finished yet (preparing or playing).
+let aiSpeechInFlight = 0;
+
+/** True while an AI voice speech is being prepared or played. */
+export const isAiSpeaking = () => aiSpeechInFlight > 0;
+
 const definedOnly = <T extends object>(o: T): Partial<T> =>
   Object.fromEntries(
     Object.entries(o).filter(([, v]) => v !== undefined)
@@ -304,6 +310,7 @@ export const speakAi = async (
   options: SpeakAiOptions = {}
 ): Promise<"done" | "stopped"> => {
   preferPlaybackAudio();
+  aiSpeechInFlight++;
   try {
     const result = await speakAiNow(text, options);
     if (result === "done") setState({ speakError: null });
@@ -311,6 +318,8 @@ export const speakAi = async (
   } catch (err) {
     setState({ speakError: describeError(err) });
     throw err;
+  } finally {
+    aiSpeechInFlight--;
   }
 };
 

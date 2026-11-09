@@ -230,15 +230,21 @@ export const useKanjiSearchResult = () => {
   };
 };
 
-// Vocab types
-export type WordPartDetail = [string, string?]; // [kanji/kana, reading?]
+/**
+ * One piece of a word (a run of kanji or kana) and, when it has one, the
+ * reading shown above it as furigana.
+ */
+export type WordPartDetail = [text: string, reading?: string];
 
+/** What the worker knows about a vocabulary word. */
 export interface VocabInfo {
+  /** English gloss. */
   meaning: string;
+  /** The word split into pieces, in order. */
   parts: WordPartDetail[];
 }
 
-// Hook to get vocab info for a specific word
+/** Meaning and furigana pieces for one word, from the kanji worker. */
 export const useVocabDetails = (word: string) => {
   const state = useWorkerQuery<VocabInfo | null>(
     word

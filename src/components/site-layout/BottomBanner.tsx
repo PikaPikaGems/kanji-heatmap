@@ -1,77 +1,162 @@
-import { ReactNode, useEffect, useRef } from "react";
+import type { ReactNode } from "react";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { DownloadNowAction } from "@/components/dependent/account/DownloadNow";
+import { useSyncAttention } from "@/components/dependent/account/old-pending";
+import { useLocation } from "@/components/dependent/routing/router-hooks";
+import { docPages } from "@/components/items/nav-items";
 import { useNetworkState } from "@/hooks/use-network-state";
+import { useDataDownload } from "@/lib/engine/data-download";
+import {
+  dashboardPageMeta,
+  exploreKanjiPageMeta,
+  masteryPageMeta,
+} from "@/lib/pages/nav-links";
+import {
+  ACCOUNT_CANT_SAVE_BANNER_COPY,
+  DATA_NOT_DOWNLOADED_BANNER_COPY,
+  GO_ONLINE_BANNER_COPY,
+  SAVING_PAUSED_BANNER_COPY,
+  SYNC_SOON_BANNER_COPY,
+} from "@/lib/engine/engine-copy";
+import { openLoginDialog } from "@/lib/engine/login-dialog";
+import { openSyncNowDialog } from "@/lib/engine/sync-now-dialog";
+import {
+  getWriteBlocker,
+  useAccountStatus,
+} from "@/lib/engine/use-account-status";
+import { openWriteBlockedDialog } from "@/lib/engine/write-blocked-dialog";
+import { BottomBannerLayout } from "./BottomBannerLayout";
 
-/** Banner height, so bottom-pinned UI (FloatingIsland, PracticeFab) can sit above it. */
-const HEIGHT_VAR = "--bottom-banner-height";
+/** Reading pages: no banner at all. */
+const NO_BANNER_PATHS: string[] = [
+  docPages.about.href,
+  docPages.terms.href,
+  docPages.privacy.href,
+];
+/** The only pages that say "You're not logged in." */
+const LOGGED_OUT_BANNER_PATHS: string[] = [
+  exploreKanjiPageMeta.href,
+  dashboardPageMeta.href,
+  masteryPageMeta.href,
+];
 
-/** `wide` fills the full-width bar (md and up); `narrow` the phone pill. */
-const Layout = ({ wide, narrow }: { wide: ReactNode; narrow: ReactNode }) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Effect needed: measures the visible banner (it wraps on narrow phones)
-  // into a CSS variable, and clears it when the banner goes away.
-  useEffect(() => {
-    const root = document.documentElement;
-    const bars = [...(ref.current?.children ?? [])];
-    const update = () =>
-      root.style.setProperty(
-        HEIGHT_VAR,
-        `${Math.max(0, ...bars.map((el) => el.getBoundingClientRect().height))}px`
-      );
-    const observer = new ResizeObserver(update);
-    bars.forEach((el) => observer.observe(el));
-    update();
-    return () => {
-      observer.disconnect();
-      root.style.removeProperty(HEIGHT_VAR);
-    };
-  }, []);
-
-  return (
-    <div role="status" ref={ref}>
-      <div className="fixed-viewport-layer fix-scroll-layout-shift-right hidden md:block fixed z-50 bottom-0 left-0 bg-foreground text-background w-full text-sm text-center font-extrabold px-1 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-        {wide}
-      </div>
-      <div
-        style={{ bottom: "env(safe-area-inset-bottom)" }}
-        className="fixed-viewport-layer fixed z-50 flex items-center justify-center w-full pointer-events-none md:hidden fix-scroll-layout-shift-right"
+/** The bar is inverted (light text on dark), and smaller on phones. */
+const NoticeBanner = ({
+  icon = "⚠️",
+  children,
+}: {
+  icon?: string | null;
+  children: ReactNode;
+}) => (
+  <BottomBannerLayout
+    wide={
+      <UserNotice
+        icon={icon}
+        className="text-sm font-extrabold text-center text-background"
       >
-        <div
-          style={{ width: "calc(100vw - 30px)" }}
-          className="flex items-center justify-center my-1 text-xs font-extrabold"
-        >
-          <div className="px-4 py-1 text-center pointer-events-auto bg-foreground text-background rounded-xl w-fit">
-            {narrow}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+        {children}
+      </UserNotice>
+    }
+    narrow={
+      <UserNotice
+        icon={icon}
+        className="text-xs font-extrabold text-center text-background"
+      >
+        {children}
+      </UserNotice>
+    }
+  />
+);
 
-/** Fixed bottom banner shown on every page while the browser is offline. */
+const OfflineBanner = () => (
+  <BottomBannerLayout
+    wide={
+      <>
+        ⚠️ {`You're offline.`} Some parts may not work, but you can still use
+        the site 💖
+      </>
+    }
+    narrow={
+      <>
+        <span className="hidden min-[360px]:inline">
+          ⚠️ {`You're offline.`} Some parts may not work.
+        </span>
+        <span className="min-[360px]:hidden">😭 {`You're offline!`}</span>
+      </>
+    }
+  />
+);
+
+/**
+ * Fixed bottom banner, one message at a time, the first that applies (the
+ * same order as `getWriteBlocker`, so every screen names the same problem):
+ * 1. the account's data hasn't downloaded (Download now, or go online),
+ * 2. the account can't save (no premium; Learn more). Before saving paused:
+ *    syncing can't unpause it while the server refuses the uploads,
+ * 3. saving is paused until this device syncs (Learn more, or go online),
+ * 4. offline,
+ * 5. changes have waited over a week to upload (Learn more),
+ * 6. logged out, on the home page, dashboard and mastery page only.
+ * Never on the about, terms and privacy pages.
+ */
 const BottomBanner = () => {
+  const [location] = useLocation();
   const { online } = useNetworkState();
-  if (online) return null;
+  const account = useAccountStatus();
+  const download = useDataDownload();
+  const attention = useSyncAttention();
 
-  return (
-    <Layout
-      wide={
-        <>
-          ⚠️ {`You're offline.`} Some parts may not work, but you can still use
-          the site 💖
-        </>
-      }
-      narrow={
-        <>
-          <span className="hidden min-[360px]:inline">
-            ⚠️ {`You're offline.`} Some parts may not work.
-          </span>
-          <span className="min-[360px]:hidden">😭 {`You're offline!`}</span>
-        </>
-      }
-    />
-  );
+  if (NO_BANNER_PATHS.includes(location)) return null;
+
+  if (download !== "ready") {
+    return (
+      <NoticeBanner>
+        {DATA_NOT_DOWNLOADED_BANNER_COPY}{" "}
+        {online ? <DownloadNowAction /> : GO_ONLINE_BANNER_COPY}
+      </NoticeBanner>
+    );
+  }
+  if (getWriteBlocker(account) === "entitlement_expired") {
+    return (
+      <NoticeBanner>
+        {ACCOUNT_CANT_SAVE_BANNER_COPY}{" "}
+        <NoticeAction onClick={openWriteBlockedDialog}>Learn more</NoticeAction>
+      </NoticeBanner>
+    );
+  }
+  if (attention === "paused-stale" || attention === "paused-full") {
+    return (
+      <NoticeBanner>
+        {SAVING_PAUSED_BANNER_COPY}{" "}
+        {online ? (
+          <NoticeAction onClick={openSyncNowDialog}>Learn more</NoticeAction>
+        ) : (
+          GO_ONLINE_BANNER_COPY
+        )}
+      </NoticeBanner>
+    );
+  }
+  if (!online) return <OfflineBanner />;
+  if (attention === "soon") {
+    return (
+      <NoticeBanner>
+        {SYNC_SOON_BANNER_COPY}{" "}
+        <NoticeAction onClick={openSyncNowDialog}>Learn more</NoticeAction>
+      </NoticeBanner>
+    );
+  }
+  if (
+    account.kind === "signed-out" &&
+    LOGGED_OUT_BANNER_PATHS.includes(location)
+  ) {
+    return (
+      <NoticeBanner icon={null}>
+        You&apos;re not logged in.{" "}
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction>
+      </NoticeBanner>
+    );
+  }
+  return null;
 };
 
 export default BottomBanner;

@@ -8,18 +8,23 @@
     "bytes": 273245
   },
   "fillTheKanji": {
-    "beginner-1": 684841,
-    "beginner-2": 796696,
-    "beginner-3": 505051,
-    "emoji": 108506,
-    "everyday-phrases-onomatopoeia": 899472,
-    "intermediate": 551744,
-    "n1": 637271,
-    "n2": 566149,
-    "n3": 481936,
-    "n4": 320489,
-    "n5": 186561,
-    "short-phrases": 220530,
-    "verb-focused": 1036326
+    "beginner-1": 685135,
+    "beginner-2": 796863,
+    "beginner-3": 505451,
+    "emoji": 108496,
+    "essential-verbs-counters": 143694,
+    "everyday": 194134,
+    "intermediate": 563099,
+    "n1": 641488,
+    "n2": 568392,
+    "n3": 484989,
+    "n4": 321178,
+    "n5": 187446,
+    "onomatopoeia": 552839,
+    "short-phrases": 125877,
+    "travel-emotions": 180077,
+    "verbs-1": 411715,
+    "verbs-2": 367052,
+    "verbs-3": 213343
   }
 }

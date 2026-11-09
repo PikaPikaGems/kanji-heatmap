@@ -134,11 +134,13 @@ export const KanjiDMAK = ({
 
   // The host stays mounted while loading: dmak draws into it, and the snail
   // sits on top until the strokes are ready. Sized to avoid layout shift.
+  // The snail fades in after a beat so quick loads (e.g. a replay, which
+  // remounts and refetches the cached SVG) never flash it.
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <div id={kanjiId} style={{ width: size, height: size }} />
       {status === "loading" && (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 animate-[fade-in_0.2s_ease-out_300ms_both]">
           <StrokeOrderLoading size={size} />
         </div>
       )}

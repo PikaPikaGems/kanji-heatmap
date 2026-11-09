@@ -1,5 +1,8 @@
 import { JLPTListItems } from "@/lib/jlpt";
 import { SquareListItem } from "@/components/common/SquareListItem";
+import { UserNotice } from "@/components/common/UserNotice";
+import { UPDATE_BROWSER_COPY } from "@/lib/engine/engine-copy";
+import { useAccountStatus } from "@/lib/engine/use-account-status";
 
 const STUDY_STATUS_ITEMS = [
   {
@@ -13,6 +16,8 @@ const STUDY_STATUS_ITEMS = [
 ];
 
 export const StudyStatusBorderMeanings = () => {
+  const status = useAccountStatus();
+
   return (
     <>
       <ul className="flex flex-wrap my-2">
@@ -25,6 +30,9 @@ export const StudyStatusBorderMeanings = () => {
           />
         ))}
       </ul>
+      {status.kind === "unavailable" && (
+        <UserNotice>{UPDATE_BROWSER_COPY}</UserNotice>
+      )}
     </>
   );
 };

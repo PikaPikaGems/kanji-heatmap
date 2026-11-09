@@ -1,68 +1,97 @@
 import { ReactNode } from "react";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { cn } from "@/lib/utils";
+import { useTapGuard } from "@/hooks/use-tap-guard";
+import { PracticeBottomBar } from "./PracticeBottomBar";
 
 /**
- * Centered end-of-session layout shared by the practice modes and the
- * speed-katakana game: cheer heading + uppercase subtitle, a wrapping stat
- * row, and a stacked primary / optional ghost button column. Keyboard
- * handling and cheer selection stay with the callers.
+ * The one end-of-round / end-of-session screen for every practice and mastery
+ * game: cheer heading, optional stat row and content scrolling above the
+ * bottom bar (the same bar the start screens use) with Continue and "I'm
+ * done", or a single "Done" when there is nothing left to do, and an optional
+ * notice under them. Keyboard handling and cheer selection stay with the
+ * callers.
  */
 export const EndScreenLayout = ({
-  heading,
+  cheer,
   subtitle,
   headingExtra,
   stats,
-  afterStats,
-  primaryLabel,
-  onPrimary,
-  secondaryLabel,
-  onSecondary,
-  className,
+  children,
+  onContinue,
+  continueLabel = "Continue",
+  onEnd,
+  notice,
 }: {
-  heading: string;
-  subtitle: string;
+  cheer: string;
+  /** One line under the cheer, e.g. "7/10 correct this round". */
+  subtitle?: string;
   headingExtra?: ReactNode;
-  stats: ReactNode;
-  /** Optional content between the stats and the buttons (e.g. a link). */
-  afterStats?: ReactNode;
-  primaryLabel: string;
-  onPrimary: () => void;
-  secondaryLabel?: string;
-  onSecondary?: () => void;
-  className?: string;
-}) => (
-  <div
-    className={cn(
-      "flex flex-col items-center justify-center w-full h-full gap-10 animate-fade-in",
-      className
-    )}
-  >
-    <div className="text-center">
-      <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
-        {heading}
-      </h2>
-      <p className="mt-1 text-xs font-bold tracking-wide uppercase text-muted-foreground">
-        {subtitle}
-      </p>
-      {headingExtra}
-    </div>
+  /** Big numbers shown in a wrapping row under the heading. */
+  stats?: ReactNode;
+  /** Anything else for the scrolling area: recap tiles, links. */
+  children?: ReactNode;
+  /** The next round; omit when there is nothing left to do. */
+  onContinue?: () => void;
+  /** E.g. Fill the Kanji's "Retry Mistakes". */
+  continueLabel?: string;
+  /** Leaves the game: "I'm done" next to Continue, otherwise "Done". */
+  onEnd: () => void;
+  /** Under the buttons, e.g. "progress not saved". */
+  notice?: ReactNode;
+}) => {
+  // Its buttons ignore taps while it fades in, so a double tap on the
+  // answer drawer's Continue can't hit "I'm done".
+  const guarded = useTapGuard();
 
-    <div className="flex flex-wrap items-center justify-center pb-4 gap-x-16 gap-y-8">
-      {stats}
-    </div>
+  return (
+    <div className="flex flex-col w-full h-full animate-fade-in">
+      {/* m-auto centers the content in the space above the bar and, unlike
+        justify-center, still scrolls from the top when it overflows. */}
+      <div className="flex flex-col flex-1 min-h-0 px-4 pt-4 overflow-y-auto">
+        <div className="flex flex-col items-center w-full max-w-md gap-10 pb-6 m-auto">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold kanji-font animate-practice-bounce-soft">
+              🎉 {cheer}
+            </h2>
+            {subtitle && (
+              <p className="mt-1 text-sm font-bold text-muted-foreground">
+                {subtitle}
+              </p>
+            )}
+            {headingExtra}
+          </div>
 
-    {afterStats}
+          {stats && (
+            <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8">
+              {stats}
+            </div>
+          )}
 
-    <div className="flex flex-col w-full max-w-xs gap-3">
-      <PracticeButton size="lg" onClick={onPrimary}>
-        {primaryLabel}
-      </PracticeButton>
-      {secondaryLabel && onSecondary && (
-        <PracticeButton variant="ghost" size="md" onClick={onSecondary}>
-          {secondaryLabel}
-        </PracticeButton>
-      )}
+          {children}
+        </div>
+      </div>
+
+      <PracticeBottomBar>
+        {onContinue ? (
+          <>
+            <PracticeButton size="lg" onClick={guarded(onContinue)}>
+              {continueLabel}
+            </PracticeButton>
+            <PracticeButton size="md" variant="ghost" onClick={guarded(onEnd)}>
+              I&apos;m done
+            </PracticeButton>
+          </>
+        ) : (
+          <PracticeButton size="lg" onClick={guarded(onEnd)}>
+            Done
+          </PracticeButton>
+        )}
+        {/* Dotted line between the buttons and the notice; `empty:hidden`
+          drops it when the notice renders nothing. */}
+        <div className="pt-3 mt-1 border-t border-dotted empty:hidden">
+          {notice}
+        </div>
+      </PracticeBottomBar>
     </div>
-  </div>
-);
+  );
+};
