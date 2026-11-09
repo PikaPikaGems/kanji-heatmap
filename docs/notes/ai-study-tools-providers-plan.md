@@ -139,12 +139,18 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 - Gemini audio is raw 24 kHz PCM: convert to MP3 before saving, or it fills
   the 35 MB audio budget about five times faster than other providers. Show
   progress while it generates.
-- OpenAI speech reports no usage: count characters ourselves.
+- OpenAI speech reports no usage: count characters ourselves. It takes 4,096
+  characters per request, so longer text is split at paragraph or sentence
+  ends and the MP3s joined (ElevenLabs v3 likewise, at its 5,000).
+- The MP3 encoder for Gemini is `@breezystack/lamejs` (LGPL-3.0, compatible
+  with this repo's GPL-3.0), loaded only when Gemini speech is used. The bit
+  rate picker applies to it, as to xAI and ElevenLabs.
 
 ## Text tools
 
-- OpenAI: Chat Completions with `include_usage` when search is off; Responses
-  API with the `web_search` tool when on.
+- OpenAI: the Responses API (the same streamer as xAI), with the `web_search`
+  tool when search is on and without it when off. (The plan said Chat
+  Completions when off; one parser for both turned out simpler.)
 - Anthropic: Messages API with the web search tool; pick the tool version the
   model supports and fall back if the API rejects it.
 - Gemini: `googleSearch` tool for search. Turn the free-tier 429 into a clear
@@ -186,6 +192,8 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 - `ai-explain-usage`: per month, per provider. Today's totals become xAI's.
 
 ## Phases (one PR)
+
+Status: all seven done on `claude/clever-feynman-ixbitr`.
 
 One PR against `main`. Every commit message starts with its phase, e.g.
 `(Phase 1) Add AI Study Tools icon and modal with three tabs`, and each phase
