@@ -20,7 +20,10 @@ giving AI Study Tools its own modal. Based on the brainstorm mockups and the
 - **Browser-only.** Every call goes straight from the browser to the
   provider. No proxy; a provider that blocks browser calls is left out.
 - **Usage in each provider's own units** (tokens, searches, credits,
-  characters). No US$ estimates of our own.
+  characters). A money amount appears only when the API itself returns it, as
+  xAI's `cost_in_usd_ticks` does (shown as US$, 10,000,000,000 ticks = US$1).
+  No price lists, no estimates: prices change.
+- **PRs target `main`.**
 - **Read Aloud speaks Japanese by default** (details below).
 
 ## Providers
@@ -104,7 +107,7 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 
 - **This month, per provider**, in its own units: requests, input/output
   tokens, web searches, images, speech characters or credits. xAI also shows
-  the cost it reports itself.
+  the cost its API returns; no other provider returns one.
 - **ElevenLabs balance**: credits used / limit and reset date, fetched when
   the tab opens.
 - **Saved content**: today's storage bars (text, audio, images) and clear
@@ -190,15 +193,14 @@ Then delete `public/spike.html`.
 
 ## Open questions
 
-- **ElevenLabs Japanese voices without adding them one by one.** Can the
-  shared-voices endpoint list Japanese library voices, and can speech use one
-  without adding it to the account? If adding is required, it needs Voices:
-  Write on the key.
+- **ElevenLabs Japanese voices without adding them one by one.** Docs show
+  `GET /v1/shared-voices?language=ja` lists Japanese Voice Library voices, and
+  adding one is a separate call (`POST /v1/voices/add/{public_owner_id}/{voice_id}`,
+  needs Voices: Write). Not documented: whether speech accepts a library voice
+  that was never added. Being tested with the spike's "Japanese library
+  voices" button.
 - **Monthly budget.** Today it's one token budget. Options: a budget per
   provider in its own unit, or budgets for text providers only.
-- **xAI's reported cost.** Keep showing the US$ figure xAI reports, or show
-  tokens only like everyone else?
-- **Base branch for the PRs** (`main` or a fresh `preview-next`).
 
 ## Not doing
 
