@@ -109,12 +109,12 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 
 ## Read Aloud
 
-| Provider   | Japanese handling                                                                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| xAI        | `language: ja` (as today)                                                                                                                         |
-| ElevenLabs | `language_code: ja` on every request; voice list shows Japanese voices first                                                                      |
-| OpenAI     | Instruction: the text mixes English and Japanese; read English in natural English and Japanese in standard Tokyo Japanese, never Chinese readings |
-| Gemini     | Same instruction, prefixed to the text                                                                                                            |
+| Provider   | Japanese handling                                                                                                                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| xAI        | `language: ja` (as today)                                                                                                                                                                                         |
+| ElevenLabs | Voice list shows Japanese voices first. `language_code: ja` had no audible effect in the spike, so kanji words inside English can still come out as Chinese: suggest ElevenLabs for all-Japanese text, not essays |
+| OpenAI     | Instruction: the text mixes English and Japanese; read English in natural English and Japanese in standard Tokyo Japanese, never Chinese readings                                                                 |
+| Gemini     | Same instruction, prefixed to the text                                                                                                                                                                            |
 
 - Suggested defaults: xAI for essays (mixed text), ElevenLabs for
   all-Japanese text.
@@ -190,9 +190,10 @@ Then delete `public/spike.html`.
   shared-voices endpoint list Japanese library voices, and can speech use one
   without adding it to the account? If adding is required, it needs Voices:
   Write on the key.
-- **Which ElevenLabs models honour `language_code: ja`.** Expected: Flash v2.5
-  and v3 yes, Multilingual v2 not enforced. Not verified; the picker should
-  offer only models that pass.
+- **ElevenLabs on mixed text.** `language_code: ja` did nothing audible in the
+  spike. Untested: whether Flash v2.5 or v3 enforce it. If neither does, the
+  remaining fix is sending Japanese words as kana (readings from the essay, or
+  a kana pass by the text model).
 - **Monthly budget.** Today it's one token budget. Options: a budget per
   provider in its own unit, or budgets for text providers only.
 - **xAI's reported cost.** Keep showing the US$ figure xAI reports, or show
