@@ -125,6 +125,16 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 
 - xAI and ElevenLabs (`eleven_v3`) both read mixed English + Japanese
   naturally; either can be the default.
+- **ElevenLabs voice picker lists Japanese Voice Library voices directly**
+  (`GET /v1/shared-voices?language=ja`, paged; Voices: Read is enough).
+  Speech works with a library voice that was never added to the account
+  (tested: 3 voices, `eleven_v3`, all rated natural), so learners never add
+  voices by hand. Show each voice's use case (education, narration,
+  conversation) and preview. Save the chosen `voice_id`; if the owner removes
+  the voice from the library, fall back to the default and say so.
+- Library voices on `eleven_v3` were slow: 29–35 s for a 381-character essay
+  (8.9 s with a voice in the account). Show progress, and offer
+  `eleven_flash_v2_5` as the fast option.
 - Gemini audio is raw 24 kHz PCM: convert to MP3 before saving, or it fills
   the 35 MB audio budget about five times faster than other providers. Show
   progress while it generates.
@@ -193,12 +203,6 @@ Then delete `public/spike.html`.
 
 ## Open questions
 
-- **ElevenLabs Japanese voices without adding them one by one.** Docs show
-  `GET /v1/shared-voices?language=ja` lists Japanese Voice Library voices, and
-  adding one is a separate call (`POST /v1/voices/add/{public_owner_id}/{voice_id}`,
-  needs Voices: Write). Not documented: whether speech accepts a library voice
-  that was never added. Being tested with the spike's "Japanese library
-  voices" button.
 - **Monthly budget.** Today it's one token budget. Options: a budget per
   provider in its own unit, or budgets for text providers only.
 
