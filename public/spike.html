@@ -202,16 +202,23 @@
       closing the tab forgets them. Each test makes one small real request (a
       few cents in total).
     </p>
-    <label for="line">Japanese test line (speech tests)</label>
+    <label for="line">Speech test text</label>
     <select id="line">
-      <option value="0">
-        1 · 雨が降りそうだから、傘を持っていったほうがいいよ。
+      <option value="0">1 · Short: 雨が降りそうだから…</option>
+      <option value="1">2 · Readings: 生きる、生ビール、先生、一生</option>
+      <option value="2">3 · Short mixed English + Japanese</option>
+      <option value="3">4 · Story (Japanese, ~130 characters)</option>
+      <option value="4">5 · Conversation (Japanese, ~130 characters)</option>
+      <option value="5">
+        6 · Essay-style explanation (English + Japanese)
       </option>
-      <option value="1">2 · 生きる、生ビール、先生、一生</option>
-      <option value="2">
-        3 · The kanji 水 appears in 水曜日, which means Wednesday.
-      </option>
+      <option value="custom">Your own text (edit the box)</option>
     </select>
+    <textarea id="lineText" rows="5" style="margin-top: 6px"></textarea>
+    <p class="note">
+      Edit or paste any text, for example an essay from the app. Longer text
+      costs more, and each result shows what it cost.
+    </p>
     <div id="providers"></div>
     <div class="bar">
       <button id="copy">Copy results</button>
@@ -224,6 +231,9 @@
         "雨が降りそうだから、傘を持っていったほうがいいよ。",
         "生きる、生ビール、先生、一生",
         "The kanji 水 appears in 水曜日, which means Wednesday.",
+        "週末、友達と京都へ行きました。朝早く出発したので、電車はまだ空いていました。清水寺に着くと、紅葉がとてもきれいで、思わず写真をたくさん撮ってしまいました。お昼には湯豆腐を食べて、午後は古い町並みをゆっくり歩きました。帰りの電車では、二人ともすぐに寝てしまいました。",
+        "「すみません、この近くに郵便局はありますか。」「ええ、ありますよ。この道をまっすぐ行って、二つ目の信号を右に曲がると、左側に見えます。」「歩いて何分ぐらいかかりますか。」「そうですね、五分ぐらいだと思います。」「ありがとうございます。助かりました。」",
+        "The kanji 生 is one of the most versatile characters in Japanese. In 生きる it means to live, and in 先生, a teacher, it is read sei. In 一生, a whole lifetime, it becomes shō. At an izakaya you might order a 生ビール, a draft beer, where 生 means fresh. To remember it, picture a sprout pushing up out of the ground, full of life. You will also see it in 学生, a student, and in 誕生日, a birthday.",
       ];
       const TEXT_PROMPT =
         "In two short sentences, what does the Japanese word 一生 mean? Cite one source.";
@@ -233,8 +243,15 @@
       const ratings = {};
       const keys = {};
       const $ = (s, el = document) => el.querySelector(s);
-      const lineText = () => LINES[Number($("#line").value)];
-      const lineNo = () => Number($("#line").value) + 1;
+      const lineText = () => $("#lineText").value.trim();
+      const lineNo = () =>
+        $("#line").value === "custom" ? "custom" : Number($("#line").value) + 1;
+      $("#lineText").value = LINES[0];
+      $("#line").onchange = () => {
+        if ($("#line").value !== "custom")
+          $("#lineText").value = LINES[Number($("#line").value)];
+      };
+      $("#lineText").oninput = () => ($("#line").value = "custom");
 
       const mask = (provider, value) => {
         let s = typeof value === "string" ? value : JSON.stringify(value);
