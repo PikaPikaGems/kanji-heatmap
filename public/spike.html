@@ -605,8 +605,13 @@
             ],
             [
               "language",
-              "Language code (optional, e.g. ja: forces Japanese pronunciation on models that support it)",
-              "",
+              "Language code (ja forces Japanese on models that support it; clear to let the model guess)",
+              "ja",
+            ],
+            [
+              "normalize",
+              "Japanese text normalization (true/false; may be slower)",
+              "false",
             ],
             ["format", "Output format", "mp3_44100_64"],
           ],
@@ -674,7 +679,8 @@
               const voiceName =
                 p.voiceNames?.[f.voiceId.value] ?? f.voiceId.value;
               const language = f.language.value.trim();
-              const voiceLabel = `${voiceName} · ${f.model.value}${language ? ` · ${language}` : ""}`;
+              const normalized = f.normalize.value.trim() === "true";
+              const voiceLabel = `${voiceName} · ${f.model.value} · ${language || "no language code"}${normalized ? " · normalized" : ""}`;
               if (!f.voiceId.value.trim())
                 return record(p.id, test, {
                   error:
@@ -691,6 +697,9 @@
                     model_id: f.model.value,
                     ...(f.language.value.trim()
                       ? { language_code: f.language.value.trim() }
+                      : {}),
+                    ...(f.normalize.value.trim() === "true"
+                      ? { apply_language_text_normalization: true }
                       : {}),
                   }),
                 }
