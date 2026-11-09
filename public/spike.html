@@ -680,31 +680,39 @@
               balance: await out.res.json(),
             });
           },
+          async speech(p, k, f, withModelHeader) {
+            const test = `Speech line ${lineNo()} (${withModelHeader ? "with" : "no"} model header)`;
+            const body = { text: lineText(), format: "mp3", mp3_bitrate: 64 };
+            if (f.referenceId.value) body.reference_id = f.referenceId.value;
+            const headers = {
+              ...p.auth(k),
+              "Content-Type": "application/json",
+            };
+            if (withModelHeader) headers.model = f.model.value;
+            const out = await call(p.id, "https://api.fish.audio/v1/tts", {
+              method: "POST",
+              headers,
+              body: JSON.stringify(body),
+            });
+            if (out.error || !out.res.ok)
+              return record(p.id, test, out, {
+                body: out.res && (await errorBody(p.id, out.res)),
+              });
+            const blob = await out.res.blob();
+            const div = record(p.id, test, out, {
+              audioKB: Math.round(blob.size / 1024),
+              utf8Bytes: new TextEncoder().encode(lineText()).length,
+            });
+            attachAudio(
+              div,
+              p.id,
+              blob,
+              withModelHeader ? f.model.value : "default model"
+            );
+          },
           tests: {
-            async Speech(p, k, f) {
-              const test = `Speech line ${lineNo()}`;
-              const body = { text: lineText(), format: "mp3", mp3_bitrate: 64 };
-              if (f.referenceId.value) body.reference_id = f.referenceId.value;
-              const out = await call(p.id, "https://api.fish.audio/v1/tts", {
-                method: "POST",
-                headers: {
-                  ...p.auth(k),
-                  "Content-Type": "application/json",
-                  model: f.model.value,
-                },
-                body: JSON.stringify(body),
-              });
-              if (out.error || !out.res.ok)
-                return record(p.id, test, out, {
-                  body: out.res && (await errorBody(p.id, out.res)),
-                });
-              const blob = await out.res.blob();
-              const div = record(p.id, test, out, {
-                audioKB: Math.round(blob.size / 1024),
-                utf8Bytes: new TextEncoder().encode(lineText()).length,
-              });
-              attachAudio(div, p.id, blob, f.model.value);
-            },
+            "Speech (no model header)": (p, k, f) => p.speech(p, k, f, false),
+            "Speech (with model header)": (p, k, f) => p.speech(p, k, f, true),
           },
         },
         {
