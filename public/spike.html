@@ -601,7 +601,7 @@
             [
               "model",
               "Model (try eleven_multilingual_v2, eleven_v3, eleven_flash_v2_5)",
-              "eleven_multilingual_v2",
+              "eleven_v3",
             ],
             [
               "language",
@@ -674,6 +674,55 @@
             record(p.id, "List voices", v, { voices: voices.length });
           },
           tests: {
+            // Lists Japanese Voice Library voices WITHOUT adding them, and
+            // puts them in the voice dropdown so Speech can try one directly.
+            async "Japanese library voices"(p, k, f) {
+              const out = await call(
+                p.id,
+                "https://api.elevenlabs.io/v1/shared-voices?language=ja&page_size=50",
+                { headers: p.auth(k) }
+              );
+              if (out.error || !out.res.ok)
+                return record(p.id, "Japanese library voices", out, {
+                  body: out.res && (await errorBody(p.id, out.res)),
+                });
+              const body = await out.res.json();
+              const voices = body.voices ?? [];
+              p.voiceNames = {
+                ...p.voiceNames,
+                ...Object.fromEntries(
+                  voices.map((voice) => [
+                    voice.voice_id,
+                    `${voice.name} (library, not added)`,
+                  ])
+                ),
+              };
+              const sel = document.createElement("select");
+              for (const voice of voices) {
+                const o = document.createElement("option");
+                o.value = voice.voice_id;
+                o.textContent = `📚 ${voice.name} · ${voice.gender ?? ""} ${voice.age ?? ""} · ${voice.use_case ?? voice.category ?? ""}`;
+                sel.appendChild(o);
+              }
+              sel.onchange = () => (f.voiceId.value = sel.value);
+              // Replace whichever dropdown sits under the Voice ID field.
+              if (f.voiceId.nextElementSibling?.tagName === "SELECT")
+                f.voiceId.nextElementSibling.remove();
+              f.voiceId.after(sel);
+              if (voices[0]) f.voiceId.value = voices[0].voice_id;
+              record(p.id, "Japanese library voices", out, {
+                voices: voices.length,
+                hasMore: body.has_more ?? null,
+                sample: voices.slice(0, 5).map((voice) => ({
+                  name: voice.name,
+                  language: voice.language,
+                  locale: voice.locale,
+                  category: voice.category,
+                  freeUsersAllowed: voice.free_users_allowed,
+                })),
+                next: "Now tap Speech: it uses the first library voice, which is NOT added to your account.",
+              });
+            },
             async Speech(p, k, f) {
               const test = `Speech line ${lineNo()}`;
               const voiceName =
