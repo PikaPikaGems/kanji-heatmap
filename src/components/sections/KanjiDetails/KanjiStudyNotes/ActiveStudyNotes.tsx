@@ -4,7 +4,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { EngineAPI, KanjiNoteView } from "engine-contract";
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
-import { copyForCode } from "@/lib/engine/engine-copy";
+import { copyForCode, copyForError } from "@/lib/engine/engine-copy";
 import { snapshotValue } from "@/lib/engine/store-cache";
 import type { WriteBlocker } from "@/lib/engine/use-account-status";
 import { useEngineQuery } from "@/lib/engine/use-engine-query";
@@ -221,7 +221,7 @@ const LoadedActiveStudyNotes = ({
       setState(leaveForRemoteChange(text));
       return;
     }
-    setSave({ kind: "error", message: copyForCode(result.error.code) });
+    setSave({ kind: "error", message: copyForError(result.error) });
   };
 
   const saveNow = () => {

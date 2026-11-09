@@ -6,7 +6,7 @@ import {
 import type { ActionStatus } from "@/components/dependent/account/action-status";
 import { utf8ByteLength } from "@/components/sections/KanjiDetails/KanjiStudyNotes/utf8-bytes";
 import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
-import { copyForCode } from "./engine-copy";
+import { copyForError } from "./engine-copy";
 import { useEngineApi } from "./use-engine-query";
 
 /** The words a pile item is added with; both stay fixed for the item's life. */
@@ -40,7 +40,7 @@ const DUPLICATE_WORD_COPY = "The two words of this kanji are the same.";
 const copyForAddError = (error: ReviewError) =>
   error.code === "validation_failed" && error.reason === "duplicate_word"
     ? DUPLICATE_WORD_COPY
-    : copyForCode(error.code);
+    : copyForError(error);
 
 const isTooLong = (word: string | undefined) =>
   word != null && utf8ByteLength(word) > REVIEW_PILE_ADD_WORD_MAX_UTF8_BYTES;
