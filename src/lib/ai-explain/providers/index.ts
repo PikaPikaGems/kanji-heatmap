@@ -9,11 +9,17 @@ import type {
   TextReply,
   TextRequest,
 } from "./types";
+import { anthropicClient } from "./anthropic";
+import { geminiClient } from "./gemini";
+import { openaiClient } from "./openai";
 import { xaiClient } from "./xai";
 
 /** The client of each provider. */
 const CLIENTS: Partial<Record<AiProvider, AiProviderClient>> = {
   xai: xaiClient,
+  openai: openaiClient,
+  anthropic: anthropicClient,
+  gemini: geminiClient,
 };
 
 /** The provider's client; throws for one this build has no client for. */
