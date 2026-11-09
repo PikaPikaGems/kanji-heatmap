@@ -32,6 +32,7 @@ import { SyncOperationsDialog } from "@/components/dependent/sync-operations/Syn
 import { WriteBlockedDialog } from "@/components/dependent/account/WriteBlockedDialog";
 import { SyncNowDialog } from "@/components/dependent/account/SyncNowDialog";
 import { WordExplainDialog } from "@/components/dependent/site-wide/WordExplainDialog";
+import { AiStudyToolsDialog } from "@/components/dependent/site-wide/ai-tools/AiStudyToolsDialog";
 import { RecoveryDialog } from "@/components/dependent/account/RecoveryDialog";
 import { LogoutDialog } from "@/components/dependent/account/LogoutDialog";
 import { LoggingOutScreen } from "@/components/dependent/account/LoggingOutScreen";
@@ -189,6 +190,7 @@ const App = () => {
             <SyncNowDialog />
             <WriteBlockedDialog />
             <WordExplainDialog />
+            <AiStudyToolsDialog />
           </KanjiFunctionalityProvider>
         </GlobalKeyboardShortcutProvider>
       </ThemeProvider>

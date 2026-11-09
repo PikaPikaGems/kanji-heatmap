@@ -32,6 +32,11 @@ import {
   openFsrsSettings,
   useFsrsSettingsOpen,
 } from "@/lib/engine/fsrs-settings-dialog";
+import {
+  openAiStudyTools,
+  useAiStudyToolsDialog,
+} from "@/lib/ai-explain/ai-tools-dialog";
+import { AiStudyToolsTrigger } from "@/components/dependent/site-wide/ai-tools/AiStudyToolsDialog";
 import { useRecoveryDialogOpen } from "@/lib/engine/recovery-dialog";
 import {
   hasNoAccounts,
@@ -61,8 +66,8 @@ const InfoLink = ({ href, title }: { href: string; title: string }) => (
 
 /**
  * What the sidebar has open: itself, or one of the dialogs it closes for and
- * returns to when that dialog closes. "login" and "fsrs" are app-wide dialogs
- * with their own open state (see `isSidebarShown`).
+ * returns to when that dialog closes. "login", "fsrs" and "ai-tools" are
+ * app-wide dialogs with their own open state (see `isSidebarShown`).
  */
 type OpenedModal =
   | "none"
@@ -162,7 +167,10 @@ const HeaderDrawerContent = ({
             className="flex items-center justify-center gap-3 pt-3 pb-1"
             onPointerDown={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-1.5">{tools}</div>
+            <div className="flex items-center gap-1.5">
+              {tools}
+              <AiStudyToolsTrigger onClick={() => onAction("ai-tools")} />
+            </div>
             <NetworkStatusBadge />
           </div>
         )}
@@ -182,19 +190,25 @@ const HeaderDrawer = ({
     initiallyOpen ? "sidebar" : "none"
   );
   const due = useDueCount();
-  // The login and FSRS dialogs are app-wide: the sidebar comes back once they
-  // (and the recovery dialog the login can hand over to) have all closed.
+  // The login, FSRS and AI Study Tools dialogs are app-wide: the sidebar
+  // comes back once they (and the recovery dialog the login can hand over
+  // to) have all closed.
   const loginOpen = useLoginDialog().open;
   const fsrsOpen = useFsrsSettingsOpen();
   const recoveryOpen = useRecoveryDialogOpen();
-  const appDialogOpen = loginOpen || fsrsOpen || recoveryOpen;
+  const aiToolsOpen = useAiStudyToolsDialog().open;
+  const appDialogOpen = loginOpen || fsrsOpen || recoveryOpen || aiToolsOpen;
   const isSidebarShown =
     openedModal === "sidebar" ||
-    ((openedModal === "login" || openedModal === "fsrs") && !appDialogOpen);
+    ((openedModal === "login" ||
+      openedModal === "fsrs" ||
+      openedModal === "ai-tools") &&
+      !appDialogOpen);
 
   const onAction = (modal: OpenedModal) => {
     if (modal === "login") openLoginDialog();
     if (modal === "fsrs") openFsrsSettings();
+    if (modal === "ai-tools") openAiStudyTools();
     setOpenedModal(modal);
   };
 

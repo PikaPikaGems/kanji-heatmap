@@ -5,6 +5,8 @@ import { DotIcon } from "@/components/icons";
 import { DebugInfo } from "@/components/common/DebugInfo";
 import { RefreshPageBtn } from "@/components/common/RefreshPageBtn";
 import { SettingsModal } from "@/components/dependent/site-wide/SettingsModal";
+import { AiStudyToolsTrigger } from "@/components/dependent/site-wide/ai-tools/AiStudyToolsDialog";
+import { openAiStudyTools } from "@/lib/ai-explain/ai-tools-dialog";
 
 export const BottomBar = ({
   includeNode,
@@ -23,6 +25,7 @@ export const BottomBar = ({
         <RefreshPageBtn />
         <DebugInfo />
         <SettingsModal />
+        <AiStudyToolsTrigger onClick={() => openAiStudyTools()} />
         {includeNode}
       </div>
       <div
