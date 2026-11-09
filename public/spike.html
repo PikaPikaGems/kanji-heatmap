@@ -616,7 +616,10 @@
             const v = await call(p.id, "https://api.elevenlabs.io/v1/voices", {
               headers: p.auth(k),
             });
-            if (v.error || !v.res.ok) return record(p.id, "List voices", v);
+            if (v.error || !v.res.ok)
+              return record(p.id, "List voices", v, {
+                body: v.res && (await errorBody(p.id, v.res)),
+              });
             const voices = (await v.res.json()).voices ?? [];
             const sel = document.createElement("select");
             for (const voice of voices) {
@@ -634,6 +637,11 @@
           tests: {
             async Speech(p, k, f) {
               const test = `Speech line ${lineNo()}`;
+              if (!f.voiceId.value.trim())
+                return record(p.id, test, {
+                  error:
+                    "No voice ID: tap Check key first, then pick a voice from the dropdown.",
+                });
               const out = await call(
                 p.id,
                 `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(f.voiceId.value)}?output_format=${encodeURIComponent(f.format.value)}`,
