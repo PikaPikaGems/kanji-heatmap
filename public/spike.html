@@ -680,15 +680,20 @@
               balance: await out.res.json(),
             });
           },
-          async speech(p, k, f, withModelHeader) {
-            const test = `Speech line ${lineNo()} (${withModelHeader ? "with" : "no"} model header)`;
+          // mode: "model" = JSON + model header, "json" = JSON only,
+          // "plain" = no Content-Type (browser sends text/plain) and no model header.
+          async speech(p, k, f, mode) {
+            const labels = {
+              model: "with model header",
+              json: "no model header",
+              plain: "plain-text body",
+            };
+            const test = `Speech line ${lineNo()} (${labels[mode]})`;
             const body = { text: lineText(), format: "mp3", mp3_bitrate: 64 };
             if (f.referenceId.value) body.reference_id = f.referenceId.value;
-            const headers = {
-              ...p.auth(k),
-              "Content-Type": "application/json",
-            };
-            if (withModelHeader) headers.model = f.model.value;
+            const headers = { ...p.auth(k) };
+            if (mode !== "plain") headers["Content-Type"] = "application/json";
+            if (mode === "model") headers.model = f.model.value;
             const out = await call(p.id, "https://api.fish.audio/v1/tts", {
               method: "POST",
               headers,
@@ -707,12 +712,14 @@
               div,
               p.id,
               blob,
-              withModelHeader ? f.model.value : "default model"
+              mode === "model" ? f.model.value : "default model"
             );
           },
           tests: {
-            "Speech (no model header)": (p, k, f) => p.speech(p, k, f, false),
-            "Speech (with model header)": (p, k, f) => p.speech(p, k, f, true),
+            "Speech (no model header)": (p, k, f) => p.speech(p, k, f, "json"),
+            "Speech (with model header)": (p, k, f) =>
+              p.speech(p, k, f, "model"),
+            "Speech (plain-text body)": (p, k, f) => p.speech(p, k, f, "plain"),
           },
         },
         {
