@@ -112,7 +112,8 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
   the tab opens.
 - **Saved content**: today's storage bars (text, audio, images) and clear
   actions, moved from Generated content.
-- **Monthly budget**: see open questions.
+- **Spending limits**: a link per provider to where its own spending limit is
+  set (provider dashboards). The old monthly text-token budget is dropped.
 
 ## Read Aloud
 
@@ -181,7 +182,7 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
 - `ai-explain-settings`: add per-tool `{ provider, model, options }`. Today's
   `model`, `imageModel`, `imageResolution`, `imageQuality`, `speechVoice`,
   `speechBitRate`, `speechLanguage` become the xAI entries of their tools.
-  Edited prompts keep their keys.
+  Edited prompts keep their keys. `monthlyTokenBudget` is ignored and dropped.
 - `ai-explain-usage`: per month, per provider. Today's totals become xAI's.
 
 ## PRs, in order
@@ -203,10 +204,9 @@ Then delete `public/spike.html`.
 
 ## Open questions
 
-- **Monthly budget.** Today it's one token budget. Options: a budget per
-  provider in its own unit, or budgets for text providers only.
+None.
 
 ## Not doing
 
 Proxy server, Fish Audio, ElevenLabs Image & Video, our own US$ estimates, the
-amber dot.
+amber dot, the monthly token budget.
