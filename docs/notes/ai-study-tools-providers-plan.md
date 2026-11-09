@@ -60,9 +60,9 @@ Listening (mixed English + Japanese essay): xAI `ara` natural, OpenAI `coral`
 OK. ElevenLabs with a Japanese voice read kanji words as Chinese on
 `eleven_multilingual_v2`, which ignores `language_code`. With
 `language_code: ja`, `eleven_v3` and `eleven_flash_v2_5` read the Japanese
-correctly and the English stayed clear; `eleven_v3` rated natural. Same cost
-on both models (84 credits for 381 characters), but `eleven_v3` took 8.9 s
-against 1.3 s.
+correctly and the English stayed clear; `eleven_v3` rated natural. `eleven_v3`
+cost the same as `eleven_multilingual_v2` (84 credits for 381 characters) but
+took 8.9 s against 1.3 s. Flash v2.5 cost and speed not recorded.
 
 ## The modal
 
