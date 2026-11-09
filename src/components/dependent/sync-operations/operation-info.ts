@@ -1,5 +1,10 @@
 import type { RecentFailedOperation, SyncOperation } from "engine-contract";
 import { CARD_TYPE_LABELS } from "@/lib/engine/card-types";
+import {
+  copyForCode,
+  ROUND_REJECTED_COPY,
+  TOO_LONG_COPY,
+} from "@/lib/engine/engine-copy";
 import { practiceActivityLabel } from "@/lib/practice/activity";
 import {
   Bookmark,
@@ -75,4 +80,22 @@ export const recoverableText = (op: RecentFailedOperation): string | null => {
   if (op.payload?.type === "note-save") return op.payload.content;
   if (op.payload?.type === "review-pile-add") return op.payload.word;
   return null;
+};
+
+/**
+ * Why a failed operation failed. A sync rejection carries no reason, so
+ * `validation_failed` is worded by operation type: a note is only rejected
+ * for its length, and a practice round usually because the server doesn't
+ * know its activity yet.
+ */
+export const failedOperationCopy = (op: RecentFailedOperation): string => {
+  if (op.code !== "validation_failed") return copyForCode(op.code);
+  if (op.operationType === "note-save") return TOO_LONG_COPY;
+  if (
+    op.operationType === "generic_challenge_completed" ||
+    op.operationType === "speed_katakana_session_completed"
+  ) {
+    return ROUND_REJECTED_COPY;
+  }
+  return copyForCode(op.code);
 };
