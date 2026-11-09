@@ -516,10 +516,20 @@
               const searches = (body.output ?? []).filter(
                 (o) => o.type === "web_search_call"
               ).length;
+              // output_text is an SDK helper, not in the raw REST body:
+              // join the message parts ourselves.
+              const parts = (body.output ?? [])
+                .filter((o) => o.type === "message")
+                .flatMap((o) => o.content ?? [])
+                .filter((c) => c.type === "output_text");
               record(p.id, "Text + web search", out, {
                 usage: body.usage ?? null,
                 webSearchCalls: searches,
-                text: (body.output_text ?? "").slice(0, 300),
+                citations: parts.flatMap((c) => c.annotations ?? []).length,
+                text: parts
+                  .map((c) => c.text)
+                  .join("")
+                  .slice(0, 300),
               });
             },
             async Image(p, k, f) {
