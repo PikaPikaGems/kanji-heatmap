@@ -596,7 +596,16 @@
           note: "speech · account credits",
           fields: [
             ["voiceId", "Voice ID (filled from your voices)", ""],
-            ["model", "Model", "eleven_multilingual_v2"],
+            [
+              "model",
+              "Model (try eleven_multilingual_v2, eleven_v3, eleven_flash_v2_5)",
+              "eleven_multilingual_v2",
+            ],
+            [
+              "language",
+              "Language code (optional, e.g. ja: forces Japanese pronunciation on models that support it)",
+              "",
+            ],
             ["format", "Output format", "mp3_44100_64"],
           ],
           auth: (k) => ({ "xi-api-key": k }),
@@ -638,15 +647,32 @@
               o.textContent = `${voice.name}${voice.labels?.language ? ` · ${voice.labels.language}` : ""}${voice.labels?.accent ? ` · ${voice.labels.accent}` : ""}`;
               sel.appendChild(o);
             }
+            p.voiceNames = Object.fromEntries(
+              voices.map((voice) => [voice.voice_id, voice.name])
+            );
             sel.onchange = () => (f.voiceId.value = sel.value);
+            // Check key can run twice: replace the old dropdown, don't stack them.
+            if (f.voiceId.nextElementSibling?.tagName === "SELECT")
+              f.voiceId.nextElementSibling.remove();
             f.voiceId.after(sel);
-            if (!f.voiceId.value && voices[0])
-              f.voiceId.value = voices[0].voice_id;
+            // Prefer a Japanese voice so the default isn't a built-in American one.
+            const japanese = voices.find((voice) =>
+              /^ja|japan/i.test(
+                `${voice.labels?.language ?? ""} ${voice.labels?.accent ?? ""}`
+              )
+            );
+            const first = japanese ?? voices[0];
+            if (!f.voiceId.value && first) f.voiceId.value = first.voice_id;
+            if (f.voiceId.value) sel.value = f.voiceId.value;
             record(p.id, "List voices", v, { voices: voices.length });
           },
           tests: {
             async Speech(p, k, f) {
               const test = `Speech line ${lineNo()}`;
+              const voiceName =
+                p.voiceNames?.[f.voiceId.value] ?? f.voiceId.value;
+              const language = f.language.value.trim();
+              const voiceLabel = `${voiceName} · ${f.model.value}${language ? ` · ${language}` : ""}`;
               if (!f.voiceId.value.trim())
                 return record(p.id, test, {
                   error:
@@ -661,6 +687,9 @@
                   body: JSON.stringify({
                     text: lineText(),
                     model_id: f.model.value,
+                    ...(f.language.value.trim()
+                      ? { language_code: f.language.value.trim() }
+                      : {}),
                   }),
                 }
               );
@@ -678,11 +707,12 @@
                 costHeaders[h] = out.res.headers.get(h);
               const blob = await out.res.blob();
               const div = record(p.id, test, out, {
+                voice: voiceLabel,
                 costHeaders,
                 audioKB: Math.round(blob.size / 1024),
                 characters: lineText().length,
               });
-              attachAudio(div, p.id, blob, f.model.value);
+              attachAudio(div, p.id, blob, voiceLabel);
             },
           },
         },
