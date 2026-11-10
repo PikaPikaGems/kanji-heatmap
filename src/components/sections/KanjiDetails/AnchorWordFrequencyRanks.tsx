@@ -66,7 +66,7 @@ const SourceDetails = ({
  * An anchor word's rank in each of the 15 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
  * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
- * when the word is in none of the lists. Hidden behind a "Frequency Ranks"
+ * when the word is in none of the lists. Hidden behind a "Show Frequency Ranks"
  * switch that is off by default and remembered across kanji.
  */
 export const AnchorWordFrequencyRanks = ({
@@ -83,10 +83,11 @@ export const AnchorWordFrequencyRanks = ({
   return (
     <div className="text-left">
       <FlagSwitch
-        label="Frequency Ranks"
+        label="Show Frequency Ranks"
         checked={shown}
         onCheckedChange={setShown}
-        className="px-2 pt-2"
+        className="px-2 pt-2 mb-6"
+        labelClassName="text-sm"
       />
       {shown && (
         <Table className="my-2 animate-fade-in-fast">
