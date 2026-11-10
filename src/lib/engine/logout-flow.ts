@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { deleteAiOwnerKey } from "@/lib/ai-explain/preferences";
+import { deleteAiOwnerKeys } from "@/lib/ai-explain/preferences";
 import { getCurrentOwner } from "./content-owner";
 import { getEngineState } from "./engine";
 import { LOGOUT_FAILED_COPY } from "./engine-copy";
@@ -107,7 +107,7 @@ const runStep = async (
     }
   }
   if (step === "ai-key" && ai) {
-    deleteAiOwnerKey(ai.userId);
+    deleteAiOwnerKeys(ai.userId);
     return null;
   }
   const engine = getEngineState();

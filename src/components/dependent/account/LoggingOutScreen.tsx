@@ -26,8 +26,8 @@ const stepCopy = (step: LogoutStep, request: LogoutRequest) => {
   }
   if (step === "ai-key") {
     return {
-      doing: "Deleting your saved xAI API key…",
-      done: "Deleted your saved xAI API key",
+      doing: "Deleting your saved AI API keys…",
+      done: "Deleted your saved AI API keys",
     };
   }
   if (request.clearLocalData) {

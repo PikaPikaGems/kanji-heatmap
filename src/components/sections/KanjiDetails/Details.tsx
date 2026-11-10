@@ -26,7 +26,7 @@ import { StrokeAnimationLoadingScreen } from "./StrokeAnimationLoadingScreen";
 import { InstallAppModal } from "@/components/common/InstallAppModal";
 import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { hasStarterAiKey, isAiToolReady } from "@/lib/ai-explain/preferences";
 import { NoticeAction } from "@/components/common/UserNotice";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
@@ -216,7 +216,7 @@ export const KanjiDetails = ({
       <SimpleAccordion trigger={"Frequency Ranks"}>
         <FrequencyInfo freqRankInfo={data?.frequency} kanji={kanji} />
       </SimpleAccordion>
-      {isAiExplainReady(aiSettings) && (
+      {isAiToolReady(aiSettings, "kanjiEssay") && (
         <SimpleAccordion trigger="Kanji Essay">
           <ErrorBoundary details="KanjiEssay in KanjiDetails">
             <Suspense fallback={<SectionLoading />}>
@@ -229,7 +229,8 @@ export const KanjiDetails = ({
           </ErrorBoundary>
         </SimpleAccordion>
       )}
-      {isAiExplainReady(aiSettings) && (
+      {/* Shown without an image key too: saved images stay viewable. */}
+      {aiSettings.enabled && hasStarterAiKey(aiSettings) && (
         <SimpleAccordion trigger="Visual Mnemonics">
           <ErrorBoundary details="VisualMnemonics in KanjiDetails">
             <Suspense fallback={<SectionLoading />}>

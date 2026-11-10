@@ -16,7 +16,7 @@ import { KanjiPopover } from "@/components/shared-practice/KanjiPopover";
 import { SpeakButtons } from "./SpeakButtons";
 import { AiExplainDialog } from "./AiExplainDialog";
 import { useAiExplain, useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { isAiToolReady } from "@/lib/ai-explain/preferences";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
 import type { SentenceSpeech } from "./use-fill-the-kanji-game";
 
@@ -244,7 +244,7 @@ export const AnswerDrawer = ({
   const hasNotes = item.notes !== "" || item.tags.length > 0;
   // Nobody's saved answers show until the owner is known.
   const showAiExplain =
-    owner.status === "known" && isAiExplainReady(aiExplainSettings);
+    owner.status === "known" && isAiToolReady(aiExplainSettings, "grammar");
 
   return (
     <PracticeDrawerShell

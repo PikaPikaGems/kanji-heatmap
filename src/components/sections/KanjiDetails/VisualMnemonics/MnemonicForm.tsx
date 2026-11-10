@@ -13,19 +13,22 @@ import BasicSelect from "@/components/common/BasicSelect";
 import { CollapsibleSection } from "@/components/common/CollapsibleSection";
 import { ResponsiveTextarea } from "@/components/common/ResponsiveTextarea";
 import {
+  addAiUsage,
+  isAiToolReady,
   readAiExplainSettings,
-  isAiExplainReady,
-  addAiExplainUsage,
+  rejectAiProviderKey,
+  resolveAiTool,
 } from "@/lib/ai-explain/preferences";
+import { getCurrentOwner } from "@/lib/engine/content-owner";
+import { generateProviderImage, modelFor } from "@/lib/ai-explain/providers";
+import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
 import {
   buildImagePrompt,
-  DEFAULT_AI_IMAGE_MODEL,
   IMAGE_PALETTE_LABELS,
   IMAGE_STYLE_LABELS,
   type ImageStyle,
   type ImagePalette,
 } from "@/lib/ai-explain/prompts";
-import { generateXaiImage } from "@/lib/ai-explain/xai";
 import {
   getGeneratedContentEpoch,
   type MnemonicImage,
@@ -45,15 +48,19 @@ export type MnemonicDraft = {
   instructions: string;
 };
 
+/** A new image starts from the style and palette picked in AI Study Tools. */
 const initialDraft = (image?: MnemonicImage): MnemonicDraft => ({
   description: image?.description ?? "",
-  style: image?.style ?? "kanji-heatmap",
+  style:
+    image?.style ??
+    readAiExplainSettings().tools.mnemonics?.style ??
+    "kanji-heatmap",
   // Images made with a palette that has since been removed fall back to the
-  // Kanji Heatmap palette when regenerated.
+  // picked palette when regenerated.
   palette:
     image && image.palette in IMAGE_PALETTE_LABELS
       ? image.palette
-      : "kanji-heatmap",
+      : (readAiExplainSettings().tools.mnemonics?.palette ?? "kanji-heatmap"),
   customStyle:
     image?.customStyle ??
     readAiExplainSettings().imageStylePrompts?.custom ??
@@ -126,14 +133,16 @@ export const MnemonicForm = ({
     )
       return;
     const settings = readAiExplainSettings();
-    if (!isAiExplainReady(settings)) {
+    if (!isAiToolReady(settings, "mnemonics")) {
       setRequest({
         status: "error",
         message:
-          "Enable AI Study Tools with a valid API key in User Preferences first.",
+          "Enable AI Study Tools with an image provider's key that works first.",
       });
       return;
     }
+    const choice = resolveAiTool(settings, "mnemonics");
+    const { provider } = choice;
     if (draft.style === "custom" && !draft.customStyle.trim()) return;
     if (draft.palette === "custom" && !draft.customPalette.trim()) return;
     // A new image adds to saved storage; regenerating replaces one.
@@ -165,28 +174,25 @@ export const MnemonicForm = ({
     );
     try {
       const prompt = buildImagePrompt(settings, { kanji, keyword, ...draft });
-      const model = settings.imageModel ?? DEFAULT_AI_IMAGE_MODEL;
-      const resolution = settings.imageResolution ?? "1k";
-      const quality = settings.imageQuality ?? "low";
-      let reportedCostUsd: number | undefined;
-      const blob = await generateXaiImage({
-        apiKey: settings.apiKey,
+      const model = modelFor(provider, "image", choice.model);
+      const resolution = choice.resolution ?? "1k";
+      const quality = choice.quality ?? "low";
+      const { blob, usage } = await generateProviderImage(provider, {
+        apiKey: choice.apiKey,
         model,
         prompt,
         resolution,
         quality,
         signal: active.signal,
-        onCost: (cost) => {
-          reportedCostUsd = cost;
-        },
       });
-      addAiExplainUsage(0, { imageRequests: 1, reportedCostUsd });
+      addAiUsage(usage);
       if (active.signal.aborted) return;
       const result: MnemonicImage = {
         id: image?.id ?? crypto.randomUUID(),
         kanji,
         blob,
         ...draft,
+        provider,
         model,
         resolution,
         quality,
@@ -205,12 +211,18 @@ export const MnemonicForm = ({
       setDetailsOpen(false);
       onComplete(result, saved);
     } catch (error) {
+      // The key stopped working (expired or revoked): hide the tool until a
+      // working key is entered.
+      const owner = getCurrentOwner();
+      if (error instanceof AiKeyRejectedError && owner.status === "known")
+        rejectAiProviderKey(owner.ownerId, provider, choice.apiKey);
       if (active.signal.aborted) return;
       setRequest({
         status: "error",
         message: describeAiError(
           error,
-          "Couldn't generate the image. Try again."
+          "Couldn't generate the image. Try again.",
+          provider
         ),
       });
     } finally {

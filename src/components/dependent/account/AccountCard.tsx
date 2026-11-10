@@ -67,7 +67,8 @@ const Avatar = ({ initial }: { initial: string | null }) =>
  * (sync state, or "Not logged in") and an optional icon action on the right;
  * whatever belongs under that row (login button, sync problems, notices) as
  * children; then a dotted divider, the row of icon tools (App & Device Info,
- * User Preferences, FSRS settings) with the Online / Offline chip at its end.
+ * User Preferences, FSRS settings, AI Study Tools) and the Online / Offline
+ * chip on its own row under them.
  * Logged in and logged out share it.
  */
 export const AccountCard = ({
@@ -102,6 +103,8 @@ export const AccountCard = ({
     <DottedSeparator />
     <div className="flex flex-wrap items-center justify-center gap-1.5">
       {tools}
+    </div>
+    <div className="flex justify-center">
       <NetworkStatusBadge />
     </div>
   </div>

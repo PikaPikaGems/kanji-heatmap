@@ -157,8 +157,8 @@ const LogoutForm = ({ userId }: { userId: string }) => {
           )}
           {hasAiKey && (
             <LogoutRemovalOption
-              label="My saved xAI API key"
-              details="You'll need to paste it again next time."
+              label="My saved AI API keys"
+              details="You'll need to paste them again next time."
               checked={choices.aiKey}
               onCheckedChange={choose("aiKey")}
             />

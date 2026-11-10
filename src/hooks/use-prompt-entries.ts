@@ -2,6 +2,7 @@ import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import {
   DEFAULT_AI_EXPLAIN_PROMPT,
   DEFAULT_AI_EXPLAIN_WORD_PROMPT,
+  DEFAULT_AI_SPEECH_PROMPT,
   JAPANESE_TEXT_PLACEHOLDER,
 } from "@/lib/ai-explain/preferences";
 import {
@@ -16,9 +17,12 @@ import {
   type ImagePalette,
   type ImageStyle,
 } from "@/lib/ai-explain/prompts";
+import type { AiTool } from "@/lib/ai-explain/providers/capabilities";
 
 export type PromptEntry = {
   id: string;
+  /** The tool that sends it. */
+  tool: AiTool;
   label: string;
   value?: string;
   defaultValue: string;
@@ -35,6 +39,7 @@ export const usePromptEntries = (): PromptEntry[] => {
   );
   const styleEntry = (style: ImageStyle): PromptEntry => ({
     id: `style:${style}`,
+    tool: "mnemonics",
     label: `${IMAGE_STYLE_LABELS[style]} style`,
     value: settings.imageStylePrompts?.[style],
     defaultValue: DEFAULT_IMAGE_STYLE_PROMPTS[style],
@@ -48,6 +53,7 @@ export const usePromptEntries = (): PromptEntry[] => {
   );
   const paletteEntry = (palette: ImagePalette): PromptEntry => ({
     id: `palette:${palette}`,
+    tool: "mnemonics",
     label: `${IMAGE_PALETTE_LABELS[palette]} palette`,
     value: settings.imagePalettePrompts?.[palette],
     defaultValue: DEFAULT_IMAGE_PALETTE_PROMPTS[palette],
@@ -62,6 +68,7 @@ export const usePromptEntries = (): PromptEntry[] => {
   return [
     {
       id: "grammar",
+      tool: "grammar",
       label: "Grammar Explain",
       value: settings.prompt,
       defaultValue: DEFAULT_AI_EXPLAIN_PROMPT,
@@ -70,7 +77,8 @@ export const usePromptEntries = (): PromptEntry[] => {
     },
     {
       id: "word",
-      label: "Word Explain",
+      tool: "vocab",
+      label: "Vocab Explain",
       value: settings.wordPrompt,
       defaultValue: DEFAULT_AI_EXPLAIN_WORD_PROMPT,
       placeholders: `${JAPANESE_TEXT_PLACEHOLDER} (if missing, the word is added at the end)`,
@@ -78,7 +86,8 @@ export const usePromptEntries = (): PromptEntry[] => {
     },
     {
       id: "vocabulary",
-      label: "Vocabulary Details",
+      tool: "anchorWord",
+      label: "Anchor Word Essay",
       value: settings.vocabularyPrompt,
       defaultValue: DEFAULT_VOCABULARY_PROMPT,
       placeholders: "{WORD}, {READING}, {DICTIONARY_CONTEXT}",
@@ -87,6 +96,7 @@ export const usePromptEntries = (): PromptEntry[] => {
     },
     {
       id: "essay",
+      tool: "kanjiEssay",
       label: "Kanji Essay",
       value: settings.kanjiEssayPrompt,
       defaultValue: DEFAULT_KANJI_ESSAY_PROMPT,
@@ -96,6 +106,7 @@ export const usePromptEntries = (): PromptEntry[] => {
     },
     {
       id: "image",
+      tool: "mnemonics",
       label: "Visual Mnemonics: shared image",
       value: settings.imagePrompt,
       defaultValue: DEFAULT_IMAGE_PROMPT,
@@ -105,10 +116,19 @@ export const usePromptEntries = (): PromptEntry[] => {
     },
     {
       id: "palette:kanji-heatmap",
+      tool: "mnemonics",
       label: "Kanji Heatmap palette",
       value: settings.imagePalettePrompt,
       defaultValue: DEFAULT_IMAGE_PALETTE_PROMPT,
       onChange: (imagePalettePrompt) => update({ imagePalettePrompt }),
+    },
+    {
+      id: "speech",
+      tool: "readAloud",
+      label: "Read Aloud: how to speak",
+      value: settings.speechPrompt,
+      defaultValue: DEFAULT_AI_SPEECH_PROMPT,
+      onChange: (speechPrompt) => update({ speechPrompt }),
     },
     ...palettes.map(paletteEntry),
     ...styles.map(styleEntry),

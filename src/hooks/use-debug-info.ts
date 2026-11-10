@@ -142,9 +142,12 @@ export function useDebugInfo(): DebugInfoSnapshot {
   };
 }
 
-/** This month's AI usage, one line, for the copied report. */
+/** This month's AI usage, one line per provider, for the copied report. */
 export const formatAiUsageForClipboard = (usage: AiExplainUsage) => [
   "",
   "AI usage this month",
-  `Text tokens: ${usage.tokens} · Requests: ${usage.requests} · Search calls: ${usage.searchCalls} · Images: ${usage.imageRequests} · Audio generations: ${usage.audioRequests} · Speech characters: ${usage.audioCharacters}`,
+  ...Object.entries(usage.providers).map(
+    ([provider, used]) =>
+      `${provider}: Requests: ${used.requests} · Tokens: ${used.tokens} · Searches: ${used.searches} · Images: ${used.images} · Speech: ${used.speechRequests} (${used.characters} characters, ${used.credits} credits)`
+  ),
 ];

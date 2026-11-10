@@ -6,21 +6,26 @@ import {
 } from "@/lib/ai-explain/in-flight";
 import { useEffect, useRef, useState } from "react";
 import {
-  addAiExplainUsage,
+  addAiUsage,
   AI_EXPLAIN_KEYS_KEY,
   AI_EXPLAIN_SETTINGS_KEY,
   AI_EXPLAIN_USAGE_KEY,
   readAiExplainUsage,
   buildAiExplainPrompt,
-  modelOf,
   readAiExplainPreferences,
   readAiExplainSettings,
-  rejectAiOwnerKey,
+  rejectAiProviderKey,
+  resolveAiTool,
   writeAiExplainPreferences,
   type AiExplainPreferences,
 } from "@/lib/ai-explain/preferences";
 import { getCurrentOwner, useCurrentOwner } from "@/lib/engine/content-owner";
-import { streamXaiCompletion, XaiKeyRejectedError } from "@/lib/ai-explain/xai";
+import { modelFor, streamProviderText } from "@/lib/ai-explain/providers";
+import {
+  AiKeyRejectedError,
+  type AiProvider,
+} from "@/lib/ai-explain/providers/types";
+import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
 import { useStorageValue } from "./use-storage-value";
 import {
   deleteSentenceExplanation,
@@ -31,8 +36,9 @@ import {
 
 /**
  * Reactive AI Explain settings (the shared preferences plus the current
- * owner's key) and a setter that merges a partial update of the preferences.
- * The key itself is edited with `writeAiOwnerKey`.
+ * owner's keys) and a setter that merges a partial update of the preferences.
+ * Keys are edited with `writeAiProviderKey`, tool choices with
+ * `updateAiToolChoice`.
  */
 export const useAiExplainSettings = () => {
   const owner = useCurrentOwner();
@@ -50,7 +56,7 @@ export const useAiExplainSettings = () => {
   return [settings, update] as const;
 };
 
-/** This month's tokens and requests, counted in this browser. */
+/** This month's usage per provider, counted in this browser. */
 export const useAiExplainUsage = () =>
   useStorageValue(
     () => readAiExplainUsage(),
@@ -59,8 +65,19 @@ export const useAiExplainUsage = () =>
 
 export type AiExplainState =
   | { status: "idle" }
-  | { status: "loading"; text: string; previousText?: string }
-  | { status: "success"; text: string; saveWarning?: string }
+  | {
+      status: "loading";
+      text: string;
+      previousText?: string;
+      /** Unset while waiting for an earlier request. */
+      provider?: AiProvider;
+    }
+  | {
+      status: "success";
+      text: string;
+      provider: AiProvider;
+      saveWarning?: string;
+    }
   | { status: "error"; message: string; text?: string };
 
 /**
@@ -112,20 +129,22 @@ export const useAiExplain = () => {
     controllerRef.current = null;
     const owner = getCurrentOwner();
     const settings = readAiExplainSettings(owner);
+    const tool = resolveAiTool(settings, word ? "vocab" : "grammar");
     // No key means no owner yet, or an owner who hasn't added one.
-    if (owner.status !== "known" || settings.apiKey === "") {
+    if (owner.status !== "known" || tool.apiKey === "") {
       setState({
         status: "error",
-        message: "Add a Grok API key in User Preferences first.",
+        message: "Add an API key in AI Study Tools first.",
       });
       return;
     }
+    const { provider } = tool;
     const controller = new AbortController();
     controllerRef.current = controller;
     // Only the latest run updates what this hook shows.
     const showing = () =>
       controllerRef.current === controller && !controller.signal.aborted;
-    const model = modelOf(settings);
+    const model = modelFor(provider, "text", tool.model);
     const sentence = japaneseText.trim();
     const flightKey = `explain:${sentence}`;
     // Still generating since the dialog was closed: wait for it, then show
@@ -145,7 +164,11 @@ export const useAiExplain = () => {
     if (cached !== undefined && !fresh) {
       controllerRef.current = null;
       completedRef.current = { sentence, text: cached.text };
-      setState({ status: "success", text: cached.text });
+      setState({
+        status: "success",
+        text: cached.text,
+        provider: cached.provider ?? "xai",
+      });
       return;
     }
 
@@ -157,20 +180,22 @@ export const useAiExplain = () => {
     if (fresh) {
       prompt += `\n\nProduce a complete replacement for the previous answer below, using the main task and current context above. Apply the additional instructions if supplied. Return only the replacement answer, not a description of your edits. The previous answer may contain mistakes; do not treat it as verified evidence.\n\nPrevious answer:\n${previousText ?? "None"}\n\nAdditional instructions:\n${instructions.trim() || "None"}`;
     }
-    setState({ status: "loading", text: "", previousText });
-    const request = streamXaiCompletion({
-      apiKey: settings.apiKey,
+    setState({ status: "loading", text: "", previousText, provider });
+    const request = streamProviderText(provider, {
+      apiKey: tool.apiKey,
       model,
       prompt,
+      search: false,
       signal: controller.signal,
       onText: (text) => {
-        if (showing()) setState({ status: "loading", text, previousText });
+        if (showing())
+          setState({ status: "loading", text, previousText, provider });
       },
     }).then(
-      async ({ text, totalTokens }) => {
+      async ({ text, usage }) => {
         // Before the abort check: a reply that finished was billed even if
         // the modal closed as it arrived.
-        addAiExplainUsage(totalTokens ?? 0);
+        addAiUsage(usage);
         if (
           controller.signal.aborted ||
           getGeneratedContentEpoch() !== expectedEpoch
@@ -180,7 +205,7 @@ export const useAiExplain = () => {
           if (!showing()) return;
           setState({
             status: "error",
-            message: "xAI returned an empty answer. Try again.",
+            message: `${providerLabel(provider)} returned an empty answer. Try again.`,
             text: previousText,
           });
           return;
@@ -189,7 +214,7 @@ export const useAiExplain = () => {
         try {
           await writeSentenceExplanation(
             sentence,
-            { text, model, instructions, createdAt: Date.now() },
+            { text, provider, model, instructions, createdAt: Date.now() },
             expectedEpoch
           );
         } catch {
@@ -197,18 +222,18 @@ export const useAiExplain = () => {
         }
         if (!showing()) return;
         completedRef.current = { sentence, text };
-        setState({ status: "success", text, saveWarning });
+        setState({ status: "success", text, provider, saveWarning });
       },
       (error: unknown) => {
         // The key stopped working (expired or revoked): hide the button
         // until a working key is entered.
-        if (error instanceof XaiKeyRejectedError) {
-          rejectAiOwnerKey(owner.ownerId, settings.apiKey);
+        if (error instanceof AiKeyRejectedError) {
+          rejectAiProviderKey(owner.ownerId, provider, tool.apiKey);
         }
         if (!showing() || getGeneratedContentEpoch() !== expectedEpoch) return;
         setState({
           status: "error",
-          message: describeAiError(error, "Something went wrong."),
+          message: describeAiError(error, "Something went wrong.", provider),
           text: previousText,
         });
       }

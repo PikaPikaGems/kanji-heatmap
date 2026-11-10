@@ -13,6 +13,7 @@ import {
 import { AccountCard } from "./AccountCard";
 import { ActiveAccount } from "./ActiveAccount";
 import { FsrsSettingsItem } from "./FsrsSettingsItem";
+import { AiStudyToolsTrigger } from "@/components/dependent/site-wide/ai-tools/AiStudyToolsDialog";
 
 /**
  * What stands in for the card while there is no account to show: an update
@@ -50,7 +51,7 @@ const NoCardNotice = ({ status }: { status: AccountStatus }) => {
 };
 
 /** Dialogs the account area opens; the sidebar closes for them, then returns. */
-export type AccountDialog = "login" | "fsrs";
+export type AccountDialog = "login" | "fsrs" | "ai-tools";
 
 const AccountBody = ({
   status,
@@ -61,6 +62,7 @@ const AccountBody = ({
   tools: ReactNode;
   onAction: (dialog: AccountDialog) => void;
 }) => {
+  const aiItem = <AiStudyToolsTrigger onClick={() => onAction("ai-tools")} />;
   const fsrsItem = <FsrsSettingsItem onClick={() => onAction("fsrs")} />;
   if (status.kind === "signed-out") {
     return (
@@ -73,6 +75,7 @@ const AccountBody = ({
           <>
             {tools}
             {fsrsItem}
+            {aiItem}
           </>
         }
       >
@@ -91,6 +94,7 @@ const AccountBody = ({
           <>
             {tools}
             {fsrsItem}
+            {aiItem}
           </>
         }
       />
@@ -102,6 +106,9 @@ const AccountBody = ({
       <NoCardNotice status={status} />
       <div className="flex flex-wrap items-center justify-center gap-1.5">
         {tools}
+        {aiItem}
+      </div>
+      <div className="flex justify-center">
         <NetworkStatusBadge />
       </div>
     </>
@@ -110,8 +117,9 @@ const AccountBody = ({
 
 /**
  * Account area of the sidebar. `tools` are the icon buttons every build shows
- * (App & Device Info, User Preferences): they sit in the card's bottom row, or on
- * their own where the card would be while there is no account to show. Renders
+ * (App & Device Info, User Preferences): they sit in the card's bottom row
+ * with FSRS settings and AI Study Tools, or on their own where the card would
+ * be while there is no account to show. Renders
  * nothing in a build without accounts (see `hasNoAccounts`).
  */
 export const AccountSection = ({

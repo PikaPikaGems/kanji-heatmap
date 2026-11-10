@@ -25,7 +25,6 @@ import { Settings } from "lucide-react";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 import { useVoiceEngine } from "@/hooks/use-ai-voice";
 import { AiVoicePanel, VoiceEngineChoice } from "./AiVoiceSettings";
-import { AiExplainSection } from "./AiExplainSettings";
 import { VOICE_PREVIEW_TEXT } from "@/lib/ai-voice/preferences";
 
 // Names line up with the active `:root` block in src/JFonts.css (jap-font-0..14).
@@ -191,7 +190,7 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Presentation, Japanese voice, offline data caching, stroke animation, and AI Study Tools preferences"
+        description="Presentation, Japanese voice and stroke animation preferences"
         titleClassName="text-left"
       >
         <SimpleAccordion trigger="Presentation" defaultOpen>
@@ -220,8 +219,6 @@ export const SettingsModal = ({
           </p>
           <StrokeAnimationSettingsFields />
         </SimpleAccordion>
-
-        <AiExplainSection />
       </ScrollableDialogContent>
     </Dialog>
   );

@@ -10,18 +10,23 @@ import {
   type AiTextResult,
 } from "@/lib/ai-explain/storage";
 import {
-  isAiExplainReady,
-  addAiExplainUsage,
-  modelOf,
+  addAiUsage,
+  isAiToolReady,
   readAiExplainSettings,
+  rejectAiProviderKey,
+  resolveAiTool,
   usesWebSearch,
   type AiExplainSettings,
 } from "@/lib/ai-explain/preferences";
+import { getCurrentOwner } from "@/lib/engine/content-owner";
+import { modelFor, streamProviderText } from "@/lib/ai-explain/providers";
+import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
+import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
 import {
   buildRegenerationPrompt,
+  withEssayLimit,
   withoutWebSearch,
 } from "@/lib/ai-explain/prompts";
-import { streamXaiSearchedCompletion } from "@/lib/ai-explain/xai";
 import {
   abortInFlight,
   getInFlight,
@@ -38,6 +43,7 @@ type TextState = {
 
 export const useAiDrawerText = (
   id: string,
+  tool: "kanjiEssay" | "anchorWord",
   makePrompt: (settings: AiExplainSettings) => string
 ) => {
   const [state, setState] = useState<TextState>({ status: "loading" });
@@ -98,7 +104,10 @@ export const useAiDrawerText = (
     if (request.current || getInFlight(flightKey) || state.status === "loading")
       return false;
     const settings = readAiExplainSettings();
-    if (!isAiExplainReady(settings)) return false;
+    if (!isAiToolReady(settings, tool)) return false;
+    const choice = resolveAiTool(settings, tool);
+    const { provider } = choice;
+    const model = modelFor(provider, "text", choice.model);
     // New text adds to saved storage; regenerating replaces it.
     if (!state.result) {
       try {
@@ -119,13 +128,15 @@ export const useAiDrawerText = (
     request.current = controller;
     readVersion.current++;
     const previous = state.result;
-    const webSearch = usesWebSearch(settings);
+    const webSearch = usesWebSearch(choice);
     const basePrompt = webSearch
       ? makePrompt(settings)
       : withoutWebSearch(makePrompt(settings));
-    const prompt = previous
-      ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
-      : basePrompt;
+    const prompt = withEssayLimit(
+      previous
+        ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
+        : basePrompt
+    );
     setState({ status: "generating", result: previous });
     let finish: () => void = () => {};
     trackInFlight(
@@ -134,11 +145,11 @@ export const useAiDrawerText = (
       new Promise<void>((resolve) => (finish = resolve))
     );
     try {
-      const reply = await streamXaiSearchedCompletion({
-        apiKey: settings.apiKey,
-        model: modelOf(settings),
+      const reply = await streamProviderText(provider, {
+        apiKey: choice.apiKey,
+        model,
         prompt,
-        webSearch,
+        search: webSearch,
         signal: controller.signal,
         onText: (preview) => {
           if (!controller.signal.aborted) {
@@ -146,19 +157,19 @@ export const useAiDrawerText = (
           }
         },
       });
-      addAiExplainUsage(reply.totalTokens ?? 0, {
-        searchCalls: reply.searchCalls,
-        reportedCostUsd: reply.costUsd ?? undefined,
-      });
+      addAiUsage(reply.usage);
       if (!reply.text.trim())
-        throw new Error("Grok returned an empty answer. Please try again.");
+        throw new Error(
+          `${providerLabel(provider)} returned an empty answer. Please try again.`
+        );
       const fingerprint = await contentFingerprint(reply.text);
       if (controller.signal.aborted) return false;
       const result: AiTextResult = {
         id,
         markdown: reply.text,
         sources: reply.sources,
-        model: modelOf(settings),
+        provider,
+        model,
         instructions,
         createdAt: Date.now(),
         fingerprint,
@@ -176,13 +187,19 @@ export const useAiDrawerText = (
       setState({ status: "ready", result, warning });
       return true;
     } catch (error) {
+      // The key stopped working (expired or revoked): hide the tool until a
+      // working key is entered.
+      const owner = getCurrentOwner();
+      if (error instanceof AiKeyRejectedError && owner.status === "known")
+        rejectAiProviderKey(owner.ownerId, provider, choice.apiKey);
       if (!controller.signal.aborted) {
         setState({
           status: "error",
           result: previous,
           message: describeAiError(
             error,
-            "Couldn't generate this answer. Please try again."
+            "Couldn't generate this answer. Please try again.",
+            provider
           ),
         });
       }

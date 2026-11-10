@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { VocabActions } from "@/components/common/VocabActions";
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { isAiExplainReady } from "@/lib/ai-explain/preferences";
+import { isAiToolReady } from "@/lib/ai-explain/preferences";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
 
 const AnchorWordDetails = lazy(() => import("./AiContent/AnchorWordDetails"));
@@ -239,12 +239,12 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
       </Table>
 
       <AnchorWordFrequencyRanks word={word} ranks={ranks} />
-      {owner.status === "known" && !isAiExplainReady(aiSettings) && (
+      {owner.status === "known" && !isAiToolReady(aiSettings, "anchorWord") && (
         <div className="flex flex-wrap items-center gap-1 pt-2">
           <ViewVocabDetails />
         </div>
       )}
-      {isAiExplainReady(aiSettings) && (
+      {isAiToolReady(aiSettings, "anchorWord") && (
         <Suspense fallback={<SectionLoading label="Loading AI controls" />}>
           <AnchorWordDetails
             word={word}

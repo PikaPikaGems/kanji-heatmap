@@ -4,12 +4,13 @@ import {
   getInFlight,
   trackInFlight,
 } from "@/lib/ai-explain/in-flight";
-import { NoticeAction } from "@/components/common/UserNotice";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { openAiStudyTools } from "@/lib/ai-explain/ai-tools-dialog";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Pause, Play } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { AudioPlayer } from "@/components/common/AudioPlayer";
 import {
   AiPrimaryButton,
   AiRequestFeedback,
@@ -17,12 +18,23 @@ import {
   RegenerateButton,
 } from "@/components/common/AiActionButtons";
 import {
-  addAiExplainUsage,
+  addAiUsage,
   DEFAULT_AI_SPEECH_BIT_RATE,
-  DEFAULT_AI_SPEECH_VOICE,
-  isAiExplainReady,
+  DEFAULT_AI_SPEECH_PROMPT,
+  isAiToolReady,
   readAiExplainSettings,
+  rejectAiProviderKey,
+  resolveAiTool,
+  updateAiToolChoice,
 } from "@/lib/ai-explain/preferences";
+import { getCurrentOwner } from "@/lib/engine/content-owner";
+import { modelFor, speakWithProvider } from "@/lib/ai-explain/providers";
+import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
+import {
+  AI_TOOLS,
+  providerLabel,
+} from "@/lib/ai-explain/providers/capabilities";
+import { DEFAULT_VOICES, voiceName } from "@/lib/ai-explain/providers/voices";
 import {
   AI_GENERATED_CONTENT_EVENT,
   contentFingerprint,
@@ -31,8 +43,8 @@ import {
   saveAudioRecord,
   type AiAudioRecord,
 } from "@/lib/ai-explain/storage";
-import { generateXaiSpeech } from "@/lib/ai-explain/xai";
 import { prepareNarration } from "./narration";
+import { useDelayedElapsedMs } from "@/components/common/use-delayed-elapsed-ms";
 
 type AudioState = {
   status: "loading" | "ready" | "generating" | "error";
@@ -43,40 +55,6 @@ type AudioState = {
   warning?: string;
 };
 
-const formatTime = (seconds: number) => {
-  if (!Number.isFinite(seconds)) return "--:--";
-  const whole = Math.floor(seconds);
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
-};
-
-/** A minimal audio bar: elapsed / total and a seek slider. */
-const MiniPlayer = ({
-  disabled,
-  current,
-  duration,
-  onSeek,
-}: {
-  disabled: boolean;
-  current: number;
-  duration: number;
-  onSeek: (seconds: number) => void;
-}) => (
-  <div className="flex items-center gap-3">
-    <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-      {formatTime(current)} / {formatTime(duration)}
-    </span>
-    <Slider
-      disabled={disabled || !Number.isFinite(duration) || duration <= 0}
-      min={0}
-      max={Number.isFinite(duration) && duration > 0 ? duration : 1}
-      step={0.1}
-      value={[current]}
-      onValueChange={([seconds]) => onSeek(seconds)}
-      thumbLabel="Seek narration"
-    />
-  </div>
-);
-
 const SavedAudio = ({
   record,
   filename,
@@ -86,38 +64,16 @@ const SavedAudio = ({
   filename: string;
   regenerate: ReactNode;
 }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [url, setUrl] = useState("");
-  const [playing, setPlaying] = useState(false);
-  const [time, setTime] = useState({ current: 0, duration: 0 });
   const [message, setMessage] = useState("");
 
-  // Effect needed: owns a browser object URL and stops the external audio player
-  // on unmount; render cannot safely allocate resources that require cleanup.
+  // Effect needed: owns a browser object URL that must be revoked on unmount;
+  // render cannot safely allocate resources that require cleanup.
   useEffect(() => {
     const objectUrl = URL.createObjectURL(record.blob);
     setUrl(objectUrl);
-    const audio = audioRef.current;
-    return () => {
-      audio?.pause();
-      URL.revokeObjectURL(objectUrl);
-    };
+    return () => URL.revokeObjectURL(objectUrl);
   }, [record.blob]);
-
-  const toggle = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-    try {
-      await audio.play();
-      setMessage("");
-    } catch {
-      setMessage("Couldn't play the MP3. Download it to listen instead.");
-    }
-  };
 
   const download = async () => {
     try {
@@ -131,47 +87,12 @@ const SavedAudio = ({
 
   return (
     <div className="space-y-3">
-      <AiPrimaryButton disabled={!url} onClick={() => void toggle()}>
-        {playing ? (
-          <>
-            <Pause /> Pause
-          </>
-        ) : (
-          <>
-            <Play /> Read Aloud
-          </>
-        )}
-      </AiPrimaryButton>
-      <audio
-        ref={audioRef}
-        src={url || undefined}
-        preload="metadata"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
-        onLoadedMetadata={(event) =>
-          setTime({
-            current: event.currentTarget.currentTime,
-            duration: event.currentTarget.duration,
-          })
-        }
-        onTimeUpdate={(event) =>
-          setTime({
-            current: event.currentTarget.currentTime,
-            duration: event.currentTarget.duration,
-          })
-        }
-        onError={() =>
-          setMessage("Couldn't load the saved audio. Try regenerating the MP3.")
-        }
-      />
-      <MiniPlayer
-        disabled={!url}
-        current={time.current}
-        duration={time.duration}
-        onSeek={(seconds) => {
-          if (audioRef.current) audioRef.current.currentTime = seconds;
-        }}
+      <AudioPlayer
+        src={url}
+        playLabel="Read Aloud"
+        seekLabel="Seek narration"
+        playFailedMessage="Couldn't play the MP3. Download it to listen instead."
+        loadFailedMessage="Couldn't load the saved audio. Try regenerating the MP3."
       />
       <div className="flex flex-wrap items-center gap-1">
         <DownloadButton onClick={() => void download()}>
@@ -181,8 +102,10 @@ const SavedAudio = ({
         {regenerate}
       </div>
       <p className="text-xs text-muted-foreground">
-        AI-generated voice ·{" "}
-        {record.language === "ja" ? "Japanese" : "Automatic language"}
+        AI-generated voice · {providerLabel(record.provider)} ·{" "}
+        {record.voiceName ?? voiceName(record.provider ?? "xai", record.voice)}
+        {(record.provider ?? "xai") === "xai" &&
+          (record.language === "ja" ? " · Japanese" : " · Automatic language")}
       </p>
       {message && (
         <p role="alert" className={cn("text-sm text-center", cnWarningText)}>
@@ -190,6 +113,18 @@ const SavedAudio = ({
         </p>
       )}
     </div>
+  );
+};
+
+/** Seconds since the MP3 request started: long essays take a while. */
+const SpeechProgress = () => {
+  const elapsedMs = useDelayedElapsedMs(1000);
+  if (elapsedMs === null) return null;
+  return (
+    <p className="text-xs text-center text-muted-foreground">
+      Generating the MP3… {Math.floor(elapsedMs / 1000)} s. A long essay can
+      take a minute or more.
+    </p>
   );
 };
 
@@ -204,6 +139,8 @@ export const AiAudio = ({
 }) => {
   const [state, setState] = useState<AudioState>({ status: "loading" });
   const request = useRef<AbortController | null>(null);
+  const [settings] = useAiExplainSettings();
+  const speechReady = isAiToolReady(settings, "readAloud");
   const [revision, setRevision] = useState(0);
 
   const flightKey = `audio:${sourceId}`;
@@ -263,7 +200,9 @@ export const AiAudio = ({
     if (request.current || getInFlight(flightKey) || state.status === "loading")
       return;
     const settings = readAiExplainSettings();
-    if (!isAiExplainReady(settings)) return;
+    if (!isAiToolReady(settings, "readAloud")) return;
+    const choice = resolveAiTool(settings, "readAloud");
+    const { provider } = choice;
     const controller = new AbortController();
     const epoch = getGeneratedContentEpoch();
     request.current = controller;
@@ -278,29 +217,56 @@ export const AiAudio = ({
     try {
       const text = prepareNarration(markdown);
       if (!text) throw new Error("There is no text to read aloud.");
-      const voice = settings.speechVoice ?? DEFAULT_AI_SPEECH_VOICE;
-      const language = settings.speechLanguage ?? "auto";
-      const blob = await generateXaiSpeech({
-        apiKey: settings.apiKey,
+      const language = choice.language ?? "ja";
+      const model = modelFor(provider, "speech", choice.model);
+      const spoken = await speakWithProvider(provider, {
+        apiKey: choice.apiKey,
+        model,
         text,
-        voice,
+        voice: choice.voice ?? DEFAULT_VOICES[provider],
         language,
-        bitRate: settings.speechBitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
+        bitRate: choice.bitRate ?? DEFAULT_AI_SPEECH_BIT_RATE,
+        instructions: settings.speechPrompt ?? DEFAULT_AI_SPEECH_PROMPT,
         signal: controller.signal,
       });
-      addAiExplainUsage(0, { audioCharacters: text.length });
+      const { blob, usage, voice } = spoken;
+      addAiUsage(usage);
+      // A voice picked for the learner becomes their saved voice.
+      if (spoken.pickedVoice)
+        updateAiToolChoice("readAloud", {
+          provider,
+          voice: spoken.pickedVoice.id,
+          voiceName: spoken.pickedVoice.name,
+        });
+      const shownVoiceName =
+        spoken.pickedVoice?.name ??
+        choice.voiceName ??
+        voiceName(provider, voice);
       const fingerprint = await contentFingerprint(markdown);
       if (controller.signal.aborted) return;
       const record: AiAudioRecord = {
-        id: JSON.stringify([sourceId, fingerprint, voice, language, "mp3"]),
+        id: JSON.stringify([
+          sourceId,
+          fingerprint,
+          voice,
+          language,
+          "mp3",
+          // Recordings made before other providers keep their ids.
+          ...(provider === "xai" ? [] : [provider, model]),
+        ]),
         sourceId,
         fingerprint,
         voice,
+        voiceName: shownVoiceName,
         language,
+        provider,
+        model: model || undefined,
         blob,
         createdAt: Date.now(),
       };
-      let warning: string | undefined;
+      let warning: string | undefined = spoken.replacedVoice
+        ? `Your ${providerLabel(provider)} voice is no longer available, so ${shownVoiceName} read this and is now your voice. Pick another in AI Study Tools.`
+        : undefined;
       try {
         await saveAudioRecord(record, epoch);
       } catch {
@@ -310,13 +276,19 @@ export const AiAudio = ({
       if (!controller.signal.aborted)
         setState({ status: "ready", record, warning });
     } catch (error) {
+      // The key stopped working (expired or revoked): hide the tool until a
+      // working key is entered.
+      const owner = getCurrentOwner();
+      if (error instanceof AiKeyRejectedError && owner.status === "known")
+        rejectAiProviderKey(owner.ownerId, provider, choice.apiKey);
       if (!controller.signal.aborted)
         setState({
           status: "error",
           record: previous,
           message: describeAiError(
             error,
-            "Couldn't generate audio. Please try again."
+            "Couldn't generate audio. Please try again.",
+            provider
           ),
         });
     } finally {
@@ -331,6 +303,15 @@ export const AiAudio = ({
     );
   return (
     <div className="space-y-3 border-t border-dotted pt-4">
+      {!speechReady && !state.record && (
+        <UserNotice className="text-xs">
+          Read Aloud needs a key from a speech provider (
+          {AI_TOOLS.readAloud.providers.map(providerLabel).join(", ")}).{" "}
+          <NoticeAction onClick={() => openAiStudyTools("keys")}>
+            Add a key
+          </NoticeAction>
+        </UserNotice>
+      )}
       {state.record ? (
         <SavedAudio
           key={`${state.record.id}-${state.record.createdAt}`}
@@ -338,6 +319,7 @@ export const AiAudio = ({
           filename={filename}
           regenerate={
             <RegenerateButton
+              disabled={!speechReady}
               busy={state.status === "generating"}
               busyLabel="Regenerating MP3…"
               onClick={() => void generate()}
@@ -347,12 +329,14 @@ export const AiAudio = ({
           }
         />
       ) : (
-        <AiPrimaryButton
-          busy={state.status === "generating"}
-          onClick={() => void generate()}
-        >
-          Generate MP3 to listen
-        </AiPrimaryButton>
+        speechReady && (
+          <AiPrimaryButton
+            busy={state.status === "generating"}
+            onClick={() => void generate()}
+          >
+            Generate MP3 to listen
+          </AiPrimaryButton>
+        )
       )}
       <AiRequestFeedback
         busy={state.status === "generating"}
@@ -379,7 +363,10 @@ export const AiAudio = ({
           )
         }
         warning={state.warning}
-      />
+      >
+        {/* Mounted while generating, so the clock starts with the request. */}
+        <SpeechProgress />
+      </AiRequestFeedback>
     </div>
   );
 };
