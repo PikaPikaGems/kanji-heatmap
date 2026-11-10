@@ -79,7 +79,6 @@
     "unist-util-visit": "^5.1.0",
     "vaul": "^1.1.2",
     "virtua": "^0.40.3",
-    "vite-plugin-pwa": "^0.21.1",
     "wanakana": "^5.3.1",
     "wouter": "^3.6.0",
     "yomiage": "https://github.com/PikaPikaGems/yomiage/releases/download/v0.3.5/yomiage-0.3.5.tgz"
@@ -114,6 +113,7 @@
     "typescript": "~5.6.3",
     "typescript-eslint": "^8.25.0",
     "vite": "^6.2.0",
+    "vite-plugin-pwa": "^0.21.1",
     "vitest": "^3.2.4",
     "wrangler": "^4.101.0"
   }

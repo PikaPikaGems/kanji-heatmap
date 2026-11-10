@@ -176,9 +176,6 @@ importers:
       virtua:
         specifier: ^0.40.3
         version: 0.40.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      vite-plugin-pwa:
-        specifier: ^0.21.1
-        version: 0.21.1(vite@6.2.0(@types/node@22.13.5)(jiti@1.21.7)(terser@5.48.0)(yaml@2.7.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
       wanakana:
         specifier: ^5.3.1
         version: 5.3.1
@@ -267,6 +264,9 @@ importers:
       vite:
         specifier: ^6.2.0
         version: 6.2.0(@types/node@22.13.5)(jiti@1.21.7)(terser@5.48.0)(yaml@2.7.0)
+      vite-plugin-pwa:
+        specifier: ^0.21.1
+        version: 0.21.1(vite@6.2.0(@types/node@22.13.5)(jiti@1.21.7)(terser@5.48.0)(yaml@2.7.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
       vitest:
         specifier: ^3.2.4
         version: 3.2.7(@types/debug@4.1.13)(@types/node@22.13.5)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.48.0)(yaml@2.7.0)
