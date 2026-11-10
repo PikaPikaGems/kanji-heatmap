@@ -4,7 +4,7 @@ import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { RecapTile } from "@/components/shared-practice/RecapTile";
 import { formatInterval } from "@/lib/engine/format-interval";
 import { ALL_CARD_TYPES, CARD_TYPE_LABELS } from "@/lib/engine/card-types";
-import { MasterySubsection } from "./MasterySubsection";
+import { SubsectionAccordionItem } from "@/components/common/SubsectionAccordionItem";
 import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs } from "@/components/ui/tabs";
 import {
@@ -99,7 +99,7 @@ const TopListItem = ({
 }) => {
   const [cardType, setCardType] = useState<CardType>("writing");
   return (
-    <MasterySubsection title={title}>
+    <SubsectionAccordionItem title={title}>
       <p className="mb-3 text-xs text-left text-muted-foreground">{about}</p>
       <Tabs
         value={cardType}
@@ -123,7 +123,7 @@ const TopListItem = ({
           captionFor={captionFor}
         />
       </div>
-    </MasterySubsection>
+    </SubsectionAccordionItem>
   );
 };
 

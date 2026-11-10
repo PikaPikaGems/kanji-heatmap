@@ -48,6 +48,7 @@ import { CumUseGraphModal } from "@/components/screens/CumUseScreen/CumUseGraphM
 
 const infoLinks = [
   { href: docPages.about.href, title: docPages.about.title },
+  { href: docPages.credit.href, title: docPages.credit.title },
   { href: docPages.terms.href, title: docPages.terms.title },
   { href: docPages.privacy.href, title: docPages.privacy.title },
 ];
