@@ -55,6 +55,11 @@ export const BOOK_TAGS: {
   { id: "core1", label: "🥚 Core 1", series: "core", level: 1 },
   { id: "core2", label: "🐣 Core 2", series: "core", level: 2 },
   { id: "core3", label: "🐥 Core 3", series: "core", level: 3 },
+  { id: "wk", label: "WK" },
+  { id: "kklc", label: "7.3k Words" },
+  { id: "kic", label: "KIC" },
+  { id: "jpdb6k", label: "Top 6k JPDB" },
+  { id: "jiten6k", label: "Top 6k Jiten Moe" },
 ];
 
 /**
