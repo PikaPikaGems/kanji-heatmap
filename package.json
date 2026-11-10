@@ -87,7 +87,7 @@
     "kanjicanvas": "github:asdfjkl/kanjicanvas"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.41.0",
+    "@cloudflare/vite-plugin": "^1.68.0",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "~1.56.1",
     "@testing-library/dom": "^10.4.0",
@@ -115,6 +115,6 @@
     "vite": "^6.4.6",
     "vite-plugin-pwa": "^0.21.2",
     "vitest": "^3.2.4",
-    "wrangler": "^4.101.0"
+    "wrangler": "^4.159.0"
   }
 }
