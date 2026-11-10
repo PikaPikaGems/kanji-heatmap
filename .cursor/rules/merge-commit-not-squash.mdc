@@ -1,5 +1,5 @@
 ---
-description: Merge PRs with a merge commit, never squash or rebase
+description: Merge PRs with a merge commit (never squash or rebase); never force-push
 alwaysApply: true
 ---
 
@@ -8,3 +8,7 @@ alwaysApply: true
 When asked to merge a pull request, use a regular **merge commit** (`merge_method: "merge"`, or `gh pr merge --merge`).
 
 Do not squash-merge or rebase-merge unless the user explicitly asks for it in that conversation. The repo keeps each commit of a PR in `main`'s history.
+
+# Never force-push
+
+Never run `git push --force` or `--force-with-lease`. If a normal push is refused (for example, the branch was already merged or its history no longer matches), push your work to a new branch from the latest `main` instead.
