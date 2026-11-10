@@ -16,7 +16,7 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import { PanelNotice } from "../PanelNotice";
 import { MasteryBars } from "./MasteryBars";
 import { MasteryTopLists } from "./MasteryTopLists";
-import { MasterySubsection } from "./MasterySubsection";
+import { SubsectionAccordionItem } from "@/components/common/SubsectionAccordionItem";
 import { Accordion } from "@/components/ui/accordion";
 import { cnWarningText } from "@/lib/generic-cn";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
@@ -120,7 +120,7 @@ export const KanjiMasteryBody = () => {
         className="animate-fade-in"
       >
         {STATS_SECTIONS.map(({ metric, title }) => (
-          <MasterySubsection key={metric} title={title}>
+          <SubsectionAccordionItem key={metric} title={title}>
             <MasteryBars
               metric={metric}
               shownKinds={shownKinds}
@@ -130,7 +130,7 @@ export const KanjiMasteryBody = () => {
               getInfo={getInfo}
               hasSecondaryWord={hasSecondaryWord}
             />
-          </MasterySubsection>
+          </SubsectionAccordionItem>
         ))}
         <MasteryTopLists pile={rows} getInfo={getInfo} />
       </Accordion>
