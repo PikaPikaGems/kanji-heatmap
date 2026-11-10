@@ -6,10 +6,11 @@ import {
 } from "@/components/ui/accordion";
 
 /**
- * One collapsible part of Kanji Mastery, styled like the Fill in the Kanji
- * groups. Goes inside an `Accordion`; `title` is also its value.
+ * A smaller collapsible part inside a section (e.g. Kanji Mastery's parts on
+ * the dashboard), styled like the Fill in the Kanji groups. Goes inside an
+ * `Accordion`; `title` is also its value.
  */
-export const MasterySubsection = ({
+export const SubsectionAccordionItem = ({
   title,
   children,
 }: {
