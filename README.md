@@ -29,7 +29,7 @@ production it comes from cloud storage; locally the vocabulary sections of the
 kanji drawer stay empty unless you fill these folders (paths are in
 `src/lib/assets-paths.ts`):
 
-- `public/kanji-words/v7/<KANJI>.json`
+- `public/kanji-words/v6/<KANJI>.json`
 - `public/kanji-textbook-words-min/<KANJI>.json`
 
 Both are built by a separate data build (not in this repo) and uploaded to
@@ -37,8 +37,8 @@ cloud storage by hand:
 
 | Local folder                       | Cloud storage folder       |
 | ---------------------------------- | -------------------------- |
-| `public/kanji-words/v7/`           | `kanji-common-words/v7/`   |
-| `public/kanji-textbook-words-min/` | `kanji-textbook-words/v8/` |
+| `public/kanji-words/v6/`           | `kanji-common-words/v6/`   |
+| `public/kanji-textbook-words-min/` | `kanji-textbook-words/v7/` |
 
 To fill them locally, get those folders from whoever maintains the data build.
 
