@@ -30,6 +30,7 @@ import { BottomBannerLayout } from "./BottomBannerLayout";
 /** Reading pages: no banner at all. */
 const NO_BANNER_PATHS: string[] = [
   docPages.about.href,
+  docPages.credit.href,
   docPages.terms.href,
   docPages.privacy.href,
 ];
@@ -97,7 +98,7 @@ const OfflineBanner = () => (
  * 4. offline,
  * 5. changes have waited over a week to upload (Learn more),
  * 6. logged out, on the home page, dashboard and mastery page only.
- * Never on the about, terms and privacy pages.
+ * Never on the about, credit, terms and privacy pages.
  */
 const BottomBanner = () => {
   const [location] = useLocation();

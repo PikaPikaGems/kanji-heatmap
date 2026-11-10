@@ -43,6 +43,7 @@ const {
   dashboardPage,
   masteryPage,
   aboutPage,
+  creditsPage,
   termsPage,
   privacyPage,
   speedKatakanaPage,
@@ -152,6 +153,10 @@ const App = () => {
                         <Route
                           path={aboutPage.href}
                           component={aboutPage.Component}
+                        />
+                        <Route
+                          path={creditsPage.href}
+                          component={creditsPage.Component}
                         />
                         <Route
                           path={termsPage.href}

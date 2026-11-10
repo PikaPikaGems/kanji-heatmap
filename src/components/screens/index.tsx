@@ -1,6 +1,11 @@
 import { ListScreen } from "./ListScreen";
 import { CumUseScreen } from "./CumUseScreen";
-import { AboutScreen, TermsScreen, PrivacyScreen } from "./DocsScreen";
+import {
+  AboutScreen,
+  CreditsScreen,
+  TermsScreen,
+  PrivacyScreen,
+} from "./DocsScreen";
 import { SpeedKatakanaScreen } from "./SpeedKatakanaScreen";
 import { FillTheKanjiScreen } from "./FillTheKanjiScreen";
 import { DashboardScreen } from "./DashboardScreen";
@@ -10,6 +15,7 @@ export {
   CumUseScreen,
   ListScreen,
   AboutScreen,
+  CreditsScreen,
   TermsScreen,
   PrivacyScreen,
   SpeedKatakanaScreen,
