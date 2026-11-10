@@ -16,7 +16,7 @@ export type AnchorWordsDetailsFile = Record<
   ]
 >;
 
-/** Per word (main and secondary): ","-joined tags, 15 frequency ranks (-1 = not ranked) and the tier emoji. */
+/** Per word (main and secondary): ","-joined tags, 17 frequency ranks (-1 = not ranked) and the tier emoji. */
 export type AnchorWordsFrequencyTagsFile = Record<
   string,
   [tags: string, ranks: number[], tierEmoji: string]
@@ -33,7 +33,7 @@ export type AnchorWordBasics = {
 export type AnchorWord = AnchorWordBasics & {
   /** Word-list tags, e.g. n4, kaishi, genki, klvl2, name. */
   tags: string[];
-  /** 15 frequency ranks in ANCHOR_RANK_SOURCES order; -1 = not ranked. */
+  /** 17 frequency ranks in ANCHOR_RANK_SOURCES order; -1 = not ranked. */
   ranks: number[];
   /** Frequency tier emoji, e.g. 🌱; "" while unknown. */
   tier: string;
@@ -127,28 +127,36 @@ export type AnchorRankSource = {
   coverage?: string;
   /** The list's home page. */
   url: string;
+  /** Ranks past this aren't kept (too few sightings to trust). */
+  cap: number;
 };
 
+/** Most lists keep their top 20,000 words. */
+const LIST_CAP = 20_000;
+
 /**
- * The 15 frequency lists behind `AnchorWord.ranks`, in order. The facts are
- * from each list's README in jp-misc-data (`jp-word-ranks-data/RAW/`).
+ * The 17 frequency lists behind `AnchorWord.ranks`, in order (jp-misc-data
+ * `jp-word-ranks-data/BUILD/sources.py`). The facts are from each list's
+ * README there (`RAW/`) and `docs/SOURCES.md`.
  */
-export const ANCHOR_RANK_SOURCES: AnchorRankSource[] = [
+const SOURCES: (Omit<AnchorRankSource, "cap"> & { cap?: number })[] = [
   {
     label: "Conversations",
     description:
       "Everyday spoken Japanese: the Corpus of Everyday Japanese Conversation (CEJC) by NINJAL, all conversation types (small talk, consultations, meetings, classes…).",
-    size: "About 29,500 entries (28,000 different words), counted in short words.",
+    size: "About 2.4 million words of speech, counted in short words.",
     coverage: "Recordings of real, everyday conversations.",
     url: "https://clrd.ninjal.ac.jp/cejc/",
+    cap: 11_000,
   },
   {
     label: "Small talk",
     description:
       "The casual small talk (雑談) part of NINJAL's CEJC conversation corpus.",
-    size: "Only words that come up in small talk, counted in short words.",
+    size: "About 1.7 million words of speech, counted in short words.",
     coverage: "Recordings of real, everyday conversations.",
     url: "https://clrd.ninjal.ac.jp/cejc/",
+    cap: 9_000,
   },
   {
     label: "Written (compounds)",
@@ -193,20 +201,22 @@ export const ANCHOR_RANK_SOURCES: AnchorRankSource[] = [
     label: "Slice-of-life anime",
     description:
       "Subtitles of slice-of-life anime, from Dave Doebrick's frequency list compilation.",
-    size: "About 44,900 ranked words.",
+    size: "About 4.1 million words of subtitles; about 44,900 ranked words.",
     url: "https://docs.google.com/document/d/1IUWkvBxhoazBSTyRbdyRVk7hfKE51yorE86DCRNQVuw/",
   },
   {
     label: "Media (jiten)",
     description:
       "jiten.moe's list for all media combined: anime, drama, manga, movies, novels, video games, visual novels, web novels and more.",
-    size: "About 430,700 ranked words.",
+    size: "About 462,600 ranked words.",
+    coverage: "Downloaded on 2026-11-09 (jiten.moe keeps updating it).",
     url: "https://jiten.moe/other",
   },
   {
     label: "TV drama (jiten)",
     description: "jiten.moe's list for live-action Japanese TV drama.",
-    size: "About 217,900 ranked words.",
+    size: "About 223,100 ranked words.",
+    coverage: "Downloaded on 2026-11-09 (jiten.moe keeps updating it).",
     url: "https://jiten.moe/other",
   },
   {
@@ -238,15 +248,32 @@ export const ANCHOR_RANK_SOURCES: AnchorRankSource[] = [
     url: "https://docs.google.com/document/d/1IUWkvBxhoazBSTyRbdyRVk7hfKE51yorE86DCRNQVuw/",
   },
   {
+    label: "Anime (animefreq)",
+    description:
+      "Anime subtitles from Kitsunekko, analyzed by mrpudn's animefreq (TV dramas and other non-anime titles left out).",
+    size: "About 48 million words of subtitles; about 204,300 different words.",
+    coverage: "Subtitles exported in April 2020.",
+    url: "https://github.com/mrpudn/animefreq",
+  },
+  {
+    label: "YouTube (jiten)",
+    description: "jiten.moe's list for YouTube video subtitles.",
+    size: "About 106,800 ranked words.",
+    coverage: "Downloaded on 2026-11-09 (jiten.moe keeps updating it).",
+    url: "https://jiten.moe/other",
+  },
+  {
     label: "JPDB.io",
-    description: "The word's place in jpdb.io's frequency deck.",
-    size: "22,316 words, ranked up to 30,000 (the deck skips some ranks).",
+    description:
+      "The word's place in jpdb.io's 22k frequency deck, a study deck ordered by jpdb's large corpus (it leaves out grammar words like する and だ).",
+    size: "22,316 words.",
     url: "https://jpdb.io",
   },
 ];
 
-/** Only each list's top words are kept, so a word past this is "not ranked". */
-export const ANCHOR_RANK_LIST_CAP = 25_000;
+export const ANCHOR_RANK_SOURCES: AnchorRankSource[] = SOURCES.map(
+  (source) => ({ cap: LIST_CAP, ...source })
+);
 
 /** Ranks beyond this fill none of the bar. */
 export const ANCHOR_RANK_BAR_MAX = 15_000;

@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import {
   ANCHOR_RANK_BAR_MAX,
-  ANCHOR_RANK_LIST_CAP,
   ANCHOR_RANK_SOURCES,
   anchorRankProgress,
   type AnchorRankSource,
@@ -42,14 +41,15 @@ const SourceDetails = ({
       )}
       <SourceFact term={word}>
         {rank === -1
-          ? `Not in its top ${ANCHOR_RANK_LIST_CAP.toLocaleString()}`
+          ? `Not in its top ${source.cap.toLocaleString()}`
           : `#${rank.toLocaleString()}`}
       </SourceFact>
     </dl>
     <p className="text-muted-foreground text-pretty">
-      1 is the most frequent. Only each list&apos;s top{" "}
-      {ANCHOR_RANK_LIST_CAP.toLocaleString()} words are used, and the bar is
-      empty from #{ANCHOR_RANK_BAR_MAX.toLocaleString()}.
+      1 is the most frequent. Only this list&apos;s top{" "}
+      {source.cap.toLocaleString()} words are used (rarer ones are seen too few
+      times to rank reliably), and the bar is empty from #
+      {ANCHOR_RANK_BAR_MAX.toLocaleString()}.
     </p>
     <div>
       <ExternalTextLink href={source.url} text="Visit the source" />
@@ -58,7 +58,7 @@ const SourceDetails = ({
 );
 
 /**
- * An anchor word's rank in each of the 15 frequency lists, laid out like the
+ * An anchor word's rank in each of the 17 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
  * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
  * when the word is in none of the lists.

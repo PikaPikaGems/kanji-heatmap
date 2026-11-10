@@ -198,7 +198,8 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
     },
     {
       label: "Tier",
-      description: "How common the word is, across the frequency lists below.",
+      description:
+        "How common the word is, from one score across the frequency lists below: the 2,000 most frequent words are Basic, the next 4,000 Common, the next 6,000 Fluent, the rest Advanced.",
       content: tier ? (
         <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
           {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
