@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Table, TableBody } from "@/components/ui/table";
 import { Keyboard } from "@/components/icons";
-import { CommonWordEntry, sortWordData } from "@/lib/sample-vocabulary";
+import { CommonWordEntry } from "@/lib/sample-vocabulary";
 import { Pagination } from "./Pagination";
 import {
   usePagination,
@@ -34,7 +34,10 @@ const ShortcutHint = ({ shortcuts }: { shortcuts: PaginationShortcuts }) => (
   </div>
 );
 
-/** Sorted, paginated vocab table shared by the sample and textbook sections. */
+/**
+ * Paginated vocab table shared by the sample and textbook sections. Words are
+ * shown in file order: the data build (jp-misc-data) writes each page sorted.
+ */
 export const PaginatedVocabulary = ({
   data,
   shortcuts,
@@ -42,17 +45,13 @@ export const PaginatedVocabulary = ({
   data: CommonWordEntry[];
   shortcuts?: PaginationShortcuts;
 }) => {
-  const sortedData = useMemo(() => {
-    return sortWordData(data);
-  }, [data]);
-
   const { start, end, onPrev, onNext, page, totalPages } = usePagination(
-    sortedData.length
+    data.length
   );
   const pageData = useMemo(() => {
-    const result = sortedData.slice(start, end);
+    const result = data.slice(start, end);
     return result;
-  }, [sortedData, end, start]);
+  }, [data, end, start]);
 
   useKeyboardPagination(shortcuts, onPrev, onNext, page, totalPages);
 
