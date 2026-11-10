@@ -17,6 +17,7 @@ const formatTime = (seconds: number) => {
  */
 export const AudioPlayer = ({
   src,
+  autoPlay = false,
   playLabel,
   seekLabel,
   playFailedMessage,
@@ -24,6 +25,8 @@ export const AudioPlayer = ({
 }: {
   /** Empty while the source isn't ready: the controls are disabled. */
   src: string;
+  /** Starts playing once loaded, e.g. right after the learner asked for it. */
+  autoPlay?: boolean;
   playLabel: string;
   seekLabel: string;
   playFailedMessage: string;
@@ -77,6 +80,7 @@ export const AudioPlayer = ({
       <audio
         ref={audioRef}
         src={src || undefined}
+        autoPlay={autoPlay}
         preload="metadata"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}

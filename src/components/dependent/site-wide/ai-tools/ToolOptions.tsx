@@ -18,6 +18,7 @@ import {
   FIXED_VOICES,
 } from "@/lib/ai-explain/providers/voices";
 import { ElevenLabsVoiceField } from "./ElevenLabsVoiceField";
+import { VoiceSample } from "./VoiceSample";
 
 /** A labelled select, the label above it. */
 const OptionSelect = ({
@@ -98,6 +99,7 @@ export const SpeechOptions = ({ choice }: { choice: ResolvedAiTool }) => {
           }))}
         />
       )}
+      {voices.length > 0 && <VoiceSample choice={choice} />}
       {takes?.bitRate && (
         <div className="space-y-1">
           <OptionSelect

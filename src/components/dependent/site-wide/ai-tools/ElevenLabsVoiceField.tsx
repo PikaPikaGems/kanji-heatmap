@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AudioPlayer } from "@/components/common/AudioPlayer";
+import { VoiceSample } from "./VoiceSample";
 import BasicSelect from "@/components/common/BasicSelect";
 import { TextActionButton } from "@/components/common/AiActionButtons";
 import {
@@ -123,18 +123,6 @@ export const ElevenLabsVoiceField = ({
         }}
         options={options}
       />
-      {selected?.previewUrl && (
-        // Keyed by voice: the old sample stops and the new one fades in.
-        <div key={selected.id} className="pt-2 animate-fade-in-fast">
-          <AudioPlayer
-            src={selected.previewUrl}
-            playLabel="Play sample"
-            seekLabel={`Seek sample of ${selected.name}`}
-            playFailedMessage="Couldn't play this sample. Try again, or pick another voice."
-            loadFailedMessage="Couldn't load this sample. Try again, or pick another voice."
-          />
-        </div>
-      )}
       <p className="text-xs text-muted-foreground">
         {list.status === "loading" && "Loading Japanese voices… "}
         {list.status === "error" && `Couldn't load voices. ${list.message} `}
@@ -148,6 +136,16 @@ export const ElevenLabsVoiceField = ({
           Load more voices
         </TextActionButton>
       )}
+      <div className="pt-3">
+        <VoiceSample
+          choice={choice}
+          librarySample={
+            selected?.previewUrl
+              ? { url: selected.previewUrl, name: selected.name }
+              : undefined
+          }
+        />
+      </div>
     </div>
   );
 };

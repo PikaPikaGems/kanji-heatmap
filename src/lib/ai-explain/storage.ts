@@ -8,6 +8,7 @@ import {
   type AiStorageUsage,
   type KindUsage,
 } from "./storage-budgets";
+import { clearVoiceSamples } from "./voice-sample-cache";
 
 /** Where AI Explain answers lived before IndexedDB; moved over on first open. */
 const LEGACY_SENTENCE_RESULTS_KEY = "ai-explain-sentence-results";
@@ -571,6 +572,7 @@ export const clearGeneratedContent = async () => {
   );
   changed(true);
   const tables = [db.textResults, db.images, db.audio, db.explanations];
+  await clearVoiceSamples();
   await db.transaction("rw", tables, async () => {
     for (const table of tables) {
       // Every key of this owner, read from the index without loading records.
