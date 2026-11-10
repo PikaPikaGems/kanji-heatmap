@@ -19,6 +19,15 @@ export const AboutPage = () => {
   );
 };
 
+export const CreditsPage = () => {
+  useHtmlDocumentTitle("Credits");
+  return (
+    <Wrapper>
+      <MarkdownDoc path="/md/credits.md" />
+    </Wrapper>
+  );
+};
+
 export const TermsPage = () => {
   useHtmlDocumentTitle("Terms of Use");
   return (

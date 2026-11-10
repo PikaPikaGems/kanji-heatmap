@@ -4,6 +4,9 @@ import { PageWrapper } from "@/components/dependent/site-wide/PageWrapper";
 const LazyAboutPage = lazy(() =>
   import("./DocsScreen").then((m) => ({ default: m.AboutPage }))
 );
+const LazyCreditsPage = lazy(() =>
+  import("./DocsScreen").then((m) => ({ default: m.CreditsPage }))
+);
 const LazyTermsPage = lazy(() =>
   import("./DocsScreen").then((m) => ({ default: m.TermsPage }))
 );
@@ -14,6 +17,12 @@ const LazyPrivacyPage = lazy(() =>
 const AboutScreen = () => (
   <PageWrapper>
     <LazyAboutPage />
+  </PageWrapper>
+);
+
+const CreditsScreen = () => (
+  <PageWrapper>
+    <LazyCreditsPage />
   </PageWrapper>
 );
 
@@ -29,4 +38,4 @@ const PrivacyScreen = () => (
   </PageWrapper>
 );
 
-export { AboutScreen, TermsScreen, PrivacyScreen };
+export { AboutScreen, CreditsScreen, TermsScreen, PrivacyScreen };

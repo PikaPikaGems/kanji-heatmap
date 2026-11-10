@@ -2,6 +2,7 @@ import {
   ListScreen,
   CumUseScreen,
   AboutScreen,
+  CreditsScreen,
   TermsScreen,
   PrivacyScreen,
   SpeedKatakanaScreen,
@@ -62,6 +63,12 @@ const aboutPage = {
   Component: AboutScreen,
 };
 
+const creditsPage = {
+  href: "/credit",
+  title: "Credits",
+  Component: CreditsScreen,
+};
+
 const termsPage = {
   href: "/terms",
   title: "Terms of Use",
@@ -120,6 +127,7 @@ const pageItems = {
   dashboardPage,
   masteryPage,
   aboutPage,
+  creditsPage,
   termsPage,
   privacyPage,
   speedKatakanaPage,
