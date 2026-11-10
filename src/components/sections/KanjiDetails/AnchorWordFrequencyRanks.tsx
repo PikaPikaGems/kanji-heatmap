@@ -7,9 +7,9 @@ import { FlagSwitch } from "@/components/common/FlagSwitch";
 import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import {
   ANCHOR_RANK_BAR_MAX,
-  ANCHOR_RANK_LIST_CAP,
   ANCHOR_RANK_SOURCES,
   anchorRankProgress,
+  isPastShortList,
   type AnchorRankSource,
 } from "@/lib/kanji/anchor-words";
 
@@ -47,15 +47,22 @@ const SourceDetails = ({
       )}
       <SourceFact term={word}>
         {rank === -1
-          ? `Not in its top ${ANCHOR_RANK_LIST_CAP.toLocaleString()}`
+          ? `Not in its top ${source.cap.toLocaleString()}`
           : `#${rank.toLocaleString()}`}
       </SourceFact>
     </dl>
     <p className="text-muted-foreground text-pretty">
-      1 is the most frequent. Only each list&apos;s top{" "}
-      {ANCHOR_RANK_LIST_CAP.toLocaleString()} words are used, and the bar is
-      empty from #{ANCHOR_RANK_BAR_MAX.toLocaleString()}.
+      1 is the most frequent. Only this list&apos;s top{" "}
+      {source.cap.toLocaleString()} words are used (rarer ones are seen too few
+      times to rank reliably). Every list&apos;s bar uses the same scale: full
+      at #1, empty from #{ANCHOR_RANK_BAR_MAX.toLocaleString()}.
     </p>
+    {source.cap < ANCHOR_RANK_BAR_MAX && (
+      <p className="text-muted-foreground text-pretty">
+        This list is small, so it stops at #{source.cap.toLocaleString()}. A
+        word past it gets a dotted bar: it may still be fairly common.
+      </p>
+    )}
     <div>
       <ExternalTextLink href={source.url} text="Visit the source" />
     </div>
@@ -63,11 +70,12 @@ const SourceDetails = ({
 );
 
 /**
- * An anchor word's rank in each of the 15 frequency lists, laid out like the
+ * An anchor word's rank in each of the 17 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
- * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
- * when the word is in none of the lists. Hidden behind a "Show Frequency Ranks"
- * switch that is off by default and remembered across kanji.
+ * full at #1 and empty from #16,000 (or when the word isn't ranked). A word
+ * past a small list's end (CEJC: 11,000) gets a dotted bar instead of an empty
+ * one. Nothing when the word is in none of the lists. Hidden behind a "Show
+ * Frequency Ranks" switch that is off by default and remembered across kanji.
  */
 export const AnchorWordFrequencyRanks = ({
   word,
@@ -95,6 +103,7 @@ export const AnchorWordFrequencyRanks = ({
             {ANCHOR_RANK_SOURCES.map((source, i) => {
               const { label } = source;
               const rank = ranks[i] ?? -1;
+              const pastShortList = isPastShortList(source, rank);
               return (
                 <TableRow key={label} className="p-0 my-1 text-left">
                   <TableCell className="p-0">
@@ -110,6 +119,11 @@ export const AnchorWordFrequencyRanks = ({
                               #{rank}
                             </span>
                           )}
+                          {pastShortList && (
+                            <span className="font-normal shrink-0 tabular-nums text-muted-foreground">
+                              &gt;#{source.cap.toLocaleString()}
+                            </span>
+                          )}
                         </button>
                       }
                       content={
@@ -122,11 +136,18 @@ export const AnchorWordFrequencyRanks = ({
                     />
                   </TableCell>
                   <TableCell className="w-full py-2 pl-2 pr-0">
-                    <Progress
-                      className="h-1"
-                      value={anchorRankProgress(rank)}
-                      primitiveCn="background-theme-color-with-opacity-100"
-                    />
+                    {pastShortList ? (
+                      <div
+                        className="border-t-2 border-dotted border-muted-foreground/60"
+                        aria-label={`Past this list's top ${source.cap.toLocaleString()}`}
+                      />
+                    ) : (
+                      <Progress
+                        className="h-1"
+                        value={anchorRankProgress(rank)}
+                        primitiveCn="background-theme-color-with-opacity-100"
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               );
