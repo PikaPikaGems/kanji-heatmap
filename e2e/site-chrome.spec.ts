@@ -40,7 +40,7 @@ test.describe("site chrome", () => {
     const menu = page.getByRole("dialog", { name: "Navigation menu" });
     await expect(menu).toBeVisible();
 
-    await menu.getByRole("link", { name: "Privacy Policy" }).click();
+    await menu.getByRole("link", { name: "Privacy" }).click();
     await expect(page).toHaveURL(/\/privacy$/);
     await expect(
       page.getByRole("heading", { name: "Privacy Policy", exact: true })

@@ -3,8 +3,8 @@ import { GenericPopover } from "@/components/common/GenericPopover";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { Accordion } from "@/components/ui/accordion";
-import { SubsectionAccordionItem } from "@/components/common/SubsectionAccordionItem";
+import { FlagSwitch } from "@/components/common/FlagSwitch";
+import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 import {
   ANCHOR_RANK_BAR_MAX,
   ANCHOR_RANK_LIST_CAP,
@@ -12,6 +12,9 @@ import {
   anchorRankProgress,
   type AnchorRankSource,
 } from "@/lib/kanji/anchor-words";
+
+/** Whether anchor words show their frequency ranks. Off by default. */
+const SHOW_ANCHOR_RANKS_KEY = "show-anchor-word-frequency-ranks";
 
 /** One "Size: …" line of a list's popover. */
 const SourceFact = ({ term, children }: { term: string; children: string }) => (
@@ -63,7 +66,8 @@ const SourceDetails = ({
  * An anchor word's rank in each of the 15 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
  * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
- * when the word is in none of the lists. Starts collapsed.
+ * when the word is in none of the lists. Hidden behind a "Frequency Ranks"
+ * switch that is off by default and remembered across kanji.
  */
 export const AnchorWordFrequencyRanks = ({
   word,
@@ -72,12 +76,20 @@ export const AnchorWordFrequencyRanks = ({
   word: string;
   ranks: number[];
 }) => {
+  const [shown, setShown] = useLocalStorageFlag(SHOW_ANCHOR_RANKS_KEY);
+
   if (ranks.every((rank) => rank === -1)) return null;
 
   return (
-    <Accordion type="multiple" className="px-2 text-left">
-      <SubsectionAccordionItem title={`Frequency Ranks: ${word}`}>
-        <Table className="my-2">
+    <div className="text-left">
+      <FlagSwitch
+        label="Frequency Ranks"
+        checked={shown}
+        onCheckedChange={setShown}
+        className="px-2 pt-2"
+      />
+      {shown && (
+        <Table className="my-2 animate-fade-in-fast">
           <TableBody>
             {ANCHOR_RANK_SOURCES.map((source, i) => {
               const { label } = source;
@@ -120,7 +132,7 @@ export const AnchorWordFrequencyRanks = ({
             })}
           </TableBody>
         </Table>
-      </SubsectionAccordionItem>
-    </Accordion>
+      )}
+    </div>
   );
 };
