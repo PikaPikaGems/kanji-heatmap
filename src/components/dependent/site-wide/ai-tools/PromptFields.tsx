@@ -8,6 +8,8 @@ import {
   TextActionButton,
 } from "@/components/common/AiActionButtons";
 import BasicSelect from "@/components/common/BasicSelect";
+import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
 import type { AiTool } from "@/lib/ai-explain/providers/capabilities";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
@@ -175,12 +177,12 @@ const MnemonicChoice = <K extends string>({
     <section className="space-y-2">
       <div className="space-y-1">
         <p aria-hidden className="text-sm font-semibold">
-          {label}
+          Default {label.toLowerCase()}
         </p>
         <BasicSelect
           isLabelSrOnly
           triggerCN="rounded-lg"
-          label={label}
+          label={`Default ${label.toLowerCase()}`}
           value={value}
           onChange={(key) => onPick(key as K)}
           options={(Object.keys(labels) as K[]).map((key) => ({
@@ -209,51 +211,77 @@ const MnemonicChoice = <K extends string>({
   );
 };
 
+type MnemonicPromptTab = "image" | "style" | "palette";
+
+const MNEMONIC_PROMPT_TABS: { value: MnemonicPromptTab; label: string }[] = [
+  { value: "image", label: "Image prompt" },
+  { value: "style", label: "Style" },
+  { value: "palette", label: "Palette" },
+];
+
 /**
- * Visual Mnemonics' prompts: the shared image prompt, then the style and the
- * palette, each with its picker (the default for new images) and prompt.
+ * Visual Mnemonics' prompts, one tab at a time: the shared image prompt, then
+ * the style and the palette, each with its picker (the default for new
+ * images) and prompt.
  */
 export const MnemonicPrompts = () => {
   const [settings] = useAiExplainSettings();
+  const [tab, setTab] = useState<MnemonicPromptTab>("image");
   const entries = usePromptEntries();
   const image = entries.find((entry) => entry.id === "image");
   const choice = settings.tools.mnemonics ?? {};
   return (
-    <div className="space-y-5">
-      {image && (
-        <PromptEditor
-          title="Image prompt"
-          value={image.value}
-          defaultValue={image.defaultValue}
-          placeholders={image.placeholders}
-          onChange={image.onChange}
+    <Tabs
+      value={tab}
+      onValueChange={(next) => setTab(next as MnemonicPromptTab)}
+    >
+      <SegmentedTabsList
+        value={tab}
+        label="Visual Mnemonics prompts"
+        className="w-full text-xs"
+        options={MNEMONIC_PROMPT_TABS}
+      />
+      {/* Radix mounts only the open tab, so each switch fades in. */}
+      <TabsContent value="image" className="mt-3 animate-fade-in-fast">
+        {image && (
+          <PromptEditor
+            title="Image prompt"
+            value={image.value}
+            defaultValue={image.defaultValue}
+            placeholders={image.placeholders}
+            onChange={image.onChange}
+          />
+        )}
+      </TabsContent>
+      <TabsContent value="style" className="mt-3 animate-fade-in-fast">
+        <MnemonicChoice<ImageStyle>
+          label="Style"
+          labels={IMAGE_STYLE_LABELS}
+          value={choice.style ?? "kanji-heatmap"}
+          idPrefix="style:"
+          note="Picked for new mnemonics; you can still change it per image. Its prompt fills {STYLE_PROMPT} in the image prompt. For Custom, this text pre-fills the custom style box."
+          onPick={(style) =>
+            updateAiToolChoice("mnemonics", {
+              style: style === "kanji-heatmap" ? undefined : style,
+            })
+          }
         />
-      )}
-      <MnemonicChoice<ImageStyle>
-        label="Style"
-        labels={IMAGE_STYLE_LABELS}
-        value={choice.style ?? "kanji-heatmap"}
-        idPrefix="style:"
-        note="Picked for new mnemonics; you can still change it per image. Its prompt fills {STYLE_PROMPT}. For Custom, this text pre-fills the custom style box."
-        onPick={(style) =>
-          updateAiToolChoice("mnemonics", {
-            style: style === "kanji-heatmap" ? undefined : style,
-          })
-        }
-      />
-      <MnemonicChoice<ImagePalette>
-        label="Palette"
-        labels={IMAGE_PALETTE_LABELS}
-        value={choice.palette ?? "kanji-heatmap"}
-        idPrefix="palette:"
-        note="Picked for new mnemonics; you can still change it per image. Its prompt fills {PALETTE_PROMPT}. For Custom, this text pre-fills the custom palette box."
-        onPick={(palette) =>
-          updateAiToolChoice("mnemonics", {
-            palette: palette === "kanji-heatmap" ? undefined : palette,
-          })
-        }
-      />
-    </div>
+      </TabsContent>
+      <TabsContent value="palette" className="mt-3 animate-fade-in-fast">
+        <MnemonicChoice<ImagePalette>
+          label="Palette"
+          labels={IMAGE_PALETTE_LABELS}
+          value={choice.palette ?? "kanji-heatmap"}
+          idPrefix="palette:"
+          note="Picked for new mnemonics; you can still change it per image. Its prompt fills {PALETTE_PROMPT} in the image prompt. For Custom, this text pre-fills the custom palette box."
+          onPick={(palette) =>
+            updateAiToolChoice("mnemonics", {
+              palette: palette === "kanji-heatmap" ? undefined : palette,
+            })
+          }
+        />
+      </TabsContent>
+    </Tabs>
   );
 };
 

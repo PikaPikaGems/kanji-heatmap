@@ -1,10 +1,12 @@
 import { useId, useRef, useState } from "react";
 import {
+  Check,
   CircleCheck,
   CircleX,
   Eye,
   EyeOff,
   Loader2,
+  X,
   Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,6 +21,7 @@ import { clientOf } from "@/lib/ai-explain/providers";
 import {
   AI_PROVIDER_ORDER,
   AI_PROVIDERS,
+  AI_TOOL_ORDER,
   AI_TOOLS,
   toolsOfProvider,
 } from "@/lib/ai-explain/providers/capabilities";
@@ -95,6 +98,38 @@ const KeyCheckStatus = ({
   );
 };
 
+/** Every tool, ticked when this provider's key can power it. */
+const ProviderToolList = ({ provider }: { provider: AiProvider }) => (
+  <ul
+    aria-label="Tools this key can power"
+    className="grid grid-cols-2 gap-x-3 gap-y-1 py-1 text-xs"
+  >
+    {AI_TOOL_ORDER.map((tool) => {
+      const { label, providers } = AI_TOOLS[tool];
+      if (providers.includes(provider))
+        return (
+          <li key={tool} className="flex items-center gap-1 font-medium">
+            <Check
+              aria-hidden
+              className="shrink-0 size-3.5 text-green-600 dark:text-green-500"
+            />
+            {label}
+          </li>
+        );
+      return (
+        <li
+          key={tool}
+          className="flex items-center gap-1 text-muted-foreground/70"
+        >
+          <X aria-hidden className="shrink-0 size-3.5" />
+          <span className="sr-only">Not </span>
+          {label}
+        </li>
+      );
+    })}
+  </ul>
+);
+
 /** Wait after the last keystroke before checking, so typing isn't checked per letter. */
 const KEY_CHECK_DELAY_MS = 600;
 
@@ -116,7 +151,6 @@ const ProviderKeyCard = ({
   const id = useId();
   const info = AI_PROVIDERS[provider];
   const key = settings.keys[provider];
-  const tools = toolsOfProvider(provider);
 
   const runCheck = (apiKey: string) => {
     setCheck({ status: "checking" });
@@ -167,9 +201,7 @@ const ProviderKeyCard = ({
       <label htmlFor={id} className="block text-sm font-semibold">
         {info.label}
       </label>
-      <p className="text-xs text-muted-foreground">
-        For {tools.map((tool) => AI_TOOLS[tool].label).join(", ")}
-      </p>
+      <ProviderToolList provider={provider} />
       <div className="flex gap-2 pt-1">
         <Input
           className="rounded-lg"
