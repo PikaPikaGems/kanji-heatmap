@@ -155,6 +155,13 @@ Explain, Vocab Explain, Read Aloud, Visual Mnemonics. Each holds:
   model supports and fall back if the API rejects it.
 - Gemini: `googleSearch` tool for search. Turn the free-tier 429 into a clear
   message ("enable billing for this project in Google AI Studio").
+- **Hard limit: Kanji Essay and Anchor Word Essay are at most 4,000
+  characters**, so every Read Aloud provider can read one in a single request
+  (OpenAI takes 4,096). The app appends this rule last to every request,
+  after an edited prompt and regeneration instructions; learners can't turn
+  it off. The Tools tab and the essay section say so, each essay shows
+  "N / 4,000 characters", and one that still runs over gets a warning to
+  regenerate. Read Aloud splits text only as a fallback.
 - Prompts must not ask for sources when web search is off.
 - Stream every provider, like xAI today.
 

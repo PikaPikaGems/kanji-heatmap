@@ -122,6 +122,8 @@ export type AiToolInfo = {
   search: boolean;
   /** Providers that can power it, in the order the picker lists them. */
   providers: AiProvider[];
+  /** The answer's length is capped (see ESSAY_CHARACTER_LIMIT). */
+  capped?: boolean;
   description: string;
 };
 
@@ -130,6 +132,7 @@ export const AI_TOOLS: Record<AiTool, AiToolInfo> = {
     label: "Anchor Word Essay",
     kind: "text",
     search: true,
+    capped: true,
     providers: ["xai", "openai", "anthropic", "gemini"],
     description: "Vocabulary details for a kanji's anchor word",
   },
@@ -137,6 +140,7 @@ export const AI_TOOLS: Record<AiTool, AiToolInfo> = {
     label: "Kanji Essay",
     kind: "text",
     search: true,
+    capped: true,
     providers: ["xai", "openai", "anthropic", "gemini"],
     description: "A beginner-friendly essay about one kanji",
   },

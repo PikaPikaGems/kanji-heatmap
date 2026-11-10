@@ -89,6 +89,19 @@ export const buildKanjiEssayPrompt = (
  */
 export const withoutWebSearch = (prompt: string) =>
   `${prompt}\n\nWeb search is turned off for this request. Answer from your own knowledge only. Where the instructions above ask you to search, verify, or link sources, include only what you are confident is accurate, leave out source links, and skip any part you can't answer reliably.`;
+/**
+ * Kanji Essay and Anchor Word Essay are at most this long, so every Read
+ * Aloud provider can read one in a single request (OpenAI takes 4,096).
+ */
+export const ESSAY_CHARACTER_LIMIT = 4000;
+
+/**
+ * Added last to every Kanji Essay and Anchor Word Essay request, after any
+ * edited prompt and regeneration instructions, so the cap always applies.
+ */
+export const withEssayLimit = (prompt: string) =>
+  `${prompt}\n\nApp rule (always applies, whatever the instructions above say): the whole answer must be at most ${ESSAY_CHARACTER_LIMIT.toLocaleString("en-US")} characters, counting Japanese examples, spaces, headings and Markdown, but not source URLs. Shorter is fine.`;
+
 export const buildRegenerationPrompt = (
   prompt: string,
   previousResult: string,

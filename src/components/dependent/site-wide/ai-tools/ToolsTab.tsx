@@ -24,6 +24,7 @@ import {
   type AiTool,
 } from "@/lib/ai-explain/providers/capabilities";
 import { ModelField } from "./ModelField";
+import { ESSAY_CHARACTER_LIMIT } from "@/lib/ai-explain/prompts";
 import { DownloadAllPrompts, ToolPrompts } from "./PromptFields";
 import { ImageOptions, SpeechOptions, WebSearchField } from "./ToolOptions";
 
@@ -141,6 +142,18 @@ const ToolItem = ({ tool }: { tool: AiTool }) => {
         <p className="mb-3 text-xs text-muted-foreground">
           {info.description}.
         </p>
+        {info.capped && (
+          <UserNotice icon="📏" className="mb-3 text-xs">
+            <strong>
+              Hard limit: {ESSAY_CHARACTER_LIMIT.toLocaleString("en-US")}{" "}
+              characters per essay.
+            </strong>{" "}
+            The app adds this rule to every request, after your prompt and any
+            &quot;What should change?&quot; instructions, and you can&apos;t
+            turn it off or raise it by editing the prompt. It keeps every essay
+            short enough for Read Aloud to read in one go.
+          </UserNotice>
+        )}
         <ToolFields tool={tool} />
       </AccordionContent>
     </AccordionItem>

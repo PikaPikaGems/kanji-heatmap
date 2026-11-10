@@ -24,6 +24,7 @@ import { AiKeyRejectedError } from "@/lib/ai-explain/providers/types";
 import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
 import {
   buildRegenerationPrompt,
+  withEssayLimit,
   withoutWebSearch,
 } from "@/lib/ai-explain/prompts";
 import {
@@ -131,9 +132,11 @@ export const useAiDrawerText = (
     const basePrompt = webSearch
       ? makePrompt(settings)
       : withoutWebSearch(makePrompt(settings));
-    const prompt = previous
-      ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
-      : basePrompt;
+    const prompt = withEssayLimit(
+      previous
+        ? buildRegenerationPrompt(basePrompt, previous.markdown, instructions)
+        : basePrompt
+    );
     setState({ status: "generating", result: previous });
     let finish: () => void = () => {};
     trackInFlight(
