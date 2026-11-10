@@ -1,6 +1,12 @@
 import { getInFlight } from "@/lib/ai-explain/in-flight";
-import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
-import { NoticeAction } from "@/components/common/UserNotice";
+import {
+  AI_TOOLS,
+  providerLabel,
+} from "@/lib/ai-explain/providers/capabilities";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { openAiStudyTools } from "@/lib/ai-explain/ai-tools-dialog";
+import { isAiToolReady } from "@/lib/ai-explain/preferences";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
 import { SectionLoading } from "@/components/common/SectionLoading";
@@ -122,6 +128,10 @@ const MnemonicGallery = ({
   const [drafts, setDrafts] = useState<Record<string, MnemonicDraft>>({});
   const [loadAttempt, setLoadAttempt] = useState(0);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const [settings] = useAiExplainSettings();
+  // Without an image key, saved images can still be viewed, downloaded and
+  // deleted; only making new ones needs it.
+  const imageReady = isAiToolReady(settings, "mnemonics");
 
   // Effect needed: read the external IndexedDB database and subscribe to content
   // clearing; render cannot perform asynchronous reads or unsubscribe on unmount.
@@ -221,7 +231,7 @@ const MnemonicGallery = ({
               />
             </button>
           ))}
-          {gallery.images.length < 3 && (
+          {imageReady && gallery.images.length < 3 && (
             <button
               type="button"
               disabled={pending}
@@ -279,13 +289,22 @@ const MnemonicGallery = ({
           />
         </div>
       )}
-      {gallery.images.length === 3 && (
+      {imageReady && gallery.images.length === 3 && (
         <p className="text-sm text-muted-foreground">
           Select an image to regenerate, or delete one before adding another.
         </p>
       )}
       <SavedStorageNotice kind="images" />
-      {(selected || gallery.images.length < 3) && (
+      {!imageReady && (
+        <UserNotice className="text-xs">
+          Visual Mnemonics needs a key from an image provider (
+          {AI_TOOLS.mnemonics.providers.map(providerLabel).join(", ")}).{" "}
+          <NoticeAction onClick={() => openAiStudyTools("keys")}>
+            Add a key
+          </NoticeAction>
+        </UserNotice>
+      )}
+      {imageReady && (selected || gallery.images.length < 3) && (
         <MnemonicForm
           key={slot}
           kanji={kanji}
@@ -330,10 +349,12 @@ const MnemonicGallery = ({
           }}
         />
       )}
-      <p className="text-xs text-muted-foreground">
-        The provider, model and quality are set in AI Study Tools. Regenerate
-        makes a fresh interpretation of your scene.
-      </p>
+      {imageReady && (
+        <p className="text-xs text-muted-foreground">
+          The provider, model and quality are set in AI Study Tools. Regenerate
+          makes a fresh interpretation of your scene.
+        </p>
+      )}
       <AiContentNotice />
       <p className="text-xs text-muted-foreground">
         {gallery.images.filter((image) => !image.unsaved).length} saved ·{" "}
