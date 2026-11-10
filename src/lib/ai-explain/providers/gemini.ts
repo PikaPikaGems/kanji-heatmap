@@ -174,7 +174,7 @@ const streamText = async (request: TextRequest) => {
 };
 
 /** Long text is spoken in pieces, so no one reply runs too long. */
-const SPEECH_PIECE = 3000;
+const SPEECH_PIECE = 4000;
 
 /**
  * Gemini speech comes back as raw 24 kHz PCM (about 2.7 MB a minute); the

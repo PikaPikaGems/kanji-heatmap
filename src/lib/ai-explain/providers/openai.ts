@@ -59,7 +59,7 @@ const listAllModels = async (apiKey: string): Promise<string[]> => {
 };
 
 /** OpenAI speech takes up to 4,096 characters per request. */
-const SPEECH_PIECE = 4000;
+const SPEECH_PIECE = 4096;
 
 export const openaiClient: AiProviderClient = {
   listModels: async (apiKey, kind) =>
