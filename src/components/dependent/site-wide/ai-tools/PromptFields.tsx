@@ -10,6 +10,14 @@ import {
 import BasicSelect from "@/components/common/BasicSelect";
 import { usePromptEntries } from "@/hooks/use-prompt-entries";
 import type { AiTool } from "@/lib/ai-explain/providers/capabilities";
+import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import { updateAiToolChoice } from "@/lib/ai-explain/preferences";
+import {
+  IMAGE_PALETTE_LABELS,
+  IMAGE_STYLE_LABELS,
+  type ImagePalette,
+  type ImageStyle,
+} from "@/lib/ai-explain/prompts";
 
 type PromptEditorProps = {
   title: string;
@@ -134,6 +142,116 @@ export const ToolPrompts = ({ tool }: { tool: AiTool }) => {
         defaultValue={selected.defaultValue}
         placeholders={selected.placeholders}
         onChange={selected.onChange}
+      />
+    </div>
+  );
+};
+
+/**
+ * One choice (style or palette) of Visual Mnemonics: a picker whose pick is
+ * the default for new images, and the prompt of what's picked.
+ */
+const MnemonicChoice = <K extends string>({
+  label,
+  labels,
+  value,
+  idPrefix,
+  note,
+  onPick,
+}: {
+  label: string;
+  labels: Record<K, string>;
+  value: K;
+  /** Prompt entry ids are `${idPrefix}${key}`. */
+  idPrefix: string;
+  note: string;
+  onPick: (key: K) => void;
+}) => {
+  const entries = usePromptEntries();
+  const entryOf = (key: string) =>
+    entries.find((entry) => entry.id === `${idPrefix}${key}`);
+  const selected = entryOf(value);
+  return (
+    <section className="space-y-2">
+      <div className="space-y-1">
+        <p aria-hidden className="text-sm font-semibold">
+          {label}
+        </p>
+        <BasicSelect
+          isLabelSrOnly
+          triggerCN="rounded-lg"
+          label={label}
+          value={value}
+          onChange={(key) => onPick(key as K)}
+          options={(Object.keys(labels) as K[]).map((key) => ({
+            value: key,
+            label:
+              entryOf(key)?.value === undefined
+                ? labels[key]
+                : `${labels[key]} (edited)`,
+          }))}
+        />
+        <p className="text-xs text-muted-foreground">{note}</p>
+      </div>
+      {selected && (
+        // Keyed by the pick: its prompt fades in when it changes.
+        <div key={selected.id} className="animate-fade-in-fast">
+          <PromptEditor
+            title={`${labels[value]} ${label.toLowerCase()} prompt`}
+            value={selected.value}
+            defaultValue={selected.defaultValue}
+            placeholders={selected.placeholders}
+            onChange={selected.onChange}
+          />
+        </div>
+      )}
+    </section>
+  );
+};
+
+/**
+ * Visual Mnemonics' prompts: the shared image prompt, then the style and the
+ * palette, each with its picker (the default for new images) and prompt.
+ */
+export const MnemonicPrompts = () => {
+  const [settings] = useAiExplainSettings();
+  const entries = usePromptEntries();
+  const image = entries.find((entry) => entry.id === "image");
+  const choice = settings.tools.mnemonics ?? {};
+  return (
+    <div className="space-y-5">
+      {image && (
+        <PromptEditor
+          title="Image prompt"
+          value={image.value}
+          defaultValue={image.defaultValue}
+          placeholders={image.placeholders}
+          onChange={image.onChange}
+        />
+      )}
+      <MnemonicChoice<ImageStyle>
+        label="Style"
+        labels={IMAGE_STYLE_LABELS}
+        value={choice.style ?? "kanji-heatmap"}
+        idPrefix="style:"
+        note="Picked for new mnemonics; you can still change it per image. Its prompt fills {STYLE_PROMPT}. For Custom, this text pre-fills the custom style box."
+        onPick={(style) =>
+          updateAiToolChoice("mnemonics", {
+            style: style === "kanji-heatmap" ? undefined : style,
+          })
+        }
+      />
+      <MnemonicChoice<ImagePalette>
+        label="Palette"
+        labels={IMAGE_PALETTE_LABELS}
+        value={choice.palette ?? "kanji-heatmap"}
+        idPrefix="palette:"
+        note="Picked for new mnemonics; you can still change it per image. Its prompt fills {PALETTE_PROMPT}. For Custom, this text pre-fills the custom palette box."
+        onPick={(palette) =>
+          updateAiToolChoice("mnemonics", {
+            palette: palette === "kanji-heatmap" ? undefined : palette,
+          })
+        }
       />
     </div>
   );

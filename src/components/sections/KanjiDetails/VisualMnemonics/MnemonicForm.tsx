@@ -48,15 +48,19 @@ export type MnemonicDraft = {
   instructions: string;
 };
 
+/** A new image starts from the style and palette picked in AI Study Tools. */
 const initialDraft = (image?: MnemonicImage): MnemonicDraft => ({
   description: image?.description ?? "",
-  style: image?.style ?? "kanji-heatmap",
+  style:
+    image?.style ??
+    readAiExplainSettings().tools.mnemonics?.style ??
+    "kanji-heatmap",
   // Images made with a palette that has since been removed fall back to the
-  // Kanji Heatmap palette when regenerated.
+  // picked palette when regenerated.
   palette:
     image && image.palette in IMAGE_PALETTE_LABELS
       ? image.palette
-      : "kanji-heatmap",
+      : (readAiExplainSettings().tools.mnemonics?.palette ?? "kanji-heatmap"),
   customStyle:
     image?.customStyle ??
     readAiExplainSettings().imageStylePrompts?.custom ??

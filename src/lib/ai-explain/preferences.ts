@@ -127,6 +127,9 @@ export type AiToolChoice = {
   resolution?: "1k" | "2k";
   /** Visual Mnemonics on xAI and OpenAI. */
   quality?: "low" | "medium";
+  /** Visual Mnemonics: picked for new images; unset means Kanji Heatmap. */
+  style?: ImageStyle;
+  palette?: ImagePalette;
 };
 
 /**
@@ -193,6 +196,10 @@ const readToolChoice = (value: unknown): AiToolChoice => {
   if (raw.language === "auto") choice.language = "auto";
   if (raw.resolution === "2k") choice.resolution = "2k";
   if (raw.quality === "medium") choice.quality = "medium";
+  if (typeof raw.style === "string" && raw.style in IMAGE_STYLE_LABELS)
+    choice.style = raw.style as ImageStyle;
+  if (typeof raw.palette === "string" && raw.palette in IMAGE_PALETTE_LABELS)
+    choice.palette = raw.palette as ImagePalette;
   return choice;
 };
 
