@@ -21,4 +21,6 @@ component breakdowns, and more.
 
 The data published in kanjiheatmap.com by PikaPikaGems are licensed under [CC BY-SA 4.0][cc-by-sa-4].
 
+See [Credits](/credit) for the data sources and projects Kanji Heatmap builds on.
+
 [cc-by-sa-4]: https://creativecommons.org/licenses/by-sa/4.0
