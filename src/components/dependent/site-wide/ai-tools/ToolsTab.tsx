@@ -27,7 +27,9 @@ import { ModelField } from "./ModelField";
 import { ESSAY_CHARACTER_LIMIT } from "@/lib/ai-explain/prompts";
 import {
   DownloadAllPrompts,
+  MnemonicDefaults,
   MnemonicPrompts,
+  PromptToggle,
   ToolPrompts,
 } from "./PromptFields";
 import { ImageOptions, SpeechOptions, WebSearchField } from "./ToolOptions";
@@ -113,12 +115,23 @@ const ToolFields = ({ tool }: { tool: AiTool }) => {
           )}
         </div>
       )}
+      {info.kind === "image" && <MnemonicDefaults />}
+      {info.kind === "image" && (
+        <PromptToggle tool={tool}>
+          <MnemonicPrompts />
+        </PromptToggle>
+      )}
+      {info.kind === "text" && (
+        <PromptToggle tool={tool}>
+          <ToolPrompts tool={tool} />
+        </PromptToggle>
+      )}
       {/* Read Aloud's prompt is speaking instructions: OpenAI and Gemini only. */}
-      {info.kind === "image" && <MnemonicPrompts />}
-      {info.kind === "text" && <ToolPrompts tool={tool} />}
       {info.kind === "speech" &&
         AI_PROVIDERS[choice.provider].speech?.instructions && (
-          <ToolPrompts tool={tool} />
+          <PromptToggle tool={tool}>
+            <ToolPrompts tool={tool} />
+          </PromptToggle>
         )}
     </div>
   );

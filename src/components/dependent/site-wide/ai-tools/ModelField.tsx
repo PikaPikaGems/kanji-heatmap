@@ -130,7 +130,9 @@ export const ModelField = ({
       {!fixed && (
         <p className="pt-1 text-xs text-muted-foreground">
           {list.status === "loading" && "Loading your models… "}
-          {list.status === "error" && `Couldn't load models. ${list.message} `}
+          {list.status === "error" &&
+            // A failed fetch's message ("Failed to fetch") has no period.
+            `Couldn't load models. ${list.message.replace(/([^.!?])$/, "$1.")} `}
           Models come from your {info.label} account.
         </p>
       )}
