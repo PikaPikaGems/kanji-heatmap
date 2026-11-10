@@ -1,0 +1,10 @@
+---
+description: Merge PRs with a merge commit, never squash or rebase
+alwaysApply: true
+---
+
+# Merge PRs with a merge commit
+
+When asked to merge a pull request, use a regular **merge commit** (`merge_method: "merge"`, or `gh pr merge --merge`).
+
+Do not squash-merge or rebase-merge unless the user explicitly asks for it in that conversation. The repo keeps each commit of a PR in `main`'s history.
