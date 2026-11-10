@@ -7,6 +7,7 @@ import {
   ANCHOR_RANK_BAR_MAX,
   ANCHOR_RANK_SOURCES,
   anchorRankProgress,
+  isPastShortList,
   type AnchorRankSource,
 } from "@/lib/kanji/anchor-words";
 
@@ -48,9 +49,15 @@ const SourceDetails = ({
     <p className="text-muted-foreground text-pretty">
       1 is the most frequent. Only this list&apos;s top{" "}
       {source.cap.toLocaleString()} words are used (rarer ones are seen too few
-      times to rank reliably), and the bar is empty from #
-      {ANCHOR_RANK_BAR_MAX.toLocaleString()}.
+      times to rank reliably). Every list&apos;s bar uses the same scale: full
+      at #1, empty from #{ANCHOR_RANK_BAR_MAX.toLocaleString()}.
     </p>
+    {source.cap < ANCHOR_RANK_BAR_MAX && (
+      <p className="text-muted-foreground text-pretty">
+        This list is small, so it stops at #{source.cap.toLocaleString()}. A
+        word past it gets a dotted bar: it may still be fairly common.
+      </p>
+    )}
     <div>
       <ExternalTextLink href={source.url} text="Visit the source" />
     </div>
@@ -60,7 +67,8 @@ const SourceDetails = ({
 /**
  * An anchor word's rank in each of the 17 frequency lists, laid out like the
  * kanji's Frequency Ranks: the list's name and the rank, then a bar that is
- * full at #1 and empty from #15,000 (or when the word isn't ranked). Nothing
+ * full at #1 and empty from #16,000 (or when the word isn't ranked). A word past
+ * a small list's end (CEJC: 11,000) gets a dotted bar instead of an empty one. Nothing
  * when the word is in none of the lists.
  */
 export const AnchorWordFrequencyRanks = ({
@@ -95,6 +103,11 @@ export const AnchorWordFrequencyRanks = ({
                         {rank !== -1 && (
                           <span className="shrink-0 tabular-nums">#{rank}</span>
                         )}
+                        {isPastShortList(source, rank) && (
+                          <span className="font-normal shrink-0 tabular-nums text-muted-foreground">
+                            &gt;#{source.cap.toLocaleString()}
+                          </span>
+                        )}
                       </button>
                     }
                     content={
@@ -103,11 +116,18 @@ export const AnchorWordFrequencyRanks = ({
                   />
                 </TableCell>
                 <TableCell className="w-full py-2 pl-2 pr-0">
-                  <Progress
-                    className="h-1"
-                    value={anchorRankProgress(rank)}
-                    primitiveCn="background-theme-color-with-opacity-100"
-                  />
+                  {isPastShortList(source, rank) ? (
+                    <div
+                      className="border-t-2 border-dotted border-muted-foreground/60"
+                      aria-label={`Past this list's top ${source.cap.toLocaleString()}`}
+                    />
+                  ) : (
+                    <Progress
+                      className="h-1"
+                      value={anchorRankProgress(rank)}
+                      primitiveCn="background-theme-color-with-opacity-100"
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             );

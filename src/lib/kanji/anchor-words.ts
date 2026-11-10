@@ -275,8 +275,18 @@ export const ANCHOR_RANK_SOURCES: AnchorRankSource[] = SOURCES.map(
   (source) => ({ cap: LIST_CAP, ...source })
 );
 
-/** Ranks beyond this fill none of the bar. */
-export const ANCHOR_RANK_BAR_MAX = 15_000;
+/**
+ * One scale for every list (a rank means the same in each): ranks beyond this
+ * fill none of the bar.
+ */
+export const ANCHOR_RANK_BAR_MAX = 16_000;
+
+/**
+ * The word is past a list that stops before the bar's end (CEJC, small talk):
+ * it may still be fairly common, so it isn't shown as an empty bar.
+ */
+export const isPastShortList = (source: AnchorRankSource, rank: number) =>
+  rank === -1 && source.cap < ANCHOR_RANK_BAR_MAX;
 
 /** How full a rank's bar is, 0–100; an unranked word (-1) has an empty bar. */
 export const anchorRankProgress = (rank: number) =>
