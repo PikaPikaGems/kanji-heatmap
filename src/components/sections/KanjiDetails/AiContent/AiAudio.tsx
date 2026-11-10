@@ -10,8 +10,7 @@ import { openAiStudyTools } from "@/lib/ai-explain/ai-tools-dialog";
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Pause, Play } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { AudioPlayer } from "@/components/common/AudioPlayer";
 import {
   AiPrimaryButton,
   AiRequestFeedback,
@@ -56,40 +55,6 @@ type AudioState = {
   warning?: string;
 };
 
-const formatTime = (seconds: number) => {
-  if (!Number.isFinite(seconds)) return "--:--";
-  const whole = Math.floor(seconds);
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
-};
-
-/** A minimal audio bar: elapsed / total and a seek slider. */
-const MiniPlayer = ({
-  disabled,
-  current,
-  duration,
-  onSeek,
-}: {
-  disabled: boolean;
-  current: number;
-  duration: number;
-  onSeek: (seconds: number) => void;
-}) => (
-  <div className="flex items-center gap-3">
-    <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-      {formatTime(current)} / {formatTime(duration)}
-    </span>
-    <Slider
-      disabled={disabled || !Number.isFinite(duration) || duration <= 0}
-      min={0}
-      max={Number.isFinite(duration) && duration > 0 ? duration : 1}
-      step={0.1}
-      value={[current]}
-      onValueChange={([seconds]) => onSeek(seconds)}
-      thumbLabel="Seek narration"
-    />
-  </div>
-);
-
 const SavedAudio = ({
   record,
   filename,
@@ -99,38 +64,16 @@ const SavedAudio = ({
   filename: string;
   regenerate: ReactNode;
 }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [url, setUrl] = useState("");
-  const [playing, setPlaying] = useState(false);
-  const [time, setTime] = useState({ current: 0, duration: 0 });
   const [message, setMessage] = useState("");
 
-  // Effect needed: owns a browser object URL and stops the external audio player
-  // on unmount; render cannot safely allocate resources that require cleanup.
+  // Effect needed: owns a browser object URL that must be revoked on unmount;
+  // render cannot safely allocate resources that require cleanup.
   useEffect(() => {
     const objectUrl = URL.createObjectURL(record.blob);
     setUrl(objectUrl);
-    const audio = audioRef.current;
-    return () => {
-      audio?.pause();
-      URL.revokeObjectURL(objectUrl);
-    };
+    return () => URL.revokeObjectURL(objectUrl);
   }, [record.blob]);
-
-  const toggle = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-    try {
-      await audio.play();
-      setMessage("");
-    } catch {
-      setMessage("Couldn't play the MP3. Download it to listen instead.");
-    }
-  };
 
   const download = async () => {
     try {
@@ -144,47 +87,12 @@ const SavedAudio = ({
 
   return (
     <div className="space-y-3">
-      <AiPrimaryButton disabled={!url} onClick={() => void toggle()}>
-        {playing ? (
-          <>
-            <Pause /> Pause
-          </>
-        ) : (
-          <>
-            <Play /> Read Aloud
-          </>
-        )}
-      </AiPrimaryButton>
-      <audio
-        ref={audioRef}
-        src={url || undefined}
-        preload="metadata"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
-        onLoadedMetadata={(event) =>
-          setTime({
-            current: event.currentTarget.currentTime,
-            duration: event.currentTarget.duration,
-          })
-        }
-        onTimeUpdate={(event) =>
-          setTime({
-            current: event.currentTarget.currentTime,
-            duration: event.currentTarget.duration,
-          })
-        }
-        onError={() =>
-          setMessage("Couldn't load the saved audio. Try regenerating the MP3.")
-        }
-      />
-      <MiniPlayer
-        disabled={!url}
-        current={time.current}
-        duration={time.duration}
-        onSeek={(seconds) => {
-          if (audioRef.current) audioRef.current.currentTime = seconds;
-        }}
+      <AudioPlayer
+        src={url}
+        playLabel="Read Aloud"
+        seekLabel="Seek narration"
+        playFailedMessage="Couldn't play the MP3. Download it to listen instead."
+        loadFailedMessage="Couldn't load the saved audio. Try regenerating the MP3."
       />
       <div className="flex flex-wrap items-center gap-1">
         <DownloadButton onClick={() => void download()}>
