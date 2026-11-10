@@ -10,6 +10,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
@@ -130,11 +136,45 @@ const ProviderToolList = ({ provider }: { provider: AiProvider }) => (
   </ul>
 );
 
+/** The collapsed row's status: the key's check and how many tools it powers. */
+const KeySummary = ({
+  provider,
+  check,
+  apiKey,
+  keyValid,
+}: {
+  provider: AiProvider;
+  check: KeyCheck;
+  apiKey: string;
+  keyValid: boolean;
+}) => {
+  const tools = `${toolsOfProvider(provider).length} of ${AI_TOOL_ORDER.length} tools`;
+  if (apiKey === "")
+    return <span className="text-muted-foreground">No key · {tools}</span>;
+  if (check.status === "checking")
+    return (
+      <span className="text-muted-foreground">Checking key… · {tools}</span>
+    );
+  if (keyValid)
+    return (
+      <span className="text-green-600 dark:text-green-500">
+        Key works · {tools}
+      </span>
+    );
+  if (check.status === "rejected")
+    return <span className={cnWarningText}>Key rejected · {tools}</span>;
+  return (
+    <span className="text-muted-foreground">Key not checked · {tools}</span>
+  );
+};
+
 /** Wait after the last keystroke before checking, so typing isn't checked per letter. */
 const KEY_CHECK_DELAY_MS = 600;
 
 /**
- * One provider's key of one owner: the field, its check and where to get one.
+ * One provider's key of one owner, as a collapsible row: its status when
+ * closed; the tools, the field, its check and where to get one when open.
+ * The check lives here, not in the content, so it survives closing the row.
  * Remounts for the next owner, so it never shows theirs.
  */
 const ProviderKeyCard = ({
@@ -197,63 +237,78 @@ const ProviderKeyCard = ({
   };
 
   return (
-    <section className="p-3 space-y-1 border rounded-xl">
-      <label htmlFor={id} className="block text-sm font-semibold">
-        {info.label}
-      </label>
-      <ProviderToolList provider={provider} />
-      <div className="flex gap-2 pt-1">
-        <Input
-          className="rounded-lg"
-          id={id}
-          type={visible ? "text" : "password"}
-          value={key.apiKey}
-          onChange={(e) => onKeyChange(e.target.value.trim())}
-          placeholder={info.keyPlaceholder}
-          autoComplete="off"
-          spellCheck={false}
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="shrink-0"
-          onClick={() => setVisible(!visible)}
-          aria-label={visible ? "Hide API key" : "Show API key"}
-        >
-          {visible ? <EyeOff /> : <Eye />}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="shrink-0"
-          onClick={() => onKeyChange("")}
-          disabled={key.apiKey === ""}
-          aria-label={`Delete ${info.label} API key`}
-        >
-          <Trash2 />
-        </Button>
-      </div>
-      {key.apiKey !== "" && (
-        <KeyCheckStatus
-          label={info.label}
-          check={check}
-          keyValid={key.keyValid}
-          onCheck={() => runCheck(key.apiKey)}
-        />
-      )}
-      <p className="pt-1 text-xs text-muted-foreground">
-        Get a key at{" "}
-        <ExternalTextLink href={info.keyUrl} text={info.keyUrlText} />.
-        {info.keyPermissions &&
-          ` A restricted key needs: ${info.keyPermissions}.`}
-      </p>
-    </section>
+    <AccordionItem value={provider} className="border-b border-dotted">
+      <AccordionTrigger className="py-3 text-left hover:no-underline">
+        <span className="flex flex-col">
+          <span className="text-sm font-semibold">{info.label}</span>
+          <span className="text-xs font-normal">
+            <KeySummary
+              provider={provider}
+              check={check}
+              apiKey={key.apiKey}
+              keyValid={key.keyValid}
+            />
+          </span>
+        </span>
+      </AccordionTrigger>
+      <AccordionContent className="pt-1.5 pb-4 pl-3 pr-1.5 space-y-1 border-l-2 border-dotted">
+        <ProviderToolList provider={provider} />
+        <label htmlFor={id} className="block pt-2 text-sm font-semibold">
+          {info.label} API key
+        </label>
+        <div className="flex gap-2">
+          <Input
+            className="rounded-lg"
+            id={id}
+            type={visible ? "text" : "password"}
+            value={key.apiKey}
+            onChange={(e) => onKeyChange(e.target.value.trim())}
+            placeholder={info.keyPlaceholder}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="shrink-0"
+            onClick={() => setVisible(!visible)}
+            aria-label={visible ? "Hide API key" : "Show API key"}
+          >
+            {visible ? <EyeOff /> : <Eye />}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="shrink-0"
+            onClick={() => onKeyChange("")}
+            disabled={key.apiKey === ""}
+            aria-label={`Delete ${info.label} API key`}
+          >
+            <Trash2 />
+          </Button>
+        </div>
+        {key.apiKey !== "" && (
+          <KeyCheckStatus
+            label={info.label}
+            check={check}
+            keyValid={key.keyValid}
+            onCheck={() => runCheck(key.apiKey)}
+          />
+        )}
+        <p className="pt-1 text-xs text-muted-foreground">
+          Get a key at{" "}
+          <ExternalTextLink href={info.keyUrl} text={info.keyUrlText} />.
+          {info.keyPermissions &&
+            ` A restricted key needs: ${info.keyPermissions}.`}
+        </p>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
-/** A key card per provider that can power at least one tool. */
+/** A collapsible row per provider that can power at least one tool. */
 export const ApiKeysTab = ({ ownerId }: { ownerId: string }) => (
   <div className="space-y-3">
     <p className="text-sm font-semibold">
@@ -266,10 +321,12 @@ export const ApiKeysTab = ({ ownerId }: { ownerId: string }) => (
       keys and custom prompts aren&apos;t private: anyone using this browser can
       see them.
     </p>
-    {AI_PROVIDER_ORDER.filter(
-      (provider) => toolsOfProvider(provider).length > 0
-    ).map((provider) => (
-      <ProviderKeyCard key={provider} ownerId={ownerId} provider={provider} />
-    ))}
+    <Accordion type="multiple">
+      {AI_PROVIDER_ORDER.filter(
+        (provider) => toolsOfProvider(provider).length > 0
+      ).map((provider) => (
+        <ProviderKeyCard key={provider} ownerId={ownerId} provider={provider} />
+      ))}
+    </Accordion>
   </div>
 );
