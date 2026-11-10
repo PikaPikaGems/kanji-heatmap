@@ -152,7 +152,7 @@ export const ToolPrompts = ({ tool }: { tool: AiTool }) => {
 
 /**
  * A Visual Mnemonics default (style or palette): the pick pre-selected for
- * new images. Its prompt is edited under "Show prompts".
+ * new images.
  */
 const MnemonicDefault = <K extends string>({
   label,
@@ -195,46 +195,12 @@ const MnemonicDefault = <K extends string>({
   );
 };
 
-/** The style and palette new Visual Mnemonics start with. */
-export const MnemonicDefaults = () => {
-  const [settings] = useAiExplainSettings();
-  const choice = settings.tools.mnemonics ?? {};
-  return (
-    <>
-      <MnemonicDefault<ImageStyle>
-        label="Default style"
-        labels={IMAGE_STYLE_LABELS}
-        value={choice.style ?? "kanji-heatmap"}
-        idPrefix="style:"
-        note="Picked for new mnemonics; you can still change it per image."
-        onPick={(style) =>
-          updateAiToolChoice("mnemonics", {
-            style: style === "kanji-heatmap" ? undefined : style,
-          })
-        }
-      />
-      <MnemonicDefault<ImagePalette>
-        label="Default palette"
-        labels={IMAGE_PALETTE_LABELS}
-        value={choice.palette ?? "kanji-heatmap"}
-        idPrefix="palette:"
-        note="Picked for new mnemonics; you can still change it per image."
-        onPick={(palette) =>
-          updateAiToolChoice("mnemonics", {
-            palette: palette === "kanji-heatmap" ? undefined : palette,
-          })
-        }
-      />
-    </>
-  );
-};
+type MnemonicTab = "style" | "palette" | "prompt";
 
-type MnemonicPromptTab = "image" | "style" | "palette";
-
-const MNEMONIC_PROMPT_TABS: { value: MnemonicPromptTab; label: string }[] = [
-  { value: "image", label: "Image prompt" },
+const MNEMONIC_TABS: { value: MnemonicTab; label: string }[] = [
   { value: "style", label: "Style" },
   { value: "palette", label: "Palette" },
+  { value: "prompt", label: "Prompt" },
 ];
 
 /** An entry's editor, or nothing when the entry is missing. */
@@ -253,74 +219,20 @@ const EntryEditor = ({ id, title }: { id: string; title: string }) => {
 };
 
 /**
- * Visual Mnemonics' prompts, one tab at a time: the shared image prompt, and
- * the prompts of the default style and palette picked above.
+ * A "Show prompt" switch, off at first, over what it reveals; says when an
+ * edited prompt is in use so it isn't forgotten while hidden.
  */
-export const MnemonicPrompts = () => {
-  const [settings] = useAiExplainSettings();
-  const [tab, setTab] = useState<MnemonicPromptTab>("image");
-  const choice = settings.tools.mnemonics ?? {};
-  const style = choice.style ?? "kanji-heatmap";
-  const palette = choice.palette ?? "kanji-heatmap";
-  return (
-    <Tabs
-      value={tab}
-      onValueChange={(next) => setTab(next as MnemonicPromptTab)}
-    >
-      <SegmentedTabsList
-        value={tab}
-        label="Visual Mnemonics prompts"
-        className="w-full text-xs"
-        options={MNEMONIC_PROMPT_TABS}
-      />
-      {/* Radix mounts only the open tab, so each switch fades in. */}
-      <TabsContent value="image" className="mt-3 animate-fade-in-fast">
-        <EntryEditor id="image" title="Image prompt" />
-      </TabsContent>
-      <TabsContent value="style" className="mt-3 animate-fade-in-fast">
-        <p className="mb-2 text-xs text-muted-foreground">
-          Fills {"{STYLE_PROMPT}"} in the image prompt. To edit another
-          style&apos;s prompt, pick it as the default style above. For Custom,
-          this text pre-fills the custom style box.
-        </p>
-        <EntryEditor
-          key={style}
-          id={`style:${style}`}
-          title={`${IMAGE_STYLE_LABELS[style]} style prompt`}
-        />
-      </TabsContent>
-      <TabsContent value="palette" className="mt-3 animate-fade-in-fast">
-        <p className="mb-2 text-xs text-muted-foreground">
-          Fills {"{PALETTE_PROMPT}"} in the image prompt. To edit another
-          palette&apos;s prompt, pick it as the default palette above. For
-          Custom, this text pre-fills the custom palette box.
-        </p>
-        <EntryEditor
-          key={palette}
-          id={`palette:${palette}`}
-          title={`${IMAGE_PALETTE_LABELS[palette]} palette prompt`}
-        />
-      </TabsContent>
-    </Tabs>
-  );
-};
-
-/**
- * Hides a tool's prompts behind a "Show prompts" switch, closed at first;
- * says when an edited prompt is in use so it isn't forgotten while hidden.
- */
-export const PromptToggle = ({
-  tool,
+const PromptSwitch = ({
+  label,
+  edited,
   children,
 }: {
-  tool: AiTool;
+  label: string;
+  edited: boolean;
   children: ReactNode;
 }) => {
   const [shown, setShown] = useState(false);
   const id = useId();
-  const entries = usePromptEntries().filter((entry) => entry.tool === tool);
-  const edited = entries.some((entry) => entry.value !== undefined);
-  const label = entries.length > 1 ? "Show prompts" : "Show prompt";
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -330,12 +242,119 @@ export const PromptToggle = ({
         </label>
         {edited && (
           <span className="text-xs text-muted-foreground">
-            · You&apos;ve edited {entries.length > 1 ? "some" : "this"}
+            · You&apos;ve edited it
           </span>
         )}
       </div>
       {shown && <div className="animate-fade-in-fast">{children}</div>}
     </div>
+  );
+};
+
+/** A tool's prompts behind a "Show prompt" switch. */
+export const PromptToggle = ({
+  tool,
+  children,
+}: {
+  tool: AiTool;
+  children: ReactNode;
+}) => {
+  const entries = usePromptEntries().filter((entry) => entry.tool === tool);
+  return (
+    <PromptSwitch
+      label={entries.length > 1 ? "Show prompts" : "Show prompt"}
+      edited={entries.some((entry) => entry.value !== undefined)}
+    >
+      {children}
+    </PromptSwitch>
+  );
+};
+
+/**
+ * Visual Mnemonics' style and palette (each the default for new images, with
+ * its prompt behind a switch) and the shared image prompt, one tab at a time.
+ */
+export const MnemonicSettings = () => {
+  const [settings] = useAiExplainSettings();
+  const [tab, setTab] = useState<MnemonicTab>("style");
+  const entries = usePromptEntries();
+  const edited = (id: string) =>
+    entries.find((entry) => entry.id === id)?.value !== undefined;
+  const choice = settings.tools.mnemonics ?? {};
+  const style = choice.style ?? "kanji-heatmap";
+  const palette = choice.palette ?? "kanji-heatmap";
+  return (
+    <Tabs value={tab} onValueChange={(next) => setTab(next as MnemonicTab)}>
+      <SegmentedTabsList
+        value={tab}
+        label="Visual Mnemonics style, palette and prompt"
+        className="w-full text-xs"
+        options={MNEMONIC_TABS}
+      />
+      {/* Radix mounts only the open tab, so each switch fades in. */}
+      <TabsContent
+        value="style"
+        className="mt-3 space-y-4 animate-fade-in-fast"
+      >
+        <MnemonicDefault<ImageStyle>
+          label="Default style"
+          labels={IMAGE_STYLE_LABELS}
+          value={style}
+          idPrefix="style:"
+          note="Picked for new mnemonics; you can still change it per image."
+          onPick={(next) =>
+            updateAiToolChoice("mnemonics", {
+              style: next === "kanji-heatmap" ? undefined : next,
+            })
+          }
+        />
+        <PromptSwitch label="Show prompt" edited={edited(`style:${style}`)}>
+          <p className="mb-2 text-xs text-muted-foreground">
+            Fills {"{STYLE_PROMPT}"} in the image prompt. For Custom, this text
+            pre-fills the custom style box.
+          </p>
+          {/* Keyed by the pick: its prompt fades in when it changes. */}
+          <div key={style} className="animate-fade-in-fast">
+            <EntryEditor
+              id={`style:${style}`}
+              title={`${IMAGE_STYLE_LABELS[style]} style prompt`}
+            />
+          </div>
+        </PromptSwitch>
+      </TabsContent>
+      <TabsContent
+        value="palette"
+        className="mt-3 space-y-4 animate-fade-in-fast"
+      >
+        <MnemonicDefault<ImagePalette>
+          label="Default palette"
+          labels={IMAGE_PALETTE_LABELS}
+          value={palette}
+          idPrefix="palette:"
+          note="Picked for new mnemonics; you can still change it per image."
+          onPick={(next) =>
+            updateAiToolChoice("mnemonics", {
+              palette: next === "kanji-heatmap" ? undefined : next,
+            })
+          }
+        />
+        <PromptSwitch label="Show prompt" edited={edited(`palette:${palette}`)}>
+          <p className="mb-2 text-xs text-muted-foreground">
+            Fills {"{PALETTE_PROMPT}"} in the image prompt. For Custom, this
+            text pre-fills the custom palette box.
+          </p>
+          <div key={palette} className="animate-fade-in-fast">
+            <EntryEditor
+              id={`palette:${palette}`}
+              title={`${IMAGE_PALETTE_LABELS[palette]} palette prompt`}
+            />
+          </div>
+        </PromptSwitch>
+      </TabsContent>
+      <TabsContent value="prompt" className="mt-3 animate-fade-in-fast">
+        <EntryEditor id="image" title="Image prompt" />
+      </TabsContent>
+    </Tabs>
   );
 };
 

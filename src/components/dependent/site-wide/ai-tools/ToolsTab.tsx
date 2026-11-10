@@ -27,8 +27,7 @@ import { ModelField } from "./ModelField";
 import { ESSAY_CHARACTER_LIMIT } from "@/lib/ai-explain/prompts";
 import {
   DownloadAllPrompts,
-  MnemonicDefaults,
-  MnemonicPrompts,
+  MnemonicSettings,
   PromptToggle,
   ToolPrompts,
 } from "./PromptFields";
@@ -115,12 +114,7 @@ const ToolFields = ({ tool }: { tool: AiTool }) => {
           )}
         </div>
       )}
-      {info.kind === "image" && <MnemonicDefaults />}
-      {info.kind === "image" && (
-        <PromptToggle tool={tool}>
-          <MnemonicPrompts />
-        </PromptToggle>
-      )}
+      {info.kind === "image" && <MnemonicSettings />}
       {info.kind === "text" && (
         <PromptToggle tool={tool}>
           <ToolPrompts tool={tool} />
