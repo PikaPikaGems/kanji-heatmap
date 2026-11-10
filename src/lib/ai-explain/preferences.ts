@@ -12,6 +12,7 @@ import {
 } from "@/lib/engine/content-owner";
 import {
   AI_PROVIDER_ORDER,
+  AI_TOOL_ORDER,
   AI_TOOLS,
   type AiTool,
 } from "./providers/capabilities";
@@ -475,13 +476,23 @@ export const hasValidKey = (
   provider: AiProvider
 ) => settings.keys[provider].apiKey !== "" && settings.keys[provider].keyValid;
 
-/** The switch can only be turned on with a key a provider accepted. */
-export const hasAnyValidAiKey = (settings: Pick<AiExplainSettings, "keys">) =>
-  AI_PROVIDER_ORDER.some((provider) => hasValidKey(settings, provider));
+/**
+ * Providers whose key can start something on its own. Read Aloud only reads
+ * an essay another tool wrote, so a speech-only key (ElevenLabs) isn't one.
+ */
+export const STARTER_PROVIDERS = AI_PROVIDER_ORDER.filter((provider) =>
+  AI_TOOL_ORDER.some(
+    (tool) =>
+      tool !== "readAloud" && AI_TOOLS[tool].providers.includes(provider)
+  )
+);
 
-/** AI Study Tools are switched on, with at least one key that works. */
-export const isAiExplainReady = (settings: AiExplainSettings) =>
-  settings.enabled && hasAnyValidAiKey(settings);
+/**
+ * The switch can only be turned on with one working key from a provider that
+ * can start something; one is enough.
+ */
+export const hasStarterAiKey = (settings: Pick<AiExplainSettings, "keys">) =>
+  STARTER_PROVIDERS.some((provider) => hasValidKey(settings, provider));
 
 /** A tool's choice with its provider settled and that provider's key. */
 export type ResolvedAiTool = AiToolChoice & {

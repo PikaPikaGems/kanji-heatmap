@@ -224,6 +224,9 @@ const ProviderKeyCard = ({
 /** A key card per provider that can power at least one tool. */
 export const ApiKeysTab = ({ ownerId }: { ownerId: string }) => (
   <div className="space-y-3">
+    <p className="text-sm font-semibold">
+      You only need one key. Add more only to use other providers.
+    </p>
     <p className="text-xs text-muted-foreground">
       Keys are saved only in this browser
       {ownerId === GUEST_OWNER_ID ? "" : ", for your account only,"} and each is

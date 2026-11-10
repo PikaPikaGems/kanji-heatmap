@@ -7,7 +7,12 @@ import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
-import { hasAnyValidAiKey } from "@/lib/ai-explain/preferences";
+import {
+  hasStarterAiKey,
+  hasValidKey,
+  STARTER_PROVIDERS,
+} from "@/lib/ai-explain/preferences";
+import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
 import {
   closeAiStudyTools,
   setAiStudyToolsTab,
@@ -43,7 +48,7 @@ const TAB_OPTIONS: { value: AiToolsTab; label: string }[] = [
 /** The switch for every AI feature; it needs a key that works. */
 const EnableSwitch = () => {
   const [settings, update] = useAiExplainSettings();
-  const keyOk = hasAnyValidAiKey(settings);
+  const keyOk = hasStarterAiKey(settings);
   // The saved choice is kept while the key is missing or rejected, so a
   // working key turns it back on.
   const active = settings.enabled && keyOk;
@@ -66,8 +71,14 @@ const EnableSwitch = () => {
         </span>
       </div>
       {!keyOk && (
-        <p className="text-xs text-muted-foreground">
-          Add an API key that works (in API keys) to turn this on.
+        <p className={cn("text-xs", cnWarningText)}>
+          {hasValidKey(settings, "elevenlabs")
+            ? "ElevenLabs only reads essays aloud. To turn this on, also add a key from one provider that writes them: "
+            : "To turn this on, add one API key from any of these providers (one is enough): "}
+          {STARTER_PROVIDERS.map((provider) => providerLabel(provider)).join(
+            ", "
+          )}
+          .
         </p>
       )}
       {active && (
