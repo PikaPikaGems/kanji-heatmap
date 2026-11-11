@@ -14,7 +14,7 @@ const assetsPaths = {
   SPHMN_COMPONENTS_FILE: "/json/v2/sphmn_components.json",
   VOCAB_FILE: "/json/v2/vocab.json",
   ANCHOR_WORDS_DETAILS_FILE: "/json/v2/anchor_words_details.json",
-  WORD_TAGS_FILE: "/json/v2/word_tags.json",
+  WORD_FREQUENCY_TAGS_FILE: "/json/v2/word_frequency_tags.json",
   CUM_USE: "/json/v2/cum_use.json",
   KANJI_SVGS: `${ASSETS_BASE_URL}/kanji/`,
   KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v7`, // Note: No slash at the end is intentional
