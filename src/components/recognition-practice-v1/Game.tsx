@@ -55,12 +55,10 @@ export const Game = ({
     ? isReadingCorrect(inputValue, current.reading)
     : false;
   const forgotTyped = isForgotCommand(inputValue);
-  // Mastery: the card is for one kanji of the word, so show which in green.
-  const highlightKanji = grading ? current?.kanji : null;
-  // With one kanji green, say the answer is the whole word's reading.
-  const answerPrompt = grading
-    ? 'Type the word\'s reading or "forgot"'
-    : 'Type the reading or type "forgot"';
+  // The card is for one kanji of the word, so show which in green, and ask
+  // for the whole word's reading so it isn't read as that kanji's.
+  const highlightKanji = current?.kanji;
+  const answerPrompt = 'Type the word\'s reading or "forgot"';
 
   const speak = useSpeak(current?.word ?? "");
   // Games keep the AI voice in memory so words after a pause play promptly.
