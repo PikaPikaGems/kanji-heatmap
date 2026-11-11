@@ -4,7 +4,7 @@ import { renderMarkdown } from "./render-markdown";
 describe("renderMarkdown", () => {
   it("renders headings and paragraphs", () => {
     const html = renderMarkdown("# About\n\nHello world.");
-    expect(html).toContain("<h1>About</h1>");
+    expect(html).toContain('<h1 id="about">About</h1>');
     expect(html).toContain("<p>Hello world.</p>");
   });
 
