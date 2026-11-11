@@ -153,23 +153,23 @@ describe("lazy datasets", () => {
 
 describe("reply envelope", () => {
   it("answers a successful request with COMPLETED and the handler's data", async () => {
-    send(10, "retrieve-vocab-info", "一つ");
+    send(10, "retrieve-vocab-info", "一部");
     await settle();
 
     expect(replyFor(10)?.response).toMatchObject({
       requestType: "retrieve-vocab-info",
       status: "COMPLETED",
     });
-    expect(replyFor(10)?.response.data).toMatchObject({ word: "一つ" });
+    expect(replyFor(10)?.response.data).toMatchObject({ word: "一部" });
   });
 
   it("echoes the request id so out-of-order replies can be matched up", async () => {
-    send(21, "retrieve-vocab-info", "一つ");
-    send(22, "retrieve-vocab-info", "一万");
+    send(21, "retrieve-vocab-info", "一部");
+    send(22, "retrieve-vocab-info", "一人");
     await settle();
 
-    expect(replyFor(21)?.response.data).toMatchObject({ word: "一つ" });
-    expect(replyFor(22)?.response.data).toMatchObject({ word: "一万" });
+    expect(replyFor(21)?.response.data).toMatchObject({ word: "一部" });
+    expect(replyFor(22)?.response.data).toMatchObject({ word: "一人" });
   });
 
   it("answers an unknown request type with ERRORED rather than silence", async () => {
@@ -242,7 +242,7 @@ describe("data handlers", () => {
       mainVocab: { first: { word: string; meaning: string } };
     };
     expect(data.keyword).toBe("one");
-    expect(data.mainVocab.first.word).toBe("一つ");
+    expect(data.mainVocab.first.word).toBe("一部");
     expect(data.mainVocab.first.meaning).toContain("one");
   });
 

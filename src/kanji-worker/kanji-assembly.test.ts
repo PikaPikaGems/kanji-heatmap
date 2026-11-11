@@ -98,30 +98,41 @@ describe("extractKanjiHoverData (characterization against real data)", () => {
     expect(result).toMatchSnapshot();
   });
 
-  it("朝: phonetic is a non-kanji component, katakana vocab chars are dropped from partsList", () => {
+  it("朝: phonetic is a non-kanji component", () => {
     const result = hoverDataFor("朝");
 
     expect(result.phonetic?.phonetic).toBe("𠦝");
     expect(result.phonetic?.isKanji).toBe(false);
     expect(result.phonetic?.keyword).toBe(components["𠦝"].k);
-    // "テレビ朝日": the katakana have no keyword entries so only 朝/日 remain.
-    expect(result.mainVocab?.first?.partsList.map((p) => p.kanji)).toEqual([
-      "朝",
-      "日",
-    ]);
     expect(result).toMatchSnapshot();
   });
 
-  it("一: no phonetic, no parts, okurigana dropped from partsList", () => {
+  it("薪: katakana vocab chars are dropped from partsList", () => {
+    const result = hoverDataFor("薪");
+
+    // "薪ストーブ": the katakana have no keyword entries so only 薪 remains.
+    expect(result.mainVocab?.first?.word).toBe("薪ストーブ");
+    expect(result.mainVocab?.first?.partsList.map((p) => p.kanji)).toEqual([
+      "薪",
+    ]);
+  });
+
+  it("一: no phonetic, no parts", () => {
     const result = hoverDataFor("一");
 
     expect(result.phonetic).toBeUndefined();
     expect(result.parts).toEqual([]);
-    // "一つ": つ has no keyword entry.
-    expect(result.mainVocab?.first?.partsList.map((p) => p.kanji)).toEqual([
-      "一",
-    ]);
     expect(result).toMatchSnapshot();
+  });
+
+  it("入: okurigana dropped from partsList", () => {
+    const result = hoverDataFor("入");
+
+    // "入れる": れる has no keyword entry.
+    expect(result.mainVocab?.first?.word).toBe("入れる");
+    expect(result.mainVocab?.first?.partsList.map((p) => p.kanji)).toEqual([
+      "入",
+    ]);
   });
 
   it("六: parts mix kanji and non-kanji components", () => {
