@@ -4,7 +4,7 @@ test.describe("navigation", () => {
   test("about page renders", async ({ page }) => {
     await page.goto("/about");
     await expect(
-      page.getByRole("heading", { name: "About", exact: true })
+      page.getByRole("heading", { name: "About Kanji Heatmap", exact: true })
     ).toBeVisible({ timeout: 30_000 });
   });
 
