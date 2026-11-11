@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { KanjiPopoverWord } from "@/components/shared-practice/KanjiPopoverWord";
+import {
+  HighlightedWord,
+  KanjiPopoverWord,
+} from "@/components/shared-practice/KanjiPopoverWord";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import {
   BlurredGloss,
@@ -52,6 +55,8 @@ export const Game = ({
     ? isReadingCorrect(inputValue, current.reading)
     : false;
   const forgotTyped = isForgotCommand(inputValue);
+  // Mastery: the card is for one kanji of the word, so show which in green.
+  const highlightKanji = grading ? current?.kanji : null;
 
   const speak = useSpeak(current?.word ?? "");
   // Games keep the AI voice in memory so words after a pause play promptly.
@@ -198,9 +203,15 @@ export const Game = ({
             {/* Once answered, each kanji opens its popover (before, its
                 readings would give the answer away). */}
             {feedback == null ? (
-              current.word
+              <HighlightedWord
+                word={current.word}
+                highlightKanji={highlightKanji}
+              />
             ) : (
-              <KanjiPopoverWord word={current.word} />
+              <KanjiPopoverWord
+                word={current.word}
+                highlightKanji={highlightKanji}
+              />
             )}
           </p>
         </div>
