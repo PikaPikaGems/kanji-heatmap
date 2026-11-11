@@ -28,7 +28,7 @@ test.describe("route smoke coverage", () => {
     await page.goto("/docs");
     await expect(page).toHaveURL(/\/about$/);
     await expect(
-      page.getByRole("heading", { name: "About", exact: true })
+      page.getByRole("heading", { name: "About Kanji Heatmap", exact: true })
     ).toBeVisible({ timeout: 30_000 });
   });
 });
