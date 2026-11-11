@@ -124,7 +124,7 @@ test.describe("practice modes", () => {
     await expect(startButton).toBeEnabled({ timeout: 30_000 });
     await startButton.click();
 
-    const answerBox = page.getByLabel('Type the reading or type "forgot"');
+    const answerBox = page.getByLabel('Type the word\'s reading or "forgot"');
     await expect(answerBox).toBeVisible({ timeout: 30_000 });
 
     await page.getByRole("button", { name: "Forgot" }).click();
@@ -133,7 +133,7 @@ test.describe("practice modes", () => {
 
     // Back on an answer prompt (next card) — end the session from there.
     await expect(
-      page.getByLabel('Type the reading or type "forgot"')
+      page.getByLabel('Type the word\'s reading or "forgot"')
     ).toBeVisible({ timeout: 30_000 });
     await page.getByRole("button", { name: "End session" }).click();
 

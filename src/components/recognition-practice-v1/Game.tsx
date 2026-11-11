@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useSpeak } from "@/hooks/use-jp-speak";
 import { useKeepAiVoiceWarm } from "@/hooks/use-ai-voice";
 import { useCorrectSound } from "@/hooks/use-correct-sound";
-import { KanjiPopoverWord } from "@/components/shared-practice/KanjiPopoverWord";
+import {
+  HighlightedWord,
+  KanjiPopoverWord,
+} from "@/components/shared-practice/KanjiPopoverWord";
 import { useKanaInput } from "@/hooks/use-kana-input";
 import {
   BlurredGloss,
@@ -52,6 +55,10 @@ export const Game = ({
     ? isReadingCorrect(inputValue, current.reading)
     : false;
   const forgotTyped = isForgotCommand(inputValue);
+  // The card is for one kanji of the word, so show which in green, and ask
+  // for the whole word's reading so it isn't read as that kanji's.
+  const highlightKanji = current?.kanji;
+  const answerPrompt = 'Type the word\'s reading or "forgot"';
 
   const speak = useSpeak(current?.word ?? "");
   // Games keep the AI voice in memory so words after a pause play promptly.
@@ -198,9 +205,15 @@ export const Game = ({
             {/* Once answered, each kanji opens its popover (before, its
                 readings would give the answer away). */}
             {feedback == null ? (
-              current.word
+              <HighlightedWord
+                word={current.word}
+                highlightKanji={highlightKanji}
+              />
             ) : (
-              <KanjiPopoverWord word={current.word} />
+              <KanjiPopoverWord
+                word={current.word}
+                highlightKanji={highlightKanji}
+              />
             )}
           </p>
         </div>
@@ -224,8 +237,8 @@ export const Game = ({
               autoCorrect="off"
               autoComplete="off"
               spellCheck={false}
-              aria-label='Type the reading or type "forgot"'
-              placeholder='Type the reading or type "forgot"'
+              aria-label={answerPrompt}
+              placeholder={answerPrompt}
               className="relative w-full p-0 px-2 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
               {...kanaInput}
