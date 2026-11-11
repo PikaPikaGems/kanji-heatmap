@@ -48,7 +48,7 @@ exports[`extractKanjiGeneralData (characterization against real data) > 朝: all
 }
 `;
 
-exports[`extractKanjiHoverData (characterization against real data) > 一: no phonetic, no parts, okurigana dropped from partsList 1`] = `
+exports[`extractKanjiHoverData (characterization against real data) > 一: no phonetic, no parts 1`] = `
 {
   "frequency": {
     "aozoraChar": 2,
@@ -78,27 +78,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
   "kun": "ひと-",
   "mainVocab": {
     "first": {
-      "meaning": "one, for one thing, only",
-      "partsList": [
-        {
-          "isKanji": true,
-          "kanji": "一",
-          "keyword": "one",
-        },
-      ],
-      "word": "一つ",
-      "wordPartDetails": [
-        [
-          "一",
-          "ひと",
-        ],
-        [
-          "つ",
-        ],
-      ],
-    },
-    "second": {
-      "meaning": "10,000, ten thousand",
+      "meaning": "one part, one portion, one section",
       "partsList": [
         {
           "isKanji": true,
@@ -107,19 +87,41 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
         },
         {
           "isKanji": true,
-          "kanji": "万",
-          "keyword": "ten thousand",
+          "kanji": "部",
+          "keyword": "section",
         },
       ],
-      "word": "一万",
+      "word": "一部",
       "wordPartDetails": [
         [
           "一",
           "いち",
         ],
         [
-          "万",
-          "まん",
+          "部",
+          "ぶ",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "one person, being alone, being by oneself",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "一",
+          "keyword": "one",
+        },
+        {
+          "isKanji": true,
+          "kanji": "人",
+          "keyword": "person",
+        },
+      ],
+      "word": "一人",
+      "wordPartDetails": [
+        [
+          "一人",
+          "ひとり",
         ],
       ],
     },
@@ -192,28 +194,28 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
       ],
     },
     "second": {
-      "meaning": "fifteen, 15",
+      "meaning": "May",
       "partsList": [
-        {
-          "isKanji": true,
-          "kanji": "十",
-          "keyword": "ten",
-        },
         {
           "isKanji": true,
           "kanji": "五",
           "keyword": "five",
         },
+        {
+          "isKanji": true,
+          "kanji": "月",
+          "keyword": "month",
+        },
       ],
-      "word": "十五",
+      "word": "五月",
       "wordPartDetails": [
-        [
-          "十",
-          "じゅう",
-        ],
         [
           "五",
           "ご",
+        ],
+        [
+          "月",
+          "がつ",
         ],
       ],
     },
@@ -278,32 +280,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
   "kun": "む",
   "mainVocab": {
     "first": {
-      "meaning": "6th day of the month, six days",
-      "partsList": [
-        {
-          "isKanji": true,
-          "kanji": "六",
-          "keyword": "six",
-        },
-        {
-          "isKanji": true,
-          "kanji": "日",
-          "keyword": "day",
-        },
-      ],
-      "word": "六日",
-      "wordPartDetails": [
-        [
-          "六",
-          "むい",
-        ],
-        [
-          "日",
-          "か",
-        ],
-      ],
-    },
-    "second": {
       "meaning": "June, sixth month of the lunar calendar",
       "partsList": [
         {
@@ -326,6 +302,26 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
         [
           "月",
           "がつ",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "six",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "六",
+          "keyword": "six",
+        },
+      ],
+      "word": "六つ",
+      "wordPartDetails": [
+        [
+          "六",
+          "むっ",
+        ],
+        [
+          "つ",
         ],
       ],
     },
@@ -353,7 +349,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
 }
 `;
 
-exports[`extractKanjiHoverData (characterization against real data) > 朝: phonetic is a non-kanji component, katakana vocab chars are dropped from partsList 1`] = `
+exports[`extractKanjiHoverData (characterization against real data) > 朝: phonetic is a non-kanji component 1`] = `
 {
   "frequency": {
     "aozoraChar": 213,
@@ -383,35 +379,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
   "kun": "あさ",
   "mainVocab": {
     "first": {
-      "meaning": "TV Asahi",
-      "partsList": [
-        {
-          "isKanji": true,
-          "kanji": "朝",
-          "keyword": "morning",
-        },
-        {
-          "isKanji": true,
-          "kanji": "日",
-          "keyword": "day",
-        },
-      ],
-      "word": "テレビ朝日",
-      "wordPartDetails": [
-        [
-          "テレビ",
-        ],
-        [
-          "朝",
-          "あさ",
-        ],
-        [
-          "日",
-          "ひ",
-        ],
-      ],
-    },
-    "second": {
       "meaning": "this morning",
       "partsList": [
         {
@@ -430,6 +397,32 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
         [
           "今朝",
           "けさ",
+        ],
+      ],
+    },
+    "second": {
+      "meaning": "every morning",
+      "partsList": [
+        {
+          "isKanji": true,
+          "kanji": "毎",
+          "keyword": "every",
+        },
+        {
+          "isKanji": true,
+          "kanji": "朝",
+          "keyword": "morning",
+        },
+      ],
+      "word": "毎朝",
+      "wordPartDetails": [
+        [
+          "毎",
+          "まい",
+        ],
+        [
+          "朝",
+          "あさ",
         ],
       ],
     },
