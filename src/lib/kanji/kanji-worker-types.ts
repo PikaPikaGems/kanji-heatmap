@@ -245,6 +245,14 @@ export interface WorkerApi {
     payload: undefined;
     response: AnchorWordsDetailsFile;
   };
+  /**
+   * One word's tags and tier from the frequency-tags file (anchor and sample
+   * words), for the reference card's word popover. Null when it has none.
+   */
+  "word-tags": {
+    payload: string;
+    response: { tags: string[]; tier: string } | null;
+  };
   /** One kanji's anchor words with tags, ranks and tier, for the drawer. */
   "kanji-anchor-words": {
     payload: string;

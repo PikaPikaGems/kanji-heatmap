@@ -1,7 +1,10 @@
 import { SectionLoading } from "@/components/common/SectionLoading";
 import { useKanjiAnchorWords } from "@/providers/kanji-representative-word-hooks";
-import { ANCHOR_TIER_LABELS, type AnchorWord } from "@/lib/kanji/anchor-words";
-import type { CommonWordEntry } from "@/lib/sample-vocabulary";
+import {
+  ANCHOR_TIER_LABELS,
+  toTagsWordEntry,
+  type AnchorWord,
+} from "@/lib/kanji/anchor-words";
 import { Badge } from "@/components/ui/badge";
 import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs } from "@/components/ui/tabs";
@@ -134,19 +137,6 @@ const WhatIsARepresentativeStudyWord = () => {
   );
 };
 
-const JLPT_TAGS = ["n5", "n4", "n3", "n2", "n1"];
-
-/** The word's tags as a word-list entry, so they show like other words' badges. */
-const toWordEntry = ({ word, tags }: AnchorWord): CommonWordEntry => {
-  const jlpt = tags.find((tag) => JLPT_TAGS.includes(tag));
-  return {
-    w: word,
-    j: jlpt ? Number(jlpt.slice(1)) : undefined,
-    k: tags.includes("kaishi"),
-    o: tags.join(","),
-  };
-};
-
 /**
  * One anchor word's table, then its frequency ranks, then View Vocabulary
  * Details (or the AI controls).
@@ -189,7 +179,7 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
       content:
         tags.length > 0 ? (
           <WordTagBadges
-            entry={toWordEntry(anchor)}
+            entry={toTagsWordEntry(anchor.word, tags)}
             isName={tags.includes("name")}
             maxVisible={Infinity}
             className="-m-1"

@@ -99,6 +99,20 @@ export const useKanjiAnchorWords = (
 };
 
 /**
+ * One word's tags and tier (anchor and sample words), from the worker. Null
+ * while loading and when the word has none.
+ */
+export const useWordTags = (word: string) => {
+  const ready = useIsKanjiWorkerReady();
+  const { data } = useWorkerQuery<{ tags: string[]; tier: string } | null>(
+    ready ? () => requestWorker({ type: "word-tags", payload: word }) : null,
+    [ready, word],
+    false
+  );
+  return data ?? null;
+};
+
+/**
  * Anchor words (word, readings, gloss) for any kanji, looked up
  * synchronously — for a whole deck or review queue, where the per-kanji hook
  * above doesn't fit. `null` until the details file has loaded, and while

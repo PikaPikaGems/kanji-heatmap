@@ -402,6 +402,14 @@ const handleKanjiAnchorWords = requirePayload(
   }
 );
 
+/** One word's tags and tier (anchor and sample words); null when it has none. */
+const handleWordTags = requirePayload(async (word: string) => {
+  const entry = (await loadAnchorWordsFrequencyTags())[word];
+  if (entry == null) return null;
+  const [tags, , tier] = entry;
+  return { tags: tags.split(",").filter((tag) => tag !== ""), tier };
+});
+
 const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
   const readingDetails = await loadReadingDetails();
   const entries = readingDetails[kanji];
@@ -481,6 +489,7 @@ const HANDLERS: {
   "component-map": () => loadComponents(),
   "anchor-words-details": () => loadAnchorWordsDetails(),
   "kanji-anchor-words": handleKanjiAnchorWords,
+  "word-tags": handleWordTags,
   "similar-map": () => loadSimilar(),
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
