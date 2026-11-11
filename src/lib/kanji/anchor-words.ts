@@ -1,3 +1,5 @@
+import type { CommonWordEntry } from "@/lib/sample-vocabulary";
+
 /**
  * Anchor words (data handoff: jp-misc-data
  * kanji-heatmap-build-2/docs/ANCHOR_WORDS_APP_HANDOFF.md). Each kanji has a
@@ -16,7 +18,11 @@ export type AnchorWordsDetailsFile = Record<
   ]
 >;
 
-/** Per word (main and secondary): ","-joined tags, 17 frequency ranks (-1 = not ranked) and the tier emoji. */
+/**
+ * Per word: ","-joined tags, frequency ranks and the tier emoji. Anchor words
+ * (main and secondary) have 17 ranks (-1 = not ranked); sample words that
+ * aren't anchor words have none (ranks only show for anchor words).
+ */
 export type AnchorWordsFrequencyTagsFile = Record<
   string,
   [tags: string, ranks: number[], tierEmoji: string]
@@ -75,6 +81,27 @@ export const toAnchorWordBasics = (
           englishGloss: secondaryGloss,
         }
       : null,
+  };
+};
+
+const JLPT_TAGS = ["n5", "n4", "n3", "n2", "n1"];
+
+/**
+ * A word's tags (and tier, when given) as a word-list entry, so they show like
+ * other words' badges.
+ */
+export const toTagsWordEntry = (
+  word: string,
+  tags: string[],
+  tier?: string
+): CommonWordEntry => {
+  const jlpt = tags.find((tag) => JLPT_TAGS.includes(tag));
+  return {
+    w: word,
+    t: tier,
+    j: jlpt ? Number(jlpt.slice(1)) : undefined,
+    k: tags.includes("kaishi"),
+    o: tags.join(","),
   };
 };
 

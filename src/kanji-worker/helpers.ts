@@ -69,7 +69,7 @@ export const fetchAnchorWordsDetails = createFetch<AnchorWordsDetailsFile>(
 
 export const fetchAnchorWordsFrequencyTags =
   createFetch<AnchorWordsFrequencyTagsFile>(
-    assetsPaths.ANCHOR_WORDS_FREQUENCY_TAGS_FILE
+    assetsPaths.WORD_FREQUENCY_TAGS_FILE
   );
 
 export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
