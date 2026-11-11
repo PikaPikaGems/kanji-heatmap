@@ -57,6 +57,10 @@ export const Game = ({
   const forgotTyped = isForgotCommand(inputValue);
   // Mastery: the card is for one kanji of the word, so show which in green.
   const highlightKanji = grading ? current?.kanji : null;
+  // With one kanji green, say the answer is the whole word's reading.
+  const answerPrompt = grading
+    ? 'Type the word\'s reading or "forgot"'
+    : 'Type the reading or type "forgot"';
 
   const speak = useSpeak(current?.word ?? "");
   // Games keep the AI voice in memory so words after a pause play promptly.
@@ -235,8 +239,8 @@ export const Game = ({
               autoCorrect="off"
               autoComplete="off"
               spellCheck={false}
-              aria-label='Type the reading or type "forgot"'
-              placeholder='Type the reading or type "forgot"'
+              aria-label={answerPrompt}
+              placeholder={answerPrompt}
               className="relative w-full p-0 px-2 mt-2 text-xl text-center border-2 rounded-2xl h-14 focus-visible:ring-offset-0 animate-fade-in"
               onKeyDown={handleKeyDown}
               {...kanaInput}
