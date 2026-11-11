@@ -62,7 +62,7 @@ const WordTagBadge = ({ tag }: { tag: WordTag }) => {
     return (
       <BadgeWithPopover
         name="👤 Name"
-        desc="A proper noun (a name of a person, place or thing), not a dictionary word"
+        desc="A proper noun: a person's name or a place, from the JMnedict names dictionary. Not an everyday word."
       />
     );
   }
