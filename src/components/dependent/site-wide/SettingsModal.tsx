@@ -101,7 +101,7 @@ const JpVoiceSelect = () => {
   const selectValue = matched?.voiceURI ?? DEFAULT_JP_VOICE_ID;
 
   return (
-    <div className="mx-1 text-left">
+    <div className="text-left">
       <Select value={selectValue} onValueChange={setVoiceId}>
         <SelectTrigger aria-label="Japanese text-to-speech voice">
           <SelectValue />
@@ -129,11 +129,22 @@ const JapaneseVoiceSection = () => {
         Voice <SpeakButton word={VOICE_PREVIEW_TEXT} iconType="volume-2" />
       </div>
       <VoiceEngineChoice />
-      {engine === "ai" && <AiVoicePanel />}
-      <div className="mt-4 mb-2 text-sm font-semibold text-left">
-        {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
+      {engine === "ai" && (
+        <div className="animate-fade-in-fast">
+          <AiVoicePanel />
+        </div>
+      )}
+      <div
+        className={cn(
+          "text-left",
+          engine === "ai" && "pt-5 mt-6 border-t border-dashed"
+        )}
+      >
+        <div className="mb-2 text-sm font-semibold">
+          {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
+        </div>
+        <JpVoiceSelect />
       </div>
-      <JpVoiceSelect />
     </SimpleAccordion>
   );
 };

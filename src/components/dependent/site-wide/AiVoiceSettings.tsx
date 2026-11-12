@@ -59,7 +59,9 @@ import {
 import sliderHints from "@/lib/ai-voice/yomiage-slider-hints.json";
 import { cn } from "@/lib/utils";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
+import { NoticeAction } from "@/components/common/UserNotice";
+import { NoteCard, NoteRow } from "@/components/common/NoteCard";
+import { Cpu, Smartphone, Volume2 } from "lucide-react";
 
 type Yomiage = typeof import("yomiage");
 type SliderName =
@@ -107,7 +109,7 @@ export const VoiceEngineChoice = () => {
 
   return (
     <div
-      className="grid grid-cols-2 gap-2 mb-3"
+      className="grid grid-cols-2 gap-2 mb-5"
       role="group"
       aria-label="Text-to-speech engine"
     >
@@ -178,7 +180,7 @@ const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
   const needsDownload = state.status === "not-loaded" && state.cached === false;
 
   return (
-    <div className="flex flex-col gap-2 py-3 border-b-2 border-dashed">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3 text-left">
         <div className="flex flex-col">
           <span className="text-sm font-semibold">Download AI voice</span>
@@ -488,9 +490,9 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
   const previewing = preview.status !== "idle";
 
   return (
-    <div className="pt-3">
+    <div>
       {/* Becomes Stop while the preview plays. */}
-      <div className="pb-3">
+      <div className="mb-5">
         {previewing ? (
           <PracticeButton
             variant="secondary"
@@ -543,7 +545,7 @@ const AiVoiceTuning = ({ mod, ready }: { mod: Yomiage; ready: boolean }) => {
         </CustomizationSection>
       )}
 
-      <span className={cn(subheadingCn, "block mt-4")}>Delivery Presets</span>
+      <span className={cn(subheadingCn, "block mt-5")}>Delivery Presets</span>
       <PresetTiles
         label="Delivery Presets"
         options={DELIVERY_PRESETS}
@@ -609,25 +611,35 @@ const DebugReportTerminal = () => {
   );
 };
 
-/** Everything shown under "AI Voice" in User Preferences. */
 /**
- * Games keep the AI voice loaded the whole time (no reload delay between
- * rounds), which can be too much memory for older phones.
+ * What to know before using the AI voice. Games keep it loaded the whole time
+ * (no reload delay between rounds), which can be too much memory for older
+ * phones, so that row offers the switch back.
  */
-const GameReloadNotice = () => {
+const AiVoiceNote = () => {
   const [, choose] = useChooseVoiceEngine();
   return (
-    <UserNotice className="pb-3 border-b-2 border-dashed">
-      On older phones, the page may reload during games while the AI voice is
-      on. If that happens,{" "}
-      <NoticeAction onClick={() => choose("browser")}>
-        switch to the browser voice
-      </NoticeAction>
-      .
-    </UserNotice>
+    <NoteCard title="Experimental">
+      <NoteRow icon={Cpu}>
+        Runs on your device: a one-time download and a few hundred MB of memory
+        while it&apos;s loaded.
+      </NoteRow>
+      <NoteRow icon={Smartphone}>
+        On older phones, the page may reload during games. If that happens,{" "}
+        <NoticeAction onClick={() => choose("browser")}>
+          switch to the browser voice
+        </NoticeAction>
+        .
+      </NoteRow>
+      <NoteRow icon={Volume2}>
+        May not work on every device or browser. Whenever it can&apos;t play,
+        your browser voice is used instead.
+      </NoteRow>
+    </NoteCard>
   );
 };
 
+/** Everything shown under "AI Voice" in User Preferences. */
 export const AiVoicePanel = () => {
   const state = useAiVoiceState();
   const mod = useYomiageModule();
@@ -641,23 +653,14 @@ export const AiVoicePanel = () => {
   const ready = state.status === "ready" || state.status === "stopped";
 
   return (
-    <div className="text-left">
-      <GameReloadNotice />
+    <div className="flex flex-col gap-5 text-left">
+      <AiVoiceNote />
       <AiVoiceFilesRow state={state} />
-
-      <p className="p-3 mb-1 text-xs border-2 border-dashed rounded-lg text-muted-foreground">
-        ⚠️ Experimental. The AI voice runs on your device: it needs a one-time
-        download (size above) and uses a few hundred MB of memory while
-        it&apos;s loaded. It may not work on every device or browser. Whenever
-        it can&apos;t play, your browser voice is used instead.
-      </p>
 
       {/* Presets and sliders only matter once the voice is downloaded. */}
       {mod && state.cached && <AiVoiceTuning mod={mod} ready={ready} />}
 
-      {mod && (
-        <p className="pt-2 text-xs text-muted-foreground">{mod.CREDIT}</p>
-      )}
+      {mod && <p className="text-xs text-muted-foreground">{mod.CREDIT}</p>}
     </div>
   );
 };
