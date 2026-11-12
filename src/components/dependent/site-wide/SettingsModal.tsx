@@ -122,9 +122,7 @@ const JapaneseVoiceSection = () => {
       <VoiceEngineChoice />
       {engine === "ai" && <AiVoicePanel />}
       <div className="mt-4 mb-2 text-sm font-semibold text-left">
-        {engine === "ai"
-          ? "Browser voice (used when the AI voice can't play)"
-          : "Browser voice"}
+        {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
       </div>
       <JpVoiceSelect />
     </SimpleAccordion>

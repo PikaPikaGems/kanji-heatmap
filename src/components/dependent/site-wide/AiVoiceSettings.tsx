@@ -59,6 +59,7 @@ import {
 import sliderHints from "@/lib/ai-voice/yomiage-slider-hints.json";
 import { cn } from "@/lib/utils";
 import { PracticeButton } from "@/components/ui/practice-button";
+import { NoticeAction, UserNotice } from "@/components/common/UserNotice";
 
 type Yomiage = typeof import("yomiage");
 type SliderName =
@@ -82,7 +83,8 @@ const ENGINE_OPTIONS: { value: VoiceEngine; label: string }[] = [
   { value: "ai", label: "AI Voice" },
 ];
 
-export const VoiceEngineChoice = () => {
+/** The current engine and a switch that also starts or unloads the AI voice. */
+const useChooseVoiceEngine = () => {
   const [engine, setEngine] = useVoiceEngine();
 
   const choose = (next: VoiceEngine) => {
@@ -96,6 +98,12 @@ export const VoiceEngineChoice = () => {
       unloadAiVoice();
     }
   };
+
+  return [engine, choose] as const;
+};
+
+export const VoiceEngineChoice = () => {
+  const [engine, choose] = useChooseVoiceEngine();
 
   return (
     <div
@@ -602,6 +610,24 @@ const DebugReportTerminal = () => {
 };
 
 /** Everything shown under "AI Voice" in User Preferences. */
+/**
+ * Games keep the AI voice loaded the whole time (no reload delay between
+ * rounds), which can be too much memory for older phones.
+ */
+const GameReloadNotice = () => {
+  const [, choose] = useChooseVoiceEngine();
+  return (
+    <UserNotice className="pb-3 border-b-2 border-dashed">
+      On older phones, the page may reload during games while the AI voice is
+      on. If that happens,{" "}
+      <NoticeAction onClick={() => choose("browser")}>
+        switch to the browser voice
+      </NoticeAction>
+      .
+    </UserNotice>
+  );
+};
+
 export const AiVoicePanel = () => {
   const state = useAiVoiceState();
   const mod = useYomiageModule();
@@ -616,6 +642,7 @@ export const AiVoicePanel = () => {
 
   return (
     <div className="text-left">
+      <GameReloadNotice />
       <AiVoiceFilesRow state={state} />
 
       <p className="p-3 mb-1 text-xs border-2 border-dashed rounded-lg text-muted-foreground">
