@@ -46,6 +46,10 @@ const FONT_NAMES = [
   "Potta One",
 ];
 
+/** "BIZ UDGothic" → "biz-udgothic", as in scripts/build-font-tiles.mjs. */
+const fontTileSlug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
 const FontGrid = () => {
   const [fontIndex, setFont] = useCurrentFont();
 
@@ -62,12 +66,17 @@ const FontGrid = () => {
           title={name}
           className="flex-col w-full h-auto gap-1 p-2 rounded-xl"
         >
+          {/* A drawing of 字体 in this font (scripts/build-font-tiles.mjs),
+              not live text: live text would download all 15 fonts. The
+              mask takes the tile's text color. */}
           <span
-            className="text-xl leading-none"
-            style={{ fontFamily: `var(--jap-font-${i})` }}
-          >
-            字体
-          </span>
+            role="img"
+            aria-label="字体"
+            className="w-10 h-5 bg-current"
+            style={{
+              mask: `url(/svg/font-tiles/${fontTileSlug(name)}.svg) center / contain no-repeat`,
+            }}
+          />
           <span
             className={cn(
               "w-full truncate text-center text-[10px] font-normal tracking-normal",
