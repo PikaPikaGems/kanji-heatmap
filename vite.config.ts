@@ -412,7 +412,8 @@ const pwaConfig = {
       // (KANJI_VOCAB and TEXT_BOOK_VOCAB in src/lib/assets-paths.ts). Any
       // version matches, so bumping a version there needs no change here;
       // the old version's pages age out through maxEntries. Pages are
-      // ~1–2 KB each, so a full cache is a few MB.
+      // ~1–2 KB each; 6000 entries fits both sets (~2,650 textbook + ~3,060
+      // common pages), so a full cache is roughly 6–12 MB.
       // **********************
       ...(ASSETS_ORIGIN
         ? [
@@ -424,7 +425,7 @@ const pwaConfig = {
               options: {
                 cacheName: "kanji-vocabulary-cache",
                 expiration: {
-                  maxEntries: 3000,
+                  maxEntries: 6000,
                   maxAgeSeconds: 365 * 24 * 60 * 60, // One year
                 },
                 fetchOptions: {
