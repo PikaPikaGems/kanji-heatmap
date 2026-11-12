@@ -76,20 +76,11 @@ const WordTagBadge = ({ tag }: { tag: WordTag }) => {
       />
     );
   }
-  if (tag.kind === "handpicked") {
+  if (tag.kind === "handpicked" || tag.kind === "reviewed") {
     return (
-      <BadgeWithPopover
-        name="👍 Handpicked"
-        desc="A person suggested this word as an anchor word for this kanji, and the algorithm picked it too."
-      />
-    );
-  }
-  if (tag.kind === "reviewed") {
-    return (
-      <BadgeWithPopover
-        name="👀 Reviewed"
-        desc="A person reviewed this anchor word and kept it."
-      />
+      <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
+        {tag.kind === "handpicked" ? "👍 Handpicked" : "👀 Reviewed"}
+      </Badge>
     );
   }
   if (tag.kind === "kaishi") {
