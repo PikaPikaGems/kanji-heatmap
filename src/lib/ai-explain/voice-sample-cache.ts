@@ -1,7 +1,7 @@
 /**
  * Generated voice samples, kept in the browser's Cache Storage so each
  * voice and setting combination is paid for once. Object URLs are reused
- * while the page is open.
+ * while the page is open and revoked when the samples are cleared.
  */
 const CACHE_NAME = "ai-voice-samples-v1";
 const urls = new Map<string, string>();
@@ -46,6 +46,8 @@ export const writeVoiceSample = async (keys: string[], blob: Blob) => {
 
 /** Forgets every sample, with the rest of the generated content. */
 export const clearVoiceSamples = async () => {
+  // Several keys can share one URL, so revoke each URL once.
+  new Set(urls.values()).forEach((url) => URL.revokeObjectURL(url));
   urls.clear();
   try {
     await caches.delete(CACHE_NAME);
