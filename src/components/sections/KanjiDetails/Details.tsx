@@ -80,9 +80,9 @@ const SpeechNote = () => {
   if (status.kind === "active" && engine === "ai") {
     return (
       <>
-        Speak buttons 🔊 🎧 play natural-sounding audio first. When a word has
-        none, the AI voice reads it, and your {"device's"} built-in voice is the
-        last fallback.
+        Speak buttons 🔊 🎧 play natural-sounding audio by default. When not
+        available, the AI voice reads it, and your {"device's"} built-in voice
+        is the last fallback.
       </>
     );
   }

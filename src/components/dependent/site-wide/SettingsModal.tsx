@@ -115,7 +115,6 @@ const JpVoiceSelect = () => {
           ))}
         </SelectContent>
       </Select>
-      <TtsNotice className="pt-2" />
     </div>
   );
 };
@@ -131,6 +130,8 @@ const JapaneseVoiceSection = () => {
       <VoiceEngineChoice />
       {engine === "ai" && (
         <div className="animate-fade-in-fast">
+          {/* Under the choice it explains: what plays, in which order. */}
+          <TtsNotice className="mb-5 -mt-2" />
           <AiVoicePanel />
         </div>
       )}
@@ -144,6 +145,7 @@ const JapaneseVoiceSection = () => {
           {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
         </div>
         <JpVoiceSelect />
+        {engine !== "ai" && <TtsNotice className="pt-2" />}
       </div>
     </SimpleAccordion>
   );

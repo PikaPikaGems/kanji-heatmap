@@ -26,8 +26,9 @@ export const TtsNotice = ({ className }: { className?: string }) => {
   if (status.kind === "active" && engine === "ai") {
     return (
       <p className={cn("text-xs text-left", className)}>
-        🔊 Natural-sounding audio first. When a word has none, the AI voice
-        reads it, and your device&apos;s built-in voice is the last fallback.
+        🔊 Natural-sounding audio will be played by default. When not available,
+        the AI voice reads it, and your device&apos;s built-in voice is the last
+        fallback.
       </p>
     );
   }
