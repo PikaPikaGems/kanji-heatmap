@@ -180,7 +180,10 @@ const OwnedGeneratedStorage = () => {
       <p className="text-xs text-muted-foreground">
         Saved only on this device and browser, and not private: anyone with
         access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep.
+        The browser may also delete it on its own if you don&apos;t open this
+        site for a while (7 days in Safari, unless it&apos;s added to the Home
+        Screen) or the device runs low on space. Download content you want to
+        keep.
       </p>
       <TextActionButton
         icon={<Trash2 size={14} />}

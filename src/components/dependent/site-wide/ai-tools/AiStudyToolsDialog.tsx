@@ -91,8 +91,10 @@ const EnableSwitch = () => {
         >
           Heads up: what you generate is saved only in this browser. It
           isn&apos;t backed up and can be lost if browser data is cleared, and
-          anyone using this computer can see it. Download anything you want to
-          keep.
+          anyone using this computer can see it. The browser may also delete it
+          on its own if you don&apos;t open this site for a while (7 days in
+          Safari, unless it&apos;s added to the Home Screen) or the device runs
+          low on space. Download anything you want to keep.
         </p>
       )}
     </div>
