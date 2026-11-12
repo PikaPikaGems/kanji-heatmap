@@ -6,7 +6,10 @@ import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-conte
 import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SavedAiContentLoading } from "@/components/common/OwnedAiContent";
-import { useAiExplainSettings } from "@/hooks/use-ai-explain";
+import {
+  useAiExplainSettings,
+  useAiStudyToolsActive,
+} from "@/hooks/use-ai-explain";
 import {
   hasStarterAiKey,
   hasValidKey,
@@ -25,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { ApiKeysTab } from "./ApiKeysTab";
 import { ToolsTab } from "./ToolsTab";
 import { UsageTab } from "./UsageTab";
+import { AiContentStorageNote } from "./AiContentStorageNote";
 
 /** The AI Study Tools icon button; it opens the app-wide dialog. */
 export const AiStudyToolsTrigger = ({ onClick }: { onClick: () => void }) => (
@@ -49,9 +53,7 @@ const TAB_OPTIONS: { value: AiToolsTab; label: string }[] = [
 const EnableSwitch = () => {
   const [settings, update] = useAiExplainSettings();
   const keyOk = hasStarterAiKey(settings);
-  // The saved choice is kept while the key is missing or rejected, so a
-  // working key turns it back on.
-  const active = settings.enabled && keyOk;
+  const active = useAiStudyToolsActive();
   return (
     <div className="space-y-2">
       <div className="flex items-center py-1">
@@ -81,22 +83,7 @@ const EnableSwitch = () => {
           .
         </p>
       )}
-      {active && (
-        <p
-          role="note"
-          className={cn(
-            "p-2 text-xs border rounded-lg animate-fade-in-fast border-amber-500/50",
-            cnWarningText
-          )}
-        >
-          Heads up: what you generate is saved only in this browser. It
-          isn&apos;t backed up and can be lost if browser data is cleared, and
-          anyone using this computer can see it. The browser may also delete it
-          on its own if you don&apos;t open this site for a while (7 days in
-          Safari, unless it&apos;s added to the Home Screen) or the device runs
-          low on space. Download anything you want to keep.
-        </p>
-      )}
+      {active && <AiContentStorageNote className="animate-fade-in-fast" />}
     </div>
   );
 };

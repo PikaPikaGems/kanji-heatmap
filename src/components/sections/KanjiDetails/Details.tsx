@@ -28,6 +28,7 @@ import { NetworkStatusBadge } from "@/components/common/NetworkStatusBadge";
 import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { hasStarterAiKey, isAiToolReady } from "@/lib/ai-explain/preferences";
 import { NoticeAction } from "@/components/common/UserNotice";
+import { NoteCard, NoteRow } from "@/components/common/NoteCard";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 
@@ -57,21 +58,6 @@ export const ImprovementCTA = () => {
     </Badge>
   );
 };
-
-const DetailsNotice = ({
-  icon: Icon,
-  children,
-}: {
-  icon: typeof Volume2;
-  children: ReactNode;
-}) => (
-  <div className="flex items-start px-3 py-2">
-    <Icon className="mr-2 mt-0.5 text-yellow-600 size-4 shrink-0 dark:text-yellow-500" />
-    <p className="text-xs leading-relaxed text-left text-foreground">
-      {children}
-    </p>
-  </div>
-);
 
 /**
  * Logged out: log in for natural-sounding audio. Logged in: that audio,
@@ -108,23 +94,19 @@ const SpeechNote = () => {
 export const KanjiDetailsBottom = ({ kanji }: { kanji: string }) => {
   return (
     <div className="my-4">
-      <div className="overflow-hidden border rounded-2xl border-foreground/20 bg-muted/15">
-        <h3 className="px-3 pt-2.5 pb-1.5 text-xs font-bold tracking-widest text-left uppercase border-b text-foreground/50">
-          Note
-        </h3>
-        <DetailsNotice icon={Volume2}>
+      <NoteCard title="Note">
+        <NoteRow icon={Volume2}>
           <SpeechNote />
-        </DetailsNotice>
-        <div className="mx-3 border-t border-dotted border-foreground/15" />
-        <DetailsNotice icon={Bug}>
+        </NoteRow>
+        <NoteRow icon={Bug}>
           We strive for accuracy, but mistakes can happen. Found a content
           issue?
           <ExternalTextLink
             href={outLinks.githubContentIssue}
             text="Suggest an edit."
           />
-        </DetailsNotice>
-      </div>
+        </NoteRow>
+      </NoteCard>
 
       <BottomBar includeNode={<KanjiKeyboardShortcuts kanji={kanji} />} />
       <div className="flex flex-col items-start w-full gap-2 pt-2 mt-6 mb-12 border-t border-dashed">
