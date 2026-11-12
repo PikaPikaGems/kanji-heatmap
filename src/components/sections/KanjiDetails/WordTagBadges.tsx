@@ -80,7 +80,7 @@ const WordTagBadge = ({ tag }: { tag: WordTag }) => {
     return (
       <BadgeWithPopover
         name="👍 Handpicked"
-        desc="Mikong suggested this word as an anchor word for this kanji, and the algorithm picked it too."
+        desc="A person suggested this word as an anchor word for this kanji, and the algorithm picked it too."
       />
     );
   }
@@ -88,7 +88,7 @@ const WordTagBadge = ({ tag }: { tag: WordTag }) => {
     return (
       <BadgeWithPopover
         name="👀 Reviewed"
-        desc="Mikong reviewed this anchor word and kept it."
+        desc="A person reviewed this anchor word and kept it."
       />
     );
   }

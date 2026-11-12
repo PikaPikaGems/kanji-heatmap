@@ -178,7 +178,7 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
     {
       label: "Tags",
       description:
-        "Its JLPT level, whether Mikong handpicked or reviewed it, and the word lists it is in.",
+        "Its JLPT level, whether it was handpicked or reviewed by a person, and the word lists it is in.",
       content:
         tags.length > 0 ? (
           <WordTagBadges
