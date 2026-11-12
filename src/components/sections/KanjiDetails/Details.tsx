@@ -29,6 +29,7 @@ import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { hasStarterAiKey, isAiToolReady } from "@/lib/ai-explain/preferences";
 import { NoticeAction } from "@/components/common/UserNotice";
 import { NoteCard, NoteRow } from "@/components/common/NoteCard";
+import { useVoiceEngine } from "@/hooks/use-ai-voice";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 
@@ -61,10 +62,11 @@ export const ImprovementCTA = () => {
 
 /**
  * Logged out: log in for natural-sounding audio. Logged in: that audio,
- * with the device's own voice when a file isn't available.
+ * then the AI voice when it's chosen, then the device's own voice.
  */
 const SpeechNote = () => {
   const status = useAccountStatus();
+  const [engine] = useVoiceEngine();
 
   if (status.kind === "signed-out") {
     return (
@@ -72,6 +74,15 @@ const SpeechNote = () => {
         <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for
         natural-sounding speech 🔊 🎧. Until then, speak buttons use your
         {" device's"} built-in voice, which may not work on every device.
+      </>
+    );
+  }
+  if (status.kind === "active" && engine === "ai") {
+    return (
+      <>
+        Speak buttons 🔊 🎧 play natural-sounding audio first. When a word has
+        none, the AI voice reads it, and your {"device's"} built-in voice is the
+        last fallback.
       </>
     );
   }
