@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DefaultErrorFallback } from "@/components/error";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
+import { WordFrequencyTags } from "./WordFrequencyTags";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { PrimaryDataSources } from "@/components/common/PrimaryDataSources";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
@@ -48,7 +49,10 @@ const ReadingRow = ({ entry }: { entry: KanjiReadingEntry }) => (
       {entry.example_word == null ? (
         "-"
       ) : (
-        <ExampleWordPopover word={entry.example_word} />
+        <ExampleWordPopover
+          word={entry.example_word}
+          optionalSection={<WordFrequencyTags word={entry.example_word} />}
+        />
       )}
     </TableCell>
     <TableCell>

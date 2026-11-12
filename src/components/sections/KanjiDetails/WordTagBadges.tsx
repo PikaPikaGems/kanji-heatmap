@@ -11,6 +11,7 @@ import {
   CommonWordEntry,
   FreqCategoryMap,
   getBookTags,
+  splitList,
 } from "@/lib/sample-vocabulary";
 
 // Leveled word lists, shown in the word-list popover as more basic → more advanced.
@@ -24,12 +25,17 @@ const BOOK_LEVEL_RANGES = [
 type WordTag =
   | { kind: "kaishi" }
   | { kind: "jlpt"; jlpt: JLTPTtypes }
+  | { kind: "handpicked" }
+  | { kind: "reviewed" }
   | { kind: "tier"; tier: string; label: string }
   | { kind: "book"; id: string; label: string; jlpt?: JLTPTtypes }
   | { kind: "variant" }
   | { kind: "name" };
 
-/** Tags in display priority: variant, JLPT, Kaishi, frequency tier, word lists. */
+/**
+ * Tags in display priority: variant, JLPT, handpicked or reviewed (anchor
+ * words), Kaishi, frequency tier, word lists.
+ */
 const getWordTags = (entry: CommonWordEntry): WordTag[] => {
   const tags: WordTag[] = [];
   if (
@@ -45,6 +51,10 @@ const getWordTags = (entry: CommonWordEntry): WordTag[] => {
   if ([1, 2, 3, 4, 5].includes(jlptNum)) {
     tags.push({ kind: "jlpt", jlpt: `n${jlptNum}` as JLTPTtypes });
   }
+
+  const listTags = splitList(entry.o);
+  if (listTags.includes("handpicked")) tags.push({ kind: "handpicked" });
+  if (listTags.includes("reviewed")) tags.push({ kind: "reviewed" });
 
   if (entry.k === true || entry.k === 1) tags.push({ kind: "kaishi" });
 
@@ -63,6 +73,22 @@ const WordTagBadge = ({ tag }: { tag: WordTag }) => {
       <BadgeWithPopover
         name="👤 Name"
         desc="A proper noun: a person's name or a place, from the JMnedict names dictionary. Not an everyday word."
+      />
+    );
+  }
+  if (tag.kind === "handpicked") {
+    return (
+      <BadgeWithPopover
+        name="👍 Handpicked"
+        desc="Mikong suggested this word as an anchor word for this kanji, and the algorithm picked it too."
+      />
+    );
+  }
+  if (tag.kind === "reviewed") {
+    return (
+      <BadgeWithPopover
+        name="👀 Reviewed"
+        desc="Mikong reviewed this anchor word and kept it."
       />
     );
   }

@@ -1,4 +1,5 @@
 import { JLTPTtypes } from "@/lib/jlpt";
+import { ANCHOR_TIER_LABELS } from "@/lib/kanji/anchor-words";
 
 // {w: '上', r: 'うえ, かみ', t: '🌱', e: '1. above 2. ...', j: 5, k: true, o: 'core1,genki'}
 // word, readings (comma-separated), frequencyTier, translation, jlpt, kaishi,
@@ -88,6 +89,15 @@ export const FreqCategoryMap: Record<string, string> = {
   //   "🌶️": "niche"
 };
 
+// Textbook pages carry the frequency tier as a tag ("basic" … "unranked");
+// as the tier emoji, like the kanji-common-words pages' `t`.
+const TIER_TAG_EMOJI: Record<string, string> = Object.fromEntries(
+  Object.entries(ANCHOR_TIER_LABELS).map(([emoji, label]) => [
+    label.toLowerCase(),
+    emoji,
+  ])
+);
+
 // The textbook JSON stores each word as a tuple; jlpt and tags are optional
 // trailing members (tags is a comma-separated list like "kaishi, alt, genki").
 // A variant spelling (河 on the 河 page, a variant of 川) has a fifth member:
@@ -110,9 +120,11 @@ export const toCommonWordEntries = (
       const bookTags = tagsArray.filter((tag) =>
         BOOK_TAGS.some((bookTag) => bookTag.id === tag)
       );
+      const tierTag = tagsArray.find((tag) => tag in TIER_TAG_EMOJI);
       return {
         w: word,
         r: reading,
+        t: tierTag ? TIER_TAG_EMOJI[tierTag] : undefined,
         e: translation,
         j: Number(jlpt),
         k: tagsArray.includes("kaishi"),

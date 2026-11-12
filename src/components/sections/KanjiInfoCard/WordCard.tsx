@@ -3,25 +3,7 @@ import { Button } from "@/components/ui/button";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { VocabPopoverContent } from "@/components/common/VocabPopoverContent";
 import { HiraganaWord } from "@/components/dependent/kana/HiraganaWord";
-import { WordTagBadges } from "@/components/sections/KanjiDetails/WordTagBadges";
-import { toTagsWordEntry } from "@/lib/kanji/anchor-words";
-import { useWordTags } from "@/providers/kanji-representative-word-hooks";
-
-/** The word's tags and tier, when it has any. Asked for when the popover opens. */
-const WordCardTags = ({ word }: { word: string }) => {
-  const found = useWordTags(word);
-  if (found == null) return null;
-  return (
-    <div className="pb-2 animate-fade-in-fast">
-      <WordTagBadges
-        entry={toTagsWordEntry(word, found.tags, found.tier)}
-        isName={found.tags.includes("name")}
-        maxVisible={3}
-        className="justify-center"
-      />
-    </div>
-  );
-};
+import { WordFrequencyTags } from "@/components/sections/KanjiDetails/WordFrequencyTags";
 
 export const WordCard = ({
   word,
@@ -56,7 +38,7 @@ export const WordCard = ({
             kana={spacedKana.split(" ").join("")}
             wordKanjis={wordKanjis}
             definition={definition}
-            optionalSection={<WordCardTags word={word} />}
+            optionalSection={<WordFrequencyTags word={word} />}
           />
         }
       />
