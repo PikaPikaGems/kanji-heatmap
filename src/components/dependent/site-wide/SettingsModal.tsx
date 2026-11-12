@@ -128,10 +128,10 @@ const JapaneseVoiceSection = () => {
         Voice <SpeakButton word={VOICE_PREVIEW_TEXT} iconType="volume-2" />
       </div>
       <VoiceEngineChoice />
+      {/* Under the choice it explains: what plays, in which order. */}
+      <TtsNotice className="mb-5 -mt-2" />
       {engine === "ai" && (
         <div className="animate-fade-in-fast">
-          {/* Under the choice it explains: what plays, in which order. */}
-          <TtsNotice className="mb-5 -mt-2" />
           <AiVoicePanel />
         </div>
       )}
@@ -145,7 +145,6 @@ const JapaneseVoiceSection = () => {
           {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
         </div>
         <JpVoiceSelect />
-        {engine !== "ai" && <TtsNotice className="pt-2" />}
       </div>
     </SimpleAccordion>
   );

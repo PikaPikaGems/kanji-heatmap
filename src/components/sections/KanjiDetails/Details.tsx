@@ -29,7 +29,6 @@ import { useAiExplainSettings } from "@/hooks/use-ai-explain";
 import { hasStarterAiKey, isAiToolReady } from "@/lib/ai-explain/preferences";
 import { NoticeAction } from "@/components/common/UserNotice";
 import { NoteCard, NoteRow } from "@/components/common/NoteCard";
-import { useVoiceEngine } from "@/hooks/use-ai-voice";
 import { openLoginDialog } from "@/lib/engine/login-dialog";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
 
@@ -61,36 +60,28 @@ export const ImprovementCTA = () => {
 };
 
 /**
- * Logged out: log in for natural-sounding audio. Logged in: that audio,
- * then the AI voice when it's chosen, then the device's own voice.
+ * Logged out: log in for more natural-sounding audio. Logged in: that
+ * audio, then the AI voice (if enabled), then the device's own voice.
  */
 const SpeechNote = () => {
   const status = useAccountStatus();
-  const [engine] = useVoiceEngine();
 
   if (status.kind === "signed-out") {
     return (
       <>
-        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for
-        natural-sounding speech 🔊 🎧. Until then, speak buttons use your
-        {" device's"} built-in voice, which may not work on every device.
-      </>
-    );
-  }
-  if (status.kind === "active" && engine === "ai") {
-    return (
-      <>
-        Speak buttons 🔊 🎧 play natural-sounding audio by default. When not
-        available, the AI voice reads it, and your {"device's"} built-in voice
-        is the last fallback.
+        <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for more
+        natural-sounding audio 🔊 🎧. Until then, speak buttons use the AI voice
+        (if enabled) or your {"device's"} built-in voice, which may not work on
+        every device.
       </>
     );
   }
   if (status.kind === "active") {
     return (
       <>
-        Speak buttons 🔊 🎧 play natural-sounding audio, and use your
-        {" device's"} built-in voice when audio isn&apos;t available.
+        Speak buttons 🔊 🎧 play natural-sounding audio by default. When not
+        available, the AI voice reads it (if enabled), and your {"device's"}{" "}
+        built-in voice is the last fallback.
       </>
     );
   }
