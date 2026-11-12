@@ -12,6 +12,7 @@ import {
   AI_EXPLAIN_USAGE_KEY,
   readAiExplainUsage,
   buildAiExplainPrompt,
+  hasStarterAiKey,
   readAiExplainPreferences,
   readAiExplainSettings,
   rejectAiProviderKey,
@@ -54,6 +55,16 @@ export const useAiExplainSettings = () => {
   const update = (patch: Partial<AiExplainPreferences>) =>
     writeAiExplainPreferences({ ...readAiExplainPreferences(), ...patch });
   return [settings, update] as const;
+};
+
+/**
+ * AI Study Tools are on: switched on with a key that works. The saved
+ * choice is kept while the key is missing or rejected, so a working key
+ * turns it back on.
+ */
+export const useAiStudyToolsActive = () => {
+  const [settings] = useAiExplainSettings();
+  return settings.enabled && hasStarterAiKey(settings);
 };
 
 /** This month's usage per provider, counted in this browser. */

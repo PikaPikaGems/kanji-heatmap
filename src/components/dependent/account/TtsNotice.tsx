@@ -5,8 +5,9 @@ import { TTS_DISCLAIMER } from "@/lib/tts";
 import { cn } from "@/lib/utils";
 
 /**
- * Under a speech setting. Logged out: "🔊 **Log in** for natural-sounding
- * speech." Logged in: the audio, with the device's voice as a fallback.
+ * Under a speech setting. Logged out: "🔊 **Log in** for more
+ * natural-sounding audio." Logged in: the audio, then the AI voice (if
+ * enabled), then the device's voice.
  * Builds without accounts: the device-voice disclaimer.
  */
 export const TtsNotice = ({ className }: { className?: string }) => {
@@ -16,15 +17,16 @@ export const TtsNotice = ({ className }: { className?: string }) => {
     return (
       <p className={cn("text-xs text-left", className)}>
         🔊 <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for
-        natural-sounding speech.
+        more natural-sounding audio.
       </p>
     );
   }
   if (status.kind === "active") {
     return (
       <p className={cn("text-xs text-left", className)}>
-        🔊 Natural-sounding audio, or your device&apos;s built-in voice when
-        audio isn&apos;t available.
+        🔊 Natural-sounding audio will be played by default. When not available,
+        the AI voice reads it (if enabled), and your device&apos;s built-in
+        voice is the last fallback.
       </p>
     );
   }

@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   useAiExplainSettings,
   useAiExplainUsage,
+  useAiStudyToolsActive,
 } from "@/hooks/use-ai-explain";
 import { useAiStorageUsage } from "@/hooks/use-ai-storage-usage";
 import {
@@ -23,6 +24,7 @@ import {
   AI_PROVIDERS,
 } from "@/lib/ai-explain/providers/capabilities";
 import type { AiProvider } from "@/lib/ai-explain/providers/types";
+import { AiContentStorageNote } from "./AiContentStorageNote";
 
 /** A label and its value, one row of a two-column list. */
 const UsageRow = ({
@@ -133,6 +135,7 @@ type StorageStatus =
  */
 const OwnedGeneratedStorage = () => {
   const [state, setState] = useState<StorageStatus>({ status: "idle" });
+  const toolsActive = useAiStudyToolsActive();
   const clear = async () => {
     setState({ status: "clearing" });
     try {
@@ -177,11 +180,8 @@ const OwnedGeneratedStorage = () => {
         <p className="text-sm">Generated content deleted.</p>
       )}
       {state.status === "error" && <p className="text-sm">{state.message}</p>}
-      <p className="text-xs text-muted-foreground">
-        Saved only on this device and browser, and not private: anyone with
-        access to this computer can see it. Browser data can be cleared or lost.
-        Download content you want to keep.
-      </p>
+      {/* While AI Study Tools are on, the same note shows above the tabs. */}
+      {!toolsActive && <AiContentStorageNote />}
       <TextActionButton
         icon={<Trash2 size={14} />}
         className="text-rose-500"

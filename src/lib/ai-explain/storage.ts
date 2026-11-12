@@ -359,6 +359,31 @@ const changed = (cleared = false) =>
 window.addEventListener("storage", (event) => {
   if (event.key === EPOCH_KEY || event.key === null) changed(true);
 });
+let persistRequested = false;
+/**
+ * AI content has no server copy, so after a save ask the browser not to
+ * evict this site's storage (Safari clears it after 7 days unused, Chrome
+ * when the disk is low). Signed-in users already asked at sign-in; this
+ * covers guests. Asked at most once per page load, since Firefox shows a
+ * prompt. Never throws.
+ */
+const requestPersistentStorage = () => {
+  if (persistRequested) return;
+  persistRequested = true;
+  const storage = navigator.storage;
+  if (typeof storage?.persist !== "function") return;
+  void storage
+    .persisted()
+    .then((persisted) => (persisted ? true : storage.persist()))
+    .catch(() => {
+      // Not granted or not supported: the warning in AI Study Tools says so.
+    });
+};
+/** After an AI item is saved. */
+const saved = () => {
+  changed();
+  requestPersistentStorage();
+};
 export const readSentenceExplanation = async (
   sentence: string
 ): Promise<SentenceExplanation | undefined> => {
@@ -387,7 +412,7 @@ export const writeSentenceExplanation = async (
     );
     await fitTextLimit(db, id);
   });
-  changed();
+  saved();
 };
 export const deleteSentenceExplanation = async (sentence: string) => {
   const ownerId = requireOwnerId();
@@ -431,7 +456,7 @@ export const saveTextResult = async (
       await fitTextLimit(db, key);
     }
   );
-  changed();
+  saved();
 };
 /** Deletes an essay or vocabulary details with its narration. */
 export const deleteTextResult = async (id: string) => {
@@ -486,7 +511,7 @@ export const saveMnemonicImage = async (
       );
     await db.images.put(tracked(image, blobRecordBytes(image), ownerId));
   });
-  changed();
+  saved();
 };
 export const deleteMnemonicImage = async (id: string) => {
   const ownerId = requireOwnerId();
@@ -550,7 +575,7 @@ export const saveAudioRecord = async (
       key
     );
   });
-  changed();
+  saved();
 };
 export const contentFingerprint = async (text: string) => {
   const digest = await crypto.subtle.digest(

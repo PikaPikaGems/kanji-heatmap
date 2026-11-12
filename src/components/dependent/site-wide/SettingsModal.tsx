@@ -46,6 +46,10 @@ const FONT_NAMES = [
   "Potta One",
 ];
 
+/** "BIZ UDGothic" → "biz-udgothic", as in scripts/build-font-tiles.mjs. */
+const fontTileSlug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
 const FontGrid = () => {
   const [fontIndex, setFont] = useCurrentFont();
 
@@ -62,12 +66,17 @@ const FontGrid = () => {
           title={name}
           className="flex-col w-full h-auto gap-1 p-2 rounded-xl"
         >
+          {/* A drawing of 字体 in this font (scripts/build-font-tiles.mjs),
+              not live text: live text would download all 15 fonts. The
+              mask takes the tile's text color. */}
           <span
-            className="text-xl leading-none"
-            style={{ fontFamily: `var(--jap-font-${i})` }}
-          >
-            字体
-          </span>
+            role="img"
+            aria-label="字体"
+            className="w-10 h-5 bg-current"
+            style={{
+              mask: `url(/svg/font-tiles/${fontTileSlug(name)}.svg) center / contain no-repeat`,
+            }}
+          />
           <span
             className={cn(
               "w-full truncate text-center text-[10px] font-normal tracking-normal",
@@ -92,7 +101,7 @@ const JpVoiceSelect = () => {
   const selectValue = matched?.voiceURI ?? DEFAULT_JP_VOICE_ID;
 
   return (
-    <div className="mx-1 text-left">
+    <div className="text-left">
       <Select value={selectValue} onValueChange={setVoiceId}>
         <SelectTrigger aria-label="Japanese text-to-speech voice">
           <SelectValue />
@@ -106,7 +115,6 @@ const JpVoiceSelect = () => {
           ))}
         </SelectContent>
       </Select>
-      <TtsNotice className="pt-2" />
     </div>
   );
 };
@@ -120,13 +128,24 @@ const JapaneseVoiceSection = () => {
         Voice <SpeakButton word={VOICE_PREVIEW_TEXT} iconType="volume-2" />
       </div>
       <VoiceEngineChoice />
-      {engine === "ai" && <AiVoicePanel />}
-      <div className="mt-4 mb-2 text-sm font-semibold text-left">
-        {engine === "ai"
-          ? "Browser voice (used when the AI voice can't play)"
-          : "Browser voice"}
+      {/* Under the choice it explains: what plays, in which order. */}
+      <TtsNotice className="mb-5 -mt-2" />
+      {engine === "ai" && (
+        <div className="animate-fade-in-fast">
+          <AiVoicePanel />
+        </div>
+      )}
+      <div
+        className={cn(
+          "text-left",
+          engine === "ai" && "pt-5 mt-6 border-t border-dashed"
+        )}
+      >
+        <div className="mb-2 text-sm font-semibold">
+          {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
+        </div>
+        <JpVoiceSelect />
       </div>
-      <JpVoiceSelect />
     </SimpleAccordion>
   );
 };

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { cnWarningText } from "@/lib/generic-cn";
-import { useId, useState, type ReactNode } from "react";
+import { lazy, Suspense, useId, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
@@ -14,7 +14,38 @@ import { DeleteWithConfirm } from "@/components/common/DeleteWithConfirm";
 import { AiContentNotice } from "@/components/common/AiContentNotice";
 import type { AiExplainState } from "@/hooks/use-ai-explain";
 import { providerLabel } from "@/lib/ai-explain/providers/capabilities";
-import { AiExplanationMarkdown } from "./AiExplanationMarkdown";
+
+// Lazy: the Markdown stack (react-markdown, remark, rehype) is about a third
+// of the startup bundle otherwise, since App mounts the word explain dialog.
+const LazyAiExplanationMarkdown = lazy(() =>
+  import("./AiExplanationMarkdown").then((m) => ({
+    default: m.AiExplanationMarkdown,
+  }))
+);
+
+/** The reply as Markdown; plain text for the moment the renderer loads. */
+const AiExplanationMarkdown = ({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) => (
+  <Suspense
+    fallback={
+      <p
+        className={cn(
+          "text-sm leading-7 break-words whitespace-pre-wrap",
+          className
+        )}
+      >
+        {text}
+      </p>
+    }
+  >
+    <LazyAiExplanationMarkdown text={text} className={className} />
+  </Suspense>
+);
 
 const ExplanationBody = ({ state }: { state: AiExplainState }) => {
   if (state.status === "idle") return null;
