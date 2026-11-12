@@ -381,8 +381,9 @@ const pwaConfig = {
         // cache for the same eviction reason as katakana. CacheFirst with no
         // age limit, so a downloaded set keeps working offline indefinitely.
         // Changed chunks still get fetched: the app requests
-        // <set>/<chunk>.json?v=<content hash> (see fillTheKanjiChunkUrl), and
-        // maxEntries evicts the old versions.
+        // <set>/<chunk>.json?v=<content hash> (see fillTheKanjiChunkUrl).
+        // Downloading a set deletes its old versions (preloadFillTheKanjiSet);
+        // maxEntries evicts the rest.
         urlPattern: /\/json\/fill-the-kanji\/.*\.json$/i,
         handler: "CacheFirst" as const,
         options: {

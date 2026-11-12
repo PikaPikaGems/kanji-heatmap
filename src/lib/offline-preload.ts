@@ -149,7 +149,10 @@ export function preloadKatakanaChallenges(
   return runPool(urls, onProgress);
 }
 
-/** One request: each challenge set is a single file. */
+/**
+ * Fetches every chunk of one set, then drops that set's cached chunks from
+ * older versions so they don't wait for the cache's entry limit.
+ */
 export function preloadFillTheKanjiSet(
   setId: FillTheKanjiSetId,
   onProgress?: (done: number, total: number) => void
@@ -157,18 +160,29 @@ export function preloadFillTheKanjiSet(
   const preload = runPool(fillTheKanjiChunkUrls(setId), onProgress);
   return {
     ...preload,
-    promise: preload.promise.then(() =>
-      removeStaleFillTheKanjiPreloadKeys(setId)
-    ),
+    promise: preload.promise.then(async () => {
+      removeStaleFillTheKanjiPreloadKeys(setId);
+      try {
+        await deleteCachedSetFiles(
+          setId,
+          new Set(fillTheKanjiChunkUrls(setId))
+        );
+      } catch {
+        // Old versions are still evicted by the cache's entry limit.
+      }
+    }),
   };
 }
 
 /**
- * Removes every cached chunk of one set, any version (plus the older
- * single-file `<set>.json`), leaving the other sets in the shared cache.
+ * Deletes one set's cached chunks, any version (plus the older single-file
+ * `<set>.json`), except the URLs in `keep` (path and `?v=`). Other sets in
+ * the shared cache are left alone.
  */
-export async function clearFillTheKanjiSetCache(setId: FillTheKanjiSetId) {
-  removeStaleFillTheKanjiPreloadKeys(setId);
+async function deleteCachedSetFiles(
+  setId: FillTheKanjiSetId,
+  keep: Set<string> = new Set()
+) {
   if (!("caches" in window)) return;
   const cache = await caches.open(FILL_THE_KANJI_CACHE_NAME);
   const dir = fillTheKanjiSetDir(setId);
@@ -177,11 +191,18 @@ export async function clearFillTheKanjiSetCache(setId: FillTheKanjiSetId) {
   await Promise.all(
     requests
       .filter((request) => {
-        const { pathname } = new URL(request.url);
+        const { pathname, search } = new URL(request.url);
+        if (keep.has(pathname + search)) return false;
         return pathname.startsWith(dir) || pathname === legacyFile;
       })
       .map((request) => cache.delete(request))
   );
+}
+
+/** Removes every cached chunk of one set, leaving the other sets. */
+export async function clearFillTheKanjiSetCache(setId: FillTheKanjiSetId) {
+  removeStaleFillTheKanjiPreloadKeys(setId);
+  await deleteCachedSetFiles(setId);
 }
 
 export async function clearKanjiSvgCache() {
