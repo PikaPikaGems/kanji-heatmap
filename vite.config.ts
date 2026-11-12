@@ -408,13 +408,17 @@ const pwaConfig = {
         },
       },
       // **********************
-      // Cache KANJI SAMPLE VOCABULARY from external source
+      // Cache KANJI SAMPLE + TEXTBOOK VOCABULARY from external source
+      // (KANJI_VOCAB and TEXT_BOOK_VOCAB in src/lib/assets-paths.ts). Any
+      // version matches, so bumping a version there needs no change here;
+      // the old version's pages age out through maxEntries. Pages are
+      // ~1–2 KB each, so a full cache is a few MB.
       // **********************
       ...(ASSETS_ORIGIN
         ? [
             {
               urlPattern: new RegExp(
-                `^${escapeRegExp(ASSETS_ORIGIN)}/kanji-common-words/v4/`
+                `^${escapeRegExp(ASSETS_ORIGIN)}/kanji-(common|textbook)-words/v\\d+/`
               ),
               handler: "CacheFirst" as const,
               options: {
