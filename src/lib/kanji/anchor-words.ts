@@ -37,7 +37,7 @@ export type AnchorWordBasics = {
 
 /** Everything the detail surfaces show about an anchor word. */
 export type AnchorWord = AnchorWordBasics & {
-  /** Word-list tags, e.g. n4, kaishi, genki, klvl2, name. */
+  /** Word-list tags, e.g. n4, handpicked, reviewed, kaishi, genki, klvl2, name. */
   tags: string[];
   /** 17 frequency ranks in ANCHOR_RANK_SOURCES order; -1 = not ranked. */
   ranks: number[];

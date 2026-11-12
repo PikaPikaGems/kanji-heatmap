@@ -1,6 +1,7 @@
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { VocabPopoverContent } from "@/components/common/VocabPopoverContent";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
+import { WordFrequencyTags } from "../WordFrequencyTags";
 import { cn, isKanji } from "@/lib/utils";
 import {
   useVocabDetails,
@@ -104,6 +105,7 @@ export const StudyNoteVocabButton = ({
           kana={kana}
           wordKanjis={wordKanjis}
           definition={meaning}
+          optionalSection={<WordFrequencyTags word={word} />}
         />
       }
     />

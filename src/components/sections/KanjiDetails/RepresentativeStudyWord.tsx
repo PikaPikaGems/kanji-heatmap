@@ -10,6 +10,7 @@ import { SegmentedTabsList } from "@/components/ui/segmented-tabs";
 import { Tabs } from "@/components/ui/tabs";
 import { AnchorWordFrequencyRanks } from "./AnchorWordFrequencyRanks";
 import { WordTagBadges } from "./WordTagBadges";
+import { WordFrequencyTags } from "./WordFrequencyTags";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GenericPopover } from "@/components/common/GenericPopover";
@@ -158,6 +159,7 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
           wordTranslationOverride={englishGloss}
           readingOverride={reading}
           className="text-4xl"
+          optionalSection={<WordFrequencyTags word={word} />}
         />
       ),
     },
@@ -175,7 +177,8 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
     },
     {
       label: "Tags",
-      description: "Its JLPT level and the word lists it is in.",
+      description:
+        "Its JLPT level, whether it was handpicked or reviewed, and the word lists it is in.",
       content:
         tags.length > 0 ? (
           <WordTagBadges

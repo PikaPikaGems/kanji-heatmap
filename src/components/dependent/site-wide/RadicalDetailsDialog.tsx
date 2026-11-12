@@ -1,6 +1,7 @@
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { GenericPopover } from "@/components/common/GenericPopover";
 import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
+import { WordFrequencyTags } from "@/components/sections/KanjiDetails/WordFrequencyTags";
 import { RomajiBadge } from "@/components/dependent/kana/RomajiBadge";
 import { GlobalKanjiLink } from "@/components/dependent/routing/global-links";
 import { useState } from "react";
@@ -258,6 +259,7 @@ const RadicalDetailsBody = ({
                   word={example.word}
                   readingOverride={example.reading}
                   wordTranslationOverride={example.gloss}
+                  optionalSection={<WordFrequencyTags word={example.word} />}
                   contentClassName={INNER_POPOVER_CN}
                   className="px-3 py-2.5 text-xl"
                 />
