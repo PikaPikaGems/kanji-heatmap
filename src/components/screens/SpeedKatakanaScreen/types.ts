@@ -27,3 +27,7 @@ export type SessionStats = {
   /** Correct katakana characters typed per minute. */
   charsPerMinute: number;
 };
+
+/** Only full (48-word) sessions are saved to the account; short ones aren't. */
+export const isRecordedSession = (settings: SpeedKatakanaSettings) =>
+  settings.wordCount === 48;

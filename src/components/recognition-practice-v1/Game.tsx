@@ -17,7 +17,10 @@ import {
   ratingForKeyEvent,
 } from "@/components/shared-practice";
 import type { MasteryGrading } from "@/components/shared-practice";
-import { EndSession } from "@/components/shared-practice/EndSessionButton";
+import {
+  GameHeader,
+  type GamePosition,
+} from "@/components/shared-practice/GameHeader";
 import {
   isForgotCommand,
   isForgotCommandPrefix,
@@ -34,6 +37,7 @@ export const Game = ({
   onProgress,
   onComplete,
   onEnd,
+  position,
 }: {
   sessionItems: PracticeItem[];
   sound: { enabled: true; type: SoundMode } | { enabled: false };
@@ -42,6 +46,11 @@ export const Game = ({
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
+  /**
+   * Mastery game only: the card's place in the round (it renders one card at
+   * a time); otherwise the place in `sessionItems`.
+   */
+  position?: GamePosition;
 }) => {
   const [index, setIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
@@ -55,7 +64,7 @@ export const Game = ({
     ? isReadingCorrect(inputValue, current.reading)
     : false;
   const forgotTyped = isForgotCommand(inputValue);
-  // The card is for one kanji of the word, so show which in green, and ask
+  // The card is for one kanji of the word, so make it stand out, and ask
   // for the whole word's reading so it isn't read as that kanji's.
   const highlightKanji = current?.kanji;
   const answerPrompt = 'Type the word\'s reading or "forgot"';
@@ -181,7 +190,13 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full gap-5 [@media(pointer:fine)]:justify-center [@media(pointer:fine)]:gap-8">
-      <EndSession onClick={onEnd} />
+      {/* Practice rounds are saved when finished; mastery saves each grade
+          as it goes, so leaving it loses nothing. */}
+      <GameHeader
+        position={position ?? { index, total: sessionItems.length }}
+        recorded={grading == null}
+        onLeave={onEnd}
+      />
       {/*
         Coarse-pointer (touch) layout: keep the prompt + input as a
         top-anchored cluster with a fixed gap. A bottom spacer absorbs

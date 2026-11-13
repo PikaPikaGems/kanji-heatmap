@@ -10,7 +10,7 @@ import { SpeedKatakanaHeader } from "./SpeedKatakanaHeader";
 import { InitialScreen } from "./InitialScreen";
 import { Game } from "./Game";
 import { EndSession } from "./EndSession";
-import { SessionStats } from "./types";
+import { isRecordedSession, SessionStats } from "./types";
 import { SPEED_KATAKANA_TOTAL_CHALLENGES } from "./constants";
 import { useChallengeSearchParam } from "./use-challenge-search-param";
 
@@ -61,7 +61,7 @@ const SpeedKatakanaScreen = () => {
   };
 
   const finishGame = (sessionStats: SessionStats) => {
-    if (settings.wordCount === 48) {
+    if (isRecordedSession(settings)) {
       void recorder.recordRound({
         type: "speed_katakana_session_completed",
         challengeId: settings.challengeSet,

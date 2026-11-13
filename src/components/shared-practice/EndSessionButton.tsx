@@ -4,9 +4,18 @@ import { useLocation } from "@/components/dependent/routing/router-hooks";
 import { useEnterAction } from "@/hooks/use-enter-action";
 import { getPracticeReturnHref } from "@/lib/practice-return-path";
 
-/** Back/exit control for in-progress practice games. Escape also ends. */
-export const EndSession = ({ onClick }: { onClick: () => void }) => {
-  useEnterAction(onClick, true, ["Escape"]);
+/**
+ * Back/exit control for practice screens. Escape does the same, unless
+ * `escapeEnabled` is false (something else on screen owns Escape).
+ */
+export const EndSession = ({
+  onClick,
+  escapeEnabled = true,
+}: {
+  onClick: () => void;
+  escapeEnabled?: boolean;
+}) => {
+  useEnterAction(onClick, escapeEnabled, ["Escape"]);
 
   return (
     <Button

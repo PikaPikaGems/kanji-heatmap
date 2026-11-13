@@ -12,7 +12,10 @@ import type {
   MasteryGrading,
   PassingRating,
 } from "@/components/shared-practice";
-import { EndSession } from "@/components/shared-practice/EndSessionButton";
+import {
+  GameHeader,
+  type GamePosition,
+} from "@/components/shared-practice/GameHeader";
 import {
   useGetKanjiInfoFn,
   useSimilarKanjiMap,
@@ -64,6 +67,7 @@ export const Game = ({
   onProgress,
   onComplete,
   onEnd,
+  position,
 }: {
   sessionItems: PracticeItem[];
   settings: ProductionPracticeSettings;
@@ -79,6 +83,11 @@ export const Game = ({
   onProgress: (progress: number) => void;
   onComplete: (results: SessionResult[]) => void;
   onEnd: () => void;
+  /**
+   * Mastery game only: the card's place in the round (it renders one card at
+   * a time); otherwise the place in `sessionItems`.
+   */
+  position?: GamePosition;
 }) => {
   const [index, setIndex] = useState(0);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -312,7 +321,13 @@ export const Game = ({
 
   return (
     <div className="relative flex flex-col w-full h-full overflow-hidden">
-      <EndSession onClick={onEnd} />
+      {/* Practice rounds are saved when finished; mastery saves each grade
+          as it goes, so leaving it loses nothing. */}
+      <GameHeader
+        position={position ?? { index, total: sessionItems.length }}
+        recorded={grading == null}
+        onLeave={onEnd}
+      />
 
       <div className="flex flex-col items-center flex-1 min-h-0 px-4 pt-12 pb-4 overflow-y-auto sm:px-6 [justify-content:safe_center]">
         {!gradingEnabled && (

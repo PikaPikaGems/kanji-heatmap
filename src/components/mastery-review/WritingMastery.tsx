@@ -28,6 +28,7 @@ import { MasteryLoading } from "./MasteryLoading";
 import { MasteryStartScreen } from "./MasteryStartScreen";
 import { useMasteryItemLookup } from "./use-mastery-item-lookup";
 import { useMasterySession } from "./use-mastery-session";
+import type { GamePosition } from "@/components/shared-practice/GameHeader";
 
 const ignoreProgress = () => {};
 
@@ -40,10 +41,12 @@ const WritingMasteryCard = ({
   gradingEnabled,
   grading,
   recognize,
+  position,
   onNext,
   onEnd,
 }: {
   item: PracticeItem;
+  position: GamePosition;
   settings: ProductionPracticeSettings;
   gradingEnabled: boolean;
   grading: MasteryGrading;
@@ -67,6 +70,7 @@ const WritingMasteryCard = ({
       onProgress={ignoreProgress}
       onComplete={onNext}
       onEnd={onEnd}
+      position={position}
     />
   );
 };
@@ -156,6 +160,7 @@ const WritingMasteryPhase = ({
     <div key={state.review.handleId} className="h-full animate-fade-in">
       <WritingMasteryCard
         item={state.item}
+        position={{ index: state.position - 1, total: state.total }}
         settings={settings}
         gradingEnabled={handwriting.gradingEnabled}
         grading={{ intervals: state.intervals, onGrade: session.grade }}
