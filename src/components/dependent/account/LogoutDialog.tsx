@@ -114,7 +114,7 @@ const LogoutForm = ({ userId }: { userId: string }) => {
           <LogoutRemovalOption
             label={
               hasAiKey
-                ? "All my data on this device, including API keys"
+                ? "All my cached study data, including API keys"
                 : "My cached study data on this device"
             }
             details="The copy of your notes, bookmarks, review pile and progress kept on this device. Nothing is deleted from your account."

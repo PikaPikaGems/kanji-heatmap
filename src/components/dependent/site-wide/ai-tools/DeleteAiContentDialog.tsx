@@ -263,6 +263,9 @@ const DeleteAiContentForm = ({
             autoCorrect="off"
             autoComplete="off"
             spellCheck={false}
+            // Typed by hand, not pasted or dropped in: typing it is the check.
+            onPaste={(event) => event.preventDefault()}
+            onDrop={(event) => event.preventDefault()}
           />
         </label>
       )}
