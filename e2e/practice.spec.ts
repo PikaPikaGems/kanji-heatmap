@@ -136,6 +136,8 @@ test.describe("practice modes", () => {
       page.getByLabel('Type the word\'s reading or "forgot"')
     ).toBeVisible({ timeout: 30_000 });
     await page.getByRole("button", { name: "End session" }).click();
+    // Leaving mid-round asks first.
+    await page.getByRole("button", { name: "Leave", exact: true }).click();
 
     await expect(
       page.getByRole("button", { name: "Start", exact: true })
