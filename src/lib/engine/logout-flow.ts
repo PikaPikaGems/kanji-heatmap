@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { AI_CONTENT_KIND_ORDER } from "@/lib/ai-explain/delete-content";
 import { deleteAiOwnerKeys } from "@/lib/ai-explain/preferences";
 import { getCurrentOwner } from "./content-owner";
 import { getEngineState } from "./engine";
@@ -97,10 +98,12 @@ const runStep = async (
       if (owner.status !== "known" || owner.ownerId !== ai.userId) {
         return AI_CONTENT_FAILED_COPY;
       }
-      const { clearGeneratedContent } = await import(
-        "@/lib/ai-explain/storage"
-      );
-      await clearGeneratedContent();
+      const { deleteAiContent } = await import("@/lib/ai-explain/storage");
+      await deleteAiContent({
+        whose: "mine",
+        kinds: AI_CONTENT_KIND_ORDER,
+        sharedExplains: false,
+      });
       return null;
     } catch {
       return AI_CONTENT_FAILED_COPY;

@@ -12,6 +12,7 @@ export const AiStorageBars = ({ usage }: { usage: AiStorageUsage }) => (
       label="Text"
       mine={usage.text.mine}
       others={usage.text.others}
+      shared={{ label: "Shared explains", bytes: usage.text.shared }}
       limit={AI_STORAGE_LIMITS.text}
       note="AI Explain answers, kanji essays, anchor word essays"
     />

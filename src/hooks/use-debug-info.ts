@@ -104,9 +104,9 @@ export const formatStorageForClipboard = (
       ["MP3", "audio"],
       ["Images", "images"],
     ] as const) {
-      const { mine, others } = usage[kind];
+      const { mine, others, shared } = usage[kind];
       lines.push(
-        `${label}: ${formatMegabytes(mine + others)} of ${formatMegabytes(AI_STORAGE_LIMITS[kind])} (you ${formatMegabytes(mine)}, others ${formatMegabytes(others)})`
+        `${label}: ${formatMegabytes(mine + others + shared)} of ${formatMegabytes(AI_STORAGE_LIMITS[kind])} (you ${formatMegabytes(mine)}, others ${formatMegabytes(others)}${shared > 0 ? `, shared ${formatMegabytes(shared)}` : ""})`
       );
     }
     if (estimate)

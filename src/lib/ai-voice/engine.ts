@@ -60,7 +60,7 @@ export const subscribeAiVoice = (fn: () => void) => {
 export const getAiVoiceState = () => state;
 
 const ERROR_TEXT: Record<string, string> = {
-  "unsupported-browser": "This browser can't run the AI voice.",
+  "unsupported-browser": "This device can't run the AI voice.",
   unavailable:
     "The AI voice was turned off after it crashed this tab. Retry to try again.",
   "download-failed":
@@ -70,7 +70,7 @@ const ERROR_TEXT: Record<string, string> = {
   timeout: "The AI voice took too long to respond.",
   "engine-failed": "The AI voice failed to start.",
   "worker-crashed": "The AI voice crashed.",
-  "audio-blocked": "The browser blocked audio. Tap a speak button to allow it.",
+  "audio-blocked": "Your device blocked audio. Tap a speak button to allow it.",
 };
 
 const describeError = (err: unknown): string => {

@@ -6,23 +6,27 @@ import { LegendDot, StackedBar } from "./StackedBar";
 
 /**
  * Storage against its limit as one stacked bar: the current user's share,
- * then everyone else's on this device (lighter), then free space. Amber near
- * the limit, red at it. Without `others`, it's a plain bar with no legend.
+ * then everyone else's on this device (lighter), then what everyone shares
+ * (lightest), then free space. Amber near the limit, red at it. Without
+ * `others`, it's a plain bar with no legend. `shared` shows only when given.
  */
 export const StorageUsageBar = ({
   label,
   mine,
   others,
+  shared,
   limit,
   note,
 }: {
   label: ReactNode;
   mine: number;
   others?: number;
+  /** What everyone on this device shares, with its legend label. */
+  shared?: { label: string; bytes: number };
   limit: number;
   note?: ReactNode;
 }) => {
-  const total = mine + (others ?? 0);
+  const total = mine + (others ?? 0) + (shared?.bytes ?? 0);
   const ratio = total / limit;
   const color =
     ratio >= 0.95
@@ -48,6 +52,11 @@ export const StorageUsageBar = ({
         segments={[
           { key: "mine", value: mine, cn: color },
           { key: "others", value: others ?? 0, cn: cn("opacity-40", color) },
+          {
+            key: "shared",
+            value: shared?.bytes ?? 0,
+            cn: cn("opacity-20", color),
+          },
         ]}
       />
       {others != null && (
@@ -60,6 +69,12 @@ export const StorageUsageBar = ({
             <LegendDot className={cn("opacity-40", color)} />
             Others on this device {formatMegabytes(others)}
           </span>
+          {shared && (
+            <span className="inline-flex items-center gap-1">
+              <LegendDot className={cn("opacity-20", color)} />
+              {shared.label} {formatMegabytes(shared.bytes)}
+            </span>
+          )}
         </div>
       )}
       {note && <p className="text-xs text-muted-foreground">{note}</p>}

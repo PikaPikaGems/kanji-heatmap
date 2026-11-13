@@ -81,7 +81,7 @@ const SLIDERS = sliderHints.sliders as SliderSpec[];
 const subheadingCn = "mb-2 text-sm font-semibold text-left";
 
 const ENGINE_OPTIONS: { value: VoiceEngine; label: string }[] = [
-  { value: "browser", label: "Browser voice" },
+  { value: "browser", label: "Built-in voice" },
   { value: "ai", label: "AI Voice" },
 ];
 
@@ -168,7 +168,7 @@ const statusText = (s: AiVoiceState): string | null => {
   // Downloaded: the "Downloaded" line below says so.
   return s.cached
     ? null
-    : "Not downloaded yet. Until then, the browser voice is used.";
+    : "Not downloaded yet. Until then, the built-in voice is used.";
 };
 
 const AiVoiceFilesRow = ({ state }: { state: AiVoiceState }) => {
@@ -627,13 +627,13 @@ const AiVoiceNote = () => {
       <NoteRow icon={Smartphone}>
         On older phones, the page may reload during games. If that happens,{" "}
         <NoticeAction onClick={() => choose("browser")}>
-          switch to the browser voice
+          switch to the built-in voice
         </NoticeAction>
         .
       </NoteRow>
       <NoteRow icon={Volume2}>
         May not work on every device or browser. Whenever it can&apos;t play,
-        your browser voice is used instead.
+        your device&apos;s built-in voice is used instead.
       </NoteRow>
     </NoteCard>
   );
