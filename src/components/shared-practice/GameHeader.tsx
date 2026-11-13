@@ -77,8 +77,8 @@ export const GameHeader = ({
         escapeEnabled={escapeEnabled && !confirming}
       />
       <p className="absolute z-10 flex items-center h-10 text-xs font-bold top-1 right-3 tabular-nums">
-        {Math.min(position.index + 1, position.total)}
-        <span className="ml-1 font-medium text-muted-foreground">
+        {Math.min(position.index + 1, position.total)}{" "}
+        <span className="font-medium whitespace-pre text-muted-foreground">
           / {position.total}
         </span>
       </p>
