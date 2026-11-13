@@ -134,7 +134,7 @@ export const useSpeakWithStatus = (word: string, slow = false) => {
     const deadline = window.setTimeout(() => {
       if (started || latestSpeakId !== id) return;
       reportAiSpeakFailure(
-        "The AI voice took too long to start, so the browser voice was used."
+        "The AI voice took too long to start, so the built-in voice was used."
       );
       stopAiSpeech();
       fallBack();

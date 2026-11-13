@@ -142,7 +142,7 @@ const JapaneseVoiceSection = () => {
         )}
       >
         <div className="mb-2 text-sm font-semibold">
-          {engine === "ai" ? "Browser voice (fallback)" : "Browser voice"}
+          {engine === "ai" ? "Built-in voice (fallback)" : "Built-in voice"}
         </div>
         <JpVoiceSelect />
       </div>
