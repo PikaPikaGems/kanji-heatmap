@@ -107,13 +107,14 @@ describe("extractKanjiHoverData (characterization against real data)", () => {
     expect(result).toMatchSnapshot();
   });
 
-  it("薪: katakana vocab chars are dropped from partsList", () => {
+  it("薪: partsList has one entry per kanji of the sample word", () => {
     const result = hoverDataFor("薪");
 
-    // "薪ストーブ": the katakana have no keyword entries so only 薪 remains.
-    expect(result.mainVocab?.first?.word).toBe("薪ストーブ");
+    // Sample words never have katakana now (jp-misc-data), so 薪ストーブ became 薪炭.
+    expect(result.mainVocab?.first?.word).toBe("薪炭");
     expect(result.mainVocab?.first?.partsList.map((p) => p.kanji)).toEqual([
       "薪",
+      "炭",
     ]);
   });
 
