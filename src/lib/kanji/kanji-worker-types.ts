@@ -259,6 +259,14 @@ export interface WorkerApi {
     response: KanjiAnchorWords | null;
   };
   "kanji-similar": { payload: string; response: string[] };
+  /**
+   * Similar kanji for just these kanji (e.g. one Fill in the Kanji batch's),
+   * so the whole map stays in the worker. Kanji with none map to [].
+   */
+  "similar-for-kanji": {
+    payload: string[];
+    response: Record<string, string[]>;
+  };
   /** The whole similar map, for callers that look up many kanji at once. */
   "similar-map": { payload: undefined; response: Record<string, string[]> };
   /**

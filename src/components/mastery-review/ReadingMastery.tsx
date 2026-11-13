@@ -95,6 +95,7 @@ const ReadingMasteryPhase = ({
         onProgress={ignoreProgress}
         onComplete={onNext}
         onEnd={session.leave}
+        position={{ index: state.position - 1, total: state.total }}
       />
     </div>
   );

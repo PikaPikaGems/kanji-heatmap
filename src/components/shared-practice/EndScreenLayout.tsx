@@ -1,7 +1,45 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
-import { useTapGuard } from "@/hooks/use-tap-guard";
 import { PracticeBottomBar } from "./PracticeBottomBar";
+
+/** When Continue (or a lone Done) can be tapped, and when "I'm done" can. */
+const CONTINUE_UNLOCK_MS = 1500;
+const DONE_UNLOCK_MS = 3000;
+
+/** Which of the end screen's buttons can be tapped yet. */
+type ButtonLock = "all" | "done-only" | "none";
+
+/**
+ * On phones the answer drawer's Continue sits right where "I'm done" appears,
+ * so a player tapping through quickly would leave by accident. The buttons
+ * wait (showing a spinner) before they take taps: Continue 1.5 s, "I'm done"
+ * 3 s.
+ */
+const useButtonLock = (): ButtonLock => {
+  const [lock, setLock] = useState<ButtonLock>("all");
+  // Effect needed: timers that unlock the buttons after the screen appears,
+  // and must be cleared if it goes away first.
+  useEffect(() => {
+    const first = setTimeout(() => setLock("done-only"), CONTINUE_UNLOCK_MS);
+    const second = setTimeout(() => setLock("none"), DONE_UNLOCK_MS);
+    return () => {
+      clearTimeout(first);
+      clearTimeout(second);
+    };
+  }, []);
+  return lock;
+};
+
+/** The label, or a spinner while the button is still locked. */
+const LockedLabel = ({
+  locked,
+  children,
+}: {
+  locked: boolean;
+  children: ReactNode;
+}) =>
+  locked ? <Loader2 aria-label="Wait" className="animate-spin" /> : children;
 
 /**
  * The one end-of-round / end-of-session screen for every practice and mastery
@@ -39,9 +77,9 @@ export const EndScreenLayout = ({
   /** Under the buttons, e.g. "progress not saved". */
   notice?: ReactNode;
 }) => {
-  // Its buttons ignore taps while it fades in, so a double tap on the
-  // answer drawer's Continue can't hit "I'm done".
-  const guarded = useTapGuard();
+  const lock = useButtonLock();
+  const continueLocked = lock === "all";
+  const doneLocked = lock !== "none";
 
   return (
     <div className="flex flex-col w-full h-full animate-fade-in">
@@ -74,16 +112,25 @@ export const EndScreenLayout = ({
       <PracticeBottomBar>
         {onContinue ? (
           <>
-            <PracticeButton size="lg" onClick={guarded(onContinue)}>
-              {continueLabel}
+            <PracticeButton
+              size="lg"
+              disabled={continueLocked}
+              onClick={onContinue}
+            >
+              <LockedLabel locked={continueLocked}>{continueLabel}</LockedLabel>
             </PracticeButton>
-            <PracticeButton size="md" variant="ghost" onClick={guarded(onEnd)}>
-              I&apos;m done
+            <PracticeButton
+              size="md"
+              variant="ghost"
+              disabled={doneLocked}
+              onClick={onEnd}
+            >
+              <LockedLabel locked={doneLocked}>I&apos;m done</LockedLabel>
             </PracticeButton>
           </>
         ) : (
-          <PracticeButton size="lg" onClick={guarded(onEnd)}>
-            Done
+          <PracticeButton size="lg" disabled={continueLocked} onClick={onEnd}>
+            <LockedLabel locked={continueLocked}>Done</LockedLabel>
           </PracticeButton>
         )}
         {/* Dotted line between the buttons and the notice; `empty:hidden`

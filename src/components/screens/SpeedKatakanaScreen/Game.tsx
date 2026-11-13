@@ -1,11 +1,17 @@
 import { useMemo } from "react";
+import { ChevronsRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DefaultErrorFallback } from "@/components/error";
 import KaomojiAnimation from "@/components/common/KaomojiLoading";
 import { useJsonFetch } from "@/hooks/use-json";
 import assetsPaths from "@/lib/assets-paths";
-import { EndSession } from "@/components/shared-practice/EndSessionButton";
-import { ChallengeSetData, SessionStats, SpeedKatakanaSettings } from "./types";
+import { GameHeader } from "@/components/shared-practice/GameHeader";
+import {
+  ChallengeSetData,
+  isRecordedSession,
+  SessionStats,
+  SpeedKatakanaSettings,
+} from "./types";
 import { randomFontIndex } from "@/hooks/use-change-font";
 import { shuffle } from "@/lib/utils";
 import { GameWord, useSpeedKatakanaGame } from "./use-speed-katakana-game";
@@ -70,21 +76,23 @@ export const Game = ({
 
   return (
     <div className="flex flex-col w-full h-full gap-4 mx-auto [@media(min-height:900px)]:justify-center animate-fade-in-fast">
-      <EndSession onClick={onEnd} />
+      <GameHeader
+        position={{ index: game.index, total: game.wordCount }}
+        recorded={isRecordedSession(settings)}
+        onLeave={onEnd}
+      />
 
       <div className="flex flex-col items-center justify-center flex-1 min-h-0 [@media(min-height:900px)]:flex-none gap-3 text-center">
-        <div className="flex items-center justify-center gap-1 pt-4">
-          <span className="px-2 text-xs font-bold tabular-nums">
-            {game.index + 1} / {game.wordCount}
-          </span>
-          <button
-            className="text-xs font-bold tracking-wide text-red-500 transition-opacity -translate-y-[0.5px] hover:opacity-70"
-            tabIndex={-1}
-            onClick={game.handleSkip}
-          >
-            {`>>`}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="grid mt-4 transition-colors border rounded-full size-7 place-items-center text-muted-foreground hover:text-foreground hover:bg-foreground/10"
+          tabIndex={-1}
+          onClick={game.handleSkip}
+          aria-label="Skip"
+          title="Skip"
+        >
+          <ChevronsRight size={16} />
+        </button>
         <div
           className={current.fontIndex === null ? "kanji-font" : undefined}
           style={

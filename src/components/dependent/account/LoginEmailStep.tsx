@@ -1,27 +1,10 @@
 import { useRef, useState, type RefObject } from "react";
 import type { EngineAPI } from "engine-contract";
-import { ExternalTextLink } from "@/components/common/ExternalTextLink";
-import { ContactIcons } from "./ContactIcons";
+import { ContactIcons, EmojiLink } from "./ContactIcons";
 import { outLinks } from "@/lib/external-links";
 import type { ActionStatus } from "./action-status";
 import { loginFailureMessage } from "./login-failure";
 import { SubmitInput } from "./SubmitInput";
-
-/** An emoji and its link, kept together on one line. */
-const WaitlistLink = ({
-  emoji,
-  href,
-  text,
-}: {
-  emoji: string;
-  href: string;
-  text: string;
-}) => (
-  <span className="whitespace-nowrap">
-    <span aria-hidden>{emoji}</span>{" "}
-    <ExternalTextLink href={href} text={text} className="p-0" />
-  </span>
-);
 
 /**
  * The `website` field sent with the login code request. Off-screen, and kept
@@ -109,11 +92,9 @@ export const LoginEmailStep = ({
         </p>
         <p className="text-sm text-center text-foreground text-pretty">
           For premium features, message us on{" "}
-          <WaitlistLink emoji="💬" href={outLinks.discord} text="Discord" />,{" "}
-          <WaitlistLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" />{" "}
-          or{" "}
-          <WaitlistLink emoji="📷" href={outLinks.instagram} text="Instagram" />
-          .
+          <EmojiLink emoji="💬" href={outLinks.discord} text="Discord" />,{" "}
+          <EmojiLink emoji="🐦" href={outLinks.twitter} text="X/Twitter" /> or{" "}
+          <EmojiLink emoji="📷" href={outLinks.instagram} text="Instagram" />.
         </p>
         <ContactIcons />
       </div>

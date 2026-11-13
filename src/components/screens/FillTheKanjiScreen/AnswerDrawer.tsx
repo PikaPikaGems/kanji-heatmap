@@ -78,7 +78,7 @@ const TileChoices = ({
   getInfo: GetBasicKanjiInfo | undefined;
 }) => (
   <p
-    className="flex flex-wrap justify-center pb-4 text-base gap-x-2 kanji-font"
+    className="flex flex-wrap justify-center pb-4 text-lg gap-x-2 kanji-font"
     lang="ja"
   >
     {tiles.map((kanji, i) => {

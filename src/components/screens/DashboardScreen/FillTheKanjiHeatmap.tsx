@@ -46,7 +46,10 @@ const CELL_PX = 13;
 const GAP_PX = 3;
 /** Batches per row (rows read left to right, top to bottom) per layout. */
 const WIDE_COLUMNS = 50;
+/** Compact rows hold at most this many batches and wrap on narrow screens. */
 const COMPACT_COLUMNS = 25;
+const gridWidthPx = (columns: number) =>
+  columns * CELL_PX + (columns - 1) * GAP_PX;
 
 const SETTINGS_KEY = "fill-the-kanji-heatmap-settings";
 type HeatmapSettings = { compact: boolean };
@@ -113,16 +116,19 @@ const BatchDetail = ({
   );
 };
 
-/** One set's batches, `columns` per row, painted by attempt count. */
+/**
+ * One set's batches, painted by attempt count. Wide: 50 per row, scrolling
+ * sideways on narrow screens. Compact: up to 25 per row, wrapping to fit.
+ */
 const SetHeatmapGrid = ({
   setId,
   stats,
-  columns,
+  compact,
   attemptShading,
 }: {
   setId: FillTheKanjiSetId;
   stats: SetBatchStats;
-  columns: number;
+  compact: boolean;
   attemptShading: AttemptCountShading;
 }) => {
   const total = batchCount(setId);
@@ -141,12 +147,16 @@ const SetHeatmapGrid = ({
           />
         </span>
       </p>
-      {/* Scrolls sideways on narrow screens instead of widening the page. */}
-      <div className="pb-2 overflow-x-auto">
+      {/* Wide scrolls sideways on narrow screens instead of widening the
+          page; compact wraps instead. */}
+      <div className={compact ? "pb-2" : "pb-2 overflow-x-auto"}>
         <div
           className="grid"
           style={{
-            gridTemplateColumns: `repeat(${columns}, ${CELL_PX}px)`,
+            gridTemplateColumns: compact
+              ? `repeat(auto-fill, ${CELL_PX}px)`
+              : `repeat(${WIDE_COLUMNS}, ${CELL_PX}px)`,
+            maxWidth: compact ? gridWidthPx(COMPACT_COLUMNS) : undefined,
             gap: GAP_PX,
           }}
         >
@@ -214,7 +224,6 @@ const FillTheKanjiHeatmapBody = () => {
     DEFAULT_SETTINGS
   );
   const compact = settings.compact === true;
-  const columns = compact ? COMPACT_COLUMNS : WIDE_COLUMNS;
   const [scale] = useAttemptCountScale();
 
   // Still loading (or the read failed): nothing to draw yet.
@@ -256,7 +265,7 @@ const FillTheKanjiHeatmapBody = () => {
                   key={id}
                   setId={id}
                   stats={statsById.get(id) ?? {}}
-                  columns={columns}
+                  compact={compact}
                   attemptShading={attemptShading}
                 />
               ))}

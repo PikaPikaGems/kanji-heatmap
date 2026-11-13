@@ -358,6 +358,11 @@ const handleKanjiSimilar = requirePayload(async (kanji: string) => {
   return similar[kanji] ?? [];
 });
 
+const handleSimilarForKanji = requirePayload(async (kanji: string[]) => {
+  const similar = await loadSimilar();
+  return Object.fromEntries(kanji.map((k) => [k, similar[k] ?? []]));
+});
+
 const handleRetrieveVocabInfo = requirePayload(async (word: string) =>
   retrieveVocabInfo(await loadVocab(), word)
 );
@@ -501,6 +506,7 @@ const HANDLERS: {
   "kanji-hover": handleKanjiHover,
   "kanji-general": handleKanjiGeneral,
   "kanji-similar": handleKanjiSimilar,
+  "similar-for-kanji": handleSimilarForKanji,
 };
 
 self.onmessage = function (event: { data: OnMessageRequestType }) {

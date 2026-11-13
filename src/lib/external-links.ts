@@ -34,6 +34,10 @@ export const externalLinks: { name: string; url: (x: string) => string }[] = [
     url: (kanji: string) => `https://thekanjimap.com/${kanji}`,
   },
   {
+    name: "Nihongo Jouzu",
+    url: (kanji: string) => `https://nihongojouzu.jp/kanji/${kanji}`,
+  },
+  {
     name: "Jisho",
     url: (kanji: string) => `https://jisho.org/search/${kanji}%20%23kanji`,
   },

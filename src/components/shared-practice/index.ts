@@ -3,6 +3,7 @@ export { BlurredGloss } from "./BlurredGloss";
 export { Stat } from "./CountUpStat";
 export { EndScreenLayout } from "./EndScreenLayout";
 export { EndSession } from "./EndSession";
+export { GameHeader } from "./GameHeader";
 export { PracticeBottomBar } from "./PracticeBottomBar";
 export { PracticeInitialScreen } from "./PracticeInitialScreen";
 export { PracticeShell } from "./PracticeShell";
