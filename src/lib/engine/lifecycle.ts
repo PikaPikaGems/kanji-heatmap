@@ -5,6 +5,8 @@ import {
   createSyncStatusStore,
   SYNC_STATUS_KEY,
 } from "./store-cache";
+import { GUEST_OWNER_ID } from "./content-owner";
+import { deleteRemovedAccountKeys } from "./removed-account-keys";
 
 /** Pending writes are pushed this long after the last one, so bursts merge. */
 const PUSH_DEBOUNCE_MS = 1500;
@@ -12,6 +14,15 @@ const PUSH_DEBOUNCE_MS = 1500;
 const RETRY_INTERVAL_MS = 60_000;
 /** A failed catchUp() is not retried automatically sooner than this. */
 const CATCH_UP_COOLDOWN_MS = 30_000;
+
+/** Who is logged in (user id, or the guest); undefined while unknown. */
+const ownerIdOf = (snapshot: QuerySnapshot<AuthStatus>) => {
+  if (snapshot.status !== "ready" || !snapshot.result.ok) return undefined;
+  const status = snapshot.result.value;
+  if (status.status === "no_active_session") return GUEST_OWNER_ID;
+  if (status.status === "active_session") return status.userId;
+  return undefined;
+};
 
 const isActive = (snapshot: QuerySnapshot<AuthStatus>) =>
   snapshot.status === "ready" &&
@@ -31,6 +42,8 @@ const isActive = (snapshot: QuerySnapshot<AuthStatus>) =>
  * - Sync reports catch_up_required → catchUp() (host/guide/SYNC.md);
  *   requestSync() cannot resolve it. At most once per cooldown, so a failing
  *   catch-up doesn't loop.
+ * - Whenever who is logged in settles (startup, login, logout), delete the
+ *   saved AI keys of accounts the engine has removed from this device.
  */
 export const startEngineLifecycle = (api: EngineAPI) => {
   const auth = getCachedStore(api, AUTH_STATUS_KEY, (a) =>
@@ -55,6 +68,17 @@ export const startEngineLifecycle = (api: EngineAPI) => {
     sawFirstAuthStatus = true;
     if (isActive(snapshot)) api.sync.requestSync();
   });
+
+  const readOwnerId = () => ownerIdOf(auth.getSnapshot());
+  let keysCheckedFor: string | undefined;
+  const checkRemovedAccountKeys = () => {
+    const ownerId = readOwnerId();
+    if (ownerId === undefined || ownerId === keysCheckedFor) return;
+    keysCheckedFor = ownerId;
+    void deleteRemovedAccountKeys(readOwnerId);
+  };
+  auth.subscribe(checkRemovedAccountKeys);
+  checkRemovedAccountKeys();
 
   let catchingUp = false;
   let lastCatchUpAt = 0;

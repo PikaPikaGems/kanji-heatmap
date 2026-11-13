@@ -415,6 +415,9 @@ export const writeAiProviderKey = (
   writeAllKeys(keys);
 };
 
+/** Every owner with a key saved on this device. */
+export const listAiKeyOwners = () => [...readAllKeys().keys()];
+
 /** Deletes every key of this owner (logout). */
 export const deleteAiOwnerKeys = (ownerId: string) => {
   const keys = readAllKeys();
