@@ -225,7 +225,7 @@ export const useAiExplain = () => {
         try {
           await writeSentenceExplanation(
             sentence,
-            { text, provider, model, instructions, createdAt: Date.now() },
+            { text, provider, model, createdAt: Date.now() },
             expectedEpoch
           );
         } catch {

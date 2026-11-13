@@ -191,7 +191,12 @@ export const MnemonicForm = ({
         id: image?.id ?? crypto.randomUUID(),
         kanji,
         blob,
-        ...draft,
+        // Not the regenerate instructions: nothing reads them back.
+        description: draft.description,
+        style: draft.style,
+        palette: draft.palette,
+        customStyle: draft.customStyle,
+        customPalette: draft.customPalette,
         provider,
         model,
         resolution,

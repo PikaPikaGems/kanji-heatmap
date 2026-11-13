@@ -170,7 +170,6 @@ export const useAiDrawerText = (
         sources: reply.sources,
         provider,
         model,
-        instructions,
         createdAt: Date.now(),
         fingerprint,
       };

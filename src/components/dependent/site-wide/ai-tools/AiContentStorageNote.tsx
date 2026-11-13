@@ -1,4 +1,4 @@
-import { CloudOff, Download, Eye, TimerOff } from "lucide-react";
+import { CloudOff, Download, Eye, TimerOff, Users } from "lucide-react";
 import { NoteCard, NoteRow } from "@/components/common/NoteCard";
 
 /** Where AI content lives and how it can be lost: one point per row. */
@@ -14,6 +14,10 @@ export const AiContentStorageNote = ({ className }: { className?: string }) => (
     </NoteRow>
     <NoteRow icon={Eye}>
       Not private: anyone using this computer can see it.
+    </NoteRow>
+    <NoteRow icon={Users}>
+      AI Explain answers are shared: everyone using this browser sees the same
+      answer for a sentence or word.
     </NoteRow>
     <NoteRow icon={Download}>Download anything you want to keep.</NoteRow>
   </NoteCard>

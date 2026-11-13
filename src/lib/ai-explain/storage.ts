@@ -26,7 +26,6 @@ export type SentenceExplanation = {
   /** Unset on answers saved before other providers: xAI. */
   provider?: AiProvider;
   model: string;
-  instructions: string;
   createdAt: number;
 };
 type StoredExplanation = SentenceExplanation & Tracked & { id: string };
@@ -37,7 +36,6 @@ export type AiTextResult = {
   /** Unset on results saved before other providers: xAI. */
   provider?: AiProvider;
   model: string;
-  instructions: string;
   createdAt: number;
   fingerprint: string;
 };
@@ -55,7 +53,6 @@ export type MnemonicImage = {
   /** Unset on images saved before other providers: xAI. */
   provider?: AiProvider;
   model: string;
-  instructions: string;
   createdAt: number;
 };
 export type AiAudioRecord = {
@@ -102,6 +99,26 @@ const USAGE_INDEX = "[ownerId+lastUsedAt+bytes]";
 const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
 
 /**
+ * Owns every AI Explain answer: one answer per sentence or word on this
+ * device, whoever asked first. They're about the app's own sentences, not
+ * anything personal, so anyone using this browser sees, regenerates or
+ * deletes the same answer.
+ */
+export const SHARED_OWNER_ID = "shared";
+/** What's saved of an AI Explain answer, without anything else on the record. */
+const explanationFields = ({
+  text,
+  provider,
+  model,
+  createdAt,
+}: SentenceExplanation): SentenceExplanation => ({
+  text,
+  ...(provider && { provider }),
+  model,
+  createdAt,
+});
+
+/**
  * Database key for one owner's copy of an item. Callers use plain ids
  * (`essay:食`); the owner is added here so two people on one device never
  * read or replace each other's content. Every exported function below reads
@@ -127,13 +144,12 @@ const moveLegacyExplanations = async (db: AiDatabase) => {
   if (typeof legacy === "object" && !Array.isArray(legacy)) {
     const records = Object.entries(legacy)
       .filter(([, record]) => typeof record?.text === "string")
-      .map(([sentence, { text, model, instructions, createdAt }]) => {
-        const record = { text, model, instructions, createdAt };
-        // Saved before accounts existed, so these belong to the guest.
+      .map(([sentence, { text, model, createdAt }]) => {
+        const record = { text, model, createdAt };
         return {
           ...record,
-          id: ownedKey(sentenceKey(sentence), GUEST_OWNER_ID),
-          ownerId: GUEST_OWNER_ID,
+          id: ownedKey(sentenceKey(sentence), SHARED_OWNER_ID),
+          ownerId: SHARED_OWNER_ID,
           bytes: textBytes(record),
           lastUsedAt: createdAt,
         };
@@ -234,6 +250,38 @@ export const getAiDatabase = () => {
             );
           }
         });
+      // Version 5: AI Explain answers are shared by everyone on this device.
+      // Each sentence keeps its newest answer. The regenerate instructions
+      // saved with each one (never read back) are dropped.
+      db.version(5)
+        .stores({})
+        .upgrade(async (tx) => {
+          const table = tx.table("explanations");
+          const records: StoredExplanation[] = await table.toArray();
+          const newest = new Map<string, StoredExplanation>();
+          for (const record of records) {
+            const sentence = plainId(record.id, record.ownerId);
+            const kept = newest.get(sentence);
+            const lastUsedAt = Math.max(
+              record.lastUsedAt,
+              kept?.lastUsedAt ?? 0
+            );
+            if (kept && kept.createdAt >= record.createdAt) {
+              kept.lastUsedAt = lastUsedAt;
+              continue;
+            }
+            const fields = explanationFields(record);
+            newest.set(sentence, {
+              ...fields,
+              id: ownedKey(sentence, SHARED_OWNER_ID),
+              ownerId: SHARED_OWNER_ID,
+              bytes: textBytes(fields),
+              lastUsedAt,
+            });
+          }
+          await table.clear();
+          await table.bulkAdd([...newest.values()]);
+        });
       await db.open();
       await moveLegacyExplanations(db);
       return db;
@@ -274,7 +322,7 @@ const sumBytes = (rows: UsageRow[]) =>
   rows.reduce((total, row) => total + row.bytes, 0);
 const splitByOwner = (rows: UsageRow[], ownerId: string): KindUsage => {
   const mine = sumBytes(rows.filter((row) => row.ownerId === ownerId));
-  return { mine, others: sumBytes(rows) - mine };
+  return { mine, others: sumBytes(rows) - mine, shared: 0 };
 };
 
 /**
@@ -322,7 +370,7 @@ export const getAiStorageUsage = async (): Promise<AiStorageUsage> => {
     )
   );
   return {
-    text: splitByOwner([...essays, ...answers], ownerId),
+    text: { ...splitByOwner(essays, ownerId), shared: sumBytes(answers) },
     audio: splitByOwner(audio, ownerId),
     images: splitByOwner(images, ownerId),
   };
@@ -387,10 +435,9 @@ const saved = () => {
 export const readSentenceExplanation = async (
   sentence: string
 ): Promise<SentenceExplanation | undefined> => {
-  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const record = await db.explanations.get(
-    ownedKey(sentenceKey(sentence), ownerId)
+    ownedKey(sentenceKey(sentence), SHARED_OWNER_ID)
   );
   if (!record || typeof record.text !== "string" || !record.text.trim())
     return undefined;
@@ -402,23 +449,22 @@ export const writeSentenceExplanation = async (
   record: SentenceExplanation,
   expectedEpoch = getGeneratedContentEpoch()
 ) => {
-  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
-  const id = ownedKey(sentenceKey(sentence), ownerId);
+  const id = ownedKey(sentenceKey(sentence), SHARED_OWNER_ID);
+  const fields = explanationFields(record);
   await db.transaction("rw", db.explanations, db.textResults, async () => {
     checkEpoch(expectedEpoch);
     await db.explanations.put(
-      tracked({ ...record, id }, textBytes(record), ownerId)
+      tracked({ ...fields, id }, textBytes(fields), SHARED_OWNER_ID)
     );
     await fitTextLimit(db, id);
   });
   saved();
 };
 export const deleteSentenceExplanation = async (sentence: string) => {
-  const ownerId = requireOwnerId();
   await (
     await getAiDatabase()
-  ).explanations.delete(ownedKey(sentenceKey(sentence), ownerId));
+  ).explanations.delete(ownedKey(sentenceKey(sentence), SHARED_OWNER_ID));
   changed();
 };
 export const getTextResult = async (

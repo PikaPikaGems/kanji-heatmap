@@ -33,6 +33,11 @@ export const SavedStorageNotice = ({ kind }: { kind: "text" | "images" }) => {
         label={NOTICES[kind].label}
         mine={usage.mine}
         others={usage.others}
+        shared={
+          kind === "text"
+            ? { label: "Shared explains", bytes: usage.shared }
+            : undefined
+        }
         limit={limit}
         note={NOTICES[kind].note}
       />

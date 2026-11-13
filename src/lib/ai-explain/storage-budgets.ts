@@ -22,8 +22,12 @@ export const AI_STORAGE_LIMITS: Record<AiStorageKind, number> = {
 /** The near-limit notice shows from this share of a limit. */
 export const STORAGE_WARNING_RATIO = 0.7;
 
-/** Bytes of one kind: the current user's, and everyone else's on this device. */
-export type KindUsage = { mine: number; others: number };
+/**
+ * Bytes of one kind: the current user's, everyone else's on this device, and
+ * what everyone shares (AI Explain answers; 0 for the other kinds).
+ */
+export type KindUsage = { mine: number; others: number; shared: number };
 export type AiStorageUsage = Record<AiStorageKind, KindUsage>;
 
-export const kindTotal = ({ mine, others }: KindUsage) => mine + others;
+export const kindTotal = ({ mine, others, shared }: KindUsage) =>
+  mine + others + shared;
