@@ -77,9 +77,10 @@ export const GameHeader = ({
         escapeEnabled={escapeEnabled && !confirming}
       />
       <p className="absolute z-10 flex items-center h-10 text-xs font-bold top-1 right-3 tabular-nums">
-        {Math.min(position.index + 1, position.total)}{" "}
+        {Math.min(position.index + 1, position.total)}
+        {/* The leading space lives in the span: a flex row drops a bare one. */}
         <span className="font-medium whitespace-pre text-muted-foreground">
-          / {position.total}
+          {` / ${position.total}`}
         </span>
       </p>
       <LeaveDialog
