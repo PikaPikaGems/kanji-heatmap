@@ -60,7 +60,7 @@ export const subscribeAiVoice = (fn: () => void) => {
 export const getAiVoiceState = () => state;
 
 const ERROR_TEXT: Record<string, string> = {
-  "unsupported-browser": "This browser can't run the AI voice.",
+  "unsupported-browser": "This device can't run the AI voice.",
   unavailable:
     "The AI voice was turned off after it crashed this tab. Retry to try again.",
   "download-failed":
