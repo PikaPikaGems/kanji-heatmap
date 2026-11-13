@@ -70,7 +70,7 @@ const ERROR_TEXT: Record<string, string> = {
   timeout: "The AI voice took too long to respond.",
   "engine-failed": "The AI voice failed to start.",
   "worker-crashed": "The AI voice crashed.",
-  "audio-blocked": "The browser blocked audio. Tap a speak button to allow it.",
+  "audio-blocked": "Your device blocked audio. Tap a speak button to allow it.",
 };
 
 const describeError = (err: unknown): string => {
