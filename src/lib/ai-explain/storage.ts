@@ -5,6 +5,10 @@ import { safeReadJson } from "@/lib/storage";
 import { GUEST_OWNER_ID, requireOwnerId } from "@/lib/engine/content-owner";
 import {
   AI_STORAGE_LIMITS,
+  ASK_ON_DISCORD,
+  FREE_SPACE_NOTES,
+  freeSpaceNote,
+  kindTotal,
   type AiStorageUsage,
   type KindUsage,
 } from "./storage-budgets";
@@ -392,10 +396,16 @@ const FULL_MESSAGES = {
  * can't be remade counts: AI Explain answers make room by themselves.
  */
 export const assertStorageAvailable = async (kind: "text" | "images") => {
+  const ownerId = requireOwnerId();
   const db = await getAiDatabase();
   const table = kind === "text" ? db.textResults : db.images;
-  const used = sumBytes(await readUsageRows(asTracked(table)));
-  if (used >= AI_STORAGE_LIMITS[kind]) throw new Error(FULL_MESSAGES[kind]);
+  const usage = splitByOwner(await readUsageRows(asTracked(table)), ownerId);
+  if (kindTotal(usage) < AI_STORAGE_LIMITS[kind]) return;
+  const note = freeSpaceNote(usage, ownerId === GUEST_OWNER_ID);
+  const message = [FULL_MESSAGES[kind]];
+  if (note) message.push(FREE_SPACE_NOTES[note]);
+  if (note === "guest") message.push(ASK_ON_DISCORD);
+  throw new Error(message.join(" "));
 };
 
 export const getGeneratedContentEpoch = () =>

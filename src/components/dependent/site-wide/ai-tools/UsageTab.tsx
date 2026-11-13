@@ -24,6 +24,8 @@ import {
 import type { AiProvider } from "@/lib/ai-explain/providers/types";
 import { AiContentStorageNote } from "./AiContentStorageNote";
 import { DeleteAiContent } from "./DeleteAiContentDialog";
+import { GUEST_OWNER_ID, useCurrentOwner } from "@/lib/engine/content-owner";
+import { deletableBytes } from "@/lib/ai-explain/storage-budgets";
 
 /** A label and its value, one row of a two-column list. */
 const UsageRow = ({
@@ -127,11 +129,18 @@ const AiUsage = () => {
  */
 const OwnedGeneratedStorage = () => {
   const toolsActive = useAiStudyToolsActive();
+  const storage = useAiStorageUsage();
+  const owner = useCurrentOwner();
   return (
     <div className="mb-4 space-y-2">
       {/* While AI Study Tools are on, the same note shows above the tabs. */}
       {!toolsActive && <AiContentStorageNote />}
-      <DeleteAiContent />
+      {/* Only when there's something this owner may delete. */}
+      {storage.status === "ready" &&
+        owner.status === "known" &&
+        deletableBytes(storage.usage, owner.ownerId === GUEST_OWNER_ID) > 0 && (
+          <DeleteAiContent />
+        )}
     </div>
   );
 };

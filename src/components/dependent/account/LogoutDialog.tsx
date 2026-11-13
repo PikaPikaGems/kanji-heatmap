@@ -61,7 +61,9 @@ const LogoutForm = ({ userId }: { userId: string }) => {
       ? Object.values(aiUsage.usage).reduce((sum, kind) => sum + kind.mine, 0)
       : 0;
   const deleteAiContent = aiBytes > 0 && choices.aiContent;
-  const deleteAiKey = hasAiKey && choices.aiKey;
+  // Removing the study data removes the account from this device, and keys
+  // of removed accounts are deleted (removed-account-keys.ts): say so here.
+  const deleteAiKey = hasAiKey && (choices.aiKey || choices.studyData);
   const losesUnsynced = choices.studyData && pending > 0;
   const losesRejectedNotes =
     choices.studyData &&
@@ -110,7 +112,11 @@ const LogoutForm = ({ userId }: { userId: string }) => {
             Also remove from this device
           </legend>
           <LogoutRemovalOption
-            label="My cached study data on this device"
+            label={
+              hasAiKey
+                ? "All my data on this device, including API keys"
+                : "My cached study data on this device"
+            }
             details="The copy of your notes, bookmarks, review pile and progress kept on this device. Nothing is deleted from your account."
             checked={choices.studyData}
             onCheckedChange={choose("studyData")}
@@ -159,7 +165,8 @@ const LogoutForm = ({ userId }: { userId: string }) => {
             <LogoutRemovalOption
               label="My saved AI API keys"
               details="You'll need to paste them again next time."
-              checked={choices.aiKey}
+              checked={deleteAiKey}
+              disabled={choices.studyData}
               onCheckedChange={choose("aiKey")}
             />
           )}

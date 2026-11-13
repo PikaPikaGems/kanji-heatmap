@@ -280,7 +280,9 @@ const DeleteAiContentForm = ({
         >
           {request.status === "deleting"
             ? "Deleting…"
-            : `Delete ${formatMegabytes(bytes)}`}
+            : picked
+              ? `Delete ${formatMegabytes(bytes)}`
+              : "Delete"}
         </PracticeButton>
       </DialogActions>
     </div>

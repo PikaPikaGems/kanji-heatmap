@@ -11,11 +11,14 @@ export const LogoutRemovalOption = ({
   label,
   details,
   checked,
+  disabled,
   onCheckedChange,
 }: {
   label: string;
   details: string;
   checked: boolean;
+  /** Locked, because another ticked option already removes this. */
+  disabled?: boolean;
   onCheckedChange: (checked: boolean) => void;
 }) => (
   <div className="flex items-start gap-3">
@@ -23,6 +26,7 @@ export const LogoutRemovalOption = ({
       className="mt-0.5"
       aria-label={label}
       checked={checked}
+      disabled={disabled}
       onCheckedChange={(next) => onCheckedChange(next === true)}
     />
     <GenericPopover
