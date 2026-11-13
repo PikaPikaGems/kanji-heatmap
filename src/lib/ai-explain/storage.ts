@@ -112,7 +112,7 @@ const sentenceKey = (sentence: string) => sentence.normalize("NFC").trim();
 /**
  * Owns every AI Explain answer: one answer per sentence or word on this
  * device, whoever asked first. They're about the app's own sentences, not
- * anything personal, so anyone using this browser sees, regenerates or
+ * anything personal, so anyone using this device sees, regenerates or
  * deletes the same answer.
  */
 export const SHARED_OWNER_ID = "shared";

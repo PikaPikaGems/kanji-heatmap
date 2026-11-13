@@ -15,40 +15,40 @@ const WhoCanSeeIt = () => {
   const owner = useCurrentOwner();
   const account = useAccountStatus();
   if (hasNoAccounts(account))
-    return (
-      <>Not private: anyone using this browser can see it and delete it.</>
-    );
+    return <>Not private: anyone using this device can see it and delete it.</>;
   if (owner.status === "known" && owner.ownerId !== GUEST_OWNER_ID)
     return (
       <>
         Shown only while you&apos;re logged in, but anyone logged in on this
-        browser can delete it.
+        device can delete it.
       </>
     );
   return (
     <>
-      Not private: anyone using this browser while logged out can see it and
+      Not private: anyone using this device while logged out can see it and
       delete it.
     </>
   );
 };
 
-/** Where AI content lives and how it can be lost: one point per row. */
+/**
+ * Where AI content lives and how it can be lost: one point per row. Says
+ * "device" for what is strictly this browser's storage, as people think of it.
+ */
 export const AiContentStorageNote = ({ className }: { className?: string }) => (
-  <NoteCard title="Saved only in this browser" className={className}>
+  <NoteCard title="Saved only on this device" className={className}>
     <NoteRow icon={CloudOff}>
-      Not backed up. Clearing browser data deletes it.
+      Not backed up. Clearing this site&apos;s data deletes it.
     </NoteRow>
     <NoteRow icon={TimerOff}>
-      The browser can also delete it on its own: after 7 days unused in Safari
-      (unless the app is added to the Home Screen), or when the device is low on
-      space.
+      Your device can also delete it by itself, for example when it&apos;s low
+      on space.
     </NoteRow>
     <NoteRow icon={Eye}>
       <WhoCanSeeIt />
     </NoteRow>
     <NoteRow icon={Users}>
-      AI Explain answers are shared: everyone using this browser sees the same
+      AI Explain answers are shared: everyone using this device sees the same
       answer for a sentence or word.
     </NoteRow>
     <NoteRow icon={Download}>Download anything you want to keep.</NoteRow>

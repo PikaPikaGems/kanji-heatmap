@@ -50,7 +50,7 @@ export const deletableBytes = (usage: AiStorageUsage, isGuest: boolean) =>
 export const FREE_SPACE_NOTES = {
   signedIn: "You can free space in AI Study Tools → Usage.",
   guest:
-    "Mostly from other people using this browser. Someone logged in can free space in AI Study Tools → Usage.",
+    "Mostly from other people using this device. Someone logged in can free space in AI Study Tools → Usage.",
 };
 /** Follows the guest note; a link to Discord where it can be one. */
 export const ASK_ON_DISCORD = "Need help? Ask us on Discord.";

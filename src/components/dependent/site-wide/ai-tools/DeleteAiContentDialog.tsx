@@ -239,7 +239,7 @@ const DeleteAiContentForm = ({
           <Warning>⚠️ This can&apos;t be undone. Nothing is backed up.</Warning>
           {includesOthers(deletion) && (
             <Warning>
-              ⚠️ People who use this browser lose their essays, images and MP3s,
+              ⚠️ People who use this device lose their essays, images and MP3s,
               and they won&apos;t be told.
             </Warning>
           )}
