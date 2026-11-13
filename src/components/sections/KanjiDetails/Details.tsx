@@ -70,9 +70,9 @@ const SpeechNote = () => {
     return (
       <>
         <NoticeAction onClick={openLoginDialog}>Log in</NoticeAction> for more
-        natural-sounding audio 🔊 🎧. Until then, speak buttons use the AI voice
-        (if enabled) or your {"device's"} built-in voice, which may not work on
-        every device.
+        natural-sounding audio 🔊 🎧. Until then, speak functions use the AI
+        voice (if enabled) or your {"device's"} built-in voice, which may not
+        work on every device.
       </>
     );
   }

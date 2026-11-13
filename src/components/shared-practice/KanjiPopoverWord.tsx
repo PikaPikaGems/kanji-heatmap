@@ -2,14 +2,15 @@ import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
 import { cn, isKanji } from "@/lib/utils";
 import { KanjiPopover } from "./KanjiPopover";
 
-const highlightCn = (char: string, highlightKanji?: string | null) =>
-  highlightKanji != null && char === highlightKanji
-    ? "text-green-600 dark:text-green-500"
-    : "";
+/** The highlighted kanji in the full text color; the rest of the word muted. */
+const highlightCn = (char: string, highlightKanji?: string | null) => {
+  if (highlightKanji == null) return "";
+  return char === highlightKanji ? "text-foreground" : "text-foreground/80";
+};
 
 /**
  * A word as plain text, with `highlightKanji` (the kanji the word is an
- * anchor word of) in green.
+ * anchor word of) in the full text color and the rest muted.
  */
 export const HighlightedWord = ({
   word,
@@ -31,7 +32,7 @@ export const HighlightedWord = ({
  * A word whose kanji each open their KanjiPopover, dash-underlined like the
  * kanji in Fill in the Kanji's sentences; kana stay plain text. Until the
  * kanji data loads, the word is plain text. `highlightKanji` is shown in
- * green, as in HighlightedWord.
+ * stands out, as in HighlightedWord.
  */
 export const KanjiPopoverWord = ({
   word,
