@@ -5,7 +5,7 @@ import { KanjiPopover } from "./KanjiPopover";
 /** The highlighted kanji in the full text color; the rest of the word muted. */
 const highlightCn = (char: string, highlightKanji?: string | null) => {
   if (highlightKanji == null) return "";
-  return char === highlightKanji ? "text-foreground" : "text-foreground/80";
+  return char === highlightKanji ? "text-foreground" : "text-foreground/65";
 };
 
 /**
