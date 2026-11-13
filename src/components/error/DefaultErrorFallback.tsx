@@ -1,16 +1,20 @@
+import type { ReactNode } from "react";
 import { ErrorToolbarCta, Wrapper } from "./common";
 import { Sumimasen } from "./Sumimasen";
 
 /**
  * Default full-page unexpected-error fallback.
- * Apology + message, then linked hi/bug/refresh above the social icon row.
+ * Apology + message, optional `actions` (e.g. Try again), then linked
+ * hi/bug/refresh above the social icon row.
  */
 export const DefaultErrorFallback = ({
   message = "Welp... this isn’t supposed to happen! 🫣🫣",
   showDefaultCta = true,
+  actions,
 }: {
   message?: string;
   showDefaultCta?: boolean;
+  actions?: ReactNode;
 }) => {
   return (
     <Wrapper>
@@ -19,6 +23,7 @@ export const DefaultErrorFallback = ({
         <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
           {message}
         </p>
+        {actions}
         {showDefaultCta && <ErrorToolbarCta />}
       </div>
     </Wrapper>
