@@ -9,6 +9,13 @@ import {
   type KindUsage,
 } from "./storage-budgets";
 import { clearVoiceSamples } from "./voice-sample-cache";
+import {
+  AI_CONTENT_WHOSE_ORDER,
+  includesMine,
+  type AiContentDeletion,
+  type AiContentWhose,
+  type DeletableAiContent,
+} from "./delete-content";
 
 /** Where AI Explain answers lived before IndexedDB; moved over on first open. */
 const LEGACY_SENTENCE_RESULTS_KEY = "ai-explain-sentence-results";
@@ -632,26 +639,101 @@ export const contentFingerprint = async (text: string) => {
     byte.toString(16).padStart(2, "0")
   ).join("");
 };
-/** Deletes everything the current owner generated on this device. */
-export const clearGeneratedContent = async () => {
-  const ownerId = requireOwnerId();
-  const db = await getAiDatabase();
-  // Advance before clearing so in-flight paid requests cannot repopulate storage.
-  localStorage.setItem(
-    EPOCH_KEY,
-    JSON.stringify(getGeneratedContentEpoch() + 1)
+/** Every row's owner, size and last use, and which text each MP3 reads. */
+const readContentRows = async (db: AiDatabase) => {
+  const [essays, audio, images, explains] = await Promise.all(
+    [db.textResults, db.audio, db.images, db.explanations].map((table) =>
+      readUsageRows(asTracked(table))
+    )
   );
-  changed(true);
-  const tables = [db.textResults, db.images, db.audio, db.explanations];
-  await clearVoiceSamples();
-  await db.transaction("rw", tables, async () => {
-    for (const table of tables) {
-      // Every key of this owner, read from the index without loading records.
-      await asTracked(table)
-        .where(USAGE_INDEX)
-        .between([ownerId, -Infinity, -Infinity], [ownerId, Infinity, Infinity])
-        .delete();
-    }
+  // From the index, so no MP3 is loaded.
+  const sourceIds = new Map<string, string>();
+  await db.audio.orderBy("sourceId").eachKey((key, cursor) => {
+    sourceIds.set(cursor.primaryKey as string, key as string);
   });
-  changed(true);
+  const essayKeys = new Set(essays.map((row) => row.id));
+  const readsEssay = (row: UsageRow) =>
+    essayKeys.has(sourceIds.get(row.id) ?? "");
+  return { essays, audio, images, explains, readsEssay };
+};
+
+/** A guest can delete only their own content; a signed-in user anyone's. */
+const allowedWhose = (ownerId: string): readonly AiContentWhose[] =>
+  ownerId === GUEST_OWNER_ID ? ["mine"] : AI_CONTENT_WHOSE_ORDER;
+
+/** Whether a row's owner is in this "whose" choice of the current owner. */
+const ownedBy = (whose: AiContentWhose, ownerId: string) => (row: UsageRow) => {
+  if (row.ownerId === SHARED_OWNER_ID) return false;
+  if (whose === "mine") return row.ownerId === ownerId;
+  if (whose === "guest") return row.ownerId === GUEST_OWNER_ID;
+  if (whose === "others")
+    return row.ownerId !== ownerId && row.ownerId !== GUEST_OWNER_ID;
+  return true;
+};
+
+/** Sizes for "Delete saved AI content", for what the current owner may delete. */
+export const getDeletableAiContent = async (): Promise<DeletableAiContent> => {
+  const ownerId = requireOwnerId();
+  const rows = await readContentRows(await getAiDatabase());
+  const groups: DeletableAiContent["groups"] = {};
+  for (const whose of allowedWhose(ownerId)) {
+    const owned = ownedBy(whose, ownerId);
+    const audio = rows.audio.filter(owned);
+    groups[whose] = {
+      essays: sumBytes(rows.essays.filter(owned)),
+      essayAudio: sumBytes(audio.filter(rows.readsEssay)),
+      audio: sumBytes(audio),
+      images: sumBytes(rows.images.filter(owned)),
+    };
+  }
+  return { groups, sharedExplains: sumBytes(rows.explains) };
+};
+
+/**
+ * Deletes the chosen kinds of the chosen owners' content, and the shared AI
+ * Explain answers if picked. Deleting essays also deletes the audio that
+ * reads them. Resolves to the bytes freed.
+ */
+export const deleteAiContent = async (
+  deletion: AiContentDeletion
+): Promise<number> => {
+  const ownerId = requireOwnerId();
+  const { whose, kinds, sharedExplains } = deletion;
+  if (whose !== null && !allowedWhose(ownerId).includes(whose))
+    throw new Error("You can't delete this content.");
+  const db = await getAiDatabase();
+  // Only when the current owner's own requests could save into what's
+  // deleted: advance before deleting so they can't repopulate it.
+  const stopsRequests = includesMine(deletion) || sharedExplains;
+  if (stopsRequests) {
+    localStorage.setItem(
+      EPOCH_KEY,
+      JSON.stringify(getGeneratedContentEpoch() + 1)
+    );
+    changed(true);
+  }
+  if (includesMine(deletion) && kinds.includes("audio"))
+    await clearVoiceSamples();
+  let freed = 0;
+  const tables = [db.textResults, db.images, db.audio, db.explanations];
+  await db.transaction("rw", tables, async () => {
+    const remove = async (table: unknown, rows: UsageRow[]) => {
+      await asTracked(table).bulkDelete(rows.map((row) => row.id));
+      freed += sumBytes(rows);
+    };
+    const rows = await readContentRows(db);
+    if (sharedExplains) await remove(db.explanations, rows.explains);
+    if (whose === null || kinds.length === 0) return;
+    const owned = ownedBy(whose, ownerId);
+    if (kinds.includes("essays"))
+      await remove(db.textResults, rows.essays.filter(owned));
+    const audio = rows.audio.filter(owned);
+    if (kinds.includes("audio")) await remove(db.audio, audio);
+    else if (kinds.includes("essays"))
+      await remove(db.audio, audio.filter(rows.readsEssay));
+    if (kinds.includes("images"))
+      await remove(db.images, rows.images.filter(owned));
+  });
+  changed(stopsRequests);
+  return freed;
 };

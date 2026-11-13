@@ -1,6 +1,4 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Trash2 } from "lucide-react";
-import { TextActionButton } from "@/components/common/AiActionButtons";
 import { OwnedAiContent } from "@/components/common/OwnedAiContent";
 import { ExternalTextLink } from "@/components/common/ExternalTextLink";
 import { AiStorageBars } from "@/components/common/AiStorageBars";
@@ -25,6 +23,7 @@ import {
 } from "@/lib/ai-explain/providers/capabilities";
 import type { AiProvider } from "@/lib/ai-explain/providers/types";
 import { AiContentStorageNote } from "./AiContentStorageNote";
+import { DeleteAiContent } from "./DeleteAiContentDialog";
 
 /** A label and its value, one row of a two-column list. */
 const UsageRow = ({
@@ -122,82 +121,24 @@ const AiUsage = () => {
   );
 };
 
-type StorageStatus =
-  | { status: "idle" }
-  | { status: "confirm" }
-  | { status: "clearing" }
-  | { status: "cleared" }
-  | { status: "error"; message: string };
-
 /**
- * Deletes this owner's saved AI text, images and MP3s. How much is saved
- * shows just above (and in App & Device Info).
+ * Where saved AI content lives, and deleting it. How much is saved shows
+ * just above (and in App & Device Info).
  */
 const OwnedGeneratedStorage = () => {
-  const [state, setState] = useState<StorageStatus>({ status: "idle" });
   const toolsActive = useAiStudyToolsActive();
-  const clear = async () => {
-    setState({ status: "clearing" });
-    try {
-      const { clearGeneratedContent } = await import(
-        "@/lib/ai-explain/storage"
-      );
-      await clearGeneratedContent();
-      setState({ status: "cleared" });
-    } catch {
-      setState({
-        status: "error",
-        message: "Couldn't clear all generated content. Try again.",
-      });
-    }
-  };
-  if (state.status === "confirm")
-    return (
-      <div className="mb-4 space-y-2">
-        <p className="text-sm">
-          Delete all saved AI text, images, and MP3s from this browser? Download
-          anything you want to keep first. Your API key and preferences stay
-          saved.
-        </p>
-        <div className="flex flex-wrap items-center gap-1">
-          <TextActionButton
-            icon={<Trash2 size={14} />}
-            className="text-rose-500"
-            onClick={clear}
-          >
-            Delete generated content
-          </TextActionButton>
-          <span aria-hidden>·</span>
-          <TextActionButton onClick={() => setState({ status: "idle" })}>
-            Cancel
-          </TextActionButton>
-        </div>
-      </div>
-    );
   return (
     <div className="mb-4 space-y-2">
-      {state.status === "cleared" && (
-        <p className="text-sm">Generated content deleted.</p>
-      )}
-      {state.status === "error" && <p className="text-sm">{state.message}</p>}
       {/* While AI Study Tools are on, the same note shows above the tabs. */}
       {!toolsActive && <AiContentStorageNote />}
-      <TextActionButton
-        icon={<Trash2 size={14} />}
-        className="text-rose-500"
-        busy={state.status === "clearing"}
-        busyLabel="Clearing…"
-        onClick={() => setState({ status: "confirm" })}
-      >
-        Clear generated content
-      </TextActionButton>
+      <DeleteAiContent />
     </div>
   );
 };
 
 /**
- * Remounts for the new owner on login/logout, so a pending "Delete generated
- * content" confirmation can't carry over and delete the other owner's content.
+ * Remounts for the new owner on login/logout, so an open "Delete saved AI
+ * content" dialog can't carry over and delete with the other owner's choices.
  */
 export const GeneratedStorageSettings = () => (
   <OwnedAiContent>
