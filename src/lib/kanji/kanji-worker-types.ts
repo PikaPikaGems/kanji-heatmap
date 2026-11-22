@@ -141,6 +141,12 @@ export type ReadingDetailsResponseType = Record<
   KanjiReadingEntrySmall[]
 >;
 
+/**
+ * public/json/v2/indonesian_meanings.json: kanji → its Indonesian meanings
+ * joined by commas ("seratus,ratus"). Kanji without any are absent.
+ */
+export type IndonesianMeaningsResponseType = Record<string, string>;
+
 export type WordMeaning = string;
 // One furigana segment: text plus an optional reading.
 export type { WordPartDetail } from "../furigana";
@@ -299,6 +305,14 @@ export interface WorkerApi {
     payload: string;
     response: KanjiReadingEntry[] | null;
   };
+  /**
+   * Downloads indonesian_meanings.json into the worker. Sent when the user
+   * turns on "Show Indonesian meanings", so a failed download can turn the
+   * switch back off.
+   */
+  "indonesian-meanings-load": { payload: undefined; response: null };
+  /** One kanji's Indonesian meanings (payload: the kanji); null when none. */
+  "indonesian-meanings": { payload: string; response: string[] | null };
 }
 
 export type KanjiWorkerRequestName = keyof WorkerApi;

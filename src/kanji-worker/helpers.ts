@@ -8,6 +8,7 @@ import {
   ComponentsMap,
   GeneralInfoResponseType,
   HoverInfoResponseType,
+  IndonesianMeaningsResponseType,
   KanjiGeneralInfo,
   KanjiHoverInfo,
   KanjiMainInfo,
@@ -79,6 +80,9 @@ export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
 export const fetchSimilarKanjis = createFetch<Record<string, string[]>>(
   assetsPaths.SIMILAR_KANJIS
 );
+
+export const fetchIndonesianMeanings =
+  createFetch<IndonesianMeaningsResponseType>(assetsPaths.INDONESIAN_MEANINGS);
 
 const fetchStructuresFile = createFetch<StructuresResponseType>(
   assetsPaths.KANJI_STRUCTURES

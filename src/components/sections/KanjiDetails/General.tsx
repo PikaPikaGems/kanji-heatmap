@@ -24,6 +24,11 @@ import {
 } from "@/lib/external-links";
 import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
 import { TableCellFixed } from "./TableCellFixed";
+import {
+  useIndonesianMeanings,
+  useShowIndonesianMeanings,
+} from "@/providers/indonesian-meanings-hooks";
+import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 
 const hasData = (data?: number) => data != null && data !== -1;
 
@@ -56,6 +61,44 @@ export const LabelCell = ({
   </TableCellFixed>
 );
 
+/** One meaning in the Core Ideas / Indonesian Meanings rows. */
+const MeaningBadge = ({ meaning }: { meaning: string }) => (
+  <Badge variant={"outline"} className="m-1 whitespace-nowrap">
+    {meaning}
+  </Badge>
+);
+
+/**
+ * Only mounted while User Preferences → "Show Indonesian meanings" is on, so
+ * the file is never fetched otherwise. Nothing shows while loading, on error,
+ * or for a kanji without Indonesian meanings.
+ */
+const IndonesianMeaningsRow = ({ kanji }: { kanji: string }) => {
+  const meanings = useIndonesianMeanings(kanji);
+
+  if (meanings == null) return null;
+
+  return (
+    <TableRow className="text-left animate-fade-in-fast">
+      <LabelCell
+        label="Indonesian Meanings"
+        description={
+          <>
+            Meanings of this kanji in Indonesian. <IndonesianMeaningsCredit />
+          </>
+        }
+      />
+      <TableCellGrow>
+        <div className="flex flex-wrap gap-1.5">
+          {meanings.map((meaning) => (
+            <MeaningBadge key={meaning} meaning={meaning} />
+          ))}
+        </div>
+      </TableCellGrow>
+    </TableRow>
+  );
+};
+
 export const BareGeneral = ({ kanji }: { kanji: string }) => {
   return (
     <>
@@ -71,6 +114,7 @@ export const BareGeneral = ({ kanji }: { kanji: string }) => {
 
 export const General = ({ kanji }: { kanji: string }) => {
   const info = useKanjiInfo(kanji, "general");
+  const [showIndonesianMeanings] = useShowIndonesianMeanings();
 
   if (info.error) {
     return (
@@ -131,15 +175,7 @@ export const General = ({ kanji }: { kanji: string }) => {
       // FIXME: I don't know why 回 has a meaning "#name?"
       items: data.meanings
         .filter((meaning) => meaning !== "#name?")
-        .map((meaning) => (
-          <Badge
-            key={meaning}
-            variant={"outline"}
-            className="m-1 whitespace-nowrap"
-          >
-            {meaning}
-          </Badge>
-        )),
+        .map((meaning) => <MeaningBadge key={meaning} meaning={meaning} />),
     },
     {
       label: "Kunyomi",
@@ -194,6 +230,7 @@ export const General = ({ kanji }: { kanji: string }) => {
       <DottedSeparator className="my-4 border-b-2" />
       <Table className="table-fixed">
         <TableBody>
+          {showIndonesianMeanings && <IndonesianMeaningsRow kanji={kanji} />}
           {readingRows.map(({ label, description, items }) => (
             <TableRow key={label} className="text-left">
               <LabelCell label={label} description={description} />
