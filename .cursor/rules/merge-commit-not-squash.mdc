@@ -11,7 +11,7 @@ Do not squash-merge or rebase-merge unless the user explicitly asks for it in th
 
 # Merge only when asked
 
-Merge a PR only when the user asks you to merge it. A question about merging ("can you merge this?", "should we merge?") is not a request: answer it, and ask before merging.
+Merge a PR only when the user asks you to merge it. A question about merging ("can you merge this?", "is it possible to merge this first?", "should we merge?") is not a request: it asks whether merging is possible or a good idea. Answer it with your reasoning, and ask before merging.
 
 # Never merge into `main` while CI is failing
 
