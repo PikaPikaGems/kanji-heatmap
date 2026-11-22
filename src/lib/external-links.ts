@@ -225,6 +225,8 @@ export const otherOutLinks = {
   webSpeechApi:
     "https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis",
   jmdictFurigana: "https://github.com/Doublevil/JmdictFurigana",
+  /** Contributed the Indonesian meanings (kanji-heatmap-data PR #29). */
+  indonesianMeaningsContributor: "https://github.com/ditog37",
   dakanji: "https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition",
   googleHandwriting:
     "https://www.google.com/inputtools/services/features/handwriting.html",

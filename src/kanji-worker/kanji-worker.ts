@@ -21,6 +21,7 @@ import {
   fetchComponents,
   fetchGeneralKanjiInfo,
   fetchHoverKanjiInfo,
+  fetchIndonesianMeanings,
   fetchKanjiDecomposition,
   fetchKanjiReadingDetails,
   fetchMainKanjiInfo,
@@ -169,6 +170,12 @@ const loadStructures = lazyDataset(
 const loadReadingDetails = lazyDataset(
   (): Promise<KanjiReadingsData> => fetchKanjiReadingDetails()
 );
+
+/**
+ * Read only by the details "Indonesian Meanings" row, which is opt-in, so it
+ * is not part of `preload`.
+ */
+const loadIndonesianMeanings = lazyDataset(() => fetchIndonesianMeanings());
 
 // Starts immediately: the worker exists to answer questions about this map.
 const CORE = loadMainInfo();
@@ -423,6 +430,17 @@ const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
   return entries == null || entries.length === 0 ? null : entries;
 });
 
+/** One kanji's Indonesian meanings, split from "a,b"; null when it has none. */
+const handleIndonesianMeanings = requirePayload(async (kanji: string) => {
+  const joined = (await loadIndonesianMeanings())[kanji];
+  if (joined == null) return null;
+  const meanings = joined
+    .split(",")
+    .map((meaning) => meaning.trim())
+    .filter((meaning) => meaning !== "");
+  return meanings.length === 0 ? null : meanings;
+});
+
 /**
  * One radical's popover text, following aliases (氵 → ⺡) like every other
  * radical fact, plus the sounds it gives as a sound part. Null when there is
@@ -498,6 +516,11 @@ const HANDLERS: {
   "similar-map": () => loadSimilar(),
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
+  "indonesian-meanings-load": async () => {
+    await loadIndonesianMeanings();
+    return null;
+  },
+  "indonesian-meanings": handleIndonesianMeanings,
   "radical-popover-text": handleRadicalPopoverText,
   "sphmn-drawer": handleSphmnDrawer,
   "retrieve-vocab-info": handleRetrieveVocabInfo,

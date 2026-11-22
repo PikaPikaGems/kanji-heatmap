@@ -27,6 +27,8 @@ const assetsPaths = {
   KANJI_DECOMPOSITION: "/json/v2/kanji_decomposition.json",
   SIMILAR_KANJIS: "/json/v2/similar_kanjis.json",
   KANJI_READING_DETAILS: "/json/v2/kanji_reading_details.json",
+  // Opt-in (User Preferences); fetched only once that switch is turned on.
+  INDONESIAN_MEANINGS: "/json/v2/indonesian_meanings.json",
   // One merged file in place of the four per-source structure files: 50 KB
   // gzipped against 66 KB over four requests.
   KANJI_STRUCTURES: "/json/v2/kanji_structures.json",

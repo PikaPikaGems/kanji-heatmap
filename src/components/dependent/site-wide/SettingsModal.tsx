@@ -1,4 +1,9 @@
-import { forwardRef, useState, type ComponentProps } from "react";
+import {
+  forwardRef,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollableDialogContent } from "@/components/ui/scrollable-dialog-content";
 import { Button } from "@/components/ui/button";
@@ -22,6 +27,13 @@ import { PracticeButton } from "@/components/ui/practice-button";
 import SimpleAccordion from "@/components/common/SimpleAccordion";
 import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
+import { Loader2 } from "@/components/icons";
+import { cnWarningText } from "@/lib/generic-cn";
+import {
+  downloadIndonesianMeanings,
+  useShowIndonesianMeanings,
+} from "@/providers/indonesian-meanings-hooks";
+import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 import { useVoiceEngine } from "@/hooks/use-ai-voice";
 import { AiVoicePanel, VoiceEngineChoice } from "./AiVoiceSettings";
@@ -150,6 +162,24 @@ const JapaneseVoiceSection = () => {
   );
 };
 
+/** A switch with its label, as the Presentation section lists them. */
+const SwitchRow = ({
+  label,
+  children,
+  ...switchProps
+}: ComponentProps<typeof Switch> & {
+  label: string;
+  children?: ReactNode;
+}) => (
+  <div className="flex items-center py-2">
+    <Switch {...switchProps} />
+    <span className="flex items-center gap-1.5 px-2 text-sm font-semibold">
+      {label}
+      {children}
+    </span>
+  </div>
+);
+
 const LightDarkRow = () => {
   const { theme, setTheme } = useTheme();
   const isDark =
@@ -158,14 +188,65 @@ const LightDarkRow = () => {
       window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
-    <div className="flex items-center py-2">
-      <Switch
-        checked={isDark}
-        onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-        aria-label="Toggle dark mode"
-      />
+    <SwitchRow
+      label="Use Dark mode"
+      checked={isDark}
+      onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+      aria-label="Toggle dark mode"
+    />
+  );
+};
 
-      <span className="px-2 text-sm font-semibold">Use Dark mode</span>
+/**
+ * Turning it on downloads indonesian_meanings.json first; the setting is
+ * saved as on only once that worked, and stays off with a warning if not.
+ */
+const IndonesianMeaningsRow = () => {
+  const [showMeanings, setShowMeanings] = useShowIndonesianMeanings();
+  const [download, setDownload] = useState<"idle" | "downloading" | "error">(
+    "idle"
+  );
+
+  const onCheckedChange = (checked: boolean) => {
+    if (!checked) {
+      setShowMeanings(false);
+      setDownload("idle");
+      return;
+    }
+    setDownload("downloading");
+    downloadIndonesianMeanings()
+      .then(() => {
+        setShowMeanings(true);
+        setDownload("idle");
+      })
+      .catch(() => setDownload("error"));
+  };
+
+  return (
+    <div className="text-left">
+      <SwitchRow
+        label="Show Indonesian meanings"
+        checked={showMeanings}
+        disabled={download === "downloading"}
+        onCheckedChange={onCheckedChange}
+        aria-label="Show Indonesian meanings"
+      >
+        {download === "downloading" && (
+          <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
+            <Loader2 className="size-3.5 shrink-0 animate-spin" />
+            downloading…
+          </span>
+        )}
+      </SwitchRow>
+      {download === "error" && (
+        <p className={cn("mb-1 ml-[52px] text-xs", cnWarningText)}>
+          Couldn&apos;t download Indonesian meanings. Check your connection and
+          try again.
+        </p>
+      )}
+      <p className="ml-[52px] text-xs text-muted-foreground">
+        Shown in the kanji details. <IndonesianMeaningsCredit />
+      </p>
     </div>
   );
 };
@@ -209,7 +290,7 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Presentation, Japanese voice and stroke animation preferences"
+        description="Presentation, Indonesian meanings, Japanese voice and stroke animation preferences"
         titleClassName="text-left"
       >
         <SimpleAccordion trigger="Presentation" defaultOpen>
@@ -228,6 +309,7 @@ export const SettingsModal = ({
           </div>
 
           <LightDarkRow />
+          <IndonesianMeaningsRow />
         </SimpleAccordion>
 
         <JapaneseVoiceSection />
