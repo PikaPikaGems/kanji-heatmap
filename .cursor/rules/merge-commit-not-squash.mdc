@@ -1,5 +1,5 @@
 ---
-description: Merge PRs with a merge commit (never squash or rebase); never force-push
+description: Merge PRs only when asked, with a merge commit (never squash or rebase), and only when CI has passed; never force-push
 alwaysApply: true
 ---
 
@@ -8,6 +8,16 @@ alwaysApply: true
 When asked to merge a pull request, use a regular **merge commit** (`merge_method: "merge"`, or `gh pr merge --merge`).
 
 Do not squash-merge or rebase-merge unless the user explicitly asks for it in that conversation. The repo keeps each commit of a PR in `main`'s history.
+
+# Merge only when asked
+
+Merge a PR only when the user asks you to merge it. A question about merging ("can you merge this?", "is it possible to merge this first?", "should we merge?") is not a request: it asks whether merging is possible or a good idea. Answer it with your reasoning, and ask before merging.
+
+# Never merge into `main` while CI is failing
+
+Before merging a PR into `main`, check its CI on the current head commit. Merge only when every check has **finished and passed**. A failing check, or one still queued or running, means do not merge yet: wait for it, or fix the failure first.
+
+If the user still wants it merged while CI is red or unfinished, say which check is failing or pending and why, and merge only after they confirm in that conversation.
 
 # Never force-push
 
