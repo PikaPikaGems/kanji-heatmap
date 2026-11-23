@@ -189,6 +189,7 @@ No step had one record per word, so each stored its own copy.
    - `StudyNoteVocabButton.tsx` gets its kana from `word_readings.json` instead of furigana
      parts.
 6. **Tests:** several existing tests use the old shapes and will fail:
+
    - `kanji-assembly.test.ts` and its snapshot
    - `kanji-worker.test.ts`
    - `kanji-search.test.ts`

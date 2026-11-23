@@ -35,8 +35,6 @@ const mainInfo = (
   kklcIndex: numbers.kklcIndex ?? -1,
   rtk: numbers.rtk ?? -1,
   topoTwitterIndex: numbers.topoTwitterIndex ?? -1,
-  repWord: null,
-  repReading: null,
 });
 
 // Meanings and readings only: strokes and grade now live on the main info.
