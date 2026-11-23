@@ -3,15 +3,8 @@ import {
   useIsKanjiWorkerReady,
   useWorkerQuery,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { useLocalStorageFlag } from "@/hooks/use-local-storage";
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
-
-const SHOW_INDONESIAN_MEANINGS_KEY = "show-indonesian-meanings";
-
-/** User Preferences → "Show Indonesian meanings" (off by default). */
-export const useShowIndonesianMeanings = () =>
-  useLocalStorageFlag(SHOW_INDONESIAN_MEANINGS_KEY);
 
 /**
  * Downloads indonesian_meanings.json into the worker. Rejects when the

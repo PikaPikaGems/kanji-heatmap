@@ -12,12 +12,14 @@ import { createContext } from "react";
 import { useSearchSettings } from "@/providers/search-settings-hooks";
 import {
   GetBasicKanjiInfo,
+  SearchRequest,
   SearchResponse,
 } from "@/lib/kanji/kanji-worker-types";
 import type { RadicalPopoverDetails, RadicalsRuntime } from "@/lib/radicals";
 import type { AnchorIndex } from "@/lib/kanji/anchor-words";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
+import { useShowIndonesianMeanings } from "@/hooks/use-show-indonesian-meanings";
 
 export const IsReadyContext = createContext<boolean>(false);
 export const GetBasicKanjiInfoContext = createContext<GetBasicKanjiInfo | null>(
@@ -137,26 +139,39 @@ export const useRadicals = () =>
  */
 const searchResultCache = new Map<string, SearchResponse>();
 
-const searchCacheKey = (settings: SearchSettings) => JSON.stringify(settings);
+const searchCacheKey = (request: SearchRequest) => JSON.stringify(request);
+
+/**
+ * Adds "Show Indonesian meanings" to the request, only for "meanings"
+ * searches, so flipping the switch never re-runs any other search.
+ */
+const useSearchRequest = (searchSettings: SearchSettings) => {
+  const [showIndonesian] = useShowIndonesianMeanings();
+  const includeIndonesian =
+    showIndonesian && searchSettings.textSearch.type === "meanings";
+  const request: SearchRequest = { ...searchSettings, includeIndonesian };
+  return { request, includeIndonesian };
+};
 
 export const useKanjiSearch = (searchSettings: SearchSettings) => {
   // ItemCountBadge (and similar) can mount before the worker is ready; the
   // query stays idle until then rather than racing initialisation.
   const ready = useIsKanjiWorkerReady();
-  const cacheKey = searchCacheKey(searchSettings);
+  const { request, includeIndonesian } = useSearchRequest(searchSettings);
+  const cacheKey = searchCacheKey(request);
 
   const state = useWorkerQuery<SearchResponse>(
     ready
       ? () =>
           requestWorker({
             type: "search",
-            payload: searchSettings,
+            payload: request,
           }).then((response) => {
             searchResultCache.set(cacheKey, response);
             return response;
           })
       : null,
-    [searchSettings, ready],
+    [searchSettings, includeIndonesian, ready],
     true,
     searchResultCache.get(cacheKey)
   );
@@ -171,16 +186,17 @@ export const useKanjiSearch = (searchSettings: SearchSettings) => {
 
 export const useKanjiSearchCount = (searchSettings: SearchSettings) => {
   const ready = useIsKanjiWorkerReady();
+  const { request, includeIndonesian } = useSearchRequest(searchSettings);
 
   const state = useWorkerQuery<number>(
     ready
       ? () =>
           requestWorker({
             type: "search-result-count",
-            payload: searchSettings,
+            payload: request,
           })
       : null,
-    [searchSettings, ready]
+    [searchSettings, includeIndonesian, ready]
   );
 
   return {
