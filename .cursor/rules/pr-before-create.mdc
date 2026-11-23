@@ -9,7 +9,8 @@ When the user asks to create a PR (or push and create a PR):
 
 1. Run Prettier on every source file you changed (`pnpm exec prettier --write <paths>`). Then `pnpm exec prettier --check .` (or `pnpm run format:check`) and fix any reported files.
 2. If the working tree is dirty, **commit** those changes (including format-only fixes). Do not open a PR with uncommitted work.
-3. Only then push and create the PR.
+3. Fill in `.github/pull_request_template.md`, including the "Visual changes" section (see `report-visual-changes.mdc`).
+4. Only then push and create the PR.
 
 Do not skip this because files “look formatted.” CI fails on `format:check`.
 
