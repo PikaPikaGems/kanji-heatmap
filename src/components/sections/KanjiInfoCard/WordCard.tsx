@@ -26,7 +26,7 @@ export const WordCard = ({
         word={word}
         readingOverride={spacedKana.split(" ").join("")}
         wordTranslationOverride={definition || undefined}
-        className="px-4 py-2 mt-1 text-4xl bg-transparent border-0 hover:bg-foreground/5"
+        className="px-4 py-2 m-2 text-4xl border-dotted border-foreground/50"
         optionalSection={<WordFrequencyTags word={word} />}
       />
     </>
