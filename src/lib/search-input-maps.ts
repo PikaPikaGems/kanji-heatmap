@@ -16,7 +16,7 @@ export const translateMap: Record<SearchType, TranslateType> = {
   "handwriting-alt-2": "none",
 };
 
-/** The "meanings" placeholder while "Show Indonesian meanings" is on. */
+/** The "meanings" placeholder while "Show Indonesian kanji meanings" is on. */
 export const INDONESIAN_MEANINGS_PLACEHOLDER =
   "Enter English or Indonesian meanings (e.g., person, orang)";
 

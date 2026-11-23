@@ -67,7 +67,7 @@ const MeaningBadge = ({ meaning }: { meaning: string }) => (
 );
 
 /**
- * Only mounted while User Preferences → "Show Indonesian meanings" is on, so
+ * Only mounted while User Preferences → "Show Indonesian kanji meanings" is on, so
  * the file is never fetched otherwise. Nothing shows while loading, on error,
  * or for a kanji without Indonesian meanings.
  */

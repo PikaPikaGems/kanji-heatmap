@@ -23,6 +23,8 @@ import { Table, TableBody, TableRow } from "@/components/ui/table";
 import { LabelCell, TableCellGrow } from "./General";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
+import { useIndonesianGloss } from "@/providers/indonesian-word-meanings-hooks";
+import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 
 import { VocabActions } from "@/components/common/VocabActions";
 import { lazy, Suspense, useState, type ReactNode } from "react";
@@ -147,69 +149,90 @@ const AnchorWordPanel = ({ anchor }: { anchor: AnchorWord }) => {
   const owner = useCurrentOwner();
   const { word, readings, englishGloss, tier, tags, ranks } = anchor;
   const reading = readings.join("・");
+  // Null unless "Prefer Indonesian vocabulary glosses" is on and the word has one.
+  const indonesianGloss = useIndonesianGloss(word);
 
-  const rows: { label: string; description: string; content: ReactNode }[] = [
-    {
-      label: "Word",
-      description:
-        "This Anchor Word. Tap it for its kanji, meaning and more links.",
-      content: (
-        <ExampleWordPopover
-          word={word}
-          wordTranslationOverride={englishGloss}
-          readingOverride={reading}
-          className="text-4xl"
-          optionalSection={<WordFrequencyTags word={word} />}
-        />
-      ),
-    },
-    {
-      label: "Readings",
-      description: "How the word is read.",
-      content: readings.map((r) => (
-        <RomajiBadge key={r} kana={r} className="text-lg" />
-      )),
-    },
-    {
-      label: "Gloss",
-      description: "A short English meaning of the word.",
-      content: <span className="text-sm font-bold">{englishGloss}</span>,
-    },
-    {
-      label: "Tags",
-      description:
-        "Its JLPT level, whether it was handpicked or reviewed, and the word lists it is in.",
-      content:
-        tags.length > 0 ? (
-          <WordTagBadges
-            entry={toTagsWordEntry(anchor.word, tags)}
-            isName={tags.includes("name")}
-            maxVisible={Infinity}
-            className="-m-1"
+  const rows: { label: string; description: ReactNode; content: ReactNode }[] =
+    [
+      {
+        label: "Word",
+        description:
+          "This Anchor Word. Tap it for its kanji, meaning and more links.",
+        content: (
+          <ExampleWordPopover
+            word={word}
+            wordTranslationOverride={englishGloss}
+            readingOverride={reading}
+            className="text-4xl"
+            optionalSection={<WordFrequencyTags word={word} />}
           />
+        ),
+      },
+      {
+        label: "Readings",
+        description: "How the word is read.",
+        content: readings.map((r) => (
+          <RomajiBadge key={r} kana={r} className="text-lg" />
+        )),
+      },
+      ...(indonesianGloss
+        ? [
+            {
+              label: "Indonesian Gloss",
+              description: (
+                <>
+                  A short Indonesian meaning of the word.{" "}
+                  <IndonesianMeaningsCredit />
+                </>
+              ),
+              content: (
+                <span className="text-sm font-bold animate-fade-in-fast">
+                  {indonesianGloss}
+                </span>
+              ),
+            },
+          ]
+        : []),
+      {
+        label: "Gloss",
+        description: "A short English meaning of the word.",
+        content: <span className="text-sm font-bold">{englishGloss}</span>,
+      },
+      {
+        label: "Tags",
+        description:
+          "Its JLPT level, whether it was handpicked or reviewed, and the word lists it is in.",
+        content:
+          tags.length > 0 ? (
+            <WordTagBadges
+              entry={toTagsWordEntry(anchor.word, tags)}
+              isName={tags.includes("name")}
+              maxVisible={Infinity}
+              className="-m-1"
+            />
+          ) : null,
+      },
+      {
+        label: "Tier",
+        description:
+          "How common the word is, from one score across the frequency lists below: the 2,000 most frequent words are Basic, the next 4,000 Common, the next 6,000 Fluent, the rest Advanced.",
+        content: tier ? (
+          <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
+            {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
+          </Badge>
         ) : null,
-    },
-    {
-      label: "Tier",
-      description:
-        "How common the word is, from one score across the frequency lists below: the 2,000 most frequent words are Basic, the next 4,000 Common, the next 6,000 Fluent, the rest Advanced.",
-      content: tier ? (
-        <Badge className="px-2 m-1 whitespace-nowrap" variant="outline">
-          {tier} {ANCHOR_TIER_LABELS[tier] ?? ""}
-        </Badge>
-      ) : null,
-    },
-    {
-      label: "Actions",
-      description: "Hear, copy or share the word.",
-      content: <VocabActions word={word} kana={reading} />,
-    },
-    {
-      label: "Links",
-      description: `Look up ${word} in dictionaries and see it used in the wild.`,
-      content: <AnchorWordLinks word={word} />,
-    },
-  ];
+      },
+      {
+        label: "Actions",
+        description: "Hear, copy or share the word.",
+        content: <VocabActions word={word} kana={reading} />,
+      },
+      {
+        label: "Links",
+        description: `Look up ${word} in dictionaries and see it used in the wild.`,
+        content: <AnchorWordLinks word={word} />,
+      },
+    ];
 
   return (
     <div className="space-y-3">

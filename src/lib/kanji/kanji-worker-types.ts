@@ -137,7 +137,7 @@ export type ReadingDetailsResponseType = Record<
 >;
 
 /**
- * public/json/v2/indonesian_meanings.json: kanji → its Indonesian meanings
+ * public/json/v2/indonesian_kanji_meanings.json: kanji → its Indonesian meanings
  * joined by commas ("seratus,ratus"). Kanji without any are absent.
  */
 export type IndonesianMeaningsResponseType = Record<string, string>;
@@ -306,13 +306,21 @@ export interface WorkerApi {
     response: KanjiReadingEntry[] | null;
   };
   /**
-   * Downloads indonesian_meanings.json into the worker. Sent when the user
-   * turns on "Show Indonesian meanings", so a failed download can turn the
-   * switch back off.
+   * Downloads indonesian_kanji_meanings.json into the worker. Sent when the
+   * user turns on "Show Indonesian kanji meanings", so a failed download can
+   * turn the switch back off.
    */
-  "indonesian-meanings-load": { payload: undefined; response: null };
+  "indonesian-kanji-meanings-load": { payload: undefined; response: null };
   /** One kanji's Indonesian meanings (payload: the kanji); null when none. */
-  "indonesian-meanings": { payload: string; response: string[] | null };
+  "indonesian-kanji-meanings": { payload: string; response: string[] | null };
+  /**
+   * Downloads indonesian_word_meanings.json into the worker. Sent when the
+   * user turns on "Prefer Indonesian vocabulary glosses", so a failed download
+   * can turn the switch back off.
+   */
+  "indonesian-word-meanings-load": { payload: undefined; response: null };
+  /** One word's Indonesian gloss (payload: the word); null when none. */
+  "indonesian-word-meaning": { payload: string; response: string | null };
 }
 
 export type KanjiWorkerRequestName = keyof WorkerApi;

@@ -92,8 +92,14 @@ export const fetchSimilarKanjis = createFetch<Record<string, string[]>>(
   assetsPaths.SIMILAR_KANJIS
 );
 
-export const fetchIndonesianMeanings =
-  createFetch<IndonesianMeaningsResponseType>(assetsPaths.INDONESIAN_MEANINGS);
+export const fetchIndonesianKanjiMeanings =
+  createFetch<IndonesianMeaningsResponseType>(
+    assetsPaths.INDONESIAN_KANJI_MEANINGS
+  );
+
+export const fetchIndonesianWordMeanings = createFetch<Record<string, string>>(
+  assetsPaths.INDONESIAN_WORD_MEANINGS
+);
 
 const fetchStructuresFile = createFetch<StructuresResponseType>(
   assetsPaths.KANJI_STRUCTURES

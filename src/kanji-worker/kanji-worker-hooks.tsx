@@ -142,7 +142,7 @@ const searchResultCache = new Map<string, SearchResponse>();
 const searchCacheKey = (request: SearchRequest) => JSON.stringify(request);
 
 /**
- * Adds "Show Indonesian meanings" to the request, only for "meanings"
+ * Adds "Show Indonesian kanji meanings" to the request, only for "meanings"
  * searches, so flipping the switch never re-runs any other search.
  */
 const useSearchRequest = (searchSettings: SearchSettings) => {

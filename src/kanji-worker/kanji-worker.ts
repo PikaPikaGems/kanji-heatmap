@@ -23,7 +23,8 @@ import { decodeFurigana } from "@/lib/furigana";
 import {
   fetchComponents,
   fetchGeneralKanjiInfo,
-  fetchIndonesianMeanings,
+  fetchIndonesianKanjiMeanings,
+  fetchIndonesianWordMeanings,
   fetchKanjiDecomposition,
   fetchKanjiParts,
   fetchKanjiReadingDetails,
@@ -191,7 +192,7 @@ const loadReadingDetails = lazyDataset(
  * opt-in, so it is not part of `preload`.
  */
 const loadIndonesianMeanings = lazyDataset(() =>
-  fetchIndonesianMeanings().then((joinedByKanji) => {
+  fetchIndonesianKanjiMeanings().then((joinedByKanji) => {
     const meaningsByKanji: Record<string, string[]> = {};
     for (const [kanji, joined] of Object.entries(joinedByKanji)) {
       const meanings = joined
@@ -203,6 +204,13 @@ const loadIndonesianMeanings = lazyDataset(() =>
     return meaningsByKanji;
   })
 );
+
+/**
+ * Each word's Indonesian gloss, { word: gloss }. Read by word popovers, the
+ * vocabulary tables and the anchor word details while "Prefer Indonesian
+ * vocabulary glosses" is on; opt-in, so it is not part of `preload`.
+ */
+const loadIndonesianWordMeanings = lazyDataset(fetchIndonesianWordMeanings);
 
 // Starts immediately: the worker exists to answer questions about this map.
 const CORE = loadMainInfo();
@@ -519,6 +527,11 @@ const handleIndonesianMeanings = requirePayload(
   async (kanji: string) => (await loadIndonesianMeanings())[kanji] ?? null
 );
 
+/** One word's Indonesian gloss; null when it has none. */
+const handleIndonesianWordMeaning = requirePayload(
+  async (word: string) => (await loadIndonesianWordMeanings())[word] ?? null
+);
+
 /**
  * One radical's popover text, following aliases (氵 → ⺡) like every other
  * radical fact, plus the sounds it gives as a sound part. Null when there is
@@ -596,11 +609,16 @@ const HANDLERS: {
   "similar-map": () => loadSimilar(),
   "kanji-structure": handleKanjiStructure,
   "kanji-reading-details": handleKanjiReadingDetails,
-  "indonesian-meanings-load": async () => {
+  "indonesian-kanji-meanings-load": async () => {
     await loadIndonesianMeanings();
     return null;
   },
-  "indonesian-meanings": handleIndonesianMeanings,
+  "indonesian-kanji-meanings": handleIndonesianMeanings,
+  "indonesian-word-meanings-load": async () => {
+    await loadIndonesianWordMeanings();
+    return null;
+  },
+  "indonesian-word-meaning": handleIndonesianWordMeaning,
   "radical-popover-text": handleRadicalPopoverText,
   "sphmn-drawer": handleSphmnDrawer,
   "retrieve-vocab-info": handleRetrieveVocabInfo,

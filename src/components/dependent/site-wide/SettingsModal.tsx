@@ -31,6 +31,8 @@ import { Loader2 } from "@/components/icons";
 import { cnWarningText } from "@/lib/generic-cn";
 import { downloadIndonesianMeanings } from "@/providers/indonesian-meanings-hooks";
 import { useShowIndonesianMeanings } from "@/hooks/use-show-indonesian-meanings";
+import { downloadIndonesianWordMeanings } from "@/providers/indonesian-word-meanings-hooks";
+import { usePreferIndonesianGlosses } from "@/hooks/use-prefer-indonesian-glosses";
 import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 import { useVoiceEngine } from "@/hooks/use-ai-voice";
@@ -196,56 +198,104 @@ const LightDarkRow = () => {
 };
 
 /**
- * Turning it on downloads indonesian_meanings.json first; the setting is
- * saved as on only once that worked, and stays off with a warning if not.
+ * A switch whose data downloads first: turning it on fetches the file, and
+ * the setting is saved as on only once that worked; it stays off with a
+ * warning if not.
  */
-const IndonesianMeaningsRow = () => {
-  const [showMeanings, setShowMeanings] = useShowIndonesianMeanings();
-  const [download, setDownload] = useState<"idle" | "downloading" | "error">(
+const DownloadSwitchRow = ({
+  label,
+  checked,
+  setChecked,
+  download,
+  failedText,
+  note,
+}: {
+  label: string;
+  checked: boolean;
+  setChecked: (next: boolean) => void;
+  download: () => Promise<unknown>;
+  failedText: string;
+  note: ReactNode;
+}) => {
+  const [status, setStatus] = useState<"idle" | "downloading" | "error">(
     "idle"
   );
 
-  const onCheckedChange = (checked: boolean) => {
-    if (!checked) {
-      setShowMeanings(false);
-      setDownload("idle");
+  const onCheckedChange = (next: boolean) => {
+    if (!next) {
+      setChecked(false);
+      setStatus("idle");
       return;
     }
-    setDownload("downloading");
-    downloadIndonesianMeanings()
+    setStatus("downloading");
+    download()
       .then(() => {
-        setShowMeanings(true);
-        setDownload("idle");
+        setChecked(true);
+        setStatus("idle");
       })
-      .catch(() => setDownload("error"));
+      .catch(() => setStatus("error"));
   };
 
   return (
     <div className="text-left">
       <SwitchRow
-        label="Show Indonesian meanings"
-        checked={showMeanings}
-        disabled={download === "downloading"}
+        label={label}
+        checked={checked}
+        disabled={status === "downloading"}
         onCheckedChange={onCheckedChange}
-        aria-label="Show Indonesian meanings"
+        aria-label={label}
       >
-        {download === "downloading" && (
+        {status === "downloading" && (
           <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
             <Loader2 className="size-3.5 shrink-0 animate-spin" />
             downloading…
           </span>
         )}
       </SwitchRow>
-      {download === "error" && (
+      {status === "error" && (
         <p className={cn("mb-1 ml-[52px] text-xs", cnWarningText)}>
-          Couldn&apos;t download Indonesian meanings. Check your connection and
-          try again.
+          {failedText}
         </p>
       )}
-      <p className="ml-[52px] text-xs text-muted-foreground">
-        Shown in the kanji details. <IndonesianMeaningsCredit />
-      </p>
+      <p className="ml-[52px] text-xs text-muted-foreground">{note}</p>
     </div>
+  );
+};
+
+const IndonesianKanjiMeaningsRow = () => {
+  const [showMeanings, setShowMeanings] = useShowIndonesianMeanings();
+  return (
+    <DownloadSwitchRow
+      label="Show Indonesian kanji meanings"
+      checked={showMeanings}
+      setChecked={setShowMeanings}
+      download={downloadIndonesianMeanings}
+      failedText="Couldn't download Indonesian kanji meanings. Check your connection and try again."
+      note={
+        <>
+          Shown in the kanji details. <IndonesianMeaningsCredit />
+        </>
+      }
+    />
+  );
+};
+
+const IndonesianGlossesRow = () => {
+  const [preferIndonesian, setPreferIndonesian] = usePreferIndonesianGlosses();
+  return (
+    <DownloadSwitchRow
+      label="Prefer Indonesian vocabulary glosses"
+      checked={preferIndonesian}
+      setChecked={setPreferIndonesian}
+      download={downloadIndonesianWordMeanings}
+      failedText="Couldn't download Indonesian vocabulary glosses. Check your connection and try again."
+      note={
+        <>
+          Shows a word&apos;s Indonesian gloss instead of the English one when
+          there is one. <IndonesianMeaningsCredit />
+        </>
+      }
+    />
   );
 };
 
@@ -288,7 +338,7 @@ export const SettingsModal = ({
       <ScrollableDialogContent
         size="md"
         title="User Preferences"
-        description="Presentation, Indonesian meanings, Japanese voice and stroke animation preferences"
+        description="Presentation, Indonesian meanings and glosses, Japanese voice and stroke animation preferences"
         titleClassName="text-left"
       >
         <SimpleAccordion trigger="Presentation" defaultOpen>
@@ -307,7 +357,8 @@ export const SettingsModal = ({
           </div>
 
           <LightDarkRow />
-          <IndonesianMeaningsRow />
+          <IndonesianKanjiMeaningsRow />
+          <IndonesianGlossesRow />
         </SimpleAccordion>
 
         <JapaneseVoiceSection />
