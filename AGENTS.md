@@ -21,6 +21,7 @@ The source of truth is `.cursor/rules/*.mdc` (auto-applied by Cursor). Follow th
 - Buttons: text buttons never use the default shadcn `Button`; use `PracticeButton`, the dotted `TextActionButton`, an inline `NoticeAction`, or a pill. See `text-buttons-not-shadcn.mdc`.
 - Dialogs: buttons go in `DialogActions` (right-aligned, main action rightmost; stacked full width on phones, main action on top; Cancel is a `ghost` PracticeButton). See `dialog-buttons.mdc`.
 - Notices: messages users must read use `UserNotice` (⚠️ + normal text color, inline underlined actions); logged-out states use `LoginNotice`. See `user-notices.mdc`.
+- Visual changes: for any change that can alter what users see (including swapping to a shared component), screenshot every screen using the changed code before and after, and report every visual difference in your reply and the PR's "Visual changes" section. Never add screenshot tests for this. See `report-visual-changes.mdc`.
 - Plans: write implementation plans, design notes and handoffs as Markdown, not HTML. HTML is only for visual mockups. See `plans-in-markdown.mdc`.
 - Tailwind: colocate `className` strings; do not extract `_CN` (or similar) constants unless the same string is reused in multiple places. See `inline-tailwind-classes.mdc`.
 

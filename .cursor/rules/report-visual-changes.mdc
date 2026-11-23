@@ -1,0 +1,21 @@
+---
+description: Screenshot affected screens before and after UI changes and report every visual difference
+alwaysApply: true
+---
+
+# Report visual changes
+
+Any change that can alter what users see (styles, markup, swapping one component for another, moving to a shared component, changing a shared component's props or classes) must be checked by eye, and every visual difference reported.
+
+## Do
+
+1. Find every screen that renders the changed code. For a shared component, that is every place that uses it (`grep` its imports), not only the one you meant to change.
+2. Screenshot each of those screens **before** and **after** the change (Playwright against `pnpm run dev`), in dark and light mode when colors or borders change.
+3. Compare them. In your reply (and in the PR's "Visual changes" section), list every visual difference, including ones you think are harmless or that the plan asked for. Say "No visual changes" only after you compared screenshots.
+4. If a difference was not asked for, fix it or ask the user before finishing.
+
+## Do not
+
+- Assume a refactor or a switch to a shared component "looks the same" without screenshots.
+- Leave out a visual change because it was a side effect of other work.
+- Add screenshot or visual-regression tests for this. Checking is done by hand with screenshots; never add tests.
