@@ -4,10 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import {
-  GetBasicKanjiInfoContext,
+  AnchorIndexContext,
   IsReadyContext,
 } from "@/kanji-worker/kanji-worker-hooks";
-import { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import type { AnchorIndex } from "@/lib/kanji/anchor-words";
 import {
   useKanjiAnchorWords,
   useKanjiRepresentativeWord,
@@ -19,19 +19,16 @@ vi.mock("@/kanji-worker/kanji-worker-promise-wrapper", () => ({
 
 const request = vi.mocked(KANJI_WORKER_SINGLETON.request);
 
-// Only the fields the representative-word hooks read.
-const getInfo = ((kanji: string) =>
-  kanji === "車"
-    ? { keyword: "car", repWord: "車", repReading: "くるま" }
-    : kanji === "亜"
-      ? { keyword: "rank", repWord: null, repReading: null }
-      : null) as GetBasicKanjiInfo;
+// The anchor index as the provider holds it: 亜 has no anchor word.
+const anchorIndex: AnchorIndex = {
+  車: { word: "車", reading: "くるま", secondary: "電車" },
+};
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
   <IsReadyContext.Provider value={true}>
-    <GetBasicKanjiInfoContext.Provider value={getInfo}>
+    <AnchorIndexContext.Provider value={anchorIndex}>
       {children}
-    </GetBasicKanjiInfoContext.Provider>
+    </AnchorIndexContext.Provider>
   </IsReadyContext.Provider>
 );
 
@@ -74,7 +71,7 @@ describe("useKanjiRepresentativeWord", () => {
     );
   };
 
-  it("reads the word and reading straight from the snapshot", () => {
+  it("reads the word and reading straight from the anchor index", () => {
     render(
       <Wrapper>
         <Probe kanji="車" />
@@ -83,6 +80,16 @@ describe("useKanjiRepresentativeWord", () => {
 
     // No awaiting: expanded tiles render this during render.
     expect(screen.getByTestId("out").textContent).toBe("車/くるま");
+  });
+
+  it("returns null while the anchor index is loading", () => {
+    render(
+      <IsReadyContext.Provider value={true}>
+        <Probe kanji="車" />
+      </IsReadyContext.Provider>
+    );
+
+    expect(screen.getByTestId("out").textContent).toBe("none");
   });
 
   it("returns null for a kanji with no representative word", () => {

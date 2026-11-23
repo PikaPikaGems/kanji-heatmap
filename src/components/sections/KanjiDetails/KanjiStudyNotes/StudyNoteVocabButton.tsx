@@ -61,12 +61,9 @@ export const StudyNoteVocabButton = ({
     );
   }
 
-  const kanaFromParts = (vocabInfo ?? { parts: [] }).parts
-    .map((part) => part[1] || part[0])
-    .join("");
   const kana =
     kanaOverride ||
-    kanaFromParts ||
+    vocabInfo?.reading ||
     (representativeWord?.word === word
       ? representativeWord.readings.join("・")
       : undefined) ||

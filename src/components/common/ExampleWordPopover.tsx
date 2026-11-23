@@ -5,22 +5,8 @@ import { VocabPopoverContent } from "@/components/common/VocabPopoverContent";
 import {
   useVocabDetails,
   useWordKanjis,
-  WordPartDetail,
 } from "@/kanji-worker/kanji-worker-hooks";
 import { cn } from "@/lib/utils";
-
-/** One piece of the word; kanji pieces carry their reading as furigana. */
-const FuriganaPart = ({ part }: { part: WordPartDetail }) => {
-  const [text, furigana] = part;
-  if (!furigana) return <span>{text}</span>;
-
-  return (
-    <ruby>
-      {text}
-      <rt className="text-[0.5em]">{furigana}</rt>
-    </ruby>
-  );
-};
 
 interface ExampleWordPopoverProps {
   word: string;
@@ -43,14 +29,14 @@ export const ExampleWordPopover = ({
   const { status, vocabInfo } = useVocabDetails(word);
   const wordKanjis = useWordKanjis(word);
 
-  // Always a button. Until the vocab data answers (or for a word it doesn't
-  // have) the word shows without furigana, and the popover opens with what
-  // is already known: kanji links, actions and outside links.
+  // Always a button showing the plain word. The popover opens with what is
+  // already known (kanji links, actions, outside links); the reading and
+  // meaning fill in when the word files answer, and stay out for a word
+  // they don't have.
   const loading = status === "idle" || status === "loading";
-  const parts: WordPartDetail[] = vocabInfo?.parts ?? [[word]];
-  const partsReading = parts
-    .map(([text, furigana]) => furigana || text)
-    .join("");
+  const reading = readingOverride ?? (vocabInfo?.reading || undefined);
+  const definition =
+    wordTranslationOverride ?? (vocabInfo?.meaning || undefined);
 
   return (
     <GenericPopover
@@ -64,19 +50,15 @@ export const ExampleWordPopover = ({
             className
           )}
         >
-          <span key={status} className="animate-fade-in-fast">
-            {parts.map((part, i) => (
-              <FuriganaPart key={`${i}-${part[0]}`} part={part} />
-            ))}
-          </span>
+          {word}
         </Button>
       }
       content={
         <VocabPopoverContent
           word={word}
-          kana={readingOverride ?? (vocabInfo ? partsReading : undefined)}
+          kana={reading}
           wordKanjis={wordKanjis}
-          definition={wordTranslationOverride ?? vocabInfo?.meaning}
+          definition={definition}
           optionalSection={optionalSection}
           definitionLoading={loading && wordTranslationOverride == null}
         />

@@ -1,46 +1,33 @@
-import { Button } from "@/components/ui/button";
-
-import { GenericPopover } from "@/components/common/GenericPopover";
-import { VocabPopoverContent } from "@/components/common/VocabPopoverContent";
+import { ExampleWordPopover } from "@/components/common/ExampleWordPopover";
 import { HiraganaWord } from "@/components/dependent/kana/HiraganaWord";
 import { WordFrequencyTags } from "@/components/sections/KanjiDetails/WordFrequencyTags";
 
+/**
+ * A reference card sample word: its kana, with this kanji's part highlighted,
+ * above the shared word popover.
+ */
 export const WordCard = ({
   word,
   spacedKana,
   highlightIndex,
   definition,
-  wordKanjis,
 }: {
   word: string;
   spacedKana: string;
   highlightIndex: number;
   definition: string;
-  wordKanjis: { kanji: string; keyword: string }[];
 }) => {
   return (
     <>
       <div className="flex justify-center -mb-2 text-center">
         <HiraganaWord rawKana={spacedKana} highlightIndex={highlightIndex} />
       </div>
-      <GenericPopover
-        trigger={
-          <Button
-            variant="ghost"
-            className="items-end h-auto px-4 py-2 mt-1 text-4xl border-dashed rounded-2xl kanji-font hover:bg-foreground/5"
-          >
-            {word}
-          </Button>
-        }
-        content={
-          <VocabPopoverContent
-            word={word}
-            kana={spacedKana.split(" ").join("")}
-            wordKanjis={wordKanjis}
-            definition={definition}
-            optionalSection={<WordFrequencyTags word={word} />}
-          />
-        }
+      <ExampleWordPopover
+        word={word}
+        readingOverride={spacedKana.split(" ").join("")}
+        wordTranslationOverride={definition || undefined}
+        className="px-4 py-2 mt-1 text-4xl"
+        optionalSection={<WordFrequencyTags word={word} />}
       />
     </>
   );

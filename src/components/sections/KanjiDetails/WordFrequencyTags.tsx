@@ -15,7 +15,7 @@ export const WordFrequencyTags = ({ word }: { word: string }) => {
       <WordTagBadges
         entry={toTagsWordEntry(word, found.tags, found.tier)}
         isName={found.tags.includes("name")}
-        maxVisible={3}
+        maxVisible={2}
         className="justify-center"
       />
     </div>
