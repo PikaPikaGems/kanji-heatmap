@@ -16,6 +16,9 @@ The same word's data is stored in several `public/json/v2/` files, in different 
     `anchor_words_details.json`, its tags and ranks are in `word_frequency_tags.json`.
   - Sample words are in `kanji_extended_hover.json` next to the kanji's parts, and their
     furigana and gloss are in `vocab.json`.
+- **A copied field:** `components.json`'s `n` (stroke count) is a copy of `radicals.json`'s
+  `groupedByStrokeCount`. For the 151 components that are kanji, it also equals
+  `kanji_main.json`'s stroke count.
 
 ## How it got this way
 
@@ -37,34 +40,39 @@ No step had one record per word, so each stored its own copy.
 
 ### New `public/json/v2/` files
 
-| File                 | Shape                                                                                       | Loaded                                                     |
-| -------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `kanji_main.json`    | kanji → the 11 sort/filter fields (anchor word and reading **removed**)                     | eager, first paint                                         |
-| `kanji_words.json`   | kanji → `[mainAnchor, secondaryAnchor \| "", sample1Furigana \| "", sample2Furigana \| ""]` | right after `kanji_main.json` (does not block first paint) |
-| `kanji_parts.json`   | kanji → `[parts, phonetic]` (the rest of `kanji_extended_hover.json`)                       | reference card, Character Structure                        |
-| `word_readings.json` | word → `"reading・reading"` (one string, no furigana)                                       | tiles, card, popovers, drawer, practice                    |
-| `word_meanings.json` | word → gloss (one format: JMdict `get_english_glosses`)                                     | card, popovers, drawer, practice                           |
-| `word_tags.json`     | word → `[tags, tierEmoji]`                                                                  | when tags are shown                                        |
-| `word_ranks.json`    | anchor word → 17 ranks                                                                      | anchor panel's frequency table only                        |
+| File                 | Key → value                                                                                 | Loaded                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `kanji_main.json`    | kanji → the 11 sort/filter fields (anchor word and reading **removed**)                     | eager, first paint                                                  |
+| `kanji_words.json`   | kanji → `[mainAnchor, secondaryAnchor \| "", sample1Furigana \| "", sample2Furigana \| ""]` | requested right after `kanji_main.json`; does not block first paint |
+| `kanji_parts.json`   | kanji → `[parts, phonetic]` (the rest of `kanji_extended_hover.json`)                       | reference card, Character Structure                                 |
+| `word_readings.json` | word → `"reading・reading"` (one string, no furigana)                                       | lazy                                                                |
+| `word_meanings.json` | word → gloss (one format: JMdict `get_english_glosses`)                                     | lazy                                                                |
+| `word_tags.json`     | word → `[tags, tierEmoji]`                                                                  | lazy, when tags are shown                                           |
+| `word_ranks.json`    | anchor word → 17 ranks                                                                      | anchor panel's frequency table only                                 |
 
-- **Words covered:** every anchor word and every sample word (6,550 today). The `word_*` files
-  have the same key set, except that `word_tags.json` skips words with no tags and no tier,
-  and `word_ranks.json` has anchor words only.
+- **Keys:** `kanji_*` files are keyed by kanji, `word_*` files by word. `kanji_words.json` is
+  what links a kanji to its words.
+- **Words covered:** every anchor word and every sample word (6,550 today).
+  - `word_readings.json` and `word_meanings.json` have that full key set.
+  - `word_tags.json` skips words with no tags and no tier.
+  - `word_ranks.json` has anchor words only.
 - **Furigana only for sample words,** and only in `kanji_words.json`.
   - Example: `二: ["二", "二つ", "二[ふた]人[り]", "二[ふつ]日[か]"]`.
   - A sample word's plain form is its furigana with the brackets removed.
   - The furigana is for the reference card, which highlights the kanji's own part.
-- **Removed:** `vocab.json`, `anchor_words_details.json`, `word_frequency_tags.json` and
-  `kanji_extended_hover.json`.
+- **Tier stays as the emoji** (🌱 ☘️ 🌷 📚 🌶️ 🦉). One ASCII letter would save only 0.5 KB gzip,
+  and the emoji is already the app's tier code (`ANCHOR_TIER_LABELS`) and the
+  `kanji-common-words` pages' `t`.
+- **Removed:**
+  - `vocab.json`
+  - `anchor_words_details.json`
+  - `word_frequency_tags.json`
+  - `kanji_extended_hover.json`
+  - the `n` field in `components.json`
 - **Not combined:** `word_readings` + `word_meanings`, and `kanji_words` + `kanji_parts`.
   Tiles need only one half of each pair:
   - Combining readings and meanings would make tiles wait for 203 KB gzip instead of 53 KB.
   - Combining words and parts would make tiles wait for 76 KB gzip instead of 61 KB.
-- **Unchanged:**
-  - The Cloudflare per-kanji pages (`kanji-textbook-words`, `kanji-common-words`). They
-    already use `get_english_glosses`, so their glosses match `word_meanings.json`.
-  - Fill the Kanji.
-  - Mastery progress keys, which are by kanji and main/secondary, not by file.
 
 ### Sizes (from today's data, gzip)
 
@@ -75,6 +83,7 @@ No step had one record per word, so each stored its own copy.
 | `kanji_parts.json`   | –      | ~19 KB  |
 | `word_readings.json` | –      | ~53 KB  |
 | `word_meanings.json` | –      | ~169 KB |
+| `word_tags.json`     | –      | ~57 KB  |
 
 ### Popovers
 
@@ -82,9 +91,12 @@ No step had one record per word, so each stored its own copy.
   (kana above the word, with the kanji's part highlighted). `WordCard` no longer builds its own
   `GenericPopover`.
 - **Tags:** every popover gets tags from `word_tags.json` and shows **2** before "…".
-- **Furigana on popover buttons:** the worker builds a word → furigana index from
-  `kanji_words.json` when it loads. This replaces today's `vocab.json` lookup
-  (`useVocabDetails`), so popover buttons for sample words keep their furigana.
+- **Furigana:**
+  - The reference card shows it, read from its kanji's sample slots in `kanji_words.json`.
+  - Every other popover button shows the plain word. There's no word → furigana index.
+- **Reading and meaning:** when no override is passed (e.g. Reading Usefulness), the popover
+  reads `word_readings.json` and `word_meanings.json`. A word not in the set shows no meaning,
+  as today.
 
 ### Loading states
 
@@ -95,6 +107,27 @@ No step had one record per word, so each stored its own copy.
 | Dashboard Kanji Mastery (`KanjiMasteryBody.tsx`)          | Kaomoji, as today (it already waits on `getAnchorWords`)                                                    |
 | "Anchor words only" filter (`use-client-list-filters.ts`) | `isLoading` becomes `getAnchorWords == null`, so the list shows `LoadingKanjis`                             |
 | Practice decks, review lookup                             | Unchanged: they already wait on `useGetAnchorWordsFn`                                                       |
+
+### Left as is
+
+- **`kanji_reading_details.json`** (Reading Usefulness).
+  - It's copied unchanged from Kandrac's _Jōyō Kanji Readings_.
+  - Its example words (`w`) show a meaning only when the word is in the word set. 976 of the
+    4,026 aren't.
+  - Its readings are a different set and format from `allOn`/`allKun`.
+- **Radical popover sound examples:** the 55 `{ word, reading, gloss }` in
+  `radical_popover_text.json` keep their own reading and short hand-written gloss. They're small
+  and only load with the radical popover.
+- **Cloudflare per-kanji pages** (`kanji-textbook-words`, `kanji-common-words`). They're
+  self-contained on purpose and already use `get_english_glosses`. Their tier-encoding
+  inconsistency is tracked in jp-misc-data #75.
+- **Not redundant, checked:**
+  - main on/kun vs `allOn[0]`/`allKun[0]` (the eager tiles need them);
+  - the three structure sources (`kanji_parts`, `kanji_decomposition`, `kanji_structures`);
+  - `similar_kanjis.json` (ranked, not symmetric);
+  - keyword vs `meanings[0]`.
+- **Not touched:** Fill the Kanji, and mastery progress keys (by kanji and main/secondary, not
+  by file).
 
 ## Step 1: data build (jp-misc-data)
 
@@ -111,6 +144,7 @@ No step had one record per word, so each stored its own copy.
    lists. Update `raw-data/README.md`.
 3. **`generate-v2-json.mjs`** writes the seven files above:
    - Remove slots 12–13 from `kanji_main.json` and update its slot check (13 → 11).
+   - Stop writing `n` into `components.json`.
    - Add checks:
      - every word in `kanji_words.json` has a `word_readings.json` and a
        `word_meanings.json` entry;
@@ -124,7 +158,7 @@ No step had one record per word, so each stored its own copy.
 ## Step 2: app (kanji-heatmap)
 
 1. **Paths and types:** in `src/lib/assets-paths.ts` and `src/lib/kanji/kanji-worker-types.ts`,
-   add the seven files and drop the four old ones.
+   add the seven files and drop the four old ones. Remove `n` from the components type.
 2. **Worker** (`src/kanji-worker/`):
    - `transformToMainKanjiInfo` drops `repWord` and `repReading`.
    - New lazy datasets: `kanji_words`, `kanji_parts`, `word_readings`, `word_meanings`,
@@ -135,8 +169,10 @@ No step had one record per word, so each stored its own copy.
    - `handleKanjiAnchorWords` and `"anchor-words-details"` read `kanji_words`,
      `word_readings` and `word_meanings`. Ranks come from `word_ranks`.
    - `handleWordTags` reads `word_tags`.
-   - `handleRetrieveVocabInfo` reads the furigana index, `word_readings` and
-     `word_meanings`.
+   - `handleRetrieveVocabInfo` returns `{ reading, meaning }` from `word_readings` and
+     `word_meanings` (no furigana parts).
+   - `handleSphmnDrawer` takes stroke counts from `kanji_main`, or else `radicals.json`'s
+     `groupedByStrokeCount`, instead of `components[component].n`.
 3. **Anchor-word checks move to `useGetAnchorWordsFn`.** These files read `repWord` from
    `kanji_main.json` today and switch to `getAnchorWords(kanji)?.main`:
    - `use-client-list-filters.ts`
@@ -146,9 +182,12 @@ No step had one record per word, so each stored its own copy.
    - `kanji-representative-word-hooks.tsx` (`useKanjiRepresentativeWord`)
 4. **Loading states:** as in the table above.
 5. **Popovers:**
-   - `WordCard.tsx` uses `ExampleWordPopover`.
+   - `WordCard.tsx` uses `ExampleWordPopover` with the card's trigger, and passes its furigana.
+   - `ExampleWordPopover`'s button shows the plain word unless furigana is passed in.
    - `WordFrequencyTags.tsx` uses `maxVisible={2}`.
    - `WordRow.tsx` tags come from `word_tags.json` through the same component.
+   - `StudyNoteVocabButton.tsx` gets its kana from `word_readings.json` instead of furigana
+     parts.
 6. **Tests:** several existing tests use the old shapes and will fail:
    - `kanji-assembly.test.ts` and its snapshot
    - `kanji-worker.test.ts`
@@ -159,8 +198,13 @@ No step had one record per word, so each stored its own copy.
    Changing them needs your OK (repo rule), so I'll list the exact changes first.
 
 7. **Checks:** `pnpm lint`, `pnpm typecheck`, `pnpm test`, `CF_PAGES=1 pnpm build`,
-   `pnpm exec prettier --check .`. Then a browser check of tiles, the reference card,
-   the anchor panel, popovers, mastery and the filter.
+   `pnpm exec prettier --check .`. Then a browser check of:
+   - tiles
+   - the reference card (glosses get longer: numbered JMdict senses)
+   - the anchor panel
+   - popovers
+   - mastery
+   - the filter
 
 ## Order and PRs
 
@@ -172,4 +216,6 @@ No step had one record per word, so each stored its own copy.
 
 - Which words are picked as sample or anchor words. 1,753 sample slots repeat the kanji's own
   anchor word; that's a sample-picking question.
-- Furigana for words that aren't sample words.
+- Furigana for words that aren't sample words, and furigana on popover buttons outside the
+  reference card.
+- The textbook pages' tier encoding (jp-misc-data #75).
