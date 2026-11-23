@@ -9,6 +9,8 @@ import { KanjiApiBtn } from "@/components/common/KanjiApiBtn";
 import { BugIconErrorBoundary } from "@/components/error";
 import { CommonWordEntry, splitList } from "@/lib/sample-vocabulary";
 import { WordTagBadges } from "./WordTagBadges";
+import { usePreferIndonesianGlosses } from "@/hooks/use-prefer-indonesian-glosses";
+import { useIndonesianGloss } from "@/providers/indonesian-word-meanings-hooks";
 
 const TRANSLATION_MAX_LEN = 60;
 
@@ -32,8 +34,21 @@ const Translation = ({ text }: { text: string }) => {
   );
 };
 
+/** The word's Indonesian gloss, or "-" when it has none. */
+const IndonesianGlossCell = ({ word }: { word: string }) => {
+  const gloss = useIndonesianGloss(word);
+  return (
+    <TableCell className="text-center">
+      <div className="w-48 mx-auto">
+        {gloss ? <Translation text={gloss} /> : "-"}
+      </div>
+    </TableCell>
+  );
+};
+
 export const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
   const readings = splitList(entry.r);
+  const [preferIndonesian] = usePreferIndonesianGlosses();
 
   return (
     <>
@@ -68,6 +83,7 @@ export const WordRow = ({ entry }: { entry: CommonWordEntry }) => {
             "-"
           )}
         </TableCell>
+        {preferIndonesian && <IndonesianGlossCell word={entry.w} />}
         <TableCell className="text-center">
           <div className="w-48 mx-auto">
             {entry.e && entry.e !== "-" ? <Translation text={entry.e} /> : "-"}

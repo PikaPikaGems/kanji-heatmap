@@ -11,6 +11,7 @@ import { openWordExplain } from "@/lib/ai-explain/word-explain-dialog";
 import { useCurrentOwner } from "@/lib/engine/content-owner";
 import { cnDottedUnderlineTrigger } from "@/lib/generic-cn";
 import { cn } from "@/lib/utils";
+import { useIndonesianGloss } from "@/providers/indonesian-word-meanings-hooks";
 
 /**
  * "✨ AI Explain" on its own line between the gloss and the action icons,
@@ -80,6 +81,7 @@ interface VocabPopoverContentProps {
   word: string;
   kana?: string;
   wordKanjis: { kanji: string; keyword: string }[];
+  /** The English gloss; the Indonesian one replaces it when preferred. */
   definition?: string;
   optionalSection?: ReactNode;
   /** The meaning is still on its way; show a skeleton in its place. */
@@ -90,10 +92,15 @@ export const VocabPopoverContent = ({
   word,
   kana,
   wordKanjis,
-  definition,
+  definition: englishDefinition,
   optionalSection,
-  definitionLoading = false,
+  definitionLoading: englishLoading = false,
 }: VocabPopoverContentProps) => {
+  // "Prefer Indonesian vocabulary glosses": the Indonesian gloss, when the
+  // word has one, stands in for the English one in every word popover.
+  const indonesianGloss = useIndonesianGloss(word);
+  const definition = indonesianGloss ?? englishDefinition;
+  const definitionLoading = englishLoading && indonesianGloss == null;
   const [showAllLinks, setShowAllLinks] = useState(false);
   const maxLinks = 6;
   const canSeeAllLinks = vocabExternalLinks.length <= maxLinks;
@@ -123,7 +130,7 @@ export const VocabPopoverContent = ({
           </div>
         </>
       )}
-      <WordAiExplain word={word} english={definition} />
+      <WordAiExplain word={word} english={englishDefinition} />
       <DottedSeparator />
       <WordActionIcons kana={kana ?? ""} word={word} />
 
