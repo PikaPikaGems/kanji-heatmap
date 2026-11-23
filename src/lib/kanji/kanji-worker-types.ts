@@ -1,7 +1,10 @@
-import type { AnchorWordsDetailsFile, KanjiAnchorWords } from "./anchor-words";
+import type {
+  AnchorIndex,
+  AnchorWordBasics,
+  KanjiAnchorWords,
+} from "./anchor-words";
 import { JLTPTtypes } from "../jlpt";
 import type { RadicalPopoverDetails, RadicalsRuntime } from "../radicals";
-import type { WordPartDetail } from "../furigana";
 import type {
   KanjiReadingEntry,
   KanjiReadingEntrySmall,
@@ -27,9 +30,6 @@ export type KanjiMainInfo = {
   kklcIndex: number;
   rtk: number;
   topoTwitterIndex: number;
-  // Rendered by expanded tiles during render, so it cannot be async.
-  repWord: string | null;
-  repReading: string | null;
 };
 
 export type GetBasicKanjiInfo = (kanji: string) => {
@@ -39,8 +39,6 @@ export type GetBasicKanjiInfo = (kanji: string) => {
   kun?: string;
   frequency?: KanjiInfoFrequency;
   jouyouGrade?: number;
-  repWord?: string | null;
-  repReading?: string | null;
 } | null;
 
 export type KanjiInfoFrequency = {
@@ -77,13 +75,11 @@ export type KanjiGeneralInfo = {
   allKunStripped: Set<string>;
 };
 
-/** Everything the hover card is assembled from. */
+/** The kanji's parts and sound part (kanji_parts.json), for the hover card. */
 export type KanjiHoverInfo = {
   parts: string[];
   /** The component that signals this kanji's sound; undefined when none. */
   phonetic?: string;
-  /** Up to two sample words, keyed into the vocab dataset. */
-  mainVocab: string[];
 };
 
 /** One entry of a component in components.json. */
@@ -92,8 +88,6 @@ export type ComponentInfo = {
   k?: string;
   /** Sounds this component signals. */
   s?: string[];
-  /** Stroke count, present for radicals shown in the drawer. */
-  n?: number;
 };
 
 export type ComponentsMap = Record<string, ComponentInfo>;
@@ -103,15 +97,16 @@ export type GeneralInfoResponseType = Record<
   [meanings: string[], allOn: string[], allKun: string[]]
 >;
 
-export type HoverInfoResponseType = Record<
+export type KanjiPartsResponseType = Record<
   string,
-  [parts: string[], phonetic: string, mainVocab: string[]]
+  [parts: string[], phonetic: string]
 >;
 
-export type VocabResponseType = Record<
-  string,
-  [furigana: string, meaning: string]
->;
+/** word_readings.json: word → its readings, "・"-joined. */
+export type WordReadingsResponseType = Record<string, string>;
+
+/** word_meanings.json: word → its English gloss. */
+export type WordMeaningsResponseType = Record<string, string>;
 
 /**
  * One entry of public/json/v2/kanji_structures.json.
@@ -150,12 +145,6 @@ export type IndonesianMeaningsResponseType = Record<string, string>;
 export type WordMeaning = string;
 // One furigana segment: text plus an optional reading.
 export type { WordPartDetail } from "../furigana";
-export type SegmentedVocabResponseType = Record<string, SegmentedVocabInfo>;
-
-export type SegmentedVocabInfo = {
-  meaning: WordMeaning;
-  parts: WordPartDetail[];
-};
 
 export type FreqList = [
   number, //rank_netflix,
@@ -192,8 +181,6 @@ export type MainKanjiInfoItemType = [
   kklcIndex: number,
   rtk: number,
   topoTwitterIndex: number,
-  repWord: string | null,
-  repReading: string | null,
 ];
 
 export type MainKanjiInfoResponseType = Record<string, MainKanjiInfoItemType>;
@@ -209,8 +196,9 @@ export type MainKanjiInfoResponseType = Record<string, MainKanjiInfoItemType>;
 
 /**
  * The one copy of worker data that lives on the main thread. It exists because
- * grid tiles read keyword, frequency, JLPT, grade and the representative word
- * during render, where awaiting a promise is not an option.
+ * grid tiles read keyword, frequency, JLPT and grade during render, where
+ * awaiting a promise is not an option. Anchor words follow right after
+ * (`anchor-index`).
  */
 export type InitSnapshot = {
   mainInfoMap: Record<string, KanjiMainInfo>;
@@ -223,10 +211,11 @@ export type SearchResponse = {
   possibleRadicals?: Set<string>;
 };
 
+/** A word's readings ("・"-joined) and gloss; null when the word set doesn't have it. */
 export type VocabInfoResponse = {
   word: string;
+  reading: string;
   meaning: WordMeaning;
-  wordPartDetails: WordPartDetail[];
 } | null;
 
 export interface WorkerApi {
@@ -244,16 +233,21 @@ export interface WorkerApi {
   "kanji-general": { payload: string; response: GeneralKanjiItem };
   "component-map": { payload: undefined; response: ComponentsMap };
   /**
-   * The whole anchor-words details file (glosses, secondary words), for
-   * practice decks and mastery games, which look up many kanji at once.
+   * Every kanji's main word, its readings and its secondary word, sent once
+   * right after `init`, for tiles, the anchor-words filter and mastery.
+   */
+  "anchor-index": { payload: undefined; response: AnchorIndex };
+  /**
+   * Every kanji's anchor words with readings and glosses, for practice decks
+   * and mastery games, which look up many kanji at once.
    */
   "anchor-words-details": {
     payload: undefined;
-    response: AnchorWordsDetailsFile;
+    response: Record<string, KanjiAnchorWords<AnchorWordBasics>>;
   };
   /**
-   * One word's tags and tier from the frequency-tags file (anchor and sample
-   * words), for the reference card's word popover. Null when it has none.
+   * One word's tags and tier (word_tags.json: anchor and sample words), for
+   * word popovers. Null when it has none.
    */
   "word-tags": {
     payload: string;

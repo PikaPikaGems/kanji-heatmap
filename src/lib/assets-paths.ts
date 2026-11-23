@@ -7,14 +7,17 @@ const ASSETS_BASE_URL = (import.meta.env.VITE_ENV_ASSET_URL ?? "").replace(
 const assetsPaths = {
   MAIN_KANJI_INFO_FILE_PATH: "/json/v2/kanji_main.json",
   EXTENDED_GENERAL_FILE_PATH: "/json/v2/kanji_extended_general.json",
-  EXTENDED_HOVER_FILE_PATH: "/json/v2/kanji_extended_hover.json",
+  KANJI_PARTS_FILE: "/json/v2/kanji_parts.json",
   COMPONENTS_FILE: "/json/v2/components.json",
   RADICALS_FILE: "/json/v2/radicals.json",
   RADICAL_POPOVER_TEXT_FILE: "/json/v2/radical_popover_text.json",
   SPHMN_COMPONENTS_FILE: "/json/v2/sphmn_components.json",
-  VOCAB_FILE: "/json/v2/vocab.json",
-  ANCHOR_WORDS_DETAILS_FILE: "/json/v2/anchor_words_details.json",
-  WORD_FREQUENCY_TAGS_FILE: "/json/v2/word_frequency_tags.json",
+  // Each kanji's anchor and sample words, then each word's facts, once per word.
+  KANJI_WORDS_FILE: "/json/v2/kanji_words.json",
+  WORD_READINGS_FILE: "/json/v2/word_readings.json",
+  WORD_MEANINGS_FILE: "/json/v2/word_meanings.json",
+  WORD_TAGS_FILE: "/json/v2/word_tags.json",
+  WORD_RANKS_FILE: "/json/v2/word_ranks.json",
   CUM_USE: "/json/v2/cum_use.json",
   KANJI_SVGS: `${ASSETS_BASE_URL}/kanji/`,
   KANJI_VOCAB: `${ASSETS_BASE_URL}/kanji-common-words/v8`, // Note: No slash at the end is intentional

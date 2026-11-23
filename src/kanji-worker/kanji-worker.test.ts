@@ -24,10 +24,14 @@ const fetched: string[] = [];
 const V2_FILES = [
   "kanji_main.json",
   "kanji_extended_general.json",
-  "kanji_extended_hover.json",
+  "kanji_parts.json",
+  "kanji_words.json",
+  "word_readings.json",
+  "word_meanings.json",
+  "word_tags.json",
+  "word_ranks.json",
   "components.json",
   "radicals.json",
-  "vocab.json",
   "kanji_decomposition.json",
   "similar_kanjis.json",
   "kanji_structures.json",
@@ -91,29 +95,30 @@ describe("lazy datasets", () => {
     await settle();
 
     expect(fetched).toContain("components.json");
-    expect(fetched).not.toContain("vocab.json");
-    expect(fetched).not.toContain("kanji_extended_hover.json");
+    expect(fetched).not.toContain("kanji_words.json");
+    expect(fetched).not.toContain("kanji_parts.json");
   });
 
   it("fetches hover datasets only on the first hover request", async () => {
-    expect(fetched).not.toContain("kanji_extended_hover.json");
+    expect(fetched).not.toContain("kanji_parts.json");
 
     send(3, "kanji-hover", "五");
     await settle();
 
-    expect(fetched).toContain("kanji_extended_hover.json");
-    expect(fetched).toContain("vocab.json");
+    expect(fetched).toContain("kanji_parts.json");
+    expect(fetched).toContain("kanji_words.json");
+    expect(fetched).toContain("word_meanings.json");
   });
 
   it("does not refetch a dataset it already has", async () => {
-    const before = fetched.filter((f) => f === "kanji_extended_hover.json");
+    const before = fetched.filter((f) => f === "kanji_parts.json");
 
     send(4, "kanji-hover", "六");
     await settle();
 
-    expect(
-      fetched.filter((f) => f === "kanji_extended_hover.json")
-    ).toHaveLength(before.length);
+    expect(fetched.filter((f) => f === "kanji_parts.json")).toHaveLength(
+      before.length
+    );
   });
 
   it("does not fetch the detail-section datasets until asked", async () => {
@@ -228,9 +233,25 @@ describe("data handlers", () => {
       keyword: "one",
       jlpt: "n5",
       strokes: 1,
-      repWord: "一",
     });
+    expect(data.mainInfoMap["一"]).not.toHaveProperty("repWord");
     expect(data.componentsMap["𠦝"].s).toEqual(["ちょう", "かん"]);
+  });
+
+  it("sends each kanji's main word, its readings and its secondary word", async () => {
+    send(75, "anchor-index");
+    await settle();
+
+    const index = replyFor(75)?.response.data as Record<
+      string,
+      { word: string; reading: string; secondary: string }
+    >;
+    expect(index["一"]).toEqual({
+      word: "一",
+      reading: "いち・ひと",
+      secondary: "一つ",
+    });
+    expect(Object.keys(index)).toHaveLength(2426);
   });
 
   it("assembles a hover payload with its sample vocabulary", async () => {
@@ -243,7 +264,7 @@ describe("data handlers", () => {
     };
     expect(data.keyword).toBe("one");
     expect(data.mainVocab.first.word).toBe("一部");
-    expect(data.mainVocab.first.meaning).toContain("one");
+    expect(data.mainVocab.first.meaning).toContain("one part");
   });
 
   it("assembles a general payload with katakana onyomi", async () => {

@@ -21,7 +21,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { cnWarningText } from "@/lib/generic-cn";
 import type { MasteryMetric } from "@/lib/engine/mastery-metrics";
 import { useLocalStorage } from "@/hooks/use-local-storage";
-import { useGetAnchorWordsFn } from "@/providers/kanji-representative-word-hooks";
+import { useGetAnchorIndexFn } from "@/providers/kanji-representative-word-hooks";
 import type { MasteryKindFilter } from "./MasteryKindFilters";
 
 // The top lists' tiles link `?open=<kanji>`, which opens the drawer here.
@@ -76,7 +76,7 @@ export const KanjiMasteryBody = () => {
   );
   // Saved before Reading II existed: its key is missing, so it shows.
   const shownKinds = { ...ALL_KINDS_SHOWN, ...savedKinds };
-  const getAnchorWords = useGetAnchorWordsFn();
+  const getAnchor = useGetAnchorIndexFn();
 
   if (loggedIn && pile.status === "failed") {
     return (
@@ -100,7 +100,7 @@ export const KanjiMasteryBody = () => {
   }
 
   const rows = loggedIn ? snapshotValue(pile) : [];
-  if (!rows || !getInfo || !getAnchorWords || !search.data) {
+  if (!rows || !getInfo || !getAnchor || !search.data) {
     return (
       <div className="py-8">
         <KaomojiAnimation />
@@ -109,8 +109,6 @@ export const KanjiMasteryBody = () => {
   }
 
   const allKanji = search.data;
-  const hasSecondaryWord = (kanji: string) =>
-    getAnchorWords(kanji)?.secondary != null;
   return (
     <>
       {/* Mastery starts open, like the first Fill in the Kanji group. */}
@@ -128,7 +126,7 @@ export const KanjiMasteryBody = () => {
               pile={rows}
               allKanji={allKanji}
               getInfo={getInfo}
-              hasSecondaryWord={hasSecondaryWord}
+              getAnchor={getAnchor}
             />
           </SubsectionAccordionItem>
         ))}

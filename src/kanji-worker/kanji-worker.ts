@@ -7,30 +7,36 @@ import {
   KanjiWorkerRequestName,
   OnMessageRequestType,
   PostMessageResponseType,
-  SegmentedVocabInfo,
+  VocabInfoResponse,
   WorkerApi,
 } from "@/lib/kanji/kanji-worker-types";
+import type { VocabExtendedInfo } from "@/lib/kanji/kanji-info-types";
 import {
   toAnchorWordBasics,
   withFrequencyTags,
+  type AnchorIndex,
+  type AnchorWordBasics,
   type KanjiAnchorWords,
 } from "@/lib/kanji/anchor-words";
+import { decodeFurigana } from "@/lib/furigana";
 import {
-  fetchAnchorWordsDetails,
-  fetchAnchorWordsFrequencyTags,
   fetchComponents,
   fetchGeneralKanjiInfo,
-  fetchHoverKanjiInfo,
   fetchIndonesianMeanings,
   fetchKanjiDecomposition,
+  fetchKanjiParts,
   fetchKanjiReadingDetails,
+  fetchKanjiWords,
   fetchMainKanjiInfo,
   fetchMultiKanjiStructures,
   fetchRadicalPopoverText,
   fetchRadicals,
-  fetchSegmentedVocab,
   fetchSimilarKanjis,
   fetchSphmnComponents,
+  fetchWordMeanings,
+  fetchWordRanks,
+  fetchWordReadings,
+  fetchWordTags,
   transformToGeneralKanjiInfo,
   transformToHoverKanjiInfo,
   transformToMainKanjiInfo,
@@ -114,16 +120,29 @@ const loadGeneralInfo = lazyDataset(
     )
 );
 
-const loadHoverInfo = lazyDataset(
+/** Parts and sound part: the hover card and the details component breakdown. */
+const loadKanjiParts = lazyDataset(
   (): Promise<Record<string, KanjiHoverInfo>> =>
-    fetchHoverKanjiInfo().then((raw) =>
-      mapValues(raw, transformToHoverKanjiInfo)
-    )
+    fetchKanjiParts().then((raw) => mapValues(raw, transformToHoverKanjiInfo))
 );
 
-const loadVocab = lazyDataset(
-  (): Promise<Record<string, SegmentedVocabInfo>> => fetchSegmentedVocab()
-);
+/**
+ * Each kanji's anchor and sample words. Asked for right after `init` (the
+ * anchor index), so tiles, the anchor-words filter and mastery have it early.
+ */
+const loadKanjiWords = lazyDataset(fetchKanjiWords);
+
+/** Every anchor and sample word's readings ("・"-joined): tiles and popovers. */
+const loadWordReadings = lazyDataset(fetchWordReadings);
+
+/** Every anchor and sample word's gloss: the card, popovers, drawer and games. */
+const loadWordMeanings = lazyDataset(fetchWordMeanings);
+
+/** Tags and tier per anchor and sample word: word popovers and the drawer. */
+const loadWordTags = lazyDataset(fetchWordTags);
+
+/** 17 ranks per anchor word: only the anchor panel's frequency table. */
+const loadWordRanks = lazyDataset(fetchWordRanks);
 
 /**
  * The radical-search index: which drawer-selectable radicals each kanji
@@ -144,12 +163,6 @@ const loadDecomposition = lazyDataset(
 const loadSimilar = lazyDataset(
   (): Promise<Record<string, string[]>> => fetchSimilarKanjis()
 );
-
-/** Glosses and secondary words: the drawer, practice decks and mastery games. */
-const loadAnchorWordsDetails = lazyDataset(fetchAnchorWordsDetails);
-
-/** Tags, ranks and tier per anchor word: only the drawer's detail surfaces. */
-const loadAnchorWordsFrequencyTags = lazyDataset(fetchAnchorWordsFrequencyTags);
 
 /** Component search and the sph-mn rows of the kanji details. */
 const loadSphmnComponents = lazyDataset(() =>
@@ -183,17 +196,52 @@ const CORE = loadMainInfo();
 /** Kanji ordered by stroke count, the entry point for radical search. */
 let kanjiByStrokeOrder: string[] = [];
 
-const retrieveVocabInfo = (
-  vocab: Record<string, SegmentedVocabInfo>,
-  word?: string
+/** A sample word from its furigana slot in kanji_words.json, with its gloss. */
+const sampleWordInfo = (
+  furigana: string | undefined,
+  meanings: Record<string, string>
 ) => {
-  const entry = word == null ? null : vocab[word];
-  if (word == null || entry == null) {
-    return null;
-  }
-
-  return { word, meaning: entry.meaning, wordPartDetails: entry.parts };
+  if (!furigana) return null;
+  const parts = decodeFurigana(furigana);
+  const word = parts.map(([text]) => text).join("");
+  return { word, meaning: meanings[word] ?? "", wordPartDetails: parts };
 };
+
+/** Every kanji's main word, its readings and its secondary word. */
+const loadAnchorIndex = lazyDataset(async (): Promise<AnchorIndex> => {
+  const [words, readings] = await Promise.all([
+    loadKanjiWords(),
+    loadWordReadings(),
+  ]);
+  const index: AnchorIndex = {};
+  for (const [kanji, [main, secondary]] of Object.entries(words)) {
+    if (!main) continue;
+    index[kanji] = { word: main, reading: readings[main] ?? "", secondary };
+  }
+  return index;
+});
+
+/** Every kanji's anchor words with readings and glosses. */
+const loadAnchorWordsDetails = lazyDataset(
+  async (): Promise<Record<string, KanjiAnchorWords<AnchorWordBasics>>> => {
+    const [words, readings, meanings] = await Promise.all([
+      loadKanjiWords(),
+      loadWordReadings(),
+      loadWordMeanings(),
+    ]);
+    const basics = (word: string) =>
+      toAnchorWordBasics(word, readings[word], meanings[word]);
+    const details: Record<string, KanjiAnchorWords<AnchorWordBasics>> = {};
+    for (const [kanji, [main, secondary]] of Object.entries(words)) {
+      if (!main) continue;
+      details[kanji] = {
+        main: basics(main),
+        secondary: secondary ? basics(secondary) : null,
+      };
+    }
+    return details;
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Request handlers
@@ -287,15 +335,19 @@ const handleSearch = requirePayload(async (settings: SearchSettings) => {
 const handleSphmnDrawer = async (): Promise<
   [string, number, number | null][]
 > => {
-  const [sphmn, main, components] = await Promise.all([
+  // Stroke counts only order ties: a kanji's own, else the radical drawer's.
+  const [sphmn, main, radicals] = await Promise.all([
     loadSphmnComponents(),
     CORE,
-    loadComponents(),
+    loadRadicals(),
   ]);
   return sphmn.order.map((component) => [
     component,
     sphmn.kanjiOf[component].length + (main[component] != null ? 1 : 0),
-    main[component]?.strokes ?? components[component]?.n ?? null,
+    main[component]?.strokes ??
+      (radicals.strokeCountMap[component] != null
+        ? Number(radicals.strokeCountMap[component])
+        : null),
   ]);
 };
 
@@ -315,30 +367,30 @@ const requireKanji = async (kanji: string) => {
 };
 
 const handleKanjiHover = requirePayload(async (kanji: string) => {
-  const [main, mainInfoMap, hoverMap, components, radicals, vocab] =
+  const [main, mainInfoMap, partsMap, components, radicals, words, meanings] =
     await Promise.all([
       requireKanji(kanji),
       CORE,
-      loadHoverInfo(),
+      loadKanjiParts(),
       loadComponents(),
       loadRadicals(),
-      loadVocab(),
+      loadKanjiWords(),
+      loadWordMeanings(),
     ]);
 
-  const hoverInfo = hoverMap[kanji];
-  if (hoverInfo == null) {
+  const partsInfo = partsMap[kanji];
+  if (partsInfo == null) {
     throw new Error("No information about this Kanji");
   }
 
+  const [, , sample1, sample2] = words[kanji] ?? [];
+  const vocabInfo: VocabExtendedInfo["vocabInfo"] = {
+    first: sampleWordInfo(sample1, meanings),
+    second: sampleWordInfo(sample2, meanings),
+  };
   return extractKanjiHoverData(
     main,
-    {
-      ...hoverInfo,
-      vocabInfo: {
-        first: retrieveVocabInfo(vocab, hoverInfo.mainVocab[0]),
-        second: retrieveVocabInfo(vocab, hoverInfo.mainVocab[1]),
-      },
-    },
+    { ...partsInfo, vocabInfo },
     mainInfoMap,
     components,
     radicals.aliases
@@ -370,8 +422,18 @@ const handleSimilarForKanji = requirePayload(async (kanji: string[]) => {
   return Object.fromEntries(kanji.map((k) => [k, similar[k] ?? []]));
 });
 
-const handleRetrieveVocabInfo = requirePayload(async (word: string) =>
-  retrieveVocabInfo(await loadVocab(), word)
+/** A word's readings and gloss, for word popovers; null outside the word set. */
+const handleRetrieveVocabInfo = requirePayload(
+  async (word: string): Promise<VocabInfoResponse> => {
+    const [readings, meanings] = await Promise.all([
+      loadWordReadings(),
+      loadWordMeanings(),
+    ]);
+    const reading = readings[word];
+    const meaning = meanings[word];
+    if (reading == null && meaning == null) return null;
+    return { word, reading: reading ?? "", meaning: meaning ?? "" };
+  }
 );
 
 /**
@@ -386,39 +448,31 @@ const handleKanjiStructure = requirePayload(async (kanji: string) => {
 
 /**
  * One kanji's anchor words with their tags, ranks and tier. Per kanji, so the
- * drawer never copies the two whole files to the main thread.
+ * drawer never copies the whole word files to the main thread.
  */
 const handleKanjiAnchorWords = requirePayload(
   async (kanji: string): Promise<KanjiAnchorWords | null> => {
-    const [main, details, frequencyTags] = await Promise.all([
-      CORE,
+    const [details, tags, ranks] = await Promise.all([
       loadAnchorWordsDetails(),
-      loadAnchorWordsFrequencyTags(),
+      loadWordTags(),
+      loadWordRanks(),
     ]);
-    const info = main[kanji];
-    const basics = toAnchorWordBasics(
-      info?.repWord,
-      info?.repReading,
-      details[kanji]
-    );
+    const basics = details[kanji];
     if (basics == null) return null;
+    const withTags = (word: AnchorWordBasics) =>
+      withFrequencyTags(word, tags[word.word], ranks[word.word]);
     return {
-      main: withFrequencyTags(basics.main, frequencyTags[basics.main.word]),
-      secondary: basics.secondary
-        ? withFrequencyTags(
-            basics.secondary,
-            frequencyTags[basics.secondary.word]
-          )
-        : null,
+      main: withTags(basics.main),
+      secondary: basics.secondary ? withTags(basics.secondary) : null,
     };
   }
 );
 
 /** One word's tags and tier (anchor and sample words); null when it has none. */
 const handleWordTags = requirePayload(async (word: string) => {
-  const entry = (await loadAnchorWordsFrequencyTags())[word];
+  const entry = (await loadWordTags())[word];
   if (entry == null) return null;
-  const [tags, , tier] = entry;
+  const [tags, tier] = entry;
   return { tags: tags.split(",").filter((tag) => tag !== ""), tier };
 });
 
@@ -496,13 +550,14 @@ const HANDLERS: {
   // lazyDataset clears failed promises so a later real request can retry.
   preload: async () => {
     await Promise.allSettled([
-      loadHoverInfo(),
-      loadVocab(),
+      loadAnchorIndex(),
+      loadKanjiParts(),
+      loadWordMeanings(),
       loadGeneralInfo(),
       loadSimilar(),
       loadDecomposition(),
       loadAnchorWordsDetails(),
-      loadAnchorWordsFrequencyTags(),
+      loadWordTags(),
       loadStructures(),
       loadReadingDetails(),
       loadSphmnComponents(),
@@ -510,6 +565,7 @@ const HANDLERS: {
     return null;
   },
   "component-map": () => loadComponents(),
+  "anchor-index": () => loadAnchorIndex(),
   "anchor-words-details": () => loadAnchorWordsDetails(),
   "kanji-anchor-words": handleKanjiAnchorWords,
   "word-tags": handleWordTags,

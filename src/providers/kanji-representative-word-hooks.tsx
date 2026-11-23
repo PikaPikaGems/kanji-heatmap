@@ -1,15 +1,16 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import {
   toAnchorWordBasics,
   withFrequencyTags,
+  type AnchorIndex,
+  type AnchorIndexEntry,
   type AnchorWordBasics,
-  type AnchorWordsDetailsFile,
   type KanjiAnchorWords,
 } from "@/lib/kanji/anchor-words";
 
 import KANJI_WORKER_SINGLETON from "@/kanji-worker/kanji-worker-promise-wrapper";
 import {
-  useGetKanjiInfoFn,
+  AnchorIndexContext,
   useIsKanjiWorkerReady,
   useWorkerQuery,
 } from "@/kanji-worker/kanji-worker-hooks";
@@ -17,10 +18,11 @@ import {
 /**
  * A kanji's main anchor word (its "representative word").
  *
- * The word and its reading are rendered by expanded grid tiles during render,
- * so they ride along in the main info snapshot. Glosses, tags, ranks and the
- * secondary word are only shown on detail surfaces and in games, so they stay
- * worker-side and are fetched on first use.
+ * The word and its reading are rendered by expanded grid tiles, so they come
+ * in the anchor index the worker sends once right after startup
+ * (kanji_words.json + word_readings.json). Glosses, tags, ranks and the
+ * secondary word's details are only shown on detail surfaces and in games, so
+ * they stay worker-side and are fetched on first use.
  */
 export interface RepresentativeWordData {
   word: string;
@@ -29,44 +31,41 @@ export interface RepresentativeWordData {
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
-const toRepresentativeWord = (
-  info: { repWord?: string | null; repReading?: string | null } | null
-): RepresentativeWordData | null =>
-  info?.repWord == null
-    ? null
-    : { word: info.repWord, reading: info.repReading ?? "" };
+/**
+ * The anchor index lookup: a kanji's main word, its readings and its secondary
+ * word ("" when none), or null when the kanji has no anchor word. The hook
+ * returns null until the index has loaded.
+ */
+export type GetAnchorIndex = (kanji: string) => AnchorIndexEntry | null;
 
-/** Synchronous: safe to call during render, no loading state. */
-export const useGetRepresentativeWordFn = () => {
-  const getKanjiInfo = useGetKanjiInfoFn();
+const lookupsByIndex = new WeakMap<AnchorIndex, GetAnchorIndex>();
 
-  return useMemo(
-    () => (kanji: string) =>
-      getKanjiInfo == null ? null : toRepresentativeWord(getKanjiInfo(kanji)),
-    [getKanjiInfo]
-  );
+/** Synchronous once loaded: safe to call during render. */
+export const useGetAnchorIndexFn = (): GetAnchorIndex | null => {
+  const index = useContext(AnchorIndexContext);
+  if (index == null) return null;
+  // One function per index, so callers that cache on it keep their cache.
+  const cached = lookupsByIndex.get(index);
+  if (cached) return cached;
+  const lookup: GetAnchorIndex = (kanji) => index[kanji] ?? null;
+  lookupsByIndex.set(index, lookup);
+  return lookup;
 };
 
-/** Synchronous word + reading for one kanji. */
+/** A kanji's main word and its readings; null while loading and when it has none. */
 export const useKanjiRepresentativeWord = (
   kanji: string
 ): RepresentativeWordData | null => {
-  const getRepresentativeWord = useGetRepresentativeWordFn();
-  return useMemo(
-    () => getRepresentativeWord(kanji),
-    [getRepresentativeWord, kanji]
-  );
+  const entry = useGetAnchorIndexFn()?.(kanji);
+  return entry ? { word: entry.word, reading: entry.reading } : null;
 };
 
 /** Until `loaded`, only the main word and its readings are known (no secondary word yet). */
 export type LoadingAnchorWords = KanjiAnchorWords & { loaded: boolean };
 
-const toBasics = (base: RepresentativeWordData) =>
-  toAnchorWordBasics(base.word, base.reading, undefined);
-
 /**
  * A kanji's anchor words with their glosses, tags, ranks and tiers. The main
- * word and its readings show at once (from the snapshot); the rest, and the
+ * word and its readings show at once (from the anchor index); the rest, and the
  * secondary word, fill in when the worker answers. Asks the worker for this
  * one kanji, so only use it where those fields are actually displayed.
  */
@@ -88,14 +87,15 @@ export const useKanjiAnchorWords = (
   if (data != null && data.main.word === base.word) {
     return { ...data, loaded: true };
   }
-  const basics = toBasics(base);
-  return (
-    basics && {
-      main: withFrequencyTags(basics.main, undefined),
-      secondary: null,
-      loaded: false,
-    }
-  );
+  return {
+    main: withFrequencyTags(
+      toAnchorWordBasics(base.word, base.reading, undefined),
+      undefined,
+      undefined
+    ),
+    secondary: null,
+    loaded: false,
+  };
 };
 
 /**
@@ -115,25 +115,23 @@ export const useWordTags = (word: string) => {
 /**
  * Anchor words (word, readings, gloss) for any kanji, looked up
  * synchronously — for a whole deck or review queue, where the per-kanji hook
- * above doesn't fit. `null` until the details file has loaded, and while
+ * above doesn't fit. `null` until the word files have loaded, and while
  * `enabled` is false (nothing is fetched).
  */
 export const useGetAnchorWordsFn = (enabled = true) => {
   const ready = useIsKanjiWorkerReady() && enabled;
-  const getRepresentativeWord = useGetRepresentativeWordFn();
 
-  const { data } = useWorkerQuery<AnchorWordsDetailsFile>(
-    ready ? () => requestWorker({ type: "anchor-words-details" }) : null,
-    [ready]
-  );
+  const { data } = useWorkerQuery<
+    Record<string, KanjiAnchorWords<AnchorWordBasics>>
+  >(ready ? () => requestWorker({ type: "anchor-words-details" }) : null, [
+    ready,
+  ]);
 
   // Memo needed: practice decks memoize (and shuffle) on this function, so a
   // new one every render would rebuild and reshuffle the deck each render.
   return useMemo(() => {
     if (data == null) return null;
-    return (kanji: string): KanjiAnchorWords<AnchorWordBasics> | null => {
-      const base = getRepresentativeWord(kanji);
-      return base && toAnchorWordBasics(base.word, base.reading, data[kanji]);
-    };
-  }, [data, getRepresentativeWord]);
+    return (kanji: string): KanjiAnchorWords<AnchorWordBasics> | null =>
+      data[kanji] ?? null;
+  }, [data]);
 };

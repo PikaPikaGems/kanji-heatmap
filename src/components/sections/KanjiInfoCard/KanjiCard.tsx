@@ -71,7 +71,6 @@ const transformKanjiWordDetails = (
 
   const result = {
     word: wordDetails.word,
-    wordKanjis: wordDetails.partsList,
     definition: wordDetails.meaning,
     spacedKana,
     highlightIndex,

@@ -78,7 +78,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
   "kun": "ひと-",
   "mainVocab": {
     "first": {
-      "meaning": "one part, one portion, one section",
+      "meaning": "1. one part; one portion; one section 2. one copy (of a book); (one) complete set (of books)",
       "partsList": [
         {
           "isKanji": true,
@@ -104,7 +104,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
       ],
     },
     "second": {
-      "meaning": "one person, being alone, being by oneself",
+      "meaning": "1. one person 2. being alone; being by oneself 3. being single; being unmarried",
       "partsList": [
         {
           "isKanji": true,
@@ -129,8 +129,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 一: no ph
   "on": "いち",
   "parts": [],
   "phonetic": undefined,
-  "repReading": "いち・ひと",
-  "repWord": "一",
   "rtk": 1,
   "strokes": 1,
   "topoTwitterIndex": 2,
@@ -168,7 +166,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
   "kun": "いつ",
   "mainVocab": {
     "first": {
-      "meaning": "5th day of the month, five days",
+      "meaning": "1. 5th day of the month 2. five days",
       "partsList": [
         {
           "isKanji": true,
@@ -194,7 +192,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
       ],
     },
     "second": {
-      "meaning": "May",
+      "meaning": "1. May 2. fifth month of the lunar calendar",
       "partsList": [
         {
           "isKanji": true,
@@ -241,8 +239,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 五: phone
       "ご",
     ],
   },
-  "repReading": "ご",
-  "repWord": "五",
   "rtk": 5,
   "strokes": 4,
   "topoTwitterIndex": 419,
@@ -280,7 +276,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
   "kun": "む",
   "mainVocab": {
     "first": {
-      "meaning": "June, sixth month of the lunar calendar",
+      "meaning": "1. June 2. sixth month of the lunar calendar",
       "partsList": [
         {
           "isKanji": true,
@@ -306,7 +302,7 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
       ],
     },
     "second": {
-      "meaning": "six",
+      "meaning": "1. six 2. six years of age 3. six o'clock (old time system)",
       "partsList": [
         {
           "isKanji": true,
@@ -340,8 +336,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 六: parts
     },
   ],
   "phonetic": undefined,
-  "repReading": "ろく",
-  "repWord": "六",
   "rtk": 6,
   "strokes": 4,
   "topoTwitterIndex": 959,
@@ -454,8 +448,6 @@ exports[`extractKanjiHoverData (characterization against real data) > 朝: phone
       "かん",
     ],
   },
-  "repReading": "あさ",
-  "repWord": "朝",
   "rtk": 53,
   "strokes": 12,
   "topoTwitterIndex": 210,

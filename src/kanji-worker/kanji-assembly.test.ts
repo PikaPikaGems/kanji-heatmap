@@ -6,11 +6,12 @@ import { VocabExtendedInfo } from "@/lib/kanji/kanji-info-types";
 import {
   ComponentsMap,
   GeneralInfoResponseType,
-  HoverInfoResponseType,
   KanjiMainInfo,
+  KanjiPartsResponseType,
   MainKanjiInfoResponseType,
-  VocabResponseType,
+  WordMeaningsResponseType,
 } from "@/lib/kanji/kanji-worker-types";
+import type { KanjiWordsFile } from "@/lib/kanji/anchor-words";
 import { decodeFurigana } from "@/lib/furigana";
 import {
   transformToGeneralKanjiInfo,
@@ -37,12 +38,13 @@ const rawMain = readV2<MainKanjiInfoResponseType>("kanji_main.json");
 const rawGeneral = readV2<GeneralInfoResponseType>(
   "kanji_extended_general.json"
 );
-const rawHover = readV2<HoverInfoResponseType>("kanji_extended_hover.json");
+const rawParts = readV2<KanjiPartsResponseType>("kanji_parts.json");
 const components = readV2<ComponentsMap>("components.json");
 const { aliases } = readV2<{ aliases: Record<string, string> }>(
   "radicals.json"
 );
-const rawVocab = readV2<VocabResponseType>("vocab.json");
+const rawWords = readV2<KanjiWordsFile>("kanji_words.json");
+const rawMeanings = readV2<WordMeaningsResponseType>("word_meanings.json");
 
 const mainInfoMap: Record<string, KanjiMainInfo> = {};
 for (const kanji of Object.keys(rawMain)) {
@@ -50,26 +52,23 @@ for (const kanji of Object.keys(rawMain)) {
 }
 
 // Mirrors what the worker's kanji-hover handler assembles before calling into
-// the pure functions under test.
-const vocabInfoFor = (word?: string) => {
-  const entry = word == null ? null : rawVocab[word];
-  if (word == null || entry == null) {
-    return null;
-  }
-  return {
-    word,
-    meaning: entry[1],
-    wordPartDetails: decodeFurigana(entry[0]),
-  };
+// the pure functions under test: a sample word is its furigana slot in
+// kanji_words.json, with its gloss from word_meanings.json.
+const vocabInfoFor = (furigana?: string) => {
+  if (!furigana) return null;
+  const wordPartDetails = decodeFurigana(furigana);
+  const word = wordPartDetails.map(([text]) => text).join("");
+  return { word, meaning: rawMeanings[word] ?? "", wordPartDetails };
 };
 
 const hoverDataFor = (kanji: string) => {
-  const hoverInfo = transformToHoverKanjiInfo(rawHover[kanji]);
+  const hoverInfo = transformToHoverKanjiInfo(rawParts[kanji]);
+  const [, , sample1, sample2] = rawWords[kanji];
   const withVocab: typeof hoverInfo & VocabExtendedInfo = {
     ...hoverInfo,
     vocabInfo: {
-      first: vocabInfoFor(hoverInfo.mainVocab[0]),
-      second: vocabInfoFor(hoverInfo.mainVocab[1]),
+      first: vocabInfoFor(sample1),
+      second: vocabInfoFor(sample2),
     },
   };
 
@@ -148,7 +147,7 @@ describe("extractKanjiHoverData (characterization against real data)", () => {
 
   it("labels every part as kanji or component consistently with the maps", () => {
     // A part mislabelled as a kanji links to a kanji page that does not exist.
-    for (const kanji of Object.keys(rawHover).slice(0, 400)) {
+    for (const kanji of Object.keys(rawParts).slice(0, 400)) {
       for (const part of hoverDataFor(kanji).parts) {
         expect(part.isKanji, `${kanji} / ${part.part}`).toBe(
           mainInfoMap[part.part] != null

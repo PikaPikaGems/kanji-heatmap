@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { PracticeButton } from "@/components/ui/practice-button";
 import useHtmlDocumentTitle from "@/hooks/use-html-document-title";
 import { useIsKanjiWorkerReady } from "@/kanji-worker/kanji-worker-hooks";
+import { useGetAnchorIndexFn } from "@/providers/kanji-representative-word-hooks";
 import { AccountGateMessage } from "@/components/mastery-review/MasteryGateScreen";
 import { isEngineAbsent } from "@/lib/engine/account-ui";
 import { useAccountStatus } from "@/lib/engine/use-account-status";
@@ -35,6 +36,7 @@ const MasteryScreen = () => {
   useHtmlDocumentTitle("Mastery");
   const account = useAccountStatus();
   const ready = useIsKanjiWorkerReady();
+  const anchorIndexReady = useGetAnchorIndexFn() != null;
   const pile = useReviewPileByKanji();
 
   if (account.kind === "loading") {
@@ -86,7 +88,9 @@ const MasteryScreen = () => {
           </>
         }
       >
-        {ready ? (
+        {/* Tiles wait for the anchor index too: it decides which kanji have
+            cards, so tiles never paint and then recolor. */}
+        {ready && anchorIndexReady ? (
           <MasteryTileColors>
             <SuspendedKanjiList />
           </MasteryTileColors>

@@ -1,32 +1,40 @@
 import type { CommonWordEntry } from "@/lib/sample-vocabulary";
 
 /**
- * Anchor words (data handoff: jp-misc-data
- * kanji-heatmap-build-2/docs/ANCHOR_WORDS_APP_HANDOFF.md). Each kanji has a
- * main word (in kanji_main.json) and maybe a secondary word (in
- * anchor_words_details.json).
+ * Anchor words. Each kanji has a main word and maybe a secondary word
+ * (kanji_words.json); each word's readings, gloss, tags and ranks are stored
+ * once per word (word_readings.json, word_meanings.json, word_tags.json,
+ * word_ranks.json).
  */
 
-/** Per kanji: the main word's gloss, then the secondary word, its ","-joined readings and gloss ("" when none). */
-export type AnchorWordsDetailsFile = Record<
+/** Per kanji: main anchor, secondary anchor, then two sample words as furigana; "" when missing. */
+export type KanjiWordsFile = Record<
   string,
   [
-    mainGloss: string,
-    secondaryWord: string,
-    secondaryReadings: string,
-    secondaryGloss: string,
+    mainAnchor: string,
+    secondaryAnchor: string,
+    sample1Furigana: string,
+    sample2Furigana: string,
   ]
 >;
 
-/**
- * Per word: ","-joined tags, frequency ranks and the tier emoji. Anchor words
- * (main and secondary) have 17 ranks (-1 = not ranked); sample words that
- * aren't anchor words have none (ranks only show for anchor words).
- */
-export type AnchorWordsFrequencyTagsFile = Record<
-  string,
-  [tags: string, ranks: number[], tierEmoji: string]
->;
+/** Per word: ","-joined tags and the tier emoji (anchor and sample words). */
+export type WordTagsFile = Record<string, [tags: string, tierEmoji: string]>;
+
+/** Per anchor word: 17 frequency ranks (-1 = not ranked). */
+export type WordRanksFile = Record<string, number[]>;
+
+/** What tiles, filters and mastery read: a kanji's main word, its readings and its secondary word. */
+export type AnchorIndexEntry = {
+  word: string;
+  /** "・"-joined, as tiles show it. */
+  reading: string;
+  /** "" when the kanji has none. */
+  secondary: string;
+};
+
+/** Kanji with a main anchor word only. */
+export type AnchorIndex = Record<string, AnchorIndexEntry>;
 
 /** What the games need: the word, its readings (the kanji's own first) and a short English gloss. */
 export type AnchorWordBasics = {
@@ -50,39 +58,16 @@ export type KanjiAnchorWords<T extends AnchorWordBasics = AnchorWord> = {
   secondary: T | null;
 };
 
-const splitReadings = (joined: string | null | undefined, separator: string) =>
-  (joined ?? "").split(separator).filter((reading) => reading !== "");
-
-/**
- * A kanji's anchor words from its main-info word and reading
- * (kanji_main.json, readings "・"-joined) and its details entry (secondary
- * readings ","-joined). Null when the kanji has no main word. Without the
- * details entry the main word has no gloss and there is no secondary word.
- */
+/** One anchor word from its "・"-joined readings and its gloss ("" when none). */
 export const toAnchorWordBasics = (
-  repWord: string | null | undefined,
-  repReading: string | null | undefined,
-  details: AnchorWordsDetailsFile[string] | undefined
-): KanjiAnchorWords<AnchorWordBasics> | null => {
-  if (!repWord) return null;
-  const [mainGloss = "", secondaryWord = "", secondaryReadings = ""] =
-    details ?? [];
-  const secondaryGloss = details?.[3] ?? "";
-  return {
-    main: {
-      word: repWord,
-      readings: splitReadings(repReading, "・"),
-      englishGloss: mainGloss,
-    },
-    secondary: secondaryWord
-      ? {
-          word: secondaryWord,
-          readings: splitReadings(secondaryReadings, ","),
-          englishGloss: secondaryGloss,
-        }
-      : null,
-  };
-};
+  word: string,
+  readings: string | undefined,
+  gloss: string | undefined
+): AnchorWordBasics => ({
+  word,
+  readings: (readings ?? "").split("・").filter((reading) => reading !== ""),
+  englishGloss: gloss ?? "",
+});
 
 const JLPT_TAGS = ["n5", "n4", "n3", "n2", "n1"];
 
@@ -105,16 +90,17 @@ export const toTagsWordEntry = (
   };
 };
 
-/** Adds a word's tags, ranks and tier from the frequency-tags file. */
+/** Adds a word's tags and tier (word_tags.json) and ranks (word_ranks.json). */
 export const withFrequencyTags = (
   basics: AnchorWordBasics,
-  entry: AnchorWordsFrequencyTagsFile[string] | undefined
+  tags: WordTagsFile[string] | undefined,
+  ranks: number[] | undefined
 ): AnchorWord => {
-  const [tags = "", ranks = [], tier = ""] = entry ?? [];
+  const [joined = "", tier = ""] = tags ?? [];
   return {
     ...basics,
-    tags: tags.split(",").filter((tag) => tag !== ""),
-    ranks,
+    tags: joined.split(",").filter((tag) => tag !== ""),
+    ranks: ranks ?? [],
     tier,
   };
 };

@@ -1,28 +1,28 @@
 import type {
-  AnchorWordsDetailsFile,
-  AnchorWordsFrequencyTagsFile,
+  KanjiWordsFile,
+  WordRanksFile,
+  WordTagsFile,
 } from "@/lib/kanji/anchor-words";
 import wanakana from "@/lib/wanakana-adapter";
 import { JLTPTtypes } from "@/lib/jlpt";
 import {
   ComponentsMap,
   GeneralInfoResponseType,
-  HoverInfoResponseType,
   IndonesianMeaningsResponseType,
   KanjiGeneralInfo,
   KanjiHoverInfo,
   KanjiMainInfo,
+  KanjiPartsResponseType,
   MainKanjiInfoItemType,
   MainKanjiInfoResponseType,
   ReadingDetailsResponseType,
-  SegmentedVocabInfo,
   StructuresResponseType,
-  VocabResponseType,
+  WordMeaningsResponseType,
+  WordReadingsResponseType,
 } from "@/lib/kanji/kanji-worker-types";
 import type { RadicalPopoverText, RadicalsFile } from "@/lib/radicals";
 import type { SphmnComponentsFile } from "@/lib/sphmn-components";
 import assetsPaths from "@/lib/assets-paths";
-import { decodeFurigana } from "@/lib/furigana";
 import type {
   KanjiReadingsData,
   MultiKanjiStructureData,
@@ -44,8 +44,8 @@ export const fetchGeneralKanjiInfo = createFetch<GeneralInfoResponseType>(
   assetsPaths.EXTENDED_GENERAL_FILE_PATH
 );
 
-export const fetchHoverKanjiInfo = createFetch<HoverInfoResponseType>(
-  assetsPaths.EXTENDED_HOVER_FILE_PATH
+export const fetchKanjiParts = createFetch<KanjiPartsResponseType>(
+  assetsPaths.KANJI_PARTS_FILE
 );
 
 export const fetchComponents = createFetch<ComponentsMap>(
@@ -64,14 +64,25 @@ export const fetchSphmnComponents = createFetch<SphmnComponentsFile>(
   assetsPaths.SPHMN_COMPONENTS_FILE
 );
 
-export const fetchAnchorWordsDetails = createFetch<AnchorWordsDetailsFile>(
-  assetsPaths.ANCHOR_WORDS_DETAILS_FILE
+export const fetchKanjiWords = createFetch<KanjiWordsFile>(
+  assetsPaths.KANJI_WORDS_FILE
 );
 
-export const fetchAnchorWordsFrequencyTags =
-  createFetch<AnchorWordsFrequencyTagsFile>(
-    assetsPaths.WORD_FREQUENCY_TAGS_FILE
-  );
+export const fetchWordReadings = createFetch<WordReadingsResponseType>(
+  assetsPaths.WORD_READINGS_FILE
+);
+
+export const fetchWordMeanings = createFetch<WordMeaningsResponseType>(
+  assetsPaths.WORD_MEANINGS_FILE
+);
+
+export const fetchWordTags = createFetch<WordTagsFile>(
+  assetsPaths.WORD_TAGS_FILE
+);
+
+export const fetchWordRanks = createFetch<WordRanksFile>(
+  assetsPaths.WORD_RANKS_FILE
+);
 
 export const fetchKanjiDecomposition = createFetch<Record<string, string>>(
   assetsPaths.KANJI_DECOMPOSITION
@@ -127,19 +138,6 @@ export const fetchKanjiReadingDetails = () =>
     return cache;
   });
 
-const fetchVocabFile = createFetch<VocabResponseType>(assetsPaths.VOCAB_FILE);
-
-/** Furigana is stored as one string per word; decode it back into segments. */
-export const fetchSegmentedVocab = () =>
-  fetchVocabFile().then((entries) => {
-    const cache: Record<string, SegmentedVocabInfo> = {};
-    for (const word of Object.keys(entries)) {
-      const [furigana, meaning] = entries[word];
-      cache[word] = { meaning, parts: decodeFurigana(furigana) };
-    }
-    return cache;
-  });
-
 export const transformToMainKanjiInfo = (
   raw: MainKanjiInfoItemType
 ): KanjiMainInfo => {
@@ -155,8 +153,6 @@ export const transformToMainKanjiInfo = (
     kklcIndex,
     rtk,
     topoTwitterIndex,
-    repWord,
-    repReading,
   ] = raw;
 
   const jlptByRawLevel: Record<number, JLTPTtypes> = {
@@ -182,8 +178,6 @@ export const transformToMainKanjiInfo = (
     kklcIndex,
     rtk,
     topoTwitterIndex,
-    repWord,
-    repReading,
     frequency: {
       netflix: freq[0], //rank_netflix
       twitter: freq[1], //rank_twitter
@@ -229,9 +223,7 @@ export const transformToGeneralKanjiInfo = ([
 export const transformToHoverKanjiInfo = ([
   parts,
   phonetic,
-  mainVocab,
-]: HoverInfoResponseType[string]): KanjiHoverInfo => ({
+]: KanjiPartsResponseType[string]): KanjiHoverInfo => ({
   parts: parts ?? [],
   phonetic: (phonetic ?? "").length > 0 ? phonetic : undefined,
-  mainVocab: mainVocab ?? [],
 });

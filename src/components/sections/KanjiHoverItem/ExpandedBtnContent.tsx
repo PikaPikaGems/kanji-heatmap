@@ -8,8 +8,11 @@ const RepWordKanji = ({ kanji }: { kanji: string }) => {
 
   return (
     <>
+      {/* "·" until the anchor index lands, then the word fades in. */}
       {repWord ? (
-        <span className={`${ellipsisCn} block text-sm kanji-font`}>
+        <span
+          className={`${ellipsisCn} block text-sm kanji-font animate-fade-in-fast`}
+        >
           {repWord.word} ({repWord.reading})
         </span>
       ) : (

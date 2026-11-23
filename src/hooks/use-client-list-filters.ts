@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
+import { useGetAnchorIndexFn } from "@/providers/kanji-representative-word-hooks";
 import {
   applyClientListFilters,
   needsClientListFilters,
@@ -11,28 +11,23 @@ import { FilterSettings } from "@/lib/settings/settings";
  * Loads the sets needed for list client-side filters (the account's
  * bookmarks; representative/anchor words only when that toggle is on).
  *
- * Anchor words used to mean fetching the 168 KB representative-word JSON on
- * the main thread; the worker snapshot already carries the word per kanji.
+ * Anchor words come from the anchor index the worker sends right after
+ * startup; the list shows its loading state until it lands.
  */
 export const useClientListFilterContext = (filters: FilterSettings) => {
   const bookmarks = useBookmarkedKanji();
-  const getInfo = useGetKanjiInfoFn();
+  const getAnchor = useGetAnchorIndexFn();
   const needsAnchorData = filters.withAnchorWordsOnly;
 
-  // A membership predicate rather than a prebuilt set: the snapshot answers
+  // A membership predicate rather than a prebuilt set: the index answers
   // per kanji, so there is nothing to enumerate up front.
   const kanjiWithAnchorWords = useMemo(() => {
-    if (!needsAnchorData || getInfo == null) return null;
-    return {
-      has: (kanji: string) => {
-        const word = getInfo(kanji)?.repWord;
-        return word != null && word.length > 0;
-      },
-    };
-  }, [needsAnchorData, getInfo]);
+    if (!needsAnchorData || getAnchor == null) return null;
+    return { has: (kanji: string) => getAnchor(kanji) != null };
+  }, [needsAnchorData, getAnchor]);
 
   const isLoading =
-    (needsAnchorData && getInfo == null) ||
+    (needsAnchorData && getAnchor == null) ||
     (filters.bookmarkedOnly && bookmarks.status === "loading");
 
   return {

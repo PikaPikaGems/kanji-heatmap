@@ -3,10 +3,8 @@ import { JLPT_TYPE_ARR } from "@/lib/jlpt";
 import { JOUYOU_GRADE_TYPE_ARR } from "@/lib/jouyou-grade";
 import { K_RANK_GOOGLE } from "@/lib/options/options-constants";
 import type { SearchSettings } from "@/lib/settings/settings";
-import {
-  useGetKanjiInfoFn,
-  useKanjiSearch,
-} from "@/kanji-worker/kanji-worker-hooks";
+import { useKanjiSearch } from "@/kanji-worker/kanji-worker-hooks";
+import { useGetAnchorIndexFn } from "@/providers/kanji-representative-word-hooks";
 import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
 
 /** Every kanji, most frequent first by the Google rank. */
@@ -33,15 +31,13 @@ const BY_GOOGLE_RANK: SearchSettings = {
  */
 export const useSuggestedKanji = (): string | null => {
   const ranked = useKanjiSearch(BY_GOOGLE_RANK).data;
-  const getInfo = useGetKanjiInfoFn();
+  const getAnchor = useGetAnchorIndexFn();
   const pile = useReviewPileByKanji();
 
-  if (ranked == null || getInfo == null || pile.status !== "ready") {
+  if (ranked == null || getAnchor == null || pile.status !== "ready") {
     return null;
   }
   return (
-    ranked.find(
-      (kanji) => !pile.byKanji.has(kanji) && Boolean(getInfo(kanji)?.repWord)
-    ) ?? null
+    ranked.find((kanji) => !pile.byKanji.has(kanji) && getAnchor(kanji)) ?? null
   );
 };

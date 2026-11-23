@@ -5,6 +5,7 @@ import type {
   UTCTimestamp,
 } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import type { GetAnchorIndex } from "@/providers/kanji-representative-word-hooks";
 import { JLPT_TYPE_ARR, JLPTListItems } from "@/lib/jlpt";
 import {
   JOUYOU_GRADE_ARR,
@@ -149,7 +150,7 @@ export const tallyMastery = (
   allKanji: readonly string[],
   pile: readonly ReviewPileItemView[],
   getInfo: GetBasicKanjiInfo,
-  hasSecondaryWord: (kanji: string) => boolean,
+  getAnchor: GetAnchorIndex,
   grouping: MasteryGrouping,
   now: number
 ): MasteryTallies => {
@@ -159,9 +160,10 @@ export const tallyMastery = (
   );
 
   for (const kanji of allKanji) {
+    const anchor = getAnchor(kanji);
+    if (anchor == null) continue;
     const info = getInfo(kanji);
-    if (!info?.repWord) continue;
-    const secondary = hasSecondaryWord(kanji);
+    const secondary = anchor.secondary !== "";
     addToTotals(byGroup[grouping.keyOf(info)], secondary);
     addToTotals(all, secondary);
   }
@@ -172,10 +174,11 @@ export const tallyMastery = (
     // A piled kanji whose anchor word (or secondary word) is gone from the
     // data still has progress to show, so it joins the totals rather than
     // overflowing them.
-    if (!info?.repWord) {
+    const anchor = getAnchor(item.kanji);
+    if (anchor == null) {
       addToTotals(tally, item.secondary != null);
       addToTotals(all, item.secondary != null);
-    } else if (item.secondary && !hasSecondaryWord(item.kanji)) {
+    } else if (item.secondary && anchor.secondary === "") {
       tally.totals.secondaryReading += 1;
       all.totals.secondaryReading += 1;
     }

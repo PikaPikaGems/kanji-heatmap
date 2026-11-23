@@ -15,6 +15,7 @@ import {
   SearchResponse,
 } from "@/lib/kanji/kanji-worker-types";
 import type { RadicalPopoverDetails, RadicalsRuntime } from "@/lib/radicals";
+import type { AnchorIndex } from "@/lib/kanji/anchor-words";
 import { isKanji } from "@/lib/utils";
 import { useClientFilteredKanjis } from "@/hooks/use-client-list-filters";
 
@@ -23,6 +24,8 @@ export const GetBasicKanjiInfoContext = createContext<GetBasicKanjiInfo | null>(
   null
 );
 export const RadicalsContext = createContext<RadicalsRuntime | null>(null);
+/** Every kanji's main word, its readings and secondary word; null until loaded. */
+export const AnchorIndexContext = createContext<AnchorIndex | null>(null);
 
 const requestWorker = KANJI_WORKER_SINGLETON.request;
 
@@ -230,35 +233,24 @@ export const useKanjiSearchResult = () => {
   };
 };
 
-/**
- * One piece of a word (a run of kanji or kana) and, when it has one, the
- * reading shown above it as furigana.
- */
-export type WordPartDetail = [text: string, reading?: string];
-
 /** What the worker knows about a vocabulary word. */
 export interface VocabInfo {
-  /** English gloss. */
+  /** English gloss; "" when the word set has none. */
   meaning: string;
-  /** The word split into pieces, in order. */
-  parts: WordPartDetail[];
+  /** Readings, "・"-joined; "" when unknown. */
+  reading: string;
 }
 
-/** Meaning and furigana pieces for one word, from the kanji worker. */
+/** Readings and gloss for one word (anchor and sample words), from the kanji worker. */
 export const useVocabDetails = (word: string) => {
   const state = useWorkerQuery<VocabInfo | null>(
     word
       ? () =>
           requestWorker({ type: "retrieve-vocab-info", payload: word }).then(
-            (response) => {
-              if (response == null) {
-                return null;
-              }
-              return {
-                meaning: response.meaning || "",
-                parts: response.wordPartDetails,
-              };
-            }
+            (response) =>
+              response == null
+                ? null
+                : { meaning: response.meaning, reading: response.reading }
           )
       : null,
     [word]

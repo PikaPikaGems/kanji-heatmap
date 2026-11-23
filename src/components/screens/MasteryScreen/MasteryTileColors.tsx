@@ -11,14 +11,11 @@ import {
   getHeatmapMeasure,
   type HeatmapMetric,
 } from "@/lib/engine/mastery-heatmap-metrics";
-import type {
-  AnchorWordBasics,
-  KanjiAnchorWords,
-} from "@/lib/kanji/anchor-words";
-import { useGetAnchorWordsFn } from "@/providers/kanji-representative-word-hooks";
+import {
+  useGetAnchorIndexFn,
+  type GetAnchorIndex,
+} from "@/providers/kanji-representative-word-hooks";
 import { useReviewPileByKanji } from "@/lib/engine/use-review-pile";
-import { useGetKanjiInfoFn } from "@/kanji-worker/kanji-worker-hooks";
-import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
 import { useBookmarkedKanji } from "@/lib/engine/use-kanji-sets";
 import {
   BOOKMARKED_FILL_CN,
@@ -28,13 +25,8 @@ import {
 
 type TileColorLookup = (kanji: Kanji) => TileColor;
 
-type GetAnchorWords = (
-  kanji: string
-) => KanjiAnchorWords<AnchorWordBasics> | null;
-
 type CachedLookup = {
-  getInfo: GetBasicKanjiInfo | null;
-  getAnchorWords: GetAnchorWords | null;
+  getAnchor: GetAnchorIndex | null;
   /** The bookmarks to paint solid, or null when the highlight is off. */
   bookmarked: ReadonlySet<Kanji> | null;
   lookup: TileColorLookup;
@@ -42,7 +34,7 @@ type CachedLookup = {
 
 // The pile map is stable between store updates, so a lookup built for it and
 // a metric keeps its identity: tiles only re-render when the pile, the
-// metric, the kanji info or the highlighted bookmarks change (no useMemo).
+// metric, the anchor index or the highlighted bookmarks change (no useMemo).
 const lookupsByPile = new WeakMap<
   ReadonlyMap<Kanji, ReviewPileItemView>,
   Map<HeatmapMetric, CachedLookup>
@@ -55,21 +47,20 @@ const lookupsByPile = new WeakMap<
 const hasNoCardFor = (
   kanji: Kanji,
   metric: HeatmapMetric,
-  getInfo: GetBasicKanjiInfo | null,
-  getAnchorWords: GetAnchorWords | null
+  getAnchor: GetAnchorIndex | null
 ): boolean => {
-  const info = getInfo?.(kanji);
-  if (info != null && info.repWord == null) return true;
-  if (getHeatmapCardKind(metric) !== "secondaryReading") return false;
-  const anchors = getAnchorWords?.(kanji);
-  return anchors != null && anchors.secondary == null;
+  if (getAnchor == null) return false;
+  const anchor = getAnchor(kanji);
+  if (anchor == null) return true;
+  return (
+    getHeatmapCardKind(metric) === "secondaryReading" && anchor.secondary === ""
+  );
 };
 
 const getLookup = (
   pile: ReadonlyMap<Kanji, ReviewPileItemView>,
   metric: HeatmapMetric,
-  getInfo: GetBasicKanjiInfo | null,
-  getAnchorWords: GetAnchorWords | null,
+  getAnchor: GetAnchorIndex | null,
   bookmarked: ReadonlySet<Kanji> | null
 ): TileColorLookup => {
   const byMetric = lookupsByPile.get(pile) ?? new Map();
@@ -77,8 +68,7 @@ const getLookup = (
   const cached = byMetric.get(metric);
   if (
     cached &&
-    cached.getInfo === getInfo &&
-    cached.getAnchorWords === getAnchorWords &&
+    cached.getAnchor === getAnchor &&
     cached.bookmarked === bookmarked
   ) {
     return cached.lookup;
@@ -100,10 +90,10 @@ const getLookup = (
     return {
       bgCn: getBandFillCn(measure, band),
       textCn: getBandTextCn(band),
-      dimmed: hasNoCardFor(kanji, metric, getInfo, getAnchorWords),
+      dimmed: hasNoCardFor(kanji, metric, getAnchor),
     };
   };
-  byMetric.set(metric, { getInfo, getAnchorWords, bookmarked, lookup });
+  byMetric.set(metric, { getAnchor, bookmarked, lookup });
   return lookup;
 };
 
@@ -113,19 +103,14 @@ export const MasteryTileColors = ({ children }: { children: ReactNode }) => {
   const [highlightBookmarked] = useHighlightBookmarked();
   const bookmarks = useBookmarkedKanji();
   const { byKanji } = useReviewPileByKanji();
-  const getInfo = useGetKanjiInfoFn();
-  // The secondary words are only needed to dim kanji without one.
-  const getAnchorWords = useGetAnchorWordsFn(
-    getHeatmapCardKind(metric) === "secondaryReading"
-  );
+  const getAnchor = useGetAnchorIndexFn();
 
   return (
     <TileColorContext.Provider
       value={getLookup(
         byKanji,
         metric,
-        getInfo,
-        getAnchorWords,
+        getAnchor,
         highlightBookmarked ? bookmarks.kanji : null
       )}
     >

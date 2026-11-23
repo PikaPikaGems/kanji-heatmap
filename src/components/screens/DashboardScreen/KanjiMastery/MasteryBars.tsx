@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ReviewPileItemView } from "engine-contract";
 import type { GetBasicKanjiInfo } from "@/lib/kanji/kanji-worker-types";
+import type { GetAnchorIndex } from "@/providers/kanji-representative-word-hooks";
 import type {
   MasteryCardKind,
   MasteryMetric,
@@ -42,7 +43,7 @@ export const MasteryBars = ({
   pile,
   allKanji,
   getInfo,
-  hasSecondaryWord,
+  getAnchor,
 }: {
   metric: MasteryMetric;
   shownKinds: MasteryKindFilter;
@@ -50,7 +51,7 @@ export const MasteryBars = ({
   pile: readonly ReviewPileItemView[];
   allKanji: readonly string[];
   getInfo: GetBasicKanjiInfo;
-  hasSecondaryWord: (kanji: string) => boolean;
+  getAnchor: GetAnchorIndex;
 }) => {
   const [showJouyou, setShowJouyou] = useState(false);
 
@@ -60,7 +61,7 @@ export const MasteryBars = ({
     allKanji,
     pile,
     getInfo,
-    hasSecondaryWord,
+    getAnchor,
     grouping,
     Date.now()
   );
