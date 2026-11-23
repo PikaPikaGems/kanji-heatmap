@@ -28,6 +28,8 @@ type DataPool = {
   /** Meanings and readings. Lazily loaded: absent until a text search needs it. */
   extended: Record<string, KanjiGeneralInfo>;
   similar?: Record<string, string[]>;
+  /** Indonesian meanings per kanji. Present only for opted-in "meanings" searches. */
+  indonesian?: Record<string, string[]>;
 };
 
 const jlptSort = (a: JLTPTtypes, b: JLTPTtypes) => {
@@ -159,6 +161,9 @@ const SEARCH_DESCRIPTORS: Record<SearchType, SearchDescriptor> = {
       (pool.main[kanji]?.keyword.includes(text) ?? false) ||
       pool.extended[kanji]?.meanings.find((meaning) =>
         meaning.includes(text)
+      ) != null ||
+      pool.indonesian?.[kanji]?.find((meaning) =>
+        meaning.toLowerCase().includes(text)
       ) != null,
   },
   onyomi: {

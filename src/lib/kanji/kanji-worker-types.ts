@@ -147,6 +147,12 @@ export type ReadingDetailsResponseType = Record<
  */
 export type IndonesianMeaningsResponseType = Record<string, string>;
 
+/**
+ * The search settings plus a personal preference that is not URL state:
+ * whether a "meanings" search also matches Indonesian meanings.
+ */
+export type SearchRequest = SearchSettings & { includeIndonesian?: boolean };
+
 export type WordMeaning = string;
 // One furigana segment: text plus an optional reading.
 export type { WordPartDetail } from "../furigana";
@@ -238,8 +244,8 @@ export interface WorkerApi {
    */
   preload: { payload: undefined; response: null };
   "retrieve-vocab-info": { payload: string; response: VocabInfoResponse };
-  search: { payload: SearchSettings; response: SearchResponse };
-  "search-result-count": { payload: SearchSettings; response: number };
+  search: { payload: SearchRequest; response: SearchResponse };
+  "search-result-count": { payload: SearchRequest; response: number };
   "kanji-hover": { payload: string; response: HoverItemReturnData };
   "kanji-general": { payload: string; response: GeneralKanjiItem };
   "component-map": { payload: undefined; response: ComponentsMap };
