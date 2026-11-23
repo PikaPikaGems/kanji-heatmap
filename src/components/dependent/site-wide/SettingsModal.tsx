@@ -29,10 +29,8 @@ import { SpeakButton } from "@/components/common/SpeakButton";
 import { Settings } from "lucide-react";
 import { Loader2 } from "@/components/icons";
 import { cnWarningText } from "@/lib/generic-cn";
-import {
-  downloadIndonesianMeanings,
-  useShowIndonesianMeanings,
-} from "@/providers/indonesian-meanings-hooks";
+import { downloadIndonesianMeanings } from "@/providers/indonesian-meanings-hooks";
+import { useShowIndonesianMeanings } from "@/hooks/use-show-indonesian-meanings";
 import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 import { StrokeAnimationSettingsFields } from "@/components/common/StrokeAnimationSettingsFields";
 import { useVoiceEngine } from "@/hooks/use-ai-voice";

@@ -7,6 +7,7 @@ import {
   KanjiWorkerRequestName,
   OnMessageRequestType,
   PostMessageResponseType,
+  SearchRequest,
   SegmentedVocabInfo,
   WorkerApi,
 } from "@/lib/kanji/kanji-worker-types";
@@ -172,10 +173,23 @@ const loadReadingDetails = lazyDataset(
 );
 
 /**
- * Read only by the details "Indonesian Meanings" row, which is opt-in, so it
- * is not part of `preload`.
+ * Each kanji's Indonesian meanings, split once from "a,b". Read by the details
+ * "Indonesian Meanings" row and by opted-in "meanings" searches; both are
+ * opt-in, so it is not part of `preload`.
  */
-const loadIndonesianMeanings = lazyDataset(() => fetchIndonesianMeanings());
+const loadIndonesianMeanings = lazyDataset(() =>
+  fetchIndonesianMeanings().then((joinedByKanji) => {
+    const meaningsByKanji: Record<string, string[]> = {};
+    for (const [kanji, joined] of Object.entries(joinedByKanji)) {
+      const meanings = joined
+        .split(",")
+        .map((meaning) => meaning.trim())
+        .filter((meaning) => meaning !== "");
+      if (meanings.length > 0) meaningsByKanji[kanji] = meanings;
+    }
+    return meaningsByKanji;
+  })
+);
 
 // Starts immediately: the worker exists to answer questions about this map.
 const CORE = loadMainInfo();
@@ -225,13 +239,29 @@ const needsGeneralInfo = (settings: SearchSettings) =>
 const needsSimilar = (settings: SearchSettings) =>
   settings.textSearch.type === "similar" && settings.textSearch.text !== "";
 
-const searchPool = async (settings: SearchSettings) => ({
+const needsIndonesian = (request: SearchRequest) =>
+  request.includeIndonesian === true &&
+  request.textSearch.type === "meanings" &&
+  request.textSearch.text !== "";
+
+/**
+ * Loaded on the first opted-in "meanings" search when the switch or a details
+ * drawer hasn't loaded it yet. A failed load still answers with the English
+ * matches (and lazyDataset lets the next search retry).
+ */
+const searchIndonesian = (request: SearchRequest) =>
+  needsIndonesian(request)
+    ? loadIndonesianMeanings().catch(() => ({}))
+    : Promise.resolve({});
+
+const searchPool = async (request: SearchRequest) => ({
   main: await CORE,
-  extended: needsGeneralInfo(settings) ? await loadGeneralInfo() : {},
-  similar: needsSimilar(settings) ? await loadSimilar() : {},
+  extended: needsGeneralInfo(request) ? await loadGeneralInfo() : {},
+  similar: needsSimilar(request) ? await loadSimilar() : {},
+  indonesian: await searchIndonesian(request),
 });
 
-const handleSearch = requirePayload(async (settings: SearchSettings) => {
+const handleSearch = requirePayload(async (settings: SearchRequest) => {
   const pool = await searchPool(settings);
 
   if (
@@ -300,7 +330,7 @@ const handleSphmnDrawer = async (): Promise<
 };
 
 const handleSearchResultCount = requirePayload(
-  async (settings: SearchSettings) => {
+  async (settings: SearchRequest) => {
     const pool = await searchPool(settings);
     return filterKanji(Object.keys(pool.main), settings, pool).length;
   }
@@ -430,16 +460,10 @@ const handleKanjiReadingDetails = requirePayload(async (kanji: string) => {
   return entries == null || entries.length === 0 ? null : entries;
 });
 
-/** One kanji's Indonesian meanings, split from "a,b"; null when it has none. */
-const handleIndonesianMeanings = requirePayload(async (kanji: string) => {
-  const joined = (await loadIndonesianMeanings())[kanji];
-  if (joined == null) return null;
-  const meanings = joined
-    .split(",")
-    .map((meaning) => meaning.trim())
-    .filter((meaning) => meaning !== "");
-  return meanings.length === 0 ? null : meanings;
-});
+/** One kanji's Indonesian meanings; null when it has none. */
+const handleIndonesianMeanings = requirePayload(
+  async (kanji: string) => (await loadIndonesianMeanings())[kanji] ?? null
+);
 
 /**
  * One radical's popover text, following aliases (氵 → ⺡) like every other

@@ -2,7 +2,12 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchType } from "@/lib/settings/settings";
-import { placeholderMap, SEARCH_TYPE_OPTIONS } from "@/lib/search-input-maps";
+import {
+  INDONESIAN_MEANINGS_PLACEHOLDER,
+  placeholderMap,
+  SEARCH_TYPE_OPTIONS,
+} from "@/lib/search-input-maps";
+import { useShowIndonesianMeanings } from "@/hooks/use-show-indonesian-meanings";
 import { CircleX, Search } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import BasicSelect from "@/components/common/BasicSelect";
@@ -30,6 +35,12 @@ export const SearchInput = ({
   const showDrawerLoading =
     isDrawerChunkLoading && controller.openDialogType !== "none";
 
+  const [showIndonesian] = useShowIndonesianMeanings();
+  const placeholder =
+    showIndonesian && searchType === "meanings"
+      ? INDONESIAN_MEANINGS_PLACEHOLDER
+      : placeholderMap[searchType];
+
   const fontCN =
     parsedValue === "" || searchType === "meanings" || searchType === "keyword"
       ? ""
@@ -51,7 +62,7 @@ export const SearchInput = ({
           isDrawerType && "cursor-pointer"
         )}
         value={parsedValue}
-        placeholder={placeholderMap[searchType]}
+        placeholder={placeholder}
         {...controller.inputHandlers}
       />
 

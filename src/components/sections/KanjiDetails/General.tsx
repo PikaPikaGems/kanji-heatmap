@@ -24,10 +24,8 @@ import {
 } from "@/lib/external-links";
 import { KanjiActions } from "@/components/dependent/site-wide/KanjiActionBtns";
 import { TableCellFixed } from "./TableCellFixed";
-import {
-  useIndonesianMeanings,
-  useShowIndonesianMeanings,
-} from "@/providers/indonesian-meanings-hooks";
+import { useIndonesianMeanings } from "@/providers/indonesian-meanings-hooks";
+import { useShowIndonesianMeanings } from "@/hooks/use-show-indonesian-meanings";
 import { IndonesianMeaningsCredit } from "@/components/common/IndonesianMeaningsCredit";
 
 const hasData = (data?: number) => data != null && data !== -1;
